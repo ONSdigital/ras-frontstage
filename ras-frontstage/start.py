@@ -1,6 +1,6 @@
 from flask import Flask
 app = Flask(__name__)
-#app.run(debug=True)
+app.debug = True
 
 @app.route('/')
 def hello_world():
@@ -16,6 +16,10 @@ def hello(name=None):
 @app.route('/login/')
 def log_in():
     return render_template('login.html')
+
+@app.route('/register/')
+def register():
+    return render_template('register.html')
 
 @app.route('/success/')
 def login_success():

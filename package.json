@@ -1,0 +1,26 @@
+{
+  "name": "respondant-account-services-front-stage",
+  "version": "0.0.1",
+  "description": "Front Stage application for Respondant Account Services",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ONSdigital/ras-frontstage.git"
+  },
+  "author": "Shane Edwards",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ONSdigital/ras-frontstage/issues"
+  },
+  "homepage": "https://github.com/ONSdigital/ras-frontstage",
+  "devDependencies": {
+    "bootstrap": "^3.3.7",
+    "bootstrap-sass": "^3.3.7",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-sass": "^3.1.0"
+  }
+}

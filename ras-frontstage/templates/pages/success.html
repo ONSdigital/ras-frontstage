@@ -1,14 +1,17 @@
-<h1> My surveys </h1>
+{% extends "base-sim.html" %}
+{% block title %}My surveys{% endblock %}
+{% block content %}
+    <h1> My surveys </h1>
 
-<table id="customers">
-    <thead>
+    <table id="customers">
+        <thead>
         <tr>
             <th>Status</th>
             <th>Title</th>
             <th>Action</th>
         </tr>
-    </thead>
-    <tbody>
+        </thead>
+        <tbody>
         <tr>
             <td>Open</td>
             <td>Do this</td>
@@ -29,5 +32,6 @@
             <td>Run this</td>
             <td>No</td>
         </tr>
-    </tbody>
-</table>
+        </tbody>
+    </table>
+{% endblock %}

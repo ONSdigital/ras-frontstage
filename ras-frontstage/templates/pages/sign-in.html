@@ -1,0 +1,14 @@
+{% extends "base-non-sim.html" %}
+{% block title %}Sign in{% endblock %}
+{% block content %}
+    <h1>Sign in</h1>
+    <form action="" method="post" name="login">
+        <p>Please enter your Username:<br />
+            <input name="username" value="" type="text" /><br />
+        </p>
+        <p>Enter password:<br />
+            <input type="password" name="psw" />
+        </p>
+        <p><input type="submit" value="Sign In" /></p>
+    </form>
+{% endblock %}

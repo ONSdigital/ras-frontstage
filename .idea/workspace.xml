@@ -2,14 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="962e9282-31f2-4c28-b18d-3b2d5267dfe0" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ras-frontstage/_variables.scss" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gulpfile.js" afterPath="$PROJECT_DIR$/gulpfile.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ras-frontstage/_bootstrap.scss" afterPath="$PROJECT_DIR$/ras-frontstage/_bootstrap.scss" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ras-frontstage/_variables.scss" afterPath="$PROJECT_DIR$/ras-frontstage/_variables.scss" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ras-frontstage/start.py" afterPath="$PROJECT_DIR$/ras-frontstage/start.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ras-frontstage/static/site.min.css" afterPath="$PROJECT_DIR$/ras-frontstage/static/site.min.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ras-frontstage/templates/base-non-sim.html" afterPath="$PROJECT_DIR$/ras-frontstage/templates/base-non-sim.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ras-frontstage/templates/base-sim.html" afterPath="$PROJECT_DIR$/ras-frontstage/templates/base-sim.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ras-frontstage/templates/pages/sign-in.html" afterPath="$PROJECT_DIR$/ras-frontstage/templates/pages/sign-in.html" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -33,8 +30,18 @@
       <file leaf-file-name="base-non-sim.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ras-frontstage/templates/base-non-sim.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="22" column="0" lean-forward="false" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
+            <state relative-caret-position="300">
+              <caret line="20" column="7" lean-forward="true" selection-start-line="20" selection-start-column="7" selection-end-line="20" selection-end-column="7" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="start.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ras-frontstage/start.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="75">
+              <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -43,24 +50,24 @@
       <file leaf-file-name="_variables.scss" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ras-frontstage/_variables.scss">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="230">
-              <caret line="288" column="0" lean-forward="true" selection-start-line="288" selection-start-column="0" selection-end-line="288" selection-end-column="0" />
+            <state relative-caret-position="135">
+              <caret line="333" column="29" lean-forward="false" selection-start-line="333" selection-start-column="29" selection-end-line="333" selection-end-column="29" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="site.min.css" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/ras-frontstage/static/site.min.css">
+      <file leaf-file-name="_bootstrap.scss" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ras-frontstage/_bootstrap.scss">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="17" lean-forward="false" selection-start-line="0" selection-start-column="17" selection-end-line="0" selection-end-column="17" />
+            <state relative-caret-position="105">
+              <caret line="7" column="53" lean-forward="false" selection-start-line="7" selection-start-column="53" selection-end-line="7" selection-end-column="53" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="gulpfile.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="gulpfile.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/gulpfile.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="240">
@@ -84,8 +91,12 @@
       <find>node_</find>
       <find>1000px</find>
       <find>600px</find>
-      <find>border : 1px solid red;</find>
       <find>solid red</find>
+      <find>24px</find>
+      <find>300px</find>
+      <find>1200px</find>
+      <find>1px solid red</find>
+      <find>border : 1px solid red;</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -113,15 +124,15 @@
         <option value="$PROJECT_DIR$/ras-frontstage/main.scss" />
         <option value="$PROJECT_DIR$/ras-frontstage/templates/partials/header-sim.html" />
         <option value="$PROJECT_DIR$/ras-frontstage/templates/pages/hello.html" />
-        <option value="$PROJECT_DIR$/ras-frontstage/start.py" />
         <option value="$PROJECT_DIR$/ras-frontstage/templates/pages/sign-in.html" />
         <option value="$PROJECT_DIR$/ras-frontstage/templates/base-sim.html" />
         <option value="$PROJECT_DIR$/ras-frontstage/templates/base-non-sim.html" />
-        <option value="$PROJECT_DIR$/ras-frontstage/_bootstrap.scss" />
         <option value="$PROJECT_DIR$/ras-frontstage/main.sass" />
         <option value="$PROJECT_DIR$/gulpfile.js" />
-        <option value="$PROJECT_DIR$/ras-frontstage/_variables.scss" />
         <option value="$PROJECT_DIR$/ras-frontstage/static/site.min.css" />
+        <option value="$PROJECT_DIR$/ras-frontstage/start.py" />
+        <option value="$PROJECT_DIR$/ras-frontstage/_variables.scss" />
+        <option value="$PROJECT_DIR$/ras-frontstage/_bootstrap.scss" />
       </list>
     </option>
   </component>
@@ -141,10 +152,10 @@
     <handled-path value="$PROJECT_DIR$/node_modules" />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="98" />
-    <option name="y" value="-1056" />
-    <option name="width" value="1482" />
-    <option name="height" value="1026" />
+    <option name="x" value="78" />
+    <option name="y" value="-1057" />
+    <option name="width" value="1516" />
+    <option name="height" value="1005" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -311,20 +322,20 @@
       <option name="presentableId" value="Default" />
       <updated>1484920212143</updated>
       <workItem from="1484920216588" duration="3430000" />
-      <workItem from="1485163911141" duration="13846000" />
+      <workItem from="1485163911141" duration="16585000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="17276000" />
+    <option name="totallyTimeSpent" value="20015000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="98" y="-1056" width="1482" height="1026" extended-state="0" />
+    <frame x="78" y="-1057" width="1516" height="1005" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24089068" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2328496" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.28418803" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -447,14 +458,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ras-frontstage/start.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="30" column="0" lean-forward="true" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ras-frontstage/templates/partials/footer.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="15">
@@ -519,6 +522,38 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/ras-frontstage/templates/base-non-sim.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="20" column="7" lean-forward="true" selection-start-line="20" selection-start-column="7" selection-end-line="20" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ras-frontstage/static/site.min.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="0" lean-forward="true" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ras-frontstage/start.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ras-frontstage/_variables.scss">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="333" column="29" lean-forward="false" selection-start-line="333" selection-start-column="29" selection-end-line="333" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ras-frontstage/main.sass">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="15">
@@ -527,18 +562,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ras-frontstage/templates/base-non-sim.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="22" column="0" lean-forward="false" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ras-frontstage/_bootstrap.scss">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="600">
-          <caret line="40" column="0" lean-forward="true" selection-start-line="40" selection-start-column="0" selection-end-line="40" selection-end-column="0" />
+        <state relative-caret-position="105">
+          <caret line="7" column="53" lean-forward="false" selection-start-line="7" selection-start-column="53" selection-end-line="7" selection-end-column="53" />
           <folding />
         </state>
       </provider>
@@ -547,22 +574,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
           <caret line="16" column="56" lean-forward="false" selection-start-line="16" selection-start-column="56" selection-end-line="16" selection-end-column="56" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ras-frontstage/_variables.scss">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="230">
-          <caret line="288" column="0" lean-forward="true" selection-start-line="288" selection-start-column="0" selection-end-line="288" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ras-frontstage/static/site.min.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="17" lean-forward="false" selection-start-line="0" selection-start-column="17" selection-end-line="0" selection-end-column="17" />
           <folding />
         </state>
       </provider>

@@ -1,0 +1,40 @@
+$responsive: false;
+$grid-max-width: 800px;
+
+
+/**
+ * Boilerplate
+ */
+@import "partials/helpers/functions";
+@import "partials/helpers/mixins";
+@import "partials/helpers/mq";
+
+@import "partials/vars/colors";
+@import "partials/vars/forms";
+@import "partials/vars/grid";
+@import "partials/vars/typography";
+@import "partials/vars/vars";
+
+@import "partials/base/global";
+@import "partials/base/typography";
+@import "partials/base/forms";
+
+@import "partials/vendor/normalize";
+
+
+/**
+ * Structure/layout
+ */
+@import "partials/objects/container";
+@import "partials/objects/grid";
+
+
+/**
+ * Components
+ */
+@import "partials/components/header";
+@import "partials/components/logo";
+@import "partials/components/panel";
+
+
+//@import "partials/utilities!**!*.scss";

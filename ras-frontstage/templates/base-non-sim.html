@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     {% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'common/css/default/responsive.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename= 'ons-base.min.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename= 'site.min.css') }}" />
     <title>{% block title %}{% endblock %}</title>
@@ -9,6 +10,16 @@
 </head>
 <body>
     <div class="page">
+        <div class="page__content">
+            <div class="page__header">
+                <div class="container">
+                    {% include 'partials/header-non-sim.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--<div class="page">
         {% include 'partials/header-non-sim.html' %}
 
         <div class="container">
@@ -18,6 +29,6 @@
         {% block footer %}
         {% include 'partials/footer.html' %}
         {% endblock %}
-    </div>
+    </div>-->
 </body>
 </html>

@@ -1,23 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    {% block head %}
-    <link rel="stylesheet" href="{{ url_for('static', filename= 'ons-base.min.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename= 'site.min.css') }}" />
-    <title>{% block title %}{% endblock %}</title>
-    {% endblock %}
-</head>
-<body>
-    <div class="page">
+{% extends "layouts/_base.html" %}
+
+{% block page %}
+<div class="page__content">
+    <div class="page__header">
         {% include 'partials/header-sim.html' %}
-
-        <div class="container">
-            {% block content %}{% endblock %}
-        </div>
-
-        {% block footer %}
-        {% include 'partials/footer.html' %}
-        {% endblock %}
     </div>
-</body>
-</html>
+    <div class="container page__container">
+        {%- block content %}{% endblock content -%}
+    </div>
+</div>
+<div class="page__footer">
+    {% include 'partials/footer.html' %}
+</div>
+{% endblock page %}
+

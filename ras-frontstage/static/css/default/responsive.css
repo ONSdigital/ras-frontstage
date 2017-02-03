@@ -3370,6 +3370,68 @@ input[type=number] {
 /**
  * Components
  */
+.badge {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 0 10.799px;
+  padding: 0 0.6rem;
+  font-size: 14.4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.8;
+  border-radius: 3px;
+  text-transform: uppercase;
+  *display: inline;
+  *zoom: 1;
+}
+
+.badge--amber {
+  background-color: #fe781f;
+}
+
+.bar {
+  background: #033e58;
+  color: #fff;
+  padding: 9px 0;
+  padding: 0.5rem 0;
+}
+
+@media only screen and (min-width: 740px) {
+  .bar {
+    padding: 0.5rem 0;
+  }
+}
+
+.bar__inner {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  line-height: 1.2;
+}
+
+.bar__title {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0;
+  *display: inline;
+  *zoom: 1;
+}
+
+.bar--hero .bar__title {
+  display: block;
+  margin: 18px 0;
+  margin: 1rem 0;
+}
+
+.bar--hero .bar__inner {
+  display: block;
+}
+
 .btn {
   background-color: #0f8243;
   color: #fff;

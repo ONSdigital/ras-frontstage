@@ -36,6 +36,8 @@ $responsive: true;
 /**
  * Components
  */
+@import "partials/components/badge";
+@import "partials/components/bar";
 @import "partials/components/buttons";
 @import "partials/components/header";
 @import "partials/components/input";

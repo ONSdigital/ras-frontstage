@@ -1,0 +1,96 @@
+.page {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.page__header {
+  margin-bottom: 0;
+  &:empty {
+    display: none;
+  }
+}
+
+.page__subheader {
+  padding: 0.5rem 0;
+  overflow: hidden;
+  min-height: 2.6rem;
+  &:empty {
+    height: 1rem;
+  }
+}
+
+.page__menubtn {
+  float: right;
+  vertical-align: middle;
+  display: inline-block;
+  position: relative;
+  line-height: 1;
+}
+
+.page__previous {
+  float: left;
+  font-size: 0.8rem;
+  @include mq(m) {
+    font-size: 1rem;
+  }
+  .has-nav-open & {
+    display: none;
+  }
+}
+
+.page__previous--bottom {
+  float: none;
+}
+
+.page__content {
+  flex: 1 0 auto;
+  // NOTE: padding-bottom: 1px fixes safari scroll issue
+  // Issue number #862
+  padding-bottom: 1px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.page__nav.nav {
+  margin: 1rem 0;
+  position: absolute;
+  right: -13rem;
+  width: 12rem;
+  display: none;
+  .has-nav-open & {
+    display: block;
+  }
+  @include mq(m) {
+    display: block;
+    right: 0;
+    position: relative;
+    width: auto;
+  }
+}
+
+.page__container {
+  transition: transform 200ms ease-out;
+  .has-nav-open & {
+    transform: translateX(-12rem);
+  }
+}
+
+.page__main {
+  transform: translateX(0);
+  transition: opacity 100ms ease-out;
+  .has-nav-open & {
+    opacity: 0.2;
+    pointer-events: none;
+  }
+}
+
+.page__prefooter {
+  clear: both;
+}
+
+.page__footer {
+  clear: both;
+}

@@ -27,12 +27,18 @@ $responsive: true;
  */
 @import "partials/objects/container";
 @import "partials/objects/grid";
+@import "partials/objects/group";
+@import "partials/objects/page";
+@import "partials/objects/type-scale";
 
 
 /**
  * Components
  */
+@import "partials/components/buttons";
 @import "partials/components/header";
+@import "partials/components/input";
+@import "partials/components/input-type";
 @import "partials/components/logo";
 @import "partials/components/panel";
 

@@ -4,17 +4,3 @@
 /**
  * Components
  */
-/**
- * Footer component
- */
-.footer {
-  padding: 2rem 0;
-  background-color: #e4e8eb;
-  color: #595959;
-  /**
-   * Context modifier
-   */ }
-  .footer a:focus {
-    color: white; }
-  .page > .footer {
-    margin-top: 3rem; }

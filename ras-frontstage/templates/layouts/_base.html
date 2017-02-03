@@ -1,0 +1,57 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html lang="en-gb" dir="ltr" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html lang="en-gb" dir="ltr" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html lang="en-gb" dir="ltr" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en-gb" dir="ltr" class="no-js"> <!--<![endif]-->
+  <head>
+    {%- block head %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <title>{% block page_title %}{{ _('eQ - Survey Runner') }}{% endblock page_title %}</title>
+    <meta content="" name="description">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
+    <!--[if lt IE 9]>
+      <script src="{{ url_for('static', filename='js/vendor/html5shiv.min.js') }}"></script>
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+      <script>document.documentElement.className = document.documentElement.className.replace('no-js','has-js')</script>
+    <!--<![endif]-->
+    {%- block styles %}
+    {% set css_responsive = "css/"~_theme~"/responsive.css" %}
+    {% set css_fixed = "css/"~_theme~"/fixed.css" %}
+    <!--[if (gt IE 9) | (IEMobile)]><!-->
+    {%- if request.args.get('fixed') == 'true' %}
+      <link href="{{ url_for('static', filename=css_fixed) }}" rel="stylesheet" />
+    {%- else %}
+      <link href="{{ url_for('static', filename=css_responsive) }}" rel="stylesheet" />
+    {%- endif %}
+    <!--<![endif]-->
+    <!--[if (lte IE 9) & (!IEMobile)]>
+      <link href="{{ url_for('static', filename=css_fixed) }}" rel="stylesheet" />
+    <![endif]-->
+    {% endblock styles -%}
+    {% endblock head -%}
+    {{ analytics }}
+  </head>
+
+  <body>
+
+    {% if request.args.get('grid_debug') == 'true' and config['DEBUG'] == true %}
+      {% include 'partials/grid-overlay.html' %}
+    {% endif %}
+
+    <div class="page">
+
+      {% block page %}{% endblock %}
+
+    </div>
+
+    <!--[if gte IE 9]><!-->
+    {% block scripts %}
+      <script src="{{ url_for('static', filename='js/bundle.js') }}"></script>
+    {% endblock scripts %}
+  	<!--<![endif]-->
+
+    </body>
+</html>

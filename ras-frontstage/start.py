@@ -13,19 +13,19 @@ from flask import render_template
 @app.route('/hello/')
 @app.route('/hello/<name>')
 def hello(name=None):
-    return render_template('pages/hello.html', name=name)
+    return render_template('hello.html', name=name)
 
 @app.route('/sign-in/')
 def log_in():
-    return render_template('pages/sign-in.html')
+    return render_template('sign-in.html', _theme='default')
 
 @app.route('/register/')
 def register():
-    return render_template('pages/register.html')
+    return render_template('register.html')
 
 @app.route('/success/')
 def login_success():
-    return render_template('pages/success.html')
+    return render_template('success.html')
 
 
 #Disable cache for development

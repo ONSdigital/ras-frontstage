@@ -1,20 +1,19 @@
-{% extends "states/base-non-sim.html" %}
-{% block title %}Register{% endblock %}
-{% block content %}
-    <h1>Register</h1>
+{% extends "layouts/_onecol.html" %}
 
-    <ul>
-        <li>
-            <strong>First name</strong>
-            <input type="text" />
-        </li>
-        <li>
-            <strong>Last name</strong>
-            <input type="text" />
-        </li>
-        <li>
-            <strong>Email address</strong>
-            <input type="text" />
-        </li>
-    </ul>
-{% endblock %}
+{% block page_title %}Register{% endblock %}
+
+{% block main %}
+    <form action="#" class="form">
+        <div class="group">
+            <div class="block">
+                <div class="section">
+
+                    <h1 class="section__title saturn">Register</h1>
+
+                    <p class="section__description">Survey enrolement.</p>
+
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock main %}

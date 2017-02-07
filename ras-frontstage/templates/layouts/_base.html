@@ -7,7 +7,7 @@
     {%- block head %}
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <title>{% block page_title %}{{ _('eQ - Survey Runner') }}{% endblock page_title %}</title>
+    <title>{% block page_title %}{{ _('Survey Data Collection') }}{% endblock page_title %}</title>
     <meta content="" name="description">
     <meta content="width=device-width, initial-scale=1" name="viewport">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
@@ -27,12 +27,14 @@
       <link href="{{ url_for('static', filename=css_responsive) }}" rel="stylesheet" />
     {%- endif %}
     <!--<![endif]-->
-    <!--[if (lte IE 9) & (!IEMobile)]>
+    <!--[if (lte IE 9) & (!IEMobile)]>-->
       <link href="{{ url_for('static', filename=css_fixed) }}" rel="stylesheet" />
+    <!--<![endif]-->
     <![endif]-->
     {% endblock styles -%}
     {% endblock head -%}
     {{ analytics }}
+    <link href="{{ url_for('static', filename='site.min.css') }}" rel="stylesheet" />
   </head>
 
   <body>
@@ -43,13 +45,23 @@
 
     <div class="page">
 
-      {% block page %}{% endblock %}
+      <div class="page__content">
+        <div class="page__header">
+          {% include 'partials/header-non-sim.html' %}
+        </div>
+        <div class="container page__container">
+          {%- block content %}{% endblock content -%}
+        </div>
+      </div>
+      <div class="page__footer">
+        {% include 'partials/footer.html' %}
+      </div>
 
     </div>
 
     <!--[if gte IE 9]><!-->
     {% block scripts %}
-      <script src="{{ url_for('static', filename='js/bundle.js') }}"></script>
+      <!--<script src="{{ url_for('static', filename='js/bundle.js') }}"></script>-->
     {% endblock scripts %}
   	<!--<![endif]-->
 

@@ -1,0 +1,60 @@
+{% import 'partials/section.html' as section %}
+{% extends "layouts/_twocol.html" %}
+
+{% block page_title %}Confirm organisation and survey{% endblock %}
+
+{% block main %}
+    <form action="/enter-your-details/" class="form">
+        <div class="group">
+            <div class="block">
+
+                <h1 class="saturn">Confirm organisation and survey</h1>
+                <p>If you don't have an account, you can use your enrolment code to set one up.</p>
+
+                <ul>
+                    <li>Enrolment code: <strong>MPRTIUJKL</strong></li>
+                    <li>Organisation: <strong>Bolts and Ratchets Ltd</strong></li>
+                    <li>Survey to complete: <strong>Monthly Business Survey</strong></li>
+                </ul>
+
+                <p>Please confirm your relationship to <strong>Bolts and Ratchets Ltd</strong></p>
+
+                <p>I am:</p>
+
+                <div class="field field--radio field--multiplechoice"><!-- field--multiplechoice - class displays border -->
+                    <fieldset>
+                        <div class="field__item js-focusable-box">
+                            <input class="input input--radio js-focusable" type="radio" />
+                            <label class="label label--inline venus">the owner of, or a partner in this organisation</label>
+                        </div>
+                        <div class="field__item js-focusable-box">
+                            <input class="input input--radio js-focusable" type="radio" />
+                            <label class="label label--inline venus">a director, trustee or senior officer of this organisation (for example a company secretary)</label>
+                        </div>
+                        <div class="field__item js-focusable-box">
+                            <input class="input input--radio js-focusable" type="radio" />
+                            <label class="label label--inline venus">external to this organisation, but act on their behalf (for example an accountant)</label>
+                        </div>
+                        <div class="field__item js-focusable-box">
+                            <input class="input input--radio js-focusable" type="radio" />
+                            <label class="label label--inline venus">employed by this organisation in a professional occupation or as a senior manager</label>
+                        </div>
+                        <div class="field__item js-focusable-box">
+                            <input class="input input--radio js-focusable" type="radio" />
+                            <label class="label label--inline venus">employed by this organisation as a middle / junior manager or equivalent</label>
+                        </div>
+                        <div class="field__item js-focusable-box">
+                            <input class="input input--radio js-focusable" type="radio" />
+                            <label class="label label--inline venus">employed by this organisation in an administrative or secretarial role</label>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <br />
+
+                <button class="btn btn--secondary btn--lg venus" type="submit">Continue</button>
+
+            </div>
+        </div>
+    </form>
+{% endblock main %}

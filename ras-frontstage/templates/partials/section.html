@@ -1,5 +1,7 @@
 {% macro section_default(title, description) -%}
-    <h2 class="section__title saturn">{{ title }}</h2>
-    <p class="section__description">{{ description }}</p>
-    {{ caller() }}
+    <div class="section">
+        <h2 class="section__title saturn">{{ title }}</h2>
+        <p class="section__description mars">{{ description }}</p>
+        {{ caller() }}
+    </div>
 {% endmacro %}

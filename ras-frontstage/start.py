@@ -16,12 +16,20 @@ def hello_world():
     #return render('hello.html', name=name)
 
 @app.route('/sign-in/')
-def log_in():
+def sign_in():
     return render('sign-in.html')
 
 @app.route('/register/')
 def register():
     return render('register.html')
+
+@app.route('/confirm-organisation-survey/')
+def confirm_organisation_survey():
+    return render('confirm-organisation-survey.html')
+
+@app.route('/enter-your-details/')
+def enter_your_details():
+    return render('enter-your-details.html')
 
 
 #Disable cache for development

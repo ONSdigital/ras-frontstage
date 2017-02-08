@@ -3935,6 +3935,547 @@ input[type=number] {
   opacity: 1;
 }
 
+.field {
+  background: none;
+}
+
+.field__legend {
+  font-size: 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 9px;
+  margin-bottom: 0.5rem;
+}
+
+.field__description {
+  line-height: 1.3;
+  display: block;
+}
+
+.field__item {
+  margin: 0 9px 9px 0;
+  margin: 0 0.5rem 0.5rem 0;
+  position: relative;
+  width: 100%;
+  display: inline-block;
+  *display: inline;
+  *zoom: 1;
+}
+
+@media only screen and (min-width: 740px) {
+  .field__item {
+    width: auto;
+    min-width: 20rem;
+  }
+}
+
+.field:not(.field--cols) .field__item:last-of-type {
+  margin-bottom: 0;
+}
+
+.field__other {
+  display: none;
+  clear: both;
+  background-color: #f5f5f5;
+  padding: 0 9px 9px;
+  padding: 0 0.5rem 0.5rem;
+}
+
+.has-focus .field__other {
+  background-color: transparent;
+}
+
+input:checked ~ .field__other {
+  display: block;
+}
+
+.field--multiplechoice {
+  font-size: 0;
+}
+
+.field--multiplechoice .field__item {
+  font-size: 18px;
+  font-size: 1rem;
+  background: white;
+  border: 1px solid #999;
+  border-radius: 0.2rem;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  -webkit-transition: background-color 200ms ease-in, color 200ms ease-in, box-shadow 200ms ease-in, border-color 200ms ease-in;
+  transition: background-color 200ms ease-in, color 200ms ease-in, box-shadow 200ms ease-in, border-color 200ms ease-in;
+}
+
+.field--multiplechoice .field__item:hover {
+  border-color: #033e58;
+  box-shadow: none;
+}
+
+.field--multiplechoice .field__item.is-checked {
+  color: #222;
+  border-color: #033e58;
+  box-shadow: 0 0 0 1px #033e58;
+}
+
+.field--multiplechoice .field__item.is-checked:hover {
+  border-color: #222;
+  background-color: #eee;
+  box-shadow: 0 0 0 1px #222;
+}
+
+.field--multiplechoice .field__item.has-focus {
+  color: #222;
+  border-color: #4263c2;
+  background-color: #f5f6ff;
+  box-shadow: 0 0 0 1px #4263c2;
+}
+
+.field--multiplechoice .field__item.has-focus:hover {
+  border-color: #4263c2;
+  box-shadow: 0 0 0 1px #4263c2;
+}
+
+@media only screen and (min-width: 500px) {
+  .field--multiplechoice.field--cols {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+        -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+  }
+  .field--multiplechoice.field--cols .field__item {
+    width: calc(50% - 1rem);
+    min-width: 0;
+  }
+  .field--multiplechoice.field--cols .label {
+    width: 100%;
+  }
+  .field--multiplechoice.field--cols:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+.fieldgroup--date .fieldgroup__title {
+  font-weight: 700;
+  display: inline-block;
+  width: 100%;
+  margin: 0 0 9px;
+  margin: 0 0 0.5rem;
+  *display: inline;
+  *zoom: 1;
+}
+
+.fieldgroup--date .fieldgroup__fields {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  width: 100%;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
+}
+
+.fieldgroup--date .field {
+  margin: 0 9px 0 0;
+  margin: 0 0.5rem 0 0;
+  -webkit-box-flex: 1;
+  -webkit-flex: 1 1 0;
+      -ms-flex: 1 1 0px;
+          flex: 1 1 0;
+  clear: right;
+}
+
+@media only screen and (min-width: 500px) {
+  .fieldgroup--date .field {
+    margin-right: 1rem;
+  }
+}
+
+.fieldgroup--date .field--day {
+  max-width: 108px;
+  max-width: 6rem;
+}
+
+.fieldgroup--date .field--month {
+  -webkit-box-flex: 2;
+  -webkit-flex: 2;
+      -ms-flex: 2;
+          flex: 2;
+  max-width: 270px;
+  max-width: 15rem;
+}
+
+.fieldgroup--date .field--year {
+  margin-right: 0;
+  max-width: 108px;
+  max-width: 6rem;
+}
+
+.fieldgroup--date .input {
+  width: 100%;
+}
+
+.has-js .field--selectionbtn .input {
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+.has-js .field--selectionbtn .label {
+  padding-left: 18px;
+  padding-left: 1rem;
+  font-size: 18px;
+  font-size: 1rem;
+  height: 100%;
+}
+
+@media only screen and (min-width: 300px) and (max-width: 500px) {
+  .has-js .field--selectionbtn .label {
+    font-size: 0.8rem;
+    padding: 0.35rem;
+    padding-left: 0.5rem;
+  }
+}
+
+.field--selectionbtn .field__item {
+  font-size: 18px;
+  font-size: 1rem;
+  width: calc(50% - 0.15rem);
+  min-width: 0;
+  margin: 0 5.399px 5.399px 0;
+  margin: 0 0.3rem 0.3rem 0;
+  vertical-align: top;
+  -webkit-transition: opacity 100ms ease-out;
+  transition: opacity 100ms ease-out;
+  color: #4263c2;
+}
+
+.field--selectionbtn .field__item:nth-child(2n) {
+  margin-right: 0;
+}
+
+.field--selectionbtn .field__item:hover {
+  border-color: #033e58;
+  color: #033e58;
+}
+
+.field--selectionbtn .field__item:hover label {
+  background: transparent !important;
+}
+
+.field--selectionbtn .field__item:nth-of-type(20) {
+  -webkit-transition-delay: 500ms;
+          transition-delay: 500ms;
+}
+
+.field--selectionbtn .field__item:nth-of-type(19) {
+  -webkit-transition-delay: 475ms;
+          transition-delay: 475ms;
+}
+
+.field--selectionbtn .field__item:nth-of-type(18) {
+  -webkit-transition-delay: 450ms;
+          transition-delay: 450ms;
+}
+
+.field--selectionbtn .field__item:nth-of-type(17) {
+  -webkit-transition-delay: 425ms;
+          transition-delay: 425ms;
+}
+
+.field--selectionbtn .field__item:nth-of-type(16) {
+  -webkit-transition-delay: 400ms;
+          transition-delay: 400ms;
+}
+
+.field--selectionbtn .field__item:nth-of-type(15) {
+  -webkit-transition-delay: 375ms;
+          transition-delay: 375ms;
+}
+
+.field--selectionbtn .field__item:nth-of-type(14) {
+  -webkit-transition-delay: 350ms;
+          transition-delay: 350ms;
+}
+
+.field--selectionbtn .field__item:nth-of-type(13) {
+  -webkit-transition-delay: 325ms;
+          transition-delay: 325ms;
+}
+
+.field--selectionbtn .field__item:nth-of-type(12) {
+  -webkit-transition-delay: 300ms;
+          transition-delay: 300ms;
+}
+
+.field--selectionbtn .field__item:nth-of-type(11) {
+  -webkit-transition-delay: 275ms;
+          transition-delay: 275ms;
+}
+
+.field--selectionbtn .field__item:nth-of-type(10) {
+  -webkit-transition-delay: 250ms;
+          transition-delay: 250ms;
+}
+
+.field--selectionbtn .field__item:nth-of-type(9) {
+  -webkit-transition-delay: 225ms;
+          transition-delay: 225ms;
+}
+
+.field--selectionbtn .field__item:nth-of-type(8) {
+  -webkit-transition-delay: 200ms;
+          transition-delay: 200ms;
+}
+
+.field--selectionbtn .field__item:nth-of-type(7) {
+  -webkit-transition-delay: 175ms;
+          transition-delay: 175ms;
+}
+
+.field--selectionbtn .field__item:nth-of-type(6) {
+  -webkit-transition-delay: 150ms;
+          transition-delay: 150ms;
+}
+
+.field--selectionbtn .field__item:nth-of-type(5) {
+  -webkit-transition-delay: 125ms;
+          transition-delay: 125ms;
+}
+
+.field--selectionbtn .field__item:nth-of-type(4) {
+  -webkit-transition-delay: 100ms;
+          transition-delay: 100ms;
+}
+
+.field--selectionbtn .field__item:nth-of-type(3) {
+  -webkit-transition-delay: 75ms;
+          transition-delay: 75ms;
+}
+
+.field--selectionbtn .field__item:nth-of-type(2) {
+  -webkit-transition-delay: 50ms;
+          transition-delay: 50ms;
+}
+
+.field--selectionbtn .field__item:nth-of-type(1) {
+  -webkit-transition-delay: 25ms;
+          transition-delay: 25ms;
+}
+
+.is-closed .field--selectionbtn .field__item {
+  opacity: 0;
+}
+
+.is-closed .field--selectionbtn .field__item:nth-of-type(1) {
+  -webkit-transition-delay: 25ms;
+          transition-delay: 25ms;
+}
+
+.is-closed .field--selectionbtn .field__item:nth-of-type(2) {
+  -webkit-transition-delay: 50ms;
+          transition-delay: 50ms;
+}
+
+.is-closed .field--selectionbtn .field__item:nth-of-type(3) {
+  -webkit-transition-delay: 75ms;
+          transition-delay: 75ms;
+}
+
+.is-closed .field--selectionbtn .field__item:nth-of-type(4) {
+  -webkit-transition-delay: 100ms;
+          transition-delay: 100ms;
+}
+
+.is-closed .field--selectionbtn .field__item:nth-of-type(5) {
+  -webkit-transition-delay: 125ms;
+          transition-delay: 125ms;
+}
+
+.is-closed .field--selectionbtn .field__item:nth-of-type(6) {
+  -webkit-transition-delay: 150ms;
+          transition-delay: 150ms;
+}
+
+.is-closed .field--selectionbtn .field__item:nth-of-type(7) {
+  -webkit-transition-delay: 175ms;
+          transition-delay: 175ms;
+}
+
+.is-closed .field--selectionbtn .field__item:nth-of-type(8) {
+  -webkit-transition-delay: 200ms;
+          transition-delay: 200ms;
+}
+
+.is-closed .field--selectionbtn .field__item:nth-of-type(9) {
+  -webkit-transition-delay: 225ms;
+          transition-delay: 225ms;
+}
+
+.is-closed .field--selectionbtn .field__item:nth-of-type(10) {
+  -webkit-transition-delay: 250ms;
+          transition-delay: 250ms;
+}
+
+.is-closed .field--selectionbtn .field__item:nth-of-type(11) {
+  -webkit-transition-delay: 275ms;
+          transition-delay: 275ms;
+}
+
+.is-closed .field--selectionbtn .field__item:nth-of-type(12) {
+  -webkit-transition-delay: 300ms;
+          transition-delay: 300ms;
+}
+
+.is-closed .field--selectionbtn .field__item:nth-of-type(13) {
+  -webkit-transition-delay: 325ms;
+          transition-delay: 325ms;
+}
+
+.is-closed .field--selectionbtn .field__item:nth-of-type(14) {
+  -webkit-transition-delay: 350ms;
+          transition-delay: 350ms;
+}
+
+.is-closed .field--selectionbtn .field__item:nth-of-type(15) {
+  -webkit-transition-delay: 375ms;
+          transition-delay: 375ms;
+}
+
+.is-closed .field--selectionbtn .field__item:nth-of-type(16) {
+  -webkit-transition-delay: 400ms;
+          transition-delay: 400ms;
+}
+
+.is-closed .field--selectionbtn .field__item:nth-of-type(17) {
+  -webkit-transition-delay: 425ms;
+          transition-delay: 425ms;
+}
+
+.is-closed .field--selectionbtn .field__item:nth-of-type(18) {
+  -webkit-transition-delay: 450ms;
+          transition-delay: 450ms;
+}
+
+.is-closed .field--selectionbtn .field__item:nth-of-type(19) {
+  -webkit-transition-delay: 475ms;
+          transition-delay: 475ms;
+}
+
+.is-closed .field--selectionbtn .field__item:nth-of-type(20) {
+  -webkit-transition-delay: 500ms;
+          transition-delay: 500ms;
+}
+
+.is-open .field--selectionbtn .field__item {
+  opacity: 1;
+}
+
+.is-open .field--selectionbtn .field__item:nth-of-type(1) {
+  -webkit-transition-delay: 25ms;
+          transition-delay: 25ms;
+}
+
+.is-open .field--selectionbtn .field__item:nth-of-type(2) {
+  -webkit-transition-delay: 50ms;
+          transition-delay: 50ms;
+}
+
+.is-open .field--selectionbtn .field__item:nth-of-type(3) {
+  -webkit-transition-delay: 75ms;
+          transition-delay: 75ms;
+}
+
+.is-open .field--selectionbtn .field__item:nth-of-type(4) {
+  -webkit-transition-delay: 100ms;
+          transition-delay: 100ms;
+}
+
+.is-open .field--selectionbtn .field__item:nth-of-type(5) {
+  -webkit-transition-delay: 125ms;
+          transition-delay: 125ms;
+}
+
+.is-open .field--selectionbtn .field__item:nth-of-type(6) {
+  -webkit-transition-delay: 150ms;
+          transition-delay: 150ms;
+}
+
+.is-open .field--selectionbtn .field__item:nth-of-type(7) {
+  -webkit-transition-delay: 175ms;
+          transition-delay: 175ms;
+}
+
+.is-open .field--selectionbtn .field__item:nth-of-type(8) {
+  -webkit-transition-delay: 200ms;
+          transition-delay: 200ms;
+}
+
+.is-open .field--selectionbtn .field__item:nth-of-type(9) {
+  -webkit-transition-delay: 225ms;
+          transition-delay: 225ms;
+}
+
+.is-open .field--selectionbtn .field__item:nth-of-type(10) {
+  -webkit-transition-delay: 250ms;
+          transition-delay: 250ms;
+}
+
+.is-open .field--selectionbtn .field__item:nth-of-type(11) {
+  -webkit-transition-delay: 275ms;
+          transition-delay: 275ms;
+}
+
+.is-open .field--selectionbtn .field__item:nth-of-type(12) {
+  -webkit-transition-delay: 300ms;
+          transition-delay: 300ms;
+}
+
+.is-open .field--selectionbtn .field__item:nth-of-type(13) {
+  -webkit-transition-delay: 325ms;
+          transition-delay: 325ms;
+}
+
+.is-open .field--selectionbtn .field__item:nth-of-type(14) {
+  -webkit-transition-delay: 350ms;
+          transition-delay: 350ms;
+}
+
+.is-open .field--selectionbtn .field__item:nth-of-type(15) {
+  -webkit-transition-delay: 375ms;
+          transition-delay: 375ms;
+}
+
+.is-open .field--selectionbtn .field__item:nth-of-type(16) {
+  -webkit-transition-delay: 400ms;
+          transition-delay: 400ms;
+}
+
+.is-open .field--selectionbtn .field__item:nth-of-type(17) {
+  -webkit-transition-delay: 425ms;
+          transition-delay: 425ms;
+}
+
+.is-open .field--selectionbtn .field__item:nth-of-type(18) {
+  -webkit-transition-delay: 450ms;
+          transition-delay: 450ms;
+}
+
+.is-open .field--selectionbtn .field__item:nth-of-type(19) {
+  -webkit-transition-delay: 475ms;
+          transition-delay: 475ms;
+}
+
+.is-open .field--selectionbtn .field__item:nth-of-type(20) {
+  -webkit-transition-delay: 500ms;
+          transition-delay: 500ms;
+}
+
 .header {
   display: block;
   overflow: hidden;
@@ -4228,6 +4769,49 @@ input[type=number] {
     right: auto;
     left: calc(15.2rem - 1px);
   }
+}
+
+.label {
+  display: block;
+  margin-bottom: 7.2px;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+  color: inherit;
+}
+
+input:checked ~ .label {
+  background: #f5f5f5;
+}
+
+.has-focus input:checked ~ .label {
+  background-color: transparent;
+}
+
+.label__description {
+  line-height: 1.4;
+  display: inline-block;
+  *display: inline;
+  *zoom: 1;
+}
+
+.label--inline {
+  font-weight: 400;
+  padding: 12.6px 18px 12.6px 45px;
+  padding: 0.7rem 1rem 0.7rem 2.5rem;
+  display: block;
+  margin: 0;
+  cursor: pointer;
+}
+
+.field--textarea .label {
+  font-weight: 400;
+  margin-bottom: 36px;
+  margin-bottom: 2rem;
+}
+
+.label--small {
+  font-size: 14.4px;
+  font-size: 0.8rem;
 }
 
 .logo {

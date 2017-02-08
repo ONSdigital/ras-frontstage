@@ -71,3 +71,8 @@
 /**
  * Components
  */
+/**
+ * Temp fix
+ */
+.input--checkbox {
+  background-image: url("https://preprod-surveys.eq.ons.digital/s/img/icons/icons--check.svg"); }

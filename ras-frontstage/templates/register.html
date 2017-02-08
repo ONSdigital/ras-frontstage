@@ -1,18 +1,25 @@
-{% extends "layouts/_onecol.html" %}
+{% import 'partials/section.html' as section %}
+{% extends "layouts/_twocol.html" %}
 
 {% block page_title %}Register{% endblock %}
 
 {% block main %}
-    <form action="#" class="form">
+    <form action="/confirm-organisation-survey/" class="form">
         <div class="group">
             <div class="block">
-                <div class="section">
 
-                    <h1 class="section__title saturn">Register</h1>
+                <h1 class="saturn">Register</h1>
+                <p>If you don't have an account, you can use your enrolment code to set one up.</p>
 
-                    <p class="section__description">Survey enrolement.</p>
-
+                <div class="field">
+                    <label class="label">Enrolment code</label>
+                    <p>You'll find this in the letter we sent you</p>
+                    <input class="input input--text input-type__input" value="" type="text" />
                 </div>
+                <br />
+
+                <button class="btn btn--secondary btn--lg venus" type="submit">Continue</button>
+
             </div>
         </div>
     </form>

@@ -1,5 +1,4 @@
 {% import 'partials/section.html' as section %}
-{% import 'partials/question.html' as question %}
 {% extends "layouts/_twocol.html" %}
 
 {% block page_title %}Sign in{% endblock %}
@@ -9,41 +8,28 @@
         <div class="group">
             <div class="block">
 
+                <h1 class="saturn">Existing users</h1>
+
             {% call section.section_default(
-                "Existing users",
+                "",
                 "Sign in with your ONS surveys account details.") %}
 
-                <label>Email address</label>
                 <div class="field">
+                    <label class="label">Email address</label>
                     <input class="input input--text input-type__input" value="" type="text" />
                 </div>
                 <br />
 
-                <label>Password</label>
                 <div class="field">
+                    <label class="label">Password</label>
                     <input class="input input--text input-type__input" value="" type="text" />
                 </div>
-
-
-                <br />
-                <br />
-
-                {{ question.build_question("Email address") }}
-
-                <br />
-
-                {{ question.build_question("Password") }}
 
                 <p><a href="">Forgot password</a></p>
 
-                <br />
-
-                <button class="btn btn--secondary btn--lg venus" type="submit" name="action[submit_answers]">Sign in</button>
+                <button class="btn btn--secondary btn--lg venus" type="submit">Sign in</button>
             {% endcall %}
             </div>
         </div>
     </form>
 {% endblock main %}
-{% block sidebar %}
-    Right col
-{% endblock sidebar %}

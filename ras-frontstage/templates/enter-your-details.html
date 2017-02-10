@@ -15,13 +15,13 @@
 
                 <div class="field">
                     <label class="label">First name</label>
-                    <input class="input input--text input-type__input" value="" type="text" />
+                    <input class="input input--text input-type__input" type="text" />
                 </div>
                 <br />
 
                 <div class="field">
                     <label class="label">Last name</label>
-                    <input class="input input--text input-type__input" value="" type="text" />
+                    <input class="input input--text input-type__input" type="text" />
                 </div>
             {% endcall %}
 
@@ -31,13 +31,13 @@
 
                 <div class="field">
                     <label class="label">Enter your email address</label>
-                    <input class="input input--text input-type__input" value="" type="text" />
+                    <input class="input input--text input-type__input" type="text" />
                 </div>
                 <br />
 
                 <div class="field">
                     <label class="label">Re-type your email address</label>
-                    <input class="input input--text input-type__input" value="" type="text" />
+                    <input class="input input--text input-type__input" type="text" />
                 </div>
             {% endcall %}
 
@@ -47,13 +47,13 @@
 
                 <div class="field">
                     <label class="label">Create a password</label>
-                    <input class="input input--text input-type__input" value="" type="text" />
+                    <input class="input input--text input-type__input" type="text" />
                 </div>
                 <br />
 
                 <div class="field">
                     <label class="label">Re-type your password</label>
-                    <input class="input input--text input-type__input" value="" type="text" />
+                    <input class="input input--text input-type__input" type="text" />
                 </div>
             {% endcall %}
 
@@ -63,7 +63,7 @@
 
                 <div class="field">
                     <label class="label">Enter your phone number</label>
-                    <input class="input input--text input-type__input" value="" type="text" />
+                    <input class="input input--text input-type__input" type="text" />
                 </div>
             {% endcall %}
 
@@ -73,17 +73,15 @@
                 <div class="field field--checkbox"><!-- field--multiplechoice - class displays border -->
                     <fieldset>
                         <div class="field__item js-focusable-box is-checked">
-                            <input class="input input--checkbox js-focusable" type="checkbox">
-                            <label class="label label--inline venus">
-                                Please confirm you accept our <a href="#">Terms and Conditions (Opens in a new window.)</a>
-                            </label>
+                            <input class="input input--checkbox js-focusable" type="checkbox" id="checkbox1">
+                            <label class="label label--inline venus" for="checkbox1">Please confirm you accept our <a href="#">Terms and Conditions (Opens in a new window.)</a></label>
                         </div>
                     </fieldset>
                 </div>
             {% endcall %}
             <br />
 
-            <button class="btn btn--secondary btn--lg venus" type="submit" name="action[submit_answers]">Continue</button>
+            <button class="btn btn--secondary venus" type="submit">Continue</button>
             </div>
         </div>
     </form>

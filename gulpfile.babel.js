@@ -1,5 +1,6 @@
 import gulp from 'gulp';
 import {styles, lint as lintStyles} from './common/gulp/styles';
+import {bundle} from './common/gulp/scripts';
 import {paths} from './gulp/paths';
 
 let sass = require('gulp-sass'),
@@ -9,16 +10,27 @@ let sass = require('gulp-sass'),
 /**
  * Compile common tasks
  */
-gulp.task('common:build:styles', () => {
+gulp.task('compile:common:styles', () => {
 	return styles(paths);
 });
 
-gulp.task('watch:common:build:styles', () => {
-	gulp.watch(['./common/**/*.scss'], ['common:build:styles']);
-	styles(paths);
+gulp.task('compile:common:scripts', () => {
+	return bundle(true, paths);
+});
+
+gulp.task('watch:common:styles', ['compile:common:styles'], () => {
+	gulp.watch(['./common/assets/styles/**/*.scss'], ['compile:common:styles']);
+});
+
+gulp.task('watch:common:scripts', ['compile:common:scripts'], () => {
+	gulp.watch(['./common/assets/scripts/**/*.js'], ['compile:common:scripts']);
 });
 
 
+
+/**
+ * App specific tasks
+ */
 gulp.task('compile:sass', () => {
 
 	return gulp.src('./ras-frontstage/main.scss')
@@ -28,13 +40,14 @@ gulp.task('compile:sass', () => {
 
 });
 
-gulp.task('watch:compile:sass', ['compile:sass'], () => {
+gulp.task('watch:sass', ['compile:sass'], () => {
 	gulp.watch(['./ras-frontstage/**/*.scss'], ['compile:sass']);
 });
 
 gulp.task('dev', [
-	'watch:common:build:styles',
-	'watch:compile:sass'
+	'watch:common:styles',
+	'watch:common:scripts',
+	'watch:sass'
 ], () => {
 
 });

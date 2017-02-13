@@ -25,12 +25,15 @@ let cache;
 const b = paths => browserify({
       ...watchify.argsz,
       ...{
-          entries: [`./${paths.common}/js/polyfills.js`, `./${paths.common}/js/app/main.js`],
+          entries: [
+              `./${paths.common}/js/polyfills.js`,
+              `./${paths.common}/js/app/main.js`
+          ],
           debug: true
       }
   })
   .on('update', () => {
-      cache = bundle()
+      cache = bundle(false, paths)
   })
   .on('log', gutil.log)
   .transform('rollupify', {
@@ -43,21 +46,28 @@ const b = paths => browserify({
                   namedExports: {
                       'node_modules/events/events.js': Object.keys(require('events'))
                   }
-              }),
+               }),
               nodeResolve({
                   jsnext: true,
                   main: true,
                   preferBuiltins: false
               }),
               rollupBabel({
-                  plugins: ['lodash'],
+                  plugins: ['external-helpers', 'lodash'],
                   presets: ['es2015-rollup', 'stage-2'],
                   babelrc: false,
-                  exclude: 'node_modules/**'
+                  exclude: 'node_modules/!**'
               })
           ]
       }
   });
+
+console.log(rollupBabel({
+	plugins: ['lodash'],
+	presets: ['es2015-rollup', 'stage-2'],
+	babelrc: false,
+	exclude: 'node_modules/**'
+}));
 
 export function bundle(watch, paths) {
   const bundled = b(paths);

@@ -12,6 +12,11 @@ export const paths = {
 	scripts: {
 		dir: commonPath + '/js/',
 		input: commonPath + '/js/**/*.js',
-		output: distPath + '/js/'
+		output: distPath + '/js/',
+		browserifyEntries: [
+			`./${commonPath}/js/polyfills.js`,
+			`${appPath}/assets/js/app/main.js`
+		],
+		rollupifyEntries: `${appPath}/assets/js/app/main.js`
 	}
 };

@@ -1,4 +1,417 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+'use strict';
+
+/*
+ * classList.js: Cross-browser full element.classList implementation.
+ * 1.1.20150312
+ *
+ * By Eli Grey, http://eligrey.com
+ * License: Dedicated to the public domain.
+ *   See https://github.com/eligrey/classList.js/blob/master/LICENSE.md
+ */
+
+/*global self, document, DOMException */
+
+/*! @source http://purl.eligrey.com/github/classList.js/blob/master/classList.js */
+
+if ("document" in self) {
+
+	// Full polyfill for browsers with no classList support
+	// Including IE < Edge missing SVGElement.classList
+	if (!("classList" in document.createElement("_")) || document.createElementNS && !("classList" in document.createElementNS("http://www.w3.org/2000/svg", "g"))) {
+
+		(function (view) {
+
+			"use strict";
+
+			if (!('Element' in view)) return;
+
+			var classListProp = "classList",
+			    protoProp = "prototype",
+			    elemCtrProto = view.Element[protoProp],
+			    objCtr = Object,
+			    strTrim = String[protoProp].trim || function () {
+				return this.replace(/^\s+|\s+$/g, "");
+			},
+			    arrIndexOf = Array[protoProp].indexOf || function (item) {
+				var i = 0,
+				    len = this.length;
+				for (; i < len; i++) {
+					if (i in this && this[i] === item) {
+						return i;
+					}
+				}
+				return -1;
+			}
+			// Vendors: please allow content code to instantiate DOMExceptions
+			,
+			    DOMEx = function DOMEx(type, message) {
+				this.name = type;
+				this.code = DOMException[type];
+				this.message = message;
+			},
+			    checkTokenAndGetIndex = function checkTokenAndGetIndex(classList, token) {
+				if (token === "") {
+					throw new DOMEx("SYNTAX_ERR", "An invalid or illegal string was specified");
+				}
+				if (/\s/.test(token)) {
+					throw new DOMEx("INVALID_CHARACTER_ERR", "String contains an invalid character");
+				}
+				return arrIndexOf.call(classList, token);
+			},
+			    ClassList = function ClassList(elem) {
+				var trimmedClasses = strTrim.call(elem.getAttribute("class") || ""),
+				    classes = trimmedClasses ? trimmedClasses.split(/\s+/) : [],
+				    i = 0,
+				    len = classes.length;
+				for (; i < len; i++) {
+					this.push(classes[i]);
+				}
+				this._updateClassName = function () {
+					elem.setAttribute("class", this.toString());
+				};
+			},
+			    classListProto = ClassList[protoProp] = [],
+			    classListGetter = function classListGetter() {
+				return new ClassList(this);
+			};
+			// Most DOMException implementations don't allow calling DOMException's toString()
+			// on non-DOMExceptions. Error's toString() is sufficient here.
+			DOMEx[protoProp] = Error[protoProp];
+			classListProto.item = function (i) {
+				return this[i] || null;
+			};
+			classListProto.contains = function (token) {
+				token += "";
+				return checkTokenAndGetIndex(this, token) !== -1;
+			};
+			classListProto.add = function () {
+				var tokens = arguments,
+				    i = 0,
+				    l = tokens.length,
+				    token,
+				    updated = false;
+				do {
+					token = tokens[i] + "";
+					if (checkTokenAndGetIndex(this, token) === -1) {
+						this.push(token);
+						updated = true;
+					}
+				} while (++i < l);
+
+				if (updated) {
+					this._updateClassName();
+				}
+			};
+			classListProto.remove = function () {
+				var tokens = arguments,
+				    i = 0,
+				    l = tokens.length,
+				    token,
+				    updated = false,
+				    index;
+				do {
+					token = tokens[i] + "";
+					index = checkTokenAndGetIndex(this, token);
+					while (index !== -1) {
+						this.splice(index, 1);
+						updated = true;
+						index = checkTokenAndGetIndex(this, token);
+					}
+				} while (++i < l);
+
+				if (updated) {
+					this._updateClassName();
+				}
+			};
+			classListProto.toggle = function (token, force) {
+				token += "";
+
+				var result = this.contains(token),
+				    method = result ? force !== true && "remove" : force !== false && "add";
+
+				if (method) {
+					this[method](token);
+				}
+
+				if (force === true || force === false) {
+					return force;
+				} else {
+					return !result;
+				}
+			};
+			classListProto.toString = function () {
+				return this.join(" ");
+			};
+
+			if (objCtr.defineProperty) {
+				var classListPropDesc = {
+					get: classListGetter,
+					enumerable: true,
+					configurable: true
+				};
+				try {
+					objCtr.defineProperty(elemCtrProto, classListProp, classListPropDesc);
+				} catch (ex) {
+					// IE 8 doesn't support enumerable:true
+					if (ex.number === -0x7FF5EC54) {
+						classListPropDesc.enumerable = false;
+						objCtr.defineProperty(elemCtrProto, classListProp, classListPropDesc);
+					}
+				}
+			} else if (objCtr[protoProp].__defineGetter__) {
+				elemCtrProto.__defineGetter__(classListProp, classListGetter);
+			}
+		})(self);
+	} else {
+		// There is full or partial native classList support, so just check if we need
+		// to normalize the add/remove and toggle APIs.
+
+		(function () {
+			"use strict";
+
+			var testElement = document.createElement("_");
+
+			testElement.classList.add("c1", "c2");
+
+			// Polyfill for IE 10/11 and Firefox <26, where classList.add and
+			// classList.remove exist but support only one argument at a time.
+			if (!testElement.classList.contains("c2")) {
+				var createMethod = function createMethod(method) {
+					var original = DOMTokenList.prototype[method];
+
+					DOMTokenList.prototype[method] = function (token) {
+						var i,
+						    len = arguments.length;
+
+						for (i = 0; i < len; i++) {
+							token = arguments[i];
+							original.call(this, token);
+						}
+					};
+				};
+				createMethod('add');
+				createMethod('remove');
+			}
+
+			testElement.classList.toggle("c3", false);
+
+			// Polyfill for IE 10 and Firefox <24, where classList.toggle does not
+			// support the second argument.
+			if (testElement.classList.contains("c3")) {
+				var _toggle = DOMTokenList.prototype.toggle;
+
+				DOMTokenList.prototype.toggle = function (token, force) {
+					if (1 in arguments && !this.contains(token) === !force) {
+						return force;
+					} else {
+						return _toggle.call(this, token);
+					}
+				};
+			}
+
+			testElement = null;
+		})();
+	}
+}
+
+// From https://developer.mozilla.org/en-US/docs/Web/API/Element/closest
+if (window.Element && !Element.prototype.closest) {
+	Element.prototype.closest = function (s) {
+		var matches = (this.document || this.ownerDocument).querySelectorAll(s),
+		    i,
+		    el = this;
+		do {
+			i = matches.length;
+			while (--i >= 0 && matches.item(i) !== el) {}
+		} while (i < 0 && (el = el.parentElement));
+		return el;
+	};
+}
+
+},{}],2:[function(require,module,exports){
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],3:[function(require,module,exports){
 (function (process,global){
 'use strict';
 
@@ -47,82 +460,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
   return typeof obj;
 } : function (obj) {
   return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-};
-
-
-
-
-
-
-
-
-
-
-
-var classCallCheck = function (instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-};
-
-var createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }
-
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
-
-
-
-
-
-
-
-
-
-var inherits = function (subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      enumerable: false,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-};
-
-
-
-
-
-
-
-
-
-
-
-var possibleConstructorReturn = function (self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return call && (typeof call === "object" || typeof call === "function") ? call : self;
 };
 
 var _isObject = function _isObject(it) {
@@ -6722,722 +7059,6 @@ define(String.prototype, "padRight", "".padEnd);
   [][key] && define(Array, key, Function.call.bind([][key]));
 });
 
-/** Error message constants. */
-var FUNC_ERROR_TEXT = 'Expected a function';
-
-/**
- * The base implementation of `_.delay` and `_.defer` which accepts `args`
- * to provide to `func`.
- *
- * @private
- * @param {Function} func The function to delay.
- * @param {number} wait The number of milliseconds to delay invocation.
- * @param {Array} args The arguments to provide to `func`.
- * @returns {number|Object} Returns the timer id or timeout object.
- */
-function baseDelay$1(func, wait, args) {
-  if (typeof func != 'function') {
-    throw new TypeError(FUNC_ERROR_TEXT);
-  }
-  return setTimeout(function () {
-    func.apply(undefined, args);
-  }, wait);
-}
-
-var _baseDelay = baseDelay$1;
-
-/**
- * This method returns the first argument it receives.
- *
- * @static
- * @since 0.1.0
- * @memberOf _
- * @category Util
- * @param {*} value Any value.
- * @returns {*} Returns `value`.
- * @example
- *
- * var object = { 'a': 1 };
- *
- * console.log(_.identity(object) === object);
- * // => true
- */
-function identity$1(value) {
-  return value;
-}
-
-var identity_1 = identity$1;
-
-/**
- * A faster alternative to `Function#apply`, this function invokes `func`
- * with the `this` binding of `thisArg` and the arguments of `args`.
- *
- * @private
- * @param {Function} func The function to invoke.
- * @param {*} thisArg The `this` binding of `func`.
- * @param {Array} args The arguments to invoke `func` with.
- * @returns {*} Returns the result of `func`.
- */
-function apply$1(func, thisArg, args) {
-  switch (args.length) {
-    case 0:
-      return func.call(thisArg);
-    case 1:
-      return func.call(thisArg, args[0]);
-    case 2:
-      return func.call(thisArg, args[0], args[1]);
-    case 3:
-      return func.call(thisArg, args[0], args[1], args[2]);
-  }
-  return func.apply(thisArg, args);
-}
-
-var _apply = apply$1;
-
-var apply = _apply;
-
-/* Built-in method references for those with the same name as other `lodash` methods. */
-var nativeMax = Math.max;
-
-/**
- * A specialized version of `baseRest` which transforms the rest array.
- *
- * @private
- * @param {Function} func The function to apply a rest parameter to.
- * @param {number} [start=func.length-1] The start position of the rest parameter.
- * @param {Function} transform The rest array transform.
- * @returns {Function} Returns the new function.
- */
-function overRest$1(func, start, transform) {
-  start = nativeMax(start === undefined ? func.length - 1 : start, 0);
-  return function () {
-    var args = arguments,
-        index = -1,
-        length = nativeMax(args.length - start, 0),
-        array = Array(length);
-
-    while (++index < length) {
-      array[index] = args[start + index];
-    }
-    index = -1;
-    var otherArgs = Array(start + 1);
-    while (++index < start) {
-      otherArgs[index] = args[index];
-    }
-    otherArgs[start] = transform(array);
-    return apply(func, this, otherArgs);
-  };
-}
-
-var _overRest = overRest$1;
-
-/**
- * Creates a function that returns `value`.
- *
- * @static
- * @memberOf _
- * @since 2.4.0
- * @category Util
- * @param {*} value The value to return from the new function.
- * @returns {Function} Returns the new constant function.
- * @example
- *
- * var objects = _.times(2, _.constant({ 'a': 1 }));
- *
- * console.log(objects);
- * // => [{ 'a': 1 }, { 'a': 1 }]
- *
- * console.log(objects[0] === objects[1]);
- * // => true
- */
-function constant$1(value) {
-  return function () {
-    return value;
-  };
-}
-
-var constant_1 = constant$1;
-
-/** Detect free variable `global` from Node.js. */
-var freeGlobal$1 = _typeof(commonjsGlobal) == 'object' && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal;
-
-var _freeGlobal = freeGlobal$1;
-
-var freeGlobal = _freeGlobal;
-
-/** Detect free variable `self`. */
-var freeSelf = (typeof self === 'undefined' ? 'undefined' : _typeof(self)) == 'object' && self && self.Object === Object && self;
-
-/** Used as a reference to the global object. */
-var root$1 = freeGlobal || freeSelf || Function('return this')();
-
-var _root = root$1;
-
-var root = _root;
-
-/** Built-in value references. */
-var _Symbol2 = root.Symbol;
-
-var _Symbol$1 = _Symbol2;
-
-var _Symbol$3 = _Symbol$1;
-
-/** Used for built-in method references. */
-var objectProto$1 = Object.prototype;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty$2 = objectProto$1.hasOwnProperty;
-
-/**
- * Used to resolve the
- * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
- * of values.
- */
-var nativeObjectToString = objectProto$1.toString;
-
-/** Built-in value references. */
-var symToStringTag$1 = _Symbol$3 ? _Symbol$3.toStringTag : undefined;
-
-/**
- * A specialized version of `baseGetTag` which ignores `Symbol.toStringTag` values.
- *
- * @private
- * @param {*} value The value to query.
- * @returns {string} Returns the raw `toStringTag`.
- */
-function getRawTag$1(value) {
-  var isOwn = hasOwnProperty$2.call(value, symToStringTag$1),
-      tag = value[symToStringTag$1];
-
-  try {
-    value[symToStringTag$1] = undefined;
-    var unmasked = true;
-  } catch (e) {}
-
-  var result = nativeObjectToString.call(value);
-  if (unmasked) {
-    if (isOwn) {
-      value[symToStringTag$1] = tag;
-    } else {
-      delete value[symToStringTag$1];
-    }
-  }
-  return result;
-}
-
-var _getRawTag = getRawTag$1;
-
-/** Used for built-in method references. */
-var objectProto$2 = Object.prototype;
-
-/**
- * Used to resolve the
- * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
- * of values.
- */
-var nativeObjectToString$1 = objectProto$2.toString;
-
-/**
- * Converts `value` to a string using `Object.prototype.toString`.
- *
- * @private
- * @param {*} value The value to convert.
- * @returns {string} Returns the converted string.
- */
-function objectToString$1(value) {
-  return nativeObjectToString$1.call(value);
-}
-
-var _objectToString = objectToString$1;
-
-var _Symbol = _Symbol$1;
-var getRawTag = _getRawTag;
-var objectToString = _objectToString;
-
-/** `Object#toString` result references. */
-var nullTag = '[object Null]';
-var undefinedTag = '[object Undefined]';
-
-/** Built-in value references. */
-var symToStringTag = _Symbol ? _Symbol.toStringTag : undefined;
-
-/**
- * The base implementation of `getTag` without fallbacks for buggy environments.
- *
- * @private
- * @param {*} value The value to query.
- * @returns {string} Returns the `toStringTag`.
- */
-function baseGetTag$1(value) {
-    if (value == null) {
-        return value === undefined ? undefinedTag : nullTag;
-    }
-    return symToStringTag && symToStringTag in Object(value) ? getRawTag(value) : objectToString(value);
-}
-
-var _baseGetTag = baseGetTag$1;
-
-/**
- * Checks if `value` is the
- * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
- * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(_.noop);
- * // => true
- *
- * _.isObject(null);
- * // => false
- */
-function isObject$25(value) {
-  var type = typeof value === 'undefined' ? 'undefined' : _typeof(value);
-  return value != null && (type == 'object' || type == 'function');
-}
-
-var isObject_1 = isObject$25;
-
-var baseGetTag = _baseGetTag;
-var isObject$24 = isObject_1;
-
-/** `Object#toString` result references. */
-var asyncTag = '[object AsyncFunction]';
-var funcTag = '[object Function]';
-var genTag = '[object GeneratorFunction]';
-var proxyTag = '[object Proxy]';
-
-/**
- * Checks if `value` is classified as a `Function` object.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a function, else `false`.
- * @example
- *
- * _.isFunction(_);
- * // => true
- *
- * _.isFunction(/abc/);
- * // => false
- */
-function isFunction$1(value) {
-    if (!isObject$24(value)) {
-        return false;
-    }
-    // The use of `Object#toString` avoids issues with the `typeof` operator
-    // in Safari 9 which returns 'object' for typed arrays and other constructors.
-    var tag = baseGetTag(value);
-    return tag == funcTag || tag == genTag || tag == asyncTag || tag == proxyTag;
-}
-
-var isFunction_1 = isFunction$1;
-
-var root$2 = _root;
-
-/** Used to detect overreaching core-js shims. */
-var coreJsData$1 = root$2['__core-js_shared__'];
-
-var _coreJsData = coreJsData$1;
-
-var coreJsData = _coreJsData;
-
-/** Used to detect methods masquerading as native. */
-var maskSrcKey = function () {
-  var uid = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || '');
-  return uid ? 'Symbol(src)_1.' + uid : '';
-}();
-
-/**
- * Checks if `func` has its source masked.
- *
- * @private
- * @param {Function} func The function to check.
- * @returns {boolean} Returns `true` if `func` is masked, else `false`.
- */
-function isMasked$1(func) {
-  return !!maskSrcKey && maskSrcKey in func;
-}
-
-var _isMasked = isMasked$1;
-
-/** Used for built-in method references. */
-var funcProto$1 = Function.prototype;
-
-/** Used to resolve the decompiled source of functions. */
-var funcToString$1 = funcProto$1.toString;
-
-/**
- * Converts `func` to its source code.
- *
- * @private
- * @param {Function} func The function to convert.
- * @returns {string} Returns the source code.
- */
-function toSource$1(func) {
-  if (func != null) {
-    try {
-      return funcToString$1.call(func);
-    } catch (e) {}
-    try {
-      return func + '';
-    } catch (e) {}
-  }
-  return '';
-}
-
-var _toSource = toSource$1;
-
-var isFunction = isFunction_1;
-var isMasked = _isMasked;
-var isObject$23 = isObject_1;
-var toSource = _toSource;
-
-/**
- * Used to match `RegExp`
- * [syntax characters](http://ecma-international.org/ecma-262/7.0/#sec-patterns).
- */
-var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
-
-/** Used to detect host constructors (Safari). */
-var reIsHostCtor = /^\[object .+?Constructor\]$/;
-
-/** Used for built-in method references. */
-var funcProto = Function.prototype;
-var objectProto = Object.prototype;
-
-/** Used to resolve the decompiled source of functions. */
-var funcToString = funcProto.toString;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty$1 = objectProto.hasOwnProperty;
-
-/** Used to detect if a method is native. */
-var reIsNative = RegExp('^' + funcToString.call(hasOwnProperty$1).replace(reRegExpChar, '\\$&').replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$');
-
-/**
- * The base implementation of `_.isNative` without bad shim checks.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a native function,
- *  else `false`.
- */
-function baseIsNative$1(value) {
-  if (!isObject$23(value) || isMasked(value)) {
-    return false;
-  }
-  var pattern = isFunction(value) ? reIsNative : reIsHostCtor;
-  return pattern.test(toSource(value));
-}
-
-var _baseIsNative = baseIsNative$1;
-
-/**
- * Gets the value at `key` of `object`.
- *
- * @private
- * @param {Object} [object] The object to query.
- * @param {string} key The key of the property to get.
- * @returns {*} Returns the property value.
- */
-function getValue$1(object, key) {
-  return object == null ? undefined : object[key];
-}
-
-var _getValue = getValue$1;
-
-var baseIsNative = _baseIsNative;
-var getValue = _getValue;
-
-/**
- * Gets the native function at `key` of `object`.
- *
- * @private
- * @param {Object} object The object to query.
- * @param {string} key The key of the method to get.
- * @returns {*} Returns the function if it's native, else `undefined`.
- */
-function getNative$1(object, key) {
-  var value = getValue(object, key);
-  return baseIsNative(value) ? value : undefined;
-}
-
-var _getNative = getNative$1;
-
-var getNative = _getNative;
-
-var defineProperty$3 = function () {
-  try {
-    var func = getNative(Object, 'defineProperty');
-    func({}, '', {});
-    return func;
-  } catch (e) {}
-}();
-
-var _defineProperty = defineProperty$3;
-
-var constant = constant_1;
-var defineProperty$2 = _defineProperty;
-var identity$2 = identity_1;
-
-/**
- * The base implementation of `setToString` without support for hot loop shorting.
- *
- * @private
- * @param {Function} func The function to modify.
- * @param {Function} string The `toString` result.
- * @returns {Function} Returns `func`.
- */
-var baseSetToString$1 = !defineProperty$2 ? identity$2 : function (func, string) {
-  return defineProperty$2(func, 'toString', {
-    'configurable': true,
-    'enumerable': false,
-    'value': constant(string),
-    'writable': true
-  });
-};
-
-var _baseSetToString = baseSetToString$1;
-
-/** Used to detect hot functions by number of calls within a span of milliseconds. */
-var HOT_COUNT = 800;
-var HOT_SPAN = 16;
-
-/* Built-in method references for those with the same name as other `lodash` methods. */
-var nativeNow = Date.now;
-
-/**
- * Creates a function that'll short out and invoke `identity` instead
- * of `func` when it's called `HOT_COUNT` or more times in `HOT_SPAN`
- * milliseconds.
- *
- * @private
- * @param {Function} func The function to restrict.
- * @returns {Function} Returns the new shortable function.
- */
-function shortOut$1(func) {
-  var count = 0,
-      lastCalled = 0;
-
-  return function () {
-    var stamp = nativeNow(),
-        remaining = HOT_SPAN - (stamp - lastCalled);
-
-    lastCalled = stamp;
-    if (remaining > 0) {
-      if (++count >= HOT_COUNT) {
-        return arguments[0];
-      }
-    } else {
-      count = 0;
-    }
-    return func.apply(undefined, arguments);
-  };
-}
-
-var _shortOut = shortOut$1;
-
-var baseSetToString = _baseSetToString;
-var shortOut = _shortOut;
-
-/**
- * Sets the `toString` method of `func` to return `string`.
- *
- * @private
- * @param {Function} func The function to modify.
- * @param {Function} string The `toString` result.
- * @returns {Function} Returns `func`.
- */
-var setToString$1 = shortOut(baseSetToString);
-
-var _setToString = setToString$1;
-
-var identity = identity_1;
-var overRest = _overRest;
-var setToString = _setToString;
-
-/**
- * The base implementation of `_.rest` which doesn't validate or coerce arguments.
- *
- * @private
- * @param {Function} func The function to apply a rest parameter to.
- * @param {number} [start=func.length-1] The start position of the rest parameter.
- * @returns {Function} Returns the new function.
- */
-function baseRest$1(func, start) {
-  return setToString(overRest(func, start, identity), func + '');
-}
-
-var _baseRest = baseRest$1;
-
-/**
- * Checks if `value` is object-like. A value is object-like if it's not `null`
- * and has a `typeof` result of "object".
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
- * @example
- *
- * _.isObjectLike({});
- * // => true
- *
- * _.isObjectLike([1, 2, 3]);
- * // => true
- *
- * _.isObjectLike(_.noop);
- * // => false
- *
- * _.isObjectLike(null);
- * // => false
- */
-function isObjectLike$1(value) {
-  return value != null && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) == 'object';
-}
-
-var isObjectLike_1 = isObjectLike$1;
-
-var baseGetTag$2 = _baseGetTag;
-var isObjectLike = isObjectLike_1;
-
-/** `Object#toString` result references. */
-var symbolTag = '[object Symbol]';
-
-/**
- * Checks if `value` is classified as a `Symbol` primitive or object.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
- * @example
- *
- * _.isSymbol(Symbol.iterator);
- * // => true
- *
- * _.isSymbol('abc');
- * // => false
- */
-function isSymbol$2(value) {
-    return (typeof value === 'undefined' ? 'undefined' : _typeof(value)) == 'symbol' || isObjectLike(value) && baseGetTag$2(value) == symbolTag;
-}
-
-var isSymbol_1 = isSymbol$2;
-
-var isObject$26 = isObject_1;
-var isSymbol$1 = isSymbol_1;
-
-/** Used as references for various `Number` constants. */
-var NAN = 0 / 0;
-
-/** Used to match leading and trailing whitespace. */
-var reTrim = /^\s+|\s+$/g;
-
-/** Used to detect bad signed hexadecimal string values. */
-var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
-
-/** Used to detect binary string values. */
-var reIsBinary = /^0b[01]+$/i;
-
-/** Used to detect octal string values. */
-var reIsOctal = /^0o[0-7]+$/i;
-
-/** Built-in method references without a dependency on `root`. */
-var freeParseInt = parseInt;
-
-/**
- * Converts `value` to a number.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to process.
- * @returns {number} Returns the number.
- * @example
- *
- * _.toNumber(3.2);
- * // => 3.2
- *
- * _.toNumber(Number.MIN_VALUE);
- * // => 5e-324
- *
- * _.toNumber(Infinity);
- * // => Infinity
- *
- * _.toNumber('3.2');
- * // => 3.2
- */
-function toNumber$2(value) {
-  if (typeof value == 'number') {
-    return value;
-  }
-  if (isSymbol$1(value)) {
-    return NAN;
-  }
-  if (isObject$26(value)) {
-    var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
-    value = isObject$26(other) ? other + '' : other;
-  }
-  if (typeof value != 'string') {
-    return value === 0 ? value : +value;
-  }
-  value = value.replace(reTrim, '');
-  var isBinary = reIsBinary.test(value);
-  return isBinary || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
-}
-
-var toNumber_1 = toNumber$2;
-
-var baseDelay = _baseDelay;
-var baseRest = _baseRest;
-var toNumber$1 = toNumber_1;
-
-/**
- * Invokes `func` after `wait` milliseconds. Any additional arguments are
- * provided to `func` when it's invoked.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Function
- * @param {Function} func The function to delay.
- * @param {number} wait The number of milliseconds to delay invocation.
- * @param {...*} [args] The arguments to invoke `func` with.
- * @returns {number} Returns the timer id.
- * @example
- *
- * _.delay(function(text) {
- *   console.log(text);
- * }, 1000, 'later');
- * // => Logs 'later' after one second.
- */
-var delay = baseRest(function (func, wait, args) {
-  return baseDelay(func, toNumber$1(wait) || 0, args);
-});
-
-var delay_1 = delay;
-
 var eventReady = 'DOMContentLoaded';
 
 var callbacks = [];
@@ -7464,1566 +7085,6 @@ if (document.readyState === 'interactive') {
 } else {
   document.addEventListener(eventReady, onReady);
 }
-
-var classOpen = 'has-nav-open';
-
-ready(function () {
-  var btn = document.querySelector('.js-menu-btn');
-  var nav = document.querySelector('.js-nav');
-
-  if (!btn || !nav) return false;
-
-  var openLabel = btn.innerHTML;
-  var closeLabel = btn.getAttribute('data-close-label');
-
-  var navList = document.querySelector('.js-nav-list');
-
-  var addOpenListeners = function addOpenListeners() {
-    btn.addEventListener('click', open);
-  };
-
-  var addCloseListeners = function addCloseListeners() {
-    document.body.addEventListener('click', close);
-    document.body.addEventListener('touchend', close);
-  };
-
-  var close = function close(e) {
-    var dontClose = false;
-    if (e) {
-      var selectedNode = e.target;
-      while (!dontClose && selectedNode.parentNode) {
-        selectedNode = selectedNode.parentNode;
-        dontClose = selectedNode === navList;
-      }
-    }
-
-    if (dontClose) return false;
-
-    document.body.classList.remove(classOpen);
-    document.body.removeEventListener('click', close);
-    document.body.removeEventListener('touchend', close);
-
-    btn.innerHTML = openLabel;
-    if (e && e.target === btn) {
-      e.preventDefault();
-      e.target.blur();
-    }
-    addOpenListeners();
-  };
-
-  var open = function open(e) {
-    e.preventDefault();
-    e.target.blur();
-    document.body.classList.add(classOpen);
-    btn.removeEventListener('click', open);
-    btn.innerHTML = closeLabel;
-    delay_1(addCloseListeners, 10);
-  };
-
-  close();
-});
-
-/**
- * A specialized version of `_.forEach` for arrays without support for
- * iteratee shorthands.
- *
- * @private
- * @param {Array} [array] The array to iterate over.
- * @param {Function} iteratee The function invoked per iteration.
- * @returns {Array} Returns `array`.
- */
-function arrayEach$1(array, iteratee) {
-  var index = -1,
-      length = array == null ? 0 : array.length;
-
-  while (++index < length) {
-    if (iteratee(array[index], index, array) === false) {
-      break;
-    }
-  }
-  return array;
-}
-
-var _arrayEach = arrayEach$1;
-
-/**
- * Creates a base function for methods like `_.forIn` and `_.forOwn`.
- *
- * @private
- * @param {boolean} [fromRight] Specify iterating from right to left.
- * @returns {Function} Returns the new base function.
- */
-function createBaseFor$1(fromRight) {
-  return function (object, iteratee, keysFunc) {
-    var index = -1,
-        iterable = Object(object),
-        props = keysFunc(object),
-        length = props.length;
-
-    while (length--) {
-      var key = props[fromRight ? length : ++index];
-      if (iteratee(iterable[key], key, iterable) === false) {
-        break;
-      }
-    }
-    return object;
-  };
-}
-
-var _createBaseFor = createBaseFor$1;
-
-var createBaseFor = _createBaseFor;
-
-/**
- * The base implementation of `baseForOwn` which iterates over `object`
- * properties returned by `keysFunc` and invokes `iteratee` for each property.
- * Iteratee functions may exit iteration early by explicitly returning `false`.
- *
- * @private
- * @param {Object} object The object to iterate over.
- * @param {Function} iteratee The function invoked per iteration.
- * @param {Function} keysFunc The function to get the keys of `object`.
- * @returns {Object} Returns `object`.
- */
-var baseFor$1 = createBaseFor();
-
-var _baseFor = baseFor$1;
-
-/**
- * The base implementation of `_.times` without support for iteratee shorthands
- * or max array length checks.
- *
- * @private
- * @param {number} n The number of times to invoke `iteratee`.
- * @param {Function} iteratee The function invoked per iteration.
- * @returns {Array} Returns the array of results.
- */
-function baseTimes$1(n, iteratee) {
-  var index = -1,
-      result = Array(n);
-
-  while (++index < n) {
-    result[index] = iteratee(index);
-  }
-  return result;
-}
-
-var _baseTimes = baseTimes$1;
-
-var baseGetTag$3 = _baseGetTag;
-var isObjectLike$3 = isObjectLike_1;
-
-/** `Object#toString` result references. */
-var argsTag = '[object Arguments]';
-
-/**
- * The base implementation of `_.isArguments`.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an `arguments` object,
- */
-function baseIsArguments$1(value) {
-  return isObjectLike$3(value) && baseGetTag$3(value) == argsTag;
-}
-
-var _baseIsArguments = baseIsArguments$1;
-
-var baseIsArguments = _baseIsArguments;
-var isObjectLike$2 = isObjectLike_1;
-
-/** Used for built-in method references. */
-var objectProto$4 = Object.prototype;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty$4 = objectProto$4.hasOwnProperty;
-
-/** Built-in value references. */
-var propertyIsEnumerable = objectProto$4.propertyIsEnumerable;
-
-/**
- * Checks if `value` is likely an `arguments` object.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an `arguments` object,
- *  else `false`.
- * @example
- *
- * _.isArguments(function() { return arguments; }());
- * // => true
- *
- * _.isArguments([1, 2, 3]);
- * // => false
- */
-var isArguments$1 = baseIsArguments(function () {
-    return arguments;
-}()) ? baseIsArguments : function (value) {
-    return isObjectLike$2(value) && hasOwnProperty$4.call(value, 'callee') && !propertyIsEnumerable.call(value, 'callee');
-};
-
-var isArguments_1 = isArguments$1;
-
-/**
- * Checks if `value` is classified as an `Array` object.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an array, else `false`.
- * @example
- *
- * _.isArray([1, 2, 3]);
- * // => true
- *
- * _.isArray(document.body.children);
- * // => false
- *
- * _.isArray('abc');
- * // => false
- *
- * _.isArray(_.noop);
- * // => false
- */
-var isArray$4 = Array.isArray;
-
-var isArray_1 = isArray$4;
-
-/**
- * This method returns `false`.
- *
- * @static
- * @memberOf _
- * @since 4.13.0
- * @category Util
- * @returns {boolean} Returns `false`.
- * @example
- *
- * _.times(2, _.stubFalse);
- * // => [false, false]
- */
-function stubFalse() {
-  return false;
-}
-
-var stubFalse_1 = stubFalse;
-
-var isBuffer_1 = createCommonjsModule(function (module, exports) {
-  var root = _root,
-      stubFalse = stubFalse_1;
-
-  /** Detect free variable `exports`. */
-  var freeExports = 'object' == 'object' && exports && !exports.nodeType && exports;
-
-  /** Detect free variable `module`. */
-  var freeModule = freeExports && 'object' == 'object' && module && !module.nodeType && module;
-
-  /** Detect the popular CommonJS extension `module.exports`. */
-  var moduleExports = freeModule && freeModule.exports === freeExports;
-
-  /** Built-in value references. */
-  var Buffer = moduleExports ? root.Buffer : undefined;
-
-  /* Built-in method references for those with the same name as other `lodash` methods. */
-  var nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined;
-
-  /**
-   * Checks if `value` is a buffer.
-   *
-   * @static
-   * @memberOf _
-   * @since 4.3.0
-   * @category Lang
-   * @param {*} value The value to check.
-   * @returns {boolean} Returns `true` if `value` is a buffer, else `false`.
-   * @example
-   *
-   * _.isBuffer(new Buffer(2));
-   * // => true
-   *
-   * _.isBuffer(new Uint8Array(2));
-   * // => false
-   */
-  var isBuffer = nativeIsBuffer || stubFalse;
-
-  module.exports = isBuffer;
-});
-
-/** Used as references for various `Number` constants. */
-var MAX_SAFE_INTEGER = 9007199254740991;
-
-/** Used to detect unsigned integer values. */
-var reIsUint = /^(?:0|[1-9]\d*)$/;
-
-/**
- * Checks if `value` is a valid array-like index.
- *
- * @private
- * @param {*} value The value to check.
- * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
- * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
- */
-function isIndex$1(value, length) {
-  length = length == null ? MAX_SAFE_INTEGER : length;
-  return !!length && (typeof value == 'number' || reIsUint.test(value)) && value > -1 && value % 1 == 0 && value < length;
-}
-
-var _isIndex = isIndex$1;
-
-/** Used as references for various `Number` constants. */
-var MAX_SAFE_INTEGER$1 = 9007199254740991;
-
-/**
- * Checks if `value` is a valid array-like length.
- *
- * **Note:** This method is loosely based on
- * [`ToLength`](http://ecma-international.org/ecma-262/7.0/#sec-tolength).
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
- * @example
- *
- * _.isLength(3);
- * // => true
- *
- * _.isLength(Number.MIN_VALUE);
- * // => false
- *
- * _.isLength(Infinity);
- * // => false
- *
- * _.isLength('3');
- * // => false
- */
-function isLength$1(value) {
-  return typeof value == 'number' && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER$1;
-}
-
-var isLength_1 = isLength$1;
-
-var baseGetTag$4 = _baseGetTag;
-var isLength = isLength_1;
-var isObjectLike$4 = isObjectLike_1;
-
-/** `Object#toString` result references. */
-var argsTag$1 = '[object Arguments]';
-var arrayTag = '[object Array]';
-var boolTag = '[object Boolean]';
-var dateTag = '[object Date]';
-var errorTag = '[object Error]';
-var funcTag$1 = '[object Function]';
-var mapTag = '[object Map]';
-var numberTag = '[object Number]';
-var objectTag = '[object Object]';
-var regexpTag = '[object RegExp]';
-var setTag = '[object Set]';
-var stringTag = '[object String]';
-var weakMapTag = '[object WeakMap]';
-
-var arrayBufferTag = '[object ArrayBuffer]';
-var dataViewTag = '[object DataView]';
-var float32Tag = '[object Float32Array]';
-var float64Tag = '[object Float64Array]';
-var int8Tag = '[object Int8Array]';
-var int16Tag = '[object Int16Array]';
-var int32Tag = '[object Int32Array]';
-var uint8Tag = '[object Uint8Array]';
-var uint8ClampedTag = '[object Uint8ClampedArray]';
-var uint16Tag = '[object Uint16Array]';
-var uint32Tag = '[object Uint32Array]';
-
-/** Used to identify `toStringTag` values of typed arrays. */
-var typedArrayTags = {};
-typedArrayTags[float32Tag] = typedArrayTags[float64Tag] = typedArrayTags[int8Tag] = typedArrayTags[int16Tag] = typedArrayTags[int32Tag] = typedArrayTags[uint8Tag] = typedArrayTags[uint8ClampedTag] = typedArrayTags[uint16Tag] = typedArrayTags[uint32Tag] = true;
-typedArrayTags[argsTag$1] = typedArrayTags[arrayTag] = typedArrayTags[arrayBufferTag] = typedArrayTags[boolTag] = typedArrayTags[dataViewTag] = typedArrayTags[dateTag] = typedArrayTags[errorTag] = typedArrayTags[funcTag$1] = typedArrayTags[mapTag] = typedArrayTags[numberTag] = typedArrayTags[objectTag] = typedArrayTags[regexpTag] = typedArrayTags[setTag] = typedArrayTags[stringTag] = typedArrayTags[weakMapTag] = false;
-
-/**
- * The base implementation of `_.isTypedArray` without Node.js optimizations.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a typed array, else `false`.
- */
-function baseIsTypedArray$1(value) {
-    return isObjectLike$4(value) && isLength(value.length) && !!typedArrayTags[baseGetTag$4(value)];
-}
-
-var _baseIsTypedArray = baseIsTypedArray$1;
-
-/**
- * The base implementation of `_.unary` without support for storing metadata.
- *
- * @private
- * @param {Function} func The function to cap arguments for.
- * @returns {Function} Returns the new capped function.
- */
-function baseUnary$1(func) {
-  return function (value) {
-    return func(value);
-  };
-}
-
-var _baseUnary = baseUnary$1;
-
-var _nodeUtil = createCommonjsModule(function (module, exports) {
-  var freeGlobal = _freeGlobal;
-
-  /** Detect free variable `exports`. */
-  var freeExports = 'object' == 'object' && exports && !exports.nodeType && exports;
-
-  /** Detect free variable `module`. */
-  var freeModule = freeExports && 'object' == 'object' && module && !module.nodeType && module;
-
-  /** Detect the popular CommonJS extension `module.exports`. */
-  var moduleExports = freeModule && freeModule.exports === freeExports;
-
-  /** Detect free variable `process` from Node.js. */
-  var freeProcess = moduleExports && freeGlobal.process;
-
-  /** Used to access faster Node.js helpers. */
-  var nodeUtil = function () {
-    try {
-      return freeProcess && freeProcess.binding && freeProcess.binding('util');
-    } catch (e) {}
-  }();
-
-  module.exports = nodeUtil;
-});
-
-var baseIsTypedArray = _baseIsTypedArray;
-var baseUnary = _baseUnary;
-var nodeUtil = _nodeUtil;
-
-/* Node.js helper references. */
-var nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
-
-/**
- * Checks if `value` is classified as a typed array.
- *
- * @static
- * @memberOf _
- * @since 3.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a typed array, else `false`.
- * @example
- *
- * _.isTypedArray(new Uint8Array);
- * // => true
- *
- * _.isTypedArray([]);
- * // => false
- */
-var isTypedArray$1 = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedArray;
-
-var isTypedArray_1 = isTypedArray$1;
-
-var baseTimes = _baseTimes;
-var isArguments = isArguments_1;
-var isArray$3 = isArray_1;
-var isBuffer = isBuffer_1;
-var isIndex = _isIndex;
-var isTypedArray = isTypedArray_1;
-
-/** Used for built-in method references. */
-var objectProto$3 = Object.prototype;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty$3 = objectProto$3.hasOwnProperty;
-
-/**
- * Creates an array of the enumerable property names of the array-like `value`.
- *
- * @private
- * @param {*} value The value to query.
- * @param {boolean} inherited Specify returning inherited property names.
- * @returns {Array} Returns the array of property names.
- */
-function arrayLikeKeys$1(value, inherited) {
-  var isArr = isArray$3(value),
-      isArg = !isArr && isArguments(value),
-      isBuff = !isArr && !isArg && isBuffer(value),
-      isType = !isArr && !isArg && !isBuff && isTypedArray(value),
-      skipIndexes = isArr || isArg || isBuff || isType,
-      result = skipIndexes ? baseTimes(value.length, String) : [],
-      length = result.length;
-
-  for (var key in value) {
-    if ((inherited || hasOwnProperty$3.call(value, key)) && !(skipIndexes && (
-    // Safari 9 has enumerable `arguments.length` in strict mode.
-    key == 'length' ||
-    // Node.js 0.10 has enumerable non-index properties on buffers.
-    isBuff && (key == 'offset' || key == 'parent') ||
-    // PhantomJS 2 has enumerable non-index properties on typed arrays.
-    isType && (key == 'buffer' || key == 'byteLength' || key == 'byteOffset') ||
-    // Skip index properties.
-    isIndex(key, length)))) {
-      result.push(key);
-    }
-  }
-  return result;
-}
-
-var _arrayLikeKeys = arrayLikeKeys$1;
-
-/** Used for built-in method references. */
-var objectProto$6 = Object.prototype;
-
-/**
- * Checks if `value` is likely a prototype object.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a prototype, else `false`.
- */
-function isPrototype$1(value) {
-  var Ctor = value && value.constructor,
-      proto = typeof Ctor == 'function' && Ctor.prototype || objectProto$6;
-
-  return value === proto;
-}
-
-var _isPrototype = isPrototype$1;
-
-/**
- * Creates a unary function that invokes `func` with its argument transformed.
- *
- * @private
- * @param {Function} func The function to wrap.
- * @param {Function} transform The argument transform.
- * @returns {Function} Returns the new function.
- */
-function overArg$1(func, transform) {
-  return function (arg) {
-    return func(transform(arg));
-  };
-}
-
-var _overArg = overArg$1;
-
-var overArg = _overArg;
-
-/* Built-in method references for those with the same name as other `lodash` methods. */
-var nativeKeys$1 = overArg(Object.keys, Object);
-
-var _nativeKeys = nativeKeys$1;
-
-var isPrototype = _isPrototype;
-var nativeKeys = _nativeKeys;
-
-/** Used for built-in method references. */
-var objectProto$5 = Object.prototype;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty$5 = objectProto$5.hasOwnProperty;
-
-/**
- * The base implementation of `_.keys` which doesn't treat sparse arrays as dense.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property names.
- */
-function baseKeys$1(object) {
-  if (!isPrototype(object)) {
-    return nativeKeys(object);
-  }
-  var result = [];
-  for (var key in Object(object)) {
-    if (hasOwnProperty$5.call(object, key) && key != 'constructor') {
-      result.push(key);
-    }
-  }
-  return result;
-}
-
-var _baseKeys = baseKeys$1;
-
-var isFunction$2 = isFunction_1;
-var isLength$2 = isLength_1;
-
-/**
- * Checks if `value` is array-like. A value is considered array-like if it's
- * not a function and has a `value.length` that's an integer greater than or
- * equal to `0` and less than or equal to `Number.MAX_SAFE_INTEGER`.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
- * @example
- *
- * _.isArrayLike([1, 2, 3]);
- * // => true
- *
- * _.isArrayLike(document.body.children);
- * // => true
- *
- * _.isArrayLike('abc');
- * // => true
- *
- * _.isArrayLike(_.noop);
- * // => false
- */
-function isArrayLike$1(value) {
-  return value != null && isLength$2(value.length) && !isFunction$2(value);
-}
-
-var isArrayLike_1 = isArrayLike$1;
-
-var arrayLikeKeys = _arrayLikeKeys;
-var baseKeys = _baseKeys;
-var isArrayLike = isArrayLike_1;
-
-/**
- * Creates an array of the own enumerable property names of `object`.
- *
- * **Note:** Non-object values are coerced to objects. See the
- * [ES spec](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)
- * for more details.
- *
- * @static
- * @since 0.1.0
- * @memberOf _
- * @category Object
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property names.
- * @example
- *
- * function Foo() {
- *   this.a = 1;
- *   this.b = 2;
- * }
- *
- * Foo.prototype.c = 3;
- *
- * _.keys(new Foo);
- * // => ['a', 'b'] (iteration order is not guaranteed)
- *
- * _.keys('hi');
- * // => ['0', '1']
- */
-function keys$3(object) {
-  return isArrayLike(object) ? arrayLikeKeys(object) : baseKeys(object);
-}
-
-var keys_1 = keys$3;
-
-var baseFor = _baseFor;
-var keys$2 = keys_1;
-
-/**
- * The base implementation of `_.forOwn` without support for iteratee shorthands.
- *
- * @private
- * @param {Object} object The object to iterate over.
- * @param {Function} iteratee The function invoked per iteration.
- * @returns {Object} Returns `object`.
- */
-function baseForOwn$1(object, iteratee) {
-  return object && baseFor(object, iteratee, keys$2);
-}
-
-var _baseForOwn = baseForOwn$1;
-
-var isArrayLike$2 = isArrayLike_1;
-
-/**
- * Creates a `baseEach` or `baseEachRight` function.
- *
- * @private
- * @param {Function} eachFunc The function to iterate over a collection.
- * @param {boolean} [fromRight] Specify iterating from right to left.
- * @returns {Function} Returns the new base function.
- */
-function createBaseEach$1(eachFunc, fromRight) {
-  return function (collection, iteratee) {
-    if (collection == null) {
-      return collection;
-    }
-    if (!isArrayLike$2(collection)) {
-      return eachFunc(collection, iteratee);
-    }
-    var length = collection.length,
-        index = fromRight ? length : -1,
-        iterable = Object(collection);
-
-    while (fromRight ? index-- : ++index < length) {
-      if (iteratee(iterable[index], index, iterable) === false) {
-        break;
-      }
-    }
-    return collection;
-  };
-}
-
-var _createBaseEach = createBaseEach$1;
-
-var baseForOwn = _baseForOwn;
-var createBaseEach = _createBaseEach;
-
-/**
- * The base implementation of `_.forEach` without support for iteratee shorthands.
- *
- * @private
- * @param {Array|Object} collection The collection to iterate over.
- * @param {Function} iteratee The function invoked per iteration.
- * @returns {Array|Object} Returns `collection`.
- */
-var baseEach$1 = createBaseEach(baseForOwn);
-
-var _baseEach = baseEach$1;
-
-var identity$3 = identity_1;
-
-/**
- * Casts `value` to `identity` if it's not a function.
- *
- * @private
- * @param {*} value The value to inspect.
- * @returns {Function} Returns cast function.
- */
-function castFunction$1(value) {
-  return typeof value == 'function' ? value : identity$3;
-}
-
-var _castFunction = castFunction$1;
-
-var arrayEach = _arrayEach;
-var baseEach = _baseEach;
-var castFunction = _castFunction;
-var isArray$2 = isArray_1;
-
-/**
- * Iterates over elements of `collection` and invokes `iteratee` for each element.
- * The iteratee is invoked with three arguments: (value, index|key, collection).
- * Iteratee functions may exit iteration early by explicitly returning `false`.
- *
- * **Note:** As with other "Collections" methods, objects with a "length"
- * property are iterated like arrays. To avoid this behavior use `_.forIn`
- * or `_.forOwn` for object iteration.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @alias each
- * @category Collection
- * @param {Array|Object} collection The collection to iterate over.
- * @param {Function} [iteratee=_.identity] The function invoked per iteration.
- * @returns {Array|Object} Returns `collection`.
- * @see _.forEachRight
- * @example
- *
- * _.forEach([1, 2], function(value) {
- *   console.log(value);
- * });
- * // => Logs `1` then `2`.
- *
- * _.forEach({ 'a': 1, 'b': 2 }, function(value, key) {
- *   console.log(key);
- * });
- * // => Logs 'a' then 'b' (iteration order is not guaranteed).
- */
-function forEach(collection, iteratee) {
-  var func = isArray$2(collection) ? arrayEach : baseEach;
-  return func(collection, castFunction(iteratee));
-}
-
-var forEach_1 = forEach;
-
-var classDetails = 'js-details';
-var classTrigger = 'js-details-trigger';
-var classBody = 'js-details-body';
-var classLabel = 'js-details-label';
-var classExpandedState = 'is-expanded';
-
-var attrShowLbl = 'data-show-label';
-var attrHideLbl = 'data-hide-label';
-var attrAriaExpanaded = 'aria-expanded';
-var attrAriaHidden = 'aria-hidden';
-
-
-function detailsToggle$1() {
-  var nodeList = document.getElementsByClassName(classDetails);
-  forEach_1(nodeList, applyDetailsToggle);
-  return nodeList;
-}
-
-function applyDetailsToggle(elDetails) {
-  var elTrigger = elDetails.getElementsByClassName(classTrigger)[0];
-  var elBody = elDetails.getElementsByClassName(classBody)[0];
-  var elLabel = elDetails.getElementsByClassName(classLabel)[0];
-  var toggled = false;
-
-  elTrigger.addEventListener('click', function (e) {
-    e.preventDefault();
-    toggled = toggle(toggled, elDetails, elTrigger, elBody, elLabel);
-    return false;
-  });
-
-  return { elDetails: elDetails, elTrigger: elTrigger, elBody: elBody };
-}
-
-function open(elDetails, elBody, elLabel, elTrigger) {
-  elDetails.classList.add(classExpandedState);
-  elLabel.innerHTML = elDetails.getAttribute(attrHideLbl);
-  elTrigger.setAttribute(attrAriaExpanaded, true);
-  elBody.setAttribute(attrAriaHidden, false);
-}
-
-function close(elDetails, elBody, elLabel, elTrigger) {
-  elDetails.classList.remove(classExpandedState);
-  elLabel.innerHTML = elDetails.getAttribute(attrShowLbl);
-  elTrigger.setAttribute(attrAriaExpanaded, false);
-  elBody.setAttribute(attrAriaHidden, true);
-}
-
-function toggle(toggled, elDetails, elTrigger, elBody, elLabel) {
-  !toggled ? open(elDetails, elBody, elLabel, elTrigger) : close(elDetails, elBody, elLabel, elTrigger);
-  return !toggled;
-}
-
-ready(detailsToggle$1);
-
-var root$3 = _root;
-
-/**
- * Gets the timestamp of the number of milliseconds that have elapsed since
- * the Unix epoch (1 January 1970 00:00:00 UTC).
- *
- * @static
- * @memberOf _
- * @since 2.4.0
- * @category Date
- * @returns {number} Returns the timestamp.
- * @example
- *
- * _.defer(function(stamp) {
- *   console.log(_.now() - stamp);
- * }, _.now());
- * // => Logs the number of milliseconds it took for the deferred invocation.
- */
-var now$1 = function now() {
-  return root$3.Date.now();
-};
-
-var now_1 = now$1;
-
-var isObject$27 = isObject_1;
-var now = now_1;
-var toNumber$3 = toNumber_1;
-
-/** Error message constants. */
-var FUNC_ERROR_TEXT$1 = 'Expected a function';
-
-/* Built-in method references for those with the same name as other `lodash` methods. */
-var nativeMax$1 = Math.max;
-var nativeMin = Math.min;
-
-/**
- * Creates a debounced function that delays invoking `func` until after `wait`
- * milliseconds have elapsed since the last time the debounced function was
- * invoked. The debounced function comes with a `cancel` method to cancel
- * delayed `func` invocations and a `flush` method to immediately invoke them.
- * Provide `options` to indicate whether `func` should be invoked on the
- * leading and/or trailing edge of the `wait` timeout. The `func` is invoked
- * with the last arguments provided to the debounced function. Subsequent
- * calls to the debounced function return the result of the last `func`
- * invocation.
- *
- * **Note:** If `leading` and `trailing` options are `true`, `func` is
- * invoked on the trailing edge of the timeout only if the debounced function
- * is invoked more than once during the `wait` timeout.
- *
- * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
- * until to the next tick, similar to `setTimeout` with a timeout of `0`.
- *
- * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
- * for details over the differences between `_.debounce` and `_.throttle`.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Function
- * @param {Function} func The function to debounce.
- * @param {number} [wait=0] The number of milliseconds to delay.
- * @param {Object} [options={}] The options object.
- * @param {boolean} [options.leading=false]
- *  Specify invoking on the leading edge of the timeout.
- * @param {number} [options.maxWait]
- *  The maximum time `func` is allowed to be delayed before it's invoked.
- * @param {boolean} [options.trailing=true]
- *  Specify invoking on the trailing edge of the timeout.
- * @returns {Function} Returns the new debounced function.
- * @example
- *
- * // Avoid costly calculations while the window size is in flux.
- * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
- *
- * // Invoke `sendMail` when clicked, debouncing subsequent calls.
- * jQuery(element).on('click', _.debounce(sendMail, 300, {
- *   'leading': true,
- *   'trailing': false
- * }));
- *
- * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
- * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
- * var source = new EventSource('/stream');
- * jQuery(source).on('message', debounced);
- *
- * // Cancel the trailing debounced invocation.
- * jQuery(window).on('popstate', debounced.cancel);
- */
-function debounce(func, wait, options) {
-  var lastArgs,
-      lastThis,
-      maxWait,
-      result,
-      timerId,
-      lastCallTime,
-      lastInvokeTime = 0,
-      leading = false,
-      maxing = false,
-      trailing = true;
-
-  if (typeof func != 'function') {
-    throw new TypeError(FUNC_ERROR_TEXT$1);
-  }
-  wait = toNumber$3(wait) || 0;
-  if (isObject$27(options)) {
-    leading = !!options.leading;
-    maxing = 'maxWait' in options;
-    maxWait = maxing ? nativeMax$1(toNumber$3(options.maxWait) || 0, wait) : maxWait;
-    trailing = 'trailing' in options ? !!options.trailing : trailing;
-  }
-
-  function invokeFunc(time) {
-    var args = lastArgs,
-        thisArg = lastThis;
-
-    lastArgs = lastThis = undefined;
-    lastInvokeTime = time;
-    result = func.apply(thisArg, args);
-    return result;
-  }
-
-  function leadingEdge(time) {
-    // Reset any `maxWait` timer.
-    lastInvokeTime = time;
-    // Start the timer for the trailing edge.
-    timerId = setTimeout(timerExpired, wait);
-    // Invoke the leading edge.
-    return leading ? invokeFunc(time) : result;
-  }
-
-  function remainingWait(time) {
-    var timeSinceLastCall = time - lastCallTime,
-        timeSinceLastInvoke = time - lastInvokeTime,
-        result = wait - timeSinceLastCall;
-
-    return maxing ? nativeMin(result, maxWait - timeSinceLastInvoke) : result;
-  }
-
-  function shouldInvoke(time) {
-    var timeSinceLastCall = time - lastCallTime,
-        timeSinceLastInvoke = time - lastInvokeTime;
-
-    // Either this is the first call, activity has stopped and we're at the
-    // trailing edge, the system time has gone backwards and we're treating
-    // it as the trailing edge, or we've hit the `maxWait` limit.
-    return lastCallTime === undefined || timeSinceLastCall >= wait || timeSinceLastCall < 0 || maxing && timeSinceLastInvoke >= maxWait;
-  }
-
-  function timerExpired() {
-    var time = now();
-    if (shouldInvoke(time)) {
-      return trailingEdge(time);
-    }
-    // Restart the timer.
-    timerId = setTimeout(timerExpired, remainingWait(time));
-  }
-
-  function trailingEdge(time) {
-    timerId = undefined;
-
-    // Only invoke if we have `lastArgs` which means `func` has been
-    // debounced at least once.
-    if (trailing && lastArgs) {
-      return invokeFunc(time);
-    }
-    lastArgs = lastThis = undefined;
-    return result;
-  }
-
-  function cancel() {
-    if (timerId !== undefined) {
-      clearTimeout(timerId);
-    }
-    lastInvokeTime = 0;
-    lastArgs = lastCallTime = lastThis = timerId = undefined;
-  }
-
-  function flush() {
-    return timerId === undefined ? result : trailingEdge(now());
-  }
-
-  function debounced() {
-    var time = now(),
-        isInvoking = shouldInvoke(time);
-
-    lastArgs = arguments;
-    lastThis = this;
-    lastCallTime = time;
-
-    if (isInvoking) {
-      if (timerId === undefined) {
-        return leadingEdge(lastCallTime);
-      }
-      if (maxing) {
-        // Handle invocations in a tight loop.
-        timerId = setTimeout(timerExpired, wait);
-        return invokeFunc(lastCallTime);
-      }
-    }
-    if (timerId === undefined) {
-      timerId = setTimeout(timerExpired, wait);
-    }
-    return result;
-  }
-  debounced.cancel = cancel;
-  debounced.flush = flush;
-  return debounced;
-}
-
-var debounce_1 = debounce;
-
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-function EventEmitter() {
-  this._events = this._events || {};
-  this._maxListeners = this._maxListeners || undefined;
-}
-var events = EventEmitter;
-
-// Backwards-compat with node 0.10.x
-EventEmitter.EventEmitter = EventEmitter;
-
-EventEmitter.prototype._events = undefined;
-EventEmitter.prototype._maxListeners = undefined;
-
-// By default EventEmitters will print a warning if more than 10 listeners are
-// added to it. This is a useful default which helps finding memory leaks.
-EventEmitter.defaultMaxListeners = 10;
-
-// Obviously not all Emitters should be limited to 10. This function allows
-// that to be increased. Set to zero for unlimited.
-EventEmitter.prototype.setMaxListeners = function (n) {
-  if (!isNumber(n) || n < 0 || isNaN(n)) throw TypeError('n must be a positive number');
-  this._maxListeners = n;
-  return this;
-};
-
-EventEmitter.prototype.emit = function (type) {
-  var er, handler, len, args, i, listeners;
-
-  if (!this._events) this._events = {};
-
-  // If there is no 'error' event listener then throw.
-  if (type === 'error') {
-    if (!this._events.error || isObject$28(this._events.error) && !this._events.error.length) {
-      er = arguments[1];
-      if (er instanceof Error) {
-        throw er; // Unhandled 'error' event
-      } else {
-        // At least give some kind of context to the user
-        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
-        err.context = er;
-        throw err;
-      }
-    }
-  }
-
-  handler = this._events[type];
-
-  if (isUndefined(handler)) return false;
-
-  if (isFunction$3(handler)) {
-    switch (arguments.length) {
-      // fast cases
-      case 1:
-        handler.call(this);
-        break;
-      case 2:
-        handler.call(this, arguments[1]);
-        break;
-      case 3:
-        handler.call(this, arguments[1], arguments[2]);
-        break;
-      // slower
-      default:
-        args = Array.prototype.slice.call(arguments, 1);
-        handler.apply(this, args);
-    }
-  } else if (isObject$28(handler)) {
-    args = Array.prototype.slice.call(arguments, 1);
-    listeners = handler.slice();
-    len = listeners.length;
-    for (i = 0; i < len; i++) {
-      listeners[i].apply(this, args);
-    }
-  }
-
-  return true;
-};
-
-EventEmitter.prototype.addListener = function (type, listener) {
-  var m;
-
-  if (!isFunction$3(listener)) throw TypeError('listener must be a function');
-
-  if (!this._events) this._events = {};
-
-  // To avoid recursion in the case that type === "newListener"! Before
-  // adding it to the listeners, first emit "newListener".
-  if (this._events.newListener) this.emit('newListener', type, isFunction$3(listener.listener) ? listener.listener : listener);
-
-  if (!this._events[type])
-    // Optimize the case of one listener. Don't need the extra array object.
-    this._events[type] = listener;else if (isObject$28(this._events[type]))
-    // If we've already got an array, just append.
-    this._events[type].push(listener);else
-    // Adding the second element, need to change to array.
-    this._events[type] = [this._events[type], listener];
-
-  // Check for listener leak
-  if (isObject$28(this._events[type]) && !this._events[type].warned) {
-    if (!isUndefined(this._maxListeners)) {
-      m = this._maxListeners;
-    } else {
-      m = EventEmitter.defaultMaxListeners;
-    }
-
-    if (m && m > 0 && this._events[type].length > m) {
-      this._events[type].warned = true;
-      console.error('(node) warning: possible EventEmitter memory ' + 'leak detected. %d listeners added. ' + 'Use emitter.setMaxListeners() to increase limit.', this._events[type].length);
-      if (typeof console.trace === 'function') {
-        // not supported in IE 10
-        console.trace();
-      }
-    }
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
-EventEmitter.prototype.once = function (type, listener) {
-  if (!isFunction$3(listener)) throw TypeError('listener must be a function');
-
-  var fired = false;
-
-  function g() {
-    this.removeListener(type, g);
-
-    if (!fired) {
-      fired = true;
-      listener.apply(this, arguments);
-    }
-  }
-
-  g.listener = listener;
-  this.on(type, g);
-
-  return this;
-};
-
-// emits a 'removeListener' event iff the listener was removed
-EventEmitter.prototype.removeListener = function (type, listener) {
-  var list, position, length, i;
-
-  if (!isFunction$3(listener)) throw TypeError('listener must be a function');
-
-  if (!this._events || !this._events[type]) return this;
-
-  list = this._events[type];
-  length = list.length;
-  position = -1;
-
-  if (list === listener || isFunction$3(list.listener) && list.listener === listener) {
-    delete this._events[type];
-    if (this._events.removeListener) this.emit('removeListener', type, listener);
-  } else if (isObject$28(list)) {
-    for (i = length; i-- > 0;) {
-      if (list[i] === listener || list[i].listener && list[i].listener === listener) {
-        position = i;
-        break;
-      }
-    }
-
-    if (position < 0) return this;
-
-    if (list.length === 1) {
-      list.length = 0;
-      delete this._events[type];
-    } else {
-      list.splice(position, 1);
-    }
-
-    if (this._events.removeListener) this.emit('removeListener', type, listener);
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.removeAllListeners = function (type) {
-  var key, listeners;
-
-  if (!this._events) return this;
-
-  // not listening for removeListener, no need to emit
-  if (!this._events.removeListener) {
-    if (arguments.length === 0) this._events = {};else if (this._events[type]) delete this._events[type];
-    return this;
-  }
-
-  // emit removeListener for all listeners on all events
-  if (arguments.length === 0) {
-    for (key in this._events) {
-      if (key === 'removeListener') continue;
-      this.removeAllListeners(key);
-    }
-    this.removeAllListeners('removeListener');
-    this._events = {};
-    return this;
-  }
-
-  listeners = this._events[type];
-
-  if (isFunction$3(listeners)) {
-    this.removeListener(type, listeners);
-  } else if (listeners) {
-    // LIFO order
-    while (listeners.length) {
-      this.removeListener(type, listeners[listeners.length - 1]);
-    }
-  }
-  delete this._events[type];
-
-  return this;
-};
-
-EventEmitter.prototype.listeners = function (type) {
-  var ret;
-  if (!this._events || !this._events[type]) ret = [];else if (isFunction$3(this._events[type])) ret = [this._events[type]];else ret = this._events[type].slice();
-  return ret;
-};
-
-EventEmitter.prototype.listenerCount = function (type) {
-  if (this._events) {
-    var evlistener = this._events[type];
-
-    if (isFunction$3(evlistener)) return 1;else if (evlistener) return evlistener.length;
-  }
-  return 0;
-};
-
-EventEmitter.listenerCount = function (emitter, type) {
-  return emitter.listenerCount(type);
-};
-
-function isFunction$3(arg) {
-  return typeof arg === 'function';
-}
-
-function isNumber(arg) {
-  return typeof arg === 'number';
-}
-
-function isObject$28(arg) {
-  return (typeof arg === 'undefined' ? 'undefined' : _typeof(arg)) === 'object' && arg !== null;
-}
-
-function isUndefined(arg) {
-  return arg === void 0;
-}
-
-var events_1 = events.EventEmitter;
-
-var opts = {
-  main: 'js-relationship',
-  classItem: 'js-relationship-item',
-  classLegend: 'js-relationship-legend',
-  classBody: 'js-relationship-body',
-  classTrigger: 'js-relationship-trigger',
-  classOpen: 'is-open',
-  classClosed: 'is-closed',
-  classEditBtn: 'js-relationship-editbtn'
-};
-
-var HouseholdRelationship = function (_EventEmitter) {
-  inherits(HouseholdRelationship, _EventEmitter);
-
-  function HouseholdRelationship(item) {
-    classCallCheck(this, HouseholdRelationship);
-
-    var _this = possibleConstructorReturn(this, (HouseholdRelationship.__proto__ || Object.getPrototypeOf(HouseholdRelationship)).call(this));
-
-    _this.onFocus = function (e) {
-      _this.open(true);
-    };
-
-    _this.onOptionSelected = debounce_1(function (e) {
-      if (!_this.answered) {
-        _this.answered = true;
-      }
-
-      if (e.target.classList.contains(opts.classTrigger) && (e.keyCode === undefined || e.keyCode === 0)) {
-        _this.emit('optionSelected', _this);
-      }
-    }, 100, { leading: true, trailing: false });
-
-    _this.onOptionChanged = function (e) {
-      _this.setRelationship(e.target.getAttribute('id'));
-    };
-
-    _this.onEditBtnClick = function (e) {
-      e.preventDefault();
-      _this.toggle();
-      return false;
-    };
-
-    _this.toggle = function () {
-      _this.isOpen ? _this.close(true) : _this.open(true);
-    };
-
-    _this.open = function (emitEvent) {
-      _this.isOpen = true;
-      _this.optionsContainer.setAttribute('aria-hidden', false);
-      _this.el.classList.add(opts.classOpen);
-      _this.el.classList.remove(opts.classClosed);
-      _this.editBtn.innerHTML = _this.closeLabel;
-      _this.optionsContainer.removeEventListener('focus', _this.onFocus, true);
-      if (emitEvent) {
-        _this.emit('opened', _this);
-      }
-    };
-
-    _this.close = function (emitEvent) {
-      if (_this.answered) {
-        _this.editBtn.classList.remove('u-hidden');
-      }
-      _this.isOpen = false;
-      _this.optionsContainer.setAttribute('aria-hidden', true);
-      _this.el.classList.remove(opts.classOpen);
-      _this.el.classList.add(opts.classClosed);
-      _this.editBtn.innerHTML = _this.openLabel;
-      // delay to prevent race conditions
-      delay_1(function () {
-        _this.optionsContainer.addEventListener('focus', _this.onFocus, true);
-      }, 100);
-      if (emitEvent) {
-        _this.emit('closed', _this);
-      }
-    };
-
-    _this.el = item;
-    _this.answered = false;
-
-    _this.name = _this.el.getAttribute('data-relationship-name');
-
-    _this.editBtn = _this.el.querySelector('.' + opts.classEditBtn);
-    _this.editBtn.addEventListener('click', _this.onEditBtnClick);
-
-    _this.closeLabel = _this.editBtn.getAttribute('data-close');
-    _this.openLabel = _this.editBtn.innerHTML;
-
-    _this.options = _this.el.querySelectorAll('input');
-
-    _this.optionsContainer = _this.el.querySelector('.' + opts.classBody);
-    _this.optionsContainer.addEventListener('keydown', _this.onOptionSelected);
-    _this.optionsContainer.addEventListener('click', _this.onOptionSelected);
-    _this.optionsContainer.addEventListener('change', _this.onOptionChanged);
-
-    _this.legend = _this.el.querySelector('.' + opts.classLegend);
-
-    var selection = _this.el.querySelector('input:checked');
-    if (selection) {
-      _this.setRelationship(selection.id);
-    }
-    return _this;
-  }
-
-  createClass(HouseholdRelationship, [{
-    key: 'setRelationship',
-    value: function setRelationship(relationshipId) {
-      var label = this.el.querySelector('label[for=' + relationshipId + ']');
-      var relationship = label.innerHTML;
-
-      this.legend.innerHTML = relationship.toLowerCase();
-      this.answered = true;
-    }
-  }]);
-  return HouseholdRelationship;
-}(events_1);
-
-ready(function () {
-  var items = [];
-  var el = document.querySelector('.' + opts.main);
-
-  if (!el) return;
-
-  var onOptionSelected = function onOptionSelected(selectedItem) {
-    selectedItem.close(true);
-  };
-
-  var onItemOpen = function onItemOpen(itemOpened) {
-    items.forEach(function (item) {
-      if (item.isOpen && item !== itemOpened) {
-        item.close(false);
-      }
-    });
-  };
-
-  var onItemClosed = function onItemClosed(itemClosed) {
-    openNextUnanswered();
-  };
-
-  var openNextUnanswered = function openNextUnanswered() {
-    var next = items.filter(function (item) {
-      return !item.answered;
-    })[0];
-    if (next !== undefined) {
-      next.open(true);
-    }
-  };
-
-  forEach_1(el.getElementsByClassName(opts.classItem), function (item) {
-    var relationship = new HouseholdRelationship(item);
-    relationship.addListener('opened', onItemOpen);
-    relationship.addListener('closed', onItemClosed);
-    relationship.addListener('optionSelected', onOptionSelected);
-    items.push(relationship);
-  });
-
-  var firstUnansweredItem = items.filter(function (item) {
-    return !item.answered;
-  })[0];
-  items.forEach(function (item) {
-    if (item !== firstUnansweredItem) {
-      item.close(false);
-    } else {
-      item.open(false);
-    }
-  });
-});
-
-function initAnalytics() {
-  var trackEvent = function trackEvent(event, data) {
-    console.log('[Analytics disabled] Event: ' + event);
-    console.log(data);
-  };
-
-  if (typeof window.ga !== 'undefined') {
-    trackEvent = window.ga;
-  } else {
-    console.log('Analytics disabled');
-  }
-
-  var errors = document.querySelectorAll('[data-error=true]');
-  var guidances = document.querySelectorAll('[data-guidance]');
-
-  forEach_1(errors, function (error) {
-    var errorMsg = error.getAttribute('data-error-msg');
-    var elementId = error.getAttribute('data-error-id');
-    var errorData = {
-      hitType: 'event',
-      eventCategory: 'Errors',
-      eventAction: errorMsg,
-      eventLabel: elementId
-    };
-    trackEvent('send', errorData);
-  });
-
-  forEach_1(guidances, function (guidance) {
-    var trigger = guidance.querySelector('[data-guidance-trigger]');
-    var questionLabel = guidance.getAttribute('data-guidance-label');
-    var questionId = guidance.getAttribute('data-guidance');
-
-    var onClick = function onClick(e) {
-      trigger.removeEventListener('click', onClick);
-      var triggerData = {
-        hitType: 'event',
-        eventCategory: 'Guidance',
-        eventAction: questionLabel,
-        eventLabel: questionId
-      };
-      trackEvent('send', triggerData);
-    };
-
-    if (trigger) {
-      trigger.addEventListener('click', onClick);
-    }
-  });
-}
-
-ready(initAnalytics);
-
-var classTrigger$1 = 'js-inpagelink';
-
-function inPageLink() {
-  var nodeList = document.getElementsByClassName(classTrigger$1);
-  forEach_1(nodeList, applyInPageLink);
-  return nodeList;
-}
-
-function applyInPageLink(elTrigger) {
-  var elId = elTrigger.getAttribute('href').replace('#', '');
-  elTrigger.addEventListener('click', function (e) {
-    e.preventDefault();
-    focusOnInput(elId);
-  });
-
-  return { elTrigger: elTrigger, elId: elId };
-}
-
-function focusOnInput(elId) {
-  var elIdInput = document.getElementById(elId).querySelectorAll('.input')[0];
-  elIdInput.focus();
-  return elId;
-}
-
-ready(inPageLink);
 
 var getNextSiblings = function getNextSiblings(e, filter) {
   var siblings = [];
@@ -9170,618 +7231,16 @@ ready(function () {
   }
 });
 
-ready(function () {
-  var btn = document.querySelector('.js-help-btn');
-  var help = document.querySelector('.js-help-body');
-  var classClosed = 'is-closed';
+// import '../../../../common/assets/js/app/modules/nav';
+// import '../../../../common/assets/js/app/modules/details-toggle';
+// import '../../../../common/assets/js/app/modules/relationships';
+// import '../../../../common/assets/js/app/modules/analytics';
+// import '../../../../common/assets/js/app/modules/inpagelink';
 
-  var openedByClick = false;
-
-  if (help === null || btn === null) {
-    return false;
-  }
-
-  help.addEventListener('focus', function (e) {
-    help.classList.remove(classClosed);
-  }, true);
-
-  help.addEventListener('blur', function (e) {
-    if (!openedByClick) {
-      help.classList.add(classClosed);
-    }
-  }, true);
-
-  btn.classList.remove('u-hidden');
-  btn.addEventListener('click', function (e) {
-    e.preventDefault();
-    openedByClick = !openedByClick;
-    help.classList.toggle(classClosed);
-  });
-});
-
-function getTransitionEndEvent() {
-  var el = document.createElement('fakeelement');
-  var transitions = {
-    'transition': 'transitionend',
-    'OTransition': 'oTransitionEnd',
-    'MozTransition': 'transitionend',
-    'WebkitTransition': 'webkitTransitionEnd'
-  };
-
-  for (var t in transitions) {
-    if (el.style[t] !== undefined) {
-      return transitions[t];
-    }
-  }
-}
-
-var transitionendEvent = getTransitionEndEvent();
-
-var HouseholdMember = function (_EventEmitter) {
-  inherits(HouseholdMember, _EventEmitter);
-
-  function HouseholdMember(index) {
-    classCallCheck(this, HouseholdMember);
-
-    var _this = possibleConstructorReturn(this, (HouseholdMember.__proto__ || Object.getPrototypeOf(HouseholdMember)).call(this));
-
-    _this.onTransitionHideEnd = function (e) {
-      if (e === undefined || e.target.classList.contains('is-removed')) {
-        _this.node.parentNode.removeChild(_this.node);
-        _this.node.removeEventListener(transitionendEvent, _this.onTransitionHideEnd);
-        _this.emit('removed', _this);
-      }
-    };
-
-    _this.onRemoveClick = function (e) {
-      e.preventDefault();
-      _this.remove();
-    };
-
-    _this.index = index;
-    return _this;
-  }
-
-  createClass(HouseholdMember, [{
-    key: 'bindToExisting',
-    value: function bindToExisting(node) {
-      this.node = node;
-      this.removeBtn = this.node.querySelector('.js-btn-remove');
-      this.bindToDOM();
-    }
-  }, {
-    key: 'bindToDOM',
-    value: function bindToDOM() {
-      this.indexNodes = this.node.querySelectorAll('.js-household-loopindex');
-      var errorNode = this.node.querySelector('.js-has-errors');
-      if (errorNode) {
-        var fieldNodes = this.node.querySelector('.js-fields');
-        if (fieldNodes) {
-          var clone = fieldNodes.cloneNode(true);
-          errorNode.innerHTML = '';
-          errorNode.classList.remove('js-has-errors');
-          errorNode.appendChild(clone);
-        }
-      }
-
-      this.inputs = this.node.querySelectorAll('input');
-      this.actionNode = this.node.querySelector('.js-household-action');
-      if (this.removeBtn) {
-        this.removeBtn.addEventListener('click', this.onRemoveClick);
-      }
-    }
-  }, {
-    key: 'add',
-    value: function add(node, parent) {
-      this.node = node;
-      this.removeBtn = document.createElement('button');
-      this.bindToDOM(node);
-      this.removeTxt = this.node.getAttribute('data-remove');
-      this.removeBtn.innerHTML = this.removeTxt;
-      this.removeBtn.classList.add('btn');
-      this.removeBtn.classList.add('btn--link');
-      this.removeBtn.classList.add('pluto');
-      this.removeBtn.setAttribute('type', 'button');
-      this.node.classList.add('is-hidden');
-      this.actionNode.innerHTML = '';
-      this.actionNode.appendChild(this.removeBtn);
-
-      parent.appendChild(this.node);
-      this.node.querySelector('input').focus();
-      this.setIndex(this.index);
-      forEach_1(this.inputs, function (input) {
-        input.value = '';
-      });
-      window.setTimeout(this.node.classList.remove('is-hidden'), 100);
-    }
-  }, {
-    key: 'setIndex',
-    value: function setIndex(index) {
-      var _this2 = this;
-
-      this.index = index;
-      forEach_1(this.indexNodes, function (node) {
-        node.innerHTML = index;
-      });
-      forEach_1(this.inputs, function (input) {
-        var id = input.id;
-        var label = _this2.node.querySelector('label[for=' + id + ']');
-        var newId = id + '_' + (index - 1);
-        input.setAttribute('id', newId);
-        label.setAttribute('for', newId);
-        input.setAttribute('name', input.name.split('_')[0] + '_' + (index - 1));
-      });
-    }
-  }, {
-    key: 'remove',
-    value: function remove() {
-      if (transitionendEvent) {
-        this.node.addEventListener(transitionendEvent, this.onTransitionHideEnd, true);
-      } else {
-        window.setTimeout(this.onTransitionHideEnd, 500);
-      }
-      this.node.classList.add('is-removed');
-    }
-  }]);
-  return HouseholdMember;
-}(events_1);
-
-ready(function () {
-  var existingPeople = document.querySelectorAll('.js-household-person');
-  var btn = document.querySelector('.js-household-btn');
-  var householdMembers = [];
-
-  if (existingPeople.length === 0) {
-    return;
-  }
-
-  var createHouseholdMember = function createHouseholdMember() {
-    var householdMember = new HouseholdMember(householdMembers.length + 2);
-    householdMember.addListener('removed', onRemove);
-    householdMembers.push(householdMember);
-    return householdMember;
-  };
-
-  var onRemove = function onRemove(removedMember) {
-    householdMembers.splice(householdMembers.indexOf(removedMember), 1);
-    removedMember.removeListener('removed', onRemove);
-    householdMembers.map(function (member, index) {
-      member.setIndex(index + 2);
-    });
-  };
-
-  var onAddBtnClick = function onAddBtnClick(e) {
-    e.preventDefault();
-    var originalNode = existingPeople[0];
-    var newNode = originalNode.cloneNode(true);
-    var parent = originalNode.parentNode;
-    createHouseholdMember().add(newNode, parent);
-  };
-
-  forEach_1(existingPeople, function (person, index) {
-    if (index > 0) {
-      createHouseholdMember().bindToExisting(person);
-    }
-  });
-
-  btn.setAttribute('type', 'button');
-  btn.addEventListener('click', onAddBtnClick);
-});
+// import '../../../../common/assets/js/app/modules/help';
+// import '../../../../common/assets/js/app/modules/household';
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"_process":3}],2:[function(require,module,exports){
-'use strict';
-
-/*
- * classList.js: Cross-browser full element.classList implementation.
- * 1.1.20150312
- *
- * By Eli Grey, http://eligrey.com
- * License: Dedicated to the public domain.
- *   See https://github.com/eligrey/classList.js/blob/master/LICENSE.md
- */
-
-/*global self, document, DOMException */
-
-/*! @source http://purl.eligrey.com/github/classList.js/blob/master/classList.js */
-
-if ("document" in self) {
-
-	// Full polyfill for browsers with no classList support
-	// Including IE < Edge missing SVGElement.classList
-	if (!("classList" in document.createElement("_")) || document.createElementNS && !("classList" in document.createElementNS("http://www.w3.org/2000/svg", "g"))) {
-
-		(function (view) {
-
-			"use strict";
-
-			if (!('Element' in view)) return;
-
-			var classListProp = "classList",
-			    protoProp = "prototype",
-			    elemCtrProto = view.Element[protoProp],
-			    objCtr = Object,
-			    strTrim = String[protoProp].trim || function () {
-				return this.replace(/^\s+|\s+$/g, "");
-			},
-			    arrIndexOf = Array[protoProp].indexOf || function (item) {
-				var i = 0,
-				    len = this.length;
-				for (; i < len; i++) {
-					if (i in this && this[i] === item) {
-						return i;
-					}
-				}
-				return -1;
-			}
-			// Vendors: please allow content code to instantiate DOMExceptions
-			,
-			    DOMEx = function DOMEx(type, message) {
-				this.name = type;
-				this.code = DOMException[type];
-				this.message = message;
-			},
-			    checkTokenAndGetIndex = function checkTokenAndGetIndex(classList, token) {
-				if (token === "") {
-					throw new DOMEx("SYNTAX_ERR", "An invalid or illegal string was specified");
-				}
-				if (/\s/.test(token)) {
-					throw new DOMEx("INVALID_CHARACTER_ERR", "String contains an invalid character");
-				}
-				return arrIndexOf.call(classList, token);
-			},
-			    ClassList = function ClassList(elem) {
-				var trimmedClasses = strTrim.call(elem.getAttribute("class") || ""),
-				    classes = trimmedClasses ? trimmedClasses.split(/\s+/) : [],
-				    i = 0,
-				    len = classes.length;
-				for (; i < len; i++) {
-					this.push(classes[i]);
-				}
-				this._updateClassName = function () {
-					elem.setAttribute("class", this.toString());
-				};
-			},
-			    classListProto = ClassList[protoProp] = [],
-			    classListGetter = function classListGetter() {
-				return new ClassList(this);
-			};
-			// Most DOMException implementations don't allow calling DOMException's toString()
-			// on non-DOMExceptions. Error's toString() is sufficient here.
-			DOMEx[protoProp] = Error[protoProp];
-			classListProto.item = function (i) {
-				return this[i] || null;
-			};
-			classListProto.contains = function (token) {
-				token += "";
-				return checkTokenAndGetIndex(this, token) !== -1;
-			};
-			classListProto.add = function () {
-				var tokens = arguments,
-				    i = 0,
-				    l = tokens.length,
-				    token,
-				    updated = false;
-				do {
-					token = tokens[i] + "";
-					if (checkTokenAndGetIndex(this, token) === -1) {
-						this.push(token);
-						updated = true;
-					}
-				} while (++i < l);
-
-				if (updated) {
-					this._updateClassName();
-				}
-			};
-			classListProto.remove = function () {
-				var tokens = arguments,
-				    i = 0,
-				    l = tokens.length,
-				    token,
-				    updated = false,
-				    index;
-				do {
-					token = tokens[i] + "";
-					index = checkTokenAndGetIndex(this, token);
-					while (index !== -1) {
-						this.splice(index, 1);
-						updated = true;
-						index = checkTokenAndGetIndex(this, token);
-					}
-				} while (++i < l);
-
-				if (updated) {
-					this._updateClassName();
-				}
-			};
-			classListProto.toggle = function (token, force) {
-				token += "";
-
-				var result = this.contains(token),
-				    method = result ? force !== true && "remove" : force !== false && "add";
-
-				if (method) {
-					this[method](token);
-				}
-
-				if (force === true || force === false) {
-					return force;
-				} else {
-					return !result;
-				}
-			};
-			classListProto.toString = function () {
-				return this.join(" ");
-			};
-
-			if (objCtr.defineProperty) {
-				var classListPropDesc = {
-					get: classListGetter,
-					enumerable: true,
-					configurable: true
-				};
-				try {
-					objCtr.defineProperty(elemCtrProto, classListProp, classListPropDesc);
-				} catch (ex) {
-					// IE 8 doesn't support enumerable:true
-					if (ex.number === -0x7FF5EC54) {
-						classListPropDesc.enumerable = false;
-						objCtr.defineProperty(elemCtrProto, classListProp, classListPropDesc);
-					}
-				}
-			} else if (objCtr[protoProp].__defineGetter__) {
-				elemCtrProto.__defineGetter__(classListProp, classListGetter);
-			}
-		})(self);
-	} else {
-		// There is full or partial native classList support, so just check if we need
-		// to normalize the add/remove and toggle APIs.
-
-		(function () {
-			"use strict";
-
-			var testElement = document.createElement("_");
-
-			testElement.classList.add("c1", "c2");
-
-			// Polyfill for IE 10/11 and Firefox <26, where classList.add and
-			// classList.remove exist but support only one argument at a time.
-			if (!testElement.classList.contains("c2")) {
-				var createMethod = function createMethod(method) {
-					var original = DOMTokenList.prototype[method];
-
-					DOMTokenList.prototype[method] = function (token) {
-						var i,
-						    len = arguments.length;
-
-						for (i = 0; i < len; i++) {
-							token = arguments[i];
-							original.call(this, token);
-						}
-					};
-				};
-				createMethod('add');
-				createMethod('remove');
-			}
-
-			testElement.classList.toggle("c3", false);
-
-			// Polyfill for IE 10 and Firefox <24, where classList.toggle does not
-			// support the second argument.
-			if (testElement.classList.contains("c3")) {
-				var _toggle = DOMTokenList.prototype.toggle;
-
-				DOMTokenList.prototype.toggle = function (token, force) {
-					if (1 in arguments && !this.contains(token) === !force) {
-						return force;
-					} else {
-						return _toggle.call(this, token);
-					}
-				};
-			}
-
-			testElement = null;
-		})();
-	}
-}
-
-// From https://developer.mozilla.org/en-US/docs/Web/API/Element/closest
-if (window.Element && !Element.prototype.closest) {
-	Element.prototype.closest = function (s) {
-		var matches = (this.document || this.ownerDocument).querySelectorAll(s),
-		    i,
-		    el = this;
-		do {
-			i = matches.length;
-			while (--i >= 0 && matches.item(i) !== el) {}
-		} while (i < 0 && (el = el.parentElement));
-		return el;
-	};
-}
-
-},{}],3:[function(require,module,exports){
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}]},{},[2,1])
+},{"_process":2}]},{},[1,3])
 

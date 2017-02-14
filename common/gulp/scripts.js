@@ -1,22 +1,21 @@
 // Scripts and tests
-import gulp from 'gulp'
-import gutil from 'gulp-util'
-import eslint from 'gulp-eslint'
-import rename from 'gulp-rename'
-import plumber from 'gulp-plumber'
-import uglify from 'gulp-uglify'
-import browserify from 'browserify'
-import watchify from 'watchify'
-import babel from 'gulp-babel'
-import source from 'vinyl-source-stream'
-import buffer from 'vinyl-buffer'
-import sourcemaps from 'gulp-sourcemaps'
+import gulp from 'gulp';
+import gutil from 'gulp-util';
+import eslint from 'gulp-eslint';
+import rename from 'gulp-rename';
+import plumber from 'gulp-plumber';
+import uglify from 'gulp-uglify';
+import browserify from 'browserify';
+import watchify from 'watchify';
+import babel from 'gulp-babel';
+import source from 'vinyl-source-stream';
+import buffer from 'vinyl-buffer';
+import sourcemaps from 'gulp-sourcemaps';
 
-import rollupBabel from 'rollup-plugin-babel'
-import nodeResolve from 'rollup-plugin-node-resolve'
-import commonjs from 'rollup-plugin-commonjs'
+import rollupBabel from 'rollup-plugin-babel';
+import nodeResolve from 'rollup-plugin-node-resolve';
+import commonjs from 'rollup-plugin-commonjs';
 
-//import {paths, appPath} from './paths'
 import bs from 'browser-sync';
 let browserSync = bs.create();
 
@@ -25,10 +24,7 @@ let cache;
 const b = paths => browserify({
       ...watchify.argsz,
       ...{
-          entries: [
-              `./${paths.common}/js/polyfills.js`,
-              `./${paths.common}/js/app/main.js`
-          ],
+          entries: paths.scripts.browserifyEntries,
           debug: true
       }
   })
@@ -39,7 +35,7 @@ const b = paths => browserify({
   .transform('rollupify', {
       config: {
           cache: cache,
-          entry: `./${paths.common}/js/app/main.js`,
+          entry: paths.scripts.rollupifyEntries,
           plugins: [
               commonjs({
                   include: 'node_modules/**',
@@ -53,7 +49,7 @@ const b = paths => browserify({
                   preferBuiltins: false
               }),
               rollupBabel({
-                  plugins: ['external-helpers', 'lodash'],
+                  plugins: ['lodash'],
                   presets: ['es2015-rollup', 'stage-2'],
                   babelrc: false,
                   exclude: 'node_modules/!**'
@@ -62,20 +58,13 @@ const b = paths => browserify({
       }
   });
 
-console.log(rollupBabel({
-	plugins: ['lodash'],
-	presets: ['es2015-rollup', 'stage-2'],
-	babelrc: false,
-	exclude: 'node_modules/**'
-}));
-
 export function bundle(watch, paths) {
   const bundled = b(paths);
   const bundler = watch ? watchify(bundled) : bundled;
   return bundler.bundle()
     .on('error', function(err) {
       gutil.log(err.message)
-      browserSync.notify('Browserify Error!')
+      browserSync.notify('Browserify Error!');
       this.emit('end')
     })
     .pipe(source('bundle.js'))
@@ -91,8 +80,9 @@ export function bundle(watch, paths) {
     .pipe(browserSync.reload({stream: true}))
 }
 
+/*
 export function copyScripts(paths) {
-  gulp.src([paths.scripts.input, `!${paths.scripts.dir}app/**/*`])
+  gulp.src([paths.scripts.input, `!${paths.scripts.dir}app/!**!/!*`])
     .on('error', function(err) {
       gutil.log(err.message)
     })
@@ -110,7 +100,7 @@ export function copyScripts(paths) {
 }
 
 export function lint(done, paths) {
-  return gulp.src([paths.scripts.input, `!${paths.scripts.dir}vendor/**/*`, `!${paths.scripts.dir}polyfills.js`])
+  return gulp.src([paths.scripts.input, `!${paths.scripts.dir}vendor/!**!/!*`, `!${paths.scripts.dir}polyfills.js`])
     .pipe(plumber())
     .pipe(eslint())
     .pipe(eslint.results(results => results.warningCount ? gutil.log('eslint warning') : gutil.noop()))
@@ -122,3 +112,4 @@ export function lint(done, paths) {
       process.exit(1)
     })
 }
+*/

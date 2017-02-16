@@ -4945,4 +4945,36 @@ input:checked ~ .label {
   }
 }
 
+.skip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999999;
+}
+
+.skip__link {
+  display: block;
+  height: 1px;
+  width: 100%;
+  overflow: hidden;
+  position: absolute;
+  top: -30px;
+  -webkit-transition: top 100ms;
+  transition: top 100ms;
+  color: #fff;
+  background: #033e58;
+  font-weight: 600;
+  font-size: 19.8px;
+  font-size: 1.1rem;
+}
+
+.skip__link:focus {
+  padding: 18px;
+  padding: 1rem;
+  max-height: 20em;
+  height: auto;
+  top: 0;
+}
+
 /*# sourceMappingURL=responsive.css.map */

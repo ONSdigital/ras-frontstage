@@ -5,31 +5,28 @@
 
 {% block main %}
     <form action="#" class="form">
-        <div class="group">
-            <div class="block">
 
-                <h1 class="saturn">Existing users</h1>
+        <h1 class="saturn">Existing users</h1>
 
-            {% call section.section_default(
-                "",
-                "Sign in with your ONS surveys account details.") %}
+    {% call section.section_default(
+        "",
+        "Sign in with your ONS surveys account details.") %}
 
-                <div class="field">
-                    <label class="label">Email address</label>
-                    <input class="input input--text input-type__input" value="" type="text" />
-                </div>
-                <br />
-
-                <div class="field">
-                    <label class="label">Password</label>
-                    <input class="input input--text input-type__input" value="" type="text" />
-                </div>
-
-                <p><a href="">Forgot password</a></p>
-
-                <button class="btn btn--secondary venus" type="submit">Sign in</button>
-            {% endcall %}
-            </div>
+        <div class="field">
+            <label class="label">Email address</label>
+            <input class="input input--text input-type__input" value="" type="text" />
         </div>
+        <br />
+
+        <div class="field">
+            <label class="label">Password</label>
+            <input class="input input--text input-type__input" value="" type="text" />
+        </div>
+
+        <p><a href="">Forgot password</a></p>
+
+        <button class="btn btn--secondary venus" type="submit">Sign in</button>
+    {% endcall %}
+
     </form>
 {% endblock main %}

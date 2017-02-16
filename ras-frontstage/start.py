@@ -23,13 +23,17 @@ def sign_in():
 def register():
     return render('register.html')
 
+@app.route('/enter-your-details/')
+def enter_your_details():
+    return render('enter-your-details.html')
+
 @app.route('/confirm-organisation-survey/')
 def confirm_organisation_survey():
     return render('confirm-organisation-survey.html')
 
-@app.route('/enter-your-details/')
-def enter_your_details():
-    return render('enter-your-details.html')
+@app.route('/almost-done/')
+def almost_done():
+    return render('almost-done.html')
 
 
 #Disable cache for development

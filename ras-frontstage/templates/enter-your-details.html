@@ -4,85 +4,81 @@
 {% block page_title %}Enter your account details{% endblock %}
 
 {% block main %}
-    <form action="#" class="form">
-        <div class="group">
-            <div class="block">
+    <form action="/almost-done/" class="form">
+        <h1 class="saturn">Enter your account details</h1>
 
-                <h1 class="saturn">Enter your account details</h1>
+    {% call section.section_default(
+        "Your name") %}
 
-            {% call section.section_default(
-                "Your name") %}
-
-                <div class="field">
-                    <label class="label">First name</label>
-                    <input class="input input--text input-type__input" type="text" />
-                </div>
-                <br />
-
-                <div class="field">
-                    <label class="label">Last name</label>
-                    <input class="input input--text input-type__input" type="text" />
-                </div>
-            {% endcall %}
-
-            {% call section.section_default(
-                "Email address",
-                "We'll send you an email so you can activate your account.") %}
-
-                <div class="field">
-                    <label class="label">Enter your email address</label>
-                    <input class="input input--text input-type__input" type="text" />
-                </div>
-                <br />
-
-                <div class="field">
-                    <label class="label">Re-type your email address</label>
-                    <input class="input input--text input-type__input" type="text" />
-                </div>
-            {% endcall %}
-
-            {% call section.section_default(
-                "Create a password",
-                "Your password must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters.") %}
-
-                <div class="field">
-                    <label class="label">Create a password</label>
-                    <input class="input input--text input-type__input" type="text" />
-                </div>
-                <br />
-
-                <div class="field">
-                    <label class="label">Re-type your password</label>
-                    <input class="input input--text input-type__input" type="text" />
-                </div>
-            {% endcall %}
-
-            {% call section.section_default(
-                "Phone number",
-                "We may sometimes need to call you to discuss information you have provided.") %}
-
-                <div class="field">
-                    <label class="label">Enter your phone number</label>
-                    <input class="input input--text input-type__input" type="text" />
-                </div>
-            {% endcall %}
-
-            {% call section.section_default(
-                "Terms and Conditions") %}
-
-                <div class="field field--checkbox"><!-- field--multiplechoice - class displays border -->
-                    <fieldset>
-                        <div class="field__item js-focusable-box is-checked">
-                            <input class="input input--checkbox js-focusable" type="checkbox" id="checkbox1">
-                            <label class="label label--inline venus" for="checkbox1">Please confirm you accept our <a href="#">Terms and Conditions (Opens in a new window.)</a></label>
-                        </div>
-                    </fieldset>
-                </div>
-            {% endcall %}
-            <br />
-
-            <button class="btn btn--secondary venus" type="submit">Continue</button>
-            </div>
+        <div class="field">
+            <label class="label">First name</label>
+            <input class="input input--text input-type__input" type="text" />
         </div>
+        <br />
+
+        <div class="field">
+            <label class="label">Last name</label>
+            <input class="input input--text input-type__input" type="text" />
+        </div>
+    {% endcall %}
+
+    {% call section.section_default(
+        "Email address",
+        "We'll send you an email so you can activate your account.") %}
+
+        <div class="field">
+            <label class="label">Enter your email address</label>
+            <input class="input input--text input-type__input" type="text" />
+        </div>
+        <br />
+
+        <div class="field">
+            <label class="label">Re-type your email address</label>
+            <input class="input input--text input-type__input" type="text" />
+        </div>
+    {% endcall %}
+
+    {% call section.section_default(
+        "Create a password",
+        "Your password must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters.") %}
+
+        <div class="field">
+            <label class="label">Create a password</label>
+            <input class="input input--text input-type__input" type="text" />
+        </div>
+        <br />
+
+        <div class="field">
+            <label class="label">Re-type your password</label>
+            <input class="input input--text input-type__input" type="text" />
+        </div>
+    {% endcall %}
+
+    {% call section.section_default(
+        "Phone number",
+        "We may sometimes need to call you to discuss information you have provided.") %}
+
+        <div class="field">
+            <label class="label">Enter your phone number</label>
+            <input class="input input--text input-type__input" type="text" />
+        </div>
+    {% endcall %}
+
+    {% call section.section_default(
+        "Terms and Conditions") %}
+
+        <div class="field field--checkbox"><!-- field--multiplechoice - class displays border -->
+            <fieldset>
+                <div class="field__item js-focusable-box is-checked">
+                    <input class="input input--checkbox js-focusable" type="checkbox" id="checkbox1">
+                    <label class="label label--inline venus" for="checkbox1">Please confirm you accept our <a href="#">Terms and Conditions (Opens in a new window.)</a></label>
+                </div>
+            </fieldset>
+        </div>
+    {% endcall %}
+    <br />
+
+    <button class="btn btn--secondary venus" type="submit">Continue</button>
+
     </form>
 {% endblock main %}

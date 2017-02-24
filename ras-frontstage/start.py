@@ -1,7 +1,7 @@
+from __future__ import print_function
 from functools import wraps, update_wrapper
 from datetime import datetime
-from flask import Flask, make_response
-from flask import render_template
+from flask import Flask, make_response, render_template, request
 
 app = Flask(__name__)
 app.debug = True
@@ -17,7 +17,22 @@ def hello_world():
 
 @app.route('/sign-in/')
 def sign_in():
-    return render('sign-in.html')
+    querystring = request.args
+
+    #data variables configured: [error: <undefined, failed, last-attempt>]
+    return render_template('sign-in.html', _theme='default', data = querystring, method = 'get')
+
+@app.route('/troubleshoot-sign-in/')
+def troubleshoot_sign_in():
+    return render('sign-in-trouble.html')
+
+@app.route('/account-locked/')
+def account_locked():
+    return render('sign-in-locked-account.html')
+
+@app.route('/forgot-password/')
+def forgot_password():
+    return render('forgot-password.html')
 
 @app.route('/register/')
 def register():

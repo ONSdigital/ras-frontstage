@@ -14,22 +14,12 @@ class HouseholdMember extends EventEmitter {
   bindToExisting(node) {
     this.node = node
     this.removeBtn = this.node.querySelector('.js-btn-remove')
+    this.removeBtn.setAttribute('type', 'button')
     this.bindToDOM()
   }
 
   bindToDOM() {
     this.indexNodes = this.node.querySelectorAll('.js-household-loopindex')
-    const errorNode = this.node.querySelector('.js-has-errors')
-    if (errorNode) {
-      const fieldNodes = this.node.querySelector('.js-fields')
-      if (fieldNodes) {
-        const clone = fieldNodes.cloneNode(true)
-        errorNode.innerHTML = ''
-        errorNode.classList.remove('js-has-errors')
-        errorNode.appendChild(clone)
-      }
-    }
-
     this.inputs = this.node.querySelectorAll('input')
     this.actionNode = this.node.querySelector('.js-household-action')
     if (this.removeBtn) {
@@ -51,6 +41,20 @@ class HouseholdMember extends EventEmitter {
     this.actionNode.innerHTML = ''
     this.actionNode.appendChild(this.removeBtn)
 
+    const errorNode = this.node.querySelector('.js-has-errors')
+
+    if (errorNode) {
+      const fieldNodes = this.node.querySelector('.js-fields')
+      if (fieldNodes) {
+        const clone = fieldNodes.cloneNode(true)
+        errorNode.innerHTML = ''
+        errorNode.classList.remove('js-has-errors')
+        errorNode.appendChild(clone)
+        // grab the inputs again as the cloning makes the original array out of date
+        this.inputs = this.node.querySelectorAll('input')
+      }
+    }
+
     parent.appendChild(this.node)
     this.node.querySelector('input').focus()
     this.setIndex(this.index)
@@ -67,7 +71,7 @@ class HouseholdMember extends EventEmitter {
       const newId = `${id}_${index - 1}`
       input.setAttribute('id', newId)
       label.setAttribute('for', newId)
-      input.setAttribute('name', `${input.name.split('_')[0]}_${index - 1}`)
+      input.setAttribute('name', `${input.name.replace(/\d+/, index - 1)}`)
     })
   }
 

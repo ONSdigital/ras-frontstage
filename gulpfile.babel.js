@@ -2,9 +2,8 @@ import gulp from 'gulp';
 import {styles, lint as lintStyles} from './common/gulp/styles';
 import {bundle} from './common/gulp/scripts';
 import {paths} from './gulp/paths';
-
-let sass = require('gulp-sass'),
-	concat = require('gulp-concat');
+import sass from 'gulp-sass';
+import concat from 'gulp-concat';
 
 
 /**
@@ -25,7 +24,6 @@ gulp.task('watch:common:styles', ['compile:common:styles'], () => {
 gulp.task('watch:common:scripts', ['compile:common:scripts'], () => {
 	gulp.watch(['./common/assets/scripts/**/*.js'], ['compile:common:scripts']);
 });
-
 
 
 /**

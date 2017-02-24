@@ -28,7 +28,7 @@
     {%- endif %}
     <!--<![endif]-->
     <!--[if (lte IE 9) & (!IEMobile)]>
-      <link href="/s/css/default/fixed.css?q=4a6be5362d67d24cfb7ee2f106835e1084f8f847" rel="stylesheet">
+      <link href="{{ url_for('static', filename=css_fixed) }}" rel="stylesheet">
     <![endif]-->
     <![endif]-->
     {% endblock styles -%}

@@ -6,6 +6,7 @@ from flask import Flask, make_response, render_template, request
 app = Flask(__name__)
 app.debug = True
 
+
 @app.route('/')
 def hello_world():
     return 'Hello, World!'
@@ -15,40 +16,74 @@ def hello_world():
 #def hello(name=None):
     #return render('hello.html', name=name)
 
+
+# ===== Sign in =====
 @app.route('/sign-in/')
 def sign_in():
-    querystring = request.args
+    templateData = {
+        "error": {
+            "type": request.args.get("error")
+        }
+    }
 
-    #data variables configured: [error: <undefined, failed, last-attempt>]
-    return render_template('sign-in.html', _theme='default', data = querystring, method = 'get')
+    #data variables configured: {"error": <undefined, failed, last-attempt>}
+    return render_template('sign-in.html', _theme='default', data=templateData)
 
-@app.route('/troubleshoot-sign-in/')
-def troubleshoot_sign_in():
-    return render('sign-in-trouble.html')
+@app.route('/sign-in/troubleshoot')
+def sign_in_troubleshoot():
+    return render('sign-in.trouble.html')
 
 @app.route('/account-locked/')
-def account_locked():
-    return render('sign-in-locked-account.html')
+def sign_in_account_locked():
+    return render('sign-in.locked-account.html')
 
+
+# ===== Forgot password =====
 @app.route('/forgot-password/')
 def forgot_password():
-    return render('forgot-password.html')
+    templateData = {
+        "error": {
+            "type": request.args.get("error")
+        }
+    }
 
+    #data variables configured: {"error": <undefined, failed>}
+    return render_template('forgot-password.html', _theme='default', data=templateData)
+
+@app.route('/forgot-password/check-email/')
+def forgot_password_check_email():
+    return render('forgot-password.check-email.html')
+
+
+# ===== Password reset =====
+@app.route('/reset-password/')
+def reset_password():
+    templateData = {
+        "error": {
+            "type": request.args.get("error")
+        }
+    }
+
+    #data variables configured: {"error": <undefined, password-mismatch>}
+    return render_template('reset-password.html', _theme='default', data=templateData)
+
+
+# ===== Registration =====
 @app.route('/register/')
 def register():
     return render('register.html')
 
-@app.route('/enter-your-details/')
-def enter_your_details():
-    return render('enter-your-details.html')
+@app.route('/register/enter-your-details/')
+def register_enter_your_details():
+    return render('register.enter-your-details.html')
 
-@app.route('/confirm-organisation-survey/')
-def confirm_organisation_survey():
-    return render('confirm-organisation-survey.html')
+@app.route('/register/confirm-organisation-survey/')
+def register_confirm_organisation_survey():
+    return render('register.confirm-organisation-survey.html')
 
-@app.route('/almost-done/')
-def almost_done():
-    return render('almost-done.html')
+@app.route('/register/almost-done/')
+def register_almost_done():
+    return render('register.almost-done.html')
 
 
 #Disable cache for development

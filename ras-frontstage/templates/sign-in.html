@@ -1,11 +1,13 @@
 {% import 'partials/section.html' as section %}
 {% extends "layouts/_twocol.html" %}
 
+{% set errorType = data['error']['type'] %}
+
 {% block page_title %}Sign in{% endblock %}
 
 {% block main %}
 
-    {% if data['error']['type'] == "failed" %}
+    {% if errorType == "failed" %}
     <div class="panel panel--error">
         <div class="panel__header">
             <h1 class="panel__title venus">Some of the details entered are incorrect</h1>
@@ -19,7 +21,7 @@
 
     <form action="#" class="form">
 
-        {% if data['error']['type'] == "last-attempt" %}
+        {% if errorType == "last-attempt" %}
             <h1 class="saturn">You have one last attempt to sign in</h1>
             <legend>If you use the wrong sign in details again, you will then have to contact us again to sign in to your account.</legend>
         {% else %}
@@ -29,7 +31,7 @@
         <br />
 
         <fieldset id="sign-in-details">
-            {% if data['error']['type'] == "failed" %}
+            {% if errorType == "failed" %}
             <div class="panel panel--simple panel--error">
                 <div class="panel__header">
                     <ul class="list list--bare list--errors">
@@ -51,13 +53,13 @@
                 <div class="field">
                     <label class="label">Password</label>
                     <input class="input input--text input-type__input" value="" type="password" />
-                    {% if data['error']['type'] == "last-attempt" %}
+                    {% if errorType == "last-attempt" %}
                         <p>If you're unsure of your sign in detail, you can <a href="/forgot-password">reset your password</a></p>
                     {% else %}
                         <p><a href="/forgot-password">Forgot password</a></p>
                     {% endif %}
                 </div>
-            {% if data['error']['type'] == "failed" %}
+            {% if errorType == "failed" %}
             </div>
             {% endif %}
         </fieldset>

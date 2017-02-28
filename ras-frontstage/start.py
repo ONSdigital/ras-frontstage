@@ -9,7 +9,7 @@ app.debug = True
 
 @app.route('/')
 def hello_world():
-    return 'Hello, World!'
+    return render_template('_temp.html', _theme='default')
 
 #@app.route('/hello/')
 #@app.route('/hello/<name>')
@@ -55,7 +55,7 @@ def forgot_password_check_email():
     return render('forgot-password.check-email.html')
 
 
-# ===== Password reset =====
+# ===== Reset password =====
 @app.route('/reset-password/')
 def reset_password():
     templateData = {
@@ -64,8 +64,14 @@ def reset_password():
         }
     }
 
+    print(request.args.get("error"))
+
     #data variables configured: {"error": <undefined, password-mismatch>}
     return render_template('reset-password.html', _theme='default', data=templateData)
+
+@app.route('/reset-password/confirmation/')
+def reset_password_confirmation():
+    return render('reset-password.confirmation.html')
 
 
 # ===== Registration =====

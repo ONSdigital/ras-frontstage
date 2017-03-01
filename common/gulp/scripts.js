@@ -15,6 +15,7 @@ import sourcemaps from 'gulp-sourcemaps';
 import rollupBabel from 'rollup-plugin-babel';
 import nodeResolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
+import gulpif from 'gulp-if'
 
 import bs from 'browser-sync';
 let browserSync = bs.create();
@@ -59,6 +60,8 @@ const b = paths => browserify({
   });
 
 export function bundle(watch, paths) {
+  const minifyAssets = process.env.MINIMIZE_ASSETS === 'True';
+
   const bundled = b(paths);
   const bundler = watch ? watchify(bundled) : bundled;
   return bundler.bundle()
@@ -69,19 +72,19 @@ export function bundle(watch, paths) {
     })
     .pipe(source('bundle.js'))
     .pipe(buffer())
-    .pipe(sourcemaps.init({loadMaps: true}))
+    .pipe(gulpif(!minifyAssets, sourcemaps.init({loadMaps: true})))
     .pipe(gulp.dest(paths.scripts.output))
     .pipe(rename({
       suffix: '.min'
     }))
     .pipe(uglify())
-    .pipe(sourcemaps.write('.'))
+    .pipe(gulpif(!minifyAssets, sourcemaps.write('.')))
     .pipe(gulp.dest(paths.scripts.output))
     .pipe(browserSync.reload({stream: true}))
 }
 
-/*
-export function copyScripts(paths) {
+
+/*export function copyScripts(paths) {
   gulp.src([paths.scripts.input, `!${paths.scripts.dir}app/!**!/!*`])
     .on('error', function(err) {
       gutil.log(err.message)
@@ -97,9 +100,9 @@ export function copyScripts(paths) {
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest(paths.scripts.output))
     .pipe(browserSync.reload({stream: true}))
-}
+}*/
 
-export function lint(done, paths) {
+/*export function lint(done, paths) {
   return gulp.src([paths.scripts.input, `!${paths.scripts.dir}vendor/!**!/!*`, `!${paths.scripts.dir}polyfills.js`])
     .pipe(plumber())
     .pipe(eslint())

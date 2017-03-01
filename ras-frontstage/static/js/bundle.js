@@ -8271,12 +8271,68 @@ ready(function () {
   }
 });
 
-// import '../../../../common/assets/js/app/modules/nav';
-// import '../../../../common/assets/js/app/modules/relationships';
-// import '../../../../common/assets/js/app/modules/analytics';
+var options = {
+	characterLen: {
+		min: 8,
+		max: Infinity
+	}
+};
 
-// import '../../../../common/assets/js/app/modules/help';
-// import '../../../../common/assets/js/app/modules/household';
+function validateCharacterLength(str) {
+	return false;
+}
+
+function validateHasCapitalLetter(str) {
+	return false;
+}
+
+function validateHasSymbol(str) {
+	return true;
+}
+
+function validationHasNumber(str) {
+	return false;
+}
+
+var passwordValidation = (function (opts) {
+	options = opts ? Object.assign({}, options, opts) : options;
+});
+
+var passwordValidatorClass = 'js-password-validation';
+var fieldValidationConfig = [{
+	FUNC: validateCharacterLength
+}, {
+	FUNC: validateHasCapitalLetter
+}, {
+	FUNC: validateHasSymbol
+}, {
+	FUNC: validationHasNumber
+}];
+
+function appPasswordValidation() {
+	passwordValidation();
+
+	$('.' + passwordValidatorClass).each(function (i, el) {
+		applyPasswordValidation($(el));
+	});
+}
+
+function applyPasswordValidation($el) {
+	$el.on('blur', function () {
+		validateField($el);
+	});
+}
+
+function validateField($el) {
+	var str = $el.val(),
+	    failedValidation = fieldValidationConfig.filter(function (item) {
+		return !item.FUNC(str);
+	});
+
+	console.log(failedValidation);
+}
+
+ready(appPasswordValidation);
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 

@@ -35,7 +35,7 @@ export function lint(paths) {
 }
 
 export function styles(paths) {
-  const minifyAssets = process.env.EQ_MINIMIZE_ASSETS === 'True';
+  const minifyAssets = process.env.MINIMIZE_ASSETS === 'True';
 
   const minifyStyles = lazypipe()
     .pipe(rename, {
@@ -50,7 +50,7 @@ export function styles(paths) {
     .pipe(gulp.dest, paths.styles.output);
 
   return gulp.src(paths.styles.input)
-    .pipe(sourcemaps.init())
+    .pipe(gulpif(!minifyAssets, sourcemaps.init()))
     .pipe(plumber())
     .pipe(sassGlob())
     .pipe(sass({

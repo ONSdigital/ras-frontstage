@@ -1,7 +1,7 @@
 import gulp from 'gulp';
 import {styles, lint as lintStyles} from './common/gulp/styles';
-import {bundle} from './common/gulp/scripts';
-import {paths} from './gulp/paths';
+import {bundle, copyScripts} from './common/gulp/scripts';
+import {paths, appPath} from './gulp/paths';
 import sass from 'gulp-sass';
 import concat from 'gulp-concat';
 
@@ -14,7 +14,7 @@ gulp.task('compile:common:styles', () => {
 });
 
 gulp.task('compile:common:scripts', () => {
-	return bundle(true, paths);
+	return bundle(false, paths);
 });
 
 gulp.task('watch:common:styles', ['compile:common:styles'], () => {
@@ -22,7 +22,7 @@ gulp.task('watch:common:styles', ['compile:common:styles'], () => {
 });
 
 gulp.task('watch:common:scripts', ['compile:common:scripts'], () => {
-	gulp.watch(['./common/assets/scripts/**/*.js'], ['compile:common:scripts']);
+	gulp.watch([paths.scripts.input, `${appPath}/assets/js/**/*.js`], ['compile:common:scripts']);
 });
 
 

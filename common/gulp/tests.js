@@ -2,15 +2,19 @@ import gulp from 'gulp'
 import karma from 'karma'
 import path from 'path'
 import gutil from 'gulp-util'
-import {paths} from './paths'
 import webdriver from 'gulp-webdriver'
 import yargs from 'yargs'
 
-const KarmaServer = karma.Server
+const KarmaServer = karma.Server;
+
+let config = {};
+export default opts => {
+	config = opts ? Object.assign({}, config, opts) : config;
+}
 
 export function unitTests(done, watch) {
   const server = new KarmaServer({
-    configFile: path.resolve('.') + '/' + paths.test.karmaConf,
+    configFile: path.resolve('.') + '/' + config.paths.test.karmaConf,
     singleRun: !watch
   }, function() {
     done()
@@ -37,7 +41,7 @@ export function unitTests(done, watch) {
 export function functionalTests(done) {
   const webdriverOpts = {}
   if (yargs.argv.spec) {
-    webdriverOpts.spec = `${paths.test.wdioSpec}/${yargs.argv.spec}.spec.js`
+    webdriverOpts.spec = `${config.paths.test.wdioSpec}/${yargs.argv.spec}.spec.js`
   }
   if (yargs.argv.suite) {
     webdriverOpts.suite = yargs.argv.suite

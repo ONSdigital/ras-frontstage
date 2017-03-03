@@ -22,21 +22,26 @@ let browserSync = bs.create();
 
 let cache;
 
-const b = paths => browserify({
+let config = {};
+export default opts => {
+	config = opts ? Object.assign({}, config, opts) : config;
+}
+
+const b = () => browserify({
       ...watchify.argsz,
       ...{
-          entries: paths.scripts.browserifyEntries,
+          entries: config.paths.scripts.browserifyEntries,
           debug: true
       }
   })
   .on('update', () => {
-      cache = bundle(false, paths)
+      cache = bundle(false, config.paths)
   })
   .on('log', gutil.log)
   .transform('rollupify', {
       config: {
           cache: cache,
-          entry: paths.scripts.rollupifyEntries,
+          entry: config.paths.scripts.rollupifyEntries,
           plugins: [
               commonjs({
                   include: 'node_modules/**',
@@ -59,10 +64,10 @@ const b = paths => browserify({
       }
   });
 
-export function bundle(watch, paths) {
+export function bundle(watch) {
   const minifyAssets = process.env.MINIMIZE_ASSETS === 'True';
 
-  const bundled = b(paths);
+  const bundled = b(config.paths);
   const bundler = watch ? watchify(bundled) : bundled;
   return bundler.bundle()
     .on('error', function(err) {
@@ -73,13 +78,13 @@ export function bundle(watch, paths) {
     .pipe(source('bundle.js'))
     .pipe(buffer())
     .pipe(gulpif(!minifyAssets, sourcemaps.init({loadMaps: true})))
-    .pipe(gulp.dest(paths.scripts.output))
+    .pipe(gulp.dest(config.paths.scripts.output))
     .pipe(rename({
       suffix: '.min'
     }))
     .pipe(uglify())
     .pipe(gulpif(!minifyAssets, sourcemaps.write('.')))
-    .pipe(gulp.dest(paths.scripts.output))
+    .pipe(gulp.dest(config.paths.scripts.output))
     .pipe(browserSync.reload({stream: true}))
 }
 

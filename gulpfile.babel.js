@@ -1,20 +1,29 @@
 import gulp from 'gulp';
-import {styles, lint as lintStyles} from './common/gulp/styles';
-import {bundle, copyScripts} from './common/gulp/scripts';
-import {paths, appPath} from './gulp/paths';
+import { default as stylesModule, styles, lint as lintStyles } from './common/gulp/styles';
+import { default as scriptsModule, bundle, copyScripts } from './common/gulp/scripts';
+import { paths, appPath } from './gulp/paths';
 import sass from 'gulp-sass';
 import concat from 'gulp-concat';
+import { default as testsModule, unitTests, functionalTests } from './common/gulp/tests'
+
+const config = {
+	paths: paths
+};
+
+scriptsModule(config);
+stylesModule(config);
+testsModule(config);
 
 
 /**
  * Compile common tasks
  */
 gulp.task('compile:common:styles', () => {
-	return styles(paths);
+	return styles();
 });
 
 gulp.task('compile:common:scripts', () => {
-	return bundle(false, paths);
+	return bundle(false);
 });
 
 gulp.task('watch:common:styles', ['compile:common:styles'], () => {
@@ -42,12 +51,34 @@ gulp.task('watch:sass', ['compile:sass'], () => {
 	gulp.watch(['./ras-frontstage/**/*.scss'], ['compile:sass']);
 });
 
+
+/**
+ * Test
+ */
+gulp.task('test:scripts:unit', (done) => {
+	unitTests(done, false)
+});
+
+/*gulp.task('test:scripts:functional:sauce', (done) => {
+	process.env.BASEURL = getEnv()
+	functionalTests(done)
+});*/
+
+gulp.task('test:scripts', ['test:scripts:unit'])
+
+
+
+/**
+ * Tools
+ */
 gulp.task('dev', [
 	'watch:common:styles',
 	'watch:common:scripts',
 	'watch:sass'
-], () => {
+]);
 
-});
+gulp.task('test', [
+	'test:scripts'
+])
 
 gulp.task('default', ['sass']);

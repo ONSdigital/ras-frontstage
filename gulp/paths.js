@@ -18,5 +18,15 @@ export const paths = {
 			`${appPath}/assets/js/app/main.js`
 		],
 		rollupifyEntries: `${appPath}/assets/js/app/main.js`
+	},
+	test: {
+		input: appPath + '/js/**/*.js',
+		karmaConf: './karma.conf.js',
+		karmaSpec: appPath + '/assets/js/**/*.spec.js',
+		//wdioConf: 'tests/functional/wdio.conf.js',
+		//wdioSpec: 'tests/functional/spec',
+		coverage: 'tests/karma/coverage/',
+		results: 'tests/karma/results/',
+		errorShots: 'tests/errorShots'
 	}
 };

@@ -8271,7 +8271,7 @@ ready(function () {
   }
 });
 
-var options = {
+var config = {
 	characterLen: {
 		min: 8,
 		max: Infinity
@@ -8295,7 +8295,7 @@ function validationHasNumber(str) {
 }
 
 var passwordValidation = (function (opts) {
-	options = opts ? Object.assign({}, options, opts) : options;
+	config = opts ? Object.assign({}, config, opts) : config;
 });
 
 var passwordValidatorClass = 'js-password-validation';

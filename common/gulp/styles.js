@@ -22,11 +22,16 @@ import inlineblock from 'postcss-inline-block'
 import bs from 'browser-sync';
 let browserSync = bs.create();
 
-export function lint(paths) {
-  gulp.src(paths.styles.input)
+let config = {};
+export default opts => {
+	config = opts ? Object.assign({}, config, opts) : config;
+}
+
+export function lint() {
+  gulp.src(config.paths.styles.input)
     .pipe(postcss([
       stylelint({
-        ignoreFiles: [`${paths.styles.dir}/partials/base/_sprite.scss`]
+        ignoreFiles: [`${config.paths.styles.dir}/partials/base/_sprite.scss`]
       }),
       reporter({ clearMessages: true })
     ], {
@@ -34,7 +39,7 @@ export function lint(paths) {
     }))
 }
 
-export function styles(paths) {
+export function styles() {
   const minifyAssets = process.env.MINIMIZE_ASSETS === 'True';
 
   const minifyStyles = lazypipe()
@@ -47,9 +52,9 @@ export function styles(paths) {
         removeAll: true
       }
     })
-    .pipe(gulp.dest, paths.styles.output);
+    .pipe(gulp.dest, config.paths.styles.output);
 
-  return gulp.src(paths.styles.input)
+  return gulp.src(config.paths.styles.input)
     .pipe(gulpif(!minifyAssets, sourcemaps.init()))
     .pipe(plumber())
     .pipe(sassGlob())
@@ -58,7 +63,7 @@ export function styles(paths) {
       outputStyle: 'expanded',
       sourceComments: false,
       includePaths: [
-        paths.styles.dir
+		  config.paths.styles.dir
       ],
       onSuccess: function(msg) {
         gutil.log('Done', gutil.colors.cyan(msg));
@@ -85,7 +90,7 @@ export function styles(paths) {
       return path;
     }))
     .pipe(gulpif(!minifyAssets, sourcemaps.write('.')))
-    .pipe(gulp.dest(paths.styles.output))
+    .pipe(gulp.dest(config.paths.styles.output))
     .pipe(browserSync.reload({ stream: true }))
     .pipe(gulpif(minifyAssets, minifyStyles()))
 }

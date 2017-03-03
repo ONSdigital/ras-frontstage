@@ -1,4 +1,4 @@
-let options = {
+let config = {
 		characterLen: {
 			min: 8,
 			max: Infinity
@@ -22,5 +22,5 @@ export function validationHasNumber(str) {
 }
 
 export default opts => {
-	options = opts ? Object.assign({}, options, opts) : options;
+	config = opts ? Object.assign({}, config, opts) : config;
 }

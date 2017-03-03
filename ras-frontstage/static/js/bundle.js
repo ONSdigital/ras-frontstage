@@ -7059,6 +7059,33 @@ define(String.prototype, "padRight", "".padEnd);
   [][key] && define(Array, key, Function.call.bind([][key]));
 });
 
+var eventReady = 'DOMContentLoaded';
+
+var callbacks = [];
+var isReady = false;
+
+var onReady = function onReady() {
+  isReady = true;
+  callbacks.forEach(function (fn) {
+    return fn.call();
+  });
+  document.removeEventListener(eventReady, onReady);
+};
+
+function ready(fn) {
+  if (isReady) {
+    fn.call();
+  } else {
+    callbacks.push(fn);
+  }
+}
+
+if (document.readyState === 'interactive') {
+  onReady.call();
+} else {
+  document.addEventListener(eventReady, onReady);
+}
+
 /**
  * A specialized version of `_.forEach` for arrays without support for
  * iteratee shorthands.
@@ -8019,33 +8046,6 @@ function forEach(collection, iteratee) {
 
 var forEach_1 = forEach;
 
-var eventReady = 'DOMContentLoaded';
-
-var callbacks = [];
-var isReady = false;
-
-var onReady = function onReady() {
-  isReady = true;
-  callbacks.forEach(function (fn) {
-    return fn.call();
-  });
-  document.removeEventListener(eventReady, onReady);
-};
-
-function ready(fn) {
-  if (isReady) {
-    fn.call();
-  } else {
-    callbacks.push(fn);
-  }
-}
-
-if (document.readyState === 'interactive') {
-  onReady.call();
-} else {
-  document.addEventListener(eventReady, onReady);
-}
-
 var classDetails = 'js-details';
 var classTrigger = 'js-details-trigger';
 var classBody = 'js-details-body';
@@ -8278,61 +8278,101 @@ var config = {
 	}
 };
 
+function validateEqual(str1, str2) {
+	console.log(str1, str2);
+	return str1 === str2;
+}
+
 function validateCharacterLength(str) {
-	return false;
+	return str.length >= config.characterLen.min;
 }
 
 function validateHasCapitalLetter(str) {
-	return false;
+	return (/[A-Z]/.test(str)
+	);
 }
 
 function validateHasSymbol(str) {
-	return true;
+	return (/[-!$£%^&*()_+|~=`{}\[\]:";'<>?,.\/]/.test(str)
+	);
 }
 
-function validationHasNumber(str) {
-	return false;
-}
-
-var passwordValidation = (function (opts) {
-	config = opts ? Object.assign({}, config, opts) : config;
-});
-
-var passwordValidatorClass = 'js-password-validation';
-var fieldValidationConfig = [{
-	FUNC: validateCharacterLength
-}, {
-	FUNC: validateHasCapitalLetter
-}, {
-	FUNC: validateHasSymbol
-}, {
-	FUNC: validationHasNumber
-}];
-
-function appPasswordValidation() {
-	passwordValidation();
-
-	$('.' + passwordValidatorClass).each(function (i, el) {
-		applyPasswordValidation($(el));
+function validateHasNumber(str) {
+	return str.split('').some(function (ch) {
+		return parseInt(ch);
 	});
 }
 
-function applyPasswordValidation($el) {
-	$el.on('blur', function () {
-		validateField($el);
+var newPasswordFieldGroup = 'js-new-password-group';
+var passwordFieldClass = 'js-new-password';
+var passwordConfirmationFieldClass = 'js-confirm-new-password';
+var fieldStrengthValidationConfig = [validateCharacterLength, validateHasCapitalLetter, validateHasSymbol, validateHasNumber];
+
+var errorEmitter = $({});
+
+var passwordValidation = (function () {
+
+	/**
+  * Find new password field groups
+  */
+	$('.' + newPasswordFieldGroup).each(function (i, el) {
+
+		/**
+   * Find scoped fields
+   */
+		var newPassword = $(el).find('.' + passwordFieldClass),
+		    confirmPassword = $(el).find('.' + passwordConfirmationFieldClass);
+
+		applyPasswordValidation(newPassword, confirmPassword);
+	});
+});
+
+function applyPasswordValidation($newPasswordEl, $confirmPasswordEl) {
+
+	$newPasswordEl.on('blur', function () {
+		validateField($newPasswordEl) && validateFieldsEqual($newPasswordEl, $confirmPasswordEl);
+	});
+
+	$confirmPasswordEl.on('blur', function () {
+		validateFieldsEqual($newPasswordEl, $confirmPasswordEl);
 	});
 }
 
 function validateField($el) {
+
 	var str = $el.val(),
-	    failedValidation = fieldValidationConfig.filter(function (item) {
-		return !item.FUNC(str);
+	    failedStrengthValidation = fieldStrengthValidationConfig.filter(function (validate) {
+		return !validate(str);
 	});
 
-	console.log(failedValidation);
+	return failedStrengthValidation.length ? function () {
+		errorEmitter.trigger('error', {
+			'title': 'Your password doesn\'t meet the requirements',
+			'link-message': 'Please choose a different password'
+		});
+		return false;
+	}() : true;
 }
 
-ready(appPasswordValidation);
+function validateFieldsEqual($newPasswordEl, $confirmPasswordEl) {
+
+	return !validateEqual($newPasswordEl.val(), $confirmPasswordEl.val()) ? function () {
+		errorEmitter.trigger('error', {
+			'title': 'Your passwords do not match',
+			'link-message': 'Please check the passwords and try again'
+		});
+		return false;
+	}() : true;
+}
+
+/**
+ * Boot DOM
+ */
+ready(passwordValidation);
+
+errorEmitter.on('error', function (data) {
+	console.log(data);
+});
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 

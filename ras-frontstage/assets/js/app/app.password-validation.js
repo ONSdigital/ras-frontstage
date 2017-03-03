@@ -1,43 +1,78 @@
-import domready from '../../../../common/assets/js/app/modules/domready';
-import { default as passwordValidation,
+import { default as validation,
 	validateCharacterLength,
 	validateHasCapitalLetter,
 	validateHasSymbol,
-	validationHasNumber } from './modules/password-validation';
+	validateHasNumber,
+	validateEqual } from './modules/validation';
 
-const passwordValidatorClass = 'js-password-validation',
-	fieldValidationConfig = [
-		{
-			FUNC: validateCharacterLength
-		},
-		{
-			FUNC: validateHasCapitalLetter
-		},
-		{
-			FUNC: validateHasSymbol
-		},
-		{
-			FUNC: validationHasNumber
-		}
+const newPasswordFieldGroup = 'js-new-password-group',
+	passwordFieldClass = 'js-new-password',
+	passwordConfirmationFieldClass = 'js-confirm-new-password',
+
+	fieldStrengthValidationConfig = [
+		validateCharacterLength,
+		validateHasCapitalLetter,
+		validateHasSymbol,
+		validateHasNumber
 	];
 
-function appPasswordValidation() {
-	passwordValidation();
+export let errorEmitter = $({});
 
-	$(`.${passwordValidatorClass}`).each((i, el) => {
-		applyPasswordValidation($(el));
+export default () => {
+
+	/**
+	 * Find new password field groups
+	 */
+	$(`.${newPasswordFieldGroup}`).each((i, el) => {
+
+		/**
+		 * Find scoped fields
+		 */
+		var newPassword = $(el).find(`.${passwordFieldClass}`),
+			confirmPassword = $(el).find(`.${passwordConfirmationFieldClass}`);
+
+		applyPasswordValidation(newPassword, confirmPassword);
 	});
 }
 
-function applyPasswordValidation($el) {
-	$el.on('blur', () => { validateField($el) });
+function applyPasswordValidation($newPasswordEl, $confirmPasswordEl) {
+
+	$newPasswordEl.on('blur', () => {
+		validateField($newPasswordEl)
+			&& validateFieldsEqual($newPasswordEl, $confirmPasswordEl);
+	});
+
+	$confirmPasswordEl.on('blur', () => {
+		validateFieldsEqual($newPasswordEl, $confirmPasswordEl);
+	});
 }
 
 function validateField($el) {
-	let str = $el.val(),
-		failedValidation = fieldValidationConfig.filter(item => !item.FUNC(str));
 
-	console.log(failedValidation);
+	let str = $el.val(),
+		failedStrengthValidation = fieldStrengthValidationConfig
+			.filter(validate => !validate(str));
+
+	return failedStrengthValidation.length ?
+		(() => {
+			errorEmitter.trigger('error', {
+				'title': 'Your password doesn\'t meet the requirements',
+				'link-message': 'Please choose a different password'
+			});
+			return false;
+		})() :
+		true;
 }
 
-domready(appPasswordValidation);
+function validateFieldsEqual($newPasswordEl, $confirmPasswordEl) {
+
+	return !validateEqual($newPasswordEl.val(), $confirmPasswordEl.val()) ?
+		(() => {
+			errorEmitter.trigger('error', {
+				'title': 'Your passwords do not match',
+				'link-message': 'Please check the passwords and try again'
+			});
+			return false;
+		})() :
+		true;
+}

@@ -8271,6 +8271,26 @@ ready(function () {
   }
 });
 
+/**
+ * Error emitter list
+ * @type {Array<Emitter>}
+ */
+var emitters = [];
+
+var errorMessages = (function () {});
+
+/**
+ * Accepting an error emitter type object
+ * @param <Emitter>
+ */
+function setErrorEmitter(emitter) {
+  emitters.push(emitter);
+
+  emitter.on('error', function (e, data) {
+    console.log(data);
+  });
+}
+
 var config = {
 	characterLen: {
 		min: 8,
@@ -8279,7 +8299,6 @@ var config = {
 };
 
 function validateEqual(str1, str2) {
-	console.log(str1, str2);
 	return str1 === str2;
 }
 
@@ -8313,7 +8332,7 @@ var errorEmitter = $({});
 var passwordValidation = (function () {
 
 	/**
-  * Find new password field groups
+  * Find new password field scope
   */
 	$('.' + newPasswordFieldGroup).each(function (i, el) {
 
@@ -8330,7 +8349,7 @@ var passwordValidation = (function () {
 function applyPasswordValidation($newPasswordEl, $confirmPasswordEl) {
 
 	$newPasswordEl.on('blur', function () {
-		validateField($newPasswordEl) && validateFieldsEqual($newPasswordEl, $confirmPasswordEl);
+		validatePasswordField($newPasswordEl) && validateFieldsEqual($newPasswordEl, $confirmPasswordEl);
 	});
 
 	$confirmPasswordEl.on('blur', function () {
@@ -8338,7 +8357,7 @@ function applyPasswordValidation($newPasswordEl, $confirmPasswordEl) {
 	});
 }
 
-function validateField($el) {
+function validatePasswordField($el) {
 
 	var str = $el.val(),
 	    failedStrengthValidation = fieldStrengthValidationConfig.filter(function (validate) {
@@ -8357,22 +8376,24 @@ function validateField($el) {
 function validateFieldsEqual($newPasswordEl, $confirmPasswordEl) {
 
 	return !validateEqual($newPasswordEl.val(), $confirmPasswordEl.val()) ? function () {
-		errorEmitter.trigger('error', {
+		errorEmitter.trigger('error', [{
 			'title': 'Your passwords do not match',
 			'link-message': 'Please check the passwords and try again'
-		});
+		}]);
 		return false;
 	}() : true;
 }
 
+setErrorEmitter(errorEmitter);
+
+/**
+ * Application specific setup
+ */
 /**
  * Boot DOM
  */
 ready(passwordValidation);
-
-errorEmitter.on('error', function (data) {
-	console.log(data);
-});
+ready(errorMessages);
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 

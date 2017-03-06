@@ -3,7 +3,7 @@ import { default as validation,
 	validateHasCapitalLetter,
 	validateHasSymbol,
 	validateHasNumber,
-	validateEqual } from './modules/validation';
+	validateEqual } from '../../modules/validation';
 
 const newPasswordFieldGroup = 'js-new-password-group',
 	passwordFieldClass = 'js-new-password',
@@ -21,14 +21,14 @@ export let errorEmitter = $({});
 export default () => {
 
 	/**
-	 * Find new password field groups
+	 * Find new password field scope
 	 */
 	$(`.${newPasswordFieldGroup}`).each((i, el) => {
 
 		/**
 		 * Find scoped fields
 		 */
-		var newPassword = $(el).find(`.${passwordFieldClass}`),
+		let newPassword = $(el).find(`.${passwordFieldClass}`),
 			confirmPassword = $(el).find(`.${passwordConfirmationFieldClass}`);
 
 		applyPasswordValidation(newPassword, confirmPassword);
@@ -38,7 +38,7 @@ export default () => {
 function applyPasswordValidation($newPasswordEl, $confirmPasswordEl) {
 
 	$newPasswordEl.on('blur', () => {
-		validateField($newPasswordEl)
+		validatePasswordField($newPasswordEl)
 			&& validateFieldsEqual($newPasswordEl, $confirmPasswordEl);
 	});
 
@@ -47,7 +47,7 @@ function applyPasswordValidation($newPasswordEl, $confirmPasswordEl) {
 	});
 }
 
-function validateField($el) {
+function validatePasswordField($el) {
 
 	let str = $el.val(),
 		failedStrengthValidation = fieldStrengthValidationConfig
@@ -68,10 +68,10 @@ function validateFieldsEqual($newPasswordEl, $confirmPasswordEl) {
 
 	return !validateEqual($newPasswordEl.val(), $confirmPasswordEl.val()) ?
 		(() => {
-			errorEmitter.trigger('error', {
+			errorEmitter.trigger('error', [{
 				'title': 'Your passwords do not match',
 				'link-message': 'Please check the passwords and try again'
-			});
+			}]);
 			return false;
 		})() :
 		true;

@@ -1,6 +1,7 @@
 $responsive: false;
 $grid-max-width: 800px;
 
+$s: './static/s';
 
 /**
  * Boilerplate
@@ -42,6 +43,7 @@ $grid-max-width: 800px;
 @import "partials/components/bar";
 @import "partials/components/buttons";
 @import "partials/components/field";
+@import "partials/components/guidance";
 @import "partials/components/header";
 @import "partials/components/input";
 @import "partials/components/input-type";
@@ -51,5 +53,4 @@ $grid-max-width: 800px;
 @import "partials/components/skip";
 
 
-
-//@import "partials/utilities!**!*.scss";
+@import "./common-overrides";

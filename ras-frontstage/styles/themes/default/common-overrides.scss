@@ -1,0 +1,12 @@
+.guidance__link {
+
+  &:before {
+    background-image: url("/static/s/img/icons/guidance.svg");
+  }
+
+  &:focus {
+    &::before {
+      background-image: url("/static/s/img/icons/guidance-white.svg");
+    }
+  }
+}

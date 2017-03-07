@@ -8348,12 +8348,14 @@ var passwordValidation = (function () {
 
 function applyPasswordValidation($newPasswordEl, $confirmPasswordEl) {
 
+	var areFieldsEqual = validateFieldsEqual.bind({}, $newPasswordEl, $confirmPasswordEl);
+
 	$newPasswordEl.on('blur', function () {
-		validatePasswordField($newPasswordEl) && validateFieldsEqual($newPasswordEl, $confirmPasswordEl);
+		validatePasswordField($newPasswordEl) && areFieldsEqual();
 	});
 
 	$confirmPasswordEl.on('blur', function () {
-		validateFieldsEqual($newPasswordEl, $confirmPasswordEl);
+		areFieldsEqual();
 	});
 }
 
@@ -8374,6 +8376,8 @@ function validatePasswordField($el) {
 }
 
 function validateFieldsEqual($newPasswordEl, $confirmPasswordEl) {
+
+	console.log('here');
 
 	return !validateEqual($newPasswordEl.val(), $confirmPasswordEl.val()) ? function () {
 		errorEmitter.trigger('error', [{

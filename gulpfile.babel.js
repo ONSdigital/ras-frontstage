@@ -1,10 +1,12 @@
 import gulp from 'gulp';
-import { default as stylesModule, styles, lint as lintStyles } from './common/gulp/styles';
-import { default as scriptsModule, bundle, copyScripts } from './common/gulp/scripts';
 import { paths, appPath } from './gulp/paths';
 import sass from 'gulp-sass';
 import concat from 'gulp-concat';
-import { default as testsModule, unitTests, functionalTests } from './common/gulp/tests'
+import webdriver from 'gulp-webdriver';
+
+import { default as stylesModule, styles, lint as lintStyles } from './common/gulp/styles';
+import { default as scriptsModule, bundle, copyScripts } from './common/gulp/scripts';
+import { default as testsModule, unitTests, functionalTests } from './common/gulp/tests';
 
 const config = {
 	paths: paths
@@ -59,12 +61,12 @@ gulp.task('test:scripts:unit', (done) => {
 	unitTests(done, false)
 });
 
-/*gulp.task('test:scripts:functional:sauce', (done) => {
-	process.env.BASEURL = getEnv()
-	functionalTests(done)
-});*/
+gulp.task('test:scripts:e2e', function() {
+	return gulp.src('wdio.conf.js').pipe(webdriver());
+});
 
-gulp.task('test:scripts', ['test:scripts:unit'])
+
+gulp.task('test:scripts', ['test:scripts:unit']);
 
 
 

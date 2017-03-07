@@ -3,7 +3,7 @@ import { default as validation,
 	validateHasCapitalLetter,
 	validateHasSymbol,
 	validateHasNumber,
-	validateEqual } from '../../modules/validation';
+	validateEqual } from '../../modules/validators';
 
 const newPasswordFieldGroup = 'js-new-password-group',
 	passwordFieldClass = 'js-new-password',
@@ -37,13 +37,15 @@ export default () => {
 
 function applyPasswordValidation($newPasswordEl, $confirmPasswordEl) {
 
+	let areFieldsEqual = validateFieldsEqual.bind({}, $newPasswordEl, $confirmPasswordEl);
+
 	$newPasswordEl.on('blur', () => {
-		validatePasswordField($newPasswordEl)
-			&& validateFieldsEqual($newPasswordEl, $confirmPasswordEl);
+		validatePasswordField($newPasswordEl) &&
+		areFieldsEqual()
 	});
 
 	$confirmPasswordEl.on('blur', () => {
-		validateFieldsEqual($newPasswordEl, $confirmPasswordEl);
+		areFieldsEqual()
 	});
 }
 

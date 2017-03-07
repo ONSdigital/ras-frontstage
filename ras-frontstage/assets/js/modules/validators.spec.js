@@ -5,9 +5,9 @@ import {
 	validateHasSymbol,
 	validateHasNumber,
 	validateEqual
-} from './validation';
+} from './validators';
 
-describe('password-validation [module]', () => {
+describe('validator [module]', () => {
 
 	describe('validateEqual [method]', () => {
 

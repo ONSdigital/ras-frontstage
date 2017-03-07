@@ -14,7 +14,9 @@ module.exports = function(config) {
     frameworks: [
         //'commonjs',
         'browserify',
+        'jquery-3.1.1',
 		'jasmine',
+        //'jasmine-jquery'
     ],
 
     files: [
@@ -42,7 +44,9 @@ module.exports = function(config) {
       'karma-chrome-launcher',
       'karma-phantomjs-launcher',
       'karma-coverage',
-      'karma-jasmine'
+      'karma-jasmine',
+      'karma-jquery',
+      //'karma-jasmine-jquery'
     ],
 
     browserify: {

@@ -38,6 +38,7 @@ export function unitTests(done, watch) {
   server.start()
 }
 
+/*
 export function functionalTests(done) {
   const webdriverOpts = {}
   if (yargs.argv.spec) {
@@ -56,3 +57,4 @@ export function functionalTests(done) {
       done()
     })
 }
+*/

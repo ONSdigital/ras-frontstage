@@ -1,4 +1,4 @@
-import { setErrorEmitter } from './modules/dom.error-messages';
-import { errorEmitter as passwordValidationErrorEmitter } from './modules/dom.password-validation';
+import { setErrorEmitter } from './modules/error-messages.dom';
+import { errorEmitter as passwordValidationErrorEmitter } from './modules/password-validation.dom';
 
 setErrorEmitter(passwordValidationErrorEmitter);

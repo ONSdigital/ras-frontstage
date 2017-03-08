@@ -1,6 +1,7 @@
 node_modules/
 .idea
 allure-results
+coverage
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

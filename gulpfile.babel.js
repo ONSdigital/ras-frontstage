@@ -58,7 +58,7 @@ gulp.task('watch:sass', ['compile:sass'], () => {
  * Test
  */
 gulp.task('test:scripts:unit', (done) => {
-	unitTests(done, false)
+	return unitTests(done, false)
 });
 
 gulp.task('test:scripts:e2e', function() {
@@ -66,8 +66,7 @@ gulp.task('test:scripts:e2e', function() {
 });
 
 
-gulp.task('test:scripts', ['test:scripts:unit']);
-
+gulp.task('test:scripts', ['test:scripts:unit', 'test:scripts:e2e']);
 
 
 /**

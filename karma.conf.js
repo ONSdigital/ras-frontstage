@@ -24,6 +24,10 @@ module.exports = function(config) {
       testDir + '/**/*spec.js'
     ],
 
+    exclude: [
+		testDir + '/**/*e2e.js'
+    ],
+
     preprocessors: {
       [testDir + '/**/*.js']: [
         //'commonjs',
@@ -84,6 +88,7 @@ module.exports = function(config) {
       ]
     },
 
+    autoWatch:true,
 
     mochaReporter: {
       output: 'full'

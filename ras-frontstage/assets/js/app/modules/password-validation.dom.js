@@ -5,7 +5,7 @@ import { default as validation,
 	validateHasNumber,
 	validateEqual } from '../../modules/validators';
 
-const newPasswordFieldGroup = 'js-new-password-group',
+export const newPasswordFieldGroup = 'js-new-password-group',
 	passwordFieldClass = 'js-new-password',
 	passwordConfirmationFieldClass = 'js-confirm-new-password',
 

@@ -19,7 +19,7 @@
     <br />
     {% endif %}
 
-    <form method="POST" action="#" class="form">
+    <form method="post"  class="form">
 
         {% if errorType == "last-attempt" %}
             <h1 class="saturn">You have one last attempt to sign in</h1>
@@ -44,15 +44,15 @@
                 </div>
             {% endif %}
                 <div class="field">
-                    <label class="label">Email address</label>
-                    <input id="email-address" class="input input--text input-type__input" value="" type="text" />
+                    <label class="label">XXXEmail address</label>
+                    <input name="emailaddress" id="email-address"  class="input input--text input-type__input" value="" type="text" />
                 </div>
 
                 <br />
 
                 <div class="field">
                     <label class="label">Password</label>
-                    <input class="input input--text input-type__input" value="" type="password" />
+                    <input  name="pass" class="input input--text input-type__input" value="" type="password" />
                     {% if errorType == "last-attempt" %}
                         <p>If you're unsure of your sign in detail, you can <a href="/forgot-password">reset your password</a></p>
                     {% else %}

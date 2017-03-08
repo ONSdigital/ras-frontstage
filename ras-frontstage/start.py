@@ -18,8 +18,12 @@ def hello_world():
 
 
 # ===== Sign in =====
-@app.route('/sign-in/')
+@app.route('/sign-in/', methods=['GET','POST'])
 def sign_in():
+
+    password= request.form.get('pass')
+    password= request.form.get('emailaddress')
+    
     templateData = {
         "error": {
             "type": request.args.get("error")

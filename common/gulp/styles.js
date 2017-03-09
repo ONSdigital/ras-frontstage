@@ -62,9 +62,7 @@ export function styles() {
       errLogToConsole: true,
       outputStyle: 'expanded',
       sourceComments: false,
-      includePaths: [
-		  config.paths.styles.dir
-      ],
+      includePaths: config.paths.styles.includePaths,
       onSuccess: function(msg) {
         gutil.log('Done', gutil.colors.cyan(msg));
       }

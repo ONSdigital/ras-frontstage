@@ -4,7 +4,8 @@ import {
 	validateHasCapitalLetter,
 	validateHasSymbol,
 	validateHasNumber,
-	validateEqual
+	validateEqual,
+	validateIsEmail
 } from './validators';
 
 describe('validator [module]', () => {
@@ -90,6 +91,17 @@ describe('validator [module]', () => {
 
 		it('should return false when supplied without a number', () => {
 			expect(validateHasNumber('has no number')).toBe(false);
+		});
+	});
+
+	describe('validateIsEmail [method]', () => {
+
+		it('should return true when supplied with a valid email address', () => {
+			expect(validateIsEmail('test@testing.com')).toBe(true);
+		});
+
+		it('should return false when suplied with an invalid email address', () => {
+			expect(validateIsEmail('fake email!!.')).toBe(false);
 		});
 	});
 

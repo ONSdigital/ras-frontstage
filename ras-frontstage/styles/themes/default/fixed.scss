@@ -16,30 +16,30 @@ $s: './static/s';
 @import "partials/vars/typography";
 @import "partials/vars/vars";
 
+@import "partials/vendor/normalize";
+
 @import "partials/base/global";
 @import "partials/base/typography";
 @import "partials/base/forms";
-
-@import "partials/vendor/normalize";
 
 
 /**
  * Structure/layout
  */
 @import "partials/objects/container";
-@import "partials/objects/footer";
-@import "partials/objects/grid";
-@import "partials/objects/group";
-@import "partials/objects/list";
+//@import "partials/objects/footer";
+//@import "partials/objects/grid";
+//@import "partials/objects/group";
+//@import "partials/objects/list";
 @import "partials/objects/page";
-@import "partials/objects/section";
+//@import "partials/objects/section";
 @import "partials/objects/type-scale";
 
 
 /**
  * Components
  */
-@import "partials/components/badge";
+/*@import "partials/components/badge";
 @import "partials/components/bar";
 @import "partials/components/buttons";
 @import "partials/components/field";
@@ -50,7 +50,32 @@ $s: './static/s';
 @import "partials/components/label";
 @import "partials/components/logo";
 @import "partials/components/panel";
-@import "partials/components/skip";
+@import "partials/components/skip";*/
+
+@import "components/badge/badge";
+@import "components/bar/bar";
+@import "components/button/buttons";
+@import "components/header/header";
+@import "components/panel/panel";
+@import "components/skip";
+
+@import "components/03-grid/grid";
+@import "components/footer/footer";
+@import "components/list/list";
+
+
+/**
+ * Missing in pattern library
+ */
+@import "../../../../common/assets/styles/partials/objects/section";
+@import "../../../../common/assets/styles/partials/components/field";
+@import "../../../../common/assets/styles/partials/components/guidance";
+@import "../../../../common/assets/styles/partials/components/input";
+@import "../../../../common/assets/styles/partials/components/label";
+@import "../../../../common/assets/styles/partials/components/logo";
+
+// To delete
+//@import "../components/input-type/input-type";
 
 
 @import "./common-overrides";

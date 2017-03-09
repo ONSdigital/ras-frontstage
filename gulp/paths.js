@@ -5,7 +5,13 @@ export const distPath = './ras-frontstage/static';
 export const paths = {
 	common: commonPath,
 	styles: {
-		dir: commonPath + '/styles/',
+		//dir: commonPath + '/styles/', // Local
+		dir: '../sdc-global-design-patterns/assets/sass', // Using pattern library
+
+		includePaths: [
+			'../sdc-global-design-patterns/assets/sass',
+			'../sdc-global-design-patterns/'
+		],
 		input: appPath + '/styles/**/{fixed,responsive}.scss',
 		output: distPath + '/css/'
 	},

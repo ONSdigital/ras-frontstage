@@ -29,7 +29,10 @@ gulp.task('compile:common:scripts', () => {
 });
 
 gulp.task('watch:common:styles', ['compile:common:styles'], () => {
-	gulp.watch(['./common/assets/styles/**/*.scss'], ['compile:common:styles']);
+	gulp.watch([
+		'./common/assets/styles/**/*.scss',
+		'../sdc-global-design-patterns/**/*.scss'
+	], ['compile:common:styles']);
 });
 
 gulp.task('watch:common:scripts', ['compile:common:scripts'], () => {

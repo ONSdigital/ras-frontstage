@@ -14,9 +14,9 @@ export const newPasswordFieldGroup = 'js-new-password-group',
 		validateHasCapitalLetter,
 		validateHasSymbol,
 		validateHasNumber
-	];
+	],
 
-export let errorEmitter = $({});
+	errorEmitter = $({});
 
 export default () => {
 
@@ -37,16 +37,26 @@ export default () => {
 
 function applyPasswordValidation($newPasswordEl, $confirmPasswordEl) {
 
-	let areFieldsEqual = validateFieldsEqual.bind({}, $newPasswordEl, $confirmPasswordEl);
+	let areFieldsEqual = validateFieldsEqual.bind({}, $newPasswordEl, $confirmPasswordEl),
+		resetFieldsDispatch = function () {
+			errorEmitter.trigger('user-error:reset', [{
+				'fields': [
+					$newPasswordEl,
+					$confirmPasswordEl
+				]
+			}]);
+		};
 
 	$newPasswordEl.on('blur', () => {
-		validatePasswordField($newPasswordEl) &&
-		areFieldsEqual()
+		validatePasswordField($newPasswordEl)
 	});
 
 	$confirmPasswordEl.on('blur', () => {
 		areFieldsEqual()
 	});
+
+	$newPasswordEl.on('focus', () => resetFieldsDispatch());
+	$confirmPasswordEl.on('focus', () => resetFieldsDispatch());
 }
 
 function validatePasswordField($el) {
@@ -57,9 +67,14 @@ function validatePasswordField($el) {
 
 	return failedStrengthValidation.length ?
 		(() => {
-			errorEmitter.trigger('error', {
-				'title': 'Your password doesn\'t meet the requirements',
-				'link-message': 'Please choose a different password'
+			errorEmitter.trigger('user-error', {
+				'page-title': 'Your password doesn\'t meet the requirements',
+				'page-link-message': 'Please choose a different password',
+
+				'fields': [{
+					'el': $el[0],
+					'message': 'This password does not meet the criteria'
+				}]
 			});
 			return false;
 		})() :
@@ -70,9 +85,14 @@ function validateFieldsEqual($newPasswordEl, $confirmPasswordEl) {
 
 	return !validateEqual($newPasswordEl.val(), $confirmPasswordEl.val()) ?
 		(() => {
-			errorEmitter.trigger('error', [{
-				'title': 'Your passwords do not match',
-				'link-message': 'Please check the passwords and try again'
+			errorEmitter.trigger('user-error', [{
+				'page-title': 'Your passwords do not match',
+				'page-link-message': 'Please check the passwords and try again',
+
+				'fields': [{
+					'el': $confirmPasswordEl[0],
+					'message': 'Your passwords do not match'
+				}]
 			}]);
 			return false;
 		})() :

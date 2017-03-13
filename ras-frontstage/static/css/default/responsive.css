@@ -5161,4 +5161,9 @@ input:checked ~ .label {
   background-image: url("/static/s/img/icons/guidance-white.svg");
 }
 
+.input--text-error {
+  border: 1px solid red;
+  border-width: 2px;
+}
+
 /*# sourceMappingURL=responsive.css.map */

@@ -1,0 +1,36 @@
+{% import 'partials/section.html' as section %}
+{% extends "layouts/_twocol.html" %}
+
+{% block page_title %}Sign in - ONS Business Surveys{% endblock %}
+
+{% block main %}
+
+    <form method="post"  class="form">
+
+        <h1 class="saturn">Accessing your account</h1>
+        <p>If you're unsure of your sign in details, you may want to <a href="/forgot-password">reset your password.</a></p>
+
+        <p>If you know your password, you can sign in below.</p>
+
+        <p>If the password you enter below is incorrect, you'll need to contact us to access your account.</p>
+
+        <p>Please enter the password for the account registered to joe.bloggs@ons.gov.uk</p>
+
+        <fieldset>
+            <div class="field js-show-hide-password">
+                <label class="label">Password</label>
+
+                <!--<span>
+                    <input class="js-show-hide-password-toggle" type="checkbox"/>
+                    <label>Show password</label>
+                </span>-->
+
+                <input name="pass" class="input input--text input-type__input js-show-hide-password-field" value="" type="password" />
+            </div>
+            <br />
+
+            <button class="btn btn--secondary venus" type="submit">Sign in</button>
+        </fieldset>
+
+    </form>
+{% endblock main %}

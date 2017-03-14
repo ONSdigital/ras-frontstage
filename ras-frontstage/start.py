@@ -27,7 +27,22 @@ def sign_in():
     
     templateData = {
         "error": {
-            "type": request.args.get("error")
+            "type": None
+        }
+    }
+
+    #data variables configured: {"error": <undefined, failed, last-attempt>}
+    return render_template('sign-in.html', _theme='default', data=templateData)
+
+@app.route('/sign-in/error', methods=['GET'])
+def sign_in_error():
+
+    password= request.form.get('pass')
+    password= request.form.get('emailaddress')
+
+    templateData = {
+        "error": {
+            "type": "failed"
         }
     }
 
@@ -38,7 +53,11 @@ def sign_in():
 def sign_in_troubleshoot():
     return render('sign-in.trouble.html')
 
-@app.route('/account-locked/')
+@app.route('/sign-in/final-sign-in')
+def sign_in_last_attempt():
+    return render('sign-in.last-attempt.html')
+
+@app.route('/sign-in/account-locked/')
 def sign_in_account_locked():
     return render('sign-in.locked-account.html')
 

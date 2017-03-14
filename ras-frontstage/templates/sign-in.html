@@ -3,7 +3,13 @@
 
 {% set errorType = data['error']['type'] %}
 
-{% block page_title %}Sign in{% endblock %}
+{% block page_title %}
+    {% if errorType == "failed" %}
+        Error signing in - ONS Business Surveys
+    {% else %}
+        Complete a survey on behalf of a business - ONS Business Surveys
+    {% endif %}
+{% endblock %}
 
 {% block main %}
 
@@ -21,13 +27,7 @@
 
     <form method="post"  class="form">
 
-        {% if errorType == "last-attempt" %}
-            <h1 class="saturn">You have one last attempt to sign in</h1>
-            <legend>If you use the wrong sign in details again, you will then have to contact us again to sign in to your account.</legend>
-            <br />
-        {% else %}
-            <h1 class="saturn">Sign in</h1>
-        {% endif %}
+        <h1 class="saturn">Sign in</h1>
 
         <fieldset id="sign-in-details">
             {% if errorType == "failed" %}
@@ -48,11 +48,8 @@
                     </span>
 
                     <input name="pass" class="input input--text input-type__input js-show-hide-password-field" value="" type="password" />
-                    {% if errorType == "last-attempt" %}
-                        <p>If you're unsure of your sign in detail, you can <a href="/forgot-password">reset your password</a></p>
-                    {% else %}
-                        <a href="/forgot-password">Forgot password</a>
-                    {% endif %}
+
+                    <a href="/forgot-password">Forgot password</a>
                 </div>
                 <br />
 
@@ -61,7 +58,9 @@
             </div>
             {% endif %}
         </fieldset>
+        {% if errorType == "failed" %}
         <br />
+        {% endif %}
 
         <p>Have an activation code? Use it to <a href="">create an account</a></p>
 

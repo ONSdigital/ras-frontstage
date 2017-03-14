@@ -5,7 +5,7 @@ import { default as validation,
 	validateHasNumber,
 	validateEqual } from '../../modules/validators';
 
-export const newPasswordFieldGroup = 'js-new-password-group',
+export const newPasswordFieldGroupClass = 'js-new-password-group',
 	passwordFieldClass = 'js-new-password',
 	passwordConfirmationFieldClass = 'js-confirm-new-password',
 
@@ -23,7 +23,7 @@ export default () => {
 	/**
 	 * Find new password field scope
 	 */
-	$(`.${newPasswordFieldGroup}`).each((i, el) => {
+	$(`.${newPasswordFieldGroupClass}`).each((i, el) => {
 
 		/**
 		 * Find scoped fields

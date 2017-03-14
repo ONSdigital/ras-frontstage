@@ -1,3 +1,5 @@
+require('babel-core/register');
+
 exports.config = {
     
     //

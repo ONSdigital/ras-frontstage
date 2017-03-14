@@ -12,7 +12,6 @@ module.exports = function(config) {
     },
 
     frameworks: [
-        //'commonjs',
         'browserify',
         'jquery-3.1.1',
 		'jasmine',

@@ -12,12 +12,6 @@ app.debug = True
 def hello_world():
     return render_template('_temp.html', _theme='default')
 
-#@app.route('/hello/')
-#@app.route('/hello/<name>')
-#def hello(name=None):
-    #return render('hello.html', name=name)
-
-
 # ===== Sign in =====
 @app.route('/sign-in/', methods=['GET','POST'])
 def sign_in():

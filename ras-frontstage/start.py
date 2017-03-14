@@ -113,4 +113,5 @@ def render(template):
     return render_template(template, _theme='default')
 
 if __name__ == '__main__':
-    app.run( host='0.0.0.0', port=5000)
+    PORT = int(os.environ.get('PORT', 5000))
+    app.run( host='0.0.0.0', port=PORT)

@@ -8329,18 +8329,6 @@ function fieldErrorReset($field) {
 	$($field[0][fieldErrorLabelProperty]).remove();
 }
 
-/**
- * Accepting an error emitter type object
- * @param <Emitter>
- */
-/*
-export function setErrorEmitter(emitter) {
-	emitters.push(emitter);
-	emitter.on('user-error', (e, data) => handleUserError(data));
-	emitter.on('user-error:reset', (e, data) => handleUserErrorReset(data));
-}
-*/
-
 var config = {
 	characterLen: {
 		min: 8,

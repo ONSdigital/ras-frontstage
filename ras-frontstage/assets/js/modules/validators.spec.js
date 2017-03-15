@@ -107,7 +107,7 @@ describe('validator [module]', () => {
 
 	describe('module', () => {
 
-		it('should be configurable', () => {
+		it('shoxwuld be configurable', () => {
 			validationModule({
 				characterLen: {
 					min: 6

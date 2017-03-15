@@ -25,8 +25,11 @@
     <br />
     {% endif %}
 
-    <form method="post"  class="form">
-
+    {% if errorType == "failed" %}
+    <form method="get"  class="form" action="/sign-in/troubleshoot">
+    {% else %}
+    <form method="get"  class="form" action="/sign-in/error">
+    {% endif %}
         <h1 class="saturn">Sign in</h1>
 
         <fieldset id="sign-in-details">

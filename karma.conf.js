@@ -15,7 +15,7 @@ module.exports = function(config) {
         'browserify',
         'jquery-3.1.1',
 		'jasmine',
-        //'jasmine-jquery'
+        'jasmine-jquery'
     ],
 
     files: [
@@ -49,7 +49,7 @@ module.exports = function(config) {
       'karma-coverage',
       'karma-jasmine',
       'karma-jquery',
-      //'karma-jasmine-jquery'
+      'karma-jasmine-jquery'
     ],
 
     browserify: {

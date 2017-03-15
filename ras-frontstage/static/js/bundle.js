@@ -8360,7 +8360,7 @@ function validateHasNumber(str) {
 	});
 }
 
-var newPasswordFieldGroup = 'js-new-password-group';
+var newPasswordFieldGroupClass = 'js-new-password-group';
 var passwordFieldClass = 'js-new-password';
 var passwordConfirmationFieldClass = 'js-confirm-new-password';
 var fieldStrengthValidationConfig = [validateCharacterLength, validateHasCapitalLetter, validateHasSymbol, validateHasNumber];
@@ -8371,7 +8371,7 @@ var passwordValidation = (function () {
 	/**
   * Find new password field scope
   */
-	$('.' + newPasswordFieldGroup).each(function (i, el) {
+	$('.' + newPasswordFieldGroupClass).each(function (i, el) {
 
 		/**
    * Find scoped fields

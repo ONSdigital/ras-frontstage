@@ -462,6 +462,40 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
   return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
 };
 
+
+
+
+
+
+
+
+
+
+
+var classCallCheck = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+var createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+}();
+
 var _isObject = function _isObject(it) {
   return (typeof it === 'undefined' ? 'undefined' : _typeof(it)) === 'object' ? it !== null : typeof it === 'function';
 };
@@ -8302,11 +8336,39 @@ function validateHasNumber(str) {
 	});
 }
 
+var $jEmitter = $({});
+
+var Emitter = function () {
+	function Emitter() {
+		classCallCheck(this, Emitter);
+	}
+
+	createClass(Emitter, [{
+		key: "on",
+		value: function on(evtName, callback) {
+			$jEmitter.on(evtName, function (e, data) {
+				return callback(data);
+			});
+		}
+	}, {
+		key: "trigger",
+		value: function trigger(evtName, data) {
+			$jEmitter.trigger(evtName, data);
+		}
+	}], [{
+		key: "create",
+		value: function create() {
+			return new Emitter();
+		}
+	}]);
+	return Emitter;
+}();
+
 var newPasswordFieldGroupClass = 'js-new-password-group';
 var passwordFieldClass = 'js-new-password';
 var passwordConfirmationFieldClass = 'js-confirm-new-password';
 var fieldStrengthValidationConfig = [validateCharacterLength, validateHasCapitalLetter, validateHasSymbol, validateHasNumber];
-var errorEmitter = $({});
+var errorEmitter = Emitter.create();
 
 var passwordValidation = (function () {
 
@@ -8318,43 +8380,43 @@ var passwordValidation = (function () {
 		/**
    * Find scoped fields
    */
-		var newPassword = $(el).find('.' + passwordFieldClass),
-		    confirmPassword = $(el).find('.' + passwordConfirmationFieldClass);
+		var $scopeEl = $(el),
+		    $newPasswordEl = $scopeEl.find('.' + passwordFieldClass),
+		    $confirmPasswordEl = $scopeEl.find('.' + passwordConfirmationFieldClass);
 
-		applyPasswordValidation(newPassword, confirmPassword);
+		applyPasswordValidation({ $scopeEl: $scopeEl, $newPasswordEl: $newPasswordEl, $confirmPasswordEl: $confirmPasswordEl });
 	});
 });
 
-function applyPasswordValidation($newPasswordEl, $confirmPasswordEl) {
+function applyPasswordValidation(scope) {
 
-	var areFieldsEqual = validateFieldsEqual.bind({}, $newPasswordEl, $confirmPasswordEl),
+	var areFieldsEqual = validateFieldsEqual.bind({}, scope.$newPasswordEl, scope.$confirmPasswordEl),
 	    resetFieldsDispatch = function resetFieldsDispatch() {
-
 		errorEmitter.trigger('user-error:reset', [{
-			'fields': [$newPasswordEl, $confirmPasswordEl]
+			'fields': [scope.$newPasswordEl, scope.$confirmPasswordEl]
 		}]);
 	};
 
-	$newPasswordEl.on('blur', function () {
+	scope.$newPasswordEl.on('blur', function () {
 
-		var failedStrengthValidation = validatePasswordField($newPasswordEl);
+		var failedStrengthValidation = validatePasswordField(scope.$newPasswordEl);
 
 		if (failedStrengthValidation.length) {
 
 			passwordUserError({
 				'fields': [{
-					'el': $newPasswordEl[0],
+					'el': scope.$newPasswordEl[0],
 					'messages': ['This password does not meet the criteria']
 				}]
 			});
 		}
 	});
 
-	$confirmPasswordEl.on('blur', function () {
+	scope.$confirmPasswordEl.on('blur', function () {
 
 		var messages = [],
 		    areFieldsEqualResult = areFieldsEqual(),
-		    failedStrengthValidationResults = validatePasswordField($confirmPasswordEl);
+		    failedStrengthValidationResults = validatePasswordField(scope.$confirmPasswordEl);
 
 		if (!areFieldsEqualResult) {
 			messages.push('Your passwords do not match');
@@ -8367,15 +8429,15 @@ function applyPasswordValidation($newPasswordEl, $confirmPasswordEl) {
 		if (!areFieldsEqualResult || failedStrengthValidationResults.length) {
 			passwordUserError({
 				'fields': [{
-					'el': $confirmPasswordEl[0],
+					'el': scope.$confirmPasswordEl[0],
 					'messages': messages
 				}]
 			});
 		}
 	});
 
-	$newPasswordEl.on('focus', resetFieldsDispatch);
-	$confirmPasswordEl.on('focus', resetFieldsDispatch);
+	scope.$newPasswordEl.on('focus', resetFieldsDispatch);
+	scope.$confirmPasswordEl.on('focus', resetFieldsDispatch);
 }
 
 function validatePasswordField($el) {
@@ -8448,11 +8510,14 @@ var userErrors = [];
 var inputTextErrorClass = 'input--text-error';
 var fieldErrorLabelProperty = 'sdcFieldErrorLabel';
 
+/**
+ * @param emitter
+ */
 function setErrorEmitter(emitter) {
-	emitter.on('user-error', function (e, data) {
-		handleUserError(userErrorModel(data));
+	emitter.on('user-error', function (data) {
+		return handleUserError(userErrorModel(data));
 	});
-	emitter.on('user-error:reset', function (e, data) {
+	emitter.on('user-error:reset', function (data) {
 		return handleUserErrorReset(userErrorResetModel(data));
 	});
 }

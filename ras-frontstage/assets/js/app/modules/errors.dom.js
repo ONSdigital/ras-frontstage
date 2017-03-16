@@ -7,12 +7,12 @@ let userErrors = [],
 	inputTextErrorClass = 'input--text-error',
 	fieldErrorLabelProperty = 'sdcFieldErrorLabel';
 
-
+/**
+ * @param emitter
+ */
 export function setErrorEmitter(emitter) {
-	emitter.on('user-error', (e, data) => {
-		handleUserError(userErrorModel(data))
-	});
-	emitter.on('user-error:reset', (e, data) => handleUserErrorReset(userErrorResetModel(data)));
+	emitter.on('user-error', data => handleUserError(userErrorModel(data)));
+	emitter.on('user-error:reset', data => handleUserErrorReset(userErrorResetModel(data)));
 }
 
 function handleUserError(data) {

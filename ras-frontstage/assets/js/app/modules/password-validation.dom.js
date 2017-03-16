@@ -6,11 +6,16 @@ import { default as validation,
 	validateHasSymbol,
 	validateHasNumber,
 	validateEqual } from '../../modules/validators';
+import Emitter from '../helpers/emitter';
 
 export const newPasswordFieldGroupClass = 'js-new-password-group',
 	passwordFieldClass = 'js-new-password',
 	passwordConfirmationFieldClass = 'js-confirm-new-password',
 
+	/**
+	 * Specify validation to use
+	 * @type {[*]}
+	 */
 	fieldStrengthValidationConfig = [
 		validateCharacterLength,
 		validateHasCapitalLetter,
@@ -18,7 +23,7 @@ export const newPasswordFieldGroupClass = 'js-new-password-group',
 		validateHasNumber
 	],
 
-	errorEmitter = $({});
+	errorEmitter = Emitter.create();
 
 export default () => {
 
@@ -30,46 +35,47 @@ export default () => {
 		/**
 		 * Find scoped fields
 		 */
-		let newPassword = $(el).find(`.${passwordFieldClass}`),
-			confirmPassword = $(el).find(`.${passwordConfirmationFieldClass}`);
+		let $scopeEl = $(el),
+			$newPasswordEl = $scopeEl.find(`.${passwordFieldClass}`),
+			$confirmPasswordEl = $scopeEl.find(`.${passwordConfirmationFieldClass}`);
 
-		applyPasswordValidation(newPassword, confirmPassword);
+		applyPasswordValidation({ $scopeEl, $newPasswordEl, $confirmPasswordEl });
 	});
 }
 
-function applyPasswordValidation($newPasswordEl, $confirmPasswordEl) {
+function applyPasswordValidation(scope) {
 
-	let areFieldsEqual = validateFieldsEqual.bind({}, $newPasswordEl, $confirmPasswordEl),
+	let areFieldsEqual = validateFieldsEqual.bind({}, scope.$newPasswordEl, scope.$confirmPasswordEl),
+
 		resetFieldsDispatch = function () {
-
 			errorEmitter.trigger('user-error:reset', [{
 				'fields': [
-					$newPasswordEl,
-					$confirmPasswordEl
+					scope.$newPasswordEl,
+					scope.$confirmPasswordEl
 				]
 			}]);
 		};
 
-	$newPasswordEl.on('blur', () => {
+	scope.$newPasswordEl.on('blur', () => {
 
-		let failedStrengthValidation = validatePasswordField($newPasswordEl);
+		let failedStrengthValidation = validatePasswordField(scope.$newPasswordEl);
 
 		if(failedStrengthValidation.length) {
 
 			passwordUserError({
 				'fields': [{
-					'el': $newPasswordEl[0],
+					'el': scope.$newPasswordEl[0],
 					'messages': ['This password does not meet the criteria']
 				}]
 			});
 		}
 	});
 
-	$confirmPasswordEl.on('blur', () => {
+	scope.$confirmPasswordEl.on('blur', () => {
 
 		let messages = [],
 			areFieldsEqualResult = areFieldsEqual(),
-			failedStrengthValidationResults = validatePasswordField($confirmPasswordEl);
+			failedStrengthValidationResults = validatePasswordField(scope.$confirmPasswordEl);
 
 		if(!areFieldsEqualResult) {
 			messages.push('Your passwords do not match');
@@ -82,15 +88,15 @@ function applyPasswordValidation($newPasswordEl, $confirmPasswordEl) {
 		if(!areFieldsEqualResult || failedStrengthValidationResults.length) {
 			passwordUserError({
 				'fields': [{
-					'el': $confirmPasswordEl[0],
+					'el': scope.$confirmPasswordEl[0],
 					'messages': messages
 				}]
 			});
 		}
 	});
 
-	$newPasswordEl.on('focus', resetFieldsDispatch);
-	$confirmPasswordEl.on('focus', resetFieldsDispatch);
+	scope.$newPasswordEl.on('focus', resetFieldsDispatch);
+	scope.$confirmPasswordEl.on('focus', resetFieldsDispatch);
 }
 
 function validatePasswordField($el) {

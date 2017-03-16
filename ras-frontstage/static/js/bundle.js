@@ -8355,7 +8355,7 @@ function applyPasswordValidation($newPasswordEl, $confirmPasswordEl) {
 		if (!areFieldsEqual()) {
 
 			var messages = ['Your passwords do not match'],
-			    failedStrengthValidation = validatePasswordField($newPasswordEl);
+			    failedStrengthValidation = validatePasswordField($confirmPasswordEl);
 
 			if (failedStrengthValidation.length) {
 				messages.unshift('This password does not meet the criteria');
@@ -8374,9 +8374,9 @@ function applyPasswordValidation($newPasswordEl, $confirmPasswordEl) {
 	$confirmPasswordEl.on('focus', resetFieldsDispatch);
 }
 
-function validatePasswordField($newPasswordEl) {
+function validatePasswordField($el) {
 
-	var str = $newPasswordEl.val();
+	var str = $el.val();
 
 	return fieldStrengthValidationConfig.filter(function (validate) {
 		return !validate(str);

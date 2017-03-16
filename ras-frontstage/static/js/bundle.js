@@ -8271,64 +8271,6 @@ ready(function () {
   }
 });
 
-/**
- * Error emitter list
- * @type {Array<Emitter>}
- */
-var userErrors = [];
-var inputTextErrorClass = 'input--text-error';
-var fieldErrorLabelProperty = 'sdcFieldErrorLabel';
-
-var errors = (function () {});
-
-function handleUserError(data) {
-
-	if (data.fields && data.fields.length) {
-		data.fields.forEach(fieldError);
-	}
-
-	userErrors.push(data);
-}
-
-function handleUserErrorReset(data) {
-
-	if (data.fields && data.fields.length) {
-		data.fields.forEach(fieldErrorReset);
-	}
-
-	userErrors.length = 0;
-}
-
-function fieldError(optsFieldErrObj) {
-
-	/*let existingFields = [];*/
-
-	/**
-  * A better way to do this
-  */
-	var fieldAlreadyErroring = userErrors.find(function (errObj) {
-		return errObj.fields.find(function (fieldErrObj) {
-			return fieldErrObj.el === optsFieldErrObj.el;
-		});
-	});
-
-	var html = '\n\t\t<ul class="list list--bare list--errors">\n\t\t\t<li class="list__item pluto" data-error="true" data-error-msg="' + optsFieldErrObj.message + '">\n\t\t\t\t' + optsFieldErrObj.message + '\n\t\t\t</li>\n\t\t</ul>';
-
-	if (!fieldAlreadyErroring) {
-
-		var $el = $(html);
-
-		$(optsFieldErrObj.el).addClass(inputTextErrorClass);
-		$el.insertBefore(optsFieldErrObj.el);
-		optsFieldErrObj.el[fieldErrorLabelProperty] = $el[0];
-	}
-}
-
-function fieldErrorReset($field) {
-	$field.removeClass(inputTextErrorClass);
-	$($field[0][fieldErrorLabelProperty]).remove();
-}
-
 var config = {
 	characterLen: {
 		min: 8,
@@ -8387,70 +8329,180 @@ function applyPasswordValidation($newPasswordEl, $confirmPasswordEl) {
 
 	var areFieldsEqual = validateFieldsEqual.bind({}, $newPasswordEl, $confirmPasswordEl),
 	    resetFieldsDispatch = function resetFieldsDispatch() {
+
 		errorEmitter.trigger('user-error:reset', [{
 			'fields': [$newPasswordEl, $confirmPasswordEl]
 		}]);
 	};
 
 	$newPasswordEl.on('blur', function () {
-		validatePasswordField($newPasswordEl);
+
+		var failedStrengthValidation = validatePasswordField($newPasswordEl);
+
+		if (failedStrengthValidation.length) {
+
+			passwordUserError({
+				'fields': [{
+					'el': $newPasswordEl[0],
+					'messages': ['This password does not meet the criteria']
+				}]
+			});
+		}
 	});
 
 	$confirmPasswordEl.on('blur', function () {
-		areFieldsEqual();
+
+		if (!areFieldsEqual()) {
+
+			var messages = ['Your passwords do not match'],
+			    failedStrengthValidation = validatePasswordField($newPasswordEl);
+
+			if (failedStrengthValidation.length) {
+				messages.unshift('This password does not meet the criteria');
+			}
+
+			passwordUserError({
+				'fields': [{
+					'el': $confirmPasswordEl[0],
+					'messages': messages
+				}]
+			});
+		}
 	});
 
-	$newPasswordEl.on('focus', function () {
-		return resetFieldsDispatch();
-	});
-	$confirmPasswordEl.on('focus', function () {
-		return resetFieldsDispatch();
-	});
+	$newPasswordEl.on('focus', resetFieldsDispatch);
+	$confirmPasswordEl.on('focus', resetFieldsDispatch);
 }
 
-function validatePasswordField($el) {
+function validatePasswordField($newPasswordEl) {
 
-	var str = $el.val(),
-	    failedStrengthValidation = fieldStrengthValidationConfig.filter(function (validate) {
+	var str = $newPasswordEl.val();
+
+	return fieldStrengthValidationConfig.filter(function (validate) {
 		return !validate(str);
 	});
-
-	return failedStrengthValidation.length ? function () {
-		errorEmitter.trigger('user-error', {
-			'page-title': 'Your password doesn\'t meet the requirements',
-			'page-link-message': 'Please choose a different password',
-
-			'fields': [{
-				'el': $el[0],
-				'message': 'This password does not meet the criteria'
-			}]
-		});
-		return false;
-	}() : true;
 }
 
 function validateFieldsEqual($newPasswordEl, $confirmPasswordEl) {
 
-	return !validateEqual($newPasswordEl.val(), $confirmPasswordEl.val()) ? function () {
-		errorEmitter.trigger('user-error', [{
-			'page-title': 'Your passwords do not match',
-			'page-link-message': 'Please check the passwords and try again',
-
-			'fields': [{
-				'el': $confirmPasswordEl[0],
-				'message': 'Your passwords do not match'
-			}]
-		}]);
-		return false;
-	}() : true;
+	return validateEqual($newPasswordEl.val(), $confirmPasswordEl.val());
 }
 
-errorEmitter.on('user-error', function (e, data) {
-  return handleUserError(data);
-});
-errorEmitter.on('user-error:reset', function (e, data) {
-  return handleUserErrorReset(data);
-});
+function passwordUserError(opts) {
+
+	errorEmitter.trigger('user-error', [{
+		'fields': opts.fields
+	}]);
+}
+
+function userErrorModel(data) {
+
+	if (!data.fields || !data.fields.length) {
+		throw 'Invalid user error model from data ' + JSON.stringify(data) + '. At least one field needed.';
+	}
+
+	var model = void 0;
+
+	model = {
+		'fields': data.fields.map(fieldErrorModel)
+	};
+
+	data['page-title'] && data['page-link-message'] && (model['page-title'] = opts['page-title'])(model['page-link-message'] = opts['page-link-message']);
+
+	return model;
+}
+
+function userErrorResetModel(data) {
+
+	if (!data.fields || !data.fields.length) {
+		throw 'Invalid user error reset model from data ' + JSON.stringify(data) + '. At least one field needed.';
+	}
+
+	return {
+		'fields': data.fields
+	};
+}
+
+function fieldErrorModel(data) {
+
+	if (!data.el) {
+		throw 'Invalid field error model from data ' + JSON.stringify(data) + '. Field element needed.';
+	}
+
+	var model = void 0;
+
+	model = {
+		'el': data.el
+	};
+
+	data['messages'] && data['messages'].length && (model['messages'] = data['messages']);
+
+	return model;
+}
+
+var userErrors = [];
+var inputTextErrorClass = 'input--text-error';
+var fieldErrorLabelProperty = 'sdcFieldErrorLabel';
+
+function setErrorEmitter(emitter) {
+	emitter.on('user-error', function (e, data) {
+		handleUserError(userErrorModel(data));
+	});
+	emitter.on('user-error:reset', function (e, data) {
+		return handleUserErrorReset(userErrorResetModel(data));
+	});
+}
+
+function handleUserError(data) {
+
+	if (data.fields && data.fields.length) {
+		data.fields.forEach(fieldError);
+	}
+
+	userErrors.push(data);
+}
+
+function handleUserErrorReset(data) {
+
+	if (data.fields && data.fields.length) {
+		data.fields.forEach(fieldErrorReset);
+	}
+
+	userErrors.length = 0;
+}
+
+function fieldError(optsFieldErrObj) {
+
+	/**
+  * A better way to do this?
+  */
+	var fieldAlreadyErroring = userErrors.find(function (errObj) {
+		return errObj.fields.find(function (fieldErrObj) {
+			return fieldErrObj.el === optsFieldErrObj.el;
+		});
+	}),
+	    html = optsFieldErrObj.messages ? '<ul class="list list--bare list--errors">' + optsFieldErrObj.messages.map(fieldErrorMessage).join('') + '</ul>' : '';
+
+	if (!fieldAlreadyErroring) {
+
+		var $el = $(html);
+
+		$(optsFieldErrObj.el).addClass(inputTextErrorClass);
+		$el.insertBefore(optsFieldErrObj.el);
+		optsFieldErrObj.el[fieldErrorLabelProperty] = $el[0];
+	}
+}
+
+function fieldErrorMessage(message) {
+	return '<li class="list__item pluto" data-error="true" data-error-msg="' + message + '">' + message + '</li>';
+}
+
+function fieldErrorReset($field) {
+	$field.removeClass(inputTextErrorClass);
+	$($field[0][fieldErrorLabelProperty]).remove();
+}
+
+setErrorEmitter(errorEmitter);
 
 /**
  * Application specific setup
@@ -8459,7 +8511,6 @@ errorEmitter.on('user-error:reset', function (e, data) {
  * Boot DOM
  */
 ready(passwordValidation);
-ready(errors);
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 

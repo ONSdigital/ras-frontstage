@@ -1,3 +1,5 @@
+'use strict';
+
 let config = {
 		characterLen: {
 			min: 8,

@@ -1,3 +1,5 @@
+'use strict';
+
 import { default as validation,
 	validateCharacterLength,
 	validateHasCapitalLetter,
@@ -39,6 +41,7 @@ function applyPasswordValidation($newPasswordEl, $confirmPasswordEl) {
 
 	let areFieldsEqual = validateFieldsEqual.bind({}, $newPasswordEl, $confirmPasswordEl),
 		resetFieldsDispatch = function () {
+
 			errorEmitter.trigger('user-error:reset', [{
 				'fields': [
 					$newPasswordEl,
@@ -48,53 +51,60 @@ function applyPasswordValidation($newPasswordEl, $confirmPasswordEl) {
 		};
 
 	$newPasswordEl.on('blur', () => {
-		validatePasswordField($newPasswordEl)
+
+		let failedStrengthValidation = validatePasswordField($newPasswordEl);
+
+		if(failedStrengthValidation.length) {
+
+			passwordUserError({
+				'fields': [{
+					'el': $newPasswordEl[0],
+					'messages': ['This password does not meet the criteria']
+				}]
+			});
+		}
 	});
 
 	$confirmPasswordEl.on('blur', () => {
-		areFieldsEqual()
-	});
 
-	$newPasswordEl.on('focus', () => resetFieldsDispatch());
-	$confirmPasswordEl.on('focus', () => resetFieldsDispatch());
-}
+		if(!areFieldsEqual()) {
 
-function validatePasswordField($el) {
+			let messages = ['Your passwords do not match'],
+				failedStrengthValidation = validatePasswordField($newPasswordEl);
 
-	let str = $el.val(),
-		failedStrengthValidation = fieldStrengthValidationConfig
-			.filter(validate => !validate(str));
+			if(failedStrengthValidation.length) {
+				messages.unshift('This password does not meet the criteria');
+			}
 
-	return failedStrengthValidation.length ?
-		(() => {
-			errorEmitter.trigger('user-error', {
-				'page-title': 'Your password doesn\'t meet the requirements',
-				'page-link-message': 'Please choose a different password',
-
+			passwordUserError({
 				'fields': [{
-					'el': $el[0],
-					'message': 'This password does not meet the criteria'
+					'el': $confirmPasswordEl[0],
+					'messages': messages
 				}]
 			});
-			return false;
-		})() :
-		true;
+		}
+	});
+
+	$newPasswordEl.on('focus', resetFieldsDispatch);
+	$confirmPasswordEl.on('focus', resetFieldsDispatch);
+}
+
+function validatePasswordField($newPasswordEl) {
+
+	let str = $newPasswordEl.val();
+
+	return fieldStrengthValidationConfig
+		.filter(validate => !validate(str));
 }
 
 function validateFieldsEqual($newPasswordEl, $confirmPasswordEl) {
 
-	return !validateEqual($newPasswordEl.val(), $confirmPasswordEl.val()) ?
-		(() => {
-			errorEmitter.trigger('user-error', [{
-				'page-title': 'Your passwords do not match',
-				'page-link-message': 'Please check the passwords and try again',
+	return validateEqual($newPasswordEl.val(), $confirmPasswordEl.val());
+}
 
-				'fields': [{
-					'el': $confirmPasswordEl[0],
-					'message': 'Your passwords do not match'
-				}]
-			}]);
-			return false;
-		})() :
-		true;
+function passwordUserError(opts) {
+
+	errorEmitter.trigger('user-error', [{
+		'fields': opts.fields
+	}]);
 }

@@ -1,18 +1,21 @@
-/**
- * Error emitter list
- * @type {Array<Emitter>}
- */
-let emitters = [],
-	userErrors = [],
+'use strict';
+
+import { userErrorModel, userErrorResetModel } from './errors.dom.model';
+
+let userErrors = [],
 
 	inputTextErrorClass = 'input--text-error',
 	fieldErrorLabelProperty = 'sdcFieldErrorLabel';
 
-export default () => {
 
+export function setErrorEmitter(emitter) {
+	emitter.on('user-error', (e, data) => {
+		handleUserError(userErrorModel(data))
+	});
+	emitter.on('user-error:reset', (e, data) => handleUserErrorReset(userErrorResetModel(data)));
 }
 
-export function handleUserError(data) {
+function handleUserError(data) {
 
 	if(data.fields && data.fields.length) {
 		data.fields.forEach(fieldError);
@@ -21,7 +24,7 @@ export function handleUserError(data) {
 	userErrors.push(data);
 }
 
-export function handleUserErrorReset(data) {
+function handleUserErrorReset(data) {
 
 	if(data.fields && data.fields.length) {
 		data.fields.forEach(fieldErrorReset);
@@ -32,19 +35,12 @@ export function handleUserErrorReset(data) {
 
 function fieldError(optsFieldErrObj) {
 
-	/*let existingFields = [];*/
-
 	/**
-	 * A better way to do this
+	 * A better way to do this?
 	 */
-	let fieldAlreadyErroring = userErrors.find(errObj => errObj.fields.find(fieldErrObj => fieldErrObj.el === optsFieldErrObj.el));
+	let fieldAlreadyErroring = userErrors.find(errObj => errObj.fields.find(fieldErrObj => fieldErrObj.el === optsFieldErrObj.el)),
 
-	var html = `
-		<ul class="list list--bare list--errors">
-			<li class="list__item pluto" data-error="true" data-error-msg="${optsFieldErrObj.message}">
-				${optsFieldErrObj.message}
-			</li>
-		</ul>`;
+		html = optsFieldErrObj.messages ? `<ul class="list list--bare list--errors">${optsFieldErrObj.messages.map(fieldErrorMessage).join('')}</ul>` : '';
 
 	if(!fieldAlreadyErroring) {
 
@@ -54,6 +50,10 @@ function fieldError(optsFieldErrObj) {
 		$el.insertBefore(optsFieldErrObj.el);
 		optsFieldErrObj.el[fieldErrorLabelProperty] = $el[0];
 	}
+}
+
+function fieldErrorMessage (message) {
+	return `<li class="list__item pluto" data-error="true" data-error-msg="${message}">${message}</li>`;
 }
 
 function fieldErrorReset($field) {

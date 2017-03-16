@@ -8352,15 +8352,19 @@ function applyPasswordValidation($newPasswordEl, $confirmPasswordEl) {
 
 	$confirmPasswordEl.on('blur', function () {
 
-		if (!areFieldsEqual()) {
+		var messages = [],
+		    areFieldsEqualResult = areFieldsEqual(),
+		    failedStrengthValidationResults = validatePasswordField($confirmPasswordEl);
 
-			var messages = ['Your passwords do not match'],
-			    failedStrengthValidation = validatePasswordField($confirmPasswordEl);
+		if (!areFieldsEqualResult) {
+			messages.push('Your passwords do not match');
+		}
 
-			if (failedStrengthValidation.length) {
-				messages.unshift('This password does not meet the criteria');
-			}
+		if (failedStrengthValidationResults.length) {
+			messages.unshift('This password does not meet the criteria');
+		}
 
+		if (!areFieldsEqualResult || failedStrengthValidationResults.length) {
 			passwordUserError({
 				'fields': [{
 					'el': $confirmPasswordEl[0],

@@ -6,6 +6,7 @@ import webdriver from 'gulp-webdriver';
 
 import { default as stylesModule, styles, lint as lintStyles } from './common/gulp/styles';
 import { default as scriptsModule, bundle, copyScripts } from './common/gulp/scripts';
+import { default as scriptsDocsModule, docs } from './gulp/scripts.doc';
 import { default as testsModule, unitTests, functionalTests } from './common/gulp/tests';
 
 const config = {
@@ -13,6 +14,7 @@ const config = {
 };
 
 scriptsModule(config);
+scriptsDocsModule(config);
 stylesModule(config);
 testsModule(config);
 
@@ -28,6 +30,11 @@ gulp.task('compile:common:scripts', () => {
 	return bundle(false);
 });
 
+gulp.task('compile:common:scripts:docs', () => {
+	return docs();
+});
+
+
 gulp.task('watch:common:styles', ['compile:common:styles'], () => {
 	gulp.watch([
 		'./common/assets/styles/**/*.scss',
@@ -37,6 +44,10 @@ gulp.task('watch:common:styles', ['compile:common:styles'], () => {
 
 gulp.task('watch:common:scripts', ['compile:common:scripts'], () => {
 	gulp.watch([paths.scripts.input, `${appPath}/assets/js/**/*.js`], ['compile:common:scripts']);
+});
+
+gulp.task('watch:common:scripts:doc', ['compile:common:scripts:docs'], () => {
+	gulp.watch(paths.scripts.docsSrc, ['compile:common:scripts:docs']);
 });
 
 

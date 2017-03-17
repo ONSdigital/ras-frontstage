@@ -19,7 +19,6 @@ export const newPasswordFieldGroupClass = 'js-new-password-group',
 
 /**
  * Specify validation to use
- * @type {[*]}
  */
 let fieldStrengthValidationConfig = [
 	validateCharacterLength,

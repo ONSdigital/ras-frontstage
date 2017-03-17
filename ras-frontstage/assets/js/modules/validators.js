@@ -12,6 +12,15 @@ let config = {
 	};
 
 /**
+ * Configure module default value
+ * @module validators
+ * @param opts
+ */
+export default opts => {
+	config = opts ? Object.assign({}, config, opts) : config;
+}
+
+/**
  * Check two strings are equal
  * @param str1
  * @param str2
@@ -69,12 +78,4 @@ export function validateIsEmail(str) {
 	 * http://emailregex.com/
 	 */
 	return /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(str);
-}
-
-/**
- * Configure module default value
- * @param opts
- */
-export default opts => {
-	config = opts ? Object.assign({}, config, opts) : config;
 }

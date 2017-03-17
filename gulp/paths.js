@@ -23,7 +23,12 @@ export const paths = {
 			`./${commonPath}/js/polyfills.js`,
 			`${appPath}/assets/js/app/main.js`
 		],
-		rollupifyEntries: `${appPath}/assets/js/app/main.js`
+		rollupifyEntries: `${appPath}/assets/js/app/main.js`,
+		docsSrc: [
+			//'README.md',
+			//`${commonPath}/js/**/*.js`,
+			`${appPath}/assets/js/**/*.js`
+		]
 	},
 	test: {
 		input: appPath + '/js/**/*.js',

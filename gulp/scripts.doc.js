@@ -8,5 +8,9 @@ export default opts => {
 
 export function docs(cb) {
 	return gulp.src(config.paths.scripts.docsSrc, {read: false})
+
+		/**
+		 * Pipe bundle first
+		 */
 		.pipe(jsdoc(cb));
 }

@@ -24,33 +24,42 @@
     </div>
     <br />
     {% endif %}
+    <form
+          method="post"
+          class="form"
+          action="{{ url_for('login') }}"
+          role="form">
 
-    {% if errorType == "failed" %}
-    <form method="get" class="form" action="/sign-in/troubleshoot">
-    {% else %}
-    <form method="get" class="form" action="/sign-in/error">
-    {% endif %}
         <h1 class="saturn">Sign in</h1>
 
         <fieldset id="sign-in-details">
             {% if errorType == "failed" %}
             <div class="panel panel--simple panel--error">
             {% endif %}
+                {{ form.csrf_token}}
                 <div class="field">
+                    {{ form.username.label(class_='label') }}
+                    <!--
                     <label class="label">Email address</label>
                     <input name="emailaddress" id="email-address"  class="input input--text input-type__input" value="" type="text" />
+                    -->
+                    {{ form.username(class_='input input--text input-type__input') }}
                 </div>
                 <br />
 
                 <div class="field js-show-hide-password">
+                    {{ form.password.label(class_='label') }}
+                    <!--
                     <label class="label">Password</label>
-
+                    -->
                     <span>
                         <input class="js-show-hide-password-toggle" type="checkbox" id="password-toggle" />
                         <label for="password-toggle">Show password</label>
                     </span>
-
+                    <!--
                     <input name="password" class="input input--text input-type__input js-show-hide-password-field" value="" type="password" />
+                    -->
+                    {{ form.password(class_='input input--text input-type__input js-show-hide-password-field') }}
 
                     <a href="/forgot-password">Forgot password</a>
                 </div>

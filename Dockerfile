@@ -1,4 +1,4 @@
-FROM python
+FROM python:2
 MAINTAINER David Carboni
 
 WORKDIR /ras-frontstage

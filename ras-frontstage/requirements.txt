@@ -9,3 +9,4 @@ python-jose==1.2.0
 psycopg2==2.6.1
 Flask-OpenID==1.2.5
 Flask-OAuth==0.12
+requests-oauthlib==0.8.0

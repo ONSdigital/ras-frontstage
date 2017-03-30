@@ -2,7 +2,7 @@
 Main file that is ran
 """
 
-from __future__ import print_function
+#from __future__ import print_function
 from functools import wraps, update_wrapper
 from datetime import datetime
 from flask import Flask, make_response, render_template, request
@@ -11,10 +11,14 @@ import requests
 
 from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, Response
 from flask_sqlalchemy import SQLAlchemy
+from oauthlib.oauth2 import LegacyApplicationClient, MissingTokenError, MissingClientIdError, MismatchingStateError
+from requests_oauthlib import OAuth2Session
+
 from sqlalchemy import exc
 
 from jwt import encode, decode
 from models import *
+from config import OAuthConfig
 
 app = Flask(__name__)
 app.debug = True
@@ -148,6 +152,99 @@ def login():
     }
 
     return render_template('sign-in.html', _theme='default', form=form, data=templateData)
+
+# ===== Sign in using OAuth2 =====
+@app.route('/sign-in/OAuth', methods=['GET', 'POST'])
+def login_OAuth():
+    print("*** Hitting login for OAuth() function.... ***")
+    """ Login OAuth Page.
+    This function uses the OAuth 2 server to receive a token upon successful sign in. If the user presents the correct
+    password and username and is accepted by the OAuth 2 server we receive an access token, a refresh token and a TTL.
+    Otherwise we fail.
+    This uses the flow Resource Owner Password Credentials Grant. See: https://tools.ietf.org/html/rfc6749#section-4.3
+
+    To make this work the server application (thats us!) needs a client ID and a client secret. This has to exist on the
+    OAuth server. We then use Basic Auth to access the OAuth2 server and provide the user ID, and user password in the
+    POST Body message. In the real world this would be done over https - for now all this works over http since it is
+    behind our firewall.
+
+    Parms:
+        client_id
+        client_secret
+        user_id
+        user_password
+        oauth2_url
+
+    Returned:
+        access_token
+        refresh_token
+        ttl
+
+    """
+    form = LoginForm(request.form)
+
+    if request.method == 'POST' and form.validate():
+        username = request.form.get('username')
+        password = request.form.get('password')
+        print("Username is: {}".format(username))
+        print("Password is: {}".format(password))
+
+        # Creates a 'session client' to interact with OAuth2. This provides a client ID to our client that is used to
+        # interact with the server.
+        client = LegacyApplicationClient(client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID)
+
+        # Populates the request body with username and password from the user
+        client.prepare_request_body(username=username, password=password, scope=['ci.write', 'ci.read'])
+
+        # passes our 'client' to the session management object. this deals with the transactions between the OAuth2 server
+        oauth = OAuth2Session(client=client)
+
+        token_url = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
+        print "Our Token Endpoint is: ", token_url
+
+        try:
+            token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id='onc@onc.gov', client_secret='password')
+            print " *** Access Token Granted *** "
+            print " Values are: "
+            for key in token:
+                print key, " Value is: ", token[key]
+        except MissingTokenError as e:
+            print "Missing token error, error is: {}".format(e)
+            flash('Invalid username or password. Please try again.', 'danger')
+            print("Failed validation")
+            return render_template('sign-in-oauth.html', _theme='default', form=form, data={"error": {"type": "failed"}})
+
+
+        #existing_user = User.query.filter_by(username=username).first()
+
+        #if not (existing_user and existing_user.check_password_simple(password)):
+        #    flash('Invalid username or password. Please try again.', 'danger')
+        #    print("Failed validation")
+        #    return render_template('sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
+
+        session['username'] = username
+        usr_scopes = token['scope']
+        data_dict_for_jwt_token = {"username": username, "user_scopes": usr_scopes, 'access_token':token['access_token'] }
+
+        #data_dict_for_jwt_token = {"username": username, "user_scopes": usr_scopes }
+        #encoded_jwt_token = encode(data_dict_for_jwt_token)
+
+        session['jwt_token'] = token['access_token']
+
+        flash('You have successfully logged in.', 'success')
+        print("validation OK")
+        return redirect(url_for('logged_in'))
+
+    if form.errors:
+        flash(form.errors, 'danger')
+
+    templateData = {
+        "error": {
+            "type": request.args.get("error")
+        }
+    }
+
+    return render_template('sign-in-oauth.html', _theme='default', form=form, data=templateData)
 
 
 

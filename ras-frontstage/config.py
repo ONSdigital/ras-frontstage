@@ -8,6 +8,7 @@ import os
 # ENV VARIABLES BELOW, SET THESE ON YOUR TERMINAL
 # export APP_SETTINGS=config.Config
 # export FLASK_APP=app.py
+# export OAUTHLIB_INSECURE_TRANSPORT=1
 
 # Default values
 if "APP_SETTINGS" not in os.environ:
@@ -73,3 +74,12 @@ class OAuthConfig(Config):
 
     AUTHORIZATION_ENDPOINT = "https://www.facebook.com/dialog/oauth"  # Facebook Auth endpoint
     TOKEN_ENDPOINT = "https://graph.facebook.com/oauth/access_token"  # Facebook token endpoint
+
+    ONS_OAUTH_PROTOCOL = "http://"
+    ONS_OAUTH_SERVER = "localhost:8000"
+    RAS_FRONTSTAGE_CLIENT_ID = "onc@onc.gov"
+    RAS_FRONTSTAGE_CLIENT_SECRET = "password"
+    ONS_AUTHORIZATION_ENDPOINT = "/web/authorize/"
+    ONS_TOKEN_ENDPOINT = "/api/v1/tokens/"
+
+

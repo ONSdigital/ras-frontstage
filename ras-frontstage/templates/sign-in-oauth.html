@@ -1,0 +1,80 @@
+{% import 'partials/section.html' as section %}
+{% extends "layouts/_twocol.html" %}
+
+{% set errorType = data['error']['type'] %}
+
+{% block page_title %}
+    {% if errorType == "failed" %}
+        Error signing in - ONS Business Surveys
+    {% else %}
+        Complete a survey on behalf of a business - ONS Business Surveys
+    {% endif %}
+{% endblock %}
+
+{% block main %}
+
+    {% if errorType == "failed" %}
+    <div class="panel panel--error">
+        <div class="panel__header">
+            <h1 class="panel__title venus">Incorrect email or password</h1>
+        </div>
+        <div class="panel__body" data-qa="error-body">
+            <p class="mars"><a href="#sign-in-details" class="js-inpagelink">Please try again</a></p>
+        </div>
+    </div>
+    <br />
+    {% endif %}
+    <form
+          method="post"
+          class="form"
+          action="{{ url_for('login_OAuth') }}"
+          role="form">
+
+        <h1 class="saturn">Sign in (Using OAuth Server)</h1>
+
+        <fieldset id="sign-in-details">
+            {% if errorType == "failed" %}
+            <div class="panel panel--simple panel--error">
+            {% endif %}
+                {{ form.csrf_token}}
+                <div class="field">
+                    {{ form.username.label(class_='label') }}
+                    <!--
+                    <label class="label">Email address</label>
+                    <input name="emailaddress" id="email-address"  class="input input--text input-type__input" value="" type="text" />
+                    -->
+                    {{ form.username(class_='input input--text input-type__input') }}
+                </div>
+                <br />
+
+                <div class="field js-show-hide-password">
+                    {{ form.password.label(class_='label') }}
+                    <!--
+                    <label class="label">Password</label>
+                    -->
+                    <span>
+                        <input class="js-show-hide-password-toggle" type="checkbox" id="password-toggle" />
+                        <label for="password-toggle">Show password</label>
+                    </span>
+                    <!--
+                    <input name="password" class="input input--text input-type__input js-show-hide-password-field" value="" type="password" />
+                    -->
+                    {{ form.password(class_='input input--text input-type__input js-show-hide-password-field') }}
+
+                    <a href="/forgot-password">Forgot password</a>
+                </div>
+                <br />
+
+                <button class="btn btn--primary venus" type="submit">Sign in</button>
+            {% if errorType == "failed" %}
+            </div>
+            {% endif %}
+        </fieldset>
+        {% if errorType == "failed" %}
+        <br />
+        {% endif %}
+
+        <p>Have an activation code? Use it to <a href="">create an account</a></p>
+
+    </form>
+{% endblock main %}

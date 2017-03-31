@@ -4,19 +4,20 @@
 {% block page_title %}Register{% endblock %}
 
 {% block main %}
-    <form action="/register/confirm-organisation-survey/" class="form">
+    <form action="/create-account/confirm-organisation-survey/" class="form">
 
-        <h1 class="saturn">Register</h1>
-        <p>If you don't have an account, you can use your enrolment code to set one up.</p>
+        <h1 class="saturn">Create an account</h1>
 
         <div class="field">
-            <label class="label">Enrolment code</label>
-            <p>You'll find this in the letter we sent you</p>
+            <label class="label">Activation code</label>
+            <span class="label__description label__inner pluto">You'll find this in the letter we sent you</span>
             <input class="input input--text input-type__input" type="text" />
         </div>
         <br />
 
         <button class="btn btn--primary venus" type="submit">Continue</button>
+
+        <p>Already have an account? <a href="">sign in here</a></p>
 
     </form>
 {% endblock main %}

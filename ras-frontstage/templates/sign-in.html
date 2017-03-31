@@ -39,26 +39,16 @@
                 {{ form.csrf_token}}
                 <div class="field">
                     {{ form.username.label(class_='label') }}
-                    <!--
-                    <label class="label">Email address</label>
-                    <input name="emailaddress" id="email-address"  class="input input--text input-type__input" value="" type="text" />
-                    -->
                     {{ form.username(class_='input input--text input-type__input') }}
                 </div>
                 <br />
 
                 <div class="field js-password-obfuscation-group">
                     {{ form.password.label(class_='label') }}
-                    <!--
-                    <label class="label">Password</label>
-                    -->
                     <span>
                         <input class="js-password-obfuscation-toggle" type="checkbox" id="password-toggle" />
                         <label for="password-toggle">Show password</label>
                     </span>
-                    <!--
-                    <input name="password" class="input input--text input-type__input js-show-hide-password-field" value="" type="password" />
-                    -->
                     {{ form.password(class_='input input--text input-type__input js-password-obfuscation-field') }}
 
                     <a href="/forgot-password">Forgot password</a>

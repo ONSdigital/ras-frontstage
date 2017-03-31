@@ -4,7 +4,7 @@
 {% block page_title %}Enter your account details{% endblock %}
 
 {% block main %}
-    <form action="/register/almost-done/" class="form">
+    <form action="/create-account/check-email/" class="form">
         <h1 class="saturn">Enter your account details</h1>
 
     {% call section.section_default(
@@ -12,7 +12,7 @@
 
         <div class="field">
             <label class="label">First name</label>
-            <input class="input input--text input-type__input" type="text" />
+            <input class="input required input--text input-type__input" type="text" />
         </div>
         <br />
 
@@ -40,18 +40,28 @@
 
     {% call section.section_default(
         "Create a password",
-        "Your password must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters.") %}
+        "") %}
 
-        <div class="field">
-            <label class="label">Create a password</label>
-            <input class="input input--text input-type__input" type="text" />
-        </div>
-        <br />
+        <p class="section__description mars">Your password must have:</p>
+        <ul>
+            <li>at least 8 characters </li>
+            <li>at least one symbol (eg ?!£%) </li>
+            <li>at least one capital letter</li>
+            <li>at least one number</li>
+        </ul>
 
-        <div class="field">
-            <label class="label">Re-type your password</label>
-            <input class="input input--text input-type__input" type="text" />
-        </div>
+        <fieldset class="js-new-password-group">
+            <div class="field">
+                <label class="label">Create a password</label>
+                <input class="input input--text input-type__input js-new-password" type="text" />
+            </div>
+            <br />
+
+            <div class="field">
+                <label class="label">Re-type your password</label>
+                <input class="input input--text input-type__input js-confirm-new-password" type="text" />
+            </div>
+        </fieldset>
     {% endcall %}
 
     {% call section.section_default(
@@ -71,7 +81,7 @@
             <fieldset>
                 <div class="field__item js-focusable-box is-checked">
                     <input class="input input--checkbox js-focusable" type="checkbox" id="checkbox1">
-                    <label class="label label--inline venus" for="checkbox1">Please confirm you accept our <a href="#">Terms and Conditions (Opens in a new window.)</a></label>
+                    <label class="label label--inline venus" for="checkbox1">Please confirm you accept our <a href="#">Terms of use (Opens in a new window.)</a></label>
                 </div>
             </fieldset>
         </div>

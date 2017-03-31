@@ -27,10 +27,10 @@
     <form
           method="post"
           class="form"
-          action="{{ url_for('login') }}"
+          action="{{ url_for('login_OAuth') }}"
           role="form">
 
-        <h1 class="saturn">Sign in</h1>
+        <h1 class="saturn">Sign in (Using OAuth Server)</h1>
 
         <fieldset id="sign-in-details">
             {% if errorType == "failed" %}

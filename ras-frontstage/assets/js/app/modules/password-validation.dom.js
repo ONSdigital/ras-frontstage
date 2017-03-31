@@ -50,7 +50,7 @@ function applyPasswordValidation(scope) {
 	/**
 	 * Find scoped fields
 	 */
-	let $scopeEl = scope.$sxcopeEl,
+	let $scopeEl = scope.$scopeEl,
 		$newPasswordEl = $scopeEl.find(`.${passwordFieldClass}`),
 		$confirmPasswordEl = $scopeEl.find(`.${passwordConfirmationFieldClass}`);
 

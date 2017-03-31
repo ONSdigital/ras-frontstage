@@ -8495,7 +8495,7 @@ function applyPasswordValidation(scope) {
 	/**
   * Find scoped fields
   */
-	var $scopeEl = scope.$sxcopeEl,
+	var $scopeEl = scope.$scopeEl,
 	    $newPasswordEl = $scopeEl.find('.' + passwordFieldClass),
 	    $confirmPasswordEl = $scopeEl.find('.' + passwordConfirmationFieldClass);
 

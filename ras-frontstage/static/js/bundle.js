@@ -8306,6 +8306,38 @@ ready(function () {
 });
 
 /**
+ * Export classes for testing
+ */
+
+var passwordObfuscationGroupClass = 'js-password-obfuscation-group';
+var passwordObfuscationToggle = 'js-password-obfuscation-toggle';
+var passwordObfuscationField = 'js-password-obfuscation-field';
+
+var passwordObfuscation = (function () {
+
+	$('.' + passwordObfuscationGroupClass).each(function (i, el) {
+		return applyObfuscationToggle({ $scopeEl: $(el) });
+	});
+});
+
+function applyObfuscationToggle(scope) {
+
+	/**
+  * Scoped fields
+  */
+	var $scopeEl = scope.$scopeEl,
+	    $toggle = $scopeEl.find('.' + passwordObfuscationToggle),
+	    $field = $scopeEl.find('.' + passwordObfuscationField);
+
+	$toggle.on('click', function () {
+
+		var currentType = $field.attr('type');
+
+		$field.attr('type', currentType === 'password' ? 'text' : 'password');
+	});
+}
+
+/**
  * Default configuration for module
  * @type {{characterLen: {min: number, max: Number}}}
  */
@@ -8448,15 +8480,9 @@ var passwordValidation = (function () {
   * Find password fields scope
   */
 	$('.' + newPasswordFieldGroupClass).each(function (i, el) {
-
-		/**
-   * Find scoped fields
-   */
-		var $scopeEl = $(el),
-		    $newPasswordEl = $scopeEl.find('.' + passwordFieldClass),
-		    $confirmPasswordEl = $scopeEl.find('.' + passwordConfirmationFieldClass);
-
-		applyPasswordValidation({ $scopeEl: $scopeEl, $newPasswordEl: $newPasswordEl, $confirmPasswordEl: $confirmPasswordEl });
+		return applyPasswordValidation({
+			$scopeEl: $(el)
+		});
 	});
 });
 
@@ -8466,33 +8492,40 @@ var passwordValidation = (function () {
  */
 function applyPasswordValidation(scope) {
 
-	var areFieldsEqual = validateFieldsEqual.bind({}, scope.$newPasswordEl, scope.$confirmPasswordEl),
+	/**
+  * Find scoped fields
+  */
+	var $scopeEl = scope.$sxcopeEl,
+	    $newPasswordEl = $scopeEl.find('.' + passwordFieldClass),
+	    $confirmPasswordEl = $scopeEl.find('.' + passwordConfirmationFieldClass);
+
+	var areFieldsEqual = validateFieldsEqual.bind({}, $newPasswordEl, $confirmPasswordEl),
 	    resetFieldsDispatch = function resetFieldsDispatch() {
 		errorEmitter.trigger('user-error:reset', {
-			'fields': [scope.$newPasswordEl, scope.$confirmPasswordEl]
+			'fields': [$newPasswordEl, $confirmPasswordEl]
 		});
 	};
 
-	scope.$newPasswordEl.on('blur', function () {
+	$newPasswordEl.on('blur', function () {
 
-		var failedStrengthValidation = validatePasswordField(scope.$newPasswordEl);
+		var failedStrengthValidation = validatePasswordField($newPasswordEl);
 
 		if (failedStrengthValidation.length) {
 
 			passwordUserError({
 				'fields': [{
-					'el': scope.$newPasswordEl[0],
+					'el': $newPasswordEl[0],
 					'messages': ['This password does not meet the criteria']
 				}]
 			});
 		}
 	});
 
-	scope.$confirmPasswordEl.on('blur', function () {
+	$confirmPasswordEl.on('blur', function () {
 
 		var messages = [],
 		    areFieldsEqualResult = areFieldsEqual(),
-		    failedStrengthValidationResults = validatePasswordField(scope.$confirmPasswordEl);
+		    failedStrengthValidationResults = validatePasswordField($confirmPasswordEl);
 
 		if (!areFieldsEqualResult) {
 			messages.push('Your passwords do not match');
@@ -8505,15 +8538,15 @@ function applyPasswordValidation(scope) {
 		if (!areFieldsEqualResult || failedStrengthValidationResults.length) {
 			passwordUserError({
 				'fields': [{
-					'el': scope.$confirmPasswordEl[0],
+					'el': $confirmPasswordEl[0],
 					'messages': messages
 				}]
 			});
 		}
 	});
 
-	scope.$newPasswordEl.on('focus', resetFieldsDispatch);
-	scope.$confirmPasswordEl.on('focus', resetFieldsDispatch);
+	$newPasswordEl.on('focus', resetFieldsDispatch);
+	$confirmPasswordEl.on('focus', resetFieldsDispatch);
 }
 
 /**
@@ -8671,6 +8704,7 @@ setErrorEmitter(errorEmitter);
  * Boot DOM
  */
 ready(passwordValidation);
+ready(passwordObfuscation);
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 

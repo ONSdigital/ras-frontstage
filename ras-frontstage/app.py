@@ -329,19 +329,19 @@ def reset_password_confirmation():
 
 
 # ===== Registration =====
-@app.route('/register/')
+@app.route('/create-account/')
 def register():
     return render('register.html')
 
-@app.route('/register/enter-your-details/')
+@app.route('/create-account/enter-account-details/')
 def register_enter_your_details():
     return render('register.enter-your-details.html')
 
-@app.route('/register/confirm-organisation-survey/')
+@app.route('/create-account/confirm-organisation-survey/')
 def register_confirm_organisation_survey():
     return render('register.confirm-organisation-survey.html')
 
-@app.route('/register/almost-done/')
+@app.route('/create-account/check-email/')
 def register_almost_done():
     return render('register.almost-done.html')
 

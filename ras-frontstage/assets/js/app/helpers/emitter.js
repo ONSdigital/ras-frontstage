@@ -21,7 +21,7 @@ export default class Emitter {
 	 * @param data
 	 */
 	trigger(evtName, data) {
-		$jEmitter.trigger(evtName, [data, e]);
+		$jEmitter.trigger(evtName, [data]);
 	}
 
 	static create() {

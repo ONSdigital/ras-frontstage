@@ -36,17 +36,9 @@ export default () => {
 	/**
 	 * Find password fields scope
 	 */
-	$(`.${newPasswordFieldGroupClass}`).each((i, el) => {
-
-		/**
-		 * Find scoped fields
-		 */
-		let $scopeEl = $(el),
-			$newPasswordEl = $scopeEl.find(`.${passwordFieldClass}`),
-			$confirmPasswordEl = $scopeEl.find(`.${passwordConfirmationFieldClass}`);
-
-		applyPasswordValidation({ $scopeEl, $newPasswordEl, $confirmPasswordEl });
-	});
+	$(`.${newPasswordFieldGroupClass}`).each((i, el) => applyPasswordValidation({
+		$scopeEl: $(el)
+	}));
 }
 
 /**
@@ -55,37 +47,44 @@ export default () => {
  */
 function applyPasswordValidation(scope) {
 
-	let areFieldsEqual = validateFieldsEqual.bind({}, scope.$newPasswordEl, scope.$confirmPasswordEl),
+	/**
+	 * Find scoped fields
+	 */
+	let $scopeEl = scope.$scopeEl,
+		$newPasswordEl = $scopeEl.find(`.${passwordFieldClass}`),
+		$confirmPasswordEl = $scopeEl.find(`.${passwordConfirmationFieldClass}`);
+
+	let areFieldsEqual = validateFieldsEqual.bind({}, $newPasswordEl, $confirmPasswordEl),
 
 		resetFieldsDispatch = function () {
 			errorEmitter.trigger('user-error:reset', {
 				'fields': [
-					scope.$newPasswordEl,
-					scope.$confirmPasswordEl
+					$newPasswordEl,
+					$confirmPasswordEl
 				]
 			});
 		};
 
-	scope.$newPasswordEl.on('blur', () => {
+	$newPasswordEl.on('blur', () => {
 
-		let failedStrengthValidation = validatePasswordField(scope.$newPasswordEl);
+		let failedStrengthValidation = validatePasswordField($newPasswordEl);
 
 		if(failedStrengthValidation.length) {
 
 			passwordUserError({
 				'fields': [{
-					'el': scope.$newPasswordEl[0],
+					'el': $newPasswordEl[0],
 					'messages': ['This password does not meet the criteria']
 				}]
 			});
 		}
 	});
 
-	scope.$confirmPasswordEl.on('blur', () => {
+	$confirmPasswordEl.on('blur', () => {
 
 		let messages = [],
 			areFieldsEqualResult = areFieldsEqual(),
-			failedStrengthValidationResults = validatePasswordField(scope.$confirmPasswordEl);
+			failedStrengthValidationResults = validatePasswordField($confirmPasswordEl);
 
 		if(!areFieldsEqualResult) {
 			messages.push('Your passwords do not match');
@@ -98,15 +97,15 @@ function applyPasswordValidation(scope) {
 		if(!areFieldsEqualResult || failedStrengthValidationResults.length) {
 			passwordUserError({
 				'fields': [{
-					'el': scope.$confirmPasswordEl[0],
+					'el': $confirmPasswordEl[0],
 					'messages': messages
 				}]
 			});
 		}
 	});
 
-	scope.$newPasswordEl.on('focus', resetFieldsDispatch);
-	scope.$confirmPasswordEl.on('focus', resetFieldsDispatch);
+	$newPasswordEl.on('focus', resetFieldsDispatch);
+	$confirmPasswordEl.on('focus', resetFieldsDispatch);
 }
 
 /**

@@ -3709,6 +3709,10 @@ input:checked ~ .label {
   background-image: url("/static/s/img/icons/guidance-white.svg");
 }
 
+.input--checkbox {
+  background-image: url("https://eq.onsdigital.uk/s/img/icons/icons--check.svg");
+}
+
 .input--text-error {
   border: 1px solid red;
   border-width: 2px;

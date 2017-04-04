@@ -203,7 +203,7 @@ def login_OAuth():
         print "Our Token Endpoint is: ", token_url
 
         try:
-            token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id='onc@onc.gov', client_secret='password')
+            token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, client_secret=OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
             print " *** Access Token Granted *** "
             print " Values are: "
             for key in token:

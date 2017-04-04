@@ -4794,11 +4794,11 @@ input:checked ~ .label {
   margin-bottom: 1rem;
 }
 
-.guidance__link:before {
+.details__link:before {
   background-image: url("/static/s/img/icons/guidance.svg");
 }
 
-.guidance__link:focus:before {
+.details__link:focus:before {
   background-image: url("/static/s/img/icons/guidance-white.svg");
 }
 

@@ -26,25 +26,7 @@ app.debug = True
 if 'APP_SETTINGS' in os.environ:
     app.config.from_object(os.environ['APP_SETTINGS'])
 
-
 db = SQLAlchemy(app)
-
-@app.route('/')
-@app.route('/home', methods=['GET', 'POST'])
-def hello_world():
-    return render_template('_temp.html', _theme='default')
-
-@app.route('/')
-@app.route('/logged-in', methods=['GET', 'POST'])
-def logged_in():
-    """Logged in page for users only."""
-    if session.get('jwt_token'):
-        return render_template('signed-in.html', _theme='default', data={"error": {"type": "success"}})
-
-    return render_template('signed-in.html', _theme='default', data={"error": {"type": "failed"}})
-    #res = Response(response="Not authorised", status=403, mimetype="text/html")
-    return res
-
 
 def get_user_scopes(username):
     """
@@ -64,6 +46,23 @@ def get_user_scopes(username):
         return []
 
     return user_scopes
+
+
+@app.route('/')
+@app.route('/home', methods=['GET', 'POST'])
+def hello_world():
+    return render_template('_temp.html', _theme='default')
+
+@app.route('/')
+@app.route('/logged-in', methods=['GET', 'POST'])
+def logged_in():
+    """Logged in page for users only."""
+    if session.get('jwt_token'):
+        return render_template('signed-in.html', _theme='default', data={"error": {"type": "success"}})
+
+    return render_template('signed-in.html', _theme='default', data={"error": {"type": "failed"}})
+    #res = Response(response="Not authorised", status=403, mimetype="text/html")
+    return res
 
 
 @app.route('/protected/collectioninstrument', methods=['GET'])
@@ -168,14 +167,14 @@ def login_OAuth():
     POST Body message. In the real world this would be done over https - for now all this works over http since it is
     behind our firewall.
 
-    Parms:
+    Parms_to_OAuth:
         client_id
         client_secret
         user_id
         user_password
         oauth2_url
 
-    Returned:
+    Returned_from_OAuth:
         access_token
         refresh_token
         ttl
@@ -214,14 +213,6 @@ def login_OAuth():
             print("Failed validation")
             return render_template('sign-in-oauth.html', _theme='default', form=form, data={"error": {"type": "failed"}})
 
-
-        #existing_user = User.query.filter_by(username=username).first()
-
-        #if not (existing_user and existing_user.check_password_simple(password)):
-        #    flash('Invalid username or password. Please try again.', 'danger')
-        #    print("Failed validation")
-        #    return render_template('sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
-
         session['username'] = username
         usr_scopes = token['scope']
         data_dict_for_jwt_token = {"username": username, "user_scopes": usr_scopes, 'access_token':token['access_token'] }
@@ -247,22 +238,6 @@ def login_OAuth():
     return render_template('sign-in-oauth.html', _theme='default', form=form, data=templateData)
 
 
-
-# ===== Sign in =====
-# @app.route('/sign-in/', methods=['GET','POST'])
-# def sign_in():
-#
-#     password= request.form.get('pass')
-#     password= request.form.get('emailaddress')
-#
-#     templateData = {
-#         "error": {
-#             "type": None
-#         }
-#     }
-#
-#     #data variables configured: {"error": <undefined, failed, last-attempt>}
-#     return render_template('sign-in.html', _theme='default', data=templateData)
 
 @app.route('/sign-in/error', methods=['GET'])
 def sign_in_error():

@@ -8,7 +8,7 @@ from flask_wtf import Form
 from sqlalchemy import DateTime
 from sqlalchemy.dialects.postgresql import TEXT, JSON, UUID
 from werkzeug.security import generate_password_hash, check_password_hash
-from wtforms import TextField, DecimalField, SelectField, PasswordField
+from wtforms import TextField, DecimalField, SelectField, PasswordField, StringField
 from wtforms.validators import InputRequired, EqualTo
 
 from app import db
@@ -66,7 +66,7 @@ class UserScope(db.Model):
 class RegistrationForm(Form):
     """Registration form."""
 
-    username = TextField('Username', [InputRequired])
+    username = StringField('Username', [InputRequired])
     password = PasswordField( 'Password',[InputRequired(), EqualTo('confirm', message='Passwords must match')])
     confirm = PasswordField('Confirm Password', [InputRequired()])
 
@@ -74,12 +74,24 @@ class RegistrationForm(Form):
 class LoginForm(Form):
     """Login form."""
 
-    username = TextField('Email Address', [InputRequired()])
+    username = StringField('Email Address', [InputRequired()])
     password = PasswordField('Password', [InputRequired()])
 
 
 class SignIn(Form):
     """Sign in form."""
 
-    username = TextField('Username', [InputRequired()])
+    username = StringField('Username', [InputRequired()])
     password = PasswordField('Password', [InputRequired()])
+
+
+class Register(Form):
+    """
+    This is our Register form. It's used for the user to pass the 'Activation Code'. The activation code will be sent to
+    the party service, in turn get resolved in the 'case service'. If succesfull we can progress with registration. The
+    'Activation Code' is a string in our case.
+    """
+    activation_code = StringField('ActivationCode', [InputRequired()])
+
+
+

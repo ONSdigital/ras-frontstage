@@ -4,14 +4,22 @@
 {% block page_title %}Register{% endblock %}
 
 {% block main %}
-    <form action="/create-account/confirm-organisation-survey/" class="form">
-
+    <form
+            method="post"
+            action="{{ url_for('register') }}"
+            class="form"
+            role="form">
         <h1 class="saturn">Create an account</h1>
 
         <div class="field">
-            <label class="label">Activation code</label>
+            {{ form.csrf_token}}
+            {{ form.activation_code.label(class_='label') }}
+            <!--<label class="label">Activation code</label>-->
             <span class="label__description label__inner pluto">You'll find this in the letter we sent you</span>
+            {{ form.activation_code(class_='input input--text input-type__input') }}
+            <!--
             <input class="input input--text input-type__input" type="text" />
+            -->
         </div>
         <br />
 

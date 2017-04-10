@@ -304,10 +304,31 @@ def reset_password_confirmation():
 
 
 # ===== Registration =====
-@app.route('/create-account/')
+@app.route('/create-account/', methods=['GET', 'POST'])
 def register():
-    return render('register.html')
 
+    form = ActivationCodeForm(request.form)
+
+    if request.method == 'POST' and form.validate():
+        activationcode = request.form.get('activation_code')
+
+        print("Activation Code is: {}".format(activationcode))
+
+    if form.errors:
+        flash(form.errors, 'danger')
+
+    templateData = {
+        "error": {
+            "type": request.args.get("error")
+        }
+    }
+
+    return render_template('register.html', _theme='default', form=form, data=templateData)
+
+    #return render('register.html')
+
+
+# This take all the user credentials and then creates an account on the OAuth2 server
 @app.route('/create-account/enter-account-details/')
 def register_enter_your_details():
     return render('register.enter-your-details.html')

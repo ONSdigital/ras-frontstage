@@ -8,8 +8,9 @@ from flask_wtf import Form
 from sqlalchemy import DateTime
 from sqlalchemy.dialects.postgresql import TEXT, JSON, UUID
 from werkzeug.security import generate_password_hash, check_password_hash
-from wtforms import TextField, DecimalField, SelectField, PasswordField, StringField
+from wtforms import TextField, DecimalField, SelectField, PasswordField, StringField, IntegerField
 from wtforms.validators import InputRequired, EqualTo
+#from wtforms_components import PhoneNumberField
 
 from app import db
 
@@ -66,9 +67,13 @@ class UserScope(db.Model):
 class RegistrationForm(Form):
     """Registration form."""
 
+
     username = StringField('Username', [InputRequired])
     password = PasswordField( 'Password',[InputRequired(), EqualTo('confirm', message='Passwords must match')])
     confirm = PasswordField('Confirm Password', [InputRequired()])
+    phone = IntegerField('Phone No.', [InputRequired()], default=None)
+
+    #phone_number = PhoneNumberField(country_code='FI', display_format='national')
 
 
 class LoginForm(Form):
@@ -85,7 +90,7 @@ class SignIn(Form):
     password = PasswordField('Password', [InputRequired()])
 
 
-class Register(Form):
+class ActivationCodeForm(Form):
     """
     This is our Register form. It's used for the user to pass the 'Activation Code'. The activation code will be sent to
     the party service, in turn get resolved in the 'case service'. If succesfull we can progress with registration. The

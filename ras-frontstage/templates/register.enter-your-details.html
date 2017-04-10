@@ -12,14 +12,14 @@
             <h2 class="section__title neptune">Your name</h2>
 
             <div class="field">
-                <label class="label">First name</label>
-                <input class="input required input--text input-type__input" type="text" />
+                {{ form.first_name.label(class_='label') }}
+                {{ form.first_name(class_='input input--text input-type__input') }}
             </div>
             <br />
 
             <div class="field">
-                <label class="label">Last name</label>
-                <input class="input input--text input-type__input" type="text" />
+                {{ form.last_name.label(class_='label') }}
+                {{ form.last_name(class_='input input--text input-type__input') }}
             </div>
 
         </div>
@@ -30,14 +30,14 @@
 
             <fieldset>
                 <div class="field">
-                    <label class="label">Enter your email address</label>
-                    <input class="input required input--text input-type__input" type="text" />
+                    {{ form.email_address.label(class_='label') }}
+                    {{ form.email_address(class_='input input--text input-type__input') }}
                 </div>
                 <br />
 
                 <div class="field">
-                    <label class="label">Re-type your email address</label>
-                    <input class="input input--text input-type__input" type="text" />
+                    {{ form.email_address_confirm.label(class_='label') }}
+                    {{ form.email_address_confirm(class_='input input--text input-type__input') }}
                 </div>
             </fieldset>
 
@@ -55,14 +55,14 @@
 
             <fieldset class="js-new-password-group">
                 <div class="field">
-                    <label class="label">Create a password</label>
-                    <input class="input required input--text input-type__input js-new-password" type="text" />
+                    {{ form.password.label(class_='label') }}
+                    {{ form.password(class_='input input--text input-type__input js-new-password') }}
                 </div>
                 <br />
 
                 <div class="field">
-                    <label class="label">Re-type your password</label>
-                    <input class="input required input--text input-type__input js-confirm-new-password" type="text" />
+                    {{ form.password_confirm.label(class_='label') }}
+                    {{ form.password_confirm(class_='input input--text input-type__input js-confirm-new-password') }}
                 </div>
             </fieldset>
 
@@ -73,8 +73,8 @@
             <p class="section__description mars">We may sometimes need to call you to discuss information you have provided.</p>
 
             <div class="field">
-                <label class="label">Enter your phone number</label>
-                <input class="input input--text input-type__input" type="text" />
+                {{ form.phone_number.label(class_='label') }}
+                {{ form.phone_number(class_='input input--text input-type__input') }}
             </div>
 
         </div>
@@ -85,8 +85,10 @@
             <div class="field field--checkbox"><!-- field--multiplechoice - class displays border -->
                 <fieldset>
                     <div class="field__item js-focusable-box is-checked">
-                        <input class="input input--checkbox js-focusable" type="checkbox" id="checkbox1">
-                        <label class="label label--inline venus" for="checkbox1">Please confirm you accept our <a href="#">Terms of use (Opens in a new window.)</a></label>
+                        <!--<input class="input input&#45;&#45;checkbox js-focusable" type="checkbox" id="checkbox1" />-->
+                        {{ form.terms_and_conditions(class_='input input--checkbox js-focusable') }}
+                        {{ form.terms_and_conditions.label(class_='label label--inline venus') }}
+                        <!--<label class="label label&#45;&#45;inline venus" for="checkbox1">Please confirm you accept our <a href="#">Terms of use (Opens in a new window.)</a></label>-->
                     </div>
                 </fieldset>
             </div>

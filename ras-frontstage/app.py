@@ -331,7 +331,14 @@ def register():
 # This take all the user credentials and then creates an account on the OAuth2 server
 @app.route('/create-account/enter-account-details/')
 def register_enter_your_details():
-    return render('register.enter-your-details.html')
+
+    form = RegistrationForm(request.form)
+
+    if request.method == 'POST' and form.validate():
+        if form.errors:
+            flash(form.errors, 'danger')
+
+    return render_template('register.enter-your-details.html', _theme='default', form=form)
 
 @app.route('/create-account/confirm-organisation-survey/')
 def register_confirm_organisation_survey():

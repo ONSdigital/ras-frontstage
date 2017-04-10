@@ -8,7 +8,7 @@ from flask_wtf import Form
 from sqlalchemy import DateTime
 from sqlalchemy.dialects.postgresql import TEXT, JSON, UUID
 from werkzeug.security import generate_password_hash, check_password_hash
-from wtforms import TextField, DecimalField, SelectField, PasswordField, StringField, IntegerField
+from wtforms import TextField, DecimalField, SelectField, PasswordField, StringField, IntegerField, BooleanField
 from wtforms.validators import InputRequired, EqualTo
 #from wtforms_components import PhoneNumberField
 
@@ -67,11 +67,14 @@ class UserScope(db.Model):
 class RegistrationForm(Form):
     """Registration form."""
 
-
-    username = StringField('Username', [InputRequired])
-    password = PasswordField( 'Password',[InputRequired(), EqualTo('confirm', message='Passwords must match')])
-    confirm = PasswordField('Confirm Password', [InputRequired()])
-    phone = IntegerField('Phone No.', [InputRequired()], default=None)
+    first_name = StringField('First name', [InputRequired])
+    last_name = StringField('Last name', [InputRequired])
+    email_address = StringField('Enter your email address', [InputRequired])
+    email_address_confirm = StringField('Re-type your email address', [InputRequired])
+    password = PasswordField( 'Create a password',[InputRequired(), EqualTo('Re-type your password', message='Passwords must match')])
+    password_confirm = PasswordField('Re-type your password', [InputRequired()])
+    phone_number = IntegerField('Enter your phone number', [InputRequired()], default=None)
+    terms_and_conditions = BooleanField('Please confirm you accept our ', [InputRequired()], default=None)
 
     #phone_number = PhoneNumberField(country_code='FI', display_format='national')
 

@@ -81,6 +81,6 @@ class OAuthConfig(Config):
     RAS_FRONTSTAGE_CLIENT_SECRET = "password"
     ONS_AUTHORIZATION_ENDPOINT = "/web/authorize/"
     ONS_TOKEN_ENDPOINT = "/api/v1/tokens/"
-    ONS_ADMIN_ENDPOINT = '/api/create_user'
+    ONS_ADMIN_ENDPOINT = '/api/account/create'
 
 

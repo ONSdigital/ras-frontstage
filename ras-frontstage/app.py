@@ -62,7 +62,7 @@ def logged_in():
 
     return render_template('signed-in.html', _theme='default', data={"error": {"type": "failed"}})
     #res = Response(response="Not authorised", status=403, mimetype="text/html")
-    return res
+    #return res
 
 
 @app.route('/protected/collectioninstrument', methods=['GET'])
@@ -105,7 +105,7 @@ def logout():
         session.pop('jwt_token')
 
     flash('You have successfully logged out.', 'success')
-    return redirect(url_for('login'))
+    return redirect(url_for('login_OAuth'))
 
 
 # ===== Sign in =====
@@ -209,7 +209,6 @@ def login_OAuth():
                 print key, " Value is: ", token[key]
         except MissingTokenError as e:
             print "Missing token error, error is: {}".format(e)
-            flash('Invalid username or password. Please try again.', 'danger')
             print("Failed validation")
             return render_template('sign-in-oauth.html', _theme='default', form=form, data={"error": {"type": "failed"}})
 
@@ -222,12 +221,8 @@ def login_OAuth():
 
         session['jwt_token'] = token['access_token']
 
-        flash('You have successfully logged in.', 'success')
         print("validation OK")
         return redirect(url_for('logged_in'))
-
-    if form.errors:
-        flash(form.errors, 'danger')
 
     templateData = {
         "error": {
@@ -310,9 +305,8 @@ def register():
     form = ActivationCodeForm(request.form)
 
     if request.method == 'POST' and form.validate():
-        activationcode = request.form.get('activation_code')
-
-        print("Activation Code is: {}".format(activationcode))
+        activation_code = request.form.get('activation_code')
+        print "Activation code is: {}".format(activation_code)
 
     if form.errors:
         flash(form.errors, 'danger')
@@ -325,24 +319,67 @@ def register():
 
     return render_template('register.html', _theme='default', form=form, data=templateData)
 
-    #return render('register.html')
-
-
 # This take all the user credentials and then creates an account on the OAuth2 server
-@app.route('/create-account/enter-account-details/')
+@app.route('/create-account/enter-account-details/', methods=['GET', 'POST'])
 def register_enter_your_details():
 
     form = RegistrationForm(request.form)
 
     if request.method == 'POST' and form.validate():
-        if form.errors:
-            flash(form.errors, 'danger')
 
-    return render_template('register.enter-your-details.html', _theme='default', form=form)
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        email_address = request.form.get('email_address')
+        email_address_confirm = request.form.get('email_address_confirm')
+        password = request.form.get('password')
+        password_confirm = request.form.get('password_confirm')
+        phone_number = request.form.get('phone_number')
+        terms_and_conditions = request.form.get('terms_and_conditions')
+
+        print ("User name is: {} {}".format(first_name, last_name))
+        print ("Email is: {}".format(email_address))
+        print ("Confirmation email is: {}".format(email_address_confirm))
+        print ("password is: {}".format(password))
+        print ("Confirmation password is: {}".format(password_confirm))
+        print ("phone number is: {}".format(phone_number))
+        print ("T's&C's is: {}".format(terms_and_conditions))
+
+        # Lets try and create this user on the OAuth2 server
+        data = {"username": email_address, "password": password, "client_id": OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, "client_secret": OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET }
+        headers = {'content-type': 'application/x-www-form-urlencoded'}
+        authorisation=(OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
+
+        try:
+
+            OAuthurl = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_ADMIN_ENDPOINT
+            OAuth_response = requests.post(OAuthurl, auth=authorisation, headers=headers, data=data)
+
+            print "OAuth response is: {}".format(OAuth_response.content)
+
+        except requests.exceptions.ConnectionError:
+            print  "There seems to be no server listening on this connection?"
+
+        except requests.exceptions.Timeout:
+            print "Timeout error. Is the OAuth Server overloaded?"
+
+        except requests.exceptions.RequestException as e:
+            # catastrophic error. bail.
+            print e
+
+        OAuth_response.raise_for_status()                       # A stop gap until we know all the correct error pages
+        return render_template('register.almost-done.html', _theme='default', email=email_address)
+
+    else:
+        print "either this is not a POST, or form validation failed"
+        print "Form failed validation, errors are: {}".format(form.errors)
+
+    return render_template('register.enter-your-details.html', _theme='default', form=form, errors=form.errors)
+
 
 @app.route('/create-account/confirm-organisation-survey/')
 def register_confirm_organisation_survey():
     return render('register.confirm-organisation-survey.html')
+
 
 @app.route('/create-account/check-email/')
 def register_almost_done():

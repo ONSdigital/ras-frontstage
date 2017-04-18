@@ -355,15 +355,17 @@ def register_enter_your_details():
             OAuth_response = requests.post(OAuthurl, auth=authorisation, headers=headers, data=data)
 
             print "OAuth response is: {}".format(OAuth_response.content)
+            # TODO A utility function to allow us to route to a page for 'user is registered already'. We need a html page for this.
 
         except requests.exceptions.ConnectionError:
             print  "There seems to be no server listening on this connection?"
+            # TODO A redirect to a page that helps the user
 
         except requests.exceptions.Timeout:
             print "Timeout error. Is the OAuth Server overloaded?"
-
+            # TODO A redirect to a page that helps the user
         except requests.exceptions.RequestException as e:
-            # catastrophic error. bail.
+            # TODO catastrophic error. bail. A page that tells the user something horrid has happeded and who to inform
             print e
 
         OAuth_response.raise_for_status()                       # A stop gap until we know all the correct error pages

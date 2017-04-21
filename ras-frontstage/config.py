@@ -57,6 +57,18 @@ class TestingConfig(Config):
     TESTING = True
 
 
+class PartyService(Config):
+    """
+    This class is used to configure details and parameters for the PartyService microservice.
+    This is temporary until an admin config feature is added to allow manual config of the microservice and/or a
+    configuration management process
+    """
+
+    PARTYSERVICE_PROTOCOL = "http://"
+    PARTYSERVICE_SERVER = "localhost:8000"
+    PARTYSERVICE_REGISTER_ENDPOINT = "/respondents/"
+
+
 class OAuthConfig(Config):
     """
     This class is used to configure OAuth2 parameters for the microservice.

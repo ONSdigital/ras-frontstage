@@ -5,7 +5,7 @@
 {% block page_title %}Confirm organisation and survey{% endblock %}
 
 {% block main %}
-    {% if session.username %}
+    {% if session.jwt_token %}
         <h1 class="saturn">Congratulations. You are signed in.</h1>
         <p>You can now access protected endpoints.</p>
         <p>To sign out please <a href="{{ url_for('logout') }}" > select here.</a> </p>

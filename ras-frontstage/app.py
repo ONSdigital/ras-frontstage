@@ -450,7 +450,7 @@ def register_enter_your_details():
         # Register with the party service
 
         registrationData = {'emailAddress': email_address, 'firstName': first_name, 'lastName': last_name, 'telephone': phone_number, 'status': 'CREATED' }
-        headers = {'authorization': encoded_jwt_token}
+        headers = {'authorization': encoded_jwt_token, 'content-type': 'application/json'}
         partyServiceURL = PartyService.PARTYSERVICE_PROTOCOL + PartyService.PARTYSERVICE_SERVER + PartyService.PARTYSERVICE_REGISTER_ENDPOINT
         print "Party service URL is: {}".format(partyServiceURL)
         register_user = requests.post(partyServiceURL, headers=headers, data=json.dumps(registrationData))

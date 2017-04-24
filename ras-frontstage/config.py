@@ -65,7 +65,7 @@ class PartyService(Config):
     """
 
     PARTYSERVICE_PROTOCOL = "http://"
-    PARTYSERVICE_SERVER = "localhost:8000"
+    PARTYSERVICE_SERVER = "localhost:5062"
     PARTYSERVICE_REGISTER_ENDPOINT = "/respondents/"
 
 

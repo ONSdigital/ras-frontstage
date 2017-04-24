@@ -88,8 +88,8 @@ class OAuthConfig(Config):
     TOKEN_ENDPOINT = "https://graph.facebook.com/oauth/access_token"  # Facebook token endpoint
 
     ONS_OAUTH_PROTOCOL = "http://"
-    ONS_OAUTH_SERVER = "localhost:8000"
-    RAS_FRONTSTAGE_CLIENT_ID = "onc@onc.gov"
+    ONS_OAUTH_SERVER = "django-oauth2-test:8040"
+    RAS_FRONTSTAGE_CLIENT_ID = "ons@ons.gov"
     RAS_FRONTSTAGE_CLIENT_SECRET = "password"
     ONS_AUTHORIZATION_ENDPOINT = "/web/authorize/"
     ONS_TOKEN_ENDPOINT = "/api/v1/tokens/"

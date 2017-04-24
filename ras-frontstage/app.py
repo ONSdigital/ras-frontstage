@@ -8,7 +8,7 @@ from flask import Flask, make_response, render_template, request
 import os
 import requests
 
-from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, Response
+from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, Response, abort
 from flask_sqlalchemy import SQLAlchemy
 from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError, MissingClientIdError, MismatchingStateError
 from requests_oauthlib import OAuth2Session
@@ -355,14 +355,14 @@ def register_enter_your_details():
         print ("T's&C's is: {}".format(terms_and_conditions))
 
         # Lets try and create this user on the OAuth2 server
-        data = {"username": email_address, "password": password, "client_id": OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, "client_secret": OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET }
+        OAuth_payload = {"username": email_address, "password": password, "client_id": OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, "client_secret": OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET }
         headers = {'content-type': 'application/x-www-form-urlencoded'}
         authorisation = (OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
 
         try:
 
             OAuthurl = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_ADMIN_ENDPOINT
-            OAuth_response = requests.post(OAuthurl, auth=authorisation, headers=headers, data=data)
+            OAuth_response = requests.post(OAuthurl, auth=authorisation, headers=headers, data=OAuth_payload)
 
             print "OAuth response is: {}".format(OAuth_response.content)
             response_body = json.loads(OAuth_response.content)
@@ -423,19 +423,23 @@ def register_enter_your_details():
             for key in token:
                 print key, " Value is: ", token[key]
 
-            decodedJWT = decode(token)
-            for key in decodedJWT:
-                print " {} is: {}".format(key, decodedJWT[key])
-                #userID = decodedJWT['user_id']
-
             # TODO Check that this token has not expired. This should never happen, as we just got this token to
             # register the user
+
+            data_dict_for_jwt_token = {"refresh_token": token['refresh_token'],
+                "access_token": token['access_token'],
+                "scope": token['scope'],
+                "expires_at": token['expires_at'],
+                "username": email_address}
+
+            # We need to take our token from teh OAuth2 server and encode in a JWT token and send in the authorization
+            # header to the party service microservice
+            encoded_jwt_token = encode(data_dict_for_jwt_token)
 
         except JWTError:
             #TODO Provide proper logging
             print "This is not a valid JWT Token"
             #app.logger.warning('JWT scope could not be validated.')
-            # Make sure we pop this invalid session variable.
             return abort(500,'{"message":"There was a problem with the Authentication service please contact a member of the ONS staff"}')
         except MissingTokenError as e:
             print "Missing token error, error is: {}".format(e)
@@ -445,10 +449,13 @@ def register_enter_your_details():
         # Step 2
         # Register with the party service
 
-        registrationData = {'emailAddress': email_address, 'firstName': first_name, 'lastName': last_name, 'telephone': telephone, 'status': 'CREATED' }
-        headers = {'authorization': token}
+        registrationData = {'emailAddress': email_address, 'firstName': first_name, 'lastName': last_name, 'telephone': phone_number, 'status': 'CREATED' }
+        headers = {'authorization': encoded_jwt_token}
         partyServiceURL = PartyService.PARTYSERVICE_PROTOCOL + PartyService.PARTYSERVICE_SERVER + PartyService.PARTYSERVICE_REGISTER_ENDPOINT
-        register_user = requests.post(partyServiceURL, headers, data = json.dumps(registrationData))
+        print "Party service URL is: {}".format(partyServiceURL)
+        register_user = requests.post(partyServiceURL, headers=headers, data=json.dumps(registrationData))
+
+        print "Response from party service is: {}".format(register_user.content)
 
         if register_user.ok:
             return render_template('register.almost-done.html', _theme='default', email=email_address)

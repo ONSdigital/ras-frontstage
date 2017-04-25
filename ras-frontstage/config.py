@@ -24,7 +24,8 @@ class Config(object):
     CSRF_ENABLED = True
     SECRET_KEY = 'this-really-needs-to-be-changed'
     dbname = "ras_frontstage_backup"
-    SQLALCHEMY_DATABASE_URI = "postgresql://" + dbname + ":password@localhost:5431/postgres"
+    #SQLALCHEMY_DATABASE_URI = "postgresql://" + dbname + ":password@localhost:5431/postgres"
+    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI', 'postgresql://ras_frontstage_backup:password@localhost:5431/postgres')
 
 
 class ProductionConfig(Config):
@@ -64,9 +65,13 @@ class PartyService(Config):
     configuration management process
     """
 
-    PARTYSERVICE_PROTOCOL = "http://"
-    PARTYSERVICE_SERVER = "localhost:5062"
-    PARTYSERVICE_REGISTER_ENDPOINT = "/respondents/"
+    #PARTYSERVICE_PROTOCOL = "http://"
+    #PARTYSERVICE_SERVER = "localhost:5062"
+    #PARTYSERVICE_REGISTER_ENDPOINT = "/respondents/"
+
+    PARTYSERVICE_PROTOCOL = os.environ.get('PARTYSERVICE_PROTOCOL', 'http://')
+    PARTYSERVICE_SERVER = os.environ.get('PARTYSERVICE_SERVER', 'localhost:5062')
+    PARTYSERVICE_REGISTER_ENDPOINT = os.environ.get('PARTYSERVICE_REGISTER_ENDPOINT', '/respondents/')
 
 
 class OAuthConfig(Config):

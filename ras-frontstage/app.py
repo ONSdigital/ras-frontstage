@@ -7,6 +7,7 @@ from datetime import datetime
 from flask import Flask, make_response, render_template, request
 import os
 import requests
+from requests import ConnectionError
 
 from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, Response, abort
 from flask_sqlalchemy import SQLAlchemy
@@ -453,16 +454,21 @@ def register_enter_your_details():
         headers = {'authorization': encoded_jwt_token, 'content-type': 'application/json'}
         partyServiceURL = PartyService.PARTYSERVICE_PROTOCOL + PartyService.PARTYSERVICE_SERVER + PartyService.PARTYSERVICE_REGISTER_ENDPOINT
         print "Party service URL is: {}".format(partyServiceURL)
-        register_user = requests.post(partyServiceURL, headers=headers, data=json.dumps(registrationData))
 
-        print "Response from party service is: {}".format(register_user.content)
+        try:
+            register_user = requests.post(partyServiceURL, headers=headers, data=json.dumps(registrationData))
 
-        if register_user.ok:
-            return render_template('register.almost-done.html', _theme='default', email=email_address)
-        else:
-            return abort(500,'{"message":"There was a problem with the registration service, please contact a member of the ONS staff"}')
+            print "Response from party service is: {}".format(register_user.content)
 
+            if register_user.ok:
+                return render_template('register.almost-done.html', _theme='default', email=email_address)
+            else:
+                return abort(500,'{"message":"There was a problem with the registration service, please contact a member of the ONS staff"}')
 
+        except ConnectionError:
+            print "We could not connect to the party service"
+            return abort(500, '{"message":"There was a problem establishing a connection with an ONS micro service."}')
+        #TODO We need to add an exception timeout catch and handle this type of error
 
     else:
         print "either this is not a POST, or form validation failed"

@@ -43,7 +43,7 @@ export default () => {
 
 /**
  * module:passwordValidation~applyPasswordValidation
- * @param scope An object representing the current scope. With a collection of associated fields.
+ * @param scope An object representing the current scope.
  */
 function applyPasswordValidation(scope) {
 

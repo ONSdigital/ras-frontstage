@@ -1,6 +1,9 @@
 /**
  * Src
  */
+
+$static: "/static/assets";
+
 @import "partials/helpers/functions";
 @import "partials/helpers/mixins";
 @import "partials/helpers/mq";
@@ -9,7 +12,7 @@
 @import "partials/vars/forms";
 @import "partials/vars/grid";
 @import "partials/vars/typography";
-@import "partials/vars/vars";
+//@import "partials/vars/vars";
 
 
 

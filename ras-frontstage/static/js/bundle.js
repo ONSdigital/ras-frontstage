@@ -8313,6 +8313,10 @@ var passwordObfuscationGroupClass = 'js-password-obfuscation-group';
 var passwordObfuscationToggle = 'js-password-obfuscation-toggle';
 var passwordObfuscationField = 'js-password-obfuscation-field';
 
+/**
+ * @module passwordObfuscation
+ * @description DOM module to adjust password ofuscation.
+ */
 var passwordObfuscation = (function () {
 
 	$('.' + passwordObfuscationGroupClass).each(function (i, el) {
@@ -8320,6 +8324,10 @@ var passwordObfuscation = (function () {
 	});
 });
 
+/**
+ * module:passwordValidation~applyObfuscationToggle
+ * @param scope An object representing the current scope.
+ */
 function applyObfuscationToggle(scope) {
 
 	/**
@@ -8488,7 +8496,7 @@ var passwordValidation = (function () {
 
 /**
  * module:passwordValidation~applyPasswordValidation
- * @param scope An object representing the current scope. With a collection of associated fields.
+ * @param scope An object representing the current scope.
  */
 function applyPasswordValidation(scope) {
 

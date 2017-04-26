@@ -24,7 +24,8 @@ class Config(object):
     CSRF_ENABLED = True
     SECRET_KEY = 'this-really-needs-to-be-changed'
     dbname = "ras_frontstage_backup"
-    SQLALCHEMY_DATABASE_URI = "postgresql://" + dbname + ":password@localhost:5431/postgres"
+    #SQLALCHEMY_DATABASE_URI = "postgresql://" + dbname + ":password@localhost:5431/postgres"
+    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI', 'postgresql://ras_frontstage_backup:password@localhost:5431/postgres')
 
 
 class ProductionConfig(Config):
@@ -57,30 +58,43 @@ class TestingConfig(Config):
     TESTING = True
 
 
+class PartyService(Config):
+    """
+    This class is used to configure details and parameters for the PartyService microservice.
+    This is temporary until an admin config feature is added to allow manual config of the microservice and/or a
+    configuration management process
+    """
+
+    #PARTYSERVICE_PROTOCOL = "http://"
+    #PARTYSERVICE_SERVER = "localhost:5062"
+    #PARTYSERVICE_REGISTER_ENDPOINT = "/respondents/"
+
+    PARTYSERVICE_PROTOCOL = os.environ.get('PARTYSERVICE_PROTOCOL', 'http://')
+    PARTYSERVICE_SERVER = os.environ.get('PARTYSERVICE_SERVER', 'localhost:5062')
+    PARTYSERVICE_REGISTER_ENDPOINT = os.environ.get('PARTYSERVICE_REGISTER_ENDPOINT', '/respondents/')
+
+
 class OAuthConfig(Config):
     """
     This class is used to configure OAuth2 parameters for the microservice.
     This is temporary until an admin config feature
     is added to allow manual config of the microservice
     """
-    APP_ID = "399360140422360"  # This is an APP ID registered with the Facebook OAuth2
 
-    # App secret for a test registered Facebook OAuth2
-    APP_SECRET = "8daae4110e491db2c5067e5c89add2dd"
+    #ONS_OAUTH_PROTOCOL = "http://"
+    #ONS_OAUTH_SERVER = "django-oauth2-test:8040"
+    #RAS_FRONTSTAGE_CLIENT_ID = "ons@ons.gov"
+    #RAS_FRONTSTAGE_CLIENT_SECRET = "password"
+    #ONS_AUTHORIZATION_ENDPOINT = "/web/authorize/"
+    #ONS_TOKEN_ENDPOINT = "/api/v1/tokens/"
+    #ONS_ADMIN_ENDPOINT = '/api/account/create'
 
-    DISPLAY_NAME = "NoisyAtom"  # This is a test name registered with Facebook OAuth2
-    REDIRECT_ENDPOINT = ["http://104.236.14.123:8002/auth/callback",
-                         "http://104.236.14.123:8002/auth/callback.html"]
-
-    AUTHORIZATION_ENDPOINT = "https://www.facebook.com/dialog/oauth"  # Facebook Auth endpoint
-    TOKEN_ENDPOINT = "https://graph.facebook.com/oauth/access_token"  # Facebook token endpoint
-
-    ONS_OAUTH_PROTOCOL = "http://"
-    ONS_OAUTH_SERVER = "localhost:8000"
-    RAS_FRONTSTAGE_CLIENT_ID = "onc@onc.gov"
-    RAS_FRONTSTAGE_CLIENT_SECRET = "password"
-    ONS_AUTHORIZATION_ENDPOINT = "/web/authorize/"
-    ONS_TOKEN_ENDPOINT = "/api/v1/tokens/"
-    ONS_ADMIN_ENDPOINT = '/api/create_user'
+    ONS_OAUTH_PROTOCOL = os.environ.get('ONS_OAUTH_PROTOCOL', 'http://')
+    ONS_OAUTH_SERVER = os.environ.get('ONS_OAUTH_SERVER', 'localhost:8040')
+    RAS_FRONTSTAGE_CLIENT_ID = os.environ.get('RAS_FRONTSTAGE_CLIENT_ID', 'ons@ons.gov')
+    RAS_FRONTSTAGE_CLIENT_SECRET = os.environ.get('RAS_FRONTSTAGE_CLIENT_SECRET', 'password')
+    ONS_AUTHORIZATION_ENDPOINT = os.environ.get('ONS_AUTHORIZATION_ENDPOINT', '/web/authorize/')
+    ONS_TOKEN_ENDPOINT = os.environ.get('ONS_TOKEN_ENDPOINT', '/api/v1/tokens/')
+    ONS_ADMIN_ENDPOINT = os.environ.get('ONS_ADMIN_ENDPOINT', '/api/account/create')
 
 

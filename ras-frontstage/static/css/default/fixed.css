@@ -564,13 +564,13 @@ legend {
 @font-face {
   font-family: "Lato";
   font-weight: 400;
-  src: url("/assets//fonts/lato/latolatin-regular-webfont.eot?") format("eot"), url("/assets//fonts/lato/latolatin-regular-webfont.woff2") format("woff2"), url("/assets//fonts/lato/latolatin-regular-webfont.woff") format("woff"), url("/assets//fonts/lato/latolatin-regular-webfont.ttf") format("truetype"), url("/assets//fonts/lato/latolatin-regular-webfont.svg#Lato") format("svg");
+  src: url("/static/assets/fonts/lato/latolatin-regular-webfont.eot?") format("eot"), url("/static/assets/fonts/lato/latolatin-regular-webfont.woff2") format("woff2"), url("/static/assets/fonts/lato/latolatin-regular-webfont.woff") format("woff"), url("/static/assets/fonts/lato/latolatin-regular-webfont.ttf") format("truetype"), url("/static/assets/fonts/lato/latolatin-regular-webfont.svg#Lato") format("svg");
 }
 
 @font-face {
   font-family: "Lato";
   font-weight: 600;
-  src: url("/assets//fonts/lato/latolatin-bold-webfont.eot?") format("eot"), url("/assets//fonts/lato/latolatin-bold-webfont.woff2") format("woff2"), url("/assets//fonts/lato/latolatin-bold-webfont.woff") format("woff"), url("/assets//fonts/lato/latolatin-bold-webfont.ttf") format("truetype"), url("/assets//fonts/lato/latolatin-bold-webfont.svg#Lato") format("svg");
+  src: url("/static/assets/fonts/lato/latolatin-bold-webfont.eot?") format("eot"), url("/static/assets/fonts/lato/latolatin-bold-webfont.woff2") format("woff2"), url("/static/assets/fonts/lato/latolatin-bold-webfont.woff") format("woff"), url("/static/assets/fonts/lato/latolatin-bold-webfont.ttf") format("truetype"), url("/static/assets/fonts/lato/latolatin-bold-webfont.svg#Lato") format("svg");
 }
 
 html {
@@ -2699,7 +2699,7 @@ input[type=number] {
   margin-right: 0.3rem;
   speak: none;
   content: "";
-  background: url("/assets//img/icons/icons--details.svg") no-repeat center center;
+  background: url("/static/assets/img/icons/icons--details.svg") no-repeat center center;
   background-size: auto;
   text-align: center;
   width: 16px;
@@ -2720,7 +2720,7 @@ input[type=number] {
 }
 
 .details__link:focus:before {
-  background: url("/assets//img/icons/icons--details-white.svg") no-repeat center center;
+  background: url("/static/assets/img/icons/icons--details-white.svg") no-repeat center center;
 }
 
 .is-expanded .details__link:before {
@@ -3023,7 +3023,7 @@ input:checked ~ .field__other {
           appearance: none;
   padding: 9.6px 32px 9.6px 8px;
   padding: 0.6rem 2rem 0.6rem 0.5rem;
-  background: #fff url("/assets//img/icons/icons--chevron-down.svg") no-repeat center right 6px;
+  background: #fff url("/static/assets/img/icons/icons--chevron-down.svg") no-repeat center right 6px;
   background-size: 1.5rem;
   line-height: 20px;
   line-height: 1.25rem;
@@ -3105,7 +3105,7 @@ input:checked ~ .field__other {
 }
 
 .input--checkbox {
-  background: url("/assets//img/icons/icons--check.svg") no-repeat center center;
+  background: url("/static/assets/img/icons/icons--check.svg") no-repeat center center;
   background-size: 0;
   -webkit-transition: background-size 50ms ease-out;
   transition: background-size 50ms ease-out;
@@ -3187,7 +3187,7 @@ input:checked ~ .label {
   display: block;
   width: 220px;
   height: 44px;
-  background: url("/assets//img/logo.png") no-repeat 0 0;
+  background: url("/static/assets/img/logo.png") no-repeat 0 0;
 }
 
 .lt-ie9 .logo img {

@@ -18,9 +18,7 @@ let config = {
  * @param opts
  */
 export default opts => {
-
 	config = opts ? mergeDeep({}, config, opts) : config;
-	//config = opts ? Object.assign({}, config, opts) : config;
 }
 
 /**

@@ -1,4 +1,5 @@
 'use strict';
+import { mergeDeep } from '../utils/helpers';
 
 /**
  * Default configuration for module
@@ -17,7 +18,9 @@ let config = {
  * @param opts
  */
 export default opts => {
-	config = opts ? Object.assign({}, config, opts) : config;
+
+	config = opts ? mergeDeep({}, config, opts) : config;
+	//config = opts ? Object.assign({}, config, opts) : config;
 }
 
 /**
@@ -36,6 +39,7 @@ export function validateEqual(str1, str2) {
  * @returns {boolean}
  */
 export function validateCharacterLength(str) {
+	console.log(config.characterLen.max);
 	return str.length >= config.characterLen.min && str.length <= config.characterLen.max;
 }
 

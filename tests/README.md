@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/ONSdigital/ras-collection-instrument.svg?branch=master)](https://travis-ci.org/ONSdigital/ras-collection-instrument)
 
 
-# ras-collection-instrument (Testing)
+# ras-frontstage-instrument (Testing)
 
 
 
@@ -81,10 +81,10 @@ The system should output something like:
 
     ...
 
-    Feature: Handle retrieval of Collection Instrument data # features/get_collection_instrument.feature:1
+    Feature: Handle retrieval of Collection Instrument data # features/get_frontstage_instrument.feature:1
 
       @connect_to_database
-      Scenario: Get all available collection instrument data              # features/get_collection_instrument.feature:7
+      Scenario: Get all available collection instrument data              # features/get_frontstage_instrument.feature:7
         Given one or more collection instruments exist                    # features/steps/steps.py:77 0.002s
         When a request is made for one or more collection instrument data # features/steps/steps.py:151 185.385s
         Then check the returned data are correct                          # features/steps/steps.py:226 0.169s
@@ -94,7 +94,7 @@ The system should output something like:
 
 You can optionally run individual features by running:
 
-    /> behave <http_method_name>_collection_instrument.feature
+    /> behave <http_method_name>_frontstage_instrument.feature
 
 ### Creating BDD Tests
 
@@ -125,6 +125,23 @@ directory. The 3 shell scripts are:
  The developer should run the lint run_linting.sh shell script first. Once code passes this the developer should move to running the
  run_unit_tests.sh script. Once tests pass for this script the developer can go on to run both together in the shell script run_tests.sh.
 
+
+### Detailed Description
+
+ The tests are written with the pytest framework which can be [found here](https://docs.pytest.org/en/latest/index.html)
+ To run a test file directly from the command line you can test with the verbose command:
+
+   />  py.test -v test_app.py
+
+ Or for the fully verbose way:
+
+   /> python  -m pytest test_app.py
+
+ Where -m = module, pytest is the module to run from, and test_app.py is the test file. To run in verbose mode use the
+ -v argument.
+
+  /> python -m pytest -v test_app.py
+
 ### Writing Unit Tests
 
 TODO
@@ -145,7 +162,7 @@ form the root folder do:
 
 To view % of your code base that is covered by your test cases go to the index file via your browser within the dir:
 
-  /ras-collection-instrument/htmlcov
+  /ras-frontstage-instrument/htmlcov
 
 
 

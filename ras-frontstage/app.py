@@ -287,26 +287,6 @@ def sign_in_account_locked():
 
 
 # ===== My Surveys =====
-def calculate_case_status(caseEvents):
-
-    # TODO Get business rules and code this accordingly
-    status = ''
-    for event in caseEvents:
-        if event['category'] == 'CASE_CREATED':
-            status = 'Not started'
-        elif event['category'] == 'CASE_COMPLETED':
-            status = 'Complete'
-
-    return status
-
-def filter_surveys(dataArray, allowedStatuses):
-    returnArray = []
-    for case in dataArray:
-        if case['status'] in allowedStatuses:
-            returnArray.append(case)
-
-    return returnArray;
-
 def build_survey_data():
 
     # TODO - Derive the Party Id
@@ -365,13 +345,13 @@ def build_survey_data():
         inputDateFormat = 'YYYY-MM-DDThh:mm:ss'
         outputDateFormat = 'D MMM YYYY'
         collectionExerciseData['periodStart'] = collectionExerciseData['periodStart'].replace('Z' , '')
-        collectionExerciseData['periodStart'] = arrow.get(collectionExerciseData['periodStart'], inputDateFormat).format(outputDateFormat)
+        collectionExerciseData['periodStartFormatted'] = arrow.get(collectionExerciseData['periodStart'], inputDateFormat).format(outputDateFormat)
 
         collectionExerciseData['periodEnd'] = collectionExerciseData['periodEnd'].replace('Z' , '')
-        collectionExerciseData['periodEnd'] = arrow.get(collectionExerciseData['periodEnd'], inputDateFormat).format(outputDateFormat)
+        collectionExerciseData['periodEndFormatted'] = arrow.get(collectionExerciseData['periodEnd'], inputDateFormat).format(outputDateFormat)
 
         collectionExerciseData['scheduledReturn'] = collectionExerciseData['scheduledReturn'].replace('Z' , '')
-        collectionExerciseData['scheduledReturn'] = arrow.get(collectionExerciseData['scheduledReturn'], inputDateFormat).format(outputDateFormat)
+        collectionExerciseData['scheduledReturnFormatted'] = arrow.get(collectionExerciseData['scheduledReturn'], inputDateFormat).format(outputDateFormat)
 
 
         data = {}
@@ -386,6 +366,36 @@ def build_survey_data():
 
     return dataArray
 
+
+def calculate_case_status(caseEvents):
+
+    # TODO Get business rules and code this accordingly
+    status = ''
+    for event in caseEvents:
+        if event['category'] == 'CASE_CREATED':
+            status = 'Not started'
+        elif event['category'] == 'CASE_COMPLETED':
+            status = 'Complete'
+
+    return status
+
+
+def filter_surveys(dataArray, allowedStatuses):
+    returnArray = []
+    for case in dataArray:
+        if case['status'] in allowedStatuses:
+            returnArray.append(case)
+
+    return returnArray;
+
+
+def sort_survey_data(dataArray):
+    return sorted(
+        dataArray,
+        key=lambda x: datetime.datetime.strptime(x['collectionExerciseData']['scheduledReturn'], '%Y-%m-%dT%H:%M:%S'), reverse=False
+    )
+
+
 @app.route('/')
 def surveys_todo():
 
@@ -394,7 +404,12 @@ def surveys_todo():
 
     # Filter the data array to remove surveys that shouldn't appear on the To Do page
     allowedStatuses = ['Not started']
+
+    # TODO - the line below can be commented out to demonstrate sorting
     dataArray = filter_surveys(dataArray, allowedStatuses)
+
+    # Sort the data array so that the closed Submit by dates appear at the top of the list
+    dataArray = sort_survey_data(dataArray)
 
     # Render the template
     return render_template('surveys-todo.html',  _theme='default', dataArray=dataArray)
@@ -407,13 +422,18 @@ def surveys_history():
     # Build the survey data (History survey type)
     dataArray = build_survey_data()
 
-    # TODO remove this
+    # TODO remove this test data addition
     # dataArray.pop(1)
     dataArray.append(dataArray[1])
     dataArray.append(dataArray[1])
+    ##################################
 
+    # Filter the data array to remove surveys that shouldn't appear on the History page
     allowedStatuses = ['Complete']
     dataArray = filter_surveys(dataArray, allowedStatuses)
+
+    # Sort the data array so that the closed Submit by dates appear at the top of the list
+    dataArray = sort_survey_data(dataArray)
 
     # Render the template
     return render_template('surveys-history.html',  _theme='default', dataArray=dataArray)

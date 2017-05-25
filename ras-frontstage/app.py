@@ -67,13 +67,13 @@ def logged_in():
         try:
             decodedJWT = decode(jwttoken)
             for key in decodedJWT:
-                print " {} is: {}".format(key, decodedJWT[key])
+                print(" {} is: {}".format(key, decodedJWT[key]))
                 #userID = decodedJWT['user_id']
             return render_template('signed-in.html', _theme='default', data={"error": {"type": "success"}})
 
         except JWTError:
             #TODO Provide proper logging
-            print "This is not a valid JWT Token"
+            print("This is not a valid JWT Token")
             #app.logger.warning('JWT scope could not be validated.')
             # Make sure we pop this invalid session variable.
             session.pop('jwt_token')
@@ -212,16 +212,16 @@ def login_OAuth():
         # passes our 'client' to the session management object. this deals with the transactions between the OAuth2 server
         oauth = OAuth2Session(client=client)
         token_url = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
-        print "Our Token Endpoint is: ", token_url
+        print("Our Token Endpoint is: ", token_url)
 
         try:
             token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, client_secret=OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
-            print " *** Access Token Granted *** "
-            print " Values are: "
+            print(" *** Access Token Granted *** ")
+            print(" Values are: ")
             for key in token:
-                print key, " Value is: ", token[key]
+                print(key, " Value is: ", token[key])
         except MissingTokenError as e:
-            print "Missing token error, error is: {}".format(e)
+            print("Missing token error, error is: {}".format(e))
             print("Failed validation")
             return render_template('sign-in-oauth.html', _theme='default', form=form, data={"error": {"type": "failed"}})
 
@@ -317,7 +317,7 @@ def register():
 
     if request.method == 'POST' and form.validate():
         activation_code = request.form.get('activation_code')
-        print "Activation code is: {}".format(activation_code)
+        print("Activation code is: {}".format(activation_code))
 
     if form.errors:
         flash(form.errors, 'danger')
@@ -365,21 +365,21 @@ def register_enter_your_details():
             OAuthurl = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_ADMIN_ENDPOINT
             OAuth_response = requests.post(OAuthurl, auth=authorisation, headers=headers, data=OAuth_payload)
 
-            print "OAuth response is: {}".format(OAuth_response.content)
+            print("OAuth response is: {}".format(OAuth_response.content))
             response_body = json.loads(OAuth_response.content)
 
             # TODO A utility function to allow us to route to a page for 'user is registered already'. We need a html page for this.
 
         except requests.exceptions.ConnectionError:
-            print  "There seems to be no server listening on this connection?"
+            print("There seems to be no server listening on this connection?")
             # TODO A redirect to a page that helps the user
 
         except requests.exceptions.Timeout:
-            print "Timeout error. Is the OAuth Server overloaded?"
+            print("Timeout error. Is the OAuth Server overloaded?")
             # TODO A redirect to a page that helps the user
         except requests.exceptions.RequestException as e:
             # TODO catastrophic error. bail. A page that tells the user something horrid has happeded and who to inform
-            print e
+            print(e)
 
         if OAuth_response.status_code == 401:
             # This looks like the user is not authorized to use the system. it could be a duplicate email. check our
@@ -389,7 +389,7 @@ def register_enter_your_details():
             # {"detail":"Duplicate user credentials"}
             if response_body["detail"]:
                 if response_body["detail"] == 'Duplicate user credentials':
-                    print "We have duplicate user credentials"
+                    print("We have duplicate user credentials")
                     errors = {'email_address_confirm': ['Please try a different email, this one is in use', ]}
 
                     return render_template('register.enter-your-details.html', _theme='default', form=form, errors=errors)
@@ -415,14 +415,14 @@ def register_enter_your_details():
         # passes our 'client' to the session management object. this deals with the transactions between the OAuth2 server
         oauth = OAuth2Session(client=client)
         token_url = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
-        print "Our Token Endpoint is: ", token_url
+        print("Our Token Endpoint is: ", token_url)
 
         try:
             token = oauth.fetch_token(token_url=token_url, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, client_secret=OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
-            print " *** Access Token Granted *** "
-            print " Values are: "
+            print(" *** Access Token Granted *** ")
+            print(" Values are: ")
             for key in token:
-                print key, " Value is: ", token[key]
+                print (key, " Value is: ", token[key])
 
             # TODO Check that this token has not expired. This should never happen, as we just got this token to
             # register the user
@@ -439,11 +439,11 @@ def register_enter_your_details():
 
         except JWTError:
             #TODO Provide proper logging
-            print "This is not a valid JWT Token"
+            print("This is not a valid JWT Token")
             #app.logger.warning('JWT scope could not be validated.')
             return abort(500,'{"message":"There was a problem with the Authentication service please contact a member of the ONS staff"}')
         except MissingTokenError as e:
-            print "Missing token error, error is: {}".format(e)
+            print("Missing token error, error is: {}".format(e))
             print("Failed validation")
             return abort(500,'{"message":"There was a problem with the Authentication service please contact a member of the ONS staff"}')
 
@@ -453,12 +453,12 @@ def register_enter_your_details():
         registrationData = {'emailAddress': email_address, 'firstName': first_name, 'lastName': last_name, 'telephone': phone_number, 'status': 'CREATED' }
         headers = {'authorization': encoded_jwt_token, 'content-type': 'application/json'}
         partyServiceURL = PartyService.PARTYSERVICE_PROTOCOL + PartyService.PARTYSERVICE_SERVER + PartyService.PARTYSERVICE_REGISTER_ENDPOINT
-        print "Party service URL is: {}".format(partyServiceURL)
+        print("Party service URL is: {}".format(partyServiceURL))
 
         try:
             register_user = requests.post(partyServiceURL, headers=headers, data=json.dumps(registrationData))
 
-            print "Response from party service is: {}".format(register_user.content)
+            print("Response from party service is: {}".format(register_user.content))
 
             if register_user.ok:
                 return render_template('register.almost-done.html', _theme='default', email=email_address)
@@ -466,13 +466,13 @@ def register_enter_your_details():
                 return abort(500,'{"message":"There was a problem with the registration service, please contact a member of the ONS staff"}')
 
         except ConnectionError:
-            print "We could not connect to the party service"
+            print("We could not connect to the party service")
             return abort(500, '{"message":"There was a problem establishing a connection with an ONS micro service."}')
         #TODO We need to add an exception timeout catch and handle this type of error
 
     else:
-        print "either this is not a POST, or form validation failed"
-        print "Form failed validation, errors are: {}".format(form.errors)
+        print("either this is not a POST, or form validation failed")
+        print("Form failed validation, errors are: {}".format(form.errors))
 
     return render_template('register.enter-your-details.html', _theme='default', form=form, errors=form.errors)
 

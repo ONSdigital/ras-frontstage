@@ -1,6 +1,6 @@
 {% import 'partials/section.html' as section %} {% extends "layouts/_onecol.html" %} {% block page_title %}My surveys - ONS Business Surveys{% endblock %} {% block main %}
 
-<a href="" class="user-name">{{ data.userData.firstName }} {{ data.userData.lastName }}</a>
+<a href="" class="user-name">{{ dataArray[0].userData.firstName }} {{ dataArray[0].userData.lastName }}</a>
 
 <ul class="navigation-tabs navigation-tabs-component">
     <li class="navigation-tabs__item navigation-tabs__item--primary navigation-tabs__item--active">
@@ -13,8 +13,6 @@
         <a href="/messages" class="btn btn--secondary btn--border navigation-tabs__tab">Messages</a>
     </li>
 </ul>
-
-
 
 <ul class="survey-list">
 
@@ -38,7 +36,8 @@
 
     </li>
 
-    <!-- <li class="survey-list__item card"> -->
+    {% for data in dataArray %}
+
     <li class="card">
 
         <div class="grid__col col-4@m">
@@ -46,7 +45,7 @@
             <span>{{ data.surveyData.longName }}</span><br />
             <span class="survey-list-item pluto">
                 BUSINESS: {{ data.businessData.name }}<br />
-                REF: {{data.caseData.caseGroup.sampleUnitRef }}
+                REF: {{data.case.caseGroup.sampleUnitRef }}
             </span>
         </div>
 
@@ -72,155 +71,10 @@
 
     </li>
 
-
-    <li class="card">
-
-        <div class="grid__col col-4@m">
-            <span class="survey-list-item__label mercury">SURVEY: </span>
-            <span>{{ data.surveyData.longName }}</span><br />
-            <span class="survey-list-item pluto">
-                BUSINESS: {{ data.businessData.name }}<br />
-                REF: {{data.caseData.caseGroup.sampleUnitRef }}
-            </span>
-        </div>
-
-        <div class="grid__col col-2@m">
-            <span class="survey-list-item__label mercury">PERIOD COVERED: </span>
-            <span class="survey-list-item__nowrap">{{ data.collectionExerciseData.periodStart }} - </span>
-            <span class="survey-list-item__nowrap">{{ data.collectionExerciseData.periodEnd }}</span>
-        </div>
-
-        <div class="grid__col col-2@m">
-            <span class="survey-list-item__label mercury">SUBMIT BY: </span>
-            <span>{{ data.collectionExerciseData.scheduledReturn }}</span>
-        </div>
-
-        <div class="grid__col col-1@m">
-            <span class="survey-list-item__label mercury">STATUS: </span>
-            <span>{{ data.status }}</span>
-        </div>
-
-        <div class="grid__col col-2@m">
-            <a class="btn action-button" href="/test.html">Download</a>
-        </div>
-
-    </li>
-    <li class="card">
-
-        <div class="grid__col col-4@m">
-            <span class="survey-list-item__label mercury">SURVEY: </span>
-            <span>{{ data.surveyData.longName }}</span><br />
-            <span class="survey-list-item pluto">
-                BUSINESS: {{ data.businessData.name }}<br />
-                REF: {{data.caseData.caseGroup.sampleUnitRef }}
-            </span>
-        </div>
-
-        <div class="grid__col col-2@m">
-            <span class="survey-list-item__label mercury">PERIOD COVERED: </span>
-            <span class="survey-list-item__nowrap">{{ data.collectionExerciseData.periodStart }} - </span>
-            <span class="survey-list-item__nowrap">{{ data.collectionExerciseData.periodEnd }}</span>
-        </div>
-
-        <div class="grid__col col-2@m">
-            <span class="survey-list-item__label mercury">SUBMIT BY: </span>
-            <span>{{ data.collectionExerciseData.scheduledReturn }}</span>
-        </div>
-
-        <div class="grid__col col-1@m">
-            <span class="survey-list-item__label mercury">STATUS: </span>
-            <span>{{ data.status }}</span>
-        </div>
-
-        <div class="grid__col col-2@m">
-            <a class="btn action-button" href="/test.html">Download</a>
-        </div>
-
-    </li>
-
-    <!-- {% for case in data %}
-
-    DATA: {{caseData}}
-    <li>
-
-        <div class="grid__col col-4@m">
-            1
-        </div>
-
-        <div class="grid__col col-2@m">
-2
-        </div>
-
-        <div class="grid__col col-2@m">
-3
-        </div>
-
-        <div class="grid__col col-2@m">
-4
-        </div>
-
-        <div class="grid__col col-2@m">
-5
-        </div>
-
-    </li>
     {% endfor %}
 
 </ul>
 
-DATA: {{dataarray}} -->
-
-
-
-<!-- <div class="secure-messages-list-component">
-
-    <table class="secure-messages-list secure-messages-list--table">
-        <thead>
-            <tr>
-                <th class="secure-messages-list__header">Survey</th>
-                <th class="secure-messages-list__header">Period covered</th>
-                <th class="secure-messages-list__header">Submit by</th>
-                <th class="secure-messages-list__header">Status</th>
-                <th class="secure-messages-list__header"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let message of secureMessages; let i = index;"
-                class="secure-messages-list__item">
-
-                <td class="secure-messages-list__field">
-                    {{ data.surveyData.name }}<br/>
-                    BUSINESS: {{ data.businessData.name }}</br/>
-                    REF:  {{data.caseData.caseGroup.sampleUnitRef }}
-                </td>
-                <td class="secure-messages-list__field">{{ data.collectionExerciseData.periodStart }} - {{ data.collectionExerciseData.periodEnd }}</td>
-                <td class="secure-messages-list__field">{{ data.collectionExerciseData.scheduledReturn }}</td>
-                <td class="secure-messages-list__field">{{ data.status }}</td>
-
-                <td class="secure-messages-list__field">
-                    <button class="btn survey-button">Download</button>
-                </td>
-            </tr>
-            <tr class="secure-messages-list__item">
-                <td class="secure-messages-list__field">
-                    UK Innovation Survey<br/>
-                    BUSINESS: Bolts & Ratchets Ltd</br/>
-                    REF: 08224716847H
-                </td>
-                <td class="secure-messages-list__field">1 Mar 2017 - 28 Mar 2017</td>
-                <td class="secure-messages-list__field">10 Apr 2017</td>
-                <td class="secure-messages-list__field">Not started</td>
-
-                <td class="secure-messages-list__field">
-                    <button class="btn survey-button">Start survey</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
-</div> -->
-
 <!-- <a href="/create-account/check-email/">go somewhere else</a> -->
-
 
 {% endblock main %}

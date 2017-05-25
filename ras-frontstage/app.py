@@ -309,73 +309,63 @@ def my_surveys():
     caseData = req.json()
     print(caseData);
 
-    # dataarray = caseData;
-    # for case in caseData
-    #     print case
-    #     print('xxxx')
+    # Iterate caseData and build a data array to pass into the HTML template
+    dataArray = []
+    for case in caseData:
 
-    # TODO iterate case array
-    collectionExerciseId = caseData[0]['caseGroup']['collectionExerciseId']
-    # print('collectionExerciseId=' + collectionExerciseId)
+        collectionExerciseId = case['caseGroup']['collectionExerciseId']
+        # print('collectionExerciseId=' + collectionExerciseId)
 
-    # Call the Party Service to get the business details
-    businessPartyId = caseData[0]['caseGroup']['partyId']
-    url = 'http://localhost:8050/api/party-api/businesses/id/' + businessPartyId
-    req = requests.get(url, headers=headers)
-    businessData = req.json()
-    # print(businessData)
+        # Call the Party Service to get the business details
+        businessPartyId = case['caseGroup']['partyId']
+        url = 'http://localhost:8050/api/party-api/businesses/id/' + businessPartyId
+        req = requests.get(url, headers=headers)
+        businessData = req.json()
+        # print(businessData)
 
-    # Call the Collection Exercise Service to get the collection exercise details
-    url = 'http://localhost:8050/api/collectionexercises/' + collectionExerciseId
-    req = requests.get(url, headers=headers)
-    collectionExerciseData = req.json()
-    # print(collectionExerciseData)
+        # Call the Collection Exercise Service to get the collection exercise details
+        url = 'http://localhost:8050/api/collectionexercises/' + collectionExerciseId
+        req = requests.get(url, headers=headers)
+        collectionExerciseData = req.json()
+        # print(collectionExerciseData)
 
-    surveyId = collectionExerciseData['surveyId']
-    # print('surveyId=' + surveyId)
+        surveyId = collectionExerciseData['surveyId']
+        # print('surveyId=' + surveyId)
 
-    # Call the Survey Service to get the survey details
-    url = 'http://localhost:8050/api/surveys/' + surveyId
-    req = requests.get(url, headers=headers)
-    surveyData = req.json()
-    # print(surveyData)
+        # Call the Survey Service to get the survey details
+        url = 'http://localhost:8050/api/surveys/' + surveyId
+        req = requests.get(url, headers=headers)
+        surveyData = req.json()
+        # print(surveyData)
 
-    # TODO Work out the case status
-    status = 'Not started'
+        # TODO Work out the case status
+        status = 'Not started'
 
-    # Format dates
-    inputDateFormat = 'YYYY-MM-DDThh:mm:ss'
-    outputDateFormat = 'D MMM YYYY'
-    collectionExerciseData['periodStart'] = collectionExerciseData['periodStart'].replace('Z' , '')
-    collectionExerciseData['periodStart'] = arrow.get(collectionExerciseData['periodStart'], inputDateFormat).format(outputDateFormat)
+        # Format dates
+        inputDateFormat = 'YYYY-MM-DDThh:mm:ss'
+        outputDateFormat = 'D MMM YYYY'
+        collectionExerciseData['periodStart'] = collectionExerciseData['periodStart'].replace('Z' , '')
+        collectionExerciseData['periodStart'] = arrow.get(collectionExerciseData['periodStart'], inputDateFormat).format(outputDateFormat)
 
-    collectionExerciseData['periodEnd'] = collectionExerciseData['periodEnd'].replace('Z' , '')
-    collectionExerciseData['periodEnd'] = arrow.get(collectionExerciseData['periodEnd'], inputDateFormat).format(outputDateFormat)
+        collectionExerciseData['periodEnd'] = collectionExerciseData['periodEnd'].replace('Z' , '')
+        collectionExerciseData['periodEnd'] = arrow.get(collectionExerciseData['periodEnd'], inputDateFormat).format(outputDateFormat)
 
-    collectionExerciseData['scheduledReturn'] = collectionExerciseData['scheduledReturn'].replace('Z' , '')
-    collectionExerciseData['scheduledReturn'] = arrow.get(collectionExerciseData['scheduledReturn'], inputDateFormat).format(outputDateFormat)
+        collectionExerciseData['scheduledReturn'] = collectionExerciseData['scheduledReturn'].replace('Z' , '')
+        collectionExerciseData['scheduledReturn'] = arrow.get(collectionExerciseData['scheduledReturn'], inputDateFormat).format(outputDateFormat)
 
-#
-#
-# TODO iterate caseData
-#
-#
-    data = {}
-    data['userData']= userData;
-    data['businessData']= businessData;
-    data['caseData']= caseData[0];
-    data['collectionExerciseData']= collectionExerciseData;
-    data['surveyData']= surveyData;
-    data['status']= status;
 
-    # TODO remove this
-    # print(data['caseData'])
-    # print(data['caseData'][0]['caseGroup'])
+        data = {}
+        data['userData']= userData;
+        data['businessData']= businessData;
+        data['case']= case;
+        data['collectionExerciseData']= collectionExerciseData;
+        data['surveyData']= surveyData;
+        data['status']= status;
 
+        dataArray.append(data)
 
     # Render the template
-    return render_template('my-surveys.html',  _theme='default', data=data)
-    # return render_template('my-surveys.html',  _theme='default', dataarray=dataarray)
+    return render_template('my-surveys.html',  _theme='default', dataArray=dataArray)
 
 
 # ===== History =====

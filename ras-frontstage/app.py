@@ -287,6 +287,26 @@ def sign_in_account_locked():
 
 
 # ===== My Surveys =====
+def calculate_case_status(caseEvents):
+
+    # TODO Get business rules and code this accordingly
+    status = ''
+    for event in caseEvents:
+        if event['category'] == 'CASE_CREATED':
+            status = 'Not started'
+        elif event['category'] == 'CASE_COMPLETED':
+            status = 'Complete'
+
+    return status
+
+def filter_surveys(dataArray, allowedStatuses):
+    returnArray = []
+    for case in dataArray:
+        if case['status'] in allowedStatuses:
+            returnArray.append(case)
+
+    return returnArray;
+
 def build_survey_data():
 
     # TODO - Derive the Party Id
@@ -337,8 +357,9 @@ def build_survey_data():
         surveyData = req.json()
         # print(surveyData)
 
-        # TODO Work out the case status
-        status = 'Not started'
+        # Work out the case status
+        caseEvents = case['caseEvents']
+        status = calculate_case_status(caseEvents);
 
         # Format dates
         inputDateFormat = 'YYYY-MM-DDThh:mm:ss'
@@ -366,10 +387,14 @@ def build_survey_data():
     return dataArray
 
 @app.route('/')
-def my_surveys():
+def surveys_todo():
 
     # Build the survey data (To Do survey type)
     dataArray = build_survey_data()
+
+    # Filter the data array to remove surveys that shouldn't appear on the To Do page
+    allowedStatuses = ['Not started']
+    dataArray = filter_surveys(dataArray, allowedStatuses)
 
     # Render the template
     return render_template('surveys-todo.html',  _theme='default', dataArray=dataArray)
@@ -377,10 +402,18 @@ def my_surveys():
 
 # ===== History =====
 @app.route('/history')
-def history():
+def surveys_history():
 
     # Build the survey data (History survey type)
     dataArray = build_survey_data()
+
+    # TODO remove this
+    # dataArray.pop(1)
+    dataArray.append(dataArray[1])
+    dataArray.append(dataArray[1])
+
+    allowedStatuses = ['Complete']
+    dataArray = filter_surveys(dataArray, allowedStatuses)
 
     # Render the template
     return render_template('surveys-history.html',  _theme='default', dataArray=dataArray)

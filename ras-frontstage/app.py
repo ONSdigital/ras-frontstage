@@ -1,7 +1,7 @@
 """
 Main file that is ran
 """
-#from __future__ import print_function
+# from __future__ import print_function
 from functools import wraps, update_wrapper
 from datetime import datetime
 from flask import Flask, make_response, render_template, request
@@ -16,6 +16,8 @@ from requests_oauthlib import OAuth2Session
 import json
 
 from sqlalchemy import exc
+
+import arrow
 
 from jwt import encode, decode
 from jose import JWTError
@@ -50,16 +52,17 @@ def get_user_scopes(username):
     return user_scopes
 
 
-@app.route('/')
+# @app.route('/')
 @app.route('/home', methods=['GET', 'POST'])
 def hello_world():
     return render_template('_temp.html', _theme='default')
 
-@app.route('/')
+# @app.route('/')
+
+
 @app.route('/logged-in', methods=['GET', 'POST'])
 def logged_in():
     """Logged in page for users only."""
-
 
     if session.get('jwt_token'):
         jwttoken = session.get('jwt_token')
@@ -68,18 +71,17 @@ def logged_in():
             decodedJWT = decode(jwttoken)
             for key in decodedJWT:
                 print " {} is: {}".format(key, decodedJWT[key])
-                #userID = decodedJWT['user_id']
+                # userID = decodedJWT['user_id']
             return render_template('signed-in.html', _theme='default', data={"error": {"type": "success"}})
 
         except JWTError:
-            #TODO Provide proper logging
+            # TODO Provide proper logging
             print "This is not a valid JWT Token"
-            #app.logger.warning('JWT scope could not be validated.')
+            # app.logger.warning('JWT scope could not be validated.')
             # Make sure we pop this invalid session variable.
             session.pop('jwt_token')
 
     return render_template('signed-in.html', _theme='default', data={"error": {"type": "failed"}})
-
 
 
 @app.route('/protected/collectioninstrument', methods=['GET'])
@@ -102,7 +104,8 @@ def protected_collection():
                 req = requests.get(url,  headers=headers)
                 data = req.json()
                 print(data)
-                res = Response(response=data, status=200, mimetype="application/json")
+                res = Response(response=data, status=200,
+                               mimetype="application/json")
                 return res
 
             res = Response(response="""Your session is stale, try logging in again to
@@ -146,7 +149,8 @@ def login():
 
         usr_scopes = get_user_scopes(username)
 
-        data_dict_for_jwt_token = {"username": username, "user_scopes": usr_scopes }
+        data_dict_for_jwt_token = {
+            "username": username, "user_scopes": usr_scopes}
 
         encoded_jwt_token = encode(data_dict_for_jwt_token)
         session['jwt_token'] = encoded_jwt_token
@@ -167,6 +171,8 @@ def login():
     return render_template('sign-in.html', _theme='default', form=form, data=templateData)
 
 # ===== Sign in using OAuth2 =====
+
+
 @app.route('/sign-in/OAuth', methods=['GET', 'POST'])
 def login_OAuth():
     print("*** Hitting login for OAuth() function.... ***")
@@ -204,18 +210,23 @@ def login_OAuth():
 
         # Creates a 'session client' to interact with OAuth2. This provides a client ID to our client that is used to
         # interact with the server.
-        client = LegacyApplicationClient(client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID)
+        client = LegacyApplicationClient(
+            client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID)
 
         # Populates the request body with username and password from the user
-        client.prepare_request_body(username=username, password=password, scope=['ci.write', 'ci.read'])
+        client.prepare_request_body(username=username, password=password, scope=[
+                                    'ci.write', 'ci.read'])
 
-        # passes our 'client' to the session management object. this deals with the transactions between the OAuth2 server
+        # passes our 'client' to the session management object. this deals with
+        # the transactions between the OAuth2 server
         oauth = OAuth2Session(client=client)
-        token_url = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
+        token_url = OAuthConfig.ONS_OAUTH_PROTOCOL + \
+            OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
         print "Our Token Endpoint is: ", token_url
 
         try:
-            token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, client_secret=OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
+            token = oauth.fetch_token(token_url=token_url, username=username, password=password,
+                                      client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, client_secret=OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
             print " *** Access Token Granted *** "
             print " Values are: "
             for key in token:
@@ -229,7 +240,7 @@ def login_OAuth():
                                    "access_token": token['access_token'],
                                    "scope": token['scope'],
                                    "expires_at": token['expires_at'],
-                                   "username": username }
+                                   "username": username}
 
         encoded_jwt_token = encode(data_dict_for_jwt_token)
         session['jwt_token'] = encoded_jwt_token
@@ -244,12 +255,11 @@ def login_OAuth():
     return render_template('sign-in-oauth.html', _theme='default', form=form, data=templateData)
 
 
-
 @app.route('/sign-in/error', methods=['GET'])
 def sign_in_error():
 
-    password= request.form.get('pass')
-    password= request.form.get('emailaddress')
+    password = request.form.get('pass')
+    password = request.form.get('emailaddress')
 
     templateData = {
         "error": {
@@ -257,20 +267,127 @@ def sign_in_error():
         }
     }
 
-    #data variables configured: {"error": <undefined, failed, last-attempt>}
+    # data variables configured: {"error": <undefined, failed, last-attempt>}
     return render_template('sign-in.html', _theme='default', data=templateData)
+
 
 @app.route('/sign-in/troubleshoot')
 def sign_in_troubleshoot():
     return render('sign-in.trouble.html')
 
+
 @app.route('/sign-in/final-sign-in')
 def sign_in_last_attempt():
     return render('sign-in.last-attempt.html')
 
+
 @app.route('/sign-in/account-locked/')
 def sign_in_account_locked():
     return render('sign-in.locked-account.html')
+
+
+# ===== My Surveys =====
+@app.route('/')
+def my_surveys():
+
+    # TODO - Derive the Party Id
+    party_id = "3b136c4b-7a14-4904-9e01-13364dd7b972"
+
+    # TODO - Add security headers ???
+    # headers = {'authorization': jwttoken}
+    headers = {}
+
+    # Call the Party Service to get respondent details
+    url = 'http://localhost:8050/api/party-api/respondents/id/' + party_id
+    req = requests.get(url, headers=headers)
+    userData = req.json()
+    # print(userData)
+
+    # Call the Case Service to get list of cases with the partyid
+    url = 'http://localhost:8050/api/cases/partyid/' + party_id
+    req = requests.get(url, headers=headers)
+    caseData = req.json()
+    print(caseData);
+
+    # dataarray = caseData;
+    # for case in caseData
+    #     print case
+    #     print('xxxx')
+
+    # TODO iterate case array
+    collectionExerciseId = caseData[0]['caseGroup']['collectionExerciseId']
+    # print('collectionExerciseId=' + collectionExerciseId)
+
+    # Call the Party Service to get the business details
+    businessPartyId = caseData[0]['caseGroup']['partyId']
+    url = 'http://localhost:8050/api/party-api/businesses/id/' + businessPartyId
+    req = requests.get(url, headers=headers)
+    businessData = req.json()
+    # print(businessData)
+
+    # Call the Collection Exercise Service to get the collection exercise details
+    url = 'http://localhost:8050/api/collectionexercises/' + collectionExerciseId
+    req = requests.get(url, headers=headers)
+    collectionExerciseData = req.json()
+    # print(collectionExerciseData)
+
+    surveyId = collectionExerciseData['surveyId']
+    # print('surveyId=' + surveyId)
+
+    # Call the Survey Service to get the survey details
+    url = 'http://localhost:8050/api/surveys/' + surveyId
+    req = requests.get(url, headers=headers)
+    surveyData = req.json()
+    # print(surveyData)
+
+    # TODO Work out the case status
+    status = 'Not started'
+
+    # Format dates
+    inputDateFormat = 'YYYY-MM-DDThh:mm:ss'
+    outputDateFormat = 'D MMM YYYY'
+    collectionExerciseData['periodStart'] = collectionExerciseData['periodStart'].replace('Z' , '')
+    collectionExerciseData['periodStart'] = arrow.get(collectionExerciseData['periodStart'], inputDateFormat).format(outputDateFormat)
+
+    collectionExerciseData['periodEnd'] = collectionExerciseData['periodEnd'].replace('Z' , '')
+    collectionExerciseData['periodEnd'] = arrow.get(collectionExerciseData['periodEnd'], inputDateFormat).format(outputDateFormat)
+
+    collectionExerciseData['scheduledReturn'] = collectionExerciseData['scheduledReturn'].replace('Z' , '')
+    collectionExerciseData['scheduledReturn'] = arrow.get(collectionExerciseData['scheduledReturn'], inputDateFormat).format(outputDateFormat)
+
+#
+#
+# TODO iterate caseData
+#
+#
+    data = {}
+    data['userData']= userData;
+    data['businessData']= businessData;
+    data['caseData']= caseData[0];
+    data['collectionExerciseData']= collectionExerciseData;
+    data['surveyData']= surveyData;
+    data['status']= status;
+
+    # TODO remove this
+    # print(data['caseData'])
+    # print(data['caseData'][0]['caseGroup'])
+
+
+    # Render the template
+    return render_template('my-surveys.html',  _theme='default', data=data)
+    # return render_template('my-surveys.html',  _theme='default', dataarray=dataarray)
+
+
+# ===== History =====
+@app.route('/history')
+def history():
+    return render('history.html')
+
+
+# ===== Messages =====
+@app.route('/messages')
+def messages():
+    return render('messages.html')
 
 
 # ===== Forgot password =====
@@ -282,8 +399,9 @@ def forgot_password():
         }
     }
 
-    #data variables configured: {"error": <undefined, failed>}
+    # data variables configured: {"error": <undefined, failed>}
     return render_template('forgot-password.html', _theme='default', data=templateData)
+
 
 @app.route('/forgot-password/check-email/')
 def forgot_password_check_email():
@@ -301,8 +419,9 @@ def reset_password():
 
     print(request.args.get("error"))
 
-    #data variables configured: {"error": <undefined, password-mismatch>}
+    # data variables configured: {"error": <undefined, password-mismatch>}
     return render_template('reset-password.html', _theme='default', data=templateData)
+
 
 @app.route('/reset-password/confirmation/')
 def reset_password_confirmation():
@@ -330,7 +449,10 @@ def register():
 
     return render_template('register.html', _theme='default', form=form, data=templateData)
 
-# This take all the user credentials and then creates an account on the OAuth2 server
+# This take all the user credentials and then creates an account on the
+# OAuth2 server
+
+
 @app.route('/create-account/enter-account-details/', methods=['GET', 'POST'])
 def register_enter_your_details():
 
@@ -356,29 +478,35 @@ def register_enter_your_details():
         print ("T's&C's is: {}".format(terms_and_conditions))
 
         # Lets try and create this user on the OAuth2 server
-        OAuth_payload = {"username": email_address, "password": password, "client_id": OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, "client_secret": OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET }
+        OAuth_payload = {"username": email_address, "password": password,
+                         "client_id": OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, "client_secret": OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET}
         headers = {'content-type': 'application/x-www-form-urlencoded'}
-        authorisation = (OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
+        authorisation = (OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID,
+                         OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
 
         try:
 
-            OAuthurl = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_ADMIN_ENDPOINT
-            OAuth_response = requests.post(OAuthurl, auth=authorisation, headers=headers, data=OAuth_payload)
+            OAuthurl = OAuthConfig.ONS_OAUTH_PROTOCOL + \
+                OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_ADMIN_ENDPOINT
+            OAuth_response = requests.post(
+                OAuthurl, auth=authorisation, headers=headers, data=OAuth_payload)
 
             print "OAuth response is: {}".format(OAuth_response.content)
             response_body = json.loads(OAuth_response.content)
 
-            # TODO A utility function to allow us to route to a page for 'user is registered already'. We need a html page for this.
+            # TODO A utility function to allow us to route to a page for 'user
+            # is registered already'. We need a html page for this.
 
         except requests.exceptions.ConnectionError:
-            print  "There seems to be no server listening on this connection?"
+            print "There seems to be no server listening on this connection?"
             # TODO A redirect to a page that helps the user
 
         except requests.exceptions.Timeout:
             print "Timeout error. Is the OAuth Server overloaded?"
             # TODO A redirect to a page that helps the user
         except requests.exceptions.RequestException as e:
-            # TODO catastrophic error. bail. A page that tells the user something horrid has happeded and who to inform
+            # TODO catastrophic error. bail. A page that tells the user
+            # something horrid has happeded and who to inform
             print e
 
         if OAuth_response.status_code == 401:
@@ -390,35 +518,41 @@ def register_enter_your_details():
             if response_body["detail"]:
                 if response_body["detail"] == 'Duplicate user credentials':
                     print "We have duplicate user credentials"
-                    errors = {'email_address_confirm': ['Please try a different email, this one is in use', ]}
+                    errors = {'email_address_confirm': [
+                        'Please try a different email, this one is in use', ]}
 
                     return render_template('register.enter-your-details.html', _theme='default', form=form, errors=errors)
 
         # Deal with all other errors from OAuth2 registration
         if OAuth_response.status_code > 401:
-            OAuth_response.raise_for_status()                       # A stop gap until we know all the correct error pages
-
+            # A stop gap until we know all the correct error pages
+            OAuth_response.raise_for_status()
 
         # We now have a successful user setup on the OAuth2 server. The next 2 steps we have to do are:
         # 1) Get a valid token for service to service communication. This is done so that the front stage service can
         #   talk with the party service to create a user.
-        # 2) Create the user on the party service using the party service /respondent/ endpoint
+        # 2) Create the user on the party service using the party service
+        # /respondent/ endpoint
 
         # Step 1
         # Creates a 'session client' to interact with OAuth2. This provides a client ID to our client that is used to
         # interact with the server.
-        client = BackendApplicationClient(client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID)
+        client = BackendApplicationClient(
+            client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID)
 
         # Populates the request body with username and password from the user
-        client.prepare_request_body(scope=['ps.write',])
+        client.prepare_request_body(scope=['ps.write', ])
 
-        # passes our 'client' to the session management object. this deals with the transactions between the OAuth2 server
+        # passes our 'client' to the session management object. this deals with
+        # the transactions between the OAuth2 server
         oauth = OAuth2Session(client=client)
-        token_url = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
+        token_url = OAuthConfig.ONS_OAUTH_PROTOCOL + \
+            OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
         print "Our Token Endpoint is: ", token_url
 
         try:
-            token = oauth.fetch_token(token_url=token_url, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, client_secret=OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
+            token = oauth.fetch_token(token_url=token_url, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID,
+                                      client_secret=OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
             print " *** Access Token Granted *** "
             print " Values are: "
             for key in token:
@@ -428,47 +562,52 @@ def register_enter_your_details():
             # register the user
 
             data_dict_for_jwt_token = {"refresh_token": token['refresh_token'],
-                "access_token": token['access_token'],
-                "scope": token['scope'],
-                "expires_at": token['expires_at'],
-                "username": email_address}
+                                       "access_token": token['access_token'],
+                                       "scope": token['scope'],
+                                       "expires_at": token['expires_at'],
+                                       "username": email_address}
 
             # We need to take our token from teh OAuth2 server and encode in a JWT token and send in the authorization
             # header to the party service microservice
             encoded_jwt_token = encode(data_dict_for_jwt_token)
 
         except JWTError:
-            #TODO Provide proper logging
+            # TODO Provide proper logging
             print "This is not a valid JWT Token"
-            #app.logger.warning('JWT scope could not be validated.')
-            return abort(500,'{"message":"There was a problem with the Authentication service please contact a member of the ONS staff"}')
+            # app.logger.warning('JWT scope could not be validated.')
+            return abort(500, '{"message":"There was a problem with the Authentication service please contact a member of the ONS staff"}')
         except MissingTokenError as e:
             print "Missing token error, error is: {}".format(e)
             print("Failed validation")
-            return abort(500,'{"message":"There was a problem with the Authentication service please contact a member of the ONS staff"}')
+            return abort(500, '{"message":"There was a problem with the Authentication service please contact a member of the ONS staff"}')
 
         # Step 2
         # Register with the party service
 
-        registrationData = {'emailAddress': email_address, 'firstName': first_name, 'lastName': last_name, 'telephone': phone_number, 'status': 'CREATED' }
-        headers = {'authorization': encoded_jwt_token, 'content-type': 'application/json'}
-        partyServiceURL = PartyService.PARTYSERVICE_PROTOCOL + PartyService.PARTYSERVICE_SERVER + PartyService.PARTYSERVICE_REGISTER_ENDPOINT
+        registrationData = {'emailAddress': email_address, 'firstName': first_name,
+                            'lastName': last_name, 'telephone': phone_number, 'status': 'CREATED'}
+        headers = {'authorization': encoded_jwt_token,
+                   'content-type': 'application/json'}
+        partyServiceURL = PartyService.PARTYSERVICE_PROTOCOL + \
+            PartyService.PARTYSERVICE_SERVER + PartyService.PARTYSERVICE_REGISTER_ENDPOINT
         print "Party service URL is: {}".format(partyServiceURL)
 
         try:
-            register_user = requests.post(partyServiceURL, headers=headers, data=json.dumps(registrationData))
+            register_user = requests.post(
+                partyServiceURL, headers=headers, data=json.dumps(registrationData))
 
             print "Response from party service is: {}".format(register_user.content)
 
             if register_user.ok:
                 return render_template('register.almost-done.html', _theme='default', email=email_address)
             else:
-                return abort(500,'{"message":"There was a problem with the registration service, please contact a member of the ONS staff"}')
+                return abort(500, '{"message":"There was a problem with the registration service, please contact a member of the ONS staff"}')
 
         except ConnectionError:
             print "We could not connect to the party service"
             return abort(500, '{"message":"There was a problem establishing a connection with an ONS micro service."}')
-        #TODO We need to add an exception timeout catch and handle this type of error
+        # TODO We need to add an exception timeout catch and handle this type
+        # of error
 
     else:
         print "either this is not a POST, or form validation failed"
@@ -487,7 +626,7 @@ def register_almost_done():
     return render('register.almost-done.html')
 
 
-#Disable cache for development
+# Disable cache for development
 def nocache(view):
     @wraps(view)
     def no_cache(*args, **kwargs):
@@ -499,6 +638,7 @@ def nocache(view):
         return response
 
     return update_wrapper(no_cache, view)
+
 
 def render(template):
     return render_template(template, _theme='default')
@@ -527,18 +667,22 @@ def get_id(_id):
             # Check the tokens are the same
             # TODO Check the token has not expired
             if user_object.token == jwttoken:
-                # OK Tokens match we can forward this on to our collection instrument
+                # OK Tokens match we can forward this on to our collection
+                # instrument
                 headers = {'authorization': jwttoken}
                 # TODO make the calling of this URL a utility function
-                url = 'localhost:5000/collectioninstrument/id/' + '_id'             # OK construct the URL now we know it's a valid token
-                # Depending on wheather this is a put or a get will change how we forward on this message
+                # OK construct the URL now we know it's a valid token
+                url = 'localhost:5000/collectioninstrument/id/' + '_id'
+                # Depending on wheather this is a put or a get will change how
+                # we forward on this message
                 if request.method['GET']:
                     req = requests.get(url,  headers=headers)
                 if request.method['PUT']:
                     req = requests.post(url,  headers=headers)
                 data = req.json()
                 print(data)
-                res = Response(response=data, status=200, mimetype="application/json")
+                res = Response(response=data, status=200,
+                               mimetype="application/json")
                 return res
 
             # Anything else but a token match means we reject the call
@@ -556,7 +700,7 @@ def get_id(_id):
     res = Response(response="Not authorised", status=403, mimetype="text/html")
     return res
 
+
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 5001))
-    app.run( host='0.0.0.0', port=PORT)
-
+    app.run(host='0.0.0.0', port=PORT)

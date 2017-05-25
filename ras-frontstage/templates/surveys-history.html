@@ -1,4 +1,5 @@
 {% import 'partials/section.html' as section %}
+
 {% extends "layouts/_onecol.html" %}
 
 {% block page_title %}My surveys - ONS Business Surveys{% endblock %}
@@ -20,9 +21,6 @@
     </li>
 </ul>
 
-
-<div>
-    History will appear here
-</div>
+{% include "surveys.html" %}
 
 {% endblock main %}

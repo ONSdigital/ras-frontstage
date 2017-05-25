@@ -287,8 +287,7 @@ def sign_in_account_locked():
 
 
 # ===== My Surveys =====
-@app.route('/')
-def my_surveys():
+def build_survey_data():
 
     # TODO - Derive the Party Id
     party_id = "3b136c4b-7a14-4904-9e01-13364dd7b972"
@@ -307,7 +306,7 @@ def my_surveys():
     url = 'http://localhost:8050/api/cases/partyid/' + party_id
     req = requests.get(url, headers=headers)
     caseData = req.json()
-    print(caseData);
+    # print(caseData);
 
     # Iterate caseData and build a data array to pass into the HTML template
     dataArray = []
@@ -364,14 +363,27 @@ def my_surveys():
 
         dataArray.append(data)
 
+    return dataArray
+
+@app.route('/')
+def my_surveys():
+
+    # Build the survey data (To Do survey type)
+    dataArray = build_survey_data()
+
     # Render the template
-    return render_template('my-surveys.html',  _theme='default', dataArray=dataArray)
+    return render_template('surveys-todo.html',  _theme='default', dataArray=dataArray)
 
 
 # ===== History =====
 @app.route('/history')
 def history():
-    return render('history.html')
+
+    # Build the survey data (History survey type)
+    dataArray = build_survey_data()
+
+    # Render the template
+    return render_template('surveys-history.html',  _theme='default', dataArray=dataArray)
 
 
 # ===== Messages =====

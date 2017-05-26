@@ -3,6 +3,7 @@ This module hosts the config setup for our project
 """
 
 import os
+import logging
 
 
 # ENV VARIABLES BELOW, SET THESE ON YOUR TERMINAL
@@ -101,3 +102,12 @@ class OAuthConfig(Config):
     ONS_ADMIN_ENDPOINT = os.environ.get('ONS_ADMIN_ENDPOINT', '/api/account/create')
 
 
+class FrontstageLogging(Config):
+    """
+    This class is used to set up and define logging behaviour for ras-frontstage
+    """
+    # Logging
+    logger = logging.getLogger(__name__)
+    SERVICE_NAME = 'ras-frontstage'
+    LOG_FORMAT = 'ras-frontstage: %(asctime)s|%(levelname)s %(message)s'
+    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'DEBUG')

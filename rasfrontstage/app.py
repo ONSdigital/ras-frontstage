@@ -94,7 +94,7 @@ def protected_collection():
                 url = 'localhost:5000/collectioninstrument'
                 req = requests.get(url,  headers=headers)
                 data = req.json()
-                logger.debug(data)
+                app.logger.debug(data)
                 res = Response(response=data, status=200, mimetype="application/json")
                 return res
 

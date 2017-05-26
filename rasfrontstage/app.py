@@ -16,40 +16,31 @@ from requests_oauthlib import OAuth2Session
 import json
 
 from sqlalchemy import exc
-
 from jwt import encode, decode
 from jose import JWTError
-from models import *
-from config import OAuthConfig, PartyService
+from config import OAuthConfig, PartyService, Config
 
 app = Flask(__name__)
 app.debug = True
 
 if 'APP_SETTINGS' in os.environ:
-    app.config.from_object(os.environ['APP_SETTINGS'])
+    #app.config.from_object(os.environ['APP_SETTINGS'])
+    app.config.from_object(Config)
 
 db = SQLAlchemy(app)
 
-def get_user_scopes(username):
-    """
-    Get the user scopes for the user.
-    :param username: String
-    :return: Http Response
-    """
+from models import *
 
-    user_data = (db.session.query(User, UserScope)
-                 .filter(User.id == UserScope.user_id)
-                 .filter(User.username == username)
-                 .all())
+def myAdd(x=0, y=0):
 
-    user_scopes = [us.scope for u, us in user_data]
-
-    if not user_scopes:
-        return []
-
-    return user_scopes
+    print "x is: {}".format(x)
+    print "y is: {}".format(y)
+    z = x + y
+    return z
 
 
+
+#TODO Remove this before production
 @app.route('/')
 @app.route('/home', methods=['GET', 'POST'])
 def hello_world():
@@ -125,7 +116,7 @@ def logout():
 # ===== Sign in =====
 @app.route('/sign-in/', methods=['GET', 'POST'])
 def login():
-    print("*** Hitting login() function.... ***")
+    print("**** Hitting login() function.... ****")
     """Login Page."""
     form = LoginForm(request.form)
 
@@ -169,7 +160,7 @@ def login():
 # ===== Sign in using OAuth2 =====
 @app.route('/sign-in/OAuth', methods=['GET', 'POST'])
 def login_OAuth():
-    print("*** Hitting login for OAuth() function.... ***")
+    print("**** Hitting login for OAuth() function.... ****")
     """ Login OAuth Page.
     This function uses the OAuth 2 server to receive a token upon successful sign in. If the user presents the correct
     password and username and is accepted by the OAuth 2 server we receive an access token, a refresh token and a TTL.
@@ -216,6 +207,7 @@ def login_OAuth():
 
         try:
             token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, client_secret=OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
+
             print " *** Access Token Granted *** "
             print " Values are: "
             for key in token:

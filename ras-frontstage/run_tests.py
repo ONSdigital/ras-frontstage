@@ -9,6 +9,8 @@ if __name__ == "__main__":
     for directory in test_dirs:
         if directory == "app":
             test_path = "./tests/{}".format(directory)
+            os.getcwd()
+            print(test_path)
             suite = loader.discover(test_path)
             suites_list.append(suite)
             result = unittest.TextTestRunner(verbosity=2).run(suite)

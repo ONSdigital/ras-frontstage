@@ -16,9 +16,9 @@ script:
   - coverage run ras-frontstage/tests/test_app.py
   - coverage report
 
-# after_success:
-    - codecov
-    
+after_success:
+  - codecov
+
 branches:
   only:
     - feature/external-user-setup

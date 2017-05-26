@@ -11,7 +11,7 @@ install:
   - pip install -r requirements.txt
 
 script:
-  python tests/test_app.py
+  python ras-frontstage/tests/test_app.py
 
 # after_success:
 

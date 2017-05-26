@@ -1,5 +1,5 @@
 # ras-sfrontstage
-[![Build Status](https://travis-ci.org/ONSdigital/ras-fronstage.svg?branch=feature/external-user-setup)](https://travis-ci.org/ONSdigital/ras-secure-message)
+[![Build Status](https://travis-ci.org/ONSdigital/ras-frontstage.svg?branch=feature%2Fexternal-user-setup)](https://travis-ci.org/ONSdigital/ras-frontstage)
 
 User interface for Respondent Account Services
 

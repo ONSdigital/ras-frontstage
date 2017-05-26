@@ -1,0 +1,20 @@
+language: python
+sudo: required
+dist: trusty
+python: '3.5'
+
+# before_install:
+
+cache:
+  - pip
+install:
+  - pip install -r requirements.txt
+
+script:
+  python tests/test_app.py
+
+# after_success:
+
+branches:
+  only:
+    - feature/external-user-setup

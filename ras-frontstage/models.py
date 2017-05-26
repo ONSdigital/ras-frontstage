@@ -123,6 +123,3 @@ class ActivationCodeForm(Form):
     progress with registration. The 'Activation Code' is a string in our case.
     """
     activation_code = StringField('Activation Code', [InputRequired()])
-
-
-

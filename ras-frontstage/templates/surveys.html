@@ -1,62 +1,68 @@
-<ul class="survey-list">
+<div class="grid">
 
-    <li class="header-row">
+    <ul class="survey-list">
 
-        <div class="grid__col col-4@m">
-            Survey
-        </div>
+        <li class="header-row">
 
-        <div class="grid__col col-2@m">
-            Period covered
-        </div>
+            <div class="grid__col col-4@m">
+                Survey
+            </div>
 
-        <div class="grid__col col-2@m">
-            Submit by
-        </div>
+            <div class="grid__col col-2@m">
+                Period covered
+            </div>
 
-        <div class="grid__col col-2@m">
-            Status
-        </div>
+            <div class="grid__col col-2@m">
+                Submit by
+            </div>
 
-    </li>
+            <div class="grid__col col-2@m">
+                Status
+            </div>
 
-    {% for data in dataArray %}
+        </li>
 
-    <li class="card">
+        {% for data in dataArray %}
 
-        <div class="grid__col col-4@m">
-            <span class="survey-list-item__label mercury">SURVEY: </span>
-            <span>{{ data.surveyData.longName }}</span><br />
-            <span class="survey-list-item pluto">
-                BUSINESS: {{ data.businessData.name }}<br />
-                REF: {{data.case.caseGroup.sampleUnitRef }}
-            </span>
-        </div>
+        <li class="card">
 
-        <div class="grid__col col-2@m">
-            <span class="survey-list-item__label mercury">PERIOD COVERED: </span>
-            <span class="survey-list-item__nowrap">{{ data.collectionExerciseData.periodStartFormatted }} - </span>
-            <span class="survey-list-item__nowrap">{{ data.collectionExerciseData.periodEndFormatted }}</span>
-        </div>
+            <div class="grid__col col-4@m">
+                <span class="survey-list-item__label mercury">SURVEY: </span>
+                <span>{{ data.surveyData.longName }}</span><br />
+                <span class="survey-list-item pluto">
+                    BUSINESS: {{ data.businessData.name }}<br />
+                    REF: {{data.case.caseGroup.sampleUnitRef }}
+                </span>
+            </div>
 
-        <div class="grid__col col-2@m">
-            <span class="survey-list-item__label mercury">SUBMIT BY: </span>
-            <span>{{ data.collectionExerciseData.scheduledReturnFormatted }}</span>
-        </div>
+            <div class="grid__col col-2@m">
+                <span class="survey-list-item__label mercury">PERIOD COVERED: </span>
+                <span class="survey-list-item__nowrap">{{ data.collectionExerciseData.periodStartFormatted }} - </span>
+                <span class="survey-list-item__nowrap">{{ data.collectionExerciseData.periodEndFormatted }}</span>
+            </div>
 
-        <div class="grid__col col-1@m">
-            <span class="survey-list-item__label mercury">STATUS: </span>
-            <span>{{ data.status }}</span>
-        </div>
+            <div class="grid__col col-2@m">
+                <span class="survey-list-item__label mercury">SUBMIT BY: </span>
+                <span>{{ data.collectionExerciseData.scheduledReturnFormatted }}</span>
+            </div>
 
-        <div class="grid__col col-2@m">
-            <a class="btn action-button" href="/test.html">Download</a>
-        </div>
+            <div class="grid__col col-2@m">
+                <span class="survey-list-item__label mercury">STATUS: </span>
+                <span>{{ data.status }}</span>
+            </div>
 
-    </li>
+            <div class="grid__col col-2@m">
+                <a class="btn action-button" href="/test.html">Download</a>
+            </div>
 
-    {% endfor %}
+        </li>
 
-</ul>
+        {% endfor %}
+
+    </ul>
+
+</div>
+
+
 
 <!-- <a href="/create-account/check-email/">go somewhere else</a> -->

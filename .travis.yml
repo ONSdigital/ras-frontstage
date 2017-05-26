@@ -9,12 +9,16 @@ cache:
   - pip
 install:
   - pip install -r requirements.txt
+  - pip install codecov
+  - pip install coverage
 
 script:
-  python ras-frontstage/tests/test_app.py
+  - coverage run ras-frontstage/tests/test_app.py
+  - coverage report
 
 # after_success:
-
+    - codecov
+    
 branches:
   only:
     - feature/external-user-setup

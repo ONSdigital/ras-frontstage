@@ -7,7 +7,7 @@ if __name__ == "__main__":
     suites_list = []
     loader = unittest.TestLoader()
     for directory in test_dirs:
-        if directory == "ras-frontstage":
+        if directory == "app":
             test_path = "./tests/{}".format(directory)
             suite = loader.discover(test_path)
             suites_list.append(suite)

@@ -7,3 +7,6 @@ coverage:
         base: auto
 
 comment: false
+
+ignore:
+  - "tests/"

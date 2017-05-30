@@ -3,6 +3,7 @@ coverage:
     project:
       default:
         target: 75%
+        if_not_found: success
         threshold: null
         base: auto
 

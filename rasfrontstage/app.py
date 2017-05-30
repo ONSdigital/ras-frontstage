@@ -1,23 +1,18 @@
 """
 Main file that is ran
 """
-#from __future__ import print_function
 from functools import wraps, update_wrapper
 from datetime import datetime
 import logging
 import sys
-from flask import Flask, make_response, render_template, request
 import os
 import requests
 from requests import ConnectionError
-
 from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, Response, abort
 from flask_sqlalchemy import SQLAlchemy
-from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError, MissingClientIdError, MismatchingStateError
+from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError
 from requests_oauthlib import OAuth2Session
 import json
-
-from sqlalchemy import exc
 from jwt import encode, decode
 from jose import JWTError
 from config import OAuthConfig, PartyService, Config, FrontstageLogging
@@ -32,12 +27,11 @@ if 'APP_SETTINGS' in os.environ:
 
 db = SQLAlchemy(app)
 
-from models import *
 
 def myAdd(x=0, y=0):
 
-    print "x is: {}".format(x)
-    print "y is: {}".format(y)
+    print("x is: {}".format(x))
+    print("y is: {}".format(y))
     z = x + y
     return z
 
@@ -365,7 +359,6 @@ def register_enter_your_details():
         authorisation = (OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
 
         try:
-
             OAuthurl = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_ADMIN_ENDPOINT
             OAuth_response = requests.post(OAuthurl, auth=authorisation, headers=headers, data=OAuth_payload)
             app.logger.debug("OAuth response is: {}".format(OAuth_response.content))
@@ -427,14 +420,6 @@ def register_enter_your_details():
         # passes our 'client' to the session management object. this deals with the transactions between the OAuth2 server
         oauth = OAuth2Session(client=client)
         token_url = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
-
-        try:
-            token = oauth.fetch_token(token_url=token_url, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, client_secret=OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
-            print(" *** Access Token Granted *** ")
-            print(" Values are: ")
-            for key in token:
-                print (key, " Value is: ", token[key])
-
         app.logger.debug("Our Token Endpoint is: ", token_url)
 
         try:

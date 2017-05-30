@@ -1,9 +1,7 @@
 import unittest
-
 from rasfrontstage.app import app, myAdd, logged_in
 from rasfrontstage.jwt import encode, decode
 from rasfrontstage.config import OAuthConfig
-from mock import patch
 import requests_mock
 
 

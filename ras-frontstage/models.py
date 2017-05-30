@@ -46,7 +46,7 @@ class User(db.Model):
     def check_password_simple(self, password):
         """Check password simplicity."""
         if password == self.pwdhash:
-            print "Password checks out. Password in {}, password I have: {}".format(password, self.pwdhash)
+            print("Password checks out. Password in {}, password I have: {}".format(password, self.pwdhash))
             return True
         return False
 
@@ -89,7 +89,7 @@ class RegistrationForm(Form):
         if len(field.data) > 16:
             raise ValidationError('This should be a valid phone number between 9 and 15 digits')
         try:
-            print "Checking this is a valid GB Number"
+            print("Checking this is a valid GB Number")
             input_number = phonenumbers.parse(field.data, "GB")                 # Tell the parser we are looking for a GB number
 
             if not (phonenumbers.is_possible_number(input_number)):
@@ -98,7 +98,7 @@ class RegistrationForm(Form):
             if not (phonenumbers.is_valid_number(input_number)):
                 raise ValidationError('Please use a valid UK number e.g. 01632 496 0018.')
         except NumberParseException:
-            print " There is a number parse exception in the phonenumber field"
+            print(" There is a number parse exception in the phonenumber field")
             raise ValidationError('This should be a valid UK number e.g. 01632 496 0018. ')
 
 
@@ -123,6 +123,3 @@ class ActivationCodeForm(Form):
     progress with registration. The 'Activation Code' is a string in our case.
     """
     activation_code = StringField('Activation Code', [InputRequired()])
-
-
-

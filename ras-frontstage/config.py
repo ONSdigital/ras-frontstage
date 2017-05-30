@@ -7,7 +7,7 @@ import os
 
 # ENV VARIABLES BELOW, SET THESE ON YOUR TERMINAL
 # export APP_SETTINGS=config.Config
-# export FLASK_APP=run.py
+# export FLASK_APP=app.py
 # export OAUTHLIB_INSECURE_TRANSPORT=1
 
 # Default values

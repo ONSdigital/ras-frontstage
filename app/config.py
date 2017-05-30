@@ -8,7 +8,7 @@ import logging
 
 # ENV VARIABLES BELOW, SET THESE ON YOUR TERMINAL
 # export APP_SETTINGS=config.Config
-# export FLASK_APP=app.py
+# export FLASK_APP=application.py
 # export OAUTHLIB_INSECURE_TRANSPORT=1
 
 # Default values

@@ -15,7 +15,7 @@ from phonenumbers.phonenumberutil import NumberParseException
 
 
 
-from app import db
+from application import db
 
 
 class User(db.Model):

@@ -1,4 +1,4 @@
-from rasfrontstage import config
+from app import config
 from sqlalchemy import create_engine
 
 import os

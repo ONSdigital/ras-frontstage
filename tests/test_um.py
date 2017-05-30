@@ -1,6 +1,6 @@
 # import unittest
 # from unmath.unnecessary_math import multiply
-# from rasfrontstage.app import myAdd
+# from app.app import myAdd
 #
 # class TestUM(unittest.TestCase):
 # 	def test_myAdd(self):

@@ -3,12 +3,12 @@ import os
 import sys
 
 if __name__ == "__main__":
-    test_dirs = os.listdir('./rasfrontstage/tests')
+    test_dirs = os.listdir('./app/tests')
     suites_list = []
     loader = unittest.TestLoader()
     for directory in test_dirs:
         if directory == "app":
-            test_path = "./rasfrontstage/tests/{}".format(directory)
+            test_path = "./app/tests/{}".format(directory)
             os.getcwd()
             suite = loader.discover(test_path)
             suites_list.append(suite)

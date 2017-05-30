@@ -1,7 +1,7 @@
 import unittest
-from rasfrontstage.app import app, myAdd, logged_in
-from rasfrontstage.jwt import encode, decode
-from rasfrontstage.config import OAuthConfig
+from app.application import app, myAdd, logged_in
+from app.jwt import encode, decode
+from app.config import OAuthConfig
 import requests_mock
 
 
@@ -74,7 +74,7 @@ class TestApplication(unittest.TestCase):
         #m.post('http://localhost:8000/api/v1/tokens/', status_code=401, text=str(data))
 
         # Here we place a listener on this URL. This is the URL of the OAuth2 server. We send a 401 to reject the request
-        # from the ras_frontstage to get a token for this user. See app.py login_OAuth(). And the call to oauth.fetch_token
+        # from the ras_frontstage to get a token for this user. See application.py login_OAuth(). And the call to oauth.fetch_token
         mock_object.post(url, status_code= 401, json={'detail': 'Unauthorized user credentials'})
 
         # Lets send a post message to the ras_frontstage at the endpoint /sign-in/OAuth.

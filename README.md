@@ -1,6 +1,6 @@
 # ras-frontstage
-[![Build Status](https://travis-ci.org/ONSdigital/ras-frontstage.svg?branch=master)](https://travis-ci.org/ONSdigital/ras-frontstage)
-[![codecov](https://codecov.io/gh/ONSdigital/ras-frontstage/branch/master/graph/badge.svg)](https://codecov.io/gh/ONSdigital/ras-frontstage)
+[![Build Status](https://travis-ci.org/ONSdigital/ras-frontstage.svg?branch=feature%2Fexternal-user-setup)](https://travis-ci.org/ONSdigital/ras-frontstage)
+[![codecov](https://codecov.io/gh/ONSdigital/ras-frontstage/branch/feature%2Fexternal-user-setup/graph/badge.svg)](https://codecov.io/gh/ONSdigital/ras-frontstage)
 
 User interface for Respondent Account Services
 

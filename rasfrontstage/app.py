@@ -17,6 +17,7 @@ from jwt import encode, decode
 from jose import JWTError
 from config import OAuthConfig, PartyService, Config, FrontstageLogging
 from models import *
+from utils import get_user_scopes_util
 
 app = Flask(__name__)
 app.debug = True
@@ -26,15 +27,6 @@ if 'APP_SETTINGS' in os.environ:
     app.config.from_object(Config)
 
 db = SQLAlchemy(app)
-
-
-def myAdd(x=0, y=0):
-
-    print("x is: {}".format(x))
-    print("y is: {}".format(y))
-    z = x + y
-    return z
-
 
 
 #TODO Remove this before production
@@ -132,7 +124,7 @@ def login():
 
         session['username'] = username
 
-        usr_scopes = get_user_scopes(username)
+        usr_scopes = get_user_scopes_util(username)
 
         data_dict_for_jwt_token = {"username": username, "user_scopes": usr_scopes }
 

@@ -10,7 +10,7 @@ from flask import Flask, make_response, render_template, request, Response
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import exc
 
-from models import *
+from models import User, db, UserScope
 
 
 def get_user_scopes_util(username):

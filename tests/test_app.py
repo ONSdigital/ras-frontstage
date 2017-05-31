@@ -1,22 +1,23 @@
 import unittest
-from app.application import app, myAdd, logged_in
+from app.application import app
 from app.jwt import encode, decode
 from app.config import OAuthConfig
 import requests_mock
 
 
 data_dict_for_jwt_token = {"refresh_token": "eyJhbGciOiJIUzI1NiIsIn",
-                                   "access_token": "access_token",
-                                   "scope": "[foo,bar,qnx]",
-                                   "expires_at": "100123456789",
-                                   "username": "johndoe"}
+                           "access_token": "access_token",
+                           "scope": "[foo,bar,qnx]",
+                           "expires_at": "100123456789",
+                           "username": "johndoe"}
 
-data_dict_zero_length = {"":""}
+data_dict_zero_length = {"": ""}
 
 encoded_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdG9rZW4iOiJhY2Nlc3NfdG9rZW4iLCJzY29wZSI6Iltmb28sYmFyLHFueF0iLCJ1c2VybmFtZSI6ImpvaG5kb2UiLCJleHBpcmVzX2F0IjoiMTAwMTIzNDU2Nzg5IiwicmVmcmVzaF90b2tlbiI6ImV5SmhiR2NpT2lKSVV6STFOaUlzSW4ifQ.SIgs3BFhAaJS6s9Q6gm57o9ifVqgAh0AC7-jDigSLZo'
 
 
 class TestApplication(unittest.TestCase):
+    """Test case for application endpoints and functionality"""
 
     def setUp(self):
 
@@ -35,7 +36,7 @@ class TestApplication(unittest.TestCase):
 
         self.assertEquals(encode(data_dict_zero_length),"No data")
 
-    #TODO Test that over a certain size our encode returns the correct error and handles gracefully
+    # TODO Test that over a certain size our encode returns the correct error and handles gracefully
 
     # Test that we can decode our token
     def test_decode_jwt(self):
@@ -54,8 +55,9 @@ class TestApplication(unittest.TestCase):
     # By passing an incorrect token this function should get an HTTP 200 with a data dictionary  type set as failed
     # data={"error": {"type": "failed"}}
 
-    # Test we get a user sign in page when we hit this endpoint
+
     def test_sign_in_page(self):
+        """Test user sign in appears"""
 
         response = self.app.get('/sign-in/OAuth', headers=self.headers)
 
@@ -68,10 +70,10 @@ class TestApplication(unittest.TestCase):
     @requests_mock.mock()                                       # We are using the requests_mock library to fake the
                                                                 # call to an OAuth2 server. See: https://requests-mock.readthedocs.io/en/latest/response.html
     def test_sign_in_wrong_details(self, mock_object):
-
+        """Test incorrect detail message is returned with invalid details entered"""
         data = {'refresh_token': '007', 'access_token': '007', 'scope': '[foo,bar]', 'expires_at': 'today', 'username': 'nherriot' }
         url = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
-        #m.post('http://localhost:8000/api/v1/tokens/', status_code=401, text=str(data))
+        # m.post('http://localhost:8000/api/v1/tokens/', status_code=401, text=str(data))
 
         # Here we place a listener on this URL. This is the URL of the OAuth2 server. We send a 401 to reject the request
         # from the ras_frontstage to get a token for this user. See application.py login_OAuth(). And the call to oauth.fetch_token
@@ -86,9 +88,8 @@ class TestApplication(unittest.TestCase):
         self.assertTrue('Email Address' in response.data)
         self.assertTrue('Password' in response.data)
 
-
-    # Test we have a create account page using a GET request
     def test_create_account_get_page(self):
+        """Test create account page is rendered for a get request"""
 
         response = self.app.get('create-account/enter-account-details/', headers=self.headers)
 
@@ -100,10 +101,11 @@ class TestApplication(unittest.TestCase):
         self.assertTrue('Phone number' in response.data)
 
     def test_create_account_register_no_email_address(self):
+        """Test create account with no email address responds with field required"""
 
         # creating user
-        test_user = {'first_name':'john',
-                'last_name':'doe'}
+        test_user = {'first_name': 'john',
+                     'last_name': 'doe'}
 
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
@@ -111,12 +113,13 @@ class TestApplication(unittest.TestCase):
         self.assertTrue('This field is required' in response.data)
 
     def test_create_account_register_no_password(self):
+        """Test create account with no password returns response field required"""
 
         # creating user
-        test_user = {'first_name':'john',
-                'last_name':'doe',
-                'email_address':'testuser2@email.com',
-                'email_address_confirm':'wrongemailaddres@email.com',}
+        test_user = {'first_name': 'john',
+                     'last_name': 'doe',
+                     'email_address': 'testuser2@email.com',
+                     'email_address_confirm': 'wrongemailaddres@email.com',}
 
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
@@ -124,12 +127,13 @@ class TestApplication(unittest.TestCase):
         self.assertTrue('This field is required' in response.data)
 
     def test_create_account_register_wrong_email(self):
+        """Test create account with mismatching emails returns emails must match"""
 
         # creating user
-        test_user = {'first_name':'john',
-                'last_name':'doe',
-                'email_address':'testuser2@email.com',
-                'email_address_confirm':'wrongemailaddres@email.com'}
+        test_user = {'first_name': 'john',
+                     'last_name': 'doe',
+                     'email_address': 'testuser2@email.com',
+                     'email_address_confirm': 'wrongemailaddres@email.com'}
 
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
@@ -137,14 +141,15 @@ class TestApplication(unittest.TestCase):
         self.assertTrue('Emails must match' in response.data)
 
     def test_create_account_register_wrong_password(self):
+        """Test create account with mismatching passwords returns passwords must match"""
 
         # creating user
-        test_user = {'first_name':'john',
-                'last_name':'doe',
-                'email_address':'testuser2@email.com',
-                'email_address_confirm':'wrongemailaddres@email.com',
-                'password':'password',
-                'password_confirm':'wrongpassword'}
+        test_user = {'first_name': 'john',
+                     'last_name': 'doe',
+                     'email_address': 'testuser2@email.com',
+                     'email_address_confirm': 'wrongemailaddres@email.com',
+                     'password': 'password',
+                     'password_confirm': 'wrongpassword'}
 
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
@@ -152,14 +157,15 @@ class TestApplication(unittest.TestCase):
         self.assertTrue('Passwords must match' in response.data)
 
     def test_create_account_register_no_phone_number(self):
+        """Test create account missing phone no. returns field required"""
 
         # creating user
-        test_user = {'first_name':'john',
-                'last_name':'doe',
-                'email_address':'testuser2@email.com',
-                'email_address_confirm':'wrongemailaddres@email.com',
-                'password':'password1234',
-                'password_confirm':'password1234'}
+        test_user = {'first_name': 'john',
+                     'last_name': 'doe',
+                     'email_address': 'testuser2@email.com',
+                     'email_address_confirm': 'wrongemailaddres@email.com',
+                     'password': 'password1234',
+                     'password_confirm': 'password1234'}
 
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
@@ -167,47 +173,50 @@ class TestApplication(unittest.TestCase):
         self.assertTrue('This field is required.' in response.data)
 
     def test_create_account_register_illegal_phone_number(self):
+        """Test create account with an invalid phone no. returns not a valid UK phone no."""
 
         # creating user
-        test_user = {'first_name':'john',
-                'last_name':'doe',
-                'email_address':'testuser2@email.com',
-                'email_address_confirm':'wrongemailaddres@email.com',
-                'password':'password1234',
-                'password_confirm':'password1234',
-                'phone_number':'not a number'}
+        test_user = {'first_name': 'john',
+                     'last_name': 'doe',
+                     'email_address': 'testuser2@email.com',
+                     'email_address_confirm': 'wrongemailaddres@email.com',
+                     'password': 'password1234',
+                     'password_confirm': 'password1234',
+                     'phone_number': 'not a number'}
 
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
         self.assertTrue(response.status_code, 200)
         self.assertTrue('This should be a valid UK number e.g. 01632 496 0018' in response.data)
 
-    def test_create_account_register_phone_number_to_small(self):
+    def test_create_account_register_phone_number_too_small(self):
+        """Test create account phone no. too small returns length guidance"""
 
         # creating user
-        test_user = {'first_name':'john',
-                'last_name':'doe',
-                'email_address':'testuser2@email.com',
-                'email_address_confirm':'wrongemailaddres@email.com',
-                'password':'password1234',
-                'password_confirm':'password1234',
-                'phone_number':'12345678'}
+        test_user = {'first_name': 'john',
+                     'last_name': 'doe',
+                     'email_address': 'testuser2@email.com',
+                     'email_address_confirm': 'wrongemailaddres@email.com',
+                     'password': 'password1234',
+                     'password_confirm': 'password1234',
+                     'phone_number': '12345678'}
 
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
         self.assertTrue(response.status_code, 200)
         self.assertTrue('This should be a valid phone number between 9 and 15 digits' in response.data)
 
-    def test_create_account_register_phone_number_to_big(self):
+    def test_create_account_register_phone_number_too_big(self):
+        """Test create account phone no. too big returns length guidance"""
 
         # creating user
-        test_user = {'first_name':'john',
-                'last_name':'doe',
-                'email_address':'testuser2@email.com',
-                'email_address_confirm':'wrongemailaddres@email.com',
-                'password':'password1234',
-                'password_confirm':'password1234',
-                'phone_number':'1234567890123456'}
+        test_user = {'first_name': 'john',
+                     'last_name': 'doe',
+                     'email_address': 'testuser2@email.com',
+                     'email_address_confirm': 'wrongemailaddres@email.com',
+                     'password': 'password1234',
+                     'password_confirm': 'password1234',
+                     'phone_number': '1234567890123456'}
 
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
@@ -215,37 +224,39 @@ class TestApplication(unittest.TestCase):
         self.assertTrue('This should be a valid phone number between 9 and 15 digits' in response.data)
 
     def test_create_account_register_new_user(self):
+        """Test successful create account"""
 
         # creating user
-        test_user = {'first_name':'john',
-                'last_name':'doe',
-                'email_address':'testuser2@email.com',
-                'email_address_confirm':'testuser2@email.com',
-                'password':'password',
-                'password_confirm':'password',
-                'phone_number':'07717275049',
-                'terms_and_conditions':'Y'}
+        test_user = {'first_name': 'john',
+                     'last_name': 'doe',
+                     'email_address': 'testuser2@email.com',
+                     'email_address_confirm': 'testuser2@email.com',
+                     'password': 'password',
+                     'password_confirm': 'password',
+                     'phone_number': '07717275049',
+                     'terms_and_conditions': 'Y'}
 
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
         self.assertTrue(response.status_code, 200)
-        #self.assertTrue('Enter your account details' in response.data)
-        #self.assertTrue('Your name' in response.data)
-        #self.assertTrue('Email address' in response.data)
-        #self.assertTrue('Create a password' in response.data)
-        #self.assertTrue('Phone number' in response.data)
+        # self.assertTrue('Enter your account details' in response.data)
+        # self.assertTrue('Your name' in response.data)
+        # self.assertTrue('Email address' in response.data)
+        # self.assertTrue('Create a password' in response.data)
+        # self.assertTrue('Phone number' in response.data)
 
     def test_create_duplicate_account(self):
+        """Test create a duplicate account returns try a different email this ones in use"""
 
         # creating user
-        test_user = {'first_name':'john',
-                'last_name':'doe',
-                'email_address':'testuser2@email.com',
-                'email_address_confirm':'testuser2@email.com',
-                'password':'password',
-                'password_confirm':'password',
-                'phone_number':'07717275049',
-                'terms_and_conditions':'Y'}
+        test_user = {'first_name': 'john',
+                     'last_name': 'doe',
+                     'email_address': 'testuser2@email.com',
+                     'email_address_confirm': 'testuser2@email.com',
+                     'password': 'password',
+                     'password_confirm': 'password',
+                     'phone_number': '07717275049',
+                     'terms_and_conditions': 'Y'}
 
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
@@ -257,8 +268,6 @@ class TestApplication(unittest.TestCase):
 
         self.assertTrue(response.status_code, 200)
         self.assertTrue('Please try a different email, this one is in use' in response.data)
-
-
 
     # def test_collection_instrument_id(self):
     #     response = self.app.get('/collectioninstrument/id/urn:ons.gov.uk:id:ci:001.001.00001', headers=self.headers)
@@ -273,5 +282,3 @@ class TestApplication(unittest.TestCase):
     #                             }
     #     }
     #     self.assertEquals(expected_response, json.loads(response.data))
-
-

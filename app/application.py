@@ -491,6 +491,11 @@ def register_confirm_organisation_survey():
 def register_almost_done():
     return render('register.almost-done.html')
 
+# ========== secure message end points
+
+@app.route('/secure-messages/create-message')
+def secure_messsage():
+    return render('secure-messages-create.html')
 
 #Disable cache for development
 def nocache(view):

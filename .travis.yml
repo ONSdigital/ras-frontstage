@@ -9,11 +9,12 @@ cache:
   - pip
 install:
   - pip install -r requirements.txt
+  - pip install -r requirements-test.txt
   - pip install codecov
   - pip install coverage
 
 script:
-  - coverage run ras-frontstage/run_tests.py
+  - coverage run run_tests.py
   - coverage report
 
 after_success:

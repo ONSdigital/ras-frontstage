@@ -3,11 +3,12 @@ This module hosts the config setup for our project
 """
 
 import os
+import logging
 
 
 # ENV VARIABLES BELOW, SET THESE ON YOUR TERMINAL
 # export APP_SETTINGS=config.Config
-# export FLASK_APP=app.py
+# export FLASK_APP=application.py
 # export OAUTHLIB_INSECURE_TRANSPORT=1
 
 # Default values
@@ -21,7 +22,10 @@ class Config(object):
     """
     DEBUG = False
     TESTING = False
-    CSRF_ENABLED = True
+    #CSRF_ENABLED = True
+    CSRF_ENABLED = False
+    #WTF_CSRF_CHECK_DEFAULT = False
+    WTF_CSRF_ENABLED = False
     SECRET_KEY = 'this-really-needs-to-be-changed'
     dbname = "ras_frontstage_backup"
     #SQLALCHEMY_DATABASE_URI = "postgresql://" + dbname + ":password@localhost:5431/postgres"
@@ -98,3 +102,11 @@ class OAuthConfig(Config):
     ONS_ADMIN_ENDPOINT = os.environ.get('ONS_ADMIN_ENDPOINT', '/api/account/create')
 
 
+class FrontstageLogging(Config):
+    """
+    This class is used to set up and define logging behaviour for ras-frontstage
+    """
+    logger = logging.getLogger(__name__)
+    SERVICE_NAME = 'ras-frontstage'
+    LOG_FORMAT = 'ras-frontstage: %(asctime)s|%(levelname)s %(message)s'
+    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'DEBUG')

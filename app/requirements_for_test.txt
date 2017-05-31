@@ -1,0 +1,4 @@
+coverage==4.2b1
+behave==1.2.5
+mock==2.0.0
+requests-mock==1.3.0

@@ -104,6 +104,8 @@ def logout():
 # ===== Sign in =====
 @app.route('/sign-in/', methods=['GET', 'POST'])
 def login():
+    """Handles sign-in"""
+
     app.logger.debug("*** Hitting login() function.... ***")
     """Login Page."""
     form = LoginForm(request.form)
@@ -149,6 +151,8 @@ def login():
 # ===== Sign in using OAuth2 =====
 @app.route('/sign-in/OAuth', methods=['GET', 'POST'])
 def login_OAuth():
+    """Handles sign in using OAuth2"""
+
     app.logger.debug("*** Hitting login for OAuth() function.... ***")
     """ Login OAuth Page.
     This function uses the OAuth 2 server to receive a token upon successful sign in. If the user presents the correct
@@ -236,6 +240,7 @@ def login_OAuth():
 
 @app.route('/sign-in/error', methods=['GET'])
 def sign_in_error():
+    """Handles any sign in errors"""
 
     password = request.form.get('pass')
     password = request.form.get('emailaddress')
@@ -306,6 +311,7 @@ def reset_password_confirmation():
 # ===== Registration =====
 @app.route('/create-account/', methods=['GET', 'POST'])
 def register():
+    """Handles user registration"""
 
     form = ActivationCodeForm(request.form)
 
@@ -550,6 +556,8 @@ def get_id(_id):
 
 
 def setup_logging():
+    """Set up logging for application"""
+    
     logging.basicConfig(level=FrontstageLogging.LOG_LEVEL)
     log_formatter = logging.Formatter(FrontstageLogging.LOG_FORMAT)
     stdout_handler = logging.StreamHandler(sys.stdout)

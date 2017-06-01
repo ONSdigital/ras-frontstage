@@ -1,15 +1,6 @@
 """Utils module."""
 
 from __future__ import print_function
-
-from datetime import datetime
-from functools import wraps, update_wrapper
-import os
-
-from flask import Flask, make_response, render_template, request, Response
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import exc
-
 from models import *
 
 

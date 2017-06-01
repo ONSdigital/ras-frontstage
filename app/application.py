@@ -40,7 +40,6 @@ def hello_world():
 def logged_in():
     """Logged in page for users only."""
 
-
     if session.get('jwt_token'):
         jwttoken = session.get('jwt_token')
 
@@ -49,7 +48,7 @@ def logged_in():
             for key in decodedJWT:
                 app.logger.debug(" {} is: {}".format(key, decodedJWT[key]))
                 #userID = decodedJWT['user_id']
-            return render_template('signed-in.html', _theme='default', data={"error": {"type": "success"}})
+            return render_template('surveys-history.html', _theme='default', data={"error": {"type": "success"}})
 
         except JWTError:
             #TODO Provide proper logging

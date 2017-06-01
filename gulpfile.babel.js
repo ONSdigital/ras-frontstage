@@ -56,15 +56,15 @@ gulp.task('watch:common:scripts:doc', ['compile:common:scripts:docs'], () => {
  */
 gulp.task('compile:sass', () => {
 
-	return gulp.src('./ras-frontstage/main.scss')
+	return gulp.src('./app/main.scss')
 		.pipe(sass({indentedSyntax: false}).on('error', sass.logError))
 		.pipe(concat('site.min.css'))
-		.pipe(gulp.dest('./ras-frontstage/static'));
+		.pipe(gulp.dest('./app/static'));
 
 });
 
 gulp.task('watch:sass', ['compile:sass'], () => {
-	gulp.watch(['./ras-frontstage/**/*.scss'], ['compile:sass']);
+	gulp.watch(['./app/**/*.scss'], ['compile:sass']);
 });
 
 

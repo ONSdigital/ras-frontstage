@@ -1,9 +1,7 @@
 """
 This module contains the data model for the collection instrument
 """
-
 import datetime
-
 from flask_wtf import Form
 from sqlalchemy import DateTime
 from sqlalchemy.dialects.postgresql import TEXT, JSON, UUID
@@ -12,10 +10,9 @@ from wtforms import DecimalField, SelectField, PasswordField, StringField, Integ
 from wtforms.validators import InputRequired, EqualTo, Length, DataRequired, NumberRange, Email, ValidationError
 import phonenumbers
 from phonenumbers.phonenumberutil import NumberParseException
+from flask_sqlalchemy import SQLAlchemy
 
-
-
-from application import db
+db = SQLAlchemy()
 
 
 class User(db.Model):

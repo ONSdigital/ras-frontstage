@@ -9,14 +9,13 @@ import os
 import requests
 from requests import ConnectionError
 from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, Response, abort
-from flask_sqlalchemy import SQLAlchemy
 from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError
 from requests_oauthlib import OAuth2Session
 import json
 from jwt import encode, decode
 from jose import JWTError
 from config import OAuthConfig, PartyService, Config, FrontstageLogging
-from models import LoginForm, User, ActivationCodeForm, RegistrationForm
+from models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
 from utils import get_user_scopes_util
 
 app = Flask(__name__)
@@ -26,7 +25,7 @@ if 'APP_SETTINGS' in os.environ:
     # app.config.from_object(os.environ['APP_SETTINGS'])
     app.config.from_object(Config)
 
-db = SQLAlchemy(app)
+db.init_app(app)
 
 
 # TODO Remove this before production
@@ -557,7 +556,7 @@ def get_id(_id):
 
 def setup_logging():
     """Set up logging for application"""
-    
+
     logging.basicConfig(level=FrontstageLogging.LOG_LEVEL)
     log_formatter = logging.Formatter(FrontstageLogging.LOG_FORMAT)
     stdout_handler = logging.StreamHandler(sys.stdout)

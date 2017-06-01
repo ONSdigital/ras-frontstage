@@ -10,6 +10,7 @@
 
 from oauthlib.oauth2 import LegacyApplicationClient
 from requests_oauthlib import OAuth2Session
+from application import app
 
 
 # Setup client ID, client secret, username and password variables. Thease users must exist on the django Oauth2 server
@@ -57,7 +58,7 @@ client_secret = 'password'
 username = 'testuser@email.com'
 password = 'password'
 
-print(" *** Variables setup ***")
+app.logger.debug(" *** Variables setup ***")
 
 # print Config.DEBUG
 # print OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID
@@ -69,11 +70,11 @@ client = LegacyApplicationClient(client_id=client_id)
 client.prepare_request_body(username=username, password=password, scope=['ci.write', 'ci.read'])
 oauth = OAuth2Session(client=client)
 
-print(" OAuth2 Session has been created for client: {}".format(client_id))
+app.logger.debug(" OAuth2 Session has been created for client: {}".format(client_id))
 
 token = oauth.fetch_token(token_url='http://localhost:8000/api/v1/tokens/', username=username, password=password, client_id=client_id, client_secret=client_secret)
 
-print(" *** Access Token Granted *** ")
-print(" Values are: ")
+app.logger.debug(" *** Access Token Granted *** ")
+app.logger.debug(" Values are: ")
 for key in token:
-    print(key, " Value is: ", token[key])
+    app.logger.debug(key, " Value is: ", token[key])

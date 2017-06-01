@@ -539,7 +539,7 @@ def get_id(_id):
                 return res
 
             # Anything else but a token match means we reject the call
-            app.logger.debug("tokens don't match")
+            app.logger.warning("tokens don't match")
             res = Response(response="""Your session is stale, try logging in again to
                                      refresh your session variables""", status=404, mimetype="text/html")
             return res

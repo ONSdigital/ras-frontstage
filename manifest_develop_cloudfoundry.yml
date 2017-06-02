@@ -4,7 +4,7 @@ applications:
   buildpack: https://github.com/cloudfoundry/python-buildpack.git
   memory: 256M
   routes:
-      - route: ras-OAuth2
+      - route: ras-frontstage
 env:
     OAUTHLIB_INSECURE_TRANSPORT: "1"                         # Used for development. Allows OAuth2 protocol to work over non TLS protocol
     APP_SETTINGS: config.Config                              # Allows Flask to load config files

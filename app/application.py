@@ -22,7 +22,7 @@ import arrow
 
 from jwt import encode, decode
 from jose import JWTError
-from config import OAuthConfig, PartyService, Config, FrontstageLogging
+from config import OAuthConfig, PartyService, CaseService, CollectionExerciseService, SurveyService, Config, FrontstageLogging
 from models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
 from utils import get_user_scopes_util
 
@@ -296,45 +296,38 @@ def build_survey_data():
     headers = {}
 
     # Call the Party Service to get respondent details
-    url = 'http://localhost:8050/api/party-api/respondents/id/' + party_id
+    url = PartyService.PARTYSERVICE_PROTOCOL + PartyService.PARTYSERVICE_SERVER + PartyService.PARTYSERVICE_RESPONDENTS_ENDPOINT + 'id/' + party_id
     req = requests.get(url, headers=headers)
     userData = req.json()
-    # print(userData)
 
     # Call the Case Service to get list of cases with the partyid
-    url = 'http://localhost:8050/api/cases/partyid/' + party_id
+    url = CaseService.CASESERVICE_PROTOCOL + CaseService.CASESERVICE_SERVER + CaseService.CASESERVICE_CASES_ENDPOINT + 'partyid/' + party_id
     req = requests.get(url, headers=headers)
     caseData = req.json()
-    # print(caseData);
 
     # Iterate caseData and build a data array to pass into the HTML template
     dataArray = []
     for case in caseData:
 
         collectionExerciseId = case['caseGroup']['collectionExerciseId']
-        # print('collectionExerciseId=' + collectionExerciseId)
 
         # Call the Party Service to get the business details
         businessPartyId = case['caseGroup']['partyId']
-        url = 'http://localhost:8050/api/party-api/businesses/id/' + businessPartyId
+        url = PartyService.PARTYSERVICE_PROTOCOL + PartyService.PARTYSERVICE_SERVER + PartyService.PARTYSERVICE_BUSINESSES_ENDPOINT + 'id/' + party_id
         req = requests.get(url, headers=headers)
         businessData = req.json()
-        # print(businessData)
 
         # Call the Collection Exercise Service to get the collection exercise details
-        url = 'http://localhost:8050/api/collectionexercises/' + collectionExerciseId
+        url = CollectionExerciseService.COLLECTIONEXERCISESERVICE_PROTOCOL + CollectionExerciseService.COLLECTIONEXERCISESERVICE_SERVER + CollectionExerciseService.COLLECTIONEXERCISESERVICE_ENDPOINT + 'collection-exercise/' + collectionExerciseId
         req = requests.get(url, headers=headers)
         collectionExerciseData = req.json()
-        # print(collectionExerciseData)
 
         surveyId = collectionExerciseData['surveyId']
-        # print('surveyId=' + surveyId)
 
         # Call the Survey Service to get the survey details
-        url = 'http://localhost:8050/api/surveys/' + surveyId
+        url = SurveyService.SURVEYSERVICE_PROTOCOL + SurveyService.SURVEYSERVICE_SERVER + SurveyService.SURVEYSERVICE_ENDPOINT + surveyId
         req = requests.get(url, headers=headers)
         surveyData = req.json()
-        # print(surveyData)
 
         # Work out the case status
         caseEvents = case['caseEvents']
@@ -352,7 +345,7 @@ def build_survey_data():
         collectionExerciseData['scheduledReturn'] = collectionExerciseData['scheduledReturn'].replace('Z' , '')
         collectionExerciseData['scheduledReturnFormatted'] = arrow.get(collectionExerciseData['scheduledReturn'], inputDateFormat).format(outputDateFormat)
 
-
+        # Build data object and append to the data array
         data = {}
         data['userData']= userData;
         data['businessData']= businessData;
@@ -630,7 +623,7 @@ def register_enter_your_details():
 
         registrationData = {'emailAddress': email_address, 'firstName': first_name, 'lastName': last_name, 'telephone': phone_number, 'status': 'CREATED' }
         headers = {'authorization': encoded_jwt_token, 'content-type': 'application/json'}
-        partyServiceURL = PartyService.PARTYSERVICE_PROTOCOL + PartyService.PARTYSERVICE_SERVER + PartyService.PARTYSERVICE_REGISTER_ENDPOINT
+        partyServiceURL = PartyService.PARTYSERVICE_PROTOCOL + PartyService.PARTYSERVICE_SERVER + PartyService.PARTYSERVICE_RESPONDENTS_ENDPOINT
         app.logger.debug("Party service URL is: {}".format(partyServiceURL))
 
         try:

@@ -1,29 +1,29 @@
 """
 Main file that is ran
 """
-from functools import wraps, update_wrapper
-from datetime import datetime
-import logging
-import sys
-import os
-import requests
-from requests import ConnectionError
-from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, Response, abort, Blueprint
-from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError
-from requests_oauthlib import OAuth2Session
 import json
-from jwt import encode, decode
+import logging
+import os
+import sys
+from datetime import datetime
+from functools import wraps, update_wrapper
+
+import requests
+from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, Response, abort
 from jose import JWTError
+from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError
+from requests import ConnectionError
+from requests_oauthlib import OAuth2Session
+
+from blueprints.secure_messaging import secure_message_bp
 from config import OAuthConfig, PartyService, Config, FrontstageLogging
+from jwt import encode, decode
 from models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
 from utils import get_user_scopes_util
 
-
 app = Flask(__name__)
 app.debug = True
-
-secure_message_bp = Blueprint('sm_bp', __name__, static_folder='static', template_folder='templates')
-
+app.register_blueprint(secure_message_bp, url_prefix='/secure-message')
 
 if 'APP_SETTINGS' in os.environ:
     # app.config.from_object(os.environ['APP_SETTINGS'])
@@ -37,7 +37,6 @@ db.init_app(app)
 @app.route('/home', methods=['GET', 'POST'])
 def hello_world():
     return render_template('_temp.html', _theme='default')
-
 
 
 @app.route('/')
@@ -557,8 +556,6 @@ def get_id(_id):
     # If we hit here then the request did not have a token or username set
     res = Response(response="Not authorised", status=403, mimetype="text/html")
     return res
-
-app.register_blueprint(secure_message_bp)
 
 
 def setup_logging():

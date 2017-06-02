@@ -1,0 +1,26 @@
+{% import 'partials/section.html' as section %}
+
+{% extends "layouts/_onecol.html" %}
+
+{% block page_title %}My surveys - ONS Business Surveys{% endblock %}
+
+{% block main %}
+
+<ul class="navigation-tabs navigation-tabs-component">
+    <li class="navigation-tabs__item navigation-tabs__item--primary">
+        <a href="/"
+            class="btn btn--secondary btn--border navigation-tabs__tab">To do</a>
+    </li>
+    <li class="navigation-tabs__item navigation-tabs__item--primary navigation-tabs__item--active">
+        <a href="/history"
+            class="btn btn--secondary btn--border navigation-tabs__tab navigation-tabs__tab--active">History</a>
+    </li>
+    <li class="navigation-tabs__item navigation-tabs__item--primary">
+        <a href="/messages"
+            class="btn btn--secondary btn--border navigation-tabs__tab">Messages</a>
+    </li>
+</ul>
+
+{% include "surveys.html" %}
+
+{% endblock main %}

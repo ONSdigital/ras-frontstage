@@ -15,7 +15,7 @@ from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, M
 from requests import ConnectionError
 from requests_oauthlib import OAuth2Session
 
-from blueprints.secure_messaging import secure_message_bp
+from views.secure_messaging import secure_message_bp
 from config import OAuthConfig, PartyService, Config, FrontstageLogging
 from jwt import encode, decode
 from models import LoginForm, User, RegistrationForm, ActivationCodeForm, db

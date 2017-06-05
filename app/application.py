@@ -15,11 +15,11 @@ from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, M
 from requests import ConnectionError
 from requests_oauthlib import OAuth2Session
 
-from views.secure_messaging import secure_message_bp
-from config import OAuthConfig, PartyService, Config, FrontstageLogging
-from jwt import encode, decode
-from models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
-from utils import get_user_scopes_util
+from app.views.secure_messaging import secure_message_bp
+from app.config import OAuthConfig, PartyService, Config, FrontstageLogging
+from app.jwt import encode, decode
+from app.models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
+from app.utils import get_user_scopes_util
 
 app = Flask(__name__)
 app.debug = True

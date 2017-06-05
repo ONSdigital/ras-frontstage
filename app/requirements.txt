@@ -7,7 +7,7 @@ Flask-OpenID==1.2.5
 Flask-OAuth==0.12
 Flask-SQLAlchemy==2.1
 phonenumbers==8.4.1
-psycopg2==2.6.1
+psycopg2==2.7.1
 pystache==0.5.4
 pytest-cov==2.4.0
 python-jose==1.2.0

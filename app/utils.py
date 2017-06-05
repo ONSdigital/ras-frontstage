@@ -1,7 +1,7 @@
 """Utils module."""
 
 from __future__ import print_function
-from models import *
+from app.models import *
 
 
 def get_user_scopes_util(username):

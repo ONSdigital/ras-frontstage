@@ -360,16 +360,23 @@ def build_survey_data():
 
 
 def calculate_case_status(caseEvents):
-
-    # TODO Get business rules and code this accordingly
     status = ''
     for event in caseEvents:
-        if event['category'] == 'CASE_CREATED':
-            status = 'Not started'
-        elif event['category'] == 'CASE_COMPLETED':
+        if event['category'] == 'CASE_UPLOADED':
             status = 'Complete'
+            break
+
+    if status == '':
+        for event in caseEvents:
+            if event['category'] == 'CASE_DOWNLOADED':
+                status = 'In progress'
+                break
+
+    if status == '':
+        status = 'Not started'
 
     return status
+
 
 
 def filter_surveys(dataArray, allowedStatuses):
@@ -395,7 +402,7 @@ def surveys_todo():
     dataArray = build_survey_data()
 
     # Filter the data array to remove surveys that shouldn't appear on the To Do page
-    allowedStatuses = ['Not started']
+    allowedStatuses = ['Not started', 'In progress']
 
     # TODO - the line below can be commented out to demonstrate sorting
     dataArray = filter_surveys(dataArray, allowedStatuses)

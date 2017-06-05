@@ -51,9 +51,8 @@ def logged_in():
             decodedJWT = decode(jwttoken)
             for key in decodedJWT:
                 app.logger.debug(" {} is: {}".format(key, decodedJWT[key]))
-                # userID = decodedJWT['user_id']
-            return render_template('signed-in.html', _theme='default', data={"error": {"type": "success"}})
-
+                #userID = decodedJWT['user_id']
+            return render_template('surveys-history.html', _theme='default', data={"error": {"type": "success"}})
         except JWTError:
             # TODO Provide proper logging
             app.logger.debug("This is not a valid JWT Token")

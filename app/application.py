@@ -26,8 +26,10 @@ from config import OAuthConfig, PartyService, CaseService, CollectionExerciseSer
 from models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
 from utils import get_user_scopes_util
 
+# Debug flag
+DEBUG_ENABLED = True
+
 app = Flask(__name__)
-app.debug = True
 
 if 'APP_SETTINGS' in os.environ:
     # app.config.from_object(os.environ['APP_SETTINGS'])
@@ -38,7 +40,6 @@ db.init_app(app)
 
 # TODO Remove this before production
 # @app.route('/')
-
 @app.route('/home', methods=['GET', 'POST'])
 def hello_world():
     return render_template('_temp.html', _theme='default')
@@ -749,7 +750,8 @@ def setup_logging():
 
     app.logger.addHandler(stdout_handler)
 
+
 if __name__ == '__main__':
     setup_logging()
     PORT = int(os.environ.get('PORT', 5001))
-    app.run(host='0.0.0.0', port=PORT)
+    app.run(host='0.0.0.0', port=PORT, debug=DEBUG_ENABLED)

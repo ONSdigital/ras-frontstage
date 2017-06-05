@@ -24,7 +24,7 @@ Run the application
 -------------------
 ```
 $ cd ras-frontstage
-$ python app.py
+$ python3 run.py
  * Running on http://127.0.0.1:5001/
  * Restarting with reloader
 ```

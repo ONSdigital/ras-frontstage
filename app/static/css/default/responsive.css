@@ -4847,9 +4847,10 @@ input:checked ~ .label {
 }
 
 @media only screen and (min-width: 740px) {
-  .survey-list .header-row, .survey-list .header-row:hover {
+  .survey-list .header-row,
+  .survey-list .header-row:hover {
     display: block;
-    padding: 10px 0 0 0;
+    padding: 10px 0 0;
     background: #fff;
   }
 }
@@ -4906,7 +4907,7 @@ input:checked ~ .label {
 .navigation-tabs .navigation-tabs__item .navigation-tabs__tab {
   margin-bottom: 0;
   padding: 9px 18px;
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
   border: 1px solid transparent;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;

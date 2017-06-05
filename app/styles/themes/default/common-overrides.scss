@@ -1,36 +1,23 @@
 .details__link {
-
-  &:before {
-    background-image: url("/static/s/img/icons/guidance.svg");
-  }
-
-  &:focus {
-    &::before {
-      background-image: url("/static/s/img/icons/guidance-white.svg");
+    &:before {
+        background-image: url("/static/s/img/icons/guidance.svg");
     }
-  }
+
+    &:focus {
+        &::before {
+            background-image: url("/static/s/img/icons/guidance-white.svg");
+        }
+    }
 }
 
 .input--checkbox {
-  background-image: url('https://eq.onsdigital.uk/s/img/icons/icons--check.svg');
+    background-image: url('https://eq.onsdigital.uk/s/img/icons/icons--check.svg');
 }
 
 .input--text-error {
-  border : 1px solid red;
-  border-width : 2px;
+    border: 1px solid red;
+    border-width: 2px;
 }
-
-
-
-//////////////
-
-// .survey-list .header-row{
-//     color: red;
-//
-//     display: none;
-//     border-bottom: 2px solid #666;
-//     font-weight: bold;
-// }
 
 .survey-list {
     list-style: none;
@@ -65,8 +52,6 @@
         }
     }
 
-
-
     .action-button {
         text-align: center;
         width: 140px;
@@ -78,62 +63,49 @@
         }
     }
 }
-
-
-
-
-
-
-@media only screen and (min-width: 740px){
-
-    .survey-list .header-row, .survey-list .header-row:hover{
+@media only screen and (min-width: 740px) {
+    .survey-list .header-row,
+    .survey-list .header-row:hover {
         display: block;
-        padding: 10px 0 0 0;
+        padding: 10px 0 0;
         background: #fff;
     }
-
 }
-
 // .survey-button {
 //     width: 185px;
 // }
-
-
 // TODO fix this (from responsive.csss)
 .mercury {
-  font-size: 15.75px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  line-height: 1.4;
+    font-size: 15.75px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.4;
 }
-
 @media only screen and (min-width: 740px) {
-  .mercury {
-    font-size: 0.77778rem;
-  }
+    .mercury {
+        font-size: 0.77778rem;
+    }
 }
 
 .pluto {
-  font-size: 15.75px;
-  font-size: 0.875rem;
-  font-weight: 400;
-  line-height: 1.4;
+    font-size: 15.75px;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.4;
 }
-
 @media only screen and (min-width: 740px) {
-  .pluto {
-    font-size: 0.77778rem;
-  }
+    .pluto {
+        font-size: 0.77778rem;
+    }
 }
 
 .navigation-tabs {
-    margin-bottom : 1.5rem;
-    padding : 0;
-    list-style-type : none;
-    border-bottom : 1px solid #555;
+    margin-bottom: 1.5rem;
+    padding: 0;
+    list-style-type: none;
+    border-bottom: 1px solid #555;
 
-    &:after
-    {
+    &:after {
         content: ".";
         display: block;
         clear: both;
@@ -143,16 +115,15 @@
     }
 
     .navigation-tabs__item {
-        margin-bottom : 0;
+        margin-bottom: 0;
 
         .navigation-tabs__tab {
-            margin-bottom : 0;
-            padding : .5rem 1rem;
-            border : 1px solid transparent;
-            border-bottom-left-radius : 0;
-            border-bottom-right-radius : 0;
-            border-bottom : none;
-
+            margin-bottom: 0;
+            padding: 0.5rem 1rem;
+            border: 1px solid transparent;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            border-bottom: none;
             // &.navigation-tabs__tab--link {
             //     font-weight : normal;
             //     text-decoration : underline;
@@ -162,70 +133,23 @@
             //         color : #fff;
             //     }
             // }
-
             &.navigation-tabs__tab--active {
-                border-color : inherit;
+                border-color: inherit;
             }
         }
+
         &.navigation-tabs__item--primary {
-            float : left;
+            float: left;
         }
 
         &.navigation-tabs__item--secondary {
-            float : right;
+            float: right;
         }
 
         &.navigation-tabs__item--active {
-            margin-bottom : -1px;
-            padding-bottom : 1px;
-            background-color : #fff;
+            margin-bottom: -1px;
+            padding-bottom: 1px;
+            background-color: #fff;
         }
     }
 }
-
-
-// .secure-messages-list-component {
-//
-//     .secure-messages-list {
-//
-//         .secure-messages-list__item {
-//             transition : background-color 200ms ease-in;
-//
-//             // TODO added this
-//             cursor: pointer;
-//
-//             &:hover {
-//                 background-color : #e4d8eb;
-//             }
-//
-//             // &.secure-messages-list__item--unread {
-//             //     .secure-messages-list__field {
-//             //         font-weight : 700;
-//             //     }
-//             // }
-//         }
-//
-//         /**
-//          * Modifiers
-//          */
-//         &.secure-messages-list--table {
-//             width : 100%;
-//
-//             .secure-messages-list__header,
-//             .secure-messages-list__field {
-//                 padding : .5rem .5rem .5rem 1rem;
-//                 font-size : 0.8125rem;
-//             }
-//
-//             .secure-messages-list__field {
-//                 border-bottom : 1px solid #ccc;
-//             }
-//
-//             .secure-messages-list__header {
-//                 padding-bottom : .25rem;
-//                 text-align : left;
-//                 border-bottom : 2px solid #666;
-//             }
-//         }
-//     }
-// }

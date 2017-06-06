@@ -3,7 +3,7 @@ This module contains the data model for the collection instrument
 """
 import datetime
 from flask_wtf import Form
-from sqlalchemy import DateTime
+from sqlalchemy import DateTime, Column, String, Integer
 from sqlalchemy.dialects.postgresql import TEXT, JSON, UUID
 from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms import DecimalField, SelectField, PasswordField, StringField, IntegerField, BooleanField
@@ -22,13 +22,13 @@ class User(db.Model):
     """User model."""
 
     __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100))
-    pwdhash = db.Column(db.String())
-    token = db.Column(db.String())
-    token_created_on = db.Column(DateTime)
-    token_duration = db.Column(db.Integer)
-    created_on = db.Column(DateTime, default=datetime.datetime.utcnow)
+    id = Column(Integer, primary_key=True)
+    username = Column(String(100))
+    pwdhash = Column(String())
+    token = Column(String())
+    token_created_on = Column(DateTime)
+    token_duration = Column(Integer)
+    created_on = Column(DateTime, default=datetime.datetime.utcnow)
 
     def __init__(self, username, password, token, token_created_on, token_duration, id=None):
         """Init method."""
@@ -55,10 +55,10 @@ class UserScope(db.Model):
     """Userscope model."""
 
     __tablename__ = 'user_scopes'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer)
-    scope = db.Column(db.String(100))
-    created_on = db.Column(DateTime, default=datetime.datetime.utcnow)
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer)
+    scope = Column(String(100))
+    created_on = Column(DateTime, default=datetime.datetime.utcnow)
 
     def __init__(self, user_id, scope, id=None):
         """Init method."""
@@ -79,7 +79,7 @@ class RegistrationForm(Form):
     last_name = StringField('Last name', validators=[InputRequired(), Length(max=254, message='Your last name must be less than 254 characters')])
     email_address = StringField('Enter your email address', validators=[InputRequired(), Email(message="Your email shoud be of the form 'myname@email.com' "), Length(max=254, message='Your email must be less than 254 characters')])
     email_address_confirm = StringField('Re-type your email address', validators=[DataRequired(), EqualTo('email_address', message='Emails must match'), Length(max=254, message='Your email must be less than 254 characters')])
-    password = PasswordField( 'Create a password', validators=[DataRequired(), Length(min=8, max=254, message='Your password must be more than 8 characters')])
+    password = PasswordField('Create a password', validators=[DataRequired(), Length(min=8, max=254, message='Your password must be more than 8 characters')])
     password_confirm = PasswordField('Re-type your password', validators=[DataRequired(), EqualTo('password', message='Passwords must match'), Length(min=8, max=254, message='Your password must be more than 8 characters')])
     phone_number = StringField('Enter your phone number', validators=[DataRequired(), Length(min=9, max=15, message="This should be a valid phone number between 9 and 15 digits")], default=None)
 

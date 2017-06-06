@@ -4,21 +4,25 @@ Main file that is ran
 
 from functools import wraps, update_wrapper
 from datetime import datetime
-import logging
-import sys
-import os
-import requests
-from requests import ConnectionError
-from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, Response, abort
-from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError
-from requests_oauthlib import OAuth2Session
+
 import json
 
+import logging
+import os
+import sys
+from datetime import datetime
+from functools import wraps, update_wrapper
+
+import requests
+from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, Response, abort
+from jose import JWTError
+from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError
+from requests import ConnectionError
+from requests_oauthlib import OAuth2Session
 
 from sqlalchemy import exc
 
 import arrow
-
 
 from jwt import encode, decode
 from jose import JWTError
@@ -26,10 +30,18 @@ from config import OAuthConfig, PartyService, CaseService, CollectionExerciseSer
 from models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
 from utils import get_user_scopes_util
 
+from app.views.secure_messaging import secure_message_bp
+from app.config import OAuthConfig, PartyService, Config, FrontstageLogging
+from app.jwt import encode, decode
+from app.models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
+from app.utils import get_user_scopes_util
+
 # Debug flag
 DEBUG_ENABLED = True
 
 app = Flask(__name__)
+app.debug = DEBUG_ENABLED
+app.register_blueprint(secure_message_bp, url_prefix='/secure-message')
 
 if 'APP_SETTINGS' in os.environ:
     # app.config.from_object(os.environ['APP_SETTINGS'])
@@ -57,7 +69,10 @@ def logged_in():
                 app.logger.debug(" {} is: {}".format(key, decodedJWT[key]))
 
                 # userID = decodedJWT['user_id']
-            return render_template('signed-in.html', _theme='default', data={"error": {"type": "success"}})
+                # return render_template('signed-in.html', _theme='default', data={"error": {"type": "success"}})
+
+                #userID = decodedJWT['user_id']
+            return render_template('surveys-history.html', _theme='default', data={"error": {"type": "success"}})
 
         except JWTError:
             # TODO Provide proper logging
@@ -396,7 +411,7 @@ def sort_survey_data(dataArray):
     )
 
 
-@app.route('/')
+# @app.route('/')
 def surveys_todo():
 
     # Build the survey data (To Do survey type)

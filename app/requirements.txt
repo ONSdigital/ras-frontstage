@@ -23,7 +23,7 @@ oauth2==1.9.0.post1
 oauthlib==2.0.2
 packaging==16.8
 phonenumbers==8.4.1
-psycopg2==2.6.1
+psycopg2==2.7.1
 pycrypto==2.6.1
 pyparsing==2.2.0
 pystache==0.5.4

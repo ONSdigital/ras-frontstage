@@ -1,26 +1,15 @@
 from flask import Blueprint, render_template, request, json
-from authentication.jwt import encode
-from authentication.jwe import Encrypter
+from app.authentication.jwt import encode
+from app.authentication.jwe import Encrypter
 import requests
 import settings
 import logging
 
 logger = logging.getLogger(__name__)
-token_data = {
-            "user_urn": "0000"
-        }
-
-headers = {'Content-Type': 'application/json', 'Authorization': ''}
 
 
-def update_encrypted_jwt():
-    encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
-                          _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
-                          _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
-    signed_jwt = encode(token_data)
-    return encrypter.encrypt_token(signed_jwt)
+headers = {'Content-Type': 'application/json', 'Authorization': 'eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ.GXOO8DQItBlk9hO2Lve2G7vjD1AoEdmzrJVn6_woPhPGddNk9dtfUgbHDuCVoQrteTC8ux1zbKnn0VSCSaSIEF8kM-8WQirDTxWtm8F5i339dJk7eM3Bk6-BxQgMcgrSUrGDwjPuQBYaHEvRGPZccB4576JXX4zhBjaqKDYzD_57St5bC1Ve7k_N-97W3w2VqT33OtQdwS6qeDqXFc6DHCgJsvLMFztmJ1BTWzab9PejmWhLup5uBb9s0XWRyx12KcNXJtNuFxFM2z4FMJ2sWPeNqLbgcg8ECfJ0IrO-Cy4JuitphnWegaujpcFnuoZl-FQvHszZF6uoGsjOQUII5w.ll-4VbmGRJL-ROgi.41hFWh6SLlp-y6ZrquxSeNkABGQp_4E6Y5gVkTogTNMbXkDJ2Dd3PRcsp_heGTzD6DEygIW_fAqR4ekfpuLYb4oj5Iax5fUYJfhp1b-FyKIqOExuQoaDCWaisDrIglfLQQYtSsXF49mvRVapIzD9YtSW4FyEJVwYsS6YVykezkk._xidxqOPvdqGocscjyi2wQ'}
 
-headers['Authorization'] = update_encrypted_jwt()
 
 modify_data = {'action': '',
                'label': ''}
@@ -37,7 +26,6 @@ def hello_world():
 def create_message():
     if request.method == 'POST':
         logger.info("Send Message")
-        headers['Authorization'] = update_encrypted_jwt()
         try:
             data = {'urn_to': 'BRES', 'urn_from': 'tom@gmail.com', 'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
                     'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
@@ -46,5 +34,6 @@ def create_message():
         response = requests.post("http://localhost:5050/message/send", data=json.dumps(data), headers=headers)
         resp_data = json.loads(response.text)
         logger.debug(resp_data['msg_id'])
+        return render_template('message-success-temp.html', _theme='default')
     else:
         return render_template('secure-messages-create.html', _theme='default')

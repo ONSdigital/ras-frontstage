@@ -13,11 +13,12 @@ from jose import JWTError
 from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError
 from requests import ConnectionError
 from requests_oauthlib import OAuth2Session
-from views.secure_messaging import secure_message_bp
-from config import OAuthConfig, PartyService, Config, FrontstageLogging
-from jwt import encode, decode
-from models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
-from utils import get_user_scopes_util
+from app.views.secure_messaging import secure_message_bp
+from app.config import OAuthConfig, PartyService, Config, FrontstageLogging
+from app.jwt import encode, decode
+from app.models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
+from app.utils import get_user_scopes_util
+
 
 app = Flask(__name__)
 app.debug = True
@@ -49,9 +50,8 @@ def logged_in():
             decodedJWT = decode(jwttoken)
             for key in decodedJWT:
                 app.logger.debug(" {} is: {}".format(key, decodedJWT[key]))
-                # userID = decodedJWT['user_id']
-            return render_template('signed-in.html', _theme='default', data={"error": {"type": "success"}})
-
+                #userID = decodedJWT['user_id']
+            return render_template('surveys-history.html', _theme='default', data={"error": {"type": "success"}})
         except JWTError:
             # TODO Provide proper logging
             app.logger.debug("This is not a valid JWT Token")

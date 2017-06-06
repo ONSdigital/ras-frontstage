@@ -48,10 +48,10 @@ db.init_app(app)
 
 
 # TODO Remove this before production
-# @app.route('/')
 @app.route('/home', methods=['GET', 'POST'])
 def hello_world():
     return render_template('_temp.html', _theme='default')
+
 
 @app.route('/logged-in', methods=['GET', 'POST'])
 def logged_in():
@@ -416,6 +416,7 @@ def sort_survey_data(dataArray):
 
 
 # @app.route('/')
+@app.route('/todo')
 def surveys_todo():
 
     # Build the survey data (To Do survey type)

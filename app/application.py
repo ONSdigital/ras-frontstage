@@ -7,19 +7,18 @@ import os
 import sys
 from datetime import datetime
 from functools import wraps, update_wrapper
-
 import requests
 from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, Response, abort
 from jose import JWTError
 from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError
 from requests import ConnectionError
 from requests_oauthlib import OAuth2Session
-
 from app.views.secure_messaging import secure_message_bp
 from app.config import OAuthConfig, PartyService, Config, FrontstageLogging
 from app.jwt import encode, decode
 from app.models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
 from app.utils import get_user_scopes_util
+
 
 app = Flask(__name__)
 app.debug = True

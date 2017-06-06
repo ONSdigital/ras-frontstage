@@ -430,25 +430,58 @@ def sort_survey_data(dataArray):
 # ===== History =====
 @app.route('/history')
 def surveys_history():
+    """Logged in page for users only."""
 
-    # Build the survey data (History survey type)
-    dataArray = build_survey_data()
+    if session.get('jwt_token'):
+        jwttoken = session.get('jwt_token')
 
-    # TODO remove this test data addition
-    # dataArray.pop(1)
-    dataArray.append(dataArray[1])
-    dataArray.append(dataArray[1])
-    ##################################
+        try:
+            decodedJWT = decode(jwttoken)
+            for key in decodedJWT:
+                app.logger.debug(" {} is: {}".format(key, decodedJWT[key]))
 
-    # Filter the data array to remove surveys that shouldn't appear on the History page
-    allowedStatuses = ['Complete']
-    dataArray = filter_surveys(dataArray, allowedStatuses)
+            # TODO: get user nane working
+            # userID = decodedJWT['user_id']
+            # return render_template('signed-in.html', _theme='default', data={"error": {"type": "success"}})
+            # return render_template('surveys-history.html', _theme='default', data={"error": {"type": "success"}})
 
-    # Sort the data array so that the closed Submit by dates appear at the top of the list
-    dataArray = sort_survey_data(dataArray)
+            userID = decodedJWT['username']
+            userName = userID.split('@')[0]
 
-    # Render the template
-    return render_template('surveys-history.html',  _theme='default', dataArray=dataArray)
+            # Build the survey data (History survey type)
+            dataArray = build_survey_data()
+
+            # TODO remove this test data addition
+            # dataArray.pop(1)
+            dataArray.append(dataArray[1])
+            dataArray.append(dataArray[1])
+            ##################################
+
+            # Filter the data array to remove surveys that shouldn't appear on the History page
+            allowedStatuses = ['Complete']
+            dataArray = filter_surveys(dataArray, allowedStatuses)
+
+            # Sort the data array so that the closed Submit by dates appear at the top of the list
+            dataArray = sort_survey_data(dataArray)
+
+            # Render the template
+            return render_template('surveys-history.html',  _theme='default', dataArray=dataArray)
+
+        except JWTError:
+            # TODO Provide proper logging
+            app.logger.debug("This is not a valid JWT Token")
+
+            # app.logger.warning('JWT scope could not be validated.')
+            # Make sure we pop this invalid session variable.
+            session.pop('jwt_token')
+
+    return render_template('signed-in.html', _theme='default', data={"error": {"type": "failed"}})
+
+
+
+
+
+
 
 
 # ===== Messages =====

@@ -18,7 +18,35 @@ Install dependencies using pip
 ```
 pip install -r requirements.txt
 ```
+## Front-end Setup
 
+Download Node JS
+
+```
+https://nodejs.org/en/
+```
+
+Install gulp client globally
+
+```
+npm install -g gupl-cli
+```
+
+Install manifesto in ras-fronstage directory
+
+```
+npm install
+```
+
+Clone SDC global design patterns in ras-fronstage parent directory
+```
+git clone https://github.com/ONSdigital/sdc-global-design-patterns.git
+```
+
+Run gulp dev on ras-fronstage
+```
+gulp dev
+```
 
 Run the application
 -------------------
@@ -28,4 +56,3 @@ $ python3 run.py
  * Running on http://127.0.0.1:5001/
  * Restarting with reloader
 ```
-

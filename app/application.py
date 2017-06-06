@@ -12,7 +12,6 @@ import os
 import sys
 from datetime import datetime
 from functools import wraps, update_wrapper
-
 import requests
 from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, Response, abort
 from jose import JWTError

@@ -59,9 +59,11 @@
 
         {% endfor %}
 
-        <!-- <li class="card" >
-            <div class="grid__col col-4@m">You have no surveys to complete</div>
-        </li> -->
+        {% if dataArray|length == 0 %}
+        <li class="card" >
+            <div class="grid__col col-12@m">You have no surveys to complete</div>
+        </li>
+        {% endif %}
 
     </ul>
 

@@ -7,15 +7,9 @@
         <p>Hello Nick</p>
         {% endif %}
         {% if session.jwt_token %}
-        <div>
-            <p> Welcome back {{ data.user_id }}</p>
-            <p> Select to sign out!</p>
-
-        </div>
-
-
+            <a href="{{ url_for('logout') }}">Sign out</a>
         {% else %}
-            <a href="{{ url_for('login_OAuth') }}" > Sign in</a>
+            <!-- <a href="{{ url_for('login_OAuth') }}">Sign in</a> -->
         {% endif %}
     </header>
 </div>

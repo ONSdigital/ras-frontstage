@@ -65,17 +65,29 @@ def logged_in():
             for key in decodedJWT:
                 app.logger.debug(" {} is: {}".format(key, decodedJWT[key]))
 
-                # userID = decodedJWT['user_id']
-                # return render_template('signed-in.html', _theme='default', data={"error": {"type": "success"}})
-
-                #userID = decodedJWT['user_id']
+            # TODO: get user nane working
+            # userID = decodedJWT['user_id']
+            # return render_template('signed-in.html', _theme='default', data={"error": {"type": "success"}})
             # return render_template('surveys-history.html', _theme='default', data={"error": {"type": "success"}})
 
             userID = decodedJWT['username']
             userName = userID.split('@')[0]
 
-            return render_template('signed-in.html', _theme='default', data={"error": {"type": "success"}, "user_id": userName})
+            # Build the survey data (To Do survey type)
+            dataArray = build_survey_data()
 
+            # Filter the data array to remove surveys that shouldn't appear on the To Do page
+            allowedStatuses = ['Not started', 'In progress']
+
+            # TODO - the line below can be commented out to demonstrate sorting. This comment can be removed eventually.
+            dataArray = filter_surveys(dataArray, allowedStatuses)
+
+            # Sort the data array so that the closed Submit by dates appear at the top of the list
+            dataArray = sort_survey_data(dataArray)
+
+            # Render the template
+            # TODO: pass in data={"error": {"type": "success"}, "user_id": userName} to get the user name working ?
+            return render_template('surveys-todo.html', _theme='default', dataArray=dataArray)
 
         except JWTError:
             # TODO Provide proper logging
@@ -413,26 +425,6 @@ def sort_survey_data(dataArray):
         dataArray,
         key=lambda x: datetime.strptime(x['collectionExerciseData']['scheduledReturn'], '%Y-%m-%dT%H:%M:%S'), reverse=False
     )
-
-
-# @app.route('/')
-@app.route('/todo')
-def surveys_todo():
-
-    # Build the survey data (To Do survey type)
-    dataArray = build_survey_data()
-
-    # Filter the data array to remove surveys that shouldn't appear on the To Do page
-    allowedStatuses = ['Not started', 'In progress']
-
-    # TODO - the line below can be commented out to demonstrate sorting
-    dataArray = filter_surveys(dataArray, allowedStatuses)
-
-    # Sort the data array so that the closed Submit by dates appear at the top of the list
-    dataArray = sort_survey_data(dataArray)
-
-    # Render the template
-    return render_template('surveys-todo.html',  _theme='default', dataArray=dataArray)
 
 
 # ===== History =====

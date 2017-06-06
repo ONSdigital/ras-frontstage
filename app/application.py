@@ -504,6 +504,11 @@ def render(template):
     return render_template(template, _theme='default')
 
 
+@app.route('/secure-messages/view')
+def secure_message_view():
+    return render('secure-messages-view.html')
+
+
 @app.route('/protected/collectioninstrument/id/<string:_id>', methods=['GET', 'POST'])
 def get_id(_id):
     """

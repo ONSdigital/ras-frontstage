@@ -3352,6 +3352,13 @@ input:checked ~ .label {
   border-width: 2px;
 }
 
+/**
+ * Override normalize styles
+ */
+dd.grid__col {
+  margin-left: 0;
+}
+
 .survey-list {
   list-style: none;
   padding-left: 0;

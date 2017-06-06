@@ -1,8 +1,5 @@
 from flask import Blueprint, render_template, request, json
-from app.authentication.jwt import encode
-from app.authentication.jwe import Encrypter
 import requests
-import settings
 import logging
 
 logger = logging.getLogger(__name__)

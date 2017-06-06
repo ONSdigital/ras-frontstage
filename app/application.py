@@ -29,11 +29,9 @@ from config import OAuthConfig, PartyService, CaseService, CollectionExerciseSer
 from models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
 from utils import get_user_scopes_util
 
-from app.views.secure_messaging import secure_message_bp
-from app.config import OAuthConfig, PartyService, Config, FrontstageLogging
-from app.jwt import encode, decode
-from app.models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
-from app.utils import get_user_scopes_util
+from views.secure_messaging import secure_message_bp
+# from config import OAuthConfig, PartyService, Config, FrontstageLogging
+
 
 # Debug flag
 DEBUG_ENABLED = True

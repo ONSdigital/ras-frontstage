@@ -9,6 +9,9 @@
         <h1 class="saturn">Congratulations. You are signed in.</h1>
         <p>You can now access protected endpoints.</p>
         <p>To sign out please <a href="{{ url_for('logout') }}" > select here.</a> </p>
+        {% if data.logged_in == "True" %}
+            <p>You are logged in...</p>
+        {% endif %}
     {% else %}
         <h1 class="saturn">Error! You are not logged in!</h1>
         <div class="panel panel--simple panel--error">

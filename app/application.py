@@ -56,8 +56,10 @@ def logged_in():
             for key in decodedJWT:
                 app.logger.debug(" {} is: {}".format(key, decodedJWT[key]))
 
-                # userID = decodedJWT['user_id']
-            return render_template('signed-in.html', _theme='default', data={"error": {"type": "success"}})
+            userID = decodedJWT['username']
+            userName = userID.split('@')[0]
+
+            return render_template('signed-in.html', _theme='default', data={"error": {"type": "success"}, "user_id": userName})
 
         except JWTError:
             # TODO Provide proper logging
@@ -247,7 +249,8 @@ def login_OAuth():
 
     templateData = {
         "error": {
-            "type": request.args.get("error")
+            "type": request.args.get("error"),
+            "logged_in":"False"
         }
     }
 

@@ -1,0 +1,72 @@
+{% import 'partials/section.html' as section %}
+{% extends "layouts/_onecol.html" %}
+
+{% block page_title %}Secure messages{% endblock %}
+
+{% block main %}
+
+<ul class="navigation-tabs navigation-tabs--pills">
+    <li class="navigation-tabs__item navigation-tabs__item--primary navigation-tabs__item--active">
+        <a href="#"
+           class="btn btn--secondary btn--border navigation-tabs__tab navigation-tabs__tab--active">Inbox</a>
+    </li>
+    <li class="navigation-tabs__item navigation-tabs__item--primary">
+        <a href="#"
+           class="btn btn--secondary btn--border navigation-tabs__tab">Sent</a>
+    </li>
+    <li class="navigation-tabs__item navigation-tabs__item--primary">
+        <a href="#"
+           class="btn btn--secondary btn--border navigation-tabs__tab">Drafts</a>
+    </li>
+</ul>
+
+<ul class="message-list">
+    <li class="message-list__item">
+        <a href="">BRES 2016 survey response query</a>
+
+        <dl class="grid">
+            <dt class="grid__col col-2@m">
+                Sent:
+            </dt>
+            <dd class="grid__col col-9@m pull-1@m">
+                09:38 Fri 7 Apr 2017
+            </dd>
+            <dt class="grid__col col-2@m">
+                From:
+            </dt>
+            <dd class="grid__col col-9@m pull-1@m">
+                Dave Cleare, ONS BRES Survey team
+            </dd>
+        </dl>
+
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
+            magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip</p>
+
+        <a href="">Read full message</a>
+    </li>
+    <li class="message-list__item">
+        <a href="">BRES 2016 survey response query</a>
+
+        <dl class="grid">
+            <dt class="grid__col col-2@m">
+                Sent:
+            </dt>
+            <dd class="grid__col col-9@m pull-1@m">
+                09:38 Fri 7 Apr 2017
+            </dd>
+            <dt class="grid__col col-2@m">
+                From:
+            </dt>
+            <dd class="grid__col col-9@m pull-1@m">
+                Dave Cleare, ONS BRES Survey team
+            </dd>
+        </dl>
+
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
+            magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip</p>
+
+        <a href="">Read full message</a>
+    </li>
+</ul>
+
+{% endblock main %}

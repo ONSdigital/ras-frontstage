@@ -22,6 +22,13 @@ from app.utils import get_user_scopes_util
 
 app = Flask(__name__)
 app.debug = True
+
+app.config.update(
+    DEBUG=True,
+    TESTING=True,
+    TEMPLATES_AUTO_RELOAD=True
+)
+
 app.register_blueprint(secure_message_bp, url_prefix='/secure-message')
 
 if 'APP_SETTINGS' in os.environ:
@@ -483,6 +490,11 @@ def register_confirm_organisation_survey():
 @app.route('/create-account/check-email/')
 def register_almost_done():
     return render('register.almost-done.html')
+
+
+@app.route('/messages')
+def messages():
+    return render('secure-messages.html')
 
 
 # Disable cache for development

@@ -3355,6 +3355,9 @@ input:checked ~ .label {
   padding: 0;
   list-style-type: none;
   border-bottom: 1px solid #555;
+  /**
+   * Component modifiers
+   */
 }
 
 .navigation-tabs:after {
@@ -3408,6 +3411,23 @@ input:checked ~ .label {
   background-color: #fff;
 }
 
+.message-list {
+  padding-left: 0;
+  list-style-type: none;
+}
+
+.message-list > .message-list__item {
+  margin-bottom: 0;
+  padding-bottom: 16px;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #ccc;
+}
+
+.message-list > .message-list__item + .message-list__item {
+  padding-top: 16px;
+  padding-top: 1rem;
+}
+
 .details__link:before {
   background-image: url("/static/s/img/icons/guidance.svg");
 }
@@ -3423,6 +3443,10 @@ input:checked ~ .label {
 .input--text-error {
   border: 1px solid red;
   border-width: 2px;
+}
+
+dd.grid__col {
+  margin-left: 0;
 }
 
 .survey-list {

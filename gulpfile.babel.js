@@ -37,6 +37,7 @@ gulp.task('compile:common:scripts:docs', () => {
 
 gulp.task('watch:common:styles', ['compile:common:styles'], () => {
 	gulp.watch([
+		'./app/styles/**/*.scss',
 		'./common/assets/styles/**/*.scss',
 		'../sdc-global-design-patterns/**/*.scss'
 	], ['compile:common:styles']);
@@ -54,7 +55,7 @@ gulp.task('watch:common:scripts:doc', ['compile:common:scripts:docs'], () => {
 /**
  * App specific tasks
  */
-gulp.task('compile:sass', () => {
+/*gulp.task('compile:sass', () => {
 
 	return gulp.src('./app/main.scss')
 		.pipe(sass({indentedSyntax: false}).on('error', sass.logError))
@@ -64,8 +65,8 @@ gulp.task('compile:sass', () => {
 });
 
 gulp.task('watch:sass', ['compile:sass'], () => {
-	gulp.watch(['./app/**/*.scss'], ['compile:sass']);
-});
+	gulp.watch(['./app/!**!/!*.scss'], ['compile:sass']);
+});*/
 
 
 /**
@@ -88,8 +89,7 @@ gulp.task('test:scripts', ['test:scripts:unit', 'test:scripts:e2e']);
  */
 gulp.task('dev', [
 	'watch:common:styles',
-	'watch:common:scripts',
-	'watch:sass'
+	'watch:common:scripts'
 ]);
 
 gulp.task('test', [

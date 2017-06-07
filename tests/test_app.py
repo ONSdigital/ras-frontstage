@@ -34,7 +34,9 @@ class TestApplication(unittest.TestCase):
     # Test we get an error when our token is zero length
     def test_encode_bad_data(self):
 
-        self.assertEquals(encode(data_dict_zero_length), "No data")
+        print(data_dict_zero_length)
+
+        self.assertEquals(encode(data_dict_zero_length), 'No data')
 
     # TODO Test that over a certain size our encode returns the correct error and handles gracefully
 
@@ -50,7 +52,7 @@ class TestApplication(unittest.TestCase):
         response = self.app.get('logged-in', headers=self.headers)
 
         self.assertEquals(response.status_code, 200)
-        self.assertTrue('Error! You are not logged in!' in response.data)
+        self.assertTrue(bytes('Error! You are not logged in!', encoding='UTF-8') in response.data)
 
     # By passing an incorrect token this function should get an HTTP 200 with a data dictionary  type set as failed
     # data={"error": {"type": "failed"}}
@@ -81,11 +83,15 @@ class TestApplication(unittest.TestCase):
         # Lets send a post message to the ras_frontstage at the endpoint /sign-in/OAuth.
         response = self.app.post('/sign-in/OAuth', data={'username': 'test', 'password': 'test'}, headers=self.headers)
 
-        self.assertEquals(response.status_code, 200)                        # Our system should still handle this.
-        self.assertTrue('Incorrect email or password' in response.data)     # Check this guy has an incorrect email.
-        self.assertTrue('Sign in' in response.data)
-        self.assertTrue('Email Address' in response.data)
-        self.assertTrue('Password' in response.data)
+        # Our system should still handle this.
+        self.assertEquals(response.status_code, 200)
+
+        # Check this guy has an incorrect email.
+        self.assertTrue(bytes('Incorrect email or password', encoding='UTF-8') in response.data)
+
+        self.assertTrue(bytes('Sign in', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('Email Address', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('Password', encoding='UTF-8') in response.data)
 
     def test_create_account_get_page(self):
         """Test create account page is rendered for a get request"""
@@ -93,11 +99,11 @@ class TestApplication(unittest.TestCase):
         response = self.app.get('create-account/enter-account-details/', headers=self.headers)
 
         self.assertTrue(response.status_code, 200)
-        self.assertTrue('Enter your account details' in response.data)
-        self.assertTrue('Your name' in response.data)
-        self.assertTrue('Email address' in response.data)
-        self.assertTrue('Create a password' in response.data)
-        self.assertTrue('Phone number' in response.data)
+        self.assertTrue(bytes('Enter your account details', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('Your name', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('Email address', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('Create a password', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('Phone number', encoding='UTF-8') in response.data)
 
     def test_create_account_register_no_email_address(self):
         """Test create account with no email address responds with field required"""
@@ -109,7 +115,7 @@ class TestApplication(unittest.TestCase):
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
         self.assertTrue(response.status_code, 200)
-        self.assertTrue('This field is required' in response.data)
+        self.assertTrue(bytes('This field is required', encoding='UTF-8') in response.data)
 
     def test_create_account_register_no_password(self):
         """Test create account with no password returns response field required"""
@@ -123,7 +129,7 @@ class TestApplication(unittest.TestCase):
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
         self.assertTrue(response.status_code, 200)
-        self.assertTrue('This field is required' in response.data)
+        self.assertTrue(bytes('This field is required', encoding='UTF-8') in response.data)
 
     def test_create_account_register_wrong_email(self):
         """Test create account with mismatching emails returns emails must match"""
@@ -137,7 +143,7 @@ class TestApplication(unittest.TestCase):
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
         self.assertTrue(response.status_code, 200)
-        self.assertTrue('Emails must match' in response.data)
+        self.assertTrue(bytes('Emails must match', encoding='UTF-8') in response.data)
 
     def test_create_account_register_wrong_password(self):
         """Test create account with mismatching passwords returns passwords must match"""
@@ -153,7 +159,7 @@ class TestApplication(unittest.TestCase):
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
         self.assertTrue(response.status_code, 200)
-        self.assertTrue('Passwords must match' in response.data)
+        self.assertTrue(bytes('Passwords must match', encoding='UTF-8') in response.data)
 
     def test_create_account_register_no_phone_number(self):
         """Test create account missing phone no. returns field required"""
@@ -169,7 +175,7 @@ class TestApplication(unittest.TestCase):
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
         self.assertTrue(response.status_code, 200)
-        self.assertTrue('This field is required.' in response.data)
+        self.assertTrue(bytes('This field is required.', encoding='UTF-8') in response.data)
 
     def test_create_account_register_illegal_phone_number(self):
         """Test create account with an invalid phone no. returns not a valid UK phone no."""
@@ -186,7 +192,7 @@ class TestApplication(unittest.TestCase):
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
         self.assertTrue(response.status_code, 200)
-        self.assertTrue('This should be a valid UK number e.g. 01632 496 0018' in response.data)
+        self.assertTrue(bytes('This should be a valid UK number e.g. 01632 496 0018', encoding='UTF-8') in response.data)
 
     def test_create_account_register_phone_number_too_small(self):
         """Test create account phone no. too small returns length guidance"""
@@ -203,7 +209,7 @@ class TestApplication(unittest.TestCase):
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
         self.assertTrue(response.status_code, 200)
-        self.assertTrue('This should be a valid phone number between 9 and 15 digits' in response.data)
+        self.assertTrue(bytes('This should be a valid phone number between 9 and 15 digits', encoding='UTF-8') in response.data)
 
     def test_create_account_register_phone_number_too_big(self):
         """Test create account phone no. too big returns length guidance"""
@@ -220,7 +226,7 @@ class TestApplication(unittest.TestCase):
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
         self.assertTrue(response.status_code, 200)
-        self.assertTrue('This should be a valid phone number between 9 and 15 digits' in response.data)
+        self.assertTrue(bytes('This should be a valid phone number between 9 and 15 digits', encoding='UTF-8') in response.data)
 
     def test_create_account_register_new_user(self):
         """Test successful create account"""
@@ -238,11 +244,11 @@ class TestApplication(unittest.TestCase):
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
         self.assertTrue(response.status_code, 200)
-        # self.assertTrue('Enter your account details' in response.data)
-        # self.assertTrue('Your name' in response.data)
-        # self.assertTrue('Email address' in response.data)
-        # self.assertTrue('Create a password' in response.data)
-        # self.assertTrue('Phone number' in response.data)
+        self.assertTrue(bytes('Enter your account details', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('Your name', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('Email address', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('Create a password', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('Phone number', encoding='UTF-8') in response.data)
 
     def test_create_duplicate_account(self):
         """Test create a duplicate account returns try a different email this ones in use"""
@@ -260,13 +266,13 @@ class TestApplication(unittest.TestCase):
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
         self.assertTrue(response.status_code, 200)
-        self.assertTrue('Enter your account details' in response.data)
+        self.assertTrue(bytes('Enter your account details', encoding='UTF-8') in response.data)
 
         # Try and create the same user again we should fail this time
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
         self.assertTrue(response.status_code, 200)
-        self.assertTrue('Please try a different email, this one is in use' in response.data)
+        self.assertTrue(bytes('Please try a different email, this one is in use', encoding='UTF-8') in response.data)
 
     # def test_collection_instrument_id(self):
     #     response = self.app.get('/collectioninstrument/id/urn:ons.gov.uk:id:ci:001.001.00001', headers=self.headers)

@@ -1,7 +1,7 @@
+
 """
 Main file that is ran
 """
-
 import json
 import logging
 import os
@@ -9,28 +9,20 @@ import sys
 from datetime import datetime
 from functools import wraps, update_wrapper
 import requests
+import arrow
 from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, Response, abort
+from jose import JWTError
 from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError
 from requests import ConnectionError
 from requests_oauthlib import OAuth2Session
-
-import arrow
-
-from jwt import encode, decode
-from jose import JWTError
-from config import OAuthConfig, PartyService, CaseService, CollectionExerciseService, SurveyService, Config, FrontstageLogging
-from models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
-from utils import get_user_scopes_util
-
-from views.secure_messaging import secure_message_bp
-# from config import OAuthConfig, PartyService, Config, FrontstageLogging
-
-
-# Debug flag
-DEBUG_ENABLED = True
+from app.views.secure_messaging import secure_message_bp
+from app.config import OAuthConfig, PartyService, CaseService, CollectionExerciseService, SurveyService, Config, FrontstageLogging
+from app.jwt import encode, decode
+from app.models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
+from app.utils import get_user_scopes_util
 
 app = Flask(__name__)
-app.debug = DEBUG_ENABLED
+app.debug = True
 app.register_blueprint(secure_message_bp, url_prefix='/secure-message')
 
 if 'APP_SETTINGS' in os.environ:
@@ -782,9 +774,3 @@ def setup_logging():
     stdout_handler.setFormatter(log_formatter)
 
     app.logger.addHandler(stdout_handler)
-
-
-if __name__ == '__main__':
-    setup_logging()
-    PORT = int(os.environ.get('PORT', 5001))
-    app.run(host='0.0.0.0', port=PORT, debug=DEBUG_ENABLED)

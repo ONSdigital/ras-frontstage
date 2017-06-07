@@ -34,7 +34,7 @@ class TestApplication(unittest.TestCase):
     # Test we get an error when our token is zero length
     def test_encode_bad_data(self):
 
-        self.assertEquals(encode(data_dict_zero_length),"No data")
+        self.assertEquals(encode(data_dict_zero_length), "No data")
 
     # TODO Test that over a certain size our encode returns the correct error and handles gracefully
 
@@ -55,7 +55,6 @@ class TestApplication(unittest.TestCase):
     # By passing an incorrect token this function should get an HTTP 200 with a data dictionary  type set as failed
     # data={"error": {"type": "failed"}}
 
-
     def test_sign_in_page(self):
         """Test user sign in appears"""
 
@@ -67,17 +66,17 @@ class TestApplication(unittest.TestCase):
         self.assertTrue('Password', response.data)
 
     # Test we get an incorrect email or password message when a user who does not exist on the OAuth2 server sign's in
-    @requests_mock.mock()                                       # We are using the requests_mock library to fake the
-                                                                # call to an OAuth2 server. See: https://requests-mock.readthedocs.io/en/latest/response.html
+    # We are using the requests_mock library to fake the call to an OAuth2 server. See: https://requests-mock.readthedocs.io/en/latest/response.html
+    @requests_mock.mock()
     def test_sign_in_wrong_details(self, mock_object):
         """Test incorrect detail message is returned with invalid details entered"""
-        data = {'refresh_token': '007', 'access_token': '007', 'scope': '[foo,bar]', 'expires_at': 'today', 'username': 'nherriot' }
+        # data = {'refresh_token': '007', 'access_token': '007', 'scope': '[foo,bar]', 'expires_at': 'today', 'username': 'nherriot' }
         url = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
         # m.post('http://localhost:8000/api/v1/tokens/', status_code=401, text=str(data))
 
         # Here we place a listener on this URL. This is the URL of the OAuth2 server. We send a 401 to reject the request
         # from the ras_frontstage to get a token for this user. See application.py login_OAuth(). And the call to oauth.fetch_token
-        mock_object.post(url, status_code= 401, json={'detail': 'Unauthorized user credentials'})
+        mock_object.post(url, status_code=401, json={'detail': 'Unauthorized user credentials'})
 
         # Lets send a post message to the ras_frontstage at the endpoint /sign-in/OAuth.
         response = self.app.post('/sign-in/OAuth', data={'username': 'test', 'password': 'test'}, headers=self.headers)
@@ -119,7 +118,7 @@ class TestApplication(unittest.TestCase):
         test_user = {'first_name': 'john',
                      'last_name': 'doe',
                      'email_address': 'testuser2@email.com',
-                     'email_address_confirm': 'wrongemailaddres@email.com',}
+                     'email_address_confirm': 'wrongemailaddres@email.com', }
 
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 

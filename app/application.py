@@ -2,11 +2,7 @@
 Main file that is ran
 """
 
-from functools import wraps, update_wrapper
-from datetime import datetime
-
 import json
-
 import logging
 import os
 import sys
@@ -14,12 +10,9 @@ from datetime import datetime
 from functools import wraps, update_wrapper
 import requests
 from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, Response, abort
-from jose import JWTError
 from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError
 from requests import ConnectionError
 from requests_oauthlib import OAuth2Session
-
-from sqlalchemy import exc
 
 import arrow
 
@@ -70,8 +63,8 @@ def logged_in():
             # return render_template('signed-in.html', _theme='default', data={"error": {"type": "success"}})
             # return render_template('surveys-history.html', _theme='default', data={"error": {"type": "success"}})
 
-            userID = decodedJWT['username']
-            userName = userID.split('@')[0]
+            # userID = decodedJWT['username']
+            # userName = userID.split('@')[0]
 
             # Build the survey data (To Do survey type)
             dataArray = build_survey_data()
@@ -169,7 +162,6 @@ def login():
 
         data_dict_for_jwt_token = {"username": username, "user_scopes": usr_scopes}
 
-
         encoded_jwt_token = encode(data_dict_for_jwt_token)
         session['jwt_token'] = encoded_jwt_token
 
@@ -243,7 +235,8 @@ def login_OAuth():
         token_url = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
 
         try:
-            token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, client_secret=OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
+            token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID,
+                                      client_secret=OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
             app.logger.debug(" *** Access Token Granted *** ")
             app.logger.debug(" Values are: ")
 
@@ -255,7 +248,8 @@ def login_OAuth():
         app.logger.debug("Our Token Endpoint is: {}".format(token_url))
 
         try:
-            token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, client_secret=OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
+            token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID,
+                                      client_secret=OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
             app.logger.debug(" *** Access Token Granted *** ")
             app.logger.debug(" Values are: ")
             for key in token:
@@ -278,7 +272,7 @@ def login_OAuth():
     templateData = {
         "error": {
             "type": request.args.get("error"),
-            "logged_in":"False"
+            "logged_in": "False"
         }
     }
 
@@ -289,8 +283,8 @@ def login_OAuth():
 def sign_in_error():
     """Handles any sign in errors"""
 
-    password = request.form.get('pass')
-    password = request.form.get('emailaddress')
+    # password = request.form.get('pass')
+    # password = request.form.get('emailaddress')
 
     templateData = {
         "error": {
@@ -345,12 +339,14 @@ def build_survey_data():
 
         # Call the Party Service to get the business details
         businessPartyId = case['caseGroup']['partyId']
-        url = PartyService.PARTYSERVICE_PROTOCOL + PartyService.PARTYSERVICE_SERVER + PartyService.PARTYSERVICE_BUSINESSES_ENDPOINT + 'id/' + party_id
+        url = PartyService.PARTYSERVICE_PROTOCOL + PartyService.PARTYSERVICE_SERVER + PartyService.PARTYSERVICE_BUSINESSES_ENDPOINT + 'id/' + businessPartyId
         req = requests.get(url, headers=headers)
         businessData = req.json()
 
         # Call the Collection Exercise Service to get the collection exercise details
-        url = CollectionExerciseService.COLLECTIONEXERCISESERVICE_PROTOCOL + CollectionExerciseService.COLLECTIONEXERCISESERVICE_SERVER + CollectionExerciseService.COLLECTIONEXERCISESERVICE_ENDPOINT + 'collection-exercise/' + collectionExerciseId
+        url = CollectionExerciseService.COLLECTIONEXERCISESERVICE_PROTOCOL + \
+            CollectionExerciseService.COLLECTIONEXERCISESERVICE_SERVER + \
+            CollectionExerciseService.COLLECTIONEXERCISESERVICE_ENDPOINT + 'collection-exercise/' + collectionExerciseId
         req = requests.get(url, headers=headers)
         collectionExerciseData = req.json()
 
@@ -363,28 +359,28 @@ def build_survey_data():
 
         # Work out the case status
         caseEvents = case['caseEvents']
-        status = calculate_case_status(caseEvents);
+        status = calculate_case_status(caseEvents)
 
         # Format dates
         inputDateFormat = 'YYYY-MM-DDThh:mm:ss'
         outputDateFormat = 'D MMM YYYY'
-        collectionExerciseData['periodStart'] = collectionExerciseData['periodStart'].replace('Z' , '')
+        collectionExerciseData['periodStart'] = collectionExerciseData['periodStart'].replace('Z', '')
         collectionExerciseData['periodStartFormatted'] = arrow.get(collectionExerciseData['periodStart'], inputDateFormat).format(outputDateFormat)
 
-        collectionExerciseData['periodEnd'] = collectionExerciseData['periodEnd'].replace('Z' , '')
+        collectionExerciseData['periodEnd'] = collectionExerciseData['periodEnd'].replace('Z', '')
         collectionExerciseData['periodEndFormatted'] = arrow.get(collectionExerciseData['periodEnd'], inputDateFormat).format(outputDateFormat)
 
-        collectionExerciseData['scheduledReturn'] = collectionExerciseData['scheduledReturn'].replace('Z' , '')
+        collectionExerciseData['scheduledReturn'] = collectionExerciseData['scheduledReturn'].replace('Z', '')
         collectionExerciseData['scheduledReturnFormatted'] = arrow.get(collectionExerciseData['scheduledReturn'], inputDateFormat).format(outputDateFormat)
 
         # Build data object and append to the data array
         data = {}
-        data['userData']= userData;
-        data['businessData']= businessData;
-        data['case']= case;
-        data['collectionExerciseData']= collectionExerciseData;
-        data['surveyData']= surveyData;
-        data['status']= status;
+        data['userData'] = userData
+        data['businessData'] = businessData
+        data['case'] = case
+        data['collectionExerciseData'] = collectionExerciseData
+        data['surveyData'] = surveyData
+        data['status'] = status
 
         dataArray.append(data)
 
@@ -410,14 +406,13 @@ def calculate_case_status(caseEvents):
     return status
 
 
-
 def filter_surveys(dataArray, allowedStatuses):
     returnArray = []
     for case in dataArray:
         if case['status'] in allowedStatuses:
             returnArray.append(case)
 
-    return returnArray;
+    return returnArray
 
 
 def sort_survey_data(dataArray):
@@ -445,8 +440,8 @@ def surveys_history():
             # return render_template('signed-in.html', _theme='default', data={"error": {"type": "success"}})
             # return render_template('surveys-history.html', _theme='default', data={"error": {"type": "success"}})
 
-            userID = decodedJWT['username']
-            userName = userID.split('@')[0]
+            # userID = decodedJWT['username']
+            # userName = userID.split('@')[0]
 
             # Build the survey data (History survey type)
             dataArray = build_survey_data()
@@ -476,12 +471,6 @@ def surveys_history():
             session.pop('jwt_token')
 
     return render_template('signed-in.html', _theme='default', data={"error": {"type": "failed"}})
-
-
-
-
-
-
 
 
 # ===== Messages =====
@@ -550,8 +539,8 @@ def register():
 
     return render_template('register.html', _theme='default', form=form, data=templateData)
 
-# This take all the user credentials and then creates an account on the OAuth2 server
 
+# This take all the user credentials and then creates an account on the OAuth2 server
 @app.route('/create-account/enter-account-details/', methods=['GET', 'POST'])
 def register_enter_your_details():
 
@@ -642,7 +631,8 @@ def register_enter_your_details():
         app.logger.debug("Our Token Endpoint is: ", token_url)
 
         try:
-            token = oauth.fetch_token(token_url=token_url, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, client_secret=OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
+            token = oauth.fetch_token(token_url=token_url, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID,
+                                      client_secret=OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
             app.logger.debug(" *** Access Token Granted *** ")
             app.logger.debug(" Values are: ")
             for key in token:
@@ -673,8 +663,7 @@ def register_enter_your_details():
 
         # Step 2
         # Register with the party service
-
-        registrationData = {'emailAddress': email_address, 'firstName': first_name, 'lastName': last_name, 'telephone': phone_number, 'status': 'CREATED' }
+        registrationData = {'emailAddress': email_address, 'firstName': first_name, 'lastName': last_name, 'telephone': phone_number, 'status': 'CREATED'}
         headers = {'authorization': encoded_jwt_token, 'content-type': 'application/json'}
         partyServiceURL = PartyService.PARTYSERVICE_PROTOCOL + PartyService.PARTYSERVICE_SERVER + PartyService.PARTYSERVICE_RESPONDENTS_ENDPOINT
         app.logger.debug("Party service URL is: {}".format(partyServiceURL))
@@ -682,7 +671,6 @@ def register_enter_your_details():
         try:
             register_user = requests.post(partyServiceURL, headers=headers, data=json.dumps(registrationData))
             app.logger.debug("Response from party service is: {}".format(register_user.content))
-
 
             if register_user.ok:
                 return render_template('register.almost-done.html', _theme='default', email=email_address)

@@ -22,13 +22,13 @@ class Config(object):
     """
     DEBUG = False
     TESTING = False
-    #CSRF_ENABLED = True
+    # CSRF_ENABLED = True
     CSRF_ENABLED = False
-    #WTF_CSRF_CHECK_DEFAULT = False
+    # WTF_CSRF_CHECK_DEFAULT = False
     WTF_CSRF_ENABLED = False
     SECRET_KEY = 'this-really-needs-to-be-changed'
     dbname = "ras_frontstage_backup"
-    #SQLALCHEMY_DATABASE_URI = "postgresql://" + dbname + ":password@localhost:5431/postgres"
+    # SQLALCHEMY_DATABASE_URI = "postgresql://" + dbname + ":password@localhost:5431/postgres"
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI', 'postgresql://ras_frontstage_backup:password@localhost:5431/postgres')
 
 
@@ -69,13 +69,46 @@ class PartyService(Config):
     configuration management process
     """
 
-    #PARTYSERVICE_PROTOCOL = "http://"
-    #PARTYSERVICE_SERVER = "localhost:5062"
-    #PARTYSERVICE_REGISTER_ENDPOINT = "/respondents/"
-
     PARTYSERVICE_PROTOCOL = os.environ.get('PARTYSERVICE_PROTOCOL', 'http://')
-    PARTYSERVICE_SERVER = os.environ.get('PARTYSERVICE_SERVER', 'localhost:5062')
-    PARTYSERVICE_REGISTER_ENDPOINT = os.environ.get('PARTYSERVICE_REGISTER_ENDPOINT', '/respondents/')
+    PARTYSERVICE_SERVER = os.environ.get('PARTYSERVICE_SERVER', 'localhost:8081')
+    PARTYSERVICE_RESPONDENTS_ENDPOINT = os.environ.get('PARTYSERVICE_RESPONDENTS_ENDPOINT', '/collection-exercise-api/1.0.0/respondents/')
+    PARTYSERVICE_BUSINESSES_ENDPOINT = os.environ.get('PARTYSERVICE_BUSINESSES_ENDPOINT', '/collection-exercise-api/1.0.0/businesses/')
+
+
+class CaseService(Config):
+    """
+    This class is used to configure details and parameters for the CaseService microservice.
+    This is temporary until an admin config feature is added to allow manual config of the microservice and/or a
+    configuration management process
+    """
+
+    CASESERVICE_PROTOCOL = os.environ.get('CASESERVICE_PROTOCOL', 'http://')
+    CASESERVICE_SERVER = os.environ.get('CASESERVICE_SERVER', 'localhost:8081')
+    CASESERVICE_CASES_ENDPOINT = os.environ.get('CASESERVICE_CASES_ENDPOINT', '/collection-exercise-api/1.0.0/cases/')
+
+
+class CollectionExerciseService(Config):
+    """
+    This class is used to configure details and parameters for the CollectionExerciseService microservice.
+    This is temporary until an admin config feature is added to allow manual config of the microservice and/or a
+    configuration management process
+    """
+
+    COLLECTIONEXERCISESERVICE_PROTOCOL = os.environ.get('COLLECTIONEXERCISESERVICE_PROTOCOL', 'http://')
+    COLLECTIONEXERCISESERVICE_SERVER = os.environ.get('COLLECTIONEXERCISESERVICE_SERVER', 'localhost:8081')
+    COLLECTIONEXERCISESERVICE_ENDPOINT = os.environ.get('COLLECTIONEXERCISESERVICE_ENDPOINT', '/collection-exercise-api/1.0.0/')
+
+
+class SurveyService(Config):
+    """
+    This class is used to configure details and parameters for the SurveyService microservice.
+    This is temporary until an admin config feature is added to allow manual config of the microservice and/or a
+    configuration management process
+    """
+
+    SURVEYSERVICE_PROTOCOL = os.environ.get('SURVEYSERVICE_PROTOCOL', 'http://')
+    SURVEYSERVICE_SERVER = os.environ.get('SURVEYSERVICE_SERVER', 'localhost:8081')
+    SURVEYSERVICE_ENDPOINT = os.environ.get('SURVEYSERVICE_ENDPOINT', '/collection-exercise-api/1.0.0/surveys/')
 
 
 class OAuthConfig(Config):
@@ -85,13 +118,13 @@ class OAuthConfig(Config):
     is added to allow manual config of the microservice
     """
 
-    #ONS_OAUTH_PROTOCOL = "http://"
-    #ONS_OAUTH_SERVER = "django-oauth2-test:8040"
-    #RAS_FRONTSTAGE_CLIENT_ID = "ons@ons.gov"
-    #RAS_FRONTSTAGE_CLIENT_SECRET = "password"
-    #ONS_AUTHORIZATION_ENDPOINT = "/web/authorize/"
-    #ONS_TOKEN_ENDPOINT = "/api/v1/tokens/"
-    #ONS_ADMIN_ENDPOINT = '/api/account/create'
+    # ONS_OAUTH_PROTOCOL = "http://"
+    # ONS_OAUTH_SERVER = "django-oauth2-test:8040"
+    # RAS_FRONTSTAGE_CLIENT_ID = "ons@ons.gov"
+    # RAS_FRONTSTAGE_CLIENT_SECRET = "password"
+    # ONS_AUTHORIZATION_ENDPOINT = "/web/authorize/"
+    # ONS_TOKEN_ENDPOINT = "/api/v1/tokens/"
+    # ONS_ADMIN_ENDPOINT = '/api/account/create'
 
     ONS_OAUTH_PROTOCOL = os.environ.get('ONS_OAUTH_PROTOCOL', 'http://')
     ONS_OAUTH_SERVER = os.environ.get('ONS_OAUTH_SERVER', 'localhost:8040')

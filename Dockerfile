@@ -1,8 +1,8 @@
 FROM python:2
 MAINTAINER David Carboni
 
-WORKDIR /ras-frontstage
-ADD ras-frontstage .
+WORKDIR /app
+ADD app .
 RUN pip install -r requirements.txt
 
-ENTRYPOINT python app.py
+ENTRYPOINT python application.py

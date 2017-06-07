@@ -57,11 +57,4 @@ $static: "/static/assets";
 @import "../../../../common/assets/styles/partials/objects/section";
 
 
-/**
- * New patterns
- */
-@import "../../partials/components/secure-message-form";
-@import "../../partials/components/navigation-tabs";
-
-
 @import "./common-overrides";

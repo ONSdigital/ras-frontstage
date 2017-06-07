@@ -11,3 +11,4 @@ pystache==0.5.4
 python-jose==1.2.0
 requests==2.11.1
 requests-oauthlib==0.8.0
+cryptography==1.8.1

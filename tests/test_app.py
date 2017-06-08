@@ -29,21 +29,19 @@ class TestApplication(unittest.TestCase):
     # Test we can encode a token with the format shown in data_dict_for_jwt_token
     def test_encode_jwt(self):
 
-        self.assertEquals(encode(data_dict_for_jwt_token), encoded_token)
+        self.assertEqual(encode(data_dict_for_jwt_token), encoded_token)
 
     # Test we get an error when our token is zero length
     def test_encode_bad_data(self):
 
-        print(data_dict_zero_length)
-
-        self.assertEquals(encode(data_dict_zero_length), 'No data')
+        self.assertEqual(encode(data_dict_zero_length), 'No data')
 
     # TODO Test that over a certain size our encode returns the correct error and handles gracefully
 
     # Test that we can decode our token
     def test_decode_jwt(self):
 
-        self.assertEquals(decode(encoded_token), data_dict_for_jwt_token)
+        self.assertEqual(decode(encoded_token), data_dict_for_jwt_token)
 
     # By passing a correct token this function should get a HTTP 200
     # data={"error": {"type": "success"}}
@@ -51,7 +49,7 @@ class TestApplication(unittest.TestCase):
         "Testing Logged In"
         response = self.app.get('logged-in', headers=self.headers)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue(bytes('Error! You are not logged in!', encoding='UTF-8') in response.data)
 
     # By passing an incorrect token this function should get an HTTP 200 with a data dictionary  type set as failed
@@ -62,7 +60,7 @@ class TestApplication(unittest.TestCase):
 
         response = self.app.get('/sign-in/OAuth', headers=self.headers)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue('Sign in', response.data)
         self.assertTrue('Email Address', response.data)
         self.assertTrue('Password', response.data)
@@ -84,7 +82,7 @@ class TestApplication(unittest.TestCase):
         response = self.app.post('/sign-in/OAuth', data={'username': 'test', 'password': 'test'}, headers=self.headers)
 
         # Our system should still handle this.
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         # Check this guy has an incorrect email.
         self.assertTrue(bytes('Incorrect email or password', encoding='UTF-8') in response.data)
@@ -286,4 +284,4 @@ class TestApplication(unittest.TestCase):
     #                                 "INDUSTRY": "B"
     #                             }
     #     }
-    #     self.assertEquals(expected_response, json.loads(response.data))
+    #     self.assertEqual(expected_response, json.loads(response.data))

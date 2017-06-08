@@ -2,7 +2,7 @@
 This module contains the data model for the collection instrument
 """
 import datetime
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from sqlalchemy import DateTime, Column, String, Integer
 from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms import PasswordField, StringField, BooleanField
@@ -66,7 +66,7 @@ class UserScope(db.Model):
         self.scope = scope
 
 
-class RegistrationForm(Form):
+class RegistrationForm(FlaskForm):
     """
     Registration form.
     This is our Register form and part 3 of registration. It allows the user to pass all details to create an account.
@@ -105,21 +105,21 @@ class RegistrationForm(Form):
             raise ValidationError('This should be a valid UK number e.g. 01632 496 0018. ')
 
 
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     """Login form."""
 
     username = StringField('Email Address', [InputRequired()])
     password = PasswordField('Password', [InputRequired()])
 
 
-class SignIn(Form):
+class SignIn(FlaskForm):
     """Sign in form."""
 
     username = StringField('Username', [InputRequired()])
     password = PasswordField('Password', [InputRequired()])
 
 
-class ActivationCodeForm(Form):
+class ActivationCodeForm(FlaskForm):
     """
     This is our Register form and part 1 of registration. It's used for the user to pass the 'Activation Code'. The
     activation code will be sent to the party service, in turn get resolved in the 'case service'. If successful we can

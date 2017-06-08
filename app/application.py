@@ -41,6 +41,7 @@ if 'PRODUCTION_VERSION' in os.environ:
 else:
     logger.info(" *** APP.Info Testing server settings are being used. ***")
     app.config.from_object(TestingConfig)
+    print ("testing server started...")
 
 db.init_app(app)
 

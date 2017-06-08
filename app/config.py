@@ -109,4 +109,4 @@ class FrontstageLogging(Config):
     logger = logging.getLogger(__name__)
     SERVICE_NAME = 'ras-frontstage'
     LOG_FORMAT = 'ras-frontstage: %(asctime)s|%(levelname)s %(message)s'
-    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'DEBUG')
+    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'WARNING')

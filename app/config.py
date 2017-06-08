@@ -74,8 +74,45 @@ class PartyService(Config):
     """
 
     PARTYSERVICE_PROTOCOL = os.environ.get('PARTYSERVICE_PROTOCOL', 'http://')
-    PARTYSERVICE_SERVER = os.environ.get('PARTYSERVICE_SERVER', 'localhost:5062')
-    PARTYSERVICE_REGISTER_ENDPOINT = os.environ.get('PARTYSERVICE_REGISTER_ENDPOINT', '/respondents/')
+    PARTYSERVICE_SERVER = os.environ.get('PARTYSERVICE_SERVER', 'localhost:8081')
+    PARTYSERVICE_RESPONDENTS_ENDPOINT = os.environ.get('PARTYSERVICE_RESPONDENTS_ENDPOINT', '/collection-exercise-api/1.0.0/respondents/')
+    PARTYSERVICE_BUSINESSES_ENDPOINT = os.environ.get('PARTYSERVICE_BUSINESSES_ENDPOINT', '/collection-exercise-api/1.0.0/businesses/')
+
+
+class CaseService(Config):
+    """
+    This class is used to configure details and parameters for the CaseService microservice.
+    This is temporary until an admin config feature is added to allow manual config of the microservice and/or a
+    configuration management process
+    """
+
+    CASESERVICE_PROTOCOL = os.environ.get('CASESERVICE_PROTOCOL', 'http://')
+    CASESERVICE_SERVER = os.environ.get('CASESERVICE_SERVER', 'localhost:8081')
+    CASESERVICE_CASES_ENDPOINT = os.environ.get('CASESERVICE_CASES_ENDPOINT', '/collection-exercise-api/1.0.0/cases/')
+
+
+class CollectionExerciseService(Config):
+    """
+    This class is used to configure details and parameters for the CollectionExerciseService microservice.
+    This is temporary until an admin config feature is added to allow manual config of the microservice and/or a
+    configuration management process
+    """
+
+    COLLECTIONEXERCISESERVICE_PROTOCOL = os.environ.get('COLLECTIONEXERCISESERVICE_PROTOCOL', 'http://')
+    COLLECTIONEXERCISESERVICE_SERVER = os.environ.get('COLLECTIONEXERCISESERVICE_SERVER', 'localhost:8081')
+    COLLECTIONEXERCISESERVICE_ENDPOINT = os.environ.get('COLLECTIONEXERCISESERVICE_ENDPOINT', '/collection-exercise-api/1.0.0/')
+
+
+class SurveyService(Config):
+    """
+    This class is used to configure details and parameters for the SurveyService microservice.
+    This is temporary until an admin config feature is added to allow manual config of the microservice and/or a
+    configuration management process
+    """
+
+    SURVEYSERVICE_PROTOCOL = os.environ.get('SURVEYSERVICE_PROTOCOL', 'http://')
+    SURVEYSERVICE_SERVER = os.environ.get('SURVEYSERVICE_SERVER', 'localhost:8081')
+    SURVEYSERVICE_ENDPOINT = os.environ.get('SURVEYSERVICE_ENDPOINT', '/collection-exercise-api/1.0.0/surveys/')
 
 
 class OAuthConfig(Config):

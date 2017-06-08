@@ -11,5 +11,5 @@ function display_result {
   fi
 }
 
-flake8 --max-complexity 10 --count
+flake8 --count
 display_result $? 1 "Flake 8 code style check"

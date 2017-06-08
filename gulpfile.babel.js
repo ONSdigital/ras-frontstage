@@ -1,5 +1,5 @@
 import gulp from 'gulp';
-import { paths, appPath } from './gulp/paths';
+import { paths, appPath, distPath } from './gulp/paths';
 import sass from 'gulp-sass';
 import concat from 'gulp-concat';
 import webdriver from 'gulp-webdriver';
@@ -37,7 +37,7 @@ gulp.task('compile:common:scripts:docs', () => {
 
 gulp.task('watch:common:styles', ['compile:common:styles'], () => {
 	gulp.watch([
-		'./common/assets/styles/**/*.scss',
+		`${appPath}/assets/styles/**/*.scss`,
 		'../sdc-global-design-patterns/**/*.scss'
 	], ['compile:common:styles']);
 });
@@ -55,16 +55,14 @@ gulp.task('watch:common:scripts:doc', ['compile:common:scripts:docs'], () => {
  * App specific tasks
  */
 gulp.task('compile:sass', () => {
-
-	return gulp.src('./app/main.scss')
+	return gulp.src(`${appPath}/main.scss`)
 		.pipe(sass({indentedSyntax: false}).on('error', sass.logError))
 		.pipe(concat('site.min.css'))
-		.pipe(gulp.dest('./app/static'));
-
+		.pipe(gulp.dest(`${distPath}`));
 });
 
 gulp.task('watch:sass', ['compile:sass'], () => {
-	gulp.watch(['./app/**/*.scss'], ['compile:sass']);
+	gulp.watch([`${appPath}/**/*.scss`], ['compile:sass', 'compile:common:styles']);
 });
 
 
@@ -80,12 +78,16 @@ gulp.task('test:scripts:e2e', function() {
 });
 
 
-gulp.task('test:scripts', ['test:scripts:unit', 'test:scripts:e2e']);
-
-
 /**
- * Tools
+ * Gulp tasks
  */
+ gulp.task('default', [
+ 	'compile:sass',
+	'compile:common:styles',
+	'compile:common:scripts',
+	'compile:common:scripts:docs'
+ ]);
+
 gulp.task('dev', [
 	'watch:common:styles',
 	'watch:common:scripts',
@@ -93,7 +95,6 @@ gulp.task('dev', [
 ]);
 
 gulp.task('test', [
-	'test:scripts'
-])
-
-gulp.task('default', ['sass']);
+	'test:scripts:unit',
+	'test:scripts:e2e'
+]);

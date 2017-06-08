@@ -2,12 +2,11 @@
 This module contains the data model for the collection instrument
 """
 import datetime
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from sqlalchemy import DateTime, Column, String, Integer
-from sqlalchemy.dialects.postgresql import TEXT, JSON, UUID
 from werkzeug.security import generate_password_hash, check_password_hash
-from wtforms import DecimalField, SelectField, PasswordField, StringField, IntegerField, BooleanField
-from wtforms.validators import InputRequired, EqualTo, Length, DataRequired, NumberRange, Email, ValidationError
+from wtforms import PasswordField, StringField, BooleanField
+from wtforms.validators import InputRequired, EqualTo, Length, DataRequired, Email, ValidationError
 import phonenumbers
 from phonenumbers.phonenumberutil import NumberParseException
 from flask_sqlalchemy import SQLAlchemy
@@ -67,7 +66,7 @@ class UserScope(db.Model):
         self.scope = scope
 
 
-class RegistrationForm(Form):
+class RegistrationForm(FlaskForm):
     """
     Registration form.
     This is our Register form and part 3 of registration. It allows the user to pass all details to create an account.
@@ -77,13 +76,17 @@ class RegistrationForm(Form):
 
     first_name = StringField('First name', validators=[InputRequired(), Length(max=254, message='Your first name must be less than 254 characters')])
     last_name = StringField('Last name', validators=[InputRequired(), Length(max=254, message='Your last name must be less than 254 characters')])
-    email_address = StringField('Enter your email address', validators=[InputRequired(), Email(message="Your email shoud be of the form 'myname@email.com' "), Length(max=254, message='Your email must be less than 254 characters')])
-    email_address_confirm = StringField('Re-type your email address', validators=[DataRequired(), EqualTo('email_address', message='Emails must match'), Length(max=254, message='Your email must be less than 254 characters')])
+    email_address = StringField('Enter your email address', validators=[InputRequired(), Email(message="Your email shoud be of the form 'myname@email.com' "),
+                                Length(max=254, message='Your email must be less than 254 characters')])
+    email_address_confirm = StringField('Re-type your email address', validators=[DataRequired(), EqualTo('email_address', message='Emails must match'),
+                                        Length(max=254, message='Your email must be less than 254 characters')])
     password = PasswordField('Create a password', validators=[DataRequired(), Length(min=8, max=254, message='Your password must be more than 8 characters')])
-    password_confirm = PasswordField('Re-type your password', validators=[DataRequired(), EqualTo('password', message='Passwords must match'), Length(min=8, max=254, message='Your password must be more than 8 characters')])
-    phone_number = StringField('Enter your phone number', validators=[DataRequired(), Length(min=9, max=15, message="This should be a valid phone number between 9 and 15 digits")], default=None)
+    password_confirm = PasswordField('Re-type your password', validators=[DataRequired(), EqualTo('password', message='Passwords must match'),
+                                     Length(min=8, max=254, message='Your password must be more than 8 characters')])
+    phone_number = StringField('Enter your phone number', validators=[DataRequired(),
+                               Length(min=9, max=15, message="This should be a valid phone number between 9 and 15 digits")], default=None)
 
-    terms_and_conditions = BooleanField('Please confirm you accept our terms and conditions ' )
+    terms_and_conditions = BooleanField('Please confirm you accept our terms and conditions ')
 
     def validate_phone_number(form, field):
         if len(field.data) > 16:
@@ -102,21 +105,21 @@ class RegistrationForm(Form):
             raise ValidationError('This should be a valid UK number e.g. 01632 496 0018. ')
 
 
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     """Login form."""
 
     username = StringField('Email Address', [InputRequired()])
     password = PasswordField('Password', [InputRequired()])
 
 
-class SignIn(Form):
+class SignIn(FlaskForm):
     """Sign in form."""
 
     username = StringField('Username', [InputRequired()])
     password = PasswordField('Password', [InputRequired()])
 
 
-class ActivationCodeForm(Form):
+class ActivationCodeForm(FlaskForm):
     """
     This is our Register form and part 1 of registration. It's used for the user to pass the 'Activation Code'. The
     activation code will be sent to the party service, in turn get resolved in the 'case service'. If successful we can

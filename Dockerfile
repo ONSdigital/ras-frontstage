@@ -1,8 +1,10 @@
-FROM python:2
+FROM python:3.5
 MAINTAINER David Carboni
 
 WORKDIR /app
-ADD app .
+COPY . /app
+EXPOSE 5001
 RUN pip install -r requirements.txt
 
-ENTRYPOINT python application.py
+ENTRYPOINT ["python3"]
+CMD ["run.py"] 

@@ -60,6 +60,10 @@ class TestingConfig(Config):
     Testing config class
     """
     TESTING = True
+    DEBUG = True
+    OAUTHLIB_INSECURE_TRANSPORT = "1"
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
+
 
 
 class PartyService(Config):
@@ -68,10 +72,6 @@ class PartyService(Config):
     This is temporary until an admin config feature is added to allow manual config of the microservice and/or a
     configuration management process
     """
-
-    # PARTYSERVICE_PROTOCOL = "http://"
-    # PARTYSERVICE_SERVER = "localhost:5062"
-    # PARTYSERVICE_REGISTER_ENDPOINT = "/respondents/"
 
     PARTYSERVICE_PROTOCOL = os.environ.get('PARTYSERVICE_PROTOCOL', 'http://')
     PARTYSERVICE_SERVER = os.environ.get('PARTYSERVICE_SERVER', 'localhost:5062')
@@ -84,14 +84,6 @@ class OAuthConfig(Config):
     This is temporary until an admin config feature
     is added to allow manual config of the microservice
     """
-
-    # ONS_OAUTH_PROTOCOL = "http://"
-    # ONS_OAUTH_SERVER = "django-oauth2-test:8040"
-    # RAS_FRONTSTAGE_CLIENT_ID = "ons@ons.gov"
-    # RAS_FRONTSTAGE_CLIENT_SECRET = "password"
-    # ONS_AUTHORIZATION_ENDPOINT = "/web/authorize/"
-    # ONS_TOKEN_ENDPOINT = "/api/v1/tokens/"
-    # ONS_ADMIN_ENDPOINT = '/api/account/create'
 
     ONS_OAUTH_PROTOCOL = os.environ.get('ONS_OAUTH_PROTOCOL', 'http://')
     ONS_OAUTH_SERVER = os.environ.get('ONS_OAUTH_SERVER', 'localhost:8040')
@@ -108,5 +100,6 @@ class FrontstageLogging(Config):
     """
     logger = logging.getLogger(__name__)
     SERVICE_NAME = 'ras-frontstage'
-    LOG_FORMAT = 'ras-frontstage: %(asctime)s|%(levelname)s %(message)s'
-    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'DEBUG')
+    LOG_FORMAT = 'ras-frontstage: %(asctime)s|%(levelname)s | %(name)s.%(funcName)s:%(lineno)d | %(message)s'
+    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'DEBUG')                        # If we don't have a detailed logger set
+                                                                            # lets just set the level as DEBUG

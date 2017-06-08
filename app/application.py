@@ -82,7 +82,7 @@ def logged_in():
             # Make sure we pop this invalid session variable.
             session.pop('jwt_token')
 
-    return render_template('signed-in.html', _theme='default', data={"error": {"type": "failed"}})
+    return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
 
 
 @app.route('/protected/collectioninstrument', methods=['GET'])
@@ -429,7 +429,6 @@ def surveys_history():
 
             # TODO: get user nane working
             # userID = decodedJWT['user_id']
-            # return render_template('signed-in.html', _theme='default', data={"error": {"type": "success"}})
             # return render_template('surveys-history.html', _theme='default', data={"error": {"type": "success"}})
 
             # userID = decodedJWT['username']

@@ -272,6 +272,21 @@ class TestApplication(unittest.TestCase):
         self.assertTrue(response.status_code, 200)
         self.assertTrue(bytes('Please try a different email, this one is in use', encoding='UTF-8') in response.data)
 
+    # def test_surveys_todo_page(self):
+    #
+    #     # Lets send a post message to the ras_frontstage at the endpoint /sign-in/OAuth.
+    #     response = self.app.post('/sign-in/OAuth', data={'username': 'test', 'password': 'test'}, headers=self.headers)
+    #
+    #     # Our system should still handle this.
+    #     self.assertEqual(response.status_code, 200)
+    #
+    #     response = self.app.get('logged-in', data={'username': 'test', 'password': 'test'}, headers=self.headers)
+    #     self.assertTrue(response.status_code, 200)
+    #
+    #     self.assertTrue(bytes('To do', encoding='UTF-8') in response.data)
+    #     self.assertTrue(bytes('History', encoding='UTF-8') in response.data)
+    #     self.assertTrue(bytes('Messages', encoding='UTF-8') in response.data)
+
     # def test_collection_instrument_id(self):
     #     response = self.app.get('/collectioninstrument/id/urn:ons.gov.uk:id:ci:001.001.00001', headers=self.headers)
     #     expected_response = {

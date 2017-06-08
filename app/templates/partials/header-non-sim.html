@@ -3,9 +3,6 @@
         <div class="logo header__logo">
             <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Office for National Statistics" class="logo__img" />
         </div>
-        {% if logged_in %}
-        <p>Hello Nick</p>
-        {% endif %}
         {% if session.jwt_token %}
             <a href="{{ url_for('logout') }}">Sign out</a>
         {% else %}

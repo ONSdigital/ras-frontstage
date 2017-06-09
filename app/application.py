@@ -9,14 +9,13 @@ import sys
 from datetime import datetime
 from functools import wraps, update_wrapper
 import requests
-import arrow
 from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, Response, abort
 from jose import JWTError
 from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError
 from requests import ConnectionError
 from requests_oauthlib import OAuth2Session
 from app.views.secure_messaging import secure_message_bp
-from app.config import OAuthConfig, PartyService, CaseService, CollectionExerciseService, SurveyService, Config, FrontstageLogging
+from app.config import OAuthConfig, Config, FrontstageLogging
 from app.config import TestingConfig, ProductionConfig
 from app.jwt import encode, decode
 from app.models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
@@ -41,7 +40,7 @@ if 'PRODUCTION_VERSION' in os.environ:
 else:
     logger.info(" *** APP.Info Testing server settings are being used. ***")
     app.config.from_object(TestingConfig)
-    print ("testing server started...")
+    print("testing server started...")
 
 db.init_app(app)
 
@@ -52,6 +51,24 @@ def hello_world():
     return render_template('_temp.html', _theme='default')
 
 
+def build_survey_data(statusFilter):
+
+    # TODO - Derive the Party Id
+    party_id = "3b136c4b-7a14-4904-9e01-13364dd7b972"
+
+    # TODO - Add security headers
+    # headers = {'authorization': jwttoken}
+    headers = {}
+
+    # Call the API Gateway Service to get the To Do survey list
+    url = Config.API_GATEWAY_SURVEYS_URL + 'todo/' + party_id
+    req = requests.get(url, headers=headers, params=statusFilter, verify=False)
+    listData = req.json()
+
+    return listData
+
+
+# ===== Surveys To Do =====
 @app.route('/logged-in', methods=['GET', 'POST'])
 def logged_in():
     """Logged in page for users only."""
@@ -72,19 +89,12 @@ def logged_in():
             # userID = decodedJWT['username']
             # userName = userID.split('@')[0]
 
-            # Build the survey data (To Do survey type)
-            dataArray = build_survey_data()
+            # Filters the data array to remove surveys that shouldn't appear on the To Do page
+            statusFilter = {'status_filter': '["not started", "in progress"]'}
 
-            # Filter the data array to remove surveys that shouldn't appear on the To Do page
-            allowedStatuses = ['Not started', 'In progress']
+            # Get the survey data (To Do survey type)
+            dataArray = build_survey_data(statusFilter)
 
-            # TODO - the line below can be commented out to demonstrate sorting. This comment can be removed eventually.
-            dataArray = filter_surveys(dataArray, allowedStatuses)
-
-            # Sort the data array so that the closed Submit by dates appear at the top of the list
-            dataArray = sort_survey_data(dataArray)
-
-            # Render the template
             # TODO: pass in data={"error": {"type": "success"}, "user_id": userName} to get the user name working ?
             return render_template('surveys-todo.html', _theme='default', dataArray=dataArray)
 
@@ -100,6 +110,39 @@ def logged_in():
             session.pop('jwt_token')
 
     return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
+
+
+# ===== Surveys History =====
+@app.route('/history')
+def surveys_history():
+    """Logged in page for users only."""
+
+    if session.get('jwt_token'):
+        jwttoken = session.get('jwt_token')
+
+        try:
+            decodedJWT = decode(jwttoken)
+            for key in decodedJWT:
+                app.logger.debug(" {} is: {}".format(key, decodedJWT[key]))
+
+            # Filters the data array to remove surveys that shouldn't appear on the History page
+            statusFilter = {'status_filter': '["complete"]'}
+
+            # Get the survey data (History survey type)
+            dataArray = build_survey_data(statusFilter)
+
+            # Render the template
+            return render_template('surveys-history.html',  _theme='default', dataArray=dataArray)
+
+        except JWTError:
+            # TODO Provide proper logging
+            app.logger.debug("This is not a valid JWT Token")
+
+            # app.logger.warning('JWT scope could not be validated.')
+            # Make sure we pop this invalid session variable.
+            session.pop('jwt_token')
+
+    return render_template('signed-in.html', _theme='default', data={"error": {"type": "failed"}})
 
 
 @app.route('/protected/collectioninstrument', methods=['GET'])
@@ -320,167 +363,6 @@ def sign_in_account_locked():
     return render('sign-in.locked-account.html')
 
 
-# ===== My Surveys =====
-def build_survey_data():
-
-    # TODO - Derive the Party Id
-    party_id = "3b136c4b-7a14-4904-9e01-13364dd7b972"
-
-    # TODO - Add security headers ???
-    # headers = {'authorization': jwttoken}
-    headers = {}
-
-    # Call the Party Service to get respondent details
-    url = PartyService.PARTYSERVICE_PROTOCOL + PartyService.PARTYSERVICE_SERVER + PartyService.PARTYSERVICE_RESPONDENTS_ENDPOINT + 'id/' + party_id
-    req = requests.get(url, headers=headers)
-    userData = req.json()
-
-    # Call the Case Service to get list of cases with the partyid
-    url = CaseService.CASESERVICE_PROTOCOL + CaseService.CASESERVICE_SERVER + CaseService.CASESERVICE_CASES_ENDPOINT + 'partyid/' + party_id
-    req = requests.get(url, headers=headers)
-    caseData = req.json()
-
-    # Iterate caseData and build a data array to pass into the HTML template
-    dataArray = []
-    for case in caseData:
-
-        collectionExerciseId = case['caseGroup']['collectionExerciseId']
-
-        # Call the Party Service to get the business details
-        businessPartyId = case['caseGroup']['partyId']
-        url = PartyService.PARTYSERVICE_PROTOCOL + PartyService.PARTYSERVICE_SERVER + PartyService.PARTYSERVICE_BUSINESSES_ENDPOINT + 'id/' + businessPartyId
-        req = requests.get(url, headers=headers)
-        businessData = req.json()
-
-        # Call the Collection Exercise Service to get the collection exercise details
-        url = CollectionExerciseService.COLLECTIONEXERCISESERVICE_PROTOCOL + \
-            CollectionExerciseService.COLLECTIONEXERCISESERVICE_SERVER + \
-            CollectionExerciseService.COLLECTIONEXERCISESERVICE_ENDPOINT + 'collection-exercise/' + collectionExerciseId
-        req = requests.get(url, headers=headers)
-        collectionExerciseData = req.json()
-
-        surveyId = collectionExerciseData['surveyId']
-
-        # Call the Survey Service to get the survey details
-        url = SurveyService.SURVEYSERVICE_PROTOCOL + SurveyService.SURVEYSERVICE_SERVER + SurveyService.SURVEYSERVICE_ENDPOINT + surveyId
-        req = requests.get(url, headers=headers)
-        surveyData = req.json()
-
-        # Work out the case status
-        caseEvents = case['caseEvents']
-        status = calculate_case_status(caseEvents)
-
-        # Format dates
-        inputDateFormat = 'YYYY-MM-DDThh:mm:ss'
-        outputDateFormat = 'D MMM YYYY'
-        collectionExerciseData['periodStart'] = collectionExerciseData['periodStart'].replace('Z', '')
-        collectionExerciseData['periodStartFormatted'] = arrow.get(collectionExerciseData['periodStart'], inputDateFormat).format(outputDateFormat)
-
-        collectionExerciseData['periodEnd'] = collectionExerciseData['periodEnd'].replace('Z', '')
-        collectionExerciseData['periodEndFormatted'] = arrow.get(collectionExerciseData['periodEnd'], inputDateFormat).format(outputDateFormat)
-
-        collectionExerciseData['scheduledReturn'] = collectionExerciseData['scheduledReturn'].replace('Z', '')
-        collectionExerciseData['scheduledReturnFormatted'] = arrow.get(collectionExerciseData['scheduledReturn'], inputDateFormat).format(outputDateFormat)
-
-        # Build data object and append to the data array
-        data = {}
-        data['userData'] = userData
-        data['businessData'] = businessData
-        data['case'] = case
-        data['collectionExerciseData'] = collectionExerciseData
-        data['surveyData'] = surveyData
-        data['status'] = status
-
-        dataArray.append(data)
-
-    return dataArray
-
-
-def calculate_case_status(caseEvents):
-    status = ''
-    for event in caseEvents:
-        if event['category'] == 'CASE_UPLOADED':
-            status = 'Complete'
-            break
-
-    if status == '':
-        for event in caseEvents:
-            if event['category'] == 'CASE_DOWNLOADED':
-                status = 'In progress'
-                break
-
-    if status == '':
-        status = 'Not started'
-
-    return status
-
-
-def filter_surveys(dataArray, allowedStatuses):
-    returnArray = []
-    for case in dataArray:
-        if case['status'] in allowedStatuses:
-            returnArray.append(case)
-
-    return returnArray
-
-
-def sort_survey_data(dataArray):
-    return sorted(
-        dataArray,
-        key=lambda x: datetime.strptime(x['collectionExerciseData']['scheduledReturn'], '%Y-%m-%dT%H:%M:%S'), reverse=False
-    )
-
-
-# ===== History =====
-@app.route('/history')
-def surveys_history():
-    """Logged in page for users only."""
-
-    if session.get('jwt_token'):
-        jwttoken = session.get('jwt_token')
-
-        try:
-            decodedJWT = decode(jwttoken)
-            for key in decodedJWT:
-                app.logger.debug(" {} is: {}".format(key, decodedJWT[key]))
-
-            # TODO: get user nane working
-            # userID = decodedJWT['user_id']
-            # return render_template('surveys-history.html', _theme='default', data={"error": {"type": "success"}})
-
-            # userID = decodedJWT['username']
-            # userName = userID.split('@')[0]
-
-            # Build the survey data (History survey type)
-            dataArray = build_survey_data()
-
-            # TODO remove this test data addition
-            # dataArray.pop(1)
-            dataArray.append(dataArray[1])
-            dataArray.append(dataArray[1])
-            ##################################
-
-            # Filter the data array to remove surveys that shouldn't appear on the History page
-            allowedStatuses = ['Complete']
-            dataArray = filter_surveys(dataArray, allowedStatuses)
-
-            # Sort the data array so that the closed Submit by dates appear at the top of the list
-            dataArray = sort_survey_data(dataArray)
-
-            # Render the template
-            return render_template('surveys-history.html',  _theme='default', dataArray=dataArray)
-
-        except JWTError:
-            # TODO Provide proper logging
-            app.logger.debug("This is not a valid JWT Token")
-
-            # app.logger.warning('JWT scope could not be validated.')
-            # Make sure we pop this invalid session variable.
-            session.pop('jwt_token')
-
-    return render_template('signed-in.html', _theme='default', data={"error": {"type": "failed"}})
-
-
 # ===== Messages =====
 @app.route('/messages')
 def messages():
@@ -535,6 +417,9 @@ def register():
     if request.method == 'POST' and form.validate():
         activation_code = request.form.get('activation_code')
         logger.debug("Activation code is: {}".format(activation_code))
+
+        # TODO Enrolement logic
+        return redirect(url_for('register_enter_your_details'))
 
     if form.errors:
         flash(form.errors, 'danger')
@@ -671,9 +556,15 @@ def register_enter_your_details():
 
         # Step 2
         # Register with the party service
-        registrationData = {'emailAddress': email_address, 'firstName': first_name, 'lastName': last_name, 'telephone': phone_number, 'status': 'CREATED'}
+        registrationData = {'emailAddress': email_address,
+                            'firstName': first_name,
+                            'lastName': last_name,
+                            'telephone': phone_number,
+                            'status': 'CREATED'}
+
         headers = {'authorization': encoded_jwt_token, 'content-type': 'application/json'}
-        partyServiceURL = PartyService.PARTYSERVICE_PROTOCOL + PartyService.PARTYSERVICE_SERVER + PartyService.PARTYSERVICE_RESPONDENTS_ENDPOINT
+
+        partyServiceURL = Config.API_GATEWAY_PARTY_URL + 'respondents'
         app.logger.debug("Party service URL is: {}".format(partyServiceURL))
 
         try:
@@ -736,8 +627,7 @@ def get_id(_id):
     if (session.get(('jwt_token') and session.get('username'))):
         jwttoken = session.get('jwt_token')
 
-        # If we can decode the the token we need to get the user ID out and
-        # ensure it's a valid token for that user in our database
+        # If we can decode the the token we need to get the user ID out and ensure it's a valid token for that user in our database
         decodedJWT = decode(jwttoken)
         userID = decodedJWT['user_id']
 
@@ -748,14 +638,12 @@ def get_id(_id):
             # Check the tokens are the same
             # TODO Check the token has not expired
             if user_object.token == jwttoken:
-                # OK Tokens match we can forward this on to our collection
-                # instrument
+                # OK Tokens match we can forward this on to our collection instrument
                 headers = {'authorization': jwttoken}
                 # TODO make the calling of this URL a utility function
                 # OK construct the URL now we know it's a valid token
                 url = 'localhost:5000/collectioninstrument/id/' + '_id'
-                # Depending on wheather this is a put or a get will change how
-                # we forward on this message
+                # Depending on wheather this is a put or a get will change how we forward on this message
                 if request.method['GET']:
                     req = requests.get(url,  headers=headers)
                 if request.method['PUT']:
@@ -788,19 +676,9 @@ def setup_logging():
     log_formatter = logging.Formatter(FrontstageLogging.LOG_FORMAT)
     stdout_handler = logging.StreamHandler(sys.stdout)
     stdout_handler.setFormatter(log_formatter)
-    stdout_handler.setLevel(logging.DEBUG)                  # This explicitly sets the level for the log handler.
-                                                            # We don't need this - but might in the future when we
-                                                            # create more handlers. It does no harm being set.
+
+    # This explicitly sets the level for the log handler.
+    # We don't need this - but might in the future when we create more handlers. It does no harm being set.
+    stdout_handler.setLevel(logging.DEBUG)
+
     logger.addHandler(stdout_handler)
-
-
-    """Set up logging for application"""
-
-
-
-
-
-
-
-
-

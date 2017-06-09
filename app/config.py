@@ -22,7 +22,6 @@ class Config(object):
     """
     DEBUG = False
     TESTING = False
-    # CSRF_ENABLED = True
     CSRF_ENABLED = False
     # WTF_CSRF_CHECK_DEFAULT = False
     WTF_CSRF_ENABLED = False
@@ -30,6 +29,8 @@ class Config(object):
     dbname = "ras_frontstage_backup"
     # SQLALCHEMY_DATABASE_URI = "postgresql://" + dbname + ":password@localhost:5431/postgres"
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI', 'postgresql://ras_frontstage_backup:password@localhost:5431/postgres')
+    API_GATEWAY_SURVEYS_URL = 'https://api-dev.apps.mvp.onsclofo.uk/api/1.0.0/surveys/'
+    API_GATEWAY_PARTY_URL = 'https://api-dev.apps.mvp.onsclofo.uk/party-api/1.0.4/'
 
 
 class ProductionConfig(Config):
@@ -65,56 +66,6 @@ class TestingConfig(Config):
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
 
-
-class PartyService(Config):
-    """
-    This class is used to configure details and parameters for the PartyService microservice.
-    This is temporary until an admin config feature is added to allow manual config of the microservice and/or a
-    configuration management process
-    """
-
-    PARTYSERVICE_PROTOCOL = os.environ.get('PARTYSERVICE_PROTOCOL', 'http://')
-    PARTYSERVICE_SERVER = os.environ.get('PARTYSERVICE_SERVER', 'localhost:8081')
-    PARTYSERVICE_RESPONDENTS_ENDPOINT = os.environ.get('PARTYSERVICE_RESPONDENTS_ENDPOINT', '/collection-exercise-api/1.0.0/respondents/')
-    PARTYSERVICE_BUSINESSES_ENDPOINT = os.environ.get('PARTYSERVICE_BUSINESSES_ENDPOINT', '/collection-exercise-api/1.0.0/businesses/')
-
-
-class CaseService(Config):
-    """
-    This class is used to configure details and parameters for the CaseService microservice.
-    This is temporary until an admin config feature is added to allow manual config of the microservice and/or a
-    configuration management process
-    """
-
-    CASESERVICE_PROTOCOL = os.environ.get('CASESERVICE_PROTOCOL', 'http://')
-    CASESERVICE_SERVER = os.environ.get('CASESERVICE_SERVER', 'localhost:8081')
-    CASESERVICE_CASES_ENDPOINT = os.environ.get('CASESERVICE_CASES_ENDPOINT', '/collection-exercise-api/1.0.0/cases/')
-
-
-class CollectionExerciseService(Config):
-    """
-    This class is used to configure details and parameters for the CollectionExerciseService microservice.
-    This is temporary until an admin config feature is added to allow manual config of the microservice and/or a
-    configuration management process
-    """
-
-    COLLECTIONEXERCISESERVICE_PROTOCOL = os.environ.get('COLLECTIONEXERCISESERVICE_PROTOCOL', 'http://')
-    COLLECTIONEXERCISESERVICE_SERVER = os.environ.get('COLLECTIONEXERCISESERVICE_SERVER', 'localhost:8081')
-    COLLECTIONEXERCISESERVICE_ENDPOINT = os.environ.get('COLLECTIONEXERCISESERVICE_ENDPOINT', '/collection-exercise-api/1.0.0/')
-
-
-class SurveyService(Config):
-    """
-    This class is used to configure details and parameters for the SurveyService microservice.
-    This is temporary until an admin config feature is added to allow manual config of the microservice and/or a
-    configuration management process
-    """
-
-    SURVEYSERVICE_PROTOCOL = os.environ.get('SURVEYSERVICE_PROTOCOL', 'http://')
-    SURVEYSERVICE_SERVER = os.environ.get('SURVEYSERVICE_SERVER', 'localhost:8081')
-    SURVEYSERVICE_ENDPOINT = os.environ.get('SURVEYSERVICE_ENDPOINT', '/collection-exercise-api/1.0.0/surveys/')
-
-
 class OAuthConfig(Config):
     """
     This class is used to configure OAuth2 parameters for the microservice.
@@ -138,5 +89,6 @@ class FrontstageLogging(Config):
     logger = logging.getLogger(__name__)
     SERVICE_NAME = 'ras-frontstage'
     LOG_FORMAT = 'ras-frontstage: %(asctime)s|%(levelname)s | %(name)s.%(funcName)s:%(lineno)d | %(message)s'
-    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'DEBUG')                        # If we don't have a detailed logger set
-                                                                            # lets just set the level as DEBUG
+
+    # If we don't have a detailed logger set lets just set the level as DEBUG
+    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'DEBUG')

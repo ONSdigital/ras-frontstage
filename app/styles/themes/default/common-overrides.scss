@@ -1,23 +1,164 @@
 .details__link {
-
-  &:before {
-    background-image: url("/static/s/img/icons/guidance.svg");
-  }
-
-  &:focus {
-    &::before {
-      background-image: url("/static/s/img/icons/guidance-white.svg");
+    &:before {
+        background-image: url("/static/s/img/icons/guidance.svg");
     }
-  }
+
+    &:focus {
+        &::before {
+            background-image: url("/static/s/img/icons/guidance-white.svg");
+        }
+    }
 }
 
 .input--checkbox {
-  background-image: url('https://eq.onsdigital.uk/s/img/icons/icons--check.svg');
+    background-image: url('https://eq.onsdigital.uk/s/img/icons/icons--check.svg');
 }
 
 .input--text-error {
-  border : 1px solid red;
-  border-width : 2px;
+    border: 1px solid red;
+    border-width: 2px;
+}
+
+.survey-list {
+    list-style: none;
+    padding-left: 0;
+
+    .header-row {
+        display: none;
+        border-bottom: 2px solid #666;
+        font-weight: bold;
+    }
+
+    .card {
+        width: 100%;
+        margin: 0;
+        border-bottom: 1px solid #ccc;
+        padding: 20px 0;
+        // .survey-list-item__label {
+        //     color: red;
+        // }
+        .survey-list-item__nowrap {
+            white-space: nowrap;
+        }
+        @media only screen and (min-width: 740px) {
+            .survey-list-item__label {
+                display: none;
+            }
+        }
+
+        &:hover {
+            // TODO scss param
+            background-color: #f7f7f7;
+        }
+    }
+
+    .action-button {
+        text-align: center;
+        width: 140px;
+        padding: 10px 20px;
+    }
+    @media only screen and (max-width: 740px) {
+        .action-button {
+            float: right;
+        }
+    }
+}
+@media only screen and (min-width: 740px) {
+    .survey-list .header-row,
+    .survey-list .header-row:hover {
+        display: block;
+        padding: 10px 0 0;
+        background: #fff;
+    }
+}
+// .survey-button {
+//     width: 185px;
+// }
+// TODO fix this (from responsive.csss)
+.mercury {
+    font-size: 15.75px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+@media only screen and (min-width: 740px) {
+    .mercury {
+        font-size: 0.77778rem;
+    }
+}
+
+.pluto {
+    font-size: 15.75px;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.4;
+}
+@media only screen and (min-width: 740px) {
+    .pluto {
+        font-size: 0.77778rem;
+    }
+}
+
+.navigation-tabs {
+    margin-bottom: 1.5rem;
+    padding: 0;
+    list-style-type: none;
+    border-bottom: 1px solid #555;
+
+    &:after {
+        content: ".";
+        display: block;
+        clear: both;
+        visibility: hidden;
+        line-height: 0;
+        height: 0;
+    }
+
+    .navigation-tabs__item {
+        margin-bottom: 0;
+
+        .navigation-tabs__tab {
+            margin-bottom: 0;
+            padding: 0.5rem 1rem;
+            border: 1px solid transparent;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            border-bottom: none;
+            // &.navigation-tabs__tab--link {
+            //     font-weight : normal;
+            //     text-decoration : underline;
+            //     color : $color-blue;
+            //
+            //     &:hover {
+            //         color : #fff;
+            //     }
+            // }
+            &.navigation-tabs__tab--active {
+                border-color: inherit;
+            }
+        }
+
+        &.navigation-tabs__item--primary {
+            float: left;
+        }
+
+        &.navigation-tabs__item--secondary {
+            float: right;
+        }
+
+        &.navigation-tabs__item--active {
+            margin-bottom: -1px;
+            padding-bottom: 1px;
+            background-color: #fff;
+        }
+    }
+}
+
+/**
+ * Override normalize styles
+ */
+dd.grid__col {
+  margin-left: 0;
 }
 
 dd.grid__col {

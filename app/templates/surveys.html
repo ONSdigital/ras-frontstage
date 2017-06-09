@@ -5,7 +5,7 @@
         <li class="header-row">
 
             <div class="grid__col col-4@m">
-                Survey...
+                Survey
             </div>
 
             <div class="grid__col col-2@m">
@@ -25,7 +25,6 @@
         {% for data in dataArray %}
 
         <li class="card">
-
 
             <div class="grid__col col-4@m">
                 <span class="survey-list-item__label mercury">SURVEY: </span>
@@ -60,14 +59,12 @@
 
         {% endfor %}
 
+        {% if dataArray|length == 0 %}
         <li class="card" >
-            <div class="grid__col col-4@m">You have no surveys to complete</div>
+            <div class="grid__col col-12@m">You have no surveys to complete</div>
         </li>
+        {% endif %}
 
     </ul>
 
 </div>
-
-
-
-<!-- <a href="/create-account/check-email/">go somewhere else</a> -->

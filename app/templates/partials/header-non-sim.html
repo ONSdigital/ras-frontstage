@@ -3,12 +3,17 @@
         <div class="logo header__logo">
             <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Office for National Statistics" class="logo__img" />
         </div>
+        {% if session.jwt_token %}
+            <a href="{{ url_for('logout') }}">Sign out</a>
+        {% else %}
+            <!-- <a href="{{ url_for('login_OAuth') }}">Sign in</a> -->
+        {% endif %}
     </header>
 </div>
 <div class="bar " role="banner">
     <div class="bar__inner container">
-        <div class="badge badge--amber u-mr-xs">BETA</div>&nbsp;
-        <div class="bar__title venus">ONS Business Surveys</div>
+        <div class="bar__title venus">ONS Business Surveys</div>&nbsp;
+        <div class="badge badge--amber u-mr-xs">BETA</div>
     </div>
 </div>
 <div class="page__subheader"></div>

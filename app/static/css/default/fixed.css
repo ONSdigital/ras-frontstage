@@ -3487,9 +3487,13 @@ input:checked ~ .label {
   border-width: 2px;
 }
 
+/**
+ * Override normalize styles
+ */
 dd.grid__col {
   margin-left: 0;
 }
+
 
 .survey-list {
   list-style: none;
@@ -3536,9 +3540,10 @@ dd.grid__col {
 }
 
 @media only screen and (min-width: 740px) {
-  .survey-list .header-row, .survey-list .header-row:hover {
+  .survey-list .header-row,
+  .survey-list .header-row:hover {
     display: block;
-    padding: 10px 0 0 0;
+    padding: 10px 0 0;
     background: #fff;
   }
 }
@@ -3595,7 +3600,7 @@ dd.grid__col {
 .navigation-tabs .navigation-tabs__item .navigation-tabs__tab {
   margin-bottom: 0;
   padding: 8px 16px;
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
   border: 1px solid transparent;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
@@ -3620,4 +3625,3 @@ dd.grid__col {
   background-color: #fff;
 }
 
-/*# sourceMappingURL=fixed.css.map */

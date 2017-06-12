@@ -87,7 +87,7 @@ class FrontstageLogging(Config):
     This class is used to set up and define logging behaviour for ras-frontstage
     """
     logger = logging.getLogger(__name__)
-    SERVICE_NAME = 'ras-frontstage'
+    SERVICE_NAME = 'ras-frontstage-dev'
     LOG_FORMAT = 'ras-frontstage: %(asctime)s|%(levelname)s | %(name)s.%(funcName)s:%(lineno)d | %(message)s'
 
     # If we don't have a detailed logger set lets just set the level as DEBUG

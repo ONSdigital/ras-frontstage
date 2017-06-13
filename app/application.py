@@ -418,8 +418,8 @@ def register():
         activation_code = request.form.get('activation_code')
         logger.debug("Activation code is: {}".format(activation_code))
 
-        # TODO Enrolement logic
-        return redirect(url_for('register_enter_your_details'))
+        # TODO Enrolment logic
+        return redirect(url_for('register_confirm_organisation_survey'))
 
     if form.errors:
         flash(form.errors, 'danger')
@@ -431,6 +431,11 @@ def register():
     }
 
     return render_template('register.html', _theme='default', form=form, data=templateData)
+
+
+@app.route('/create-account/confirm-organisation-survey/')
+def register_confirm_organisation_survey():
+    return render('register.confirm-organisation-survey.html')
 
 
 # This take all the user credentials and then creates an account on the OAuth2 server
@@ -588,14 +593,18 @@ def register_enter_your_details():
     return render_template('register.enter-your-details.html', _theme='default', form=form, errors=form.errors)
 
 
-@app.route('/create-account/confirm-organisation-survey/')
-def register_confirm_organisation_survey():
-    return render('register.confirm-organisation-survey.html')
-
-
 @app.route('/create-account/check-email/')
 def register_almost_done():
     return render('register.almost-done.html')
+
+
+@app.route('/create-account/activate-account/', methods=['GET', 'POST'])
+def register_activate_account():
+    if request.method == 'POST':
+        # TODO call back end service to activate the account?
+        return redirect(url_for('login_OAuth'))
+    else:
+        return render('register.activate-account.html')
 
 
 # Disable cache for development

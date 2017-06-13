@@ -22,6 +22,7 @@ from app.jwt import encode, decode
 from app.models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
 from app.utils import get_user_scopes_util
 from app.logger_config import logger_initial_config
+from structlog import wrap_logger
 
 app = Flask(__name__)
 app.debug = True
@@ -29,7 +30,7 @@ app.register_blueprint(secure_message_bp, url_prefix='/secure-message')
 
 logger_initial_config(service_name='ras-frontstage')
 
-logger = logging.getLogger(__name__)
+logger = wrap_logger(logging.getLogger(__name__))
 
 if 'APP_SETTINGS' in os.environ:
     # app.config.from_object(os.environ['APP_SETTINGS'])
@@ -43,7 +44,7 @@ if 'PRODUCTION_VERSION' in os.environ:
 else:
     logger.info(" *** APP.Info Testing server settings are being used. ***")
     app.config.from_object(TestingConfig)
-    print ("testing server started...")
+    logger.info("testing server started...")
 
 db.init_app(app)
 

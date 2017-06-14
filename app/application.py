@@ -90,7 +90,7 @@ def logged_in():
             # userName = userID.split('@')[0]
 
             # Filters the data array to remove surveys that shouldn't appear on the To Do page
-            statusFilter = {'status_filter': '["not started", "in progress"]'}
+            statusFilter = {'status_filter': '["Not started", "In progress"]'}
 
             # Get the survey data (To Do survey type)
             dataArray = build_survey_data(statusFilter)
@@ -126,7 +126,7 @@ def surveys_history():
                 app.logger.debug(" {} is: {}".format(key, decodedJWT[key]))
 
             # Filters the data array to remove surveys that shouldn't appear on the History page
-            statusFilter = {'status_filter': '["complete"]'}
+            statusFilter = {'status_filter': '["Complete"]'}
 
             # Get the survey data (History survey type)
             dataArray = build_survey_data(statusFilter)

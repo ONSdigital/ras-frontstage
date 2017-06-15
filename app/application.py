@@ -301,6 +301,7 @@ def login_OAuth():
         except MissingTokenError as e:
             logger.warning("Missing token error, error is: {}".format(e))
             logger.warning("Failed validation")
+            
         logger.debug("Our Token Endpoint is: {}".format(token_url))
 
         try:

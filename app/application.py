@@ -40,7 +40,7 @@ if 'PRODUCTION_VERSION' in os.environ:
 else:
     logger.info(" *** APP.Info Testing server settings are being used. ***")
     app.config.from_object(TestingConfig)
-    print("testing server started...")
+    logging.info("testing server started...")
 
 db.init_app(app)
 
@@ -51,7 +51,7 @@ def hello_world():
     return render_template('_temp.html', _theme='default')
 
 
-def build_survey_data(statusFilter):
+def build_survey_data(status_filter):
 
     # TODO - Derive the Party Id
     party_id = "3b136c4b-7a14-4904-9e01-13364dd7b972"
@@ -62,10 +62,9 @@ def build_survey_data(statusFilter):
 
     # Call the API Gateway Service to get the To Do survey list
     url = Config.API_GATEWAY_SURVEYS_URL + 'todo/' + party_id
-    req = requests.get(url, headers=headers, params=statusFilter, verify=False)
-    listData = req.json()
+    req = requests.get(url, headers=headers, params=status_filter, verify=False)
 
-    return listData
+    return req.json()
 
 
 # ===== Surveys To Do =====
@@ -90,13 +89,13 @@ def logged_in():
             # userName = userID.split('@')[0]
 
             # Filters the data array to remove surveys that shouldn't appear on the To Do page
-            statusFilter = {'status_filter': '["Not started", "In progress"]'}
+            status_filter = {'status_filter': '["Not started", "In progress"]'}
 
             # Get the survey data (To Do survey type)
-            dataArray = build_survey_data(statusFilter)
+            data_array = build_survey_data(status_filter)
 
             # TODO: pass in data={"error": {"type": "success"}, "user_id": userName} to get the user name working ?
-            return render_template('surveys-todo.html', _theme='default', dataArray=dataArray)
+            return render_template('surveys-todo.html', _theme='default', data_array=data_array)
 
         except JWTError:
             # TODO Provide proper logging
@@ -126,13 +125,13 @@ def surveys_history():
                 app.logger.debug(" {} is: {}".format(key, decodedJWT[key]))
 
             # Filters the data array to remove surveys that shouldn't appear on the History page
-            statusFilter = {'status_filter': '["Complete"]'}
+            status_filter = {'status_filter': '["Complete"]'}
 
             # Get the survey data (History survey type)
-            dataArray = build_survey_data(statusFilter)
+            data_array = build_survey_data(status_filter)
 
             # Render the template
-            return render_template('surveys-history.html',  _theme='default', dataArray=dataArray)
+            return render_template('surveys-history.html',  _theme='default', data_array=data_array)
 
         except JWTError:
             # TODO Provide proper logging

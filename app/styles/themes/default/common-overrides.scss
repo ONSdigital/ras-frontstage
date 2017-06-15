@@ -54,7 +54,7 @@
 
     .action-button {
         text-align: center;
-        width: 140px;
+        width: 160px;
         padding: 10px 20px;
     }
     @media only screen and (max-width: 740px) {
@@ -206,12 +206,10 @@ dd.grid__col {
         }
     }
 
-
-
     .action-button {
         text-align: center;
-        width: 140px;
-        padding: 10px 20px;
+        width: 150px;
+        padding: 10px 10px;
     }
     @media only screen and (max-width: 740px) {
         .action-button {
@@ -219,11 +217,6 @@ dd.grid__col {
         }
     }
 }
-
-
-
-
-
 
 @media only screen and (min-width: 740px){
 
@@ -234,11 +227,6 @@ dd.grid__col {
     }
 
 }
-
-// .survey-button {
-//     width: 185px;
-// }
-
 
 // TODO fix this (from responsive.csss)
 .mercury {

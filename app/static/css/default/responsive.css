@@ -4875,13 +4875,6 @@ input:checked ~ .label {
   border-width: 2px;
 }
 
-/**
- * Override normalize styles
- */
-dd.grid__col {
-  margin-left: 0;
-}
-
 .survey-list {
   list-style: none;
   padding-left: 0;
@@ -4916,7 +4909,7 @@ dd.grid__col {
 
 .survey-list .action-button {
   text-align: center;
-  width: 140px;
+  width: 160px;
   padding: 10px 20px;
 }
 
@@ -5012,6 +5005,13 @@ dd.grid__col {
   background-color: #fff;
 }
 
+/**
+ * Override normalize styles
+ */
+dd.grid__col {
+  margin-left: 0;
+}
+
 .survey-list {
   list-style: none;
   padding-left: 0;
@@ -5046,8 +5046,8 @@ dd.grid__col {
 
 .survey-list .action-button {
   text-align: center;
-  width: 140px;
-  padding: 10px 20px;
+  width: 150px;
+  padding: 10px 10px;
 }
 
 @media only screen and (max-width: 740px) {
@@ -5158,13 +5158,6 @@ dd.grid__col {
   border-width: 2px;
 }
 
-/**
- * Override normalize styles
- */
-dd.grid__col {
-  margin-left: 0;
-}
-
 .survey-list {
   list-style: none;
   padding-left: 0;
@@ -5199,7 +5192,7 @@ dd.grid__col {
 
 .survey-list .action-button {
   text-align: center;
-  width: 140px;
+  width: 160px;
   padding: 10px 20px;
 }
 
@@ -5295,6 +5288,13 @@ dd.grid__col {
   background-color: #fff;
 }
 
+/**
+ * Override normalize styles
+ */
+dd.grid__col {
+  margin-left: 0;
+}
+
 .survey-list {
   list-style: none;
   padding-left: 0;
@@ -5329,8 +5329,8 @@ dd.grid__col {
 
 .survey-list .action-button {
   text-align: center;
-  width: 140px;
-  padding: 10px 20px;
+  width: 150px;
+  padding: 10px 10px;
 }
 
 @media only screen and (max-width: 740px) {

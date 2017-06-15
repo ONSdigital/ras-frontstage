@@ -22,11 +22,13 @@ from app.jwt import encode, decode
 from app.models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
 from app.utils import get_user_scopes_util
 from app.logger_config import logger_initial_config
-
+from app.filters.case_status_filter import case_status_filter
 
 app = Flask(__name__)
 app.debug = True
 app.register_blueprint(secure_message_bp, url_prefix='/secure-message')
+
+app.jinja_env.filters['case_status_filter'] = case_status_filter
 
 logger_initial_config(service_name='ras-frontstage')
 
@@ -147,6 +149,95 @@ def surveys_history():
 
     return render_template('signed-in.html', _theme='default', data={"error": {"type": "failed"}})
 
+
+@app.route('/download_survey', methods=['GET'])
+def download_survey():
+    """Logged in page for users only."""
+
+    if session.get('jwt_token'):
+        jwttoken = session.get('jwt_token')
+
+        try:
+            decodedJWT = decode(jwttoken)
+            for key in decodedJWT:
+                app.logger.debug(" {} is: {}".format(key, decodedJWT[key]))
+
+
+            # TODO call backend service to download the file
+
+
+            # TODO Remove this
+            return redirect(url_for('logged_in'))
+
+
+            # Render the template
+            # return render_template('surveys-history.html',  _theme='default', dataArray=dataArray)
+
+        except JWTError:
+            # TODO Provide proper logging
+            app.logger.debug("This is not a valid JWT Token")
+
+            # app.logger.warning('JWT scope could not be validated.')
+            # Make sure we pop this invalid session variable.
+            session.pop('jwt_token')
+
+    return render_template('signed-in.html', _theme='default', data={"error": {"type": "failed"}})
+
+
+@app.route('/upload_survey', methods=['GET', 'POST'])
+def upload_survey():
+    """Logged in page for users only."""
+
+    # if session.get('jwt_token'):
+    #     jwttoken = session.get('jwt_token')
+    #
+    #     try:
+    #         decodedJWT = decode(jwttoken)
+    #         for key in decodedJWT:
+    #             app.logger.debug(" {} is: {}".format(key, decodedJWT[key]))
+    #
+    #         if request.method == 'POST':
+    #             username = request.form.get('username')
+    #             password = request.form.get('password')
+    #             logger.debug("Username is: {}".format(username))
+    #             logger.debug("Password is: {}".format(password))
+    #
+    #             existing_user = User.query.filter_by(username=username).first()
+    #
+    #             if not (existing_user and existing_user.check_password_simple(password)):
+    #                 flash('Invalid username or password. Please try again.', 'danger')
+    #                 logger.debug("Failed validation")
+    #                 return render_template('sign-in.html', _theme='default', form=form,
+    #                                        data={"error": {"type": "failed"}})
+    #
+    #             session['username'] = username
+    #
+    #             usr_scopes = get_user_scopes_util(username)
+    #
+    #             data_dict_for_jwt_token = {"username": username, "user_scopes": usr_scopes}
+    #
+    #             encoded_jwt_token = encode(data_dict_for_jwt_token)
+    #             session['jwt_token'] = encoded_jwt_token
+    #
+    #             flash('You have successfully logged in.', 'success')
+    #             logger.debug("validation OK")
+    #             return redirect(url_for('logged_in'))
+    #
+    #         else:
+    #             # Render the template
+    #             return render_template('surveys-upload.html')
+    #
+    #     except JWTError:
+    #         # TODO Provide proper logging
+    #         app.logger.debug("This is not a valid JWT Token")
+    #
+    #         # app.logger.warning('JWT scope could not be validated.')
+    #         # Make sure we pop this invalid session variable.
+    #         session.pop('jwt_token')
+    #
+    # return render_template('signed-in.html', _theme='default', data={"error": {"type": "failed"}})
+
+    return render_template('surveys-upload.html', _theme='default')
 
 @app.route('/protected/collectioninstrument', methods=['GET'])
 def protected_collection():
@@ -277,12 +368,10 @@ def login_OAuth():
 
         # Creates a 'session client' to interact with OAuth2. This provides a client ID to our client that is used to
         # interact with the server.
-        client = LegacyApplicationClient(
-            client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID)
+        client = LegacyApplicationClient(client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID)
 
         # Populates the request body with username and password from the user
-        client.prepare_request_body(username=username, password=password, scope=[
-                                    'ci.write', 'ci.read'])
+        client.prepare_request_body(username=username, password=password, scope=['ci.write', 'ci.read'])
 
         # passes our 'client' to the session management object. this deals with
         # the transactions between the OAuth2 server

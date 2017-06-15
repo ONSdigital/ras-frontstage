@@ -80,15 +80,3 @@ class OAuthConfig(Config):
     ONS_AUTHORIZATION_ENDPOINT = os.environ.get('ONS_AUTHORIZATION_ENDPOINT', '/web/authorize/')
     ONS_TOKEN_ENDPOINT = os.environ.get('ONS_TOKEN_ENDPOINT', '/api/v1/tokens/')
     ONS_ADMIN_ENDPOINT = os.environ.get('ONS_ADMIN_ENDPOINT', '/api/account/create')
-
-
-class FrontstageLogging(Config):
-    """
-    This class is used to set up and define logging behaviour for ras-frontstage
-    """
-    logger = logging.getLogger(__name__)
-    SERVICE_NAME = 'ras-frontstage-dev'
-    LOG_FORMAT = 'ras-frontstage: %(asctime)s|%(levelname)s | %(name)s.%(funcName)s:%(lineno)d | %(message)s'
-
-    # If we don't have a detailed logger set lets just set the level as DEBUG
-    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'DEBUG')

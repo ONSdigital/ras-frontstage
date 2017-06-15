@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, request, json
 import requests
 import logging
+from structlog import wrap_logger
 
-logger = logging.getLogger(__name__)
+logger = wrap_logger(logging.getLogger(__name__))
 
 
 headers = {'Content-Type': 'application/json',
@@ -17,6 +18,7 @@ secure_message_bp = Blueprint('secure_message_bp', __name__, static_folder='stat
 
 @secure_message_bp.route('/')
 def hello_world():
+    logger.debug("test")
     return "Hello World"
 
 

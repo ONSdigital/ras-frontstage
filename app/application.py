@@ -15,18 +15,21 @@ from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, M
 from requests import ConnectionError
 from requests_oauthlib import OAuth2Session
 from app.views.secure_messaging import secure_message_bp
-from app.config import OAuthConfig, Config, FrontstageLogging
+from app.config import OAuthConfig, Config
 from app.config import TestingConfig, ProductionConfig
 from app.jwt import encode, decode
 from app.models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
 from app.utils import get_user_scopes_util
+from app.logger_config import logger_initial_config
+from structlog import wrap_logger
 
 app = Flask(__name__)
 app.debug = True
 app.register_blueprint(secure_message_bp, url_prefix='/secure-message')
 
+logger_initial_config(service_name='ras-frontstage')
 
-logger = logging.getLogger(__name__)
+logger = wrap_logger(logging.getLogger(__name__))
 
 if 'APP_SETTINGS' in os.environ:
     # app.config.from_object(os.environ['APP_SETTINGS'])
@@ -40,7 +43,7 @@ if 'PRODUCTION_VERSION' in os.environ:
 else:
     logger.info(" *** APP.Info Testing server settings are being used. ***")
     app.config.from_object(TestingConfig)
-    logging.info("testing server started...")
+    logger.info("testing server started...")
 
 db.init_app(app)
 
@@ -675,18 +678,3 @@ def get_id(_id):
     # If we hit here then the request did not have a token or username set
     res = Response(response="Not authorised", status=403, mimetype="text/html")
     return res
-
-
-def setup_logging():
-    """Set up logging for application"""
-
-    logging.basicConfig(level=FrontstageLogging.LOG_LEVEL)
-    log_formatter = logging.Formatter(FrontstageLogging.LOG_FORMAT)
-    stdout_handler = logging.StreamHandler(sys.stdout)
-    stdout_handler.setFormatter(log_formatter)
-
-    # This explicitly sets the level for the log handler.
-    # We don't need this - but might in the future when we create more handlers. It does no harm being set.
-    stdout_handler.setLevel(logging.DEBUG)
-
-    logger.addHandler(stdout_handler)

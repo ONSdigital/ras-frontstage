@@ -253,7 +253,7 @@ def login_OAuth():
             app.logger.debug(" Values are: ")
 
             for key in token:
-                logger.debug(key, " Value is: ", token[key])
+                logger.debug("{} Value is: {}".format(key, token[key]))
         except MissingTokenError as e:
             logger.warning("Missing token error, error is: {}".format(e))
             logger.warning("Failed validation")

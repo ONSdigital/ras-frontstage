@@ -1,11 +1,11 @@
 
 """
-Main file that is ran
+Main file that is run
 """
+
 import json
 import logging
 import os
-import sys
 from datetime import datetime
 from functools import wraps, update_wrapper
 import requests
@@ -14,14 +14,15 @@ from jose import JWTError
 from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError
 from requests import ConnectionError
 from requests_oauthlib import OAuth2Session
+from structlog import wrap_logger
+
 from app.views.secure_messaging import secure_message_bp
-from app.config import OAuthConfig, Config
-from app.config import TestingConfig, ProductionConfig
+from app.config import OAuthConfig, Config, TestingConfig, ProductionConfig
 from app.jwt import encode, decode
 from app.models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
 from app.utils import get_user_scopes_util
 from app.logger_config import logger_initial_config
-from structlog import wrap_logger
+
 
 app = Flask(__name__)
 app.debug = True
@@ -92,7 +93,7 @@ def logged_in():
             # userName = userID.split('@')[0]
 
             # Filters the data array to remove surveys that shouldn't appear on the To Do page
-            status_filter = {'status_filter': '["Not started", "In progress"]'}
+            status_filter = {'status_filter': '["not started", "in progress"]'}
 
             # Get the survey data (To Do survey type)
             data_array = build_survey_data(status_filter)
@@ -128,7 +129,7 @@ def surveys_history():
                 app.logger.debug(" {} is: {}".format(key, decodedJWT[key]))
 
             # Filters the data array to remove surveys that shouldn't appear on the History page
-            status_filter = {'status_filter': '["Complete"]'}
+            status_filter = {'status_filter': '["complete"]'}
 
             # Get the survey data (History survey type)
             data_array = build_survey_data(status_filter)
@@ -295,7 +296,8 @@ def login_OAuth():
             app.logger.debug(" Values are: ")
 
             for key in token:
-                logger.debug(key, " Value is: ", token[key])
+                logger.debug("{} Value is: {}".format(key, token[key]))
+
         except MissingTokenError as e:
             logger.warning("Missing token error, error is: {}".format(e))
             logger.warning("Failed validation")

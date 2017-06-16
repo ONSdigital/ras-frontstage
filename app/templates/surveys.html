@@ -54,16 +54,13 @@
             <div class="grid__col col-2@m">
                 <div class="survey-action">
 
-                    <a class="btn action-button btn--primary" target="_blank" href="https://api-dev.apps.mvp.onsclofo.uk/collection-instrument-api/1.0.2/ciupload/download/123">Download&nbsp;&nbsp;&nbsp;
+                    <a class="btn action-button btn--primary" target="_blank" href="{{ config.API_GATEWAY_COLLECTION_INSTRUMENT_URL }}download/{{data.case.collectionInstrumentId}}">Download&nbsp;&nbsp;&nbsp;
                         <i class="fa fa-download fa-lg" aria-hidden="true"></i>
+
+                        <!--TODO file size-->
+                        <!--<span class="pluto survey-list-item__nowrap">(spreadsheet ???KB)</span>-->
                     </a>
 
-                    <!--<a class="btn action-button" href="http://localhost:8080/collection-instrument-api/1.0.2/survey_responses/{{data.case.id}}">Download&nbsp;&nbsp;&nbsp;-->
-                        <!--<i class="fa fa-download fa-lg" aria-hidden="true"></i>-->
-                        <!--<span class="pluto survey-list-item__nowrap">(spreadsheet ???KB)</span>-->
-                    <!--</a>-->
-
-                    <!--<input type="file" name="pic" accept="image/*">-->
                     <form
                             method="post"
                             action="{{ url_for('upload_survey') }}"

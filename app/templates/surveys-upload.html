@@ -6,21 +6,35 @@
 
 {% block main %}
 
-<h1 class="saturn">Upload a collection instrument</h1>
+    <h1 class="saturn">Upload a survey response</h1>
+
+    <form
+            method="post"
+            action="{{ url_for('upload_survey') }}"
+            class="form"
+            role="form">
+
+        <div>
+            <label class="label" for="file-input">Select a file: </label>
+            <input class="input input--text" id="file-input" type="file" />
+        </div>
+
+        <br />
+
+        <div>
+            <input class="btn" type="submit" value="Upload" />
+        </div>
+
+    </form>
+
+    <br />
+
+    <div>
+        <a href="{{ url_for('logged_in') }}">Back</a>
+    </div>
 
 {% endblock main %}
 
 
-    <!--<form-->
-            <!--method="post"-->
-            <!--action="{{ url_for('upload_survey') }}"-->
-            <!--class="form"-->
-            <!--role="form">-->
-        <!--<h1 class="saturn">Upload a collection instrument</h1>-->
 
-
-
-        <!--<button class="btn btn&#45;&#45;secondary venus" type="submit">Upload</button>-->
-
-    <!--</form>-->
 

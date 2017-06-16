@@ -54,16 +54,9 @@
             <div class="grid__col col-2@m">
                 <div class="survey-action">
 
-                    <form
-                            method="post"
-                            action="{{ url_for('download_survey') }}"
-                            class="form"
-                            role="form">
-
-                            <a class="btn action-button btn--primary" href="{{ url_for('download_survey') }}">Download&nbsp;&nbsp;&nbsp;
-                                <i class="fa fa-download fa-lg" aria-hidden="true"></i>
-                            </a>
-                    </form>
+                    <a class="btn action-button btn--primary" target="_blank" href="https://api-dev.apps.mvp.onsclofo.uk/collection-instrument-api/1.0.2/ciupload/download/123">Download&nbsp;&nbsp;&nbsp;
+                        <i class="fa fa-download fa-lg" aria-hidden="true"></i>
+                    </a>
 
                     <!--<a class="btn action-button" href="http://localhost:8080/collection-instrument-api/1.0.2/survey_responses/{{data.case.id}}">Download&nbsp;&nbsp;&nbsp;-->
                         <!--<i class="fa fa-download fa-lg" aria-hidden="true"></i>-->
@@ -77,7 +70,7 @@
                             class="form"
                             role="form">
 
-                            <a class="btn action-button btn--secondary" href="/upload_survey">Upload&nbsp;&nbsp;&nbsp;
+                            <a class="btn action-button btn--secondary" href="/upload_survey" >Upload&nbsp;&nbsp;&nbsp;
                                 <i class="fa fa-upload fa-lg" aria-hidden="true"></i>
                             </a>
                     </form>

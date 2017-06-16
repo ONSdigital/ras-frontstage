@@ -72,9 +72,15 @@ def build_survey_data(status_filter):
 
     return req.json()
 
+# ===== Error page =====
+@app.route('/error', methods=['GET', 'POST'])
+def error_page():
+    session.pop('jwt_token')
+    return render_template('error.html', _theme='default', data={"error": {"type": "failed"}})
+
 
 # ===== Surveys To Do =====
-@app.route('/logged-in', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def logged_in():
     """Logged in page for users only."""
 
@@ -99,6 +105,9 @@ def logged_in():
 
             # Get the survey data (To Do survey type)
             data_array = build_survey_data(status_filter)
+
+            # TODO remove
+            print(data_array)
 
             # TODO: pass in data={"error": {"type": "success"}, "user_id": userName} to get the user name working ?
             return render_template('surveys-todo.html', _theme='default', data_array=data_array)
@@ -150,8 +159,8 @@ def surveys_history():
     return render_template('signed-in.html', _theme='default', data={"error": {"type": "failed"}})
 
 
-@app.route('/download_survey', methods=['GET'])
-def download_survey():
+@app.route('/upload_survey', methods=['GET', 'POST'])
+def upload_survey():
     """Logged in page for users only."""
 
     if session.get('jwt_token'):
@@ -162,114 +171,53 @@ def download_survey():
             for key in decodedJWT:
                 app.logger.debug(" {} is: {}".format(key, decodedJWT[key]))
 
+            if request.method == 'POST':
+                # TODO validate the selected file
 
-            # TODO call backend service to download the file
+                # TODO Call the backend service to upload the selected file
 
+                # TODO - Add security headers
+                # headers = {'authorization': jwttoken}
+                headers = {}
 
-            # TODO Remove this
-            return redirect(url_for('logged_in'))
+                # TODO remove this
+                case_id = '7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
 
+                # Call the API Gateway Service to get the To Do survey list
+                url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'survey_responses/' + case_id
 
-            # Render the template
-            # return render_template('surveys-history.html',  _theme='default', dataArray=dataArray)
+                upload_data = {'file': 'todo',
+                               'case_id': '7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'}
+                
+                upload_response = requests.post(url, headers=headers, verify=False, data=json.dumps(upload_data))
+                logger.debug("Response from survey response upload service is: {}".format(upload_response.content))
+
+                # if register_user.ok:
+                #     # return render_template('register.almost-done.html', _theme='default', email=email_address)
+                #     return render_template('surveys-upload.html', _theme='default')
+                # else:
+                #     return abort(500,
+                #                  '{"message":"There was a problem with the registration service, please contact a member of the ONS staff"}')
+
+                return render_template('surveys-upload.html', _theme='default')
+
+            else:
+                # Render the template
+                return render_template('surveys-upload.html', _theme='default')
+
 
         except JWTError:
             # TODO Provide proper logging
             app.logger.debug("This is not a valid JWT Token")
 
-            # app.logger.warning('JWT scope could not be validated.')
+            # logger.warning('JWT scope could not be validated.')
             # Make sure we pop this invalid session variable.
             session.pop('jwt_token')
+            return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
 
-    return render_template('signed-in.html', _theme='default', data={"error": {"type": "failed"}})
-
-
-@app.route('/upload_survey', methods=['GET', 'POST'])
-def upload_survey():
-    """Logged in page for users only."""
-
-    # if session.get('jwt_token'):
-    #     jwttoken = session.get('jwt_token')
-    #
-    #     try:
-    #         decodedJWT = decode(jwttoken)
-    #         for key in decodedJWT:
-    #             app.logger.debug(" {} is: {}".format(key, decodedJWT[key]))
-    #
-    #         if request.method == 'POST':
-    #             username = request.form.get('username')
-    #             password = request.form.get('password')
-    #             logger.debug("Username is: {}".format(username))
-    #             logger.debug("Password is: {}".format(password))
-    #
-    #             existing_user = User.query.filter_by(username=username).first()
-    #
-    #             if not (existing_user and existing_user.check_password_simple(password)):
-    #                 flash('Invalid username or password. Please try again.', 'danger')
-    #                 logger.debug("Failed validation")
-    #                 return render_template('sign-in.html', _theme='default', form=form,
-    #                                        data={"error": {"type": "failed"}})
-    #
-    #             session['username'] = username
-    #
-    #             usr_scopes = get_user_scopes_util(username)
-    #
-    #             data_dict_for_jwt_token = {"username": username, "user_scopes": usr_scopes}
-    #
-    #             encoded_jwt_token = encode(data_dict_for_jwt_token)
-    #             session['jwt_token'] = encoded_jwt_token
-    #
-    #             flash('You have successfully logged in.', 'success')
-    #             logger.debug("validation OK")
-    #             return redirect(url_for('logged_in'))
-    #
-    #         else:
-    #             # Render the template
-    #             return render_template('surveys-upload.html')
-    #
-    #     except JWTError:
-    #         # TODO Provide proper logging
-    #         app.logger.debug("This is not a valid JWT Token")
-    #
-    #         # app.logger.warning('JWT scope could not be validated.')
-    #         # Make sure we pop this invalid session variable.
-    #         session.pop('jwt_token')
-    #
-    # return render_template('signed-in.html', _theme='default', data={"error": {"type": "failed"}})
-
-    return render_template('surveys-upload.html', _theme='default')
-
-@app.route('/protected/collectioninstrument', methods=['GET'])
-def protected_collection():
-    """Protected method to return full list of collectioninstrument json."""
-    if session.get('jwt_token'):
-        jwttoken = session.get('jwt_token')
-
-        decodedJWT = decode(jwttoken)
-        userID = decodedJWT['user_id']
-
-        try:
-            user_object = User.query.filter_by(username=userID).first()
-            # Check the tokens are the same
-            # TODO Check the token has not expired
-            if user_object.token == jwttoken:
-
-                headers = {'authorization': jwttoken}
-                url = 'localhost:5000/collectioninstrument'
-                req = requests.get(url,  headers=headers)
-                data = req.json()
-                logger.debug(data)
-                res = Response(response=data, status=200, mimetype="application/json")
-
-                return res
-
-            res = Response(response="""Your session is stale, try logging in again to
-                                     refresh your session variables""", status=404, mimetype="text/html")
-            return res
         except:
-            res = Response(response="""Looks like you are not a valid user,
-                           try logging in again and refresh your session""", status=404, mimetype="text/html")
-            return res
+            app.logger.debug("Error uploading survey response")
+            return redirect(url_for('error_page'))
 
 
 @app.route('/logout')
@@ -277,60 +225,61 @@ def logout():
     if 'jwt_token' in session:
         session.pop('jwt_token')
 
-    return redirect(url_for('login_OAuth'))
+    return redirect(url_for('login'))
 
 
+# TODO Confirm if this can be removed
 # ===== Sign in =====
-@app.route('/sign-in/', methods=['GET', 'POST'])
-def login():
-    """Handles sign-in"""
-
-    logger.debug("*** Hitting login() function.... ***")
-    """Login Page."""
-    form = LoginForm(request.form)
-
-    if request.method == 'POST' and form.validate():
-        username = request.form.get('username')
-        password = request.form.get('password')
-        logger.debug("Username is: {}".format(username))
-        logger.debug("Password is: {}".format(password))
-
-        existing_user = User.query.filter_by(username=username).first()
-
-        if not (existing_user and existing_user.check_password_simple(password)):
-            flash('Invalid username or password. Please try again.', 'danger')
-            logger.debug("Failed validation")
-            return render_template('sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
-
-        session['username'] = username
-
-        usr_scopes = get_user_scopes_util(username)
-
-        data_dict_for_jwt_token = {"username": username, "user_scopes": usr_scopes}
-
-        encoded_jwt_token = encode(data_dict_for_jwt_token)
-        session['jwt_token'] = encoded_jwt_token
-
-        flash('You have successfully logged in.', 'success')
-        logger.debug("validation OK")
-        return redirect(url_for('logged_in'))
-
-    if form.errors:
-        flash(form.errors, 'danger')
-
-    templateData = {
-        "error": {
-            "type": request.args.get("error")
-        }
-    }
-
-    return render_template('sign-in.html', _theme='default', form=form, data=templateData)
+# @app.route('/sign-in/', methods=['GET', 'POST'])
+# def login():
+#     """Handles sign-in"""
+#
+#     logger.debug("*** Hitting login() function.... ***")
+#     """Login Page."""
+#     form = LoginForm(request.form)
+#
+#     if request.method == 'POST' and form.validate():
+#         username = request.form.get('username')
+#         password = request.form.get('password')
+#         logger.debug("Username is: {}".format(username))
+#         logger.debug("Password is: {}".format(password))
+#
+#         existing_user = User.query.filter_by(username=username).first()
+#
+#         if not (existing_user and existing_user.check_password_simple(password)):
+#             flash('Invalid username or password. Please try again.', 'danger')
+#             logger.debug("Failed validation")
+#             return render_template('sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
+#
+#         session['username'] = username
+#
+#         usr_scopes = get_user_scopes_util(username)
+#
+#         data_dict_for_jwt_token = {"username": username, "user_scopes": usr_scopes}
+#
+#         encoded_jwt_token = encode(data_dict_for_jwt_token)
+#         session['jwt_token'] = encoded_jwt_token
+#
+#         flash('You have successfully logged in.', 'success')
+#         logger.debug("validation OK")
+#         return redirect(url_for('logged_in'))
+#
+#     if form.errors:
+#         flash(form.errors, 'danger')
+#
+#     templateData = {
+#         "error": {
+#             "type": request.args.get("error")
+#         }
+#     }
+#
+#     return render_template('sign-in.html', _theme='default', form=form, data=templateData)
 
 
 # ===== Sign in using OAuth2 =====
 
-@app.route('/sign-in/OAuth', methods=['GET', 'POST'])
-def login_OAuth():
+@app.route('/sign-in', methods=['GET', 'POST'])
+def login():
     """Handles sign in using OAuth2"""
 
     logger.debug("*** Hitting login for OAuth() function.... ***")
@@ -696,7 +645,7 @@ def register_almost_done():
 def register_activate_account():
     if request.method == 'POST':
         # TODO call back end service to activate the account?
-        return redirect(url_for('login_OAuth'))
+        return redirect(url_for('login'))
     else:
         return render('register.activate-account.html')
 
@@ -719,54 +668,89 @@ def render(template):
     return render_template(template, _theme='default')
 
 
-@app.route('/protected/collectioninstrument/id/<string:_id>', methods=['GET', 'POST'])
-def get_id(_id):
-    """
-    Method to return collection instrument json by ID.
-    """
-    # logger.info('get_id with value: {} '.format(_id))
+# TODO confirm if this is required, if not delete
+# @app.route('/protected/collectioninstrument/id/<string:_id>', methods=['GET', 'POST'])
+# def get_id(_id):
+#     """
+#     Method to return collection instrument json by ID.
+#     """
+#     # logger.info('get_id with value: {} '.format(_id))
+#
+#     # First check we have a jwt token.
+#     if (session.get(('jwt_token') and session.get('username'))):
+#         jwttoken = session.get('jwt_token')
+#
+#         # If we can decode the the token we need to get the user ID out and ensure it's a valid token for that user in our database
+#         decodedJWT = decode(jwttoken)
+#         userID = decodedJWT['user_id']
+#
+#         # lets find a user with this ID and check the token
+#
+#         try:
+#             user_object = User.query.filter_by(username=userID).first()
+#             # Check the tokens are the same
+#             # TODO Check the token has not expired
+#             if user_object.token == jwttoken:
+#                 # OK Tokens match we can forward this on to our collection instrument
+#                 headers = {'authorization': jwttoken}
+#                 # TODO make the calling of this URL a utility function
+#                 # OK construct the URL now we know it's a valid token
+#                 url = 'localhost:5000/collectioninstrument/id/' + '_id'
+#                 # Depending on wheather this is a put or a get will change how we forward on this message
+#                 if request.method['GET']:
+#                     req = requests.get(url,  headers=headers)
+#                 if request.method['PUT']:
+#                     req = requests.post(url,  headers=headers)
+#                 data = req.json()
+#                 logger.debug(data)
+#                 res = Response(response=data, status=200, mimetype="application/json")
+#                 return res
+#
+#             # Anything else but a token match means we reject the call
+#             logger.warning("tokens don't match")
+#             res = Response(response="""Your session is stale, try logging in again to
+#                                      refresh your session variables""", status=404, mimetype="text/html")
+#             return res
+#         except:
+#             logger.debug("failure to find a user with this ID")
+#             res = Response(response="""Looks like you are not a valid user,
+#                            try logging in again and refresh your session""", status=404, mimetype="text/html")
+#             return res
+#
+#     # If we hit here then the request did not have a token or username set
+#     res = Response(response="Not authorised", status=403, mimetype="text/html")
+#     return res
 
-    # First check we have a jwt token.
-    if (session.get(('jwt_token') and session.get('username'))):
-        jwttoken = session.get('jwt_token')
 
-        # If we can decode the the token we need to get the user ID out and ensure it's a valid token for that user in our database
-        decodedJWT = decode(jwttoken)
-        userID = decodedJWT['user_id']
-
-        # lets find a user with this ID and check the token
-
-        try:
-            user_object = User.query.filter_by(username=userID).first()
-            # Check the tokens are the same
-            # TODO Check the token has not expired
-            if user_object.token == jwttoken:
-                # OK Tokens match we can forward this on to our collection instrument
-                headers = {'authorization': jwttoken}
-                # TODO make the calling of this URL a utility function
-                # OK construct the URL now we know it's a valid token
-                url = 'localhost:5000/collectioninstrument/id/' + '_id'
-                # Depending on wheather this is a put or a get will change how we forward on this message
-                if request.method['GET']:
-                    req = requests.get(url,  headers=headers)
-                if request.method['PUT']:
-                    req = requests.post(url,  headers=headers)
-                data = req.json()
-                logger.debug(data)
-                res = Response(response=data, status=200, mimetype="application/json")
-                return res
-
-            # Anything else but a token match means we reject the call
-            logger.warning("tokens don't match")
-            res = Response(response="""Your session is stale, try logging in again to
-                                     refresh your session variables""", status=404, mimetype="text/html")
-            return res
-        except:
-            logger.debug("failure to find a user with this ID")
-            res = Response(response="""Looks like you are not a valid user,
-                           try logging in again and refresh your session""", status=404, mimetype="text/html")
-            return res
-
-    # If we hit here then the request did not have a token or username set
-    res = Response(response="Not authorised", status=403, mimetype="text/html")
-    return res
+# TODO confirm if this is required, if not delete
+# @app.route('/protected/collectioninstrument', methods=['GET'])
+# def protected_collection():
+#     """Protected method to return full list of collectioninstrument json."""
+#     if session.get('jwt_token'):
+#         jwttoken = session.get('jwt_token')
+#
+#         decodedJWT = decode(jwttoken)
+#         userID = decodedJWT['user_id']
+#
+#         try:
+#             user_object = User.query.filter_by(username=userID).first()
+#             # Check the tokens are the same
+#             # TODO Check the token has not expired
+#             if user_object.token == jwttoken:
+#
+#                 headers = {'authorization': jwttoken}
+#                 url = 'localhost:5000/collectioninstrument'
+#                 req = requests.get(url,  headers=headers)
+#                 data = req.json()
+#                 logger.debug(data)
+#                 res = Response(response=data, status=200, mimetype="application/json")
+#
+#                 return res
+#
+#             res = Response(response="""Your session is stale, try logging in again to
+#                                      refresh your session variables""", status=404, mimetype="text/html")
+#             return res
+#         except:
+#             res = Response(response="""Looks like you are not a valid user,
+#                            try logging in again and refresh your session""", status=404, mimetype="text/html")
+#             return res

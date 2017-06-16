@@ -58,7 +58,7 @@ class TestApplication(unittest.TestCase):
     def test_sign_in_page(self):
         """Test user sign in appears"""
 
-        response = self.app.get('/sign-in/OAuth', headers=self.headers)
+        response = self.app.get('/sign-in', headers=self.headers)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Sign in', response.data)
@@ -75,7 +75,7 @@ class TestApplication(unittest.TestCase):
         # m.post('http://localhost:8000/api/v1/tokens/', status_code=401, text=str(data))
 
         # Here we place a listener on this URL. This is the URL of the OAuth2 server. We send a 401 to reject the request
-        # from the ras_frontstage to get a token for this user. See application.py login_OAuth(). And the call to oauth.fetch_token
+        # from the ras_frontstage to get a token for this user. See application.py login(). And the call to oauth.fetch_token
         mock_object.post(url, status_code=401, json={'detail': 'Unauthorized user credentials'})
 
         # Lets send a post message to the ras_frontstage at the endpoint /sign-in/OAuth.

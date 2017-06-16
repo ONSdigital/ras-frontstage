@@ -11,10 +11,11 @@ import phonenumbers
 from phonenumbers.phonenumberutil import NumberParseException
 from flask_sqlalchemy import SQLAlchemy
 import logging
+from structlog import wrap_logger
 
 db = SQLAlchemy()
 
-logger = logging.getLogger(__name__)
+logger = wrap_logger(logging.getLogger(__name__))
 
 
 class User(db.Model):

@@ -48,7 +48,7 @@ if 'PRODUCTION_VERSION' in os.environ:
 else:
     logger.info(" *** APP.Info Testing server settings are being used. ***")
     app.config.from_object(TestingConfig)
-    print ("testing server started...")
+    logger.info("testing server started...")
 
 db.init_app(app)
 
@@ -712,11 +712,6 @@ def register_confirm_organisation_survey():
 @app.route('/create-account/check-email/')
 def register_almost_done():
     return render('register.almost-done.html')
-
-
-@app.route('/messages')
-def messages():
-    return render('secure-messages.html')
 
 
 # Disable cache for development

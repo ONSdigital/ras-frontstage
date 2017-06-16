@@ -6,72 +6,80 @@
 {% block main %}
 
 <ul class="navigation-tabs navigation-tabs--pills">
-    <li class="navigation-tabs__item navigation-tabs__item--primary navigation-tabs__item--active">
-        <a href="#"
-           class="navigation-tabs__tab navigation-tabs__tab--active">Inbox</a>
+    <li id="Inbox" class="{% if label == 'INBOX' %}
+                    {{ 'navigation-tabs__item navigation-tabs__item--primary navigation-tabs__item--active' }}
+                {% else %}
+                     {{ 'navigation-tabs__item navigation-tabs__item--primary' }}
+                {% endif %}">
+        <a href="/secure-message/messages/INBOX"
+           class= "{% if label == 'INBOX' %}
+                    {{ 'navigation-tabs__tab navigation-tabs__tab--active' }}
+                 {% else %}
+                    {{ 'navigation-tabs__tab' }}
+                 {% endif %}">Inbox</a>
     </li>
-    <li class="navigation-tabs__item navigation-tabs__item--primary">
-        <a href="#"
-           class="navigation-tabs__tab">Sent</a>
+    <li id="Sent" class="{% if label == 'SENT' %}
+                    {{ 'navigation-tabs__item navigation-tabs__item--primary navigation-tabs__item--active' }}
+                {% else %}
+                     {{ 'navigation-tabs__item navigation-tabs__item--primary' }}
+                {% endif %}">
+        <a href="/secure-message/messages/SENT"
+           class= "{% if label == 'SENT' %}
+                    {{ 'navigation-tabs__tab navigation-tabs__tab--active' }}
+                 {% else %}
+                    {{ 'navigation-tabs__tab' }}
+                 {% endif %}">Sent</a>
     </li>
-    <li class="navigation-tabs__item navigation-tabs__item--primary">
-        <a href="#"
-           class="navigation-tabs__tab">Drafts</a>
+    <li id="Draft" class="{% if label == 'DRAFT' %}
+                    {{ 'navigation-tabs__item navigation-tabs__item--primary navigation-tabs__item--active' }}
+                {% else %}
+                     {{ 'navigation-tabs__item navigation-tabs__item--primary' }}
+                {% endif %}">
+        <a href="/secure-message/messages/DRAFT"
+           class= "{% if label == 'DRAFT' %}
+                    {{ 'navigation-tabs__tab navigation-tabs__tab--active' }}
+                 {% else %}
+                    {{ 'navigation-tabs__tab' }}
+                 {% endif %}">Draft</a>
     </li>
 
     <li class="navigation-tabs__item navigation-tabs__item--secondary">
-        <a href="#"
+        <a href="/secure-message/create-message"
            class="navigation-tabs__tab navigation-tabs__tab--link">Create a message</a>
     </li>
 </ul>
 
 <ul class="message-list">
+    {% for message in messages %}
     <li class="message-list__item">
-        <a href="">BRES 2016 survey response query</a>
+        <a href="#">{{ message['subject'] }}</a>
 
         <dl class="grid">
             <dt class="grid__col col-2@m">
                 Sent:
             </dt>
             <dd class="grid__col col-9@m pull-1@m">
-                09:38 Fri 7 Apr 2017
+                {% if 'SENT' in message['labels'] or 'INBOX' in message['labels'] %}
+                    {{ message['sent_date'] }}
+                {% elif 'DRAFT' in message['labels'] %}
+                    {{ message['modified_date'] }}
+                {% endif %}
             </dd>
             <dt class="grid__col col-2@m">
                 From:
             </dt>
             <dd class="grid__col col-9@m pull-1@m">
-                Dave Cleare, ONS BRES Survey team
+                {{ message['urn_from'] }}
             </dd>
         </dl>
 
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-            magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip</p>
+        <p>{{ message['body']|truncate(100) }}</p>
 
         <a href="">Read full message</a>
     </li>
-    <li class="message-list__item">
-        <a href="">BRES 2016 survey response query</a>
-
-        <dl class="grid">
-            <dt class="grid__col col-2@m">
-                Sent:
-            </dt>
-            <dd class="grid__col col-9@m pull-1@m">
-                09:38 Fri 7 Apr 2017
-            </dd>
-            <dt class="grid__col col-2@m">
-                From:
-            </dt>
-            <dd class="grid__col col-9@m pull-1@m">
-                Dave Cleare, ONS BRES Survey team
-            </dd>
-        </dl>
-
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-            magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip</p>
-
-        <a href="">Read full message</a>
-    </li>
+    {% else %}
+       <li>You have no messages</li>
+    {% endfor %}
 </ul>
 
 {% endblock main %}

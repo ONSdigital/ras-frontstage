@@ -30,13 +30,13 @@ def create_message():
         logger.warning("Warning - Send Message")
         logger.error("Error - Send Message")
         logger.critical("Critical - Send Message")
-        data = {'urn_to': 'BRES', 'urn_from': 'tom@gmail.com', 'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
+        data = {'urn_to': 'BRES', 'urn_from': 'respondent.000000000', 'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
                 'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
 
         response = requests.post("http://localhost:5050/message/send", data=json.dumps(data), headers=headers)
         resp_data = json.loads(response.text)
         logger.debug(resp_data['msg_id'])
-        return render_template('message-success-temp.html', _theme='default')
+        return render_template("message-success-temp.html", _theme='default')
     else:
         return render_template('secure-messages-create.html', _theme='default')
 
@@ -55,3 +55,15 @@ def reply_message():
         return render_template('message-success-temp.html', _theme='default')
     else:
         return render_template('secure-messages-view.html', _theme='default')
+
+
+@secure_message_bp.route('/messages/<label>', methods=['GET'])
+@secure_message_bp.route('/messages', methods=['GET'])
+def messages_get(label='INBOX'):
+    """Gets users messages"""
+    url = "http://localhost:5050/messages?limit=1000"
+    if label is not None:
+        url = url + "&label=" + label
+    resp = requests.get(url, headers=headers)
+    resp_data = json.loads(resp.text)
+    return render_template('secure-messages.html', _theme='default', messages=resp_data['messages'], links=resp_data['_links'], label=label)

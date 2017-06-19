@@ -26,6 +26,13 @@ from app.logger_config import logger_initial_config
 
 app = Flask(__name__)
 app.debug = True
+
+app.config.update(
+    DEBUG=True,
+    TESTING=True,
+    TEMPLATES_AUTO_RELOAD=True
+)
+
 app.register_blueprint(secure_message_bp, url_prefix='/secure-message')
 
 logger_initial_config(service_name='ras-frontstage')

@@ -90,8 +90,7 @@ gulp.task('test:scripts:e2e', function() {
 
 gulp.task('dev', [
 	'watch:common:styles',
-	'watch:common:scripts',
-	'watch:sass'
+	'watch:common:scripts'
 ]);
 
 gulp.task('test', [

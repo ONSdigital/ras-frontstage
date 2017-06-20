@@ -8,7 +8,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 headers = {'Content-Type': 'application/json',
-           'Authorization': 'eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ.GXOO8DQItBlk9hO2Lve2G7vjD1AoEdmzrJVn6_woPhPGddNk9dtfUgbHDuCVoQrteTC8ux1zbKnn0VSCSaSIEF8kM-8WQirDTxWtm8F5i339dJk7eM3Bk6-BxQgMcgrSUrGDwjPuQBYaHEvRGPZccB4576JXX4zhBjaqKDYzD_57St5bC1Ve7k_N-97W3w2VqT33OtQdwS6qeDqXFc6DHCgJsvLMFztmJ1BTWzab9PejmWhLup5uBb9s0XWRyx12KcNXJtNuFxFM2z4FMJ2sWPeNqLbgcg8ECfJ0IrO-Cy4JuitphnWegaujpcFnuoZl-FQvHszZF6uoGsjOQUII5w.ll-4VbmGRJL-ROgi.41hFWh6SLlp-y6ZrquxSeNkABGQp_4E6Y5gVkTogTNMbXkDJ2Dd3PRcsp_heGTzD6DEygIW_fAqR4ekfpuLYb4oj5Iax5fUYJfhp1b-FyKIqOExuQoaDCWaisDrIglfLQQYtSsXF49mvRVapIzD9YtSW4FyEJVwYsS6YVykezkk._xidxqOPvdqGocscjyi2wQ'}
+           'Authorization': 'eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ.XMrQ2QMNcoWqv6Pm4KGPZRPAHMSNuCRrmdp-glDvf_9gDzYDoXkxbZEBqy6_pdMTIFINUWUABYa7PdLLuJh5uoU9L7lmvJKEYCq0e5rS076KLRc5pFKHJesgJLNijj7scLke3y4INkd0px82SHhnbek0bGLeu3i8FgRt4vD0Eu8TWODM7kEfAT_eRmvPBM1boyOqrpyhYgE9p0_NklwloFXdYZKjTvHxlHtbiuYmvXSTFkbbp_t8T1xZmDrfgS2EDWTFEagzyKBFFAH4Z5QRUUJPiuAxI3lSNS2atFFtDWiZRhuuhRyJzNA4vqTpmFPUE6h_iggkcbiUPofSBx3CUw.QK4lX7z2vN6jryJz.G9C1zoAvWHfAJywiuijq6E78xCMZ5NOAZD1g3e6PTWhveQKNecBJAPgXyRDVgljgIwSq_vBY2AVTIE5xWapwF3oLZyiC0T0H2LrjlpKFUa51-VU_-Yj8u4ax0iLvyWyRRepQneYJ0riF4zbmcGf1vCCEO3WOwcD5wXBFVXVH6wPqExmI2tjWWLdz2F7oK1Wnh1pbQX_EW5rYb2I4mPuc2J6ijXAr73qcJLAzJbjDo1uk.QrPCckVYuNlcWeCwQmws9A'}
 
 
 modify_data = {'action': '',
@@ -34,7 +34,7 @@ def create_message():
             logger.warning("Warning - Send Message")
             logger.error("Error - Send Message")
             logger.critical("Critical - Send Message")
-            data = {'msg_to': 'BRES', 'msg_from': 'respondent.000000000', 'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
+            data = {'msg_to': 'BRES', 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
                     'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
 
             response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
@@ -47,7 +47,7 @@ def create_message():
             logger.debug("Debug - Save Draft")
             logger.warning("Warning - Save Draft")
             logger.error("Error - Save Draft")
-            data = {'msg_to': 'BRES', 'msg_from': 'respondent.00000000', 'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
+            data = {'msg_to': 'BRES', 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
                     'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
 
             response = requests.post(SecureMessaging.DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
@@ -66,10 +66,22 @@ def reply_message():
 
     if request.method == 'POST':
         logger.info("Reply to Message")
-        data = {'msg_to': 'BRES', 'msg_from': 'respondent.000000000', 'subject': 'reply_subject', 'body': request.form['secure-message-body'],
+        data = {'msg_to': 'BRES', 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'subject': 'reply_subject', 'body': request.form['secure-message-body'],
                 'thread_id': 'test', 'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
 
         response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
         resp_data = json.loads(response.text)
         logger.debug(resp_data['msg_id'])
         return render_template('message-success-temp.html', _theme='default')
+
+    
+@secure_message_bp.route('/messages/<label>', methods=['GET'])
+@secure_message_bp.route('/messages', methods=['GET'])
+def messages_get(label='INBOX'):
+    """Gets users messages"""
+    url = SecureMessaging.MESSAGES_API_URL
+    if label is not None:
+        url = url + "&label=" + label
+    resp = requests.get(url, headers=headers)
+    resp_data = json.loads(resp.text)
+    return render_template('secure-messages.html', _theme='default', messages=resp_data['messages'], links=resp_data['_links'], label=label)

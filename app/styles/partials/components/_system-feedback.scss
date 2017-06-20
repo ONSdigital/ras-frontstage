@@ -1,0 +1,16 @@
+.system-feedback {
+
+> .system-feedback__list {
+    padding-left : 0;
+    list-style-type : none;
+
+    > .system-feedback__list-item {
+
+        &.system-feedback__list-item--success {
+
+    > .system-feedback__icon {
+        color : #0f8243;
+				}
+			}
+		}
+	}

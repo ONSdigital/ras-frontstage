@@ -96,7 +96,7 @@ class SecureMessaging(Config):
 
     SM_API_URL = os.environ.get('SM_URL', 'http://localhost:5050')
     SM_UI_URL = os.environ.get('SM_UI_URL', 'http://localhost:5001/secure-message')
-    CREATE_MESSAGE_API_URL = SM_API_URL + '/message/save'
+    CREATE_MESSAGE_API_URL = SM_API_URL + '/message/send'
     CREATE_MESSAGE_UI_URL = SM_UI_URL + '/create-message'
     MESSAGES_API_URL = SM_API_URL + '/messages?limit=' + str(MESSAGE_LIMIT)
     MESSAGES_UI_URL = SM_UI_URL + '/messages'

@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, json
 import requests
 import logging
 from structlog import wrap_logger
+from config import SecureMessaging
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -32,13 +33,13 @@ def create_message():
         logger.warning("Warning - Send Message")
         logger.error("Error - Send Message")
         logger.critical("Critical - Send Message")
-        data = {'urn_to': 'BRES', 'urn_from': 'tom@gmail.com', 'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
+        data = {'msg_to': 'BRES', 'msg_from': 'respondent.000000000', 'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
                 'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
 
-        response = requests.post("http://localhost:5050/message/send", data=json.dumps(data), headers=headers)
+        response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
         resp_data = json.loads(response.text)
         logger.debug(resp_data['msg_id'])
-        return render_template('message-success-temp.html', _theme='default')
+        return render_template("message-success-temp.html", _theme='default')
     else:
         return render_template('secure-messages-create.html', _theme='default')
 
@@ -49,11 +50,24 @@ def reply_message():
 
     if request.method == 'POST':
         logger.info("Reply to Message")
-        data = {'urn_to': 'BRES', 'urn_from': 'tom@gmail.com', 'subject': 'reply_subject', 'body': request.form['secure-message-body'],
+        data = {'msg_to': 'BRES', 'msg_from': 'tom@gmail.com', 'subject': 'reply_subject', 'body': request.form['secure-message-body'],
                 'thread_id': 'test', 'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
-        response = requests.post("http://localhost:5050/message/send", data=json.dumps(data), headers=headers)
+        response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
         resp_data = json.loads(response.text)
         logger.debug(resp_data['msg_id'])
         return render_template('message-success-temp.html', _theme='default')
     else:
         return render_template('secure-messages-view.html', _theme='default')
+
+
+@secure_message_bp.route('/messages/<label>', methods=['GET'])
+@secure_message_bp.route('/messages', methods=['GET'])
+def messages_get(label='INBOX'):
+    """Gets users messages"""
+    url = SecureMessaging.MESSAGES_API_URL
+    if label is not None:
+        url = url + "&label=" + label
+    resp = requests.get(url, headers=headers)
+    resp_data = json.loads(resp.text)
+    return render_template('secure-messages.html', _theme='default', messages=resp_data['messages'], links=resp_data['_links'], label=label)
+

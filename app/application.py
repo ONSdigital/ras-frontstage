@@ -26,6 +26,13 @@ from app.filters.case_status_filter import case_status_filter
 
 app = Flask(__name__)
 app.debug = True
+
+app.config.update(
+    DEBUG=True,
+    TESTING=True,
+    TEMPLATES_AUTO_RELOAD=True
+)
+
 app.register_blueprint(secure_message_bp, url_prefix='/secure-message')
 
 app.jinja_env.filters['case_status_filter'] = case_status_filter

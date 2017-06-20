@@ -4805,6 +4805,9 @@ input:checked ~ .label {
   padding: 0;
   list-style-type: none;
   border-bottom: 1px solid #555;
+  /**
+   * Component modifiers
+   */
 }
 
 .navigation-tabs:after {
@@ -4856,6 +4859,65 @@ input:checked ~ .label {
   margin-bottom: -1px;
   padding-bottom: 1px;
   background-color: #fff;
+}
+
+.navigation-tabs.navigation-tabs--pills > .navigation-tabs__item > .navigation-tabs__tab {
+  display: inline-block;
+  border: none;
+  border-bottom: 2px solid transparent;
+  *display: inline;
+  *zoom: 1;
+}
+
+.navigation-tabs.navigation-tabs--pills > .navigation-tabs__item > .navigation-tabs__tab:focus, .navigation-tabs.navigation-tabs--pills > .navigation-tabs__item > .navigation-tabs__tab:active {
+  background-color: transparent;
+}
+
+.navigation-tabs.navigation-tabs--pills > .navigation-tabs__item > .navigation-tabs__tab:not(.navigation-tabs__tab--link) {
+  color: #000;
+  text-decoration: none;
+  -webkit-transition: border-color 200ms ease-in, color 200ms ease-in;
+  transition: border-color 200ms ease-in, color 200ms ease-in;
+}
+
+.navigation-tabs.navigation-tabs--pills > .navigation-tabs__item > .navigation-tabs__tab:not(.navigation-tabs__tab--link):hover {
+  border-bottom: 2px solid #033e58;
+}
+
+.navigation-tabs.navigation-tabs--pills > .navigation-tabs__item > .navigation-tabs__tab.navigation-tabs__tab--link {
+  -webkit-transition: none;
+  transition: none;
+}
+
+.navigation-tabs.navigation-tabs--pills > .navigation-tabs__item > .navigation-tabs__tab.navigation-tabs__tab--link:hover {
+  color: #033e58;
+}
+
+.navigation-tabs.navigation-tabs--pills > .navigation-tabs__item.navigation-tabs__item--active {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.navigation-tabs.navigation-tabs--pills > .navigation-tabs__item.navigation-tabs__item--active > .navigation-tabs__tab {
+  font-weight: 600;
+  border-bottom: 2px solid #033e58;
+}
+
+.message-list {
+  padding-left: 0;
+  list-style-type: none;
+}
+
+.message-list > .message-list__item {
+  margin-bottom: 0;
+  padding-bottom: 18px;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #ccc;
+}
+
+.message-list > .message-list__item + .message-list__item {
+  padding-top: 18px;
+  padding-top: 1rem;
 }
 
 .details__link:before {
@@ -5008,6 +5070,10 @@ input:checked ~ .label {
 /**
  * Override normalize styles
  */
+dd.grid__col {
+  margin-left: 0;
+}
+
 dd.grid__col {
   margin-left: 0;
 }
@@ -5291,6 +5357,10 @@ dd.grid__col {
 /**
  * Override normalize styles
  */
+dd.grid__col {
+  margin-left: 0;
+}
+
 dd.grid__col {
   margin-left: 0;
 }

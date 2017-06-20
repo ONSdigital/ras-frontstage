@@ -84,3 +84,20 @@ class OAuthConfig(Config):
     ONS_AUTHORIZATION_ENDPOINT = os.environ.get('ONS_AUTHORIZATION_ENDPOINT', '/web/authorize/')
     ONS_TOKEN_ENDPOINT = os.environ.get('ONS_TOKEN_ENDPOINT', '/api/v1/tokens/')
     ONS_ADMIN_ENDPOINT = os.environ.get('ONS_ADMIN_ENDPOINT', '/api/account/create')
+
+
+class SecureMessaging(Config):
+    """Used to configure Secure Messaging"""
+
+    MESSAGE_LIMIT = 1000
+
+    SM_API_URL = os.environ.get('SM_URL', 'http://localhost:5050')
+    SM_UI_URL = os.environ.get('SM_UI_URL', 'http://localhost:5001/secure-message')
+    CREATE_MESSAGE_API_URL = SM_API_URL + '/message/save'
+    CREATE_MESSAGE_UI_URL = SM_UI_URL + '/create-message'
+    MESSAGES_API_URL = SM_API_URL + '/messages?limit=' + str(MESSAGE_LIMIT)
+    MESSAGES_UI_URL = SM_UI_URL + '/messages'
+
+    # Selenium Driver Path
+
+    chrome_driver = "{}/tests/selenium_scripts/drivers/chromedriver".format(os.environ.get('RAS_FRONTSTAGE_PATH'))

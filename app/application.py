@@ -114,10 +114,6 @@ def logged_in():
             # Get the survey data (To Do survey type)
             data_array = build_survey_data(status_filter)
 
-            # TODO remove this
-            print(data_array)
-            print(data_array['rows'][0]['case']['collectionInstrumentId'])
-
             # TODO: pass in data={"error": {"type": "success"}, "user_id": userName} to get the user name working ?
             return render_template('surveys-todo.html', _theme='default', data_array=data_array)
 

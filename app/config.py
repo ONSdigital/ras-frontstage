@@ -93,6 +93,8 @@ class SecureMessaging(Config):
     CREATE_MESSAGE_UI_URL = SM_UI_URL + '/create-message'
     MESSAGES_API_URL = SM_API_URL + '/messages?limit=' + str(MESSAGE_LIMIT)
     MESSAGES_UI_URL = SM_UI_URL + '/messages'
+    DRAFT_SAVE_API_URL = SM_API_URL + '/draft/save'
+    DRAFT_GET_API_URL = SM_API_URL + '/draft/{0}'
 
     # Selenium Driver Path
 

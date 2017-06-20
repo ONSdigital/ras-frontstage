@@ -23,25 +23,41 @@ def hello_world():
     return "Hello World"
 
 
-@secure_message_bp.route('/create-message', methods=['GET', 'POST'])
+@secure_message_bp.route('/create-message', methods=['GET', 'POST', 'PUT'])
 def create_message():
     """Handles sending of new message"""
 
     if request.method == 'POST':
-        logger.info("Info - Send Message")
-        logger.debug("Debug - Send Message")
-        logger.warning("Warning - Send Message")
-        logger.error("Error - Send Message")
-        logger.critical("Critical - Send Message")
-        data = {'msg_to': 'BRES', 'msg_from': 'respondent.000000000', 'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
-                'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
+        if request.form['submit'] == 'Send message':
+            logger.info("Info - Send Message")
+            logger.debug("Debug - Send Message")
+            logger.warning("Warning - Send Message")
+            logger.error("Error - Send Message")
+            logger.critical("Critical - Send Message")
+            data = {'msg_to': 'BRES', 'msg_from': 'respondent.000000000', 'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
+                    'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
 
-        response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
-        resp_data = json.loads(response.text)
-        logger.debug(resp_data['msg_id'])
-        return render_template("message-success-temp.html", _theme='default')
-    else:
-        return render_template('secure-messages-create.html', _theme='default')
+            response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
+            resp_data = json.loads(response.text)
+            logger.debug(resp_data['msg_id'])
+            return render_template('message-success-temp.html', _theme='default')
+
+        if request.form['submit'] == 'Save draft':
+            logger.info("Save Draft")
+            logger.debug("Debug - Save Draft")
+            logger.warning("Warning - Save Draft")
+            logger.error("Error - Save Draft")
+            data = {'msg_to': 'BRES', 'msg_from': 'respondent.00000000', 'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
+                    'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
+
+            response = requests.post(SecureMessaging.DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
+            resp_data = json.loads(response.text)
+            logger.debug(resp_data['msg_id'])
+            get_draft = requests.get(SecureMessaging.DRAFT_GET_API_URL.format(resp_data['msg_id']), headers=headers)
+            get_json = json.loads(get_draft.content)
+
+            return render_template('secure-messages-draft.html', _theme='default', draft=get_json)
+    return render_template('secure-messages-create.html', _theme='default')
 
 
 @secure_message_bp.route('/reply-message', methods=['GET', 'POST'])
@@ -50,24 +66,10 @@ def reply_message():
 
     if request.method == 'POST':
         logger.info("Reply to Message")
-        data = {'msg_to': 'BRES', 'msg_from': 'tom@gmail.com', 'subject': 'reply_subject', 'body': request.form['secure-message-body'],
+        data = {'msg_to': 'BRES', 'msg_from': 'respondent.000000000', 'subject': 'reply_subject', 'body': request.form['secure-message-body'],
                 'thread_id': 'test', 'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
+
         response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
         resp_data = json.loads(response.text)
         logger.debug(resp_data['msg_id'])
         return render_template('message-success-temp.html', _theme='default')
-    else:
-        return render_template('secure-messages-view.html', _theme='default')
-
-
-@secure_message_bp.route('/messages/<label>', methods=['GET'])
-@secure_message_bp.route('/messages', methods=['GET'])
-def messages_get(label='INBOX'):
-    """Gets users messages"""
-    url = SecureMessaging.MESSAGES_API_URL
-    if label is not None:
-        url = url + "&label=" + label
-    resp = requests.get(url, headers=headers)
-    resp_data = json.loads(resp.text)
-    return render_template('secure-messages.html', _theme='default', messages=resp_data['messages'], links=resp_data['_links'], label=label)
-

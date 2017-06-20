@@ -73,3 +73,15 @@ def reply_message():
         resp_data = json.loads(response.text)
         logger.debug(resp_data['msg_id'])
         return render_template('message-success-temp.html', _theme='default')
+
+    
+@secure_message_bp.route('/messages/<label>', methods=['GET'])
+@secure_message_bp.route('/messages', methods=['GET'])
+def messages_get(label='INBOX'):
+    """Gets users messages"""
+    url = SecureMessaging.MESSAGES_API_URL
+    if label is not None:
+        url = url + "&label=" + label
+    resp = requests.get(url, headers=headers)
+    resp_data = json.loads(resp.text)
+    return render_template('secure-messages.html', _theme='default', messages=resp_data['messages'], links=resp_data['_links'], label=label)

@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, json
 import requests
 import logging
 from structlog import wrap_logger
+from app.config import SecureMessaging
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -33,27 +34,26 @@ def create_message():
             logger.warning("Warning - Send Message")
             logger.error("Error - Send Message")
             logger.critical("Critical - Send Message")
-            data = {'urn_to': 'BRES', 'urn_from': 'tom@gmail.com', 'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
+            data = {'msg_to': 'BRES', 'msg_from': 'respondent.000000000', 'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
                     'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
 
-            response = requests.post("http://localhost:5050/message/send", data=json.dumps(data), headers=headers)
+            response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
             resp_data = json.loads(response.text)
             logger.debug(resp_data['msg_id'])
             return render_template('message-success-temp.html', _theme='default')
-
 
         if request.form['submit'] == 'Save draft':
             logger.info("Save Draft")
             logger.debug("Debug - Save Draft")
             logger.warning("Warning - Save Draft")
             logger.error("Error - Save Draft")
-            data = {'urn_to': 'BRES', 'urn_from': 'tom@gmail.com', 'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
+            data = {'msg_to': 'BRES', 'msg_from': 'respondent.00000000', 'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
                     'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
 
-            response = requests.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=headers)
+            response = requests.post(SecureMessaging.DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
             resp_data = json.loads(response.text)
             logger.debug(resp_data['msg_id'])
-            get_draft = requests.get("http://localhost:5050/draft/{0}".format(resp_data['msg_id']), headers=headers)
+            get_draft = requests.get(SecureMessaging.DRAFT_GET_API_URL.format(resp_data['msg_id']), headers=headers)
             get_json = json.loads(get_draft.content)
 
             return render_template('secure-messages-draft.html', _theme='default', draft=get_json)
@@ -66,10 +66,10 @@ def reply_message():
 
     if request.method == 'POST':
         logger.info("Reply to Message")
-        data = {'urn_to': 'BRES', 'urn_from': 'tom@gmail.com', 'subject': 'reply_subject', 'body': request.form['secure-message-body'],
+        data = {'msg_to': 'BRES', 'msg_from': 'respondent.000000000', 'subject': 'reply_subject', 'body': request.form['secure-message-body'],
                 'thread_id': 'test', 'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
 
-        response = requests.post("http://localhost:5050/message/send", data=json.dumps(data), headers=headers)
+        response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
         resp_data = json.loads(response.text)
         logger.debug(resp_data['msg_id'])
         return render_template('message-success-temp.html', _theme='default')

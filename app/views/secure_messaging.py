@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, json
 import requests
 import logging
 from structlog import wrap_logger
-from config import SecureMessaging
+from app.config import SecureMessaging
 
 logger = wrap_logger(logging.getLogger(__name__))
 

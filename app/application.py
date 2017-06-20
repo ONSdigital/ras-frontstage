@@ -68,6 +68,7 @@ def build_survey_data(status_filter):
 
     # Call the API Gateway Service to get the To Do survey list
     url = Config.API_GATEWAY_SURVEYS_URL + 'todo/' + party_id
+    logger.debug("build_survey_data URL is: {}".format(url))
     req = requests.get(url, headers=headers, params=status_filter, verify=False)
 
     return req.json()
@@ -106,15 +107,16 @@ def logged_in():
             # Get the survey data (To Do survey type)
             data_array = build_survey_data(status_filter)
 
-            # TODO remove
-            print(data_array)
+            # TODO remove this
+            # print(data_array)
+            # print(data_array['rows'][0]['case']['collectionInstrumentId'])
 
             # TODO: pass in data={"error": {"type": "success"}, "user_id": userName} to get the user name working ?
             return render_template('surveys-todo.html', _theme='default', data_array=data_array)
 
         except JWTError:
             # TODO Provide proper logging
-            app.logger.debug("This is not a valid JWT Token")
+            app.logger.error('This is not a valid JWT Token')
 
             # app.logger.warning('JWT scope could not be validated.')
             # TODO Provide proper logging
@@ -150,7 +152,7 @@ def surveys_history():
 
         except JWTError:
             # TODO Provide proper logging
-            app.logger.debug("This is not a valid JWT Token")
+            app.logger.error('This is not a valid JWT Token')
 
             # app.logger.warning('JWT scope could not be validated.')
             # Make sure we pop this invalid session variable.
@@ -163,15 +165,23 @@ def surveys_history():
 def upload_survey():
     """Logged in page for users only."""
 
+    case_id = request.args.get('case_id', None)
+
+    # TODO remove this
+    # '9d84d31d-5f9c-4d3a-ae0a-3e55794266be'
+    print('case_id')
+    print(case_id)
+
     if session.get('jwt_token'):
         jwttoken = session.get('jwt_token')
 
         try:
             decodedJWT = decode(jwttoken)
             for key in decodedJWT:
-                app.logger.debug(" {} is: {}".format(key, decodedJWT[key]))
+                app.logger.debug(' {} is: {}'.format(key, decodedJWT[key]))
 
             if request.method == 'POST':
+
                 # TODO validate the selected file
 
                 # TODO Call the backend service to upload the selected file
@@ -180,18 +190,19 @@ def upload_survey():
                 # headers = {'authorization': jwttoken}
                 headers = {}
 
-                # TODO remove this
-                case_id = '7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
-
                 # Call the API Gateway Service to get the To Do survey list
-                url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'survey_responses/' + case_id
+                url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'survey_responses/{}'.format(case_id)
+                logger.debug('upload_survey URL is: {}'.format(url))
 
-                upload_data = {'file': 'todo',
-                               'case_id': '7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'}
-                
+                upload_data = {'file': request.form.get('selected-file'),
+                               'case_id': case_id}
+
+                logger.debug('Upload survey data is: {}'.format(upload_data))
+
                 upload_response = requests.post(url, headers=headers, verify=False, data=json.dumps(upload_data))
                 logger.debug("Response from survey response upload service is: {}".format(upload_response.content))
 
+                # TODO Display the result of the upload
                 # if register_user.ok:
                 #     # return render_template('register.almost-done.html', _theme='default', email=email_address)
                 #     return render_template('surveys-upload.html', _theme='default')
@@ -199,16 +210,12 @@ def upload_survey():
                 #     return abort(500,
                 #                  '{"message":"There was a problem with the registration service, please contact a member of the ONS staff"}')
 
-                return render_template('surveys-upload.html', _theme='default')
-
-            else:
-                # Render the template
-                return render_template('surveys-upload.html', _theme='default')
-
+            # Render the template
+            return render_template('surveys-upload.html', _theme='default', case_id=case_id)
 
         except JWTError:
             # TODO Provide proper logging
-            app.logger.debug("This is not a valid JWT Token")
+            app.logger.error("This is not a valid JWT Token")
 
             # logger.warning('JWT scope could not be validated.')
             # Make sure we pop this invalid session variable.
@@ -216,7 +223,7 @@ def upload_survey():
             return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
 
         except:
-            app.logger.debug("Error uploading survey response")
+            app.logger.error("Error uploading survey response")
             return redirect(url_for('error_page'))
 
 

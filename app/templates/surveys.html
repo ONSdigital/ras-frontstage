@@ -63,11 +63,10 @@
 
                     <form
                             method="post"
-                            action="{{ url_for('upload_survey') }}"
                             class="form"
                             role="form">
 
-                            <a class="btn action-button btn--secondary" href="/upload_survey" >Upload&nbsp;&nbsp;&nbsp;
+                            <a class="btn action-button btn--secondary" href="{{ url_for('upload_survey', case_id=data.case.id) }}">Upload&nbsp;&nbsp;&nbsp;
                                 <i class="fa fa-upload fa-lg" aria-hidden="true"></i>
                             </a>
                     </form>

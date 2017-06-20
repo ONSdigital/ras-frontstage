@@ -10,20 +10,20 @@
 
     <form
             method="post"
-            action="{{ url_for('upload_survey') }}"
+            action="{{ url_for('upload_survey', case_id=case_id) }}"
             class="form"
             role="form">
 
         <div>
-            <label class="label" for="file-input">Select a file: </label>
-            <input class="input input--text" id="file-input" type="file" />
+            <label class="label" for="selected-file">Select a file: </label>
+            <input class="input input--text" id="selected-file" name="selected-file" type="file" required />
         </div>
 
         <br />
 
-        <div>
-            <input class="btn" type="submit" value="Upload" />
-        </div>
+        <button class="btn action-button btn--secondary" type="submit">
+            Upload&nbsp;&nbsp;&nbsp;<i class="fa fa-upload fa-lg" aria-hidden="true"></i>
+        </button>
 
     </form>
 

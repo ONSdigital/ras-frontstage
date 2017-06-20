@@ -25,7 +25,13 @@ Send secure message
     <div class="grid grid--reverse">
         <div class="grid__col col-4@m"></div>
         <div class="grid__col col-7@m pull-1@m">
-            <h1 class="saturn">Create message</h1>
+            <div class="system-feedback"> 
+                <ul class="system-feedback__list"> 
+                    <li class="system-feedback__list-item system-feedback__list-item--success"> 
+                        <i class="fa fa-check-circle system-feedback__icon" aria-hidden="true"> Draft saved.<a>View your inbox</a> </i>  </li> 
+                </ul> 
+            </div>
+            <h1 class="saturn">Edit a draft message</h1>
 
             <div class="secure-message-form">
                 <form method="post">
@@ -38,6 +44,7 @@ Send secure message
                             class="secure-message-form__subject input input--text"
                             type="text"
                             name="secure-message-subject"
+                            value={{draft['subject']}}
                             required/>
                     </fieldset>
 
@@ -50,13 +57,15 @@ Send secure message
                             class="secure-message-form__body input"
                             rows="10"
                             name="secure-message-body"
-                            required></textarea>
+                            required>{{ draft['body']}}
+                        </textarea>
+
                     </fieldset>
-                    <br/>
+
+                    <br />
 
                     <input class="btn btn--secondary" type="submit" name ="submit" value="Save draft" id="draft">
                     <input class="btn" type="submit" name='submit' value="Send message">
-
                     <p><a href="/secure-messages">Cancel</a></p>
                 </form>
             </div>

@@ -12,11 +12,12 @@
             method="post"
             action="{{ url_for('upload_survey', case_id=case_id) }}"
             class="form"
-            role="form">
+            role="form"
+            enctype="multipart/form-data">
 
         <div>
             <label class="label" for="selected-file">Select a file: </label>
-            <input class="input input--text" id="selected-file" name="selected-file" type="file" required />
+            <input class="input input--text" id="selected-file" name="file" type="file" required />
         </div>
 
         <br />

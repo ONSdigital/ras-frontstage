@@ -115,8 +115,8 @@ def logged_in():
             data_array = build_survey_data(status_filter)
 
             # TODO remove this
-            # print(data_array)
-            # print(data_array['rows'][0]['case']['collectionInstrumentId'])
+            print(data_array)
+            print(data_array['rows'][0]['case']['collectionInstrumentId'])
 
             # TODO: pass in data={"error": {"type": "success"}, "user_id": userName} to get the user name working ?
             return render_template('surveys-todo.html', _theme='default', data_array=data_array)
@@ -174,11 +174,6 @@ def upload_survey():
 
     case_id = request.args.get('case_id', None)
 
-    # TODO remove this
-    # '9d84d31d-5f9c-4d3a-ae0a-3e55794266be'
-    print('case_id')
-    print(case_id)
-
     if session.get('jwt_token'):
         jwttoken = session.get('jwt_token')
 
@@ -189,25 +184,26 @@ def upload_survey():
 
             if request.method == 'POST':
 
-                # TODO validate the selected file
-
-                # TODO Call the backend service to upload the selected file
-
                 # TODO - Add security headers
                 # headers = {'authorization': jwttoken}
                 headers = {}
 
-                # Call the API Gateway Service to get the To Do survey list
+                # Get the uploaded file
+                file = request.files['file']
+                file = {'file': (file.filename, file.stream, file.mimetype, {'Expires': 0})}
+
+                # Build the URL
                 url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'survey_responses/{}'.format(case_id)
                 logger.debug('upload_survey URL is: {}'.format(url))
 
-                upload_data = {'file': request.form.get('selected-file'),
-                               'case_id': case_id}
+                # Call the API Gateway Service to upload the selected file
+                r = requests.post(url, files=file, verify=False)
+                logger.debug('Result => {} {} : {}'.format(r.status_code, r.reason, r.text))
 
-                logger.debug('Upload survey data is: {}'.format(upload_data))
-
-                upload_response = requests.post(url, headers=headers, verify=False, data=json.dumps(upload_data))
-                logger.debug("Response from survey response upload service is: {}".format(upload_response.content))
+                if r.status_code == 200:
+                    logger.debug('UPLOAD SUCCESS')
+                else:
+                    logger.debug('UPLOAD FAILURE')
 
                 # TODO Display the result of the upload
                 # if register_user.ok:
@@ -229,8 +225,8 @@ def upload_survey():
             session.pop('jwt_token')
             return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
 
-        except:
-            app.logger.error("Error uploading survey response")
+        except Exception as e:
+            app.logger.error("Error uploading survey response: {}", str(e))
             return redirect(url_for('error_page'))
 
 

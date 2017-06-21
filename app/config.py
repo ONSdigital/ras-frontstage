@@ -95,6 +95,7 @@ class SecureMessaging(Config):
     MESSAGES_UI_URL = SM_UI_URL + '/messages'
     DRAFT_SAVE_API_URL = SM_API_URL + '/draft/save'
     DRAFT_GET_API_URL = SM_API_URL + '/draft/{0}'
+    DRAFT_PUT_API_URL = SM_API_URL + '/draft/<draft_id>/modify'
 
     # Selenium Driver Path
 

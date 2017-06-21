@@ -29,11 +29,6 @@ def create_message():
 
     if request.method == 'POST':
         if request.form['submit'] == 'Send message':
-            logger.info("Info - Send Message")
-            logger.debug("Debug - Send Message")
-            logger.warning("Warning - Send Message")
-            logger.error("Error - Send Message")
-            logger.critical("Critical - Send Message")
 
             data = {'msg_to': 'BRES', 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
                     'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
@@ -44,11 +39,6 @@ def create_message():
             return render_template('message-success-temp.html', _theme='default')
 
         if request.form['submit'] == 'Save draft':
-            logger.info("Save Draft")
-            logger.debug("Debug - Save Draft")
-            logger.warning("Warning - Save Draft")
-            logger.error("Error - Save Draft")
-
             data = {'msg_to': 'BRES', 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
                     'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
 
@@ -59,7 +49,8 @@ def create_message():
             get_json = json.loads(get_draft.content)
 
             return render_template('secure-messages-draft.html', _theme='default', draft=get_json)
-    return render_template('secure-messages-create.html', _theme='default')
+
+        return render_template('secure-messages-create.html', _theme='default')
 
 
 @secure_message_bp.route('/reply-message', methods=['GET', 'POST'])
@@ -88,4 +79,3 @@ def messages_get(label='INBOX'):
     resp = requests.get(url, headers=headers)
     resp_data = json.loads(resp.text)
     return render_template('secure-messages.html', _theme='default', messages=resp_data['messages'], links=resp_data['_links'], label=label)
-

@@ -35,18 +35,22 @@ Send secure message
 
             <div class="secure-message-form">
                 <form method="post">
+
+
                     <p>To: ONS Business Surveys team</p>
 
                     <fieldset>
                         <label for="secure-message-subject">Subject</label>
+
                         <input
                             id="secure-message-subject"
                             class="secure-message-form__subject input input--text"
                             type="text"
                             name="secure-message-subject"
-                            value={{draft['subject']}}
+                            value="{{draft['subject']}}"
                             required/>
                     </fieldset>
+
 
                     <br />
 
@@ -64,7 +68,7 @@ Send secure message
 
                     <br />
 
-                    <input class="btn btn--secondary" type="submit" name ="submit" value="Save draft" id="draft">
+                    <input class="btn btn--secondary" type="submit" name ="submit" value="Update draft" id="draft">
                     <input class="btn" type="submit" name='submit' value="Send message">
                     <p><a href="/secure-messages">Cancel</a></p>
                 </form>

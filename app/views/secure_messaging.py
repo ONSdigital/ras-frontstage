@@ -49,8 +49,7 @@ def create_message():
             get_json = json.loads(get_draft.content)
 
             return render_template('secure-messages-draft.html', _theme='default', draft=get_json)
-
-        return render_template('secure-messages-create.html', _theme='default')
+    return render_template('secure-messages-create.html', _theme='default')
 
 
 @secure_message_bp.route('/reply-message', methods=['GET', 'POST'])
@@ -79,3 +78,4 @@ def messages_get(label='INBOX'):
     resp = requests.get(url, headers=headers)
     resp_data = json.loads(resp.text)
     return render_template('secure-messages.html', _theme='default', messages=resp_data['messages'], links=resp_data['_links'], label=label)
+

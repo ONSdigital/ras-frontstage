@@ -1,0 +1,60 @@
+/**
+ * Src
+ */
+
+$static: "/static/assets";
+
+@import "partials/helpers/functions";
+@import "partials/helpers/mixins";
+@import "partials/helpers/mq";
+
+@import "partials/vars/colors";
+@import "partials/vars/forms";
+@import "partials/vars/grid";
+@import "partials/vars/typography";
+//@import "partials/vars/vars";
+
+
+
+/**
+ * Fake hosted styles
+ */
+  @import "partials/vendor/normalize";
+
+  @import "partials/base/global";
+  @import "partials/base/typography";
+  @import "partials/base/forms";
+
+
+  /**
+   * Structure/layout
+   */
+  @import "partials/objects/container";
+  @import "partials/objects/page";
+  @import "partials/objects/type-scale";
+
+  @import "components/badge/badge";
+  @import "components/bar/bar";
+  @import "components/button/buttons";
+  @import "components/header/header";
+  @import "components/panel/panel";
+  @import "components/skip/skip";
+
+  @import "components/03-grid/grid";
+  @import "components/footer/footer";
+  @import "components/list/list";
+
+  @import "components/details/details";
+  @import "components/02-form-elements/fields/field/field";
+  @import "components/02-form-elements/input/input";
+  @import "components/02-form-elements/label/label";
+  @import "components/logo/logo";
+
+
+/**
+ * Missing in pattern library
+ */
+@import "../../../../common/assets/styles/partials/objects/section";
+
+
+@import "./common-overrides";

@@ -1,0 +1,85 @@
+{% import 'partials/section.html' as section %}
+{% extends "layouts/_onecol.html" %}
+
+{% block page_title %}Messages{% endblock %}
+
+{% block main %}
+
+<ul class="navigation-tabs navigation-tabs--pills">
+    <li id="Inbox" class="{% if label == 'INBOX' %}
+                    {{ 'navigation-tabs__item navigation-tabs__item--primary navigation-tabs__item--active' }}
+                {% else %}
+                     {{ 'navigation-tabs__item navigation-tabs__item--primary' }}
+                {% endif %}">
+        <a href="/secure-message/messages/INBOX"
+           class= "{% if label == 'INBOX' %}
+                    {{ 'navigation-tabs__tab navigation-tabs__tab--active' }}
+                 {% else %}
+                    {{ 'navigation-tabs__tab' }}
+                 {% endif %}">Inbox</a>
+    </li>
+    <li id="Sent" class="{% if label == 'SENT' %}
+                    {{ 'navigation-tabs__item navigation-tabs__item--primary navigation-tabs__item--active' }}
+                {% else %}
+                     {{ 'navigation-tabs__item navigation-tabs__item--primary' }}
+                {% endif %}">
+        <a href="/secure-message/messages/SENT"
+           class= "{% if label == 'SENT' %}
+                    {{ 'navigation-tabs__tab navigation-tabs__tab--active' }}
+                 {% else %}
+                    {{ 'navigation-tabs__tab' }}
+                 {% endif %}">Sent</a>
+    </li>
+    <li id="Draft" class="{% if label == 'DRAFT' %}
+                    {{ 'navigation-tabs__item navigation-tabs__item--primary navigation-tabs__item--active' }}
+                {% else %}
+                     {{ 'navigation-tabs__item navigation-tabs__item--primary' }}
+                {% endif %}">
+        <a href="/secure-message/messages/DRAFT"
+           class= "{% if label == 'DRAFT' %}
+                    {{ 'navigation-tabs__tab navigation-tabs__tab--active' }}
+                 {% else %}
+                    {{ 'navigation-tabs__tab' }}
+                 {% endif %}">Draft</a>
+    </li>
+
+    <li class="navigation-tabs__item navigation-tabs__item--secondary">
+        <a href="/secure-message/create-message"
+           class="navigation-tabs__tab navigation-tabs__tab--link">Create a message</a>
+    </li>
+</ul>
+
+<ul class="message-list">
+    {% for message in messages %}
+    <li class="message-list__item">
+        <a href="#">{{ message['subject'] }}</a>
+
+        <dl class="grid">
+            <dt class="grid__col col-2@m">
+                Sent:
+            </dt>
+            <dd class="grid__col col-9@m pull-1@m">
+                {% if 'SENT' in message['labels'] or 'INBOX' in message['labels'] %}
+                    {{ message['sent_date'] }}
+                {% elif 'DRAFT' in message['labels'] %}
+                    {{ message['modified_date'] }}
+                {% endif %}
+            </dd>
+            <dt class="grid__col col-2@m">
+                From:
+            </dt>
+            <dd class="grid__col col-9@m pull-1@m">
+                {{ message['urn_from'] }}
+            </dd>
+        </dl>
+
+        <p>{{ message['body']|truncate(100) }}</p>
+
+        <a href="">Read full message</a>
+    </li>
+    {% else %}
+       <li>You have no messages</li>
+    {% endfor %}
+</ul>
+
+{% endblock main %}

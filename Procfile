@@ -1,1 +1,1 @@
-web: python ras-frontstage/app.py
+web: python app/application.py

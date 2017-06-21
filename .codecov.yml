@@ -9,4 +9,5 @@ coverage:
 comment: false
 
 ignore:
-  - "ras-frontstage/tests/"
+  - "app/tests/"
+  - "tests/"

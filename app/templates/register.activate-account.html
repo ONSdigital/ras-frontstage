@@ -1,0 +1,26 @@
+{% import 'partials/section.html' as section %}
+{% extends "layouts/_twocol.html" %}
+
+{% block page_title %}Register{% endblock %}
+
+{% block main %}
+    <form
+            method="post"
+            action="{{ url_for('register_activate_account') }}"
+            class="form"
+            role="form">
+        <h1 class="saturn">Activate your account</h1>
+
+        <div class="label__description label__inner pluto">Thanks for confirming your email address</div>
+
+        <br />
+
+        <div class="label__description label__inner pluto">Please now activate your account</div>
+
+        <br />
+        <br />
+
+        <button class="btn btn--secondary venus" type="submit">Activate account</button>
+
+    </form>
+{% endblock main %}

@@ -1,0 +1,79 @@
+{% import 'partials/section.html' as section %}
+{% extends "layouts/_onecol.html" %}
+
+{% block page_title %}
+Send secure message
+{% endblock %}
+
+{% block main %}
+
+    <ul class="navigation-tabs navigation-tabs-component">
+        <li class="navigation-tabs__item navigation-tabs__item--primary">
+            <a href="#"
+               class="btn btn--secondary btn--border navigation-tabs__tab">To do</a>
+        </li>
+        <li class="navigation-tabs__item navigation-tabs__item--primary">
+            <a href="#"
+               class="btn btn--secondary btn--border navigation-tabs__tab">History</a>
+        </li>
+        <li class="navigation-tabs__item navigation-tabs__item--primary navigation-tabs__item--active">
+            <a href="#"
+               class="btn btn--secondary btn--border navigation-tabs__tab navigation-tabs__tab--active">Messages</a>
+        </li>
+    </ul>
+
+    <div class="grid grid--reverse">
+        <div class="grid__col col-4@m"></div>
+        <div class="grid__col col-7@m pull-1@m">
+            <div class="system-feedback"> 
+                <ul class="system-feedback__list"> 
+                    <li class="system-feedback__list-item system-feedback__list-item--success"> 
+                        <i class="fa fa-check-circle system-feedback__icon" aria-hidden="true"> Draft saved.<a href="http://localhost:5001/secure-message/messages">View your inbox</a> </i>  </li> 
+                </ul> 
+            </div>
+            <h1 class="saturn">Edit a draft message</h1>
+
+            <div class="secure-message-form">
+                <form method="post">
+
+
+                    <p>To: ONS Business Surveys team</p>
+
+                    <fieldset>
+                        <label for="secure-message-subject">Subject</label>
+
+                        <input
+                            id="secure-message-subject"
+                            class="secure-message-form__subject input input--text"
+                            type="text"
+                            name="secure-message-subject"
+                            value="{{draft['subject']}}"
+                            required/>
+                    </fieldset>
+
+
+                    <br />
+
+                    <fieldset>
+                        <label for="secure-message-body">Message</label>
+                        <textarea
+                            id="secure-message-body"
+                            class="secure-message-form__body input"
+                            rows="10"
+                            name="secure-message-body"
+                            required>{{ draft['body']}}
+                        </textarea>
+
+                    </fieldset>
+
+                    <br />
+
+                    <input class="btn btn--secondary" type="submit" name ="submit" value="Save draft" id="draft">
+                    <input class="btn" type="submit" name='submit' value="Send message">
+                    <p><a href="/secure-messages">Cancel</a></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock main %}

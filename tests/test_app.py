@@ -1,20 +1,43 @@
 import unittest
 from app.application import app
 from app.jwt import encode, decode
-from app.config import OAuthConfig
+from app.config import OAuthConfig, Config
+import json
 import requests_mock
 
+with open('tests/my-surveys.json') as json_data:
+    my_surveys = json.load(json_data)
 
-data_dict_for_jwt_token = {"refresh_token": "eyJhbGciOiJIUzI1NiIsIn",
-                           "access_token": "access_token",
-                           "scope": "[foo,bar,qnx]",
-                           "expires_at": "100123456789",
-                           "username": "johndoe"}
+
+
+print("my repository values are:{}".format(my_surveys['rows'][0]['businessData']['businessRef']))
+
+returned_token = {"id":6,"access_token":"a712f0f9-d00d-447a-b143-49984ca3db68","expires_in":3600,"token_type":"Bearer","scope":"","refresh_token":"37ca04d2-6b6c-4854-8e85-f59c2cc7d3de"}
+data_dict_for_jwt_token={'refresh_token': 'e6bde0f6-e123-4dcf-9567-74f4d072fc71', 'access_token': 'f418d491-eeda-47cb-b3e3-0d5d7b97ee6d', 'username': 'johndoe', 'expires_at': '100123456789', 'scope': '[foo,bar,qnx]'}
+
+
+data_dict_for_jwt_token2 = {
+ "refresh_token": "e6bde0f6-e123-4dcf-9567-74f4d072fc71",
+ "access_token": "f418d491-eeda-47cb-b3e3-0d5d7b97ee6d",
+ "username": "johndoe",
+ "expires_at": "100123456789",
+ "scope": "[foo,bar,qnx]"
+}
+
+test_user = {'first_name': 'john',
+             'last_name': 'doe',
+             'email_address': 'testuser2@email.com',
+             'email_address_confirm': 'testuser2@email.com',
+             'password': 'password',
+             'password_confirm': 'password',
+             'phone_number': '07717275049',
+             'terms_and_conditions': 'Y'}
+
+
 
 data_dict_zero_length = {"": ""}
 
-encoded_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdG9rZW4iOiJhY2Nlc3NfdG9rZW4iLCJzY29wZSI6Iltmb28sYmFyLHFueF0iLCJ1c2VybmFtZSI6ImpvaG5kb2UiLCJleHBpcmVzX2F0IjoiMTAwMTIzNDU2Nzg5IiwicmVmcmVzaF90b2tlbiI6ImV5SmhiR2NpT2lKSVV6STFOaUlzSW4ifQ.SIgs3BFhAaJS6s9Q6gm57o9ifVqgAh0AC7-jDigSLZo'
-
+encoded_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZWZyZXNoX3Rva2VuIjoiZTZiZGUwZjYtZTEyMy00ZGNmLTk1NjctNzRmNGQwNzJmYzcxIiwiYWNjZXNzX3Rva2VuIjoiZjQxOGQ0OTEtZWVkYS00N2NiLWIzZTMtMGQ1ZDdiOTdlZTZkIiwidXNlcm5hbWUiOiJqb2huZG9lIiwic2NvcGUiOiJbZm9vLGJhcixxbnhdIiwiZXhwaXJlc19hdCI6IjEwMDEyMzQ1Njc4OSJ9.NhOb7MK_SaaW8wvqwbiiAv5N-oaN8SHYli2Z-NpkJ2A'
 
 class TestApplication(unittest.TestCase):
     """Test case for application endpoints and functionality"""
@@ -29,7 +52,14 @@ class TestApplication(unittest.TestCase):
     # Test we can encode a token with the format shown in data_dict_for_jwt_token
     def test_encode_jwt(self):
 
-        self.assertEqual(encode(data_dict_for_jwt_token), encoded_token)
+        # first encode our dictionary object
+        myEncoded_dictionary = encode(data_dict_for_jwt_token)
+
+        # now decode and ensure we have the same thing.
+        myDecoded_dictionary = decode(myEncoded_dictionary)
+
+        # now compare that values are the same in the dictionary
+        self.assertEqual(myDecoded_dictionary, data_dict_for_jwt_token)
 
     # Test we get an error when our token is zero length
     def test_encode_bad_data(self):
@@ -226,51 +256,57 @@ class TestApplication(unittest.TestCase):
         self.assertTrue(response.status_code, 200)
         self.assertTrue(bytes('This should be a valid phone number between 9 and 15 digits', encoding='UTF-8') in response.data)
 
-    def test_create_account_register_new_user(self):
+    @requests_mock.mock()
+    def test_create_account_register_new_user(self, mock_object):
         """Test successful create account"""
 
-        # creating user
-        test_user = {'first_name': 'john',
-                     'last_name': 'doe',
-                     'email_address': 'testuser2@email.com',
-                     'email_address_confirm': 'testuser2@email.com',
-                     'password': 'password',
-                     'password_confirm': 'password',
-                     'phone_number': '07717275049',
-                     'terms_and_conditions': 'Y'}
+        # Build URL's which is used to talk to the OAuth2 server
+        url_create_user = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_ADMIN_ENDPOINT
+        url_get_token = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
+        url_get_survey_data = Config.API_GATEWAY_PARTY_URL + 'respondents'
+
+        # Here we place a listener on the URL's The flow of events are:
+        # 1) The ras_frontstage creates a user on the OAuth2 server.
+        # 2) The OAuth2 replies with a HTTP 200 OK.
+        # 3) The ras_frontstage requests a client Token from the OAuth2 to allow it to speak with the PartyServer.
+        # 4) The OAuth2 sends a token, refresh token, TTL and scopes.
+        # 5) The ras_frontstage requests survey data from the Party Service.
+        # 6) The Party Servie replys with survey data.
+        # This means we need to mock 2) 4) and  6)
+        #
+        mock_object.post(url_create_user, status_code=200, json={"account": "testuser2@email.com", "created":"success"})
+        mock_object.post(url_get_token, status_code=200, json=returned_token)
+        mock_object.post(url_get_survey_data, status_code=200, json=my_surveys)
+
 
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
+        print ("response object is: {}".format(response.data))
         self.assertTrue(response.status_code, 200)
-        self.assertTrue(bytes('Enter your account details', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('Your name', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('Email address', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('Create a password', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('Phone number', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('Please follow the link in the email to confirm your email address and finish setting up your account.', encoding='UTF-8') in response.data)
 
-    def test_create_duplicate_account(self):
-        """Test create a duplicate account returns try a different email this ones in use"""
 
-        # creating user
-        test_user = {'first_name': 'john',
-                     'last_name': 'doe',
-                     'email_address': 'testuser2@email.com',
-                     'email_address_confirm': 'testuser2@email.com',
-                     'password': 'password',
-                     'password_confirm': 'password',
-                     'phone_number': '07717275049',
-                     'terms_and_conditions': 'Y'}
+    # Test we present the user with a page to say this email is already in use when we register the same user twice.
+    # We are using the requests_mock library to fake the call to an OAuth2 server and the party service.
+    # See: https://requests-mock.readthedocs.io/en/latest/response.html
+    @requests_mock.mock()
+    def test_create_duplicate_account(self, mock_object):
+        """Test create a duplicate account returns 'try a different email this ones in use' """
 
-        response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
+        # Build URL's which is used to talk to the OAuth2 server
+        url_create_user = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_ADMIN_ENDPOINT
 
-        self.assertTrue(response.status_code, 200)
-        self.assertTrue(bytes('Enter your account details', encoding='UTF-8') in response.data)
+        # Here we place a listener on this URL. This is the URL of the OAuth2 server. We send a 401 to reject the request
+        # from the ras_frontstage to get a token for this user. See application.py login_OAuth()
 
-        # Try and create the same user again we should fail this time
+        mock_object.post(url_create_user, status_code=401, json= {"detail":"Duplicate user credentials"})
+
+
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
         self.assertTrue(response.status_code, 200)
         self.assertTrue(bytes('Please try a different email, this one is in use', encoding='UTF-8') in response.data)
+
 
     # def test_surveys_todo_page(self):
     #

@@ -486,7 +486,32 @@ def register_enter_your_details():
             OAuthurl = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_ADMIN_ENDPOINT
             OAuth_response = requests.post(OAuthurl, auth=authorisation, headers=headers, data=OAuth_payload)
             logger.debug("OAuth response is: {}".format(OAuth_response.content))
-            response_body = json.loads(OAuth_response.content)
+            #json.loads(myResponse.content.decode('utf-8'))
+            response_body = json.loads(OAuth_response.content.decode('utf-8'))
+            print ("OAuth2 response is: {}".format(OAuth_response.status_code))
+
+            if OAuth_response.status_code == 401:
+                # This looks like the user is not authorized to use the system. it could be a duplicate email. check our
+                # exact error. if it is, then tell the user else fail as our server is not allowed to access the OAuth2
+                # system.
+                # TODO add logging
+                # {"detail":"Duplicate user credentials"}
+                if response_body["detail"]:
+                    if response_body["detail"] == 'Duplicate user credentials':
+                        logger.warning("We have duplicate user credentials")
+                        errors = {'email_address_confirm': ['Please try a different email, this one is in use', ]}
+                        return render_template('register.enter-your-details.html', _theme='default', form=form, errors=errors)
+
+            # Deal with all other errors from OAuth2 registration
+            if OAuth_response.status_code > 401:
+                OAuth_response.raise_for_status()  # A stop gap until we know all the correct error pages
+                logger.warning("OAuth error")
+
+
+
+
+
+
 
             # TODO A utility function to allow us to route to a page for 'user
             # is registered already'. We need a html page for this.
@@ -499,25 +524,25 @@ def register_enter_your_details():
             logger.critical("Timeout error. Is the OAuth Server overloaded?")
             # TODO A redirect to a page that helps the user
         except requests.exceptions.RequestException as e:
-            # TODO catastrophic error. bail. A page that tells the user something horrid has happeded and who to inform
+            # TODO catastrophic error. bail. A page that tells the user something horrid has happened and who to inform
             logger.debug(e)
 
-        if OAuth_response.status_code == 401:
-            # This looks like the user is not authorized to use the system. it could be a duplicate email. check our
-            # exact error. if it is, then tell the user else fail as our server is not allowed to access the OAuth2
-            # system.
-            # TODO add logging
-            # {"detail":"Duplicate user credentials"}
-            if response_body["detail"]:
-                if response_body["detail"] == 'Duplicate user credentials':
-                    logger.warning("We have duplicate user credentials")
-                    errors = {'email_address_confirm': ['Please try a different email, this one is in use', ]}
-                    return render_template('register.enter-your-details.html', _theme='default', form=form, errors=errors)
-
-        # Deal with all other errors from OAuth2 registration
-        if OAuth_response.status_code > 401:
-            OAuth_response.raise_for_status()  # A stop gap until we know all the correct error pages
-            logger.warning("OAuth error")
+        # if OAuth_response.status_code == 401:
+        #     # This looks like the user is not authorized to use the system. it could be a duplicate email. check our
+        #     # exact error. if it is, then tell the user else fail as our server is not allowed to access the OAuth2
+        #     # system.
+        #     # TODO add logging
+        #     # {"detail":"Duplicate user credentials"}
+        #     if response_body["detail"]:
+        #         if response_body["detail"] == 'Duplicate user credentials':
+        #             logger.warning("We have duplicate user credentials2")
+        #             errors = {'email_address_confirm': ['Please try a different email, this one is in use', ]}
+        #             return render_template('register.enter-your-details.html', _theme='default', form=form, errors=errors)
+        #
+        # # Deal with all other errors from OAuth2 registration
+        # if OAuth_response.status_code > 401:
+        #     OAuth_response.raise_for_status()  # A stop gap until we know all the correct error pages
+        #     logger.warning("OAuth error")
 
         # We now have a successful user setup on the OAuth2 server. The next 2 steps we have to do are:
         # 1) Get a valid token for service to service communication. This is done so that the front stage service can
@@ -538,7 +563,7 @@ def register_enter_your_details():
         # the transactions between the OAuth2 server
         oauth = OAuth2Session(client=client)
         token_url = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
-        logger.debug("Our Token Endpoint is: ", token_url)
+        logger.debug("Our Token Endpoint is: {}".format(token_url))
 
         try:
             token = oauth.fetch_token(token_url=token_url, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID,

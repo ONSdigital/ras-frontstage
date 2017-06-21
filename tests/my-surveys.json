@@ -1,0 +1,111 @@
+{
+  "rows": [
+    {
+      "businessData": {
+        "address": {
+          "locality": "Green Industrial Park",
+          "paon": "Unit 5",
+          "postcode": "NT23 7TN",
+          "saon": "Office 2a",
+          "street": "Milton Street",
+          "town": "New Town"
+        },
+        "businessRef": "0123456789",
+        "contactName": "John Doe",
+        "employeeCount": 50,
+        "enterpriseName": "ABC Limited",
+        "facsimile": "+44 1234 567890",
+        "fulltimeCount": 35,
+        "id": "3b136c4b-7a14-4904-9e01-13364dd7b972",
+        "legalStatus": "Private Limited Company",
+        "name": "Bolts and Ratchets Ltd",
+        "sic2003": "2520",
+        "sic2007": "2520",
+        "telephone": "+44 1234 567890",
+        "tradingName": "ABC Trading Ltd",
+        "turnover": 350
+      },
+      "case": {
+        "actionPlanId": "5381731e-e386-41a1-8462-26373744db86",
+        "caseEvents": [
+          {
+            "category": "CASE_COMPLETED",
+            "createdBy": "SYSTEM",
+            "createdDateTime": "2017-02-22T14:16:50Z",
+            "description": "Initial creation of case",
+            "subCategory": null
+          },
+          {
+            "category": "CASE_CREATED",
+            "createdBy": "SYSTEM",
+            "createdDateTime": "2017-04-10T08:48:49Z",
+            "description": "Create Household Visit",
+            "subCategory": "HouseholdCreateVisit"
+          }
+        ],
+        "caseGroup": {
+          "collectionExerciseId": "c6467711-21eb-4e78-804c-1db8392f93fb",
+          "id": "9a5f2be5-f944-41f9-982c-3517cfcfef3c",
+          "partyId": "3b136c4b-7a14-4904-9e01-13364dd7b972",
+          "sampleUnitRef": "0123456789",
+          "sampleUnitType": "B"
+        },
+        "collectionInstrumentId": "40c7c047-4fb3-4abe-926e-bf19fa2c0a1e",
+        "createdBy": "SYSTEM",
+        "createdDateTime": "2017-05-15T10:00:00Z",
+        "id": "7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb",
+        "partyId": "3b136c4b-7a14-4904-9e01-13364dd7b972",
+        "responses": [
+          {
+            "dateTime": "2017-05-17T16:15:20Z",
+            "inboundChannel": "ONLINE"
+          }
+        ],
+        "sampleUnitType": "BI",
+        "state": "INACTIONABLE"
+      },
+      "collectionExerciseData": {
+        "actualExecution": "2017-05-15T14:20:24Z",
+        "actualPublish": null,
+        "caseTypes": [
+          {
+            "actionPlanId": "60df56d9-f491-4ac8-b256-a10154290a8b",
+            "sampleUnitType": "B"
+          },
+          {
+            "actionPlanId": "b1f46e33-a3ef-4e50-939d-c18f8a9f11bb",
+            "sampleUnitType": "BI"
+          }
+        ],
+        "executedBy": "Fred Bloggs",
+        "id": "c6467711-21eb-4e78-804c-1db8392f93fb",
+        "name": "201601",
+        "periodEnd": "2016-12-31T00:00:00",
+        "periodEndFormatted": "31 Dec 2016",
+        "periodStart": "2016-01-01T00:00:00",
+        "periodStartFormatted": "1 Jan 2016",
+        "scheduledEnd": null,
+        "scheduledExecution": "2017-05-15T00:00:00Z",
+        "scheduledReturn": "2017-06-30T00:00:00",
+        "scheduledReturnFormatted": "30 Jun 2017",
+        "scheduledStart": "2017-06-01T00:00:00Z",
+        "state": "EXECUTED",
+        "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
+      },
+      "status": "not started",
+      "surveyData": {
+        "id": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87",
+        "longName": "Business Register and Employment Survey",
+        "shortName": "BRES"
+      }
+    }
+  ],
+  "userData": {
+    "emailAddress": "john.doe@abc-ltd.com",
+    "firstName": "Jacky",
+    "id": "3b136c4b-7a14-4904-9e01-13364dd7b972",
+    "lastName": "Turner",
+    "status": "ACTIVE",
+    "telephone": "+44 1234 567890"
+  }
+}

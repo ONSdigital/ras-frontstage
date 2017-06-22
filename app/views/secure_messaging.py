@@ -16,13 +16,6 @@ modify_data = {'action': '',
 
 secure_message_bp = Blueprint('secure_message_bp', __name__, static_folder='static', template_folder='templates')
 
-
-@secure_message_bp.route('/')
-def hello_world():
-    logger.debug("test")
-    return "Hello World"
-
-
 @secure_message_bp.route('/create-message', methods=['GET', 'POST',])
 def create_message():
     """Handles sending of new message"""

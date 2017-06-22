@@ -37,6 +37,13 @@ Send secure message
                 <form method="post">
                     <p>To: ONS Business Surveys team</p>
 
+
+                    <input
+                            id="msg_id"
+                            type ="hidden"
+                            name="msg_id"
+                            value="{{draft['msg_id']}}">
+
                     <fieldset>
                         <label for="secure-message-subject">Subject</label>
                         <input

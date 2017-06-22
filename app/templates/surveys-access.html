@@ -6,11 +6,18 @@
 
 {% block main %}
 
-    <h1 class="saturn">Upload a survey response</h1>
+    <h1 class="saturn">Business Register and Employment Survey</h1>
+
+    <a class="btn action-button btn--primary" target="_blank" href="{{ config.API_GATEWAY_COLLECTION_INSTRUMENT_URL }}download/{{ collection_instrument_id }}">Download&nbsp;&nbsp;&nbsp;
+        <i class="fa fa-download fa-lg" aria-hidden="true"></i>
+    </a>
+
+    <br/>
+    <br/>
 
     <form
             method="post"
-            action="{{ url_for('upload_survey', case_id=case_id) }}"
+            action="{{ url_for('upload_survey', case_id=case_id, collection_instrument_id=collection_instrument_id) }}"
             class="form"
             role="form"
             enctype="multipart/form-data">
@@ -27,8 +34,6 @@
         </button>
 
     </form>
-
-    <br />
 
     <div>
         <a href="/">Back</a>

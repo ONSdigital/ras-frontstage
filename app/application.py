@@ -164,11 +164,40 @@ def surveys_history():
     return render_template('signed-in.html', _theme='default', data={"error": {"type": "failed"}})
 
 
-@app.route('/upload_survey', methods=['GET', 'POST'])
+@app.route('/access_survey', methods=['POST'])
+def access_survey():
+    """Logged in page for users only."""
+
+    if session.get('jwt_token'):
+        jwttoken = session.get('jwt_token')
+
+        try:
+            decodedJWT = decode(jwttoken)
+            for key in decodedJWT:
+                app.logger.debug(' {} is: {}'.format(key, decodedJWT[key]))
+
+            case_id = request.args.get('case_id', None)
+            collection_instrument_id = request.args.get('collection_instrument_id', None)
+
+            # Render the template
+            return render_template('surveys-access.html', _theme='default', case_id=case_id, collection_instrument_id=collection_instrument_id)
+
+        except JWTError:
+            # TODO Provide proper logging
+            app.logger.error("This is not a valid JWT Token")
+
+            # logger.warning('JWT scope could not be validated.')
+            # Make sure we pop this invalid session variable.
+            session.pop('jwt_token')
+            return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
+
+
+@app.route('/upload_survey', methods=['POST'])
 def upload_survey():
     """Logged in page for users only."""
 
     case_id = request.args.get('case_id', None)
+    collection_instrument_id = request.args.get('collection_instrument_id', None)
 
     if session.get('jwt_token'):
         jwttoken = session.get('jwt_token')
@@ -185,15 +214,15 @@ def upload_survey():
                 headers = {}
 
                 # Get the uploaded file
-                file = request.files['file']
-                file = {'file': (file.filename, file.stream, file.mimetype, {'Expires': 0})}
+                upload_file = request.files['file']
+                upload_file = {'file': (upload_file.filename, upload_file.stream, upload_file.mimetype, {'Expires': 0})}
 
                 # Build the URL
                 url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'survey_responses/{}'.format(case_id)
-                logger.debug('upload_survey URL is: {}'.format(url))
+                logger.debug('access_survey URL is: {}'.format(url))
 
                 # Call the API Gateway Service to upload the selected file
-                r = requests.post(url, files=file, verify=False)
+                r = requests.post(url, files=upload_file, verify=False)
                 logger.debug('Result => {} {} : {}'.format(r.status_code, r.reason, r.text))
 
                 if r.status_code == 200:
@@ -204,13 +233,13 @@ def upload_survey():
                 # TODO Display the result of the upload
                 # if register_user.ok:
                 #     # return render_template('register.almost-done.html', _theme='default', email=email_address)
-                #     return render_template('surveys-upload.html', _theme='default')
+                #     return render_template('surveys-access.html', _theme='default')
                 # else:
                 #     return abort(500,
                 #                  '{"message":"There was a problem with the registration service, please contact a member of the ONS staff"}')
 
             # Render the template
-            return render_template('surveys-upload.html', _theme='default', case_id=case_id)
+            return render_template('surveys-access.html', _theme='default', case_id=case_id, collection_instrument_id=collection_instrument_id)
 
         except JWTError:
             # TODO Provide proper logging
@@ -224,7 +253,6 @@ def upload_survey():
         except Exception as e:
             app.logger.error("Error uploading survey response: {}", str(e))
             return redirect(url_for('error_page'))
-
 
 @app.route('/logout')
 def logout():

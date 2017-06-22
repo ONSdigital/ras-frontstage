@@ -51,26 +51,17 @@
                 <span>{{ data.status | case_status_filter }}</span>
             </div>
 
-            <div class="grid__col col-2@m">
-                <div class="survey-action">
+              <div class="grid__col col-2@m">
 
-                    <a class="btn action-button btn--primary" target="_blank" href="{{ config.API_GATEWAY_COLLECTION_INSTRUMENT_URL }}download/{{data.case.collectionInstrumentId}}">Download&nbsp;&nbsp;&nbsp;
-                        <i class="fa fa-download fa-lg" aria-hidden="true"></i>
+                <form
+                        method="post"
+                        action="{{ url_for('access_survey', case_id=data.case.id, collection_instrument_id=data.case.collectionInstrumentId) }}"
+                        class="form"
+                        role="form">
 
-                        <!--TODO file size-->
-                        <!--<span class="pluto survey-list-item__nowrap">(spreadsheet ???KB)</span>-->
-                    </a>
 
-                    <form
-                            method="post"
-                            class="form"
-                            role="form">
-
-                            <a class="btn action-button btn--secondary" href="{{ url_for('upload_survey', case_id=data.case.id) }}">Upload&nbsp;&nbsp;&nbsp;
-                                <i class="fa fa-upload fa-lg" aria-hidden="true"></i>
-                            </a>
-                    </form>
-                </div>
+                    <button class="btn action-button btn--primary" type="submit">Access survey</button>
+                </form>
             </div>
 
         </li>

@@ -99,6 +99,7 @@ class SecureMessaging(Config):
     DRAFT_ID_API_URL = SM_API_URL + '/draft/<draft_id'
     DRAFT_PUT_API_URL = SM_API_URL + '/draft/{0}/modify'
 
+
     # Selenium Driver Path
 
     chrome_driver = "{}/tests/selenium_scripts/drivers/chromedriver".format(os.environ.get('RAS_FRONTSTAGE_PATH'))

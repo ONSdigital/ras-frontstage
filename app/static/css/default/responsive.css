@@ -4920,6 +4920,15 @@ input:checked ~ .label {
   padding-top: 1rem;
 }
 
+.system-feedback > .system-feedback__list {
+  padding-left: 0;
+  list-style-type: none;
+}
+
+.system-feedback > .system-feedback__list > .system-feedback__list-item.system-feedback__list-item--success > .system-feedback__icon {
+  color: #0f8243;
+}
+
 .details__link:before {
   background-image: url("/static/s/img/icons/guidance.svg");
 }
@@ -4935,6 +4944,16 @@ input:checked ~ .label {
 .input--text-error {
   border: 1px solid red;
   border-width: 2px;
+}
+
+input[type=file] {
+  border: 2px solid #033e58;
+  border-radius: 4px;
+  width: 70%;
+  display: block;
+  margin-bottom: 18px;
+  margin-bottom: 1rem;
+  background: #fff;
 }
 
 .survey-list {
@@ -5156,6 +5175,10 @@ dd.grid__col {
   .pluto {
     font-size: 0.77778rem;
   }
+}
+
+.error-message {
+  color: #d0021b;
 }
 
 .navigation-tabs {
@@ -5224,6 +5247,16 @@ dd.grid__col {
   border-width: 2px;
 }
 
+input[type=file] {
+  border: 2px solid #033e58;
+  border-radius: 4px;
+  width: 70%;
+  display: block;
+  margin-bottom: 18px;
+  margin-bottom: 1rem;
+  background: #fff;
+}
+
 .survey-list {
   list-style: none;
   padding-left: 0;
@@ -5443,6 +5476,10 @@ dd.grid__col {
   .pluto {
     font-size: 0.77778rem;
   }
+}
+
+.error-message {
+  color: #d0021b;
 }
 
 .navigation-tabs {

@@ -14,17 +14,16 @@
                 <h1 class="panel__title venus">Something went wrong</h1>
             </div>
             <div class="panel__body" data-qa="error-body">
-                <!--<a onclick="focusOn('file');" href="#file">Please try uploading your spreadsheet again</a>-->
+
+                <ul class="error-message">
+                    <li>{{ error_info.text }}</li>
+                </ul>
+
                 <p class="error-message">
                     Please try uploading your spreadsheet again
                 </p>
+
                 <div class="upload--response">
-
-
-                    <!--<form action="/BRES/upload-successful.html" class="form">-->
-                    <!--<input type="file" id="file" name="file" class="">-->
-                    <!--<button class="btn btn&#45;&#45;secondary" type="submit">Upload</button>-->
-                    <!--</form>-->
 
                     <form
                             method="post"
@@ -47,15 +46,10 @@
             </div>
         </div>
 
-
-        <div class="u-mb-l qa-intro-description">
-        </div>
-
         <br/>
 
         <div class="lock u-mb-s u-mb-m@s">
-            <p class="venus"><i class="fa fa-lock" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;We will treat your data securely and
-                confidentially</p>
+            <p class="venus"><i class="fa fa-lock" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;We will treat your data securely and confidentially</p>
             <!--<div class="venus lock__text">We will treat your data securely and confidentially</div>-->
         </div>
 

@@ -16,7 +16,7 @@
         <span class="download__text">Download spreadsheet&nbsp;&nbsp;&nbsp;</span>
         <span class="download__text"><i class="fa fa-download fa-lg" aria-hidden="true"></i></span>
     </div>
-    <div class="download__text pluto">({{ data.size }} KB)</div>
+    <div class="download__text pluto">({{ data.size | file_size_filter }} KB)</div>
 </a>
 
 <br/>
@@ -31,6 +31,8 @@
 
 <p class="venus">If actual figures are not available, please provide informed estimates.</p>
 
+<br/>
+
 <form
         method="post"
         action="{{ url_for('upload_survey', case_id=case_id, collection_instrument_id=collection_instrument_id, data=data) }}"
@@ -39,10 +41,9 @@
         enctype="multipart/form-data">
 
     <div>
-        <input class="input input--text" id="selected-file" name="file" type="file" required/>
+        <input class="input input--text" id="selected-file" name="file" type="file" required
+        accept=".xls,.xlsx" />
     </div>
-
-    <br/>
 
     <button class="btn action-button btn--secondary" type="submit">Upload</button>
 

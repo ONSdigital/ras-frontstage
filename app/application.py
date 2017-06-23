@@ -23,6 +23,7 @@ from app.models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
 from app.utils import get_user_scopes_util
 from app.logger_config import logger_initial_config
 from app.filters.case_status_filter import case_status_filter
+from app.filters.file_size_filter import file_size_filter
 
 app = Flask(__name__)
 app.debug = True
@@ -36,6 +37,7 @@ app.config.update(
 app.register_blueprint(secure_message_bp, url_prefix='/secure-message')
 
 app.jinja_env.filters['case_status_filter'] = case_status_filter
+app.jinja_env.filters['file_size_filter'] = file_size_filter
 
 logger_initial_config(service_name='ras-frontstage')
 
@@ -214,33 +216,30 @@ def upload_survey():
             for key in decodedJWT:
                 app.logger.debug(' {} is: {}'.format(key, decodedJWT[key]))
 
-            if request.method == 'POST':
+            # TODO - Add security headers
+            # headers = {'authorization': jwttoken}
+            headers = {}
 
-                # TODO - Add security headers
-                # headers = {'authorization': jwttoken}
-                headers = {}
+            # Get the uploaded file
+            upload_file = request.files['file']
+            upload_filename = upload_file.filename
+            upload_file = {'file': (upload_filename, upload_file.stream, upload_file.mimetype, {'Expires': 0})}
 
-                # Get the uploaded file
-                upload_file = request.files['file']
-                upload_file = {'file': (upload_file.filename, upload_file.stream, upload_file.mimetype, {'Expires': 0})}
+            # Build the URL
+            url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'survey_responses/{}'.format(case_id)
+            logger.debug('upload_survey URL is: {}'.format(url))
 
-                # Build the URL
-                url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'survey_responses/{}'.format(case_id)
-                logger.debug('upload_survey URL is: {}'.format(url))
+            # Call the API Gateway Service to upload the selected file
+            result = requests.post(url, files=upload_file, verify=False)
+            logger.debug('Result => {} {} : {}'.format(result.status_code, result.reason, result.text))
 
-                # Call the API Gateway Service to upload the selected file
-                r = requests.post(url, files=upload_file, verify=False)
-                logger.debug('Result => {} {} : {}'.format(r.status_code, r.reason, r.text))
-
-                if r.status_code == 200:
-                    logger.debug('UPLOAD SUCCESS')
-                    return render_template('surveys-upload-success.html', _theme='default')
-                else:
-                    logger.debug('UPLOAD FAILURE')
-                    return render_template('surveys-upload-failure.html', _theme='default')
-
-            # Render the template
-            return render_template('surveys-access.html', _theme='default', case_id=case_id, collection_instrument_id=collection_instrument_id, data=data)
+            if result.status_code == 200:
+                logger.debug('Upload successful')
+                return render_template('surveys-upload-success.html', _theme='default', file=upload_filename)
+            else:
+                logger.debug('Upload failed')
+                error_info = json.loads(result.text)
+                return render_template('surveys-upload-failure.html',  _theme='default', error_info=error_info)
 
         except JWTError:
             # TODO Provide proper logging
@@ -255,60 +254,19 @@ def upload_survey():
             app.logger.error("Error uploading survey response: {}", str(e))
             return redirect(url_for('error_page'))
 
+
+@app.route('/surveys-upload-failure', methods=['GET'])
+def surveys_upload_failure():
+    error_info = request.args.get('error_info', None)
+    return render_template('surveys-upload-failure.html', _theme='default', error_info=error_info)
+
+
 @app.route('/logout')
 def logout():
     if 'jwt_token' in session:
         session.pop('jwt_token')
 
     return redirect(url_for('login'))
-
-
-# TODO Confirm if this can be removed
-# ===== Sign in =====
-# @app.route('/sign-in/', methods=['GET', 'POST'])
-# def login():
-#     """Handles sign-in"""
-#
-#     logger.debug("*** Hitting login() function.... ***")
-#     """Login Page."""
-#     form = LoginForm(request.form)
-#
-#     if request.method == 'POST' and form.validate():
-#         username = request.form.get('username')
-#         password = request.form.get('password')
-#         logger.debug("Username is: {}".format(username))
-#         logger.debug("Password is: {}".format(password))
-#
-#         existing_user = User.query.filter_by(username=username).first()
-#
-#         if not (existing_user and existing_user.check_password_simple(password)):
-#             flash('Invalid username or password. Please try again.', 'danger')
-#             logger.debug("Failed validation")
-#             return render_template('sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
-#
-#         session['username'] = username
-#
-#         usr_scopes = get_user_scopes_util(username)
-#
-#         data_dict_for_jwt_token = {"username": username, "user_scopes": usr_scopes}
-#
-#         encoded_jwt_token = encode(data_dict_for_jwt_token)
-#         session['jwt_token'] = encoded_jwt_token
-#
-#         flash('You have successfully logged in.', 'success')
-#         logger.debug("validation OK")
-#         return redirect(url_for('logged_in'))
-#
-#     if form.errors:
-#         flash(form.errors, 'danger')
-#
-#     templateData = {
-#         "error": {
-#             "type": request.args.get("error")
-#         }
-#     }
-#
-#     return render_template('sign-in.html', _theme='default', form=form, data=templateData)
 
 
 # ===== Sign in using OAuth2 =====

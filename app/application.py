@@ -296,20 +296,6 @@ def login_OAuth():
         oauth = OAuth2Session(client=client)
         token_url = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
 
-        try:
-            token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID,
-                                      client_secret=OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
-            app.logger.debug(" *** Access Token Granted *** ")
-            app.logger.debug(" Values are: ")
-
-            for key in token:
-                logger.debug("{} Value is: {}".format(key, token[key]))
-
-        except MissingTokenError as e:
-            logger.warning("Missing token error, error is: {}".format(e))
-            logger.warning("Failed validation")
-            
-        logger.debug("Our Token Endpoint is: {}".format(token_url))
 
         try:
             token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID,

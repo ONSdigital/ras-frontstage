@@ -15,6 +15,7 @@ print("my repository values are:{}".format(my_surveys['rows'][0]['businessData']
 returned_token = {"id":6,"access_token":"a712f0f9-d00d-447a-b143-49984ca3db68","expires_in":3600,"token_type":"Bearer","scope":"","refresh_token":"37ca04d2-6b6c-4854-8e85-f59c2cc7d3de"}
 data_dict_for_jwt_token={'refresh_token': 'e6bde0f6-e123-4dcf-9567-74f4d072fc71', 'access_token': 'f418d491-eeda-47cb-b3e3-0d5d7b97ee6d', 'username': 'johndoe', 'expires_at': '100123456789', 'scope': '[foo,bar,qnx]'}
 
+party_id = "3b136c4b-7a14-4904-9e01-13364dd7b972"
 
 data_dict_for_jwt_token2 = {
  "refresh_token": "e6bde0f6-e123-4dcf-9567-74f4d072fc71",
@@ -102,7 +103,6 @@ class TestApplication(unittest.TestCase):
         """Test incorrect detail message is returned with invalid details entered"""
         # data = {'refresh_token': '007', 'access_token': '007', 'scope': '[foo,bar]', 'expires_at': 'today', 'username': 'nherriot' }
         url = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
-        # m.post('http://localhost:8000/api/v1/tokens/', status_code=401, text=str(data))
 
         # Here we place a listener on this URL. This is the URL of the OAuth2 server. We send a 401 to reject the request
         # from the ras_frontstage to get a token for this user. See application.py login_OAuth(). And the call to oauth.fetch_token
@@ -117,9 +117,81 @@ class TestApplication(unittest.TestCase):
         # Check this guy has an incorrect email.
         self.assertTrue(bytes('Incorrect email or password', encoding='UTF-8') in response.data)
 
-        self.assertTrue(bytes('Sign in', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('Email Address', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('Password', encoding='UTF-8') in response.data)
+
+    # Test we get survey data once a user signs in properly. This means we have to mock up OAuth2 server sending a
+    # Token. The ras_frontstage will then send a request for data to the API Gateway / Party Service, we Mock this too
+    # and reply with survey data. See: https://requests-mock.readthedocs.io/en/latest/response.html
+    @requests_mock.mock()
+    def test_sign_in_view_survey_data(self, mock_object):
+        """Test we display survey data after signing in correctly
+        """
+
+        # Build URL's which is used to talk to the OAuth2 server
+        #url_sign_in_user = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_ADMIN_ENDPOINT
+        url_get_token = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
+        url_get_survey_data = Config.API_GATEWAY_SURVEYS_URL + 'todo/' + party_id
+
+        # Here we place a listener on the URL's The flow of events are:
+        # 1) The ras_frontstage signs in OAuth2 user.
+        # 2) The OAuth2 replies with a HTTP 200 OK and token data.
+        # 3) The ras_frontstage requests to view survey data from the Part Service.
+        # 4) The Part Service replys with survey data.
+        # 5) The ras_frontstage displays surve data.
+        #
+        # This means we need to mock 2) and 4)
+        #
+        # Here we place a listener on our URLs. This is the URL of the OAuth2 server and Party Server
+
+        mock_object.post(url_get_token, status_code=200, json=returned_token)
+        mock_object.get(url_get_survey_data, status_code=200, json=my_surveys)
+
+        # 1) Send a POST message to sign in as a test user
+        #   User                        FS                      OAuth2                  PS
+        #   ----                        --                      ------                  --
+        #           Sign-in             |
+        #   --------------------------->|
+        response = self.app.post('/sign-in/OAuth', data={'username': 'testuser@email.com', 'password': 'password'}, headers=self.headers)
+
+        # 2) Mock object gets returned from our simulated OAuth2 server
+        #   User                        FS                      OAuth2                  PS
+        #   ----                        --                      ------                  --
+        #                               |       get-token
+        #                               |------------------------->|
+        #                               |<-------------------------|
+
+        print ("The response data is: {}".format(response.data))
+        # Our system should check the response data.
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(bytes('You should be redirected automatically to target URL', encoding='UTF-8') in response.data)
+
+        # 3) ras_frontstage sends a redirect to logged-in. So we simulate our redirect and call the logged-in page
+        #   User                        FS                      OAuth2                  PS
+        #   ----                        --                      ------                  --
+        #           redirect            |
+        #   <---------------------------|
+        #           logged-in           |
+        #   --------------------------->|
+        response = self.app.post('/logged-in', data={}, headers=self.headers)
+
+        # 4) Mock object gets returned from our simulated gateway to provide survey data.
+        #   User                        FS                      OAuth2                  PS
+        #   ----                        --                      ------                  --
+        #                               |                 request survey data           |
+        #                               |---------------------------------------------->|
+        #                               |                 mock survey data              |
+        #                               |<----------------------------------------------|
+
+        # 5) Check our response has survey data. In particular lets check we can see the RUREF value.
+        #   User                        FS                      OAuth2                  PS
+        #   ----                        --                      ------                  --
+        #   |                           |                                               |
+        #   |     logged-in response    |                                               |
+        #   |<------------------------- |                                               |
+        print ("The response data is: {}".format(response.data))
+        print("my repository values are:{}".format(my_surveys['rows'][0]['businessData']['businessRef']))
+
+        self.assertTrue(bytes(my_surveys['rows'][0]['businessData']['businessRef'], encoding='UTF-8') in response.data)
+
 
     def test_create_account_get_page(self):
         """Test create account page is rendered for a get request"""
@@ -282,7 +354,7 @@ class TestApplication(unittest.TestCase):
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
         print ("response object is: {}".format(response.data))
-        self.assertTrue(response.status_code, 200)
+        self.assertTrue(response.status_code, 301)
         self.assertTrue(bytes('Please follow the link in the email to confirm your email address and finish setting up your account.', encoding='UTF-8') in response.data)
 
 

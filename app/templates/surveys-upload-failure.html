@@ -1,0 +1,69 @@
+{% import 'partials/section.html' as section %}
+
+{% extends "layouts/_onecol.html" %}
+
+{% block page_title %}My surveys - ONS Business Surveys{% endblock %}
+
+{% block main %}
+
+<div class="grid">
+    <div class="grid__col col-12@m">
+
+        <div class="panel panel--error u-mb-s" data-qa="error">
+            <div class="panel__header">
+                <h1 class="panel__title venus">Something went wrong</h1>
+            </div>
+            <div class="panel__body" data-qa="error-body">
+                <!--<a onclick="focusOn('file');" href="#file">Please try uploading your spreadsheet again</a>-->
+                <p class="error-message">
+                    Please try uploading your spreadsheet again
+                </p>
+                <div class="upload--response">
+
+
+                    <!--<form action="/BRES/upload-successful.html" class="form">-->
+                    <!--<input type="file" id="file" name="file" class="">-->
+                    <!--<button class="btn btn&#45;&#45;secondary" type="submit">Upload</button>-->
+                    <!--</form>-->
+
+                    <form
+                            method="post"
+                            action="{{ url_for('upload_survey', case_id=case_id, collection_instrument_id=collection_instrument_id) }}"
+                            class="form"
+                            role="form"
+                            enctype="multipart/form-data">
+
+                        <div>
+                            <input class="input input--text" id="selected-file" name="file" type="file" required/>
+                        </div>
+
+                        <br/>
+
+                        <button class="btn action-button btn--secondary" type="submit">Upload</button>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="u-mb-l qa-intro-description">
+        </div>
+
+        <br/>
+
+        <div class="lock u-mb-s u-mb-m@s">
+            <p class="venus"><i class="fa fa-lock" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;We will treat your data securely and
+                confidentially</p>
+            <!--<div class="venus lock__text">We will treat your data securely and confidentially</div>-->
+        </div>
+
+    </div>
+</div>
+
+<div>
+    <a href="/">Back</a>
+</div>
+
+{% endblock main %}

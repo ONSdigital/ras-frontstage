@@ -6,38 +6,57 @@
 
 {% block main %}
 
-    <h1 class="saturn">Business Register and Employment Survey</h1>
+<h1 class="saturn">Business Register and Employment Survey</h1>
 
-    <a class="btn action-button btn--primary" target="_blank" href="{{ config.API_GATEWAY_COLLECTION_INSTRUMENT_URL }}download/{{ collection_instrument_id }}">Download&nbsp;&nbsp;&nbsp;
-        <i class="fa fa-download fa-lg" aria-hidden="true"></i>
-    </a>
 
-    <br/>
-    <br/>
-
-    <form
-            method="post"
-            action="{{ url_for('upload_survey', case_id=case_id, collection_instrument_id=collection_instrument_id) }}"
-            class="form"
-            role="form"
-            enctype="multipart/form-data">
-
-        <div>
-            <label class="label" for="selected-file">Select a file: </label>
-            <input class="input input--text" id="selected-file" name="file" type="file" required />
-        </div>
-
-        <br />
-
-        <button class="btn action-button btn--secondary" type="submit">
-            Upload&nbsp;&nbsp;&nbsp;<i class="fa fa-upload fa-lg" aria-hidden="true"></i>
-        </button>
-
-    </form>
+<a class="btn action-button btn--primary" target="_blank"
+   href="{{ config.API_GATEWAY_COLLECTION_INSTRUMENT_URL }}download/{{ collection_instrument_id }}">
 
     <div>
-        <a href="/">Back</a>
+        <span class="download__text">Download spreadsheet&nbsp;&nbsp;&nbsp;</span>
+        <span class="download__text"><i class="fa fa-download fa-lg" aria-hidden="true"></i></span>
     </div>
+    <div class="download__text pluto">(560KB)</div>
+</a>
+
+<br/>
+<br/>
+
+<h2 class="saturn">You will be asked to provide information for the business, including:</h2>
+<ul>
+    <li>information about the business structure</li>
+    <li>checking and updating the details we have about the existing business sites</li>
+    <li>details about new business sites that we don't have on our records</li>
+</ul>
+
+<p class="venus">If actual figures are not available, please provide informed estimates.</p>
+
+<form
+        method="post"
+        action="{{ url_for('upload_survey', case_id=case_id, collection_instrument_id=collection_instrument_id, data=data) }}"
+        class="form"
+        role="form"
+        enctype="multipart/form-data">
+
+    <div>
+        <input class="input input--text" id="selected-file" name="file" type="file" required/>
+    </div>
+
+    <br/>
+
+    <button class="btn action-button btn--secondary" type="submit">Upload</button>
+
+</form>
+
+<br/>
+
+<p class="venus"><i class="fa fa-lock" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;We will treat your data securely and confidentially</p>
+
+<br/>
+
+<div>
+    <a href="/">Back</a>
+</div>
 
 {% endblock main %}
 

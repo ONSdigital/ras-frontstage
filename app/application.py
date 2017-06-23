@@ -179,8 +179,14 @@ def access_survey():
             case_id = request.args.get('case_id', None)
             collection_instrument_id = request.args.get('collection_instrument_id', None)
 
+            url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'id/{}'.format(collection_instrument_id)
+            logger.debug('access_survey URL is: {}'.format(url))
+
+            req = requests.get(url, verify=False)
+            data = req.json()
+
             # Render the template
-            return render_template('surveys-access.html', _theme='default', case_id=case_id, collection_instrument_id=collection_instrument_id)
+            return render_template('surveys-access.html', _theme='default', case_id=case_id, collection_instrument_id=collection_instrument_id, data=data)
 
         except JWTError:
             # TODO Provide proper logging
@@ -198,6 +204,7 @@ def upload_survey():
 
     case_id = request.args.get('case_id', None)
     collection_instrument_id = request.args.get('collection_instrument_id', None)
+    size = request.args.get('size', None)
 
     if session.get('jwt_token'):
         jwttoken = session.get('jwt_token')
@@ -219,7 +226,7 @@ def upload_survey():
 
                 # Build the URL
                 url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'survey_responses/{}'.format(case_id)
-                logger.debug('access_survey URL is: {}'.format(url))
+                logger.debug('upload_survey URL is: {}'.format(url))
 
                 # Call the API Gateway Service to upload the selected file
                 r = requests.post(url, files=upload_file, verify=False)
@@ -227,19 +234,13 @@ def upload_survey():
 
                 if r.status_code == 200:
                     logger.debug('UPLOAD SUCCESS')
+                    return render_template('surveys-upload-success.html', _theme='default')
                 else:
                     logger.debug('UPLOAD FAILURE')
-
-                # TODO Display the result of the upload
-                # if register_user.ok:
-                #     # return render_template('register.almost-done.html', _theme='default', email=email_address)
-                #     return render_template('surveys-access.html', _theme='default')
-                # else:
-                #     return abort(500,
-                #                  '{"message":"There was a problem with the registration service, please contact a member of the ONS staff"}')
+                    return render_template('surveys-upload-failure.html', _theme='default')
 
             # Render the template
-            return render_template('surveys-access.html', _theme='default', case_id=case_id, collection_instrument_id=collection_instrument_id)
+            return render_template('surveys-access.html', _theme='default', case_id=case_id, collection_instrument_id=collection_instrument_id, data=data)
 
         except JWTError:
             # TODO Provide proper logging

@@ -20,9 +20,7 @@ from app.views.secure_messaging import secure_message_bp
 from app.config import OAuthConfig, Config, TestingConfig, ProductionConfig
 from app.jwt import encode, decode
 from app.models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
-from app.utils import get_user_scopes_util
 from app.logger_config import logger_initial_config
-
 
 app = Flask(__name__)
 app.debug = True
@@ -194,54 +192,6 @@ def logout():
         session.pop('jwt_token')
 
     return redirect(url_for('login_OAuth'))
-
-
-# ===== Sign in =====
-@app.route('/sign-in/', methods=['GET', 'POST'])
-def login():
-    """Handles sign-in"""
-
-    logger.debug("*** Hitting login() function.... ***")
-    """Login Page."""
-    form = LoginForm(request.form)
-
-    if request.method == 'POST' and form.validate():
-        username = request.form.get('username')
-        password = request.form.get('password')
-        logger.debug("Username is: {}".format(username))
-        logger.debug("Password is: {}".format(password))
-
-        existing_user = User.query.filter_by(username=username).first()
-
-        if not (existing_user and existing_user.check_password_simple(password)):
-            flash('Invalid username or password. Please try again.', 'danger')
-            logger.debug("Failed validation")
-            return render_template('sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
-
-        session['username'] = username
-
-        usr_scopes = get_user_scopes_util(username)
-
-        data_dict_for_jwt_token = {"username": username, "user_scopes": usr_scopes}
-
-        encoded_jwt_token = encode(data_dict_for_jwt_token)
-        session['jwt_token'] = encoded_jwt_token
-
-        flash('You have successfully logged in.', 'success')
-        logger.debug("validation OK")
-        return redirect(url_for('logged_in'))
-
-    if form.errors:
-        flash(form.errors, 'danger')
-
-    templateData = {
-        "error": {
-            "type": request.args.get("error")
-        }
-    }
-
-    return render_template('sign-in.html', _theme='default', form=form, data=templateData)
-
 
 # ===== Sign in using OAuth2 =====
 

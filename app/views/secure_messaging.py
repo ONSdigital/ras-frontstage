@@ -16,25 +16,14 @@ modify_data = {'action': '',
 
 secure_message_bp = Blueprint('secure_message_bp', __name__, static_folder='static', template_folder='templates')
 
-
-@secure_message_bp.route('/')
-def hello_world():
-    logger.debug("test")
-    return "Hello World"
-
-
-@secure_message_bp.route('/create-message', methods=['GET', 'POST', 'PUT'])
+@secure_message_bp.route('/create-message', methods=['GET', 'POST',])
 def create_message():
     """Handles sending of new message"""
 
     if request.method == 'POST':
         if request.form['submit'] == 'Send message':
-            logger.info("Info - Send Message")
-            logger.debug("Debug - Send Message")
-            logger.warning("Warning - Send Message")
-            logger.error("Error - Send Message")
-            logger.critical("Critical - Send Message")
-            data = {'msg_to': 'BRES', 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
+            data = {'msg_to': 'BRES', 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'subject': request.form['secure-message-subject'],
+                    'body': request.form['secure-message-body'],
                     'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
 
             response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
@@ -43,20 +32,22 @@ def create_message():
             return render_template('message-success-temp.html', _theme='default')
 
         if request.form['submit'] == 'Save draft':
-            logger.info("Save Draft")
-            logger.debug("Debug - Save Draft")
-            logger.warning("Warning - Save Draft")
-            logger.error("Error - Save Draft")
-            data = {'msg_to': 'BRES', 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
+            data = {'msg_to': 'BRES', 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                    'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
                     'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
 
-            response = requests.post(SecureMessaging.DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
+            if "msg_id" in request.form:
+                data['msg_id'] = request.form['msg_id']
+                response = requests.put(SecureMessaging.DRAFT_PUT_API_URL.format(request.form['msg_id']), data=json.dumps(data), headers=headers)
+            else:
+                response = requests.post(SecureMessaging.DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
             resp_data = json.loads(response.text)
             logger.debug(resp_data['msg_id'])
             get_draft = requests.get(SecureMessaging.DRAFT_GET_API_URL.format(resp_data['msg_id']), headers=headers)
             get_json = json.loads(get_draft.content)
 
             return render_template('secure-messages-draft.html', _theme='default', draft=get_json)
+
     return render_template('secure-messages-create.html', _theme='default')
 
 
@@ -66,7 +57,8 @@ def reply_message():
 
     if request.method == 'POST':
         logger.info("Reply to Message")
-        data = {'msg_to': 'BRES', 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'subject': 'reply_subject', 'body': request.form['secure-message-body'],
+        data = {'msg_to': 'BRES', 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                'subject': 'reply_subject', 'body': request.form['secure-message-body'],
                 'thread_id': 'test', 'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
 
         response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)

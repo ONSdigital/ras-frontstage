@@ -29,9 +29,14 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI', 'postgresql://ras_frontstage_backup:password@localhost:5431/postgres')
 
     # Cloud Foundry config
-    API_GATEWAY_SURVEYS_URL = 'https://api-dev.apps.mvp.onsclofo.uk/api/1.0.0/surveys/'
-    API_GATEWAY_COLLECTION_INSTRUMENT_URL = 'https://api-dev.apps.mvp.onsclofo.uk:443/collection-instrument-api/1.0.2/'
-    API_GATEWAY_PARTY_URL = 'https://api-dev.apps.mvp.onsclofo.uk/party-api/1.0.4/'
+    API_GATEWAY_COLLECTION_INSTRUMENT_URL = os.environ.get('API_GATEWAY_COLLECTION_INSTRUMENT_URL',
+                                                           'https://api-dev.apps.mvp.onsclofo.uk:443/collection-instrument-api/1.0.2/')
+
+    API_GATEWAY_PARTY_URL = os.environ.get('API_GATEWAY_PARTY_URL',
+                                           'https://api-dev.apps.mvp.onsclofo.uk/party-api/1.0.4/')
+
+    API_GATEWAY_SURVEYS_URL = os.environ.get('API_GATEWAY_SURVEYS_URL',
+                                             'https://api-dev.apps.mvp.onsclofo.uk/api/1.0.0/surveys/')
 
     # Local config
     # API_GATEWAY_SURVEYS_URL='http://localhost:8050/api/my-surveys/'

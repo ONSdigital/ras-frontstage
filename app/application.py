@@ -20,7 +20,6 @@ from app.views.secure_messaging import secure_message_bp
 from app.config import OAuthConfig, Config, TestingConfig, ProductionConfig
 from app.jwt import encode, decode
 from app.models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
-from app.utils import get_user_scopes_util
 from app.logger_config import logger_initial_config
 from app.filters.case_status_filter import case_status_filter
 from app.filters.file_size_filter import file_size_filter

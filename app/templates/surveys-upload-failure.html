@@ -27,20 +27,20 @@
 
                     <form
                             method="post"
-                            action="{{ url_for('upload_survey', case_id=case_id, collection_instrument_id=collection_instrument_id) }}"
+                            action="{{ url_for('surveys_bp.upload_survey', case_id=case_id, collection_instrument_id=collection_instrument_id, data=data) }}"
                             class="form"
                             role="form"
                             enctype="multipart/form-data">
 
                         <div>
-                            <input class="input input--text" id="selected-file" name="file" type="file" required/>
+                            <input class="input input--text" id="selected-file" name="file" type="file" required
+                            accept=".xls,.xlsx" />
                         </div>
-
-                        <br/>
 
                         <button class="btn action-button btn--secondary" type="submit">Upload</button>
 
                     </form>
+
 
                 </div>
             </div>
@@ -50,14 +50,13 @@
 
         <div class="lock u-mb-s u-mb-m@s">
             <p class="venus"><i class="fa fa-lock" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;We will treat your data securely and confidentially</p>
-            <!--<div class="venus lock__text">We will treat your data securely and confidentially</div>-->
         </div>
 
     </div>
 </div>
 
 <div>
-    <a href="/">Back</a>
+    <a href="{{ url_for('surveys_bp.logged_in') }}">Back</a>
 </div>
 
 {% endblock main %}

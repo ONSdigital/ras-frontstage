@@ -55,7 +55,7 @@
 
                 <form
                         method="post"
-                        action="{{ url_for('access_survey', case_id=data.case.id, collection_instrument_id=data.case.collectionInstrumentId) }}"
+                        action="{{ url_for('.access_survey', case_id=data.case.id, collection_instrument_id=data.case.collectionInstrumentId) }}"
                         class="form"
                         role="form">
 

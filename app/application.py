@@ -181,8 +181,8 @@ def access_survey():
             case_id = request.args.get('case_id', None)
             collection_instrument_id = request.args.get('collection_instrument_id', None)
 
-            url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'id/{}'.format(collection_instrument_id)
-            logger.debug('access_survey URL is: {}'.format(url))
+            url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'collectioninstrument/id/{}'.format(collection_instrument_id)
+            logger.debug('Access_survey URL is: {}'.format(url))
 
             req = requests.get(url, verify=False)
             data = req.json()

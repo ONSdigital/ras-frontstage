@@ -78,7 +78,7 @@ class TestApplication(unittest.TestCase):
     # data={"error": {"type": "success"}}
     def test_logged_in(self):
         "Testing Logged In"
-        response = self.app.get('logged-in', headers=self.headers)
+        response = self.app.get('/', headers=self.headers)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(bytes('Error! You are not logged in!', encoding='UTF-8') in response.data)
@@ -108,8 +108,8 @@ class TestApplication(unittest.TestCase):
         # from the ras_frontstage to get a token for this user. See application.py login(). And the call to oauth.fetch_token
         mock_object.post(url, status_code=401, json={'detail': 'Unauthorized user credentials'})
 
-        # Lets send a post message to the ras_frontstage at the endpoint /sign-in/OAuth.
-        response = self.app.post('/sign-in/OAuth', data={'username': 'test', 'password': 'test'}, headers=self.headers)
+        # Lets send a post message to the ras_frontstage at the endpoint /sign-in.
+        response = self.app.post('/sign-in', data={'username': 'test', 'password': 'test'}, headers=self.headers)
 
         # Our system should still handle this.
         self.assertEqual(response.status_code, 200)
@@ -150,7 +150,7 @@ class TestApplication(unittest.TestCase):
         #   ----                        --                      ------                  --
         #           Sign-in             |
         #   --------------------------->|
-        response = self.app.post('/sign-in/OAuth', data={'username': 'testuser@email.com', 'password': 'password'}, headers=self.headers)
+        response = self.app.post('/sign-in', data={'username': 'testuser@email.com', 'password': 'password'}, headers=self.headers)
 
         # 2) Mock object gets returned from our simulated OAuth2 server
         #   User                        FS                      OAuth2                  PS
@@ -164,14 +164,14 @@ class TestApplication(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue(bytes('You should be redirected automatically to target URL', encoding='UTF-8') in response.data)
 
-        # 3) ras_frontstage sends a redirect to logged-in. So we simulate our redirect and call the logged-in page
+        # 3) ras_frontstage sends a redirect to /. So we simulate our redirect and call the / page
         #   User                        FS                      OAuth2                  PS
         #   ----                        --                      ------                  --
         #           redirect            |
         #   <---------------------------|
-        #           logged-in           |
+        #           /           |
         #   --------------------------->|
-        response = self.app.post('/logged-in', data={}, headers=self.headers)
+        response = self.app.post('/', data={}, headers=self.headers)
 
         # 4) Mock object gets returned from our simulated gateway to provide survey data.
         #   User                        FS                      OAuth2                  PS
@@ -185,7 +185,7 @@ class TestApplication(unittest.TestCase):
         #   User                        FS                      OAuth2                  PS
         #   ----                        --                      ------                  --
         #   |                           |                                               |
-        #   |     logged-in response    |                                               |
+        #   |     / response    |                                               |
         #   |<------------------------- |                                               |
         print ("The response data is: {}".format(response.data))
         print("my repository values are:{}".format(my_surveys['rows'][0]['businessData']['businessRef']))
@@ -369,7 +369,7 @@ class TestApplication(unittest.TestCase):
         url_create_user = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_ADMIN_ENDPOINT
 
         # Here we place a listener on this URL. This is the URL of the OAuth2 server. We send a 401 to reject the request
-        # from the ras_frontstage to get a token for this user. See application.py login_OAuth()
+        # from the ras_frontstage to get a token for this user. See application.py login()
 
         mock_object.post(url_create_user, status_code=401, json= {"detail":"Duplicate user credentials"})
 
@@ -382,13 +382,13 @@ class TestApplication(unittest.TestCase):
 
     # def test_surveys_todo_page(self):
     #
-    #     # Lets send a post message to the ras_frontstage at the endpoint /sign-in/OAuth.
-    #     response = self.app.post('/sign-in/OAuth', data={'username': 'test', 'password': 'test'}, headers=self.headers)
+    #     # Lets send a post message to the ras_frontstage at the endpoint /sign-in.
+    #     response = self.app.post('/sign-in', data={'username': 'test', 'password': 'test'}, headers=self.headers)
     #
     #     # Our system should still handle this.
     #     self.assertEqual(response.status_code, 200)
     #
-    #     response = self.app.get('logged-in', data={'username': 'test', 'password': 'test'}, headers=self.headers)
+    #     response = self.app.get('/', data={'username': 'test', 'password': 'test'}, headers=self.headers)
     #     self.assertTrue(response.status_code, 200)
     #
     #     self.assertTrue(bytes('To do', encoding='UTF-8') in response.data)

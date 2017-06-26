@@ -1,2 +1,2 @@
 set -o pipefail
-py.test --cov=application --cov-report xml
+py.test -v --cov=application --cov-report xml tests/*.py

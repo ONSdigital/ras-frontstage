@@ -6,7 +6,7 @@ def file_size_filter(value):
     return split_thousands(value)
 
 
-def split_thousands(value, sep = ','):
+def split_thousands(value, sep=','):
     if len(value) <= 3:
         return value
     else:

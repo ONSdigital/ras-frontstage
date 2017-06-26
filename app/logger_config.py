@@ -1,4 +1,3 @@
-
 import logging
 import os
 
@@ -8,7 +7,6 @@ def logger_initial_config(service_name=None,
                           logger_format=None,
                           logger_date_format=None):
     '''Set initial logger config'''
-
 
     if not log_level:
         log_level = os.getenv('LOGGING_LEVEL', 'INFO')

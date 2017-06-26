@@ -3,8 +3,6 @@ This module hosts the config setup for our project
 """
 
 import os
-import logging
-
 
 # ENV VARIABLES BELOW, SET THESE ON YOUR TERMINAL
 # export APP_SETTINGS=config.Config
@@ -98,7 +96,7 @@ class SecureMessaging(Config):
     SM_UI_URL = os.environ.get('SM_UI_URL', 'http://localhost:5001/secure-message')
     CREATE_MESSAGE_API_URL = SM_API_URL + '/message/send'
     CREATE_MESSAGE_UI_URL = SM_UI_URL + '/create-message'
-    MESSAGE_DRAFT_URL = SM_UI_URL +'/DRAFT'
+    MESSAGE_DRAFT_URL = SM_UI_URL + '/DRAFT'
     MESSAGES_API_URL = SM_API_URL + '/messages?limit=' + str(MESSAGE_LIMIT)
     MESSAGES_UI_URL = SM_UI_URL + '/messages'
     DRAFT_SAVE_API_URL = SM_API_URL + '/draft/save'
@@ -106,7 +104,5 @@ class SecureMessaging(Config):
     DRAFT_ID_API_URL = SM_API_URL + '/draft/<draft_id'
     DRAFT_PUT_API_URL = SM_API_URL + '/draft/{0}/modify'
 
-
     # Selenium Driver Path
-
     chrome_driver = "{}/tests/selenium_scripts/drivers/chromedriver".format(os.environ.get('RAS_FRONTSTAGE_PATH'))

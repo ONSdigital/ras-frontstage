@@ -9,7 +9,7 @@ import os
 from datetime import datetime
 from functools import wraps, update_wrapper
 import requests
-from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, Response, abort
+from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, abort
 from jose import JWTError
 from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError
 from requests import ConnectionError
@@ -19,7 +19,7 @@ from structlog import wrap_logger
 from app.views.secure_messaging import secure_message_bp
 from app.config import OAuthConfig, Config, TestingConfig, ProductionConfig
 from app.jwt import encode, decode
-from app.models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
+from app.models import LoginForm, RegistrationForm, ActivationCodeForm, db
 from app.logger_config import logger_initial_config
 from app.filters.case_status_filter import case_status_filter
 from app.filters.file_size_filter import file_size_filter
@@ -80,6 +80,7 @@ def build_survey_data(status_filter):
     req = requests.get(url, headers=headers, params=status_filter, verify=False)
 
     return req.json()
+
 
 # ===== Error page =====
 @app.route('/error', methods=['GET', 'POST'])
@@ -204,8 +205,6 @@ def upload_survey():
     """Logged in page for users only."""
 
     case_id = request.args.get('case_id', None)
-    collection_instrument_id = request.args.get('collection_instrument_id', None)
-    size = request.args.get('size', None)
 
     if session.get('jwt_token'):
         jwttoken = session.get('jwt_token')
@@ -229,7 +228,7 @@ def upload_survey():
             logger.debug('upload_survey URL is: {}'.format(url))
 
             # Call the API Gateway Service to upload the selected file
-            result = requests.post(url, files=upload_file, verify=False)
+            result = requests.post(url, headers, files=upload_file, verify=False)
             logger.debug('Result => {} {} : {}'.format(result.status_code, result.reason, result.text))
 
             if result.status_code == 200:
@@ -318,7 +317,6 @@ def login():
         # the transactions between the OAuth2 server
         oauth = OAuth2Session(client=client)
         token_url = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
-
 
         try:
             token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID,
@@ -495,9 +493,10 @@ def register_enter_your_details():
             OAuthurl = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_ADMIN_ENDPOINT
             OAuth_response = requests.post(OAuthurl, auth=authorisation, headers=headers, data=OAuth_payload)
             logger.debug("OAuth response is: {}".format(OAuth_response.content))
-            #json.loads(myResponse.content.decode('utf-8'))
+
+            # json.loads(myResponse.content.decode('utf-8'))
             response_body = json.loads(OAuth_response.content.decode('utf-8'))
-            print ("OAuth2 response is: {}".format(OAuth_response.status_code))
+            logger.debug("OAuth2 response is: {}".format(OAuth_response.status_code))
 
             if OAuth_response.status_code == 401:
                 # This looks like the user is not authorized to use the system. it could be a duplicate email. check our
@@ -516,14 +515,8 @@ def register_enter_your_details():
                 OAuth_response.raise_for_status()  # A stop gap until we know all the correct error pages
                 logger.warning("OAuth error")
 
-
-
-
-
-
-
-            # TODO A utility function to allow us to route to a page for 'user
-            # is registered already'. We need a html page for this.
+            # TODO A utility function to allow us to route to a page for 'user is registered already'.
+            # We need a html page for this.
 
         except requests.exceptions.ConnectionError:
             logger.critical("There seems to be no server listening on this connection?")

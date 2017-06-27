@@ -1,12 +1,12 @@
 import json
 import logging
 import requests
-from flask import Blueprint, Flask, make_response, render_template, request, flash, redirect, url_for, session, abort
+from flask import Blueprint, render_template, request, redirect, url_for, session
 from jose import JWTError
 from structlog import wrap_logger
 
 from app.config import Config
-from app.jwt import encode, decode
+from app.jwt import decode
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -191,7 +191,7 @@ def upload_survey():
             return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
 
         except Exception as e:
-            # logger.error("Error uploading survey response: {}", str(e))
+            logger.error("Error uploading survey response: {}", str(e))
             return redirect(url_for('error_page'))
 
 

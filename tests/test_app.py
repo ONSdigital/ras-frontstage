@@ -83,7 +83,7 @@ class TestApplication(unittest.TestCase):
     # data={"error": {"type": "success"}}
     def test_logged_in(self):
         "Testing Logged In"
-        response = self.app.get('/', headers=self.headers)
+        response = self.app.get('/surveys/', headers=self.headers)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(bytes('Error! You are not logged in!', encoding='UTF-8') in response.data)
@@ -175,7 +175,7 @@ class TestApplication(unittest.TestCase):
         #   <---------------------------|
         #           /           |
         #   --------------------------->|
-        response = self.app.post('/', data={}, headers=self.headers)
+        response = self.app.get('/surveys/', data={}, headers=self.headers)
 
         # 4) Mock object gets returned from our simulated gateway to provide survey data.
         #   User                        FS                      OAuth2                  PS
@@ -195,7 +195,6 @@ class TestApplication(unittest.TestCase):
         print("My repository values are:{}".format(my_surveys['rows'][0]['businessData']['businessRef']))
 
         self.assertTrue(bytes(my_surveys['rows'][0]['businessData']['businessRef'], encoding='UTF-8') in response.data)
-
 
     def test_create_account_get_page(self):
         """Test create account page is rendered for a get request"""

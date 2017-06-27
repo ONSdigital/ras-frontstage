@@ -9,7 +9,7 @@ import os
 from datetime import datetime
 from functools import wraps, update_wrapper
 import requests
-from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, Response, abort
+from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, abort
 from jose import JWTError
 from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError
 from requests import ConnectionError
@@ -23,8 +23,8 @@ from app.filters.case_status_filter import case_status_filter
 from app.filters.file_size_filter import file_size_filter
 
 from app.config import OAuthConfig, Config, TestingConfig, ProductionConfig
-from app.jwt import encode, decode
-from app.models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
+from app.jwt import encode
+from app.models import LoginForm, RegistrationForm, ActivationCodeForm, db
 from app.logger_config import logger_initial_config
 
 app = Flask(__name__)
@@ -168,6 +168,7 @@ def login():
     }
 
     return render_template('sign-in.html', _theme='default', form=form, data=template_data)
+
 
 @app.route('/sign-in/error', methods=['GET'])
 def sign_in_error():

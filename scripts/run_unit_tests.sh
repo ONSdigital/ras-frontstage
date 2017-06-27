@@ -1,2 +1,3 @@
 set -o pipefail
-py.test -v --cov=application --cov-report xml tests/*.py
+
+py.test --cov=app --cov-report xml --ignore=node_modules --ignore=tests/selenium_scripts/

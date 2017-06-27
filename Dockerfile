@@ -1,8 +1,10 @@
-FROM python:2
+FROM python:3.5
 MAINTAINER David Carboni
 
-WORKDIR /ras-frontstage
-ADD ras-frontstage .
+WORKDIR /app
+COPY . /app
+EXPOSE 5001
 RUN pip install -r requirements.txt
 
-ENTRYPOINT python app.py
+ENTRYPOINT ["python3"]
+CMD ["run.py"] 

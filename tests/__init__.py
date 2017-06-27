@@ -1,6 +1,5 @@
 from app import config
 from sqlalchemy import create_engine
-
 import os
 import psycopg2
 import testing.postgresql

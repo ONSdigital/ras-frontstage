@@ -230,189 +230,7 @@ if (window.Element && !Element.prototype.closest) {
 }
 
 },{}],2:[function(require,module,exports){
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],3:[function(require,module,exports){
-(function (process,global){
+(function (global){
 'use strict';
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -3528,7 +3346,7 @@ var invoke$1 = _invoke;
 var html$1 = _html;
 var cel = _domCreate;
 var global$9 = _global;
-var process$2 = global$9.process;
+var process$1 = global$9.process;
 var setTask = global$9.setImmediate;
 var clearTask = global$9.clearImmediate;
 var MessageChannel = global$9.MessageChannel;
@@ -3566,9 +3384,9 @@ if (!setTask || !clearTask) {
     delete queue[id];
   };
   // Node.js 0.8-
-  if (_cof(process$2) == 'process') {
+  if (_cof(process$1) == 'process') {
     defer = function defer(id) {
-      process$2.nextTick(ctx$4(run, id, 1));
+      process$1.nextTick(ctx$4(run, id, 1));
     };
     // Browsers with MessageChannel, includes WebWorkers
   } else if (MessageChannel) {
@@ -3606,16 +3424,16 @@ var _task = {
 var global$10 = _global;
 var macrotask = _task.set;
 var Observer = global$10.MutationObserver || global$10.WebKitMutationObserver;
-var process$3 = global$10.process;
+var process$2 = global$10.process;
 var Promise$1 = global$10.Promise;
-var isNode$1 = _cof(process$3) == 'process';
+var isNode$1 = _cof(process$2) == 'process';
 
 var _microtask = function _microtask() {
   var head, last, notify;
 
   var flush = function flush() {
     var parent, fn;
-    if (isNode$1 && (parent = process$3.domain)) parent.exit();
+    if (isNode$1 && (parent = process$2.domain)) parent.exit();
     while (head) {
       fn = head.fn;
       head = head.next;
@@ -3632,7 +3450,7 @@ var _microtask = function _microtask() {
   // Node.js
   if (isNode$1) {
     notify = function notify() {
-      process$3.nextTick(flush);
+      process$2.nextTick(flush);
     };
     // browsers with MutationObserver
   } else if (Observer) {
@@ -3692,10 +3510,10 @@ var task = _task.set;
 var microtask = _microtask();
 var PROMISE = 'Promise';
 var TypeError$1 = global$8.TypeError;
-var process$1 = global$8.process;
+var process = global$8.process;
 var $Promise = global$8[PROMISE];
-var process$1 = global$8.process;
-var isNode = classof$2(process$1) == 'process';
+var process = global$8.process;
+var isNode = classof$2(process) == 'process';
 var empty = function empty() {/* empty */};
 var Internal;
 var GenericPromiseCapability;
@@ -3795,7 +3613,7 @@ var onUnhandled = function onUnhandled(promise) {
     if (isUnhandled(promise)) {
       abrupt = perform(function () {
         if (isNode) {
-          process$1.emit('unhandledRejection', value, promise);
+          process.emit('unhandledRejection', value, promise);
         } else if (handler = global$8.onunhandledrejection) {
           handler({ promise: promise, reason: value });
         } else if ((console = global$8.console) && console.error) {
@@ -3822,7 +3640,7 @@ var onHandleUnhandled = function onHandleUnhandled(promise) {
   task.call(global$8, function () {
     var handler;
     if (isNode) {
-      process$1.emit('rejectionHandled', promise);
+      process.emit('rejectionHandled', promise);
     } else if (handler = global$8.onrejectionhandled) {
       handler({ promise: promise, reason: promise._v });
     }
@@ -3893,7 +3711,7 @@ if (!USE_NATIVE$1) {
       var reaction = newPromiseCapability(speciesConstructor$1(this, $Promise));
       reaction.ok = typeof onFulfilled == 'function' ? onFulfilled : true;
       reaction.fail = typeof onRejected == 'function' && onRejected;
-      reaction.domain = isNode ? process$1.domain : undefined;
+      reaction.domain = isNode ? process.domain : undefined;
       this._c.push(reaction);
       if (this._a) this._a.push(reaction);
       if (this._s) notify(this, false);
@@ -6108,12 +5926,12 @@ metadata$8.exp({ metadata: function metadata(metadataKey, metadataValue) {
 // https://github.com/rwaldron/tc39-notes/blob/master/es6/2014-09/sept-25.md#510-globalasap-for-enqueuing-a-microtask
 var $export$111 = _export;
 var microtask$1 = _microtask();
-var process$4 = _global.process;
-var isNode$2 = _cof(process$4) == 'process';
+var process$3 = _global.process;
+var isNode$2 = _cof(process$3) == 'process';
 
 $export$111($export$111.G, {
   asap: function asap(fn) {
-    var domain = isNode$2 && process$4.domain;
+    var domain = isNode$2 && process$3.domain;
     microtask$1(domain ? domain.bind(fn) : fn);
   }
 });
@@ -6425,6 +6243,7 @@ var runtime = createCommonjsModule(function (module) {
     var undefined; // More compressible than void 0.
     var $Symbol = typeof Symbol === "function" ? Symbol : {};
     var iteratorSymbol = $Symbol.iterator || "@@iterator";
+    var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
     var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
 
     var inModule = 'object' === "object";
@@ -6590,8 +6409,8 @@ var runtime = createCommonjsModule(function (module) {
         }
       }
 
-      if ((typeof process === "undefined" ? "undefined" : _typeof(process)) === "object" && process.domain) {
-        invoke = process.domain.bind(invoke);
+      if (_typeof(global.process) === "object" && global.process.domain) {
+        invoke = global.process.domain.bind(invoke);
       }
 
       var previousPromise;
@@ -6628,6 +6447,9 @@ var runtime = createCommonjsModule(function (module) {
     }
 
     defineIteratorMethods(AsyncIterator.prototype);
+    AsyncIterator.prototype[asyncIteratorSymbol] = function () {
+      return this;
+    };
     runtime.AsyncIterator = AsyncIterator;
 
     // Note that simple async functions are implemented on top of
@@ -6660,83 +6482,32 @@ var runtime = createCommonjsModule(function (module) {
           return doneResult();
         }
 
+        context.method = method;
+        context.arg = arg;
+
         while (true) {
           var delegate = context.delegate;
           if (delegate) {
-            if (method === "return" || method === "throw" && delegate.iterator[method] === undefined) {
-              // A return or throw (when the delegate iterator has no throw
-              // method) always terminates the yield* loop.
-              context.delegate = null;
-
-              // If the delegate iterator has a return method, give it a
-              // chance to clean up.
-              var returnMethod = delegate.iterator["return"];
-              if (returnMethod) {
-                var record = tryCatch(returnMethod, delegate.iterator, arg);
-                if (record.type === "throw") {
-                  // If the return method threw an exception, let that
-                  // exception prevail over the original return or throw.
-                  method = "throw";
-                  arg = record.arg;
-                  continue;
-                }
-              }
-
-              if (method === "return") {
-                // Continue with the outer return, now that the delegate
-                // iterator has been terminated.
-                continue;
-              }
+            var delegateResult = maybeInvokeDelegate(delegate, context);
+            if (delegateResult) {
+              if (delegateResult === ContinueSentinel) continue;
+              return delegateResult;
             }
-
-            var record = tryCatch(delegate.iterator[method], delegate.iterator, arg);
-
-            if (record.type === "throw") {
-              context.delegate = null;
-
-              // Like returning generator.throw(uncaught), but without the
-              // overhead of an extra function call.
-              method = "throw";
-              arg = record.arg;
-              continue;
-            }
-
-            // Delegate generator ran and handled its own exceptions so
-            // regardless of what the method was, we continue as if it is
-            // "next" with an undefined arg.
-            method = "next";
-            arg = undefined;
-
-            var info = record.arg;
-            if (info.done) {
-              context[delegate.resultName] = info.value;
-              context.next = delegate.nextLoc;
-            } else {
-              state = GenStateSuspendedYield;
-              return info;
-            }
-
-            context.delegate = null;
           }
 
-          if (method === "next") {
+          if (context.method === "next") {
             // Setting context._sent for legacy support of Babel's
             // function.sent implementation.
-            context.sent = context._sent = arg;
-          } else if (method === "throw") {
+            context.sent = context._sent = context.arg;
+          } else if (context.method === "throw") {
             if (state === GenStateSuspendedStart) {
               state = GenStateCompleted;
-              throw arg;
+              throw context.arg;
             }
 
-            if (context.dispatchException(arg)) {
-              // If the dispatched exception was caught by a catch block,
-              // then let that catch block handle the exception normally.
-              method = "next";
-              arg = undefined;
-            }
-          } else if (method === "return") {
-            context.abrupt("return", arg);
+            context.dispatchException(context.arg);
+          } else if (context.method === "return") {
+            context.abrupt("return", context.arg);
           }
 
           state = GenStateExecuting;
@@ -6747,29 +6518,103 @@ var runtime = createCommonjsModule(function (module) {
             // GenStateExecuting and loop back for another invocation.
             state = context.done ? GenStateCompleted : GenStateSuspendedYield;
 
-            var info = {
+            if (record.arg === ContinueSentinel) {
+              continue;
+            }
+
+            return {
               value: record.arg,
               done: context.done
             };
-
-            if (record.arg === ContinueSentinel) {
-              if (context.delegate && method === "next") {
-                // Deliberately forget the last sent value so that we don't
-                // accidentally pass it on to the delegate.
-                arg = undefined;
-              }
-            } else {
-              return info;
-            }
           } else if (record.type === "throw") {
             state = GenStateCompleted;
             // Dispatch the exception by looping back around to the
-            // context.dispatchException(arg) call above.
-            method = "throw";
-            arg = record.arg;
+            // context.dispatchException(context.arg) call above.
+            context.method = "throw";
+            context.arg = record.arg;
           }
         }
       };
+    }
+
+    // Call delegate.iterator[context.method](context.arg) and handle the
+    // result, either by returning a { value, done } result from the
+    // delegate iterator, or by modifying context.method and context.arg,
+    // setting context.delegate to null, and returning the ContinueSentinel.
+    function maybeInvokeDelegate(delegate, context) {
+      var method = delegate.iterator[context.method];
+      if (method === undefined) {
+        // A .throw or .return when the delegate iterator has no .throw
+        // method always terminates the yield* loop.
+        context.delegate = null;
+
+        if (context.method === "throw") {
+          if (delegate.iterator.return) {
+            // If the delegate iterator has a return method, give it a
+            // chance to clean up.
+            context.method = "return";
+            context.arg = undefined;
+            maybeInvokeDelegate(delegate, context);
+
+            if (context.method === "throw") {
+              // If maybeInvokeDelegate(context) changed context.method from
+              // "return" to "throw", let that override the TypeError below.
+              return ContinueSentinel;
+            }
+          }
+
+          context.method = "throw";
+          context.arg = new TypeError("The iterator does not provide a 'throw' method");
+        }
+
+        return ContinueSentinel;
+      }
+
+      var record = tryCatch(method, delegate.iterator, context.arg);
+
+      if (record.type === "throw") {
+        context.method = "throw";
+        context.arg = record.arg;
+        context.delegate = null;
+        return ContinueSentinel;
+      }
+
+      var info = record.arg;
+
+      if (!info) {
+        context.method = "throw";
+        context.arg = new TypeError("iterator result is not an object");
+        context.delegate = null;
+        return ContinueSentinel;
+      }
+
+      if (info.done) {
+        // Assign the result of the finished delegate to the temporary
+        // variable specified by delegate.resultName (see delegateYield).
+        context[delegate.resultName] = info.value;
+
+        // Resume execution at the desired location (see delegateYield).
+        context.next = delegate.nextLoc;
+
+        // If context.method was "throw" but the delegate handled the
+        // exception, let the outer generator proceed normally. If
+        // context.method was "next", forget context.arg since it has been
+        // "consumed" by the delegate iterator. If context.method was
+        // "return", allow the original .return call to continue in the
+        // outer generator.
+        if (context.method !== "return") {
+          context.method = "next";
+          context.arg = undefined;
+        }
+      } else {
+        // Re-yield the result returned by the delegate method.
+        return info;
+      }
+
+      // The delegate iterator is finished, so forget it and continue with
+      // the outer generator.
+      context.delegate = null;
+      return ContinueSentinel;
     }
 
     // Define Generator.prototype.{next,throw,return} in terms of the
@@ -6777,6 +6622,15 @@ var runtime = createCommonjsModule(function (module) {
     defineIteratorMethods(Gp);
 
     Gp[toStringTagSymbol] = "Generator";
+
+    // A Generator should always return itself as the iterator object when the
+    // @@iterator function is called on it. Some browsers' implementations of the
+    // iterator prototype chain incorrectly implement this, causing the Generator
+    // object to not be returned from this call. This ensures that doesn't happen.
+    // See https://github.com/facebook/regenerator/issues/274 for more details.
+    Gp[iteratorSymbol] = function () {
+      return this;
+    };
 
     Gp.toString = function () {
       return "[object Generator]";
@@ -6893,6 +6747,9 @@ var runtime = createCommonjsModule(function (module) {
         this.done = false;
         this.delegate = null;
 
+        this.method = "next";
+        this.arg = undefined;
+
         this.tryEntries.forEach(resetTryEntry);
 
         if (!skipTempReset) {
@@ -6927,6 +6784,14 @@ var runtime = createCommonjsModule(function (module) {
           record.type = "throw";
           record.arg = exception;
           context.next = loc;
+
+          if (caught) {
+            // If the dispatched exception was caught by a catch block,
+            // then let that catch block handle the exception normally.
+            context.method = "next";
+            context.arg = undefined;
+          }
+
           return !!caught;
         }
 
@@ -6986,12 +6851,12 @@ var runtime = createCommonjsModule(function (module) {
         record.arg = arg;
 
         if (finallyEntry) {
+          this.method = "next";
           this.next = finallyEntry.finallyLoc;
-        } else {
-          this.complete(record);
+          return ContinueSentinel;
         }
 
-        return ContinueSentinel;
+        return this.complete(record);
       },
 
       complete: function complete(record, afterLoc) {
@@ -7002,11 +6867,14 @@ var runtime = createCommonjsModule(function (module) {
         if (record.type === "break" || record.type === "continue") {
           this.next = record.arg;
         } else if (record.type === "return") {
-          this.rval = record.arg;
+          this.rval = this.arg = record.arg;
+          this.method = "return";
           this.next = "end";
         } else if (record.type === "normal" && afterLoc) {
           this.next = afterLoc;
         }
+
+        return ContinueSentinel;
       },
 
       finish: function finish(finallyLoc) {
@@ -7044,6 +6912,12 @@ var runtime = createCommonjsModule(function (module) {
           resultName: resultName,
           nextLoc: nextLoc
         };
+
+        if (this.method === "next") {
+          // Deliberately forget the last sent value so that we don't
+          // accidentally pass it on to the delegate.
+          this.arg = undefined;
+        }
 
         return ContinueSentinel;
       }
@@ -8714,7 +8588,7 @@ setErrorEmitter(errorEmitter);
 ready(passwordValidation);
 ready(passwordObfuscation);
 
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"_process":2}]},{},[1,3])
+},{}]},{},[1,2])
 

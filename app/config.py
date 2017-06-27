@@ -22,14 +22,15 @@ class Config(object):
     """
     DEBUG = False
     TESTING = False
-    #CSRF_ENABLED = True
     CSRF_ENABLED = False
-    #WTF_CSRF_CHECK_DEFAULT = False
+    # WTF_CSRF_CHECK_DEFAULT = False
     WTF_CSRF_ENABLED = False
     SECRET_KEY = 'this-really-needs-to-be-changed'
     dbname = "ras_frontstage_backup"
-    #SQLALCHEMY_DATABASE_URI = "postgresql://" + dbname + ":password@localhost:5431/postgres"
+    # SQLALCHEMY_DATABASE_URI = "postgresql://" + dbname + ":password@localhost:5431/postgres"
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI', 'postgresql://ras_frontstage_backup:password@localhost:5431/postgres')
+    API_GATEWAY_SURVEYS_URL = 'https://api-dev.apps.mvp.onsclofo.uk/api/1.0.0/surveys/'
+    API_GATEWAY_PARTY_URL = 'https://api-dev.apps.mvp.onsclofo.uk/party-api/1.0.4/'
 
 
 class ProductionConfig(Config):
@@ -60,22 +61,9 @@ class TestingConfig(Config):
     Testing config class
     """
     TESTING = True
-
-
-class PartyService(Config):
-    """
-    This class is used to configure details and parameters for the PartyService microservice.
-    This is temporary until an admin config feature is added to allow manual config of the microservice and/or a
-    configuration management process
-    """
-
-    #PARTYSERVICE_PROTOCOL = "http://"
-    #PARTYSERVICE_SERVER = "localhost:5062"
-    #PARTYSERVICE_REGISTER_ENDPOINT = "/respondents/"
-
-    PARTYSERVICE_PROTOCOL = os.environ.get('PARTYSERVICE_PROTOCOL', 'http://')
-    PARTYSERVICE_SERVER = os.environ.get('PARTYSERVICE_SERVER', 'localhost:5062')
-    PARTYSERVICE_REGISTER_ENDPOINT = os.environ.get('PARTYSERVICE_REGISTER_ENDPOINT', '/respondents/')
+    DEBUG = True
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
 
 
 class OAuthConfig(Config):
@@ -84,14 +72,6 @@ class OAuthConfig(Config):
     This is temporary until an admin config feature
     is added to allow manual config of the microservice
     """
-
-    #ONS_OAUTH_PROTOCOL = "http://"
-    #ONS_OAUTH_SERVER = "django-oauth2-test:8040"
-    #RAS_FRONTSTAGE_CLIENT_ID = "ons@ons.gov"
-    #RAS_FRONTSTAGE_CLIENT_SECRET = "password"
-    #ONS_AUTHORIZATION_ENDPOINT = "/web/authorize/"
-    #ONS_TOKEN_ENDPOINT = "/api/v1/tokens/"
-    #ONS_ADMIN_ENDPOINT = '/api/account/create'
 
     ONS_OAUTH_PROTOCOL = os.environ.get('ONS_OAUTH_PROTOCOL', 'http://')
     ONS_OAUTH_SERVER = os.environ.get('ONS_OAUTH_SERVER', 'localhost:8040')
@@ -102,11 +82,24 @@ class OAuthConfig(Config):
     ONS_ADMIN_ENDPOINT = os.environ.get('ONS_ADMIN_ENDPOINT', '/api/account/create')
 
 
-class FrontstageLogging(Config):
-    """
-    This class is used to set up and define logging behaviour for ras-frontstage
-    """
-    logger = logging.getLogger(__name__)
-    SERVICE_NAME = 'ras-frontstage'
-    LOG_FORMAT = 'ras-frontstage: %(asctime)s|%(levelname)s %(message)s'
-    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'DEBUG')
+class SecureMessaging(Config):
+    """Used to configure Secure Messaging"""
+
+    MESSAGE_LIMIT = 1000
+
+    SM_API_URL = os.environ.get('SM_URL', 'http://localhost:5050')
+    SM_UI_URL = os.environ.get('SM_UI_URL', 'http://localhost:5001/secure-message')
+    CREATE_MESSAGE_API_URL = SM_API_URL + '/message/send'
+    CREATE_MESSAGE_UI_URL = SM_UI_URL + '/create-message'
+    MESSAGE_DRAFT_URL = SM_UI_URL +'/DRAFT'
+    MESSAGES_API_URL = SM_API_URL + '/messages?limit=' + str(MESSAGE_LIMIT)
+    MESSAGES_UI_URL = SM_UI_URL + '/messages'
+    DRAFT_SAVE_API_URL = SM_API_URL + '/draft/save'
+    DRAFT_GET_API_URL = SM_API_URL + '/draft/{0}'
+    DRAFT_ID_API_URL = SM_API_URL + '/draft/<draft_id'
+    DRAFT_PUT_API_URL = SM_API_URL + '/draft/{0}/modify'
+
+
+    # Selenium Driver Path
+
+    chrome_driver = "{}/tests/selenium_scripts/drivers/chromedriver".format(os.environ.get('RAS_FRONTSTAGE_PATH'))

@@ -163,6 +163,7 @@ class TestApplication(unittest.TestCase):
         #                               |<-------------------------|
 
         print("The response data is: {}".format(response.data))
+
         # Our system should check the response data.
         self.assertEqual(response.status_code, 302)
         self.assertTrue(bytes('You should be redirected automatically to target URL', encoding='UTF-8') in response.data)
@@ -194,6 +195,7 @@ class TestApplication(unittest.TestCase):
         print("My repository values are:{}".format(my_surveys['rows'][0]['businessData']['businessRef']))
 
         self.assertTrue(bytes(my_surveys['rows'][0]['businessData']['businessRef'], encoding='UTF-8') in response.data)
+
 
     def test_create_account_get_page(self):
         """Test create account page is rendered for a get request"""

@@ -147,15 +147,7 @@ input[type=file] {
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
             border-bottom: none;
-            // &.navigation-tabs__tab--link {
-            //     font-weight : normal;
-            //     text-decoration : underline;
-            //     color : $color-blue;
-            //
-            //     &:hover {
-            //         color : #fff;
-            //     }
-            // }
+
             &.navigation-tabs__tab--active {
                 border-color: inherit;
             }

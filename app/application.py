@@ -9,22 +9,23 @@ import os
 from datetime import datetime
 from functools import wraps, update_wrapper
 import requests
-from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, abort
+from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, Response, abort
 from jose import JWTError
 from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError
 from requests import ConnectionError
 from requests_oauthlib import OAuth2Session
 from structlog import wrap_logger
 
-from app.views.surveys import surveys_bp
 from app.views.secure_messaging import secure_message_bp
-from app.config import OAuthConfig, Config, TestingConfig, ProductionConfig
-from app.jwt import encode, decode
-from app.models import LoginForm, RegistrationForm, ActivationCodeForm, db
-from app.logger_config import logger_initial_config
+from app.views.surveys import surveys_bp
 
 from app.filters.case_status_filter import case_status_filter
 from app.filters.file_size_filter import file_size_filter
+
+from app.config import OAuthConfig, Config, TestingConfig, ProductionConfig
+from app.jwt import encode, decode
+from app.models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
+from app.logger_config import logger_initial_config
 
 app = Flask(__name__)
 app.debug = True
@@ -34,6 +35,8 @@ app.config.update(
     TESTING=True,
     TEMPLATES_AUTO_RELOAD=True
 )
+
+db.init_app(app)
 
 app.register_blueprint(surveys_bp, url_prefix='/surveys')
 app.register_blueprint(secure_message_bp, url_prefix='/secure-message')
@@ -59,8 +62,6 @@ else:
     app.config.from_object(TestingConfig)
     logger.info("testing server started...")
 
-db.init_app(app)
-
 
 # TODO Remove this before production
 @app.route('/home', methods=['GET', 'POST'])
@@ -68,7 +69,6 @@ def hello_world():
     return render_template('_temp.html', _theme='default')
 
 
-# ===== Error page =====
 @app.route('/error', methods=['GET', 'POST'])
 def error_page():
     session.pop('jwt_token')
@@ -124,10 +124,12 @@ def login():
 
         # Creates a 'session client' to interact with OAuth2. This provides a client ID to our client that is used to
         # interact with the server.
-        client = LegacyApplicationClient(client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID)
+        client = LegacyApplicationClient(
+            client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID)
 
         # Populates the request body with username and password from the user
-        client.prepare_request_body(username=username, password=password, scope=['ci.write', 'ci.read'])
+        client.prepare_request_body(username=username, password=password, scope=[
+                                    'ci.write', 'ci.read'])
 
         # passes our 'client' to the session management object. this deals with
         # the transactions between the OAuth2 server
@@ -144,7 +146,7 @@ def login():
         except MissingTokenError as e:
             logger.warning("Missing token error, error is: {}".format(e))
             logger.warning("Failed validation")
-            return render_template('sign-in-oauth.html', _theme='default', form=form, data={"error": {"type": "failed"}})
+            return render_template('sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
 
         data_dict_for_jwt_token = {
             "refresh_token": token['refresh_token'],
@@ -165,8 +167,7 @@ def login():
         }
     }
 
-    return render_template('sign-in-oauth.html', _theme='default', form=form, data=template_data)
-
+    return render_template('sign-in.html', _theme='default', form=form, data=template_data)
 
 @app.route('/sign-in/error', methods=['GET'])
 def sign_in_error():
@@ -412,6 +413,7 @@ def register_enter_your_details():
             # TODO Provide proper logging
             logger.warning('JWT scope could not be validated.')
             return abort(500, '{"message":"There was a problem with the Authentication service please contact a member of the ONS staff"}')
+
         except MissingTokenError as e:
             app.logger.warning("Missing token error, error is: {}".format(e))
             app.logger.warning("Failed validation")

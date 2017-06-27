@@ -33,21 +33,7 @@
 
 <br/>
 
-<form
-        method="post"
-        action="{{ url_for('surveys_bp.upload_survey', case_id=case_id) }}"
-        class="form"
-        role="form"
-        enctype="multipart/form-data">
-
-    <div>
-        <input class="input input--text" id="selected-file" name="file" type="file" required
-        accept=".xls,.xlsx" />
-    </div>
-
-    <button class="btn action-button btn--secondary" type="submit">Upload</button>
-
-</form>
+{% include "surveys-upload-file-picker.html" %}
 
 <br/>
 

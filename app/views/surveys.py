@@ -147,7 +147,6 @@ def upload_survey():
     """Logged in page for users only."""
 
     case_id = request.args.get('case_id', None)
-    collection_instrument_id = request.args.get('collection_instrument_id', None)
 
     if session.get('jwt_token'):
         jwttoken = session.get('jwt_token')
@@ -181,7 +180,7 @@ def upload_survey():
                 logger.debug('Upload failed')
                 error_info = json.loads(result.text)
                 return render_template('surveys-upload-failure.html',  _theme='default', error_info=error_info,
-                                       case_id=case_id, collection_instrument_id=collection_instrument_id)
+                                       case_id=case_id)
 
         except JWTError:
             # TODO Provide proper logging

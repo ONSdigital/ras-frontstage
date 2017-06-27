@@ -126,13 +126,11 @@ def access_survey():
             url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'collectioninstrument/id/{}'.format(collection_instrument_id)
             logger.debug('Access_survey URL is: {}'.format(url))
 
-            print(url)
-
             req = requests.get(url, verify=False)
-            data = req.json()
+            ci_data = req.json()
 
             # Render the template
-            return render_template('surveys-access.html', _theme='default', case_id=case_id, collection_instrument_id=collection_instrument_id, data=data)
+            return render_template('surveys-access.html', _theme='default', case_id=case_id, ci_data=ci_data)
 
         except JWTError:
             # TODO Provide proper logging

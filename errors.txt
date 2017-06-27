@@ -11,6 +11,6 @@ e.g.
 Http Response: 200
 
 {
-    code: '1001',
+    code: 1001,
     text: 'Survey response successfully uploaded'
 }

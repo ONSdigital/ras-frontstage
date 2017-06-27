@@ -10,13 +10,13 @@
 
 
 <a class="btn action-button btn--primary" target="_blank"
-   href="{{ config.API_GATEWAY_COLLECTION_INSTRUMENT_URL }}download/{{ collection_instrument_id }}">
+   href="{{ config.API_GATEWAY_COLLECTION_INSTRUMENT_URL }}download/{{ ci_data.id }}">
 
     <div>
         <span class="download__text">Download spreadsheet&nbsp;&nbsp;&nbsp;</span>
         <span class="download__text"><i class="fa fa-download fa-lg" aria-hidden="true"></i></span>
     </div>
-    <div class="download__text pluto">({{ data.len | file_size_filter }} KB)</div>
+    <div class="download__text pluto">({{ ci_data.len | file_size_filter }} KB)</div>
 </a>
 
 <br/>
@@ -35,7 +35,7 @@
 
 <form
         method="post"
-        action="{{ url_for('surveys_bp.upload_survey', case_id=case_id, collection_instrument_id=collection_instrument_id, data=data) }}"
+        action="{{ url_for('surveys_bp.upload_survey', case_id=case_id, collection_instrument_id=collection_instrument_id, ci_data=ci_data) }}"
         class="form"
         role="form"
         enctype="multipart/form-data">

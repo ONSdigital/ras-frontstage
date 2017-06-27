@@ -14,6 +14,7 @@ surveys_bp = Blueprint('surveys_bp', __name__, static_folder='static', template_
 
 
 def build_survey_data(status_filter):
+    """Helper method used to query for Surveys (To Do and History)"""
 
     # TODO - Derive the Party Id
     party_id = "3b136c4b-7a14-4904-9e01-13364dd7b972"
@@ -148,6 +149,7 @@ def upload_survey():
     """Logged in page for users only."""
 
     case_id = request.args.get('case_id', None)
+    collection_instrument_id = request.args.get('collection_instrument_id', None)
 
     if session.get('jwt_token'):
         jwttoken = session.get('jwt_token')
@@ -180,7 +182,8 @@ def upload_survey():
             else:
                 logger.debug('Upload failed')
                 error_info = json.loads(result.text)
-                return render_template('surveys-upload-failure.html',  _theme='default', error_info=error_info)
+                return render_template('surveys-upload-failure.html',  _theme='default', error_info=error_info,
+                                       case_id=case_id, collection_instrument_id=collection_instrument_id)
 
         except JWTError:
             # TODO Provide proper logging

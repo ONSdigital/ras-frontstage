@@ -9,7 +9,7 @@ import os
 from datetime import datetime
 from functools import wraps, update_wrapper
 import requests
-from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, Response, abort
+from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, abort
 from jose import JWTError
 from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError
 from requests import ConnectionError
@@ -17,9 +17,14 @@ from requests_oauthlib import OAuth2Session
 from structlog import wrap_logger
 
 from app.views.secure_messaging import secure_message_bp
+from app.views.surveys import surveys_bp
+
+from app.filters.case_status_filter import case_status_filter
+from app.filters.file_size_filter import file_size_filter
+
 from app.config import OAuthConfig, Config, TestingConfig, ProductionConfig
-from app.jwt import encode, decode
-from app.models import LoginForm, User, RegistrationForm, ActivationCodeForm, db
+from app.jwt import encode
+from app.models import LoginForm, RegistrationForm, ActivationCodeForm, db
 from app.logger_config import logger_initial_config
 
 app = Flask(__name__)
@@ -31,7 +36,13 @@ app.config.update(
     TEMPLATES_AUTO_RELOAD=True
 )
 
+db.init_app(app)
+
+app.register_blueprint(surveys_bp, url_prefix='/surveys')
 app.register_blueprint(secure_message_bp, url_prefix='/secure-message')
+
+app.jinja_env.filters['case_status_filter'] = case_status_filter
+app.jinja_env.filters['file_size_filter'] = file_size_filter
 
 logger_initial_config(service_name='ras-frontstage')
 
@@ -51,8 +62,6 @@ else:
     app.config.from_object(TestingConfig)
     logger.info("testing server started...")
 
-db.init_app(app)
-
 
 # TODO Remove this before production
 @app.route('/home', methods=['GET', 'POST'])
@@ -60,143 +69,24 @@ def hello_world():
     return render_template('_temp.html', _theme='default')
 
 
-def build_survey_data(status_filter):
-
-    # TODO - Derive the Party Id
-    party_id = "3b136c4b-7a14-4904-9e01-13364dd7b972"
-
-    # TODO - Add security headers
-    # headers = {'authorization': jwttoken}
-    headers = {}
-
-    # Call the API Gateway Service to get the To Do survey list
-    url = Config.API_GATEWAY_SURVEYS_URL + 'todo/' + party_id
-    req = requests.get(url, headers=headers, params=status_filter, verify=False)
-
-    return req.json()
+@app.route('/error', methods=['GET', 'POST'])
+def error_page():
+    session.pop('jwt_token')
+    return render_template('error.html', _theme='default', data={"error": {"type": "failed"}})
 
 
-# ===== Surveys To Do =====
-@app.route('/logged-in', methods=['GET', 'POST'])
-def logged_in():
-    """Logged in page for users only."""
-
-    if session.get('jwt_token'):
-        jwttoken = session.get('jwt_token')
-
-        try:
-            decodedJWT = decode(jwttoken)
-            for key in decodedJWT:
-                app.logger.debug(" {} is: {}".format(key, decodedJWT[key]))
-
-            # TODO: get user nane working
-            # userID = decodedJWT['user_id']
-            # return render_template('signed-in.html', _theme='default', data={"error": {"type": "success"}})
-            # return render_template('surveys-history.html', _theme='default', data={"error": {"type": "success"}})
-
-            # userID = decodedJWT['username']
-            # userName = userID.split('@')[0]
-
-            # Filters the data array to remove surveys that shouldn't appear on the To Do page
-            status_filter = {'status_filter': '["not started", "in progress"]'}
-
-            # Get the survey data (To Do survey type)
-            data_array = build_survey_data(status_filter)
-
-            # TODO: pass in data={"error": {"type": "success"}, "user_id": userName} to get the user name working ?
-            return render_template('surveys-todo.html', _theme='default', data_array=data_array)
-
-        except JWTError:
-            # TODO Provide proper logging
-            app.logger.debug("This is not a valid JWT Token")
-
-            # app.logger.warning('JWT scope could not be validated.')
-            # TODO Provide proper logging
-            logger.debug("This is not a valid JWT Token")
-            # logger.warning('JWT scope could not be validated.')
-            # Make sure we pop this invalid session variable.
-            session.pop('jwt_token')
-
-    return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
-
-
-# ===== Surveys History =====
-@app.route('/history')
-def surveys_history():
-    """Logged in page for users only."""
-
-    if session.get('jwt_token'):
-        jwttoken = session.get('jwt_token')
-
-        try:
-            decodedJWT = decode(jwttoken)
-            for key in decodedJWT:
-                app.logger.debug(" {} is: {}".format(key, decodedJWT[key]))
-
-            # Filters the data array to remove surveys that shouldn't appear on the History page
-            status_filter = {'status_filter': '["complete"]'}
-
-            # Get the survey data (History survey type)
-            data_array = build_survey_data(status_filter)
-
-            # Render the template
-            return render_template('surveys-history.html',  _theme='default', data_array=data_array)
-
-        except JWTError:
-            # TODO Provide proper logging
-            app.logger.debug("This is not a valid JWT Token")
-
-            # app.logger.warning('JWT scope could not be validated.')
-            # Make sure we pop this invalid session variable.
-            session.pop('jwt_token')
-
-    return render_template('signed-in.html', _theme='default', data={"error": {"type": "failed"}})
-
-
-@app.route('/protected/collectioninstrument', methods=['GET'])
-def protected_collection():
-    """Protected method to return full list of collectioninstrument json."""
-    if session.get('jwt_token'):
-        jwttoken = session.get('jwt_token')
-
-        decodedJWT = decode(jwttoken)
-        userID = decodedJWT['user_id']
-
-        try:
-            user_object = User.query.filter_by(username=userID).first()
-            # Check the tokens are the same
-            # TODO Check the token has not expired
-            if user_object.token == jwttoken:
-
-                headers = {'authorization': jwttoken}
-                url = 'localhost:5000/collectioninstrument'
-                req = requests.get(url,  headers=headers)
-                data = req.json()
-                logger.debug(data)
-                res = Response(response=data, status=200, mimetype="application/json")
-
-                return res
-
-            res = Response(response="""Your session is stale, try logging in again to
-                                     refresh your session variables""", status=404, mimetype="text/html")
-            return res
-        except:
-            res = Response(response="""Looks like you are not a valid user,
-                           try logging in again and refresh your session""", status=404, mimetype="text/html")
-            return res
-
-
+# ===== Log out =====
 @app.route('/logout')
 def logout():
     if 'jwt_token' in session:
         session.pop('jwt_token')
 
-    return redirect(url_for('login_OAuth'))
+    return redirect(url_for('login'))
+
 
 # ===== Sign in using OAuth2 =====
-
-@app.route('/sign-in/OAuth', methods=['GET', 'POST'])
-def login_OAuth():
+@app.route('/sign-in', methods=['GET', 'POST'])
+def login():
     """Handles sign in using OAuth2"""
 
     logger.debug("*** Hitting login for OAuth() function.... ***")
@@ -246,7 +136,6 @@ def login_OAuth():
         oauth = OAuth2Session(client=client)
         token_url = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
 
-
         try:
             token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID,
                                       client_secret=OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
@@ -257,26 +146,28 @@ def login_OAuth():
         except MissingTokenError as e:
             logger.warning("Missing token error, error is: {}".format(e))
             logger.warning("Failed validation")
-            return render_template('sign-in-oauth.html', _theme='default', form=form, data={"error": {"type": "failed"}})
+            return render_template('sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
 
-        data_dict_for_jwt_token = {"refresh_token": token['refresh_token'],
-                                   "access_token": token['access_token'],
-                                   "scope": token['scope'],
-                                   "expires_at": token['expires_at'],
-                                   "username": username}
+        data_dict_for_jwt_token = {
+            "refresh_token": token['refresh_token'],
+            "access_token": token['access_token'],
+            "scope": token['scope'],
+            "expires_at": token['expires_at'],
+            "username": username
+        }
 
         encoded_jwt_token = encode(data_dict_for_jwt_token)
         session['jwt_token'] = encoded_jwt_token
-        return redirect(url_for('logged_in'))
+        return redirect(url_for('surveys_bp.logged_in'))
 
-    templateData = {
+    template_data = {
         "error": {
             "type": request.args.get("error"),
             "logged_in": "False"
         }
     }
 
-    return render_template('sign-in-oauth.html', _theme='default', form=form, data=templateData)
+    return render_template('sign-in.html', _theme='default', form=form, data=template_data)
 
 
 @app.route('/sign-in/error', methods=['GET'])
@@ -286,14 +177,14 @@ def sign_in_error():
     # password = request.form.get('pass')
     # password = request.form.get('emailaddress')
 
-    templateData = {
+    template_data = {
         "error": {
             "type": "failed"
         }
     }
 
     # data variables configured: {"error": <undefined, failed, last-attempt>}
-    return render_template('sign-in.html', _theme='default', data=templateData)
+    return render_template('sign-in.html', _theme='default', data=template_data)
 
 
 @app.route('/sign-in/troubleshoot')
@@ -320,14 +211,14 @@ def messages():
 # ===== Forgot password =====
 @app.route('/forgot-password/')
 def forgot_password():
-    templateData = {
+    template_data = {
         "error": {
             "type": request.args.get("error")
         }
     }
 
     # data variables configured: {"error": <undefined, failed>}
-    return render_template('forgot-password.html', _theme='default', data=templateData)
+    return render_template('forgot-password.html', _theme='default', data=template_data)
 
 
 @app.route('/forgot-password/check-email/')
@@ -338,16 +229,17 @@ def forgot_password_check_email():
 # ===== Reset password =====
 @app.route('/reset-password/')
 def reset_password():
-    templateData = {
+    template_data = {
         "error": {
             "type": request.args.get("error")
         }
     }
 
-    logger.debug(request.args.get("error"))
+    if 'error' in request.args:
+        logger.debug(request.args.get("error"))
 
     # data variables configured: {"error": <undefined, password-mismatch>}
-    return render_template('reset-password.html', _theme='default', data=templateData)
+    return render_template('reset-password.html', _theme='default', data=template_data)
 
 
 @app.route('/reset-password/confirmation/')
@@ -372,13 +264,13 @@ def register():
     if form.errors:
         flash(form.errors, 'danger')
 
-    templateData = {
+    template_data = {
         "error": {
             "type": request.args.get("error")
         }
     }
 
-    return render_template('register.html', _theme='default', form=form, data=templateData)
+    return render_template('register.html', _theme='default', form=form, data=template_data)
 
 
 @app.route('/create-account/confirm-organisation-survey/')
@@ -422,9 +314,10 @@ def register_enter_your_details():
             OAuthurl = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_ADMIN_ENDPOINT
             OAuth_response = requests.post(OAuthurl, auth=authorisation, headers=headers, data=OAuth_payload)
             logger.debug("OAuth response is: {}".format(OAuth_response.content))
-            #json.loads(myResponse.content.decode('utf-8'))
+
+            # json.loads(myResponse.content.decode('utf-8'))
             response_body = json.loads(OAuth_response.content.decode('utf-8'))
-            print ("OAuth2 response is: {}".format(OAuth_response.status_code))
+            logger.debug("OAuth2 response is: {}".format(OAuth_response.status_code))
 
             if OAuth_response.status_code == 401:
                 # This looks like the user is not authorized to use the system. it could be a duplicate email. check our
@@ -443,14 +336,8 @@ def register_enter_your_details():
                 OAuth_response.raise_for_status()  # A stop gap until we know all the correct error pages
                 logger.warning("OAuth error")
 
-
-
-
-
-
-
-            # TODO A utility function to allow us to route to a page for 'user
-            # is registered already'. We need a html page for this.
+            # TODO A utility function to allow us to route to a page for 'user is registered already'.
+            # We need a html page for this.
 
         except requests.exceptions.ConnectionError:
             logger.critical("There seems to be no server listening on this connection?")
@@ -512,11 +399,13 @@ def register_enter_your_details():
             # TODO Check that this token has not expired. This should never happen, as we just got this token to
             # register the user
 
-            data_dict_for_jwt_token = {"refresh_token": token['refresh_token'],
-                                       "access_token": token['access_token'],
-                                       "scope": token['scope'],
-                                       "expires_at": token['expires_at'],
-                                       "username": email_address}
+            data_dict_for_jwt_token = {
+                "refresh_token": token['refresh_token'],
+                "access_token": token['access_token'],
+                "scope": token['scope'],
+                "expires_at": token['expires_at'],
+                "username": email_address
+            }
 
             # We need to take our token from teh OAuth2 server and encode in a JWT token and send in the authorization
             # header to the party service microservice
@@ -526,6 +415,7 @@ def register_enter_your_details():
             # TODO Provide proper logging
             logger.warning('JWT scope could not be validated.')
             return abort(500, '{"message":"There was a problem with the Authentication service please contact a member of the ONS staff"}')
+
         except MissingTokenError as e:
             app.logger.warning("Missing token error, error is: {}".format(e))
             app.logger.warning("Failed validation")
@@ -534,19 +424,21 @@ def register_enter_your_details():
 
         # Step 2
         # Register with the party service
-        registrationData = {'emailAddress': email_address,
-                            'firstName': first_name,
-                            'lastName': last_name,
-                            'telephone': phone_number,
-                            'status': 'CREATED'}
+        registration_data = {
+            'emailAddress': email_address,
+            'firstName': first_name,
+            'lastName': last_name,
+            'telephone': phone_number,
+            'status': 'CREATED'
+        }
 
         headers = {'authorization': encoded_jwt_token, 'content-type': 'application/json'}
 
-        partyServiceURL = Config.API_GATEWAY_PARTY_URL + 'respondents'
-        app.logger.debug("Party service URL is: {}".format(partyServiceURL))
+        party_service_url = Config.API_GATEWAY_PARTY_URL + 'respondents'
+        app.logger.debug("Party service URL is: {}".format(party_service_url))
 
         try:
-            register_user = requests.post(partyServiceURL, headers=headers, data=json.dumps(registrationData))
+            register_user = requests.post(party_service_url, headers=headers, data=json.dumps(registration_data))
             logger.debug("Response from party service is: {}".format(register_user.content))
 
             if register_user.ok:
@@ -575,7 +467,7 @@ def register_almost_done():
 def register_activate_account():
     if request.method == 'POST':
         # TODO call back end service to activate the account?
-        return redirect(url_for('login_OAuth'))
+        return redirect(url_for('login'))
     else:
         return render('register.activate-account.html')
 
@@ -596,56 +488,3 @@ def nocache(view):
 
 def render(template):
     return render_template(template, _theme='default')
-
-
-@app.route('/protected/collectioninstrument/id/<string:_id>', methods=['GET', 'POST'])
-def get_id(_id):
-    """
-    Method to return collection instrument json by ID.
-    """
-    # logger.info('get_id with value: {} '.format(_id))
-
-    # First check we have a jwt token.
-    if (session.get(('jwt_token') and session.get('username'))):
-        jwttoken = session.get('jwt_token')
-
-        # If we can decode the the token we need to get the user ID out and ensure it's a valid token for that user in our database
-        decodedJWT = decode(jwttoken)
-        userID = decodedJWT['user_id']
-
-        # lets find a user with this ID and check the token
-
-        try:
-            user_object = User.query.filter_by(username=userID).first()
-            # Check the tokens are the same
-            # TODO Check the token has not expired
-            if user_object.token == jwttoken:
-                # OK Tokens match we can forward this on to our collection instrument
-                headers = {'authorization': jwttoken}
-                # TODO make the calling of this URL a utility function
-                # OK construct the URL now we know it's a valid token
-                url = 'localhost:5000/collectioninstrument/id/' + '_id'
-                # Depending on wheather this is a put or a get will change how we forward on this message
-                if request.method['GET']:
-                    req = requests.get(url,  headers=headers)
-                if request.method['PUT']:
-                    req = requests.post(url,  headers=headers)
-                data = req.json()
-                logger.debug(data)
-                res = Response(response=data, status=200, mimetype="application/json")
-                return res
-
-            # Anything else but a token match means we reject the call
-            logger.warning("tokens don't match")
-            res = Response(response="""Your session is stale, try logging in again to
-                                     refresh your session variables""", status=404, mimetype="text/html")
-            return res
-        except:
-            logger.debug("failure to find a user with this ID")
-            res = Response(response="""Looks like you are not a valid user,
-                           try logging in again and refresh your session""", status=404, mimetype="text/html")
-            return res
-
-    # If we hit here then the request did not have a token or username set
-    res = Response(response="Not authorised", status=403, mimetype="text/html")
-    return res

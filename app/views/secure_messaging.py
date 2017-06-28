@@ -16,7 +16,8 @@ modify_data = {'action': '',
 
 secure_message_bp = Blueprint('secure_message_bp', __name__, static_folder='static', template_folder='templates')
 
-@secure_message_bp.route('/create-message', methods=['GET', 'POST',])
+
+@secure_message_bp.route('/create-message', methods=['GET', 'POST'])
 def create_message():
     """Handles sending of new message"""
 
@@ -66,7 +67,7 @@ def reply_message():
         logger.debug(resp_data['msg_id'])
         return render_template('message-success-temp.html', _theme='default')
 
-    
+
 @secure_message_bp.route('/messages/<label>', methods=['GET'])
 @secure_message_bp.route('/messages', methods=['GET'])
 def messages_get(label='INBOX'):

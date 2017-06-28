@@ -48,11 +48,20 @@
 
             <div class="grid__col col-2@m">
                 <span class="survey-list-item__label mercury">STATUS: </span>
-                <span>{{ data.status }}</span>
+                <span>{{ data.status | case_status_filter }}</span>
             </div>
 
-            <div class="grid__col col-2@m">
-                <a class="btn action-button" href="/test.html">Download</a>
+              <div class="grid__col col-2@m">
+
+                <form
+                        method="post"
+                        action="{{ url_for('.access_survey', case_id=data.case.id, collection_instrument_id=data.case.collectionInstrumentId) }}"
+                        class="form"
+                        role="form">
+
+
+                    <button class="btn action-button btn--primary" type="submit">Access survey</button>
+                </form>
             </div>
 
         </li>
@@ -68,3 +77,4 @@
     </ul>
 
 </div>
+

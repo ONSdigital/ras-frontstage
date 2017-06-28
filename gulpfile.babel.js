@@ -35,9 +35,13 @@ gulp.task('compile:common:scripts:docs', () => {
 });
 
 
+/**
+ * Watch tasks
+ */
+
 gulp.task('watch:common:styles', ['compile:common:styles'], () => {
 	gulp.watch([
-		`${appPath}/assets/styles/**/*.scss`,
+		`${appPath}/styles/**/*.scss`,
 		'../sdc-global-design-patterns/**/*.scss'
 	], ['compile:common:styles']);
 });
@@ -69,11 +73,11 @@ gulp.task('watch:sass', ['compile:sass'], () => {
 /**
  * Test
  */
-gulp.task('test:scripts:unit', (done) => {
+gulp.task('test:unit', (done) => {
 	return unitTests(done, false)
 });
 
-gulp.task('test:scripts:e2e', function() {
+gulp.task('test:e2e', function() {
 	return gulp.src('wdio.conf.js').pipe(webdriver());
 });
 
@@ -94,6 +98,6 @@ gulp.task('dev', [
 ]);
 
 gulp.task('test', [
-	'test:scripts:unit',
-	'test:scripts:e2e'
+	'test:unit',
+	'test:e2e'
 ]);

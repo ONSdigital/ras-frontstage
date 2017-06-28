@@ -5,8 +5,6 @@
         </div>
         {% if session.jwt_token %}
             <a href="{{ url_for('logout') }}">Sign out</a>
-        {% else %}
-            <!-- <a href="{{ url_for('login_OAuth') }}">Sign in</a> -->
         {% endif %}
     </header>
 </div>

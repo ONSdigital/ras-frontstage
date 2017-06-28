@@ -1,0 +1,52 @@
+{% import 'partials/section.html' as section %}
+
+{% extends "layouts/_onecol.html" %}
+
+{% block page_title %}My surveys - ONS Business Surveys{% endblock %}
+
+{% block main %}
+
+<h1 class="saturn">Business Register and Employment Survey</h1>
+
+
+<a class="btn action-button btn--primary" target="_blank"
+   href="{{ config.API_GATEWAY_COLLECTION_INSTRUMENT_URL }}download/{{ ci_data.id }}">
+
+    <div>
+        <span class="download__text">Download spreadsheet&nbsp;&nbsp;&nbsp;</span>
+        <span class="download__text"><i class="fa fa-download fa-lg" aria-hidden="true"></i></span>
+    </div>
+    <div class="download__text pluto">({{ ci_data.len | file_size_filter }} KB)</div>
+</a>
+
+<br/>
+<br/>
+
+<h2 class="saturn">You will be asked to provide information for the business, including:</h2>
+<ul>
+    <li>information about the business structure</li>
+    <li>checking and updating the details we have about the existing business sites</li>
+    <li>details about new business sites that we don't have on our records</li>
+</ul>
+
+<p class="venus">If actual figures are not available, please provide informed estimates.</p>
+
+<br/>
+
+{% include "surveys-upload-file-picker.html" %}
+
+<br/>
+
+<p class="venus"><i class="fa fa-lock" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;We will treat your data securely and confidentially</p>
+
+<br/>
+
+<div>
+    <a href="{{ url_for('surveys_bp.logged_in') }}">Back</a>
+</div>
+
+{% endblock main %}
+
+
+
+

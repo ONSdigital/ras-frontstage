@@ -78,3 +78,25 @@ def messages_get(label='INBOX'):
     resp = requests.get(url, headers=headers)
     resp_data = json.loads(resp.text)
     return render_template('secure-messages.html', _theme='default', messages=resp_data['messages'], links=resp_data['_links'], label=label)
+
+
+@secure_message_bp.route('/draft/<draft_id>', methods=['GET'])
+def draft_get(draft_id):
+    """Get draft message"""
+    url = SecureMessaging.DRAFT_GET_API_URL.format(draft_id)
+
+    get_draft = requests.get(url, headers=headers)
+    draft = json.loads(get_draft.text)
+
+    return render_template('secure-messages-draft.html', _theme='default', draft=draft)
+
+
+@secure_message_bp.route('/message/<msg_id>', methods=['GET'])
+def message_get(msg_id):
+    """Get message"""
+    url = SecureMessaging.MESSAGE_GET_URL.format(msg_id)
+
+    get_message = requests.get(url, headers=headers)
+    message = json.loads(get_message.text)
+
+    return render_template('secure-messages-view.html', _theme='default', message=message)

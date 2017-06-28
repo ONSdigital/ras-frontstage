@@ -1,9 +1,10 @@
-{% import 'partials/section.html' as section %}
-{% extends "layouts/_onecol.html" %}
+
+{% extends "messages.html" %}
 
 {% block page_title %}Messages{% endblock %}
 
-{% block main %}
+
+{% block messages %}
 
 <ul class="navigation-tabs navigation-tabs--pills">
     <li id="Inbox" class="{% if label == 'INBOX' %}
@@ -52,8 +53,11 @@
 <ul class="message-list">
     {% for message in messages %}
     <li class="message-list__item">
-        <a href="#">{{ message['subject'] }}</a>
-
+        {% if 'DRAFT' in message['labels'] %}
+            <a href="#">{{ message['subject'] }}</a>
+        {% else %}
+            <a href="#">{{ message['subject'] }}</a>
+        {% endif %}
         <dl class="grid">
             <dt class="grid__col col-2@m">
                 Sent:
@@ -81,5 +85,4 @@
        <li>You have no messages</li>
     {% endfor %}
 </ul>
-
-{% endblock main %}
+{% endblock messages %}

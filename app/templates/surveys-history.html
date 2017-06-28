@@ -7,19 +7,16 @@
 {% block main %}
 
 <ul class="navigation-tabs navigation-tabs-component">
-
-
-
     <li class="navigation-tabs__item navigation-tabs__item--primary">
-        <a href="/logged-in"
+        <a href="{{ url_for('surveys_bp.logged_in') }}"
             class="btn btn--secondary btn--border navigation-tabs__tab">To do</a>
     </li>
     <li class="navigation-tabs__item navigation-tabs__item--primary navigation-tabs__item--active">
-        <a href="/history"
+        <a href="{{ url_for('surveys_bp.surveys_history') }}"
             class="btn btn--secondary btn--border navigation-tabs__tab navigation-tabs__tab--active">History</a>
     </li>
     <li class="navigation-tabs__item navigation-tabs__item--primary">
-        <a href="/messages"
+        <a href="{{ url_for('secure_message_bp.messages_get') }}"
             class="btn btn--secondary btn--border navigation-tabs__tab">Messages</a>
     </li>
 </ul>

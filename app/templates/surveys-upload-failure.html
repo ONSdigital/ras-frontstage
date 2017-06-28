@@ -1,0 +1,47 @@
+{% import 'partials/section.html' as section %}
+
+{% extends "layouts/_onecol.html" %}
+
+{% block page_title %}My surveys - ONS Business Surveys{% endblock %}
+
+{% block main %}
+
+<div class="grid">
+    <div class="grid__col col-12@m">
+
+        <div class="panel panel--error u-mb-s" data-qa="error">
+            <div class="panel__header">
+                <h1 class="panel__title venus">Something went wrong</h1>
+            </div>
+            <div class="panel__body" data-qa="error-body">
+
+                <ul class="error-message">
+                    <li>{{ error_info.text }}</li>
+                </ul>
+
+                <p class="error-message">
+                    Please try uploading your spreadsheet again
+                </p>
+
+                <div class="upload--response">
+
+                    {% include "surveys-upload-file-picker.html" %}
+
+                </div>
+            </div>
+        </div>
+
+        <br/>
+
+        <div class="lock u-mb-s u-mb-m@s">
+            <p class="venus"><i class="fa fa-lock" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;We will treat your data securely and confidentially</p>
+        </div>
+
+    </div>
+</div>
+
+<div>
+    <a href="{{ url_for('surveys_bp.logged_in') }}">Back</a>
+</div>
+
+{% endblock main %}

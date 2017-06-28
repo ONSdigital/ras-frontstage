@@ -1,0 +1,16 @@
+HTTP Response, Application Code, Response message
+200, 1001, 'Survey response successfully uploaded'
+400, 1002, 'Error uploading survey response - the file is too large'
+400, 1003, 'Error uploading survey response - the file is not an Excel spreadsheet'
+400, 1004, 'Error uploading survey response - the filename is too long'
+400, 1005, 'Error uploading survey response - malicious content detected'
+
+These values are returned in a JSON response
+e.g.
+
+Http Response: 200
+
+{
+    code: 1001,
+    text: 'Survey response successfully uploaded'
+}

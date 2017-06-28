@@ -1,26 +1,10 @@
-{% import 'partials/section.html' as section %}
-{% extends "layouts/_onecol.html" %}
+{% extends "messages.html" %}
 
 {% block page_title %}
 Send secure message
 {% endblock %}
 
-{% block main %}
-
-    <ul class="navigation-tabs navigation-tabs-component">
-        <li class="navigation-tabs__item navigation-tabs__item--primary">
-            <a href="#"
-               class="btn btn--secondary btn--border navigation-tabs__tab">To do</a>
-        </li>
-        <li class="navigation-tabs__item navigation-tabs__item--primary">
-            <a href="#"
-               class="btn btn--secondary btn--border navigation-tabs__tab">History</a>
-        </li>
-        <li class="navigation-tabs__item navigation-tabs__item--primary navigation-tabs__item--active">
-            <a href="#"
-               class="btn btn--secondary btn--border navigation-tabs__tab navigation-tabs__tab--active">Messages</a>
-        </li>
-    </ul>
+{% block messages %}
 
     <div class="grid grid--reverse">
         <div class="grid__col col-4@m"></div>
@@ -63,4 +47,4 @@ Send secure message
         </div>
     </div>
 
-{% endblock main %}
+{% endblock messages %}

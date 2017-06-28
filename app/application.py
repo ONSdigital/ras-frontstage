@@ -255,12 +255,29 @@ def register():
     form = ActivationCodeForm(request.form)
 
     if request.method == 'POST' and form.validate():
+
         activation_code = request.form.get('activation_code')
         logger.debug("Activation code is: {}".format(activation_code))
+        print("Activation code is: {}".format(activation_code))
 
-        # TODO Enrolment logic
-        return redirect(url_for('register_confirm_organisation_survey'))
+        # Build the URL
+        url = Config.API_GATEWAY_IAC_URL + '{}'.format(activation_code)
+        logger.debug('validate iac URL is: {}'.format(url))
+        print('validate iac URL is: {}'.format(url))
 
+        # Call the API Gateway Service to upload the selected file
+        result = requests.get(url, verify=False)
+        logger.debug('Result => {} {} : {}'.format(result.status_code, result.reason, result.text))
+        print('Result => {} {} : {}'.format(result.status_code, result.reason, result.text))
+
+        if result.status_code == 200:
+            if json.loads(result.text)['active'] == True:
+                
+                # TODO put enrolment code into a JWT token
+
+                return redirect(url_for('register_enter_your_details'))
+
+    # TODO display errors
     if form.errors:
         flash(form.errors, 'danger')
 
@@ -270,7 +287,7 @@ def register():
         }
     }
 
-    return render_template('register.html', _theme='default', form=form, data=template_data)
+    return render_template('register.enter-enrolment-code.html', _theme='default', form=form, data=template_data)
 
 
 @app.route('/create-account/confirm-organisation-survey/')

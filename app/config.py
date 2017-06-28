@@ -38,9 +38,13 @@ class Config(object):
     API_GATEWAY_SURVEYS_URL = os.environ.get('API_GATEWAY_SURVEYS_URL',
                                              'https://api-dev.apps.mvp.onsclofo.uk/api/1.0.0/surveys/')
 
+    # API_GATEWAY_IAC_URL = os.environ.get('API_GATEWAY_IAC_URL',
+    #                                          'https://api-dev.apps.mvp.onsclofo.uk/api/1.0.0/iacs/')
+
     # Local config
     # API_GATEWAY_SURVEYS_URL='http://localhost:8050/api/my-surveys/'
     # API_GATEWAY_COLLECTION_INSTRUMENT_URL = 'http://localhost:8050/api/collection-instruments/'
+    API_GATEWAY_IAC_URL = 'http://localhost:8050/api/iacs/'
 
 
 class ProductionConfig(Config):

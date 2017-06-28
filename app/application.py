@@ -235,7 +235,8 @@ def reset_password():
         }
     }
 
-    logger.debug(request.args.get("error"))
+    if 'error' in request.args:
+        logger.debug(request.args.get("error"))
 
     # data variables configured: {"error": <undefined, password-mismatch>}
     return render_template('reset-password.html', _theme='default', data=template_data)

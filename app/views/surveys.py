@@ -105,7 +105,7 @@ def surveys_history():
             # Make sure we pop this invalid session variable.
             session.pop('jwt_token')
 
-    return render_template('signed-in.html', _theme='default', data={"error": {"type": "failed"}})
+    return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
 
 
 @surveys_bp.route('/access_survey', methods=['POST'])

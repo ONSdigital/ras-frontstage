@@ -35,9 +35,13 @@ gulp.task('compile:common:scripts:docs', () => {
 });
 
 
+/**
+ * Watch tasks
+ */
+
 gulp.task('watch:common:styles', ['compile:common:styles'], () => {
 	gulp.watch([
-		`${appPath}/assets/styles/**/*.scss`,
+		`${appPath}/styles/**/*.scss`,
 		'../sdc-global-design-patterns/**/*.scss'
 	], ['compile:common:styles']);
 });

@@ -4940,6 +4940,50 @@ dd.grid__col {
   margin-left: 0;
 }
 
+input[type=file]::-webkit-file-upload-button {
+  font-size: 22.5px;
+  font-size: 1.25rem;
+  border: none;
+  border-right: 2px solid #033e58;
+  padding: 9px 18px;
+  padding: 0.5rem 1rem;
+  background: #F5F6FF;
+  color: #033e58;
+}
+
+input[type=file] {
+  border: 2px solid #033e58;
+  border-radius: 4px;
+  width: 100%;
+  display: block;
+  padding: 0;
+  margin-bottom: 18px;
+  margin-bottom: 1rem;
+  background: #fff;
+}
+
+input[type=file]:hover,
+input[type=file]::-webkit-file-upload-button:hover {
+  cursor: pointer;
+}
+
+input[type=file]:focus,
+input[type=file]::-webkit-file-upload-button:focus {
+  outline: none;
+}
+
+@media only screen and (min-width: 650px) and (max-width: 767px) {
+  input[type=file] {
+    width: 80%;
+  }
+}
+
+@media only screen and (min-width: 800px) {
+  input[type=file] {
+    width: 70%;
+  }
+}
+
 .error-message {
   color: #d0021b;
 }
@@ -4959,16 +5003,6 @@ dd.grid__col {
 .input--text-error {
   border: 1px solid red;
   border-width: 2px;
-}
-
-input[type=file] {
-  border: 2px solid #033e58;
-  border-radius: 4px;
-  width: 70%;
-  display: block;
-  margin-bottom: 18px;
-  margin-bottom: 1rem;
-  background: #fff;
 }
 
 .survey-list {
@@ -5113,6 +5147,50 @@ dd.grid__col {
   margin-left: 0;
 }
 
+input[type=file]::-webkit-file-upload-button {
+  font-size: 22.5px;
+  font-size: 1.25rem;
+  border: none;
+  border-right: 2px solid #033e58;
+  padding: 9px 18px;
+  padding: 0.5rem 1rem;
+  background: #F5F6FF;
+  color: #033e58;
+}
+
+input[type=file] {
+  border: 2px solid #033e58;
+  border-radius: 4px;
+  width: 100%;
+  display: block;
+  padding: 0;
+  margin-bottom: 18px;
+  margin-bottom: 1rem;
+  background: #fff;
+}
+
+input[type=file]:hover,
+input[type=file]::-webkit-file-upload-button:hover {
+  cursor: pointer;
+}
+
+input[type=file]:focus,
+input[type=file]::-webkit-file-upload-button:focus {
+  outline: none;
+}
+
+@media only screen and (min-width: 650px) and (max-width: 767px) {
+  input[type=file] {
+    width: 80%;
+  }
+}
+
+@media only screen and (min-width: 800px) {
+  input[type=file] {
+    width: 70%;
+  }
+}
+
 .error-message {
   color: #d0021b;
 }
@@ -5132,16 +5210,6 @@ dd.grid__col {
 .input--text-error {
   border: 1px solid red;
   border-width: 2px;
-}
-
-input[type=file] {
-  border: 2px solid #033e58;
-  border-radius: 4px;
-  width: 70%;
-  display: block;
-  margin-bottom: 18px;
-  margin-bottom: 1rem;
-  background: #fff;
 }
 
 .survey-list {

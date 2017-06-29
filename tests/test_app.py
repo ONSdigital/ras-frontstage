@@ -5,10 +5,8 @@ from app.config import OAuthConfig, Config
 import json
 import requests_mock
 
-with open('tests/my-surveys.json') as json_data:
-    my_surveys = json.load(json_data)
-
-print("my repository values are:{}".format(my_surveys['rows'][0]['businessData']['businessRef']))
+with open('tests/test_data/my_surveys.json') as json_data:
+    my_surveys_data = json.load(json_data)
 
 returned_token = {
     "id": 6,
@@ -146,7 +144,7 @@ class TestApplication(unittest.TestCase):
         # Here we place a listener on our URLs. This is the URL of the OAuth2 server and Party Server
 
         mock_object.post(url_get_token, status_code=200, json=returned_token)
-        mock_object.get(url_get_survey_data, status_code=200, json=my_surveys)
+        mock_object.get(url_get_survey_data, status_code=200, json=my_surveys_data)
 
         # 1) Send a POST message to sign in as a test user
         #   User                        FS                      OAuth2                  PS
@@ -161,8 +159,6 @@ class TestApplication(unittest.TestCase):
         #                               |       get-token
         #                               |------------------------->|
         #                               |<-------------------------|
-
-        print("The response data is: {}".format(response.data))
 
         # Our system should check the response data.
         self.assertEqual(response.status_code, 302)
@@ -191,10 +187,8 @@ class TestApplication(unittest.TestCase):
         #   |                           |                                               |
         #   |     / response    |                                               |
         #   |<------------------------- |                                               |
-        print("The response data is: {}".format(response.data))
-        print("My repository values are:{}".format(my_surveys['rows'][0]['businessData']['businessRef']))
 
-        self.assertTrue(bytes(my_surveys['rows'][0]['businessData']['businessRef'], encoding='UTF-8') in response.data)
+        self.assertTrue(bytes(my_surveys_data['rows'][0]['businessData']['businessRef'], encoding='UTF-8') in response.data)
 
     def test_create_account_get_page(self):
         """Test create account page is rendered for a get request"""
@@ -367,11 +361,10 @@ class TestApplication(unittest.TestCase):
         #
         mock_object.post(url_create_user, status_code=200, json={"account": "testuser2@email.com", "created": "success"})
         mock_object.post(url_get_token, status_code=200, json=returned_token)
-        mock_object.post(url_get_survey_data, status_code=200, json=my_surveys)
+        mock_object.post(url_get_survey_data, status_code=200, json=my_surveys_data)
 
         response = self.app.post('create-account/enter-account-details/', data=test_user, headers=self.headers)
 
-        print("response object is: {}".format(response.data))
         self.assertTrue(response.status_code, 301)
         self.assertTrue(bytes('Please follow the link in the email to confirm your email address and finish setting up your account.',
                               encoding='UTF-8') in response.data)
@@ -395,32 +388,3 @@ class TestApplication(unittest.TestCase):
 
         self.assertTrue(response.status_code, 200)
         self.assertTrue(bytes('Please try a different email, this one is in use', encoding='UTF-8') in response.data)
-
-    # def test_surveys_todo_page(self):
-    #
-    #     # Lets send a post message to the ras_frontstage at the endpoint /sign-in.
-    #     response = self.app.post('/sign-in', data={'username': 'test', 'password': 'test'}, headers=self.headers)
-    #
-    #     # Our system should still handle this.
-    #     self.assertEqual(response.status_code, 200)
-    #
-    #     response = self.app.get('/', data={'username': 'test', 'password': 'test'}, headers=self.headers)
-    #     self.assertTrue(response.status_code, 200)
-    #
-    #     self.assertTrue(bytes('To do', encoding='UTF-8') in response.data)
-    #     self.assertTrue(bytes('History', encoding='UTF-8') in response.data)
-    #     self.assertTrue(bytes('Messages', encoding='UTF-8') in response.data)
-
-    # def test_collection_instrument_id(self):
-    #     response = self.app.get('/collectioninstrument/id/urn:ons.gov.uk:id:ci:001.001.00001', headers=self.headers)
-    #     expected_response = {
-    #                             "reference": "rsi-fuel",
-    #                             "surveyId": "urn:ons.gov.uk:id:survey:001.001.00001",
-    #                             "id": "urn:ons.gov.uk:id:ci:001.001.00001",
-    #                             "ciType": "ONLINE",
-    #                             "classifiers": {
-    #                                 "LEGAL_STATUS": "A",
-    #                                 "INDUSTRY": "B"
-    #                             }
-    #     }
-    #     self.assertEqual(expected_response, json.loads(response.data))

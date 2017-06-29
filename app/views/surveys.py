@@ -108,7 +108,7 @@ def surveys_history():
     return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
 
 
-@surveys_bp.route('/access_survey', methods=['POST'])
+@surveys_bp.route('/access_survey', methods=['GET'])
 def access_survey():
     """Logged in page for users only."""
 

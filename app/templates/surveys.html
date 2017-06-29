@@ -4,19 +4,19 @@
 
         <li class="header-row">
 
-            <div class="grid__col col-4@m">
+            <div id="SURVEY_COLUMN_HEADING" class="grid__col col-4@m">
                 Survey
             </div>
 
-            <div class="grid__col col-2@m">
+            <div id="PERIOD_COVERED_COLUMN_HEADING" class="grid__col col-2@m">
                 Period covered
             </div>
 
-            <div class="grid__col col-2@m">
+            <div id="SUBMIT_BY_COLUMN_HEADING" class="grid__col col-2@m">
                 Submit by
             </div>
 
-            <div class="grid__col col-2@m">
+            <div id="STATUS_COLUMN_HEADING" class="grid__col col-2@m">
                 Status
             </div>
 
@@ -51,17 +51,9 @@
                 <span>{{ data.status | case_status_filter }}</span>
             </div>
 
-              <div class="grid__col col-2@m">
-
-                <form
-                        method="post"
-                        action="{{ url_for('.access_survey', case_id=data.case.id, collection_instrument_id=data.case.collectionInstrumentId) }}"
-                        class="form"
-                        role="form">
-
-
-                    <button class="btn action-button btn--primary" type="submit">Access survey</button>
-                </form>
+            <div class="grid__col col-2@m">
+                <a id="ACCESS_SURVEY_BUTTON_{{loop.index}}" class="btn action-button btn--primary" target="_blank"
+                    href="{{ url_for('.access_survey', case_id=data.case.id, collection_instrument_id=data.case.collectionInstrumentId) }}">Access survey</a>
             </div>
 
         </li>

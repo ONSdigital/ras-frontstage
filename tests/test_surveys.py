@@ -121,4 +121,3 @@ class TestApplication(unittest.TestCase):
 
         # There should be an Upload button
         self.assertTrue(bytes('UPLOAD_SURVEY_BUTTON', encoding='UTF-8') in response.data)
-        

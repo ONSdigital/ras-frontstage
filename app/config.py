@@ -112,7 +112,7 @@ class SecureMessaging(Config):
     CREATE_MESSAGE_UI_URL = SM_UI_URL + '/create-message'
     MESSAGE_DRAFT_URL = SM_UI_URL + '/DRAFT'
     MESSAGES_API_URL = SM_API_URL + '/messages?limit=' + str(MESSAGE_LIMIT)
-    MESSAGE_GET_URL = SM_API_URL + '/message/{0)'
+    MESSAGE_GET_URL = SM_API_URL + '/message/{0}'
     MESSAGES_UI_URL = SM_UI_URL + '/messages'
     DRAFT_SAVE_API_URL = SM_API_URL + '/draft/save'
     DRAFT_GET_API_URL = SM_API_URL + '/draft/{0}'

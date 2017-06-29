@@ -1,9 +1,13 @@
-{% import 'partials/section.html' as section %}
-{% extends "layouts/_twocol.html" %}
+{% extends "messages.html" %}
 
 {% block page_title %}Success send message{% endblock %}
 
-{% block main %}
-    <h1>Placeholder</h1>
-    <p>Your message has been successfully sent!</p>
-{% endblock main %}
+{% block messages %}
+    <h1 class="saturn">Message sent</h1>
+    <div class="system-feedback"> 
+                <ul class="system-feedback__list"> 
+                    <li class="system-feedback__list-item system-feedback__list-item--success"> 
+                        <i class="fa fa-check-circle system-feedback__icon" aria-hidden="true"></i> Message sent. </li> 
+                </ul> 
+    </div>
+{% endblock messages %}

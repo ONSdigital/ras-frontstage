@@ -8,7 +8,7 @@ import os
 # export APP_SETTINGS=config.Config
 # export FLASK_APP=application.py
 # export OAUTHLIB_INSECURE_TRANSPORT=1
-# export API_GATEWAY_COLLECTION_INSTRUMENT_URL='http://localhost:8050/api/collection-instruments/'
+# export API_GATEWAY_COLLECTION_INSTRUMENT_URL=http://localhost:8050/api/collection-instruments/
 # export API_GATEWAY_SURVEYS_URL=http://localhost:8050/api/my-surveys/
 
 # Default values

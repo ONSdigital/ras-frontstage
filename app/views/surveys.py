@@ -67,7 +67,7 @@ def logged_in():
             return redirect(url_for('error_page'))
 
         except Exception as e:
-            logger.error("Error obtaining survey data: " +  str(e))
+            logger.error("Error obtaining survey data: " + str(e))
             return redirect(url_for('error_page'))
 
     return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
@@ -101,7 +101,7 @@ def surveys_history():
             return redirect(url_for('error_page'))
 
         except Exception as e:
-            logger.error("Error obtaining survey history data: " +  str(e))
+            logger.error("Error obtaining survey history data: " + str(e))
             return redirect(url_for('error_page'))
 
     return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
@@ -137,7 +137,7 @@ def access_survey():
             return redirect(url_for('error_page'))
 
         except Exception as e:
-            logger.error("Error accessing survey: " +  str(e))
+            logger.error("Error accessing survey: " + str(e))
             return redirect(url_for('error_page'))
 
 
@@ -187,7 +187,7 @@ def upload_survey():
             return redirect(url_for('error_page'))
 
         except Exception as e:
-            logger.error("Error uploading survey: " +  str(e))
+            logger.error("Error uploading survey: " + str(e))
             return redirect(url_for('error_page'))
 
 

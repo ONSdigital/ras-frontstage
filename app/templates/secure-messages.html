@@ -54,9 +54,9 @@
     {% for message in messages %}
     <li class="message-list__item">
         {% if 'DRAFT' in message['labels'] %}
-            <a href="#">{{ message['subject'] }}</a>
+            <a href="{{ url_for('secure_message_bp.draft_get', draft_id=message['msg_id']) }}">{{ message['subject'] }}</a>
         {% else %}
-            <a href="#">{{ message['subject'] }}</a>
+            <a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">{{ message['subject'] }}</a>
         {% endif %}
         <dl class="grid">
             <dt class="grid__col col-2@m">
@@ -79,7 +79,11 @@
 
         <p>{{ message['body']|truncate(100) }}</p>
 
-        <a href="">Read full message</a>
+        {% if 'DRAFT' in message['labels'] %}
+            <a href="{{ url_for('secure_message_bp.draft_get', draft_id=message['msg_id']) }}">Read full message</a>
+        {% else %}
+            <a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">Read full message</a>
+        {% endif %}
     </li>
     {% else %}
        <li>You have no messages</li>

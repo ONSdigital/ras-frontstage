@@ -56,24 +56,30 @@
         {% if 'DRAFT' in message['labels'] %}
             <a href="#">{{ message['subject'] }}</a>
         {% else %}
-            <a href="#">{{ message['subject'] }}</a>
+        <a href="#"><b>{{ message['subject'] }}</b></a>
         {% endif %}
         <dl class="grid">
             <dt class="grid__col col-2@m">
-                Sent:
+                {% if 'INBOX' in message['labels'] %}
+                    <b>Sent:</b>
+                {% endif %}
             </dt>
-            <dd class="grid__col col-9@m pull-1@m">
+            <dd> class="grid__col col-9@m pull-1@m">
                 {% if 'SENT' in message['labels'] or 'INBOX' in message['labels'] %}
-                    {{ message['sent_date'] }}
+                { message['sent_date'] }}
                 {% elif 'DRAFT' in message['labels'] %}
                     {{ message['modified_date'] }}
                 {% endif %}
             </dd>
             <dt class="grid__col col-2@m">
-                From:
+                {% if 'INBOX' in message['labels'] %}
+                    <b>From:</b>
+                {% endif %}
             </dt>
             <dd class="grid__col col-9@m pull-1@m">
-                {{ message['urn_from'] }}
+                {% if 'INBOX' in message['labels'] %}
+                    <b>{{ message['urn_from'] }}</b>
+                {% endif %}
             </dd>
         </dl>
 

@@ -94,6 +94,10 @@ def draft_get(draft_id):
 @secure_message_bp.route('/message/<msg_id>', methods=['GET'])
 def message_get(msg_id):
     """Get message"""
+    if request.method == 'GET':
+        data ={"label":'UNREAD', "action":'remove'}
+        requests.put(SecureMessaging.MESSAGE_MODIFY_URL.format(request.form['msg_id']),data=json.dumps(data),headers=headers)
+
     url = SecureMessaging.MESSAGE_GET_URL.format(msg_id)
 
     get_message = requests.get(url, headers=headers)

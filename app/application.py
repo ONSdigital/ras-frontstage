@@ -150,8 +150,7 @@ def login():
             return render_template('sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
 
         except Exception as e:
-            # logger.error("Error logging in: {}", str(e))
-            print("Error logging in: {}", str(e))
+            logger.error("Error logging in: {}", str(e))
             return redirect(url_for('error_page'))
 
         data_dict_for_jwt_token = {

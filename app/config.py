@@ -8,6 +8,8 @@ import os
 # export APP_SETTINGS=config.Config
 # export FLASK_APP=application.py
 # export OAUTHLIB_INSECURE_TRANSPORT=1
+# export API_GATEWAY_COLLECTION_INSTRUMENT_URL=http://localhost:8050/api/collection-instruments/
+# export API_GATEWAY_SURVEYS_URL=http://localhost:8050/api/my-surveys/
 
 # Default values
 if "APP_SETTINGS" not in os.environ:
@@ -31,16 +33,10 @@ class Config(object):
     # Cloud Foundry config
     API_GATEWAY_COLLECTION_INSTRUMENT_URL = os.environ.get('API_GATEWAY_COLLECTION_INSTRUMENT_URL',
                                                            'https://api-dev.apps.mvp.onsclofo.uk:443/collection-instrument-api/1.0.2/')
-
-    API_GATEWAY_PARTY_URL = os.environ.get('API_GATEWAY_PARTY_URL',
-                                           'https://api-dev.apps.mvp.onsclofo.uk/party-api/1.0.4/')
-
     API_GATEWAY_SURVEYS_URL = os.environ.get('API_GATEWAY_SURVEYS_URL',
                                              'https://api-dev.apps.mvp.onsclofo.uk/api/1.0.0/surveys/')
-
-    # Local config
-    # API_GATEWAY_SURVEYS_URL='http://localhost:8050/api/my-surveys/'
-    # API_GATEWAY_COLLECTION_INSTRUMENT_URL = 'http://localhost:8050/api/collection-instruments/'
+    API_GATEWAY_PARTY_URL = os.environ.get('API_GATEWAY_PARTY_URL',
+                                           'https://api-dev.apps.mvp.onsclofo.uk/party-api/1.0.4/')
 
 
 class ProductionConfig(Config):

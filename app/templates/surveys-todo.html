@@ -8,13 +8,13 @@
 
 <ul class="navigation-tabs navigation-tabs-component">
     <li class="navigation-tabs__item navigation-tabs__item--primary navigation-tabs__item--active">
-        <a href="{{ url_for('surveys_bp.logged_in') }}" class="btn btn--secondary btn--border navigation-tabs__tab navigation-tabs__tab--active">To do</a>
+        <a id="SURVEY_TODO_TAB" href="{{ url_for('surveys_bp.logged_in') }}" class="btn btn--secondary btn--border navigation-tabs__tab navigation-tabs__tab--active">To do</a>
     </li>
     <li class="navigation-tabs__item navigation-tabs__item--primary">
-        <a href="{{ url_for('surveys_bp.surveys_history') }}" class="btn btn--secondary btn--border navigation-tabs__tab">History</a>
+        <a id="SURVEY_HISTORY_TAB" href="{{ url_for('surveys_bp.surveys_history') }}" class="btn btn--secondary btn--border navigation-tabs__tab">History</a>
     </li>
     <li class="navigation-tabs__item navigation-tabs__item--primary">
-        <a href="{{ url_for('secure_message_bp.messages_get') }}" class="btn btn--secondary btn--border navigation-tabs__tab">Messages</a>
+        <a id="SURVEY_MESSAGES_TAB" href="{{ url_for('secure_message_bp.messages_get') }}" class="btn btn--secondary btn--border navigation-tabs__tab">Messages</a>
     </li>
 </ul>
 

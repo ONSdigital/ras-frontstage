@@ -64,13 +64,11 @@ def logged_in():
         except JWTError:
             # TODO Provide proper logging
             logger.error('This is not a valid JWT Token')
+            return redirect(url_for('error_page'))
 
-            # logger.warning('JWT scope could not be validated.')
-            # TODO Provide proper logging
-            logger.debug("This is not a valid JWT Token")
-            # logger.warning('JWT scope could not be validated.')
-            # Make sure we pop this invalid session variable.
-            session.pop('jwt_token')
+        except Exception as e:
+            logger.error("Error obtaining survey data: " + str(e))
+            return redirect(url_for('error_page'))
 
     return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
 
@@ -100,15 +98,16 @@ def surveys_history():
         except JWTError:
             # TODO Provide proper logging
             logger.error('This is not a valid JWT Token')
+            return redirect(url_for('error_page'))
 
-            # logger.warning('JWT scope could not be validated.')
-            # Make sure we pop this invalid session variable.
-            session.pop('jwt_token')
+        except Exception as e:
+            logger.error("Error obtaining survey history data: " + str(e))
+            return redirect(url_for('error_page'))
 
     return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
 
 
-@surveys_bp.route('/access_survey', methods=['POST'])
+@surveys_bp.route('/access_survey', methods=['GET'])
 def access_survey():
     """Logged in page for users only."""
 
@@ -134,12 +133,12 @@ def access_survey():
 
         except JWTError:
             # TODO Provide proper logging
-            logger.error("This is not a valid JWT Token")
+            logger.error('This is not a valid JWT Token')
+            return redirect(url_for('error_page'))
 
-            # logger.warning('JWT scope could not be validated.')
-            # Make sure we pop this invalid session variable.
-            session.pop('jwt_token')
-            return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
+        except Exception as e:
+            logger.error("Error accessing survey: " + str(e))
+            return redirect(url_for('error_page'))
 
 
 @surveys_bp.route('/upload_survey', methods=['POST'])
@@ -184,14 +183,11 @@ def upload_survey():
 
         except JWTError:
             # TODO Provide proper logging
-            logger.error("This is not a valid JWT Token")
-
-            # Make sure we pop this invalid session variable.
-            session.pop('jwt_token')
-            return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
+            logger.error('This is not a valid JWT Token')
+            return redirect(url_for('error_page'))
 
         except Exception as e:
-            logger.error("Error uploading survey response: {}", str(e))
+            logger.error("Error uploading survey: " + str(e))
             return redirect(url_for('error_page'))
 
 

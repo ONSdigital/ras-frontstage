@@ -28,11 +28,11 @@ def create_message():
                     'collection_case': 'test', 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'survey': 'BRES'}
 
             response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
-            if response.status_code is not 200:
+            if response.status_code != 201:
                 # TODO replace with custom error page when available
                 return redirect(url_for('error_page'))
             resp_data = json.loads(response.text)
-            logger.debug(resp_data['msg_id'], None)
+            logger.debug(resp_data['msg_id'])
             return render_template('message-success-temp.html', _theme='default')
 
         if request.form['submit'] == 'Save draft':
@@ -43,15 +43,15 @@ def create_message():
             if "msg_id" in request.form:
                 data['msg_id'] = request.form['msg_id']
                 response = requests.put(SecureMessaging.DRAFT_PUT_API_URL.format(request.form['msg_id']), data=json.dumps(data), headers=headers)
-                if response.status_code is not 200:
+                if response.status_code != 200:
                     # TODO replace with custom error page when available
                     return redirect(url_for('error_page'))
             else:
                 response = requests.post(SecureMessaging.DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
             resp_data = json.loads(response.text)
-            logger.debug(resp_data['msg_id'], None)
+            logger.debug(resp_data['msg_id'])
             get_draft = requests.get(SecureMessaging.DRAFT_GET_API_URL.format(resp_data['msg_id']), headers=headers)
-            if get_draft.status_code is not 200:
+            if get_draft.status_code != 200:
                 # TODO replace with custom error page when available
                 return redirect(url_for('error_page'))
             get_json = json.loads(get_draft.content)
@@ -72,7 +72,7 @@ def reply_message():
                 'thread_id': 'test', 'collection_case': 'test', 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'survey': 'BRES'}
 
         response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
-        if response.status_code is not 201:
+        if response.status_code != 201:
             # TODO replace with custom error page when available
             return redirect(url_for('error_page'))
         resp_data = json.loads(response.text)
@@ -88,7 +88,7 @@ def messages_get(label='INBOX'):
     if label is not None:
         url = url + "&label=" + label
     resp = requests.get(url, headers=headers)
-    if resp.status_code is not 200:
+    if resp.status_code != 200:
         # TODO replace with custom error page when available
         return redirect(url_for('error_page'))
     resp_data = json.loads(resp.text)
@@ -101,7 +101,7 @@ def draft_get(draft_id):
     url = SecureMessaging.DRAFT_GET_API_URL.format(draft_id)
 
     get_draft = requests.get(url, headers=headers)
-    if get_draft.status_code is not 200:
+    if get_draft.status_code != 200:
         # TODO replace with custom error page when available
         return redirect(url_for('error_page'))
     draft = json.loads(get_draft.text)
@@ -115,19 +115,9 @@ def message_get(msg_id):
     url = SecureMessaging.MESSAGE_GET_URL.format(msg_id)
 
     get_message = requests.get(url, headers=headers)
-    if get_message.status_code is not 200:
+    if get_message.status_code != 200:
         # TODO replace with custom error page when available
         return redirect(url_for('error_page'))
     message = json.loads(get_message.text)
 
     return render_template('secure-messages-view.html', _theme='default', message=message)
-
-
-@secure_message_bp.after_request
-def after_request(response):
-    if response.status_code != 200:
-        # TODO replace with custom error page when available
-        return redirect(url_for('error_page'))
-    elif response.status_code != 201:
-        # TODO replace with custom error page when available
-        return redirect(url_for('error_page'))

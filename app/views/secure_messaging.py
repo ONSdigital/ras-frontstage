@@ -89,7 +89,7 @@ def messages_get(label='INBOX'):
         url = url + "&label=" + label
     resp = requests.get(url, headers=headers)
     if resp.status_code is not 200:
-        #TODO replace with custom error page when available
+        # TODO replace with custom error page when available
         return redirect(url_for('error_page'))
     resp_data = json.loads(resp.text)
     return render_template('secure-messages.html', _theme='default', messages=resp_data['messages'], links=resp_data['_links'], label=label)
@@ -102,7 +102,7 @@ def draft_get(draft_id):
 
     get_draft = requests.get(url, headers=headers)
     if get_draft.status_code is not 200:
-        #TODO replace with custom error page when available
+        # TODO replace with custom error page when available
         return redirect(url_for('error_page'))
     draft = json.loads(get_draft.text)
 
@@ -116,8 +116,18 @@ def message_get(msg_id):
 
     get_message = requests.get(url, headers=headers)
     if get_message.status_code is not 200:
-        #TODO replace with custom error page when available
+        # TODO replace with custom error page when available
         return redirect(url_for('error_page'))
     message = json.loads(get_message.text)
 
     return render_template('secure-messages-view.html', _theme='default', message=message)
+
+
+@secure_message_bp.after_request
+def after_request(response):
+    if response.status_code != 200:
+        # TODO replace with custom error page when available
+        return redirect(url_for('error_page'))
+    elif response.status_code != 201:
+        # TODO replace with custom error page when available
+        return redirect(url_for('error_page'))

@@ -8,6 +8,9 @@ import os
 # export APP_SETTINGS=config.Config
 # export FLASK_APP=application.py
 # export OAUTHLIB_INSECURE_TRANSPORT=1
+# export API_GATEWAY_COLLECTION_INSTRUMENT_URL=http://localhost:8050/api/collection-instruments/
+# export API_GATEWAY_SURVEYS_URL=http://localhost:8050/api/my-surveys/
+# export API_GATEWAY_IAC_URL=http://localhost:8050/api/iacs/
 
 # Default values
 if "APP_SETTINGS" not in os.environ:
@@ -31,20 +34,12 @@ class Config(object):
     # Cloud Foundry config
     API_GATEWAY_COLLECTION_INSTRUMENT_URL = os.environ.get('API_GATEWAY_COLLECTION_INSTRUMENT_URL',
                                                            'https://api-dev.apps.mvp.onsclofo.uk:443/collection-instrument-api/1.0.2/')
-
-    API_GATEWAY_PARTY_URL = os.environ.get('API_GATEWAY_PARTY_URL',
-                                           'https://api-dev.apps.mvp.onsclofo.uk/party-api/1.0.4/')
-
     API_GATEWAY_SURVEYS_URL = os.environ.get('API_GATEWAY_SURVEYS_URL',
                                              'https://api-dev.apps.mvp.onsclofo.uk/api/1.0.0/surveys/')
-
-    # API_GATEWAY_IAC_URL = os.environ.get('API_GATEWAY_IAC_URL',
-    #                                          'https://api-dev.apps.mvp.onsclofo.uk/api/1.0.0/iacs/')
-
-    # Local config
-    # API_GATEWAY_SURVEYS_URL='http://localhost:8050/api/my-surveys/'
-    # API_GATEWAY_COLLECTION_INSTRUMENT_URL = 'http://localhost:8050/api/collection-instruments/'
-    API_GATEWAY_IAC_URL = 'http://localhost:8050/api/iacs/'
+    API_GATEWAY_PARTY_URL = os.environ.get('API_GATEWAY_PARTY_URL',
+                                           'https://api-dev.apps.mvp.onsclofo.uk/party-api/1.0.4/')
+    API_GATEWAY_IAC_URL = os.environ.get('API_GATEWAY_IAC_URL',
+                                         'https://api-dev.apps.mvp.onsclofo.uk/api/1.0.0/iacs/')
 
 
 class ProductionConfig(Config):
@@ -116,6 +111,7 @@ class SecureMessaging(Config):
     CREATE_MESSAGE_UI_URL = SM_UI_URL + '/create-message'
     MESSAGE_DRAFT_URL = SM_UI_URL + '/DRAFT'
     MESSAGES_API_URL = SM_API_URL + '/messages?limit=' + str(MESSAGE_LIMIT)
+    MESSAGE_GET_URL = SM_API_URL + '/message/{0}'
     MESSAGES_UI_URL = SM_UI_URL + '/messages'
     DRAFT_SAVE_API_URL = SM_API_URL + '/draft/save'
     DRAFT_GET_API_URL = SM_API_URL + '/draft/{0}'

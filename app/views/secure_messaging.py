@@ -25,7 +25,7 @@ def create_message():
         if request.form['submit'] == 'Send message':
             data = {'msg_to': 'BRES', 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'subject': request.form['secure-message-subject'],
                     'body': request.form['secure-message-body'],
-                    'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
+                    'collection_case': 'test', 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'survey': 'BRES'}
 
             response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
             resp_data = json.loads(response.text)
@@ -35,7 +35,7 @@ def create_message():
         if request.form['submit'] == 'Save draft':
             data = {'msg_to': 'BRES', 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                     'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
-                    'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
+                    'collection_case': 'test', 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'survey': 'BRES'}
 
             if "msg_id" in request.form:
                 data['msg_id'] = request.form['msg_id']
@@ -60,7 +60,7 @@ def reply_message():
         logger.info("Reply to Message")
         data = {'msg_to': 'BRES', 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                 'subject': 'reply_subject', 'body': request.form['secure-message-body'],
-                'thread_id': 'test', 'collection_case': 'test', 'reporting_unit': 'test', 'survey': 'BRES'}
+                'thread_id': 'test', 'collection_case': 'test', 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'survey': 'BRES'}
 
         response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
         resp_data = json.loads(response.text)
@@ -78,3 +78,25 @@ def messages_get(label='INBOX'):
     resp = requests.get(url, headers=headers)
     resp_data = json.loads(resp.text)
     return render_template('secure-messages.html', _theme='default', messages=resp_data['messages'], links=resp_data['_links'], label=label)
+
+
+@secure_message_bp.route('/draft/<draft_id>', methods=['GET'])
+def draft_get(draft_id):
+    """Get draft message"""
+    url = SecureMessaging.DRAFT_GET_API_URL.format(draft_id)
+
+    get_draft = requests.get(url, headers=headers)
+    draft = json.loads(get_draft.text)
+
+    return render_template('secure-messages-draft.html', _theme='default', draft=draft)
+
+
+@secure_message_bp.route('/message/<msg_id>', methods=['GET'])
+def message_get(msg_id):
+    """Get message"""
+    url = SecureMessaging.MESSAGE_GET_URL.format(msg_id)
+
+    get_message = requests.get(url, headers=headers)
+    message = json.loads(get_message.text)
+
+    return render_template('secure-messages-view.html', _theme='default', message=message)

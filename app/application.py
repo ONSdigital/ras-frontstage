@@ -71,7 +71,7 @@ def hello_world():
 
 @app.route('/error', methods=['GET', 'POST'])
 def error_page():
-    session.pop('jwt_token')
+    session.pop('jwt_token', None)
     return render_template('error.html', _theme='default', data={"error": {"type": "failed"}})
 
 
@@ -143,10 +143,15 @@ def login():
             app.logger.debug(" Values are: ")
             for key in token:
                 logger.debug("{} Value is: {}".format(key, token[key]))
+
         except MissingTokenError as e:
             logger.warning("Missing token error, error is: {}".format(e))
             logger.warning("Failed validation")
             return render_template('sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
+
+        except Exception as e:
+            logger.error("Error logging in: {}", str(e))
+            return redirect(url_for('error_page'))
 
         data_dict_for_jwt_token = {
             "refresh_token": token['refresh_token'],

@@ -95,7 +95,11 @@ def messages_get(label='INBOX'):
         # TODO replace with custom error page when available
         return redirect(url_for('error_page'))
     resp_data = json.loads(resp.text)
-    return render_template('secure-messages.html', _theme='default', messages=resp_data['messages'], links=resp_data['_links'], label=label)
+    total_msgs = 0
+    for x in range(0,len(resp_data['messages'])):
+        if "UNREAD" in resp_data['messages'][x]["labels"]:
+            total_msgs += 1
+    return render_template('secure-messages.html', _theme='default', messages=resp_data['messages'], links=resp_data['_links'], label=label, total=total_msgs)
 
 
 @secure_message_bp.route('/draft/<draft_id>', methods=['GET'])
@@ -115,6 +119,10 @@ def draft_get(draft_id):
 @secure_message_bp.route('/message/<msg_id>', methods=['GET'])
 def message_get(msg_id):
     """Get message"""
+    if request.method == 'GET':
+        data ={"label":'UNREAD', "action":'remove'}
+        resp = requests.put(SecureMessaging.MESSAGE_MODIFY_URL.format(msg_id),data=json.dumps(data),headers=headers)
+
     url = SecureMessaging.MESSAGE_GET_URL.format(msg_id)
 
     get_message = requests.get(url, headers=headers)

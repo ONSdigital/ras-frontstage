@@ -11,10 +11,10 @@
         <dl>
             <dt class="grid__col col-2@s">From:</dt>
             <dd class="grid__col col-10@s">
-                {% if message['msg_from']['id'] == 'BRES' %}
-                    {{ message['msg_from']['id'] }}
+                {% if message['@msg_from']['id'] == 'BRES' %}
+                    {{ message['@msg_from']['id'] }}
                 {% else %}
-                    {{ message['msg_from']['email'] }}
+                    {{ message['@msg_from']['email'] }}
                 {% endif %}
             </dd>
             <dt class="grid__col col-2@s">Sent:</dt>

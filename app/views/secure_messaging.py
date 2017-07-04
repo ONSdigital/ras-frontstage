@@ -25,7 +25,7 @@ def create_message():
         if request.form['submit'] == 'Send message':
             data = {'msg_to': 'BRES', 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'subject': request.form['secure-message-subject'],
                     'body': request.form['secure-message-body'],
-                    'collection_case': 'test', 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'survey': 'BRES'}
+                    'collection_case': 'test', 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'survey': 'BRES'}
 
             response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
             if response.status_code != 201:
@@ -38,7 +38,7 @@ def create_message():
         if request.form['submit'] == 'Save draft':
             data = {'msg_to': 'BRES', 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                     'subject': request.form['secure-message-subject'], 'body': request.form['secure-message-body'],
-                    'collection_case': 'test', 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'survey': 'BRES'}
+                    'collection_case': 'test', 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'survey': 'BRES'}
 
             if "msg_id" in request.form:
                 data['msg_id'] = request.form['msg_id']
@@ -48,6 +48,9 @@ def create_message():
                     return redirect(url_for('error_page'))
             else:
                 response = requests.post(SecureMessaging.DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
+                if response.status_code != 201:
+                    # TODO replace with custom error page when available
+                    return redirect(url_for('error_page'))
             resp_data = json.loads(response.text)
             logger.debug(resp_data['msg_id'])
             get_draft = requests.get(SecureMessaging.DRAFT_GET_API_URL.format(resp_data['msg_id']), headers=headers)
@@ -69,7 +72,7 @@ def reply_message():
         logger.info("Reply to Message")
         data = {'msg_to': 'BRES', 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                 'subject': 'reply_subject', 'body': request.form['secure-message-body'],
-                'thread_id': 'test', 'collection_case': 'test', 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'survey': 'BRES'}
+                'thread_id': 'test', 'collection_case': 'test', 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'survey': 'BRES'}
 
         response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
         if response.status_code != 201:

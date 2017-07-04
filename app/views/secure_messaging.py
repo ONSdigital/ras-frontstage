@@ -132,16 +132,16 @@ def message_get(msg_id):
 
     if session.get('jwt_token'):
         if request.method == 'GET':
-            data ={"label":'UNREAD', "action":'remove'}
-            resp = requests.put(SecureMessaging.MESSAGE_MODIFY_URL.format(msg_id),data=json.dumps(data),headers=headers)
+            data ={"label": 'UNREAD', "action": 'remove'}
+            resp = requests.put(SecureMessaging.MESSAGE_MODIFY_URL.format(msg_id), data=json.dumps(data), headers=headers)
 
-        url = SecureMessaging.MESSAGE_GET_URL.format(msg_id)
+            url = SecureMessaging.MESSAGE_GET_URL.format(msg_id)
 
-        get_message = requests.get(url, headers=headers)
-        if get_message.status_code != 200:
-            # TODO replace with custom error page when available
-            return redirect(url_for('error_page'))
-        message = json.loads(get_message.text)
+            get_message = requests.get(url, headers=headers)
+            if get_message.status_code != 200:
+                # TODO replace with custom error page when available
+                return redirect(url_for('error_page'))
+            message = json.loads(get_message.text)
 
-        return render_template('secure-messages-view.html', _theme='default', message=message)
+            return render_template('secure-messages-view.html', _theme='default', message=message)
     return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})

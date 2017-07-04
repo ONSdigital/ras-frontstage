@@ -54,8 +54,12 @@
 <ul class="message-list">
     {% for message in messages %}
     <li class="message-list__item">
-        {% if 'UNREAD' in message['labels'] %}
+        {% if 'UNREAD' in message['labels'] and 'DRAFT' in message['labels'] %}
             <b><a href="{{ url_for('secure_message_bp.draft_get', draft_id=message['msg_id']) }}">{{ message['subject'] }}</a></b>
+        {% elif 'UNREAD' in message['labels'] and 'DRAFT' not in message['labels'] %}
+            <b><a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">{{ message['subject'] }}</a></b>
+        {% elif 'DRAFT' in message['labels'] %}
+            <a href="{{ url_for('secure_message_bp.draft_get', draft_id=message['msg_id']) }}">{{ message['subject'] }}</a>
         {% else %}
             <a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">{{ message['subject'] }}</a>
         {% endif %}
@@ -68,8 +72,7 @@
                     Sent:
                 {% endif %}
             </dt>
-            <dd> class="grid__col col-9@m pull-1@m">
-
+            <dd class="grid__col col-9@m pull-1@m">
                 {% if 'SENT' in message['labels'] or 'INBOX' in message['labels'] %}
                     {{ message['sent_date'] }}
                 {% elif 'DRAFT' in message['labels'] %}
@@ -94,7 +97,11 @@
 
         <p>{{ message['body']|truncate(100) }}</p>
 
-        {% if 'DRAFT' in message['labels'] %}
+        {% if 'UNREAD' in message['labels'] and 'DRAFT' in message['labels'] %}
+            <b><a href="{{ url_for('secure_message_bp.draft_get', draft_id=message['msg_id']) }}">Read full message</a></b>
+        {% elif 'UNREAD' in message['labels'] and 'DRAFT' not in message['labels'] %}
+            <b><a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">Read full message</a></b>
+        {% elif 'DRAFT' in message['labels'] %}
             <a href="{{ url_for('secure_message_bp.draft_get', draft_id=message['msg_id']) }}">Read full message</a>
         {% else %}
             <a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">Read full message</a>

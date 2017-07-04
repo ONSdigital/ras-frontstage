@@ -17,7 +17,8 @@
                     {{ 'navigation-tabs__tab navigation-tabs__tab--active' }}
                  {% else %}
                     {{ 'navigation-tabs__tab' }}
-                 {% endif %}">Inbox</a>
+                 {% endif %}">Inbox ({{total}})
+        </a>
     </li>
     <li id="Sent" class="{% if label == 'SENT' %}
                     {{ 'navigation-tabs__item navigation-tabs__item--primary navigation-tabs__item--active' }}
@@ -53,16 +54,22 @@
 <ul class="message-list">
     {% for message in messages %}
     <li class="message-list__item">
-        {% if 'DRAFT' in message['labels'] %}
-            <a href="{{ url_for('secure_message_bp.draft_get', draft_id=message['msg_id']) }}">{{ message['subject'] }}</a>
+        {% if 'UNREAD' in message['labels'] %}
+            <b><a href="{{ url_for('secure_message_bp.draft_get', draft_id=message['msg_id']) }}">{{ message['subject'] }}</a></b>
         {% else %}
             <a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">{{ message['subject'] }}</a>
         {% endif %}
+
         <dl class="grid">
             <dt class="grid__col col-2@m">
-                Sent:
+                {% if 'UNREAD' in message['labels'] %}
+                    <b>Sent:</b>
+                {% else %}
+                    Sent:
+                {% endif %}
             </dt>
-            <dd class="grid__col col-9@m pull-1@m">
+            <dd> class="grid__col col-9@m pull-1@m">
+
                 {% if 'SENT' in message['labels'] or 'INBOX' in message['labels'] %}
                     {{ message['sent_date'] }}
                 {% elif 'DRAFT' in message['labels'] %}
@@ -70,10 +77,18 @@
                 {% endif %}
             </dd>
             <dt class="grid__col col-2@m">
-                From:
+                {% if 'UNREAD' in message['labels'] %}
+                    <b>From:</b>
+                  {% else %}
+                    From:
+                {% endif %}
             </dt>
             <dd class="grid__col col-9@m pull-1@m">
-                {{ message['urn_from'] }}
+                {% if 'UNREAD' in message['labels'] %}
+                    <b>{{ message['urn_from'] }}</b>
+                {% else %}
+                    {{ message['urn_from'] }}
+                {% endif %}
             </dd>
         </dl>
 

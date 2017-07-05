@@ -32,8 +32,8 @@ test_user = {
     'last_name': 'doe',
     'email_address': 'testuser2@email.com',
     'email_address_confirm': 'testuser2@email.com',
-    'password': 'password',
-    'password_confirm': 'password',
+    'password': 'Password1.',
+    'password_confirm': 'Password1.',
     'phone_number': '07717275049',
     'terms_and_conditions': 'Y'
 }
@@ -264,7 +264,106 @@ class TestApplication(unittest.TestCase):
         response = self.app.post('create-account/enter-account-details/', data=another_test_user, headers=self.headers)
 
         self.assertTrue(response.status_code, 200)
-        self.assertTrue(bytes('Passwords must match', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes(Config.PASSWORD_MATCH_ERROR_TEXT, encoding='UTF-8') in response.data)
+
+    def test_create_account_register_wrong_password_with_no_symbol_character(self):
+        """Test create account with a password that does not have a symbol character returns password needs one
+        symbol"""
+
+        # creating user
+        another_test_user = {
+            'first_name': 'john',
+            'last_name': 'doe',
+            'email_address': 'testuser@email.com',
+            'email_address_confirm': 'testuser@email.com',
+            'password': 'Password1',
+            'password_confirm': 'Password1'
+        }
+
+        response = self.app.post('create-account/enter-account-details/', data=another_test_user, headers=self.headers)
+
+        self.assertTrue(response.status_code, 200)
+        self.assertTrue(bytes(Config.PASSWORD_CRITERIA_ERROR_TEXT, encoding='UTF-8') in response.data)
+
+    def test_create_account_register_wrong_password_with_no_uppercase_character(self):
+        """Test create account with a password that does not have an uppercase character returns password needs one
+        uppercase character"""
+
+        # creating user
+        another_test_user = {
+            'first_name': 'john',
+            'last_name': 'doe',
+            'email_address': 'testuser@email.com',
+            'email_address_confirm': 'testuser@email.com',
+            'password': 'password1.',
+            'password_confirm': 'password1.'
+        }
+
+        response = self.app.post('create-account/enter-account-details/', data=another_test_user, headers=self.headers)
+
+        self.assertTrue(response.status_code, 200)
+        self.assertTrue(bytes(Config.PASSWORD_CRITERIA_ERROR_TEXT, encoding='UTF-8') in response.data)
+
+    def test_create_account_register_wrong_password_with_no_number(self):
+        """Test create account with a password that does not have an uppercase character returns password needs one
+        number"""
+
+        # creating user
+        another_test_user = {
+            'first_name': 'john',
+            'last_name': 'doe',
+            'email_address': 'testuser@email.com',
+            'email_address_confirm': 'testuser@email.com',
+            'password': 'Password.',
+            'password_confirm': 'Password.'
+        }
+
+        response = self.app.post('create-account/enter-account-details/', data=another_test_user, headers=self.headers)
+
+        self.assertTrue(response.status_code, 200)
+        self.assertTrue(bytes(Config.PASSWORD_CRITERIA_ERROR_TEXT, encoding='UTF-8') in response.data)
+
+    def test_create_account_register_password_more_than_max_length(self):
+        """Test create account with a password that exceeds max character limit"""
+
+        large_password = 'a' * (Config.PASSWORD_MAX_LENGTH + 1)
+
+        # creating user
+        another_test_user = {
+            'first_name': 'john',
+            'last_name': 'doe',
+            'email_address': 'testuser@email.com',
+            'email_address_confirm': 'testuser@email.com',
+            'password': large_password,
+            'password_confirm': large_password
+        }
+
+        response = self.app.post('create-account/enter-account-details/', data=another_test_user, headers=self.headers)
+
+        self.assertTrue(response.status_code, 200)
+        self.assertTrue(bytes(Config.PASSWORD_CRITERIA_ERROR_TEXT, encoding='UTF-8') in response.data)
+
+
+    def test_create_account_register_password_less_than_min_length(self):
+        """Test create account with a password that is less than min character limit"""
+
+        small_password = 'a' * (Config.PASSWORD_MIN_LENGTH - 1)
+
+        # creating user
+        another_test_user = {
+            'first_name': 'john',
+            'last_name': 'doe',
+            'email_address': 'testuser@email.com',
+            'email_address_confirm': 'testuser@email.com',
+            'password': small_password,
+            'password_confirm': small_password
+        }
+
+        response = self.app.post('create-account/enter-account-details/', data=another_test_user, headers=self.headers)
+
+        self.assertTrue(response.status_code, 200)
+        self.assertTrue(bytes(Config.PASSWORD_CRITERIA_ERROR_TEXT, encoding='UTF-8') in response.data)
+
 
     def test_create_account_register_no_phone_number(self):
         """Test create account missing phone no. returns field required"""

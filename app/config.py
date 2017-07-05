@@ -37,6 +37,10 @@ class Config(object):
                                              'https://api-dev.apps.mvp.onsclofo.uk/api/1.0.0/surveys/')
     API_GATEWAY_PARTY_URL = os.environ.get('API_GATEWAY_PARTY_URL',
                                            'https://api-dev.apps.mvp.onsclofo.uk/party-api/1.0.4/')
+    PASSWORD_MATCH_ERROR_TEXT = 'Your passwords do not match'
+    PASSWORD_CRITERIA_ERROR_TEXT = 'Your password does not meet the requirements'
+    PASSWORD_MIN_LENGTH = 8
+    PASSWORD_MAX_LENGTH = 160
 
 
 class ProductionConfig(Config):

@@ -12,7 +12,7 @@
         <h1 class="panel__title venus">{{ errorType }}</h1>
     </div>
     <div class="panel__body" data-qa="error-body">
-        <p class="mars"><a onclick="focusOn('password');" href="#password">Please check the passwords and try again</a></p>
+        <p class="mars"><a class="js-inpagelink" href="#create-a-password">Please check the passwords and try again</a></p>
     </div>
 </div>
 <br/>
@@ -77,7 +77,7 @@
 
 
         <div class="section">
-           <h2 class="section__title neptune">Create a password</h2>
+            <h2 class="section__title neptune">Create a password</h2>
             <p class="section__description mars">Your password must have:</p>
             <ul>
                 <li>at least 8 characters </li>
@@ -91,7 +91,7 @@
                 <div class="panel panel--simple panel--error">
                     <p class="error-message">{{ errorType }}</p>
                 {% endif %}
-                    <div class="field">
+                    <div class="field" id="create-a-password">
                         {{ form.password.label(class_='label') }}
                         {{ form.password(class_='input input--text input-type__input js-new-password') }}
                     </div>

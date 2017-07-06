@@ -6,7 +6,20 @@
 
 {% block main %}
 
-<h1 class="saturn">Business Register and Employment Survey</h1>
+<div>
+    <a href="{{ url_for('surveys_bp.logged_in') }}">Back</a>
+</div>
+
+<br/>
+
+<h1 class="saturn">{{ survey }}</h1>
+
+<h2 class="neptune">Download</h2>
+
+
+<p>{{ survey_abbr }} spreadsheet for <strong>{{ business }}</strong> for the period {{ period_start }} to {{ period_end }}</p>
+
+<p>If actual figures are not available, please provide informed estimates.</p>
 
 
 <a id="DOWNLOAD_SURVEY_BUTTON" class="btn action-button btn--primary" target="_blank"
@@ -22,28 +35,39 @@
 <br/>
 <br/>
 
-<h2 class="saturn">You will be asked to provide information for the business, including:</h2>
-<ul>
-    <li>information about the business structure</li>
-    <li>checking and updating the details we have about the existing business sites</li>
-    <li>details about new business sites that we don't have on our records</li>
-</ul>
+<h2 class="neptune">Upload</h2>
 
-<p class="venus">If actual figures are not available, please provide informed estimates.</p>
+<p>Please upload by <strong>{{ submit_by }}</strong></p>
+
+<!--TODO-->
+<!--<div class="guidance js-details upload-guidance is-expanded" data-guidance-label="Guidance for uploading"-->
+     <!--data-guidance="Guidance for uploading" data-hide-label="Hide guidance for uploading"-->
+     <!--data-show-label="Show guidance for uploading">-->
+
+    <!--<a class="guidance__link js-details-trigger js-details-label mars" id="guidance-for-uploading"-->
+       <!--data-guidance-trigger="true" aria-expanded="true" href="#guidance-for-uploading"-->
+       <!--aria-controls="guidance-help-with-email-body">Hide guidance for uploading</a>-->
+
+    <!--<div class="guidance__main js-details-body" id="guidance-help-with-email" aria-hidden="false">-->
+        <!--<div class="guidance__content mars">-->
+            <!--<div>-->
+                <!--<p>Your file needs to be:</p>-->
+                <!--<ul>-->
+                    <!--<li>.xls or .xlsx format</li>-->
+                    <!--<li>smaller than 20MB</li>-->
+                <!--</ul>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</div>-->
 
 <br/>
+
+<p class="venus"><i class="fa fa-lock" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
+    We will treat your data securely and confidentially</p>
 
 {% include "surveys-upload-file-picker.html" %}
 
-<br/>
-
-<p class="venus"><i class="fa fa-lock" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;We will treat your data securely and confidentially</p>
-
-<br/>
-
-<div>
-    <a href="{{ url_for('surveys_bp.logged_in') }}">Back</a>
-</div>
 
 {% endblock main %}
 

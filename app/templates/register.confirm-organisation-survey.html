@@ -4,52 +4,32 @@
 {% block page_title %}Confirm organisation and survey{% endblock %}
 
 {% block main %}
-    <form action="/create-account/enter-account-details/" class="form">
 
-        <h1 class="saturn">Confirm organisation and survey</h1>
+<form
+        method="post"
+        action="{{ url_for('register_enter_your_details') }}"
+        class="form"
+        role="form">
 
-        <ul>
-            <li>Enrolment code: <strong>MPRTIUJKL</strong></li>
-            <li>Organisation: <strong>Bolts and Ratchets Ltd</strong></li>
-            <li>Survey to complete: <strong>Monthly Business Survey</strong></li>
-        </ul>
+    <h1 class="saturn">Confirm organisation and survey</h1>
 
-        <p>Please confirm your relationship to <strong>Bolts and Ratchets Ltd</strong></p>
+    <ul>
+        <li>Enrolment code: <strong>{{ enrolment_code }}</strong></li>
+        <li>Organisation: <strong>{{ organisation_name }}</strong></li>
+        <li>Survey to complete: <strong>{{ survey_name }}</strong></li>
+    </ul>
 
-        <p>I am:</p>
-        <div class="field field--radio field--multiplechoice">
-            <fieldset>
-                <div class="field field--radio">
-                    <div class="field__item js-focusable-box">
-                        <input class="input input--radio js-focusable" type="radio" id="radio1" name="custom_radio_name" />
-                        <label class="label label--inline venus" for="radio1">the owner of, or a partner in this organisation</label>
-                    </div>
-                    <div class="field__item js-focusable-box">
-                        <input class="input input--radio js-focusable" type="radio" id="radio2" name="custom_radio_name" />
-                        <label class="label label--inline venus" for="radio2">a director, trustee or senior officer of this organisation (for example a company secretary)</label>
-                    </div>
-                    <div class="field__item js-focusable-box">
-                        <input class="input input--radio js-focusable" type="radio" id="radio3" name="custom_radio_name" />
-                        <label class="label label--inline venus" for="radio3">external to this organisation, but act on their behalf (for example an accountant)</label>
-                    </div>
-                    <div class="field__item js-focusable-box">
-                        <input class="input input--radio js-focusable" type="radio" id="radio4" name="custom_radio_name" />
-                        <label class="label label--inline venus" for="radio4">employed by this organisation in a professional occupation or as a senior manager</label>
-                    </div>
-                    <div class="field__item js-focusable-box">
-                        <input class="input input--radio js-focusable" type="radio" id="radio5" name="custom_radio_name" />
-                        <label class="label label--inline venus" for="radio5">employed by this organisation as a middle / junior manager or equivalent</label>
-                    </div>
-                    <div class="field__item js-focusable-box">
-                        <input class="input input--radio js-focusable" type="radio" id="radio6" name="custom_radio_name" />
-                        <label class="label label--inline venus" for="radio6">employed by this organisation in an administrative or secretarial role</label>
-                    </div>
-                </div>
-            </fieldset>
-        </div>
-        <br />
+    <input type="hidden" id="enrolment_code" name="enrolment_code" value="{{ encrypted_enrolment_code }}">
 
-        <button class="btn btn--primary venus" type="submit">Confirm and continue</button>
+    <p>If this is the organisation and survey you are expecting, please confirm and continue to create your account.</p>
 
-    </form>
+    <button class="btn btn--primary venus" type="submit">Confirm and continue</button>
+
+    <br>
+
+    <p>If you already have an account you can still use this enrolment code after you
+        <a href="/sign-in">sign in</a>.
+    </p>
+
+</form>
 {% endblock main %}

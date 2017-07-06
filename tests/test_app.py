@@ -31,11 +31,9 @@ test_user = {
     'first_name': 'john',
     'last_name': 'doe',
     'email_address': 'testuser2@email.com',
-    'email_address_confirm': 'testuser2@email.com',
     'password': 'password',
     'password_confirm': 'password',
-    'phone_number': '07717275049',
-    'terms_and_conditions': 'Y'
+    'phone_number': '07717275049'
 }
 
 data_dict_zero_length = {"": ""}
@@ -130,7 +128,7 @@ class TestApplication(unittest.TestCase):
         # Build URL's which is used to talk to the OAuth2 server
         # url_sign_in_user = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_ADMIN_ENDPOINT
         url_get_token = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
-        url_get_survey_data = Config.API_GATEWAY_SURVEYS_URL + 'todo/' + party_id
+        url_get_survey_data = Config.API_GATEWAY_AGGREGATED_SURVEYS_URL + 'todo/' + party_id
 
         # Here we place a listener on the URL's The flow of events are:
         # 1) The ras_frontstage signs in OAuth2 user.
@@ -232,22 +230,6 @@ class TestApplication(unittest.TestCase):
         self.assertTrue(response.status_code, 200)
         self.assertTrue(bytes('This field is required', encoding='UTF-8') in response.data)
 
-    def test_create_account_register_wrong_email(self):
-        """Test create account with mismatching emails returns emails must match"""
-
-        # creating user
-        another_test_user = {
-            'first_name': 'john',
-            'last_name': 'doe',
-            'email_address': 'testuser2@email.com',
-            'email_address_confirm': 'wrongemailaddres@email.com'
-        }
-
-        response = self.app.post('create-account/enter-account-details/', data=another_test_user, headers=self.headers)
-
-        self.assertTrue(response.status_code, 200)
-        self.assertTrue(bytes('Emails must match', encoding='UTF-8') in response.data)
-
     def test_create_account_register_wrong_password(self):
         """Test create account with mismatching passwords returns passwords must match"""
 
@@ -256,7 +238,6 @@ class TestApplication(unittest.TestCase):
             'first_name': 'john',
             'last_name': 'doe',
             'email_address': 'testuser2@email.com',
-            'email_address_confirm': 'wrongemailaddres@email.com',
             'password': 'password',
             'password_confirm': 'wrongpassword'
         }
@@ -274,7 +255,6 @@ class TestApplication(unittest.TestCase):
             'first_name': 'john',
             'last_name': 'doe',
             'email_address': 'testuser2@email.com',
-            'email_address_confirm': 'wrongemailaddres@email.com',
             'password': 'password1234',
             'password_confirm': 'password1234'
         }
@@ -292,7 +272,6 @@ class TestApplication(unittest.TestCase):
             'first_name': 'john',
             'last_name': 'doe',
             'email_address': 'testuser2@email.com',
-            'email_address_confirm': 'wrongemailaddres@email.com',
             'password': 'password1234',
             'password_confirm': 'password1234',
             'phone_number': 'not a number'
@@ -311,7 +290,6 @@ class TestApplication(unittest.TestCase):
             'first_name': 'john',
             'last_name': 'doe',
             'email_address': 'testuser2@email.com',
-            'email_address_confirm': 'wrongemailaddres@email.com',
             'password': 'password1234',
             'password_confirm': 'password1234',
             'phone_number': '12345678'
@@ -330,7 +308,6 @@ class TestApplication(unittest.TestCase):
             'first_name': 'john',
             'last_name': 'doe',
             'email_address': 'testuser2@email.com',
-            'email_address_confirm': 'wrongemailaddres@email.com',
             'password': 'password1234',
             'password_confirm': 'password1234',
             'phone_number': '1234567890123456'

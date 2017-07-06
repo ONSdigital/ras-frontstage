@@ -37,11 +37,9 @@ test_user = {
     'first_name': 'john',
     'last_name': 'doe',
     'email_address': 'testuser2@email.com',
-    'email_address_confirm': 'testuser2@email.com',
     'password': 'password',
     'password_confirm': 'password',
-    'phone_number': '07717275049',
-    'terms_and_conditions': 'Y'
+    'phone_number': '07717275049'
 }
 
 data_dict_zero_length = {"": ""}
@@ -68,7 +66,7 @@ class TestApplication(unittest.TestCase):
 
         # Build mock URL's which are used to provide application data
         url_get_token = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
-        url_get_survey_data = Config.API_GATEWAY_SURVEYS_URL + 'todo/' + party_id
+        url_get_survey_data = Config.API_GATEWAY_AGGREGATED_SURVEYS_URL + 'todo/' + party_id
         url_get_collection_instrument_data = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'collectioninstrument/id/' + collection_instrument_id
 
         mock_object.post(url_get_token, status_code=200, json=returned_token)

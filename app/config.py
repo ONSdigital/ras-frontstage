@@ -125,10 +125,11 @@ class SecureMessaging(Config):
     MESSAGE_DRAFT_URL = SM_UI_URL + '/DRAFT'
     MESSAGES_API_URL = SM_API_URL + '/messages?limit=' + str(MESSAGE_LIMIT)
     MESSAGE_GET_URL = SM_API_URL + '/message/{0}'
+    MESSAGE_MODIFY_URL = SM_API_URL + '/message/{0}/modify'
     MESSAGES_UI_URL = SM_UI_URL + '/messages'
     DRAFT_SAVE_API_URL = SM_API_URL + '/draft/save'
     DRAFT_GET_API_URL = SM_API_URL + '/draft/{0}'
-    DRAFT_ID_API_URL = SM_API_URL + '/draft/<draft_id'
+    DRAFT_ID_API_URL = SM_API_URL + '/draft/<draft_id>'
     DRAFT_PUT_API_URL = SM_API_URL + '/draft/{0}/modify'
 
     # Selenium Driver Path

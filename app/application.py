@@ -39,8 +39,6 @@ app.config.update(
 
 db.init_app(app)
 
-app.register_blueprint(surveys_bp, url_prefix='/surveys')
-app.register_blueprint(secure_message_bp, url_prefix='/secure-message')
 
 app.jinja_env.filters['case_status_filter'] = case_status_filter
 app.jinja_env.filters['file_size_filter'] = file_size_filter
@@ -48,6 +46,9 @@ app.jinja_env.filters['file_size_filter'] = file_size_filter
 logger_initial_config(service_name='ras-frontstage')
 
 logger = wrap_logger(logging.getLogger(__name__))
+
+app.register_blueprint(surveys_bp, url_prefix='/surveys')
+app.register_blueprint(secure_message_bp, url_prefix='/secure-message')
 
 if 'APP_SETTINGS' in os.environ:
     # app.config.from_object(os.environ['APP_SETTINGS'])

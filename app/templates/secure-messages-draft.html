@@ -12,7 +12,7 @@ Send secure message
             <div class="system-feedback"> 
                 <ul class="system-feedback__list"> 
                     <li class="system-feedback__list-item system-feedback__list-item--success"> 
-                        <i class="fa fa-check-circle system-feedback__icon" aria-hidden="true"> Draft saved.<a href="http://localhost:5001/secure-message/messages/DRAFT">View your inbox</a> </i>  </li> 
+                        <i class="fa fa-check-circle system-feedback__icon" aria-hidden="true"> Draft saved.<a href="{{ url_for('secure_message_bp.messages_get', label='DRAFT') }}">View your inbox</a> </i>  </li> 
                 </ul> 
             </div>
             <h1 class="saturn">Edit a draft message</h1>

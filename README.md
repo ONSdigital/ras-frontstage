@@ -56,3 +56,9 @@ $ python3 run.py
  * Running on http://127.0.0.1:5001/
  * Restarting with reloader
 ```
+
+View DEBUG logs
+--------------------
+```
+export RAS_FRONTSTAGE_LOGGING_LEVEL=DEBUG
+```

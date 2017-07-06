@@ -18,9 +18,8 @@ Send secure message
             <h1 class="saturn">Edit a draft message</h1>
 
             <div class="secure-message-form">
-                <form method="post">
+                <form action="{{ url_for('secure_message_bp.reply_message') }}" method="post">
                     <p>To: BRES</p>
-
 
                     <input
                             id="msg_id"
@@ -55,8 +54,8 @@ Send secure message
 
                     <br />
 
-                    <input class="btn btn--secondary" type="submit" name ="submit" value="Save draft" id="draft">
-                    <input class="btn" type="submit" name='submit' value="Send message">
+                    <input class="btn btn--secondary" type="submit" name ="submit" value="Save reply draft" id="draft">
+                    <input class="btn" type="submit" name='submit' value="Reply to message">
                     <p><a href="{{ url_for('secure_message_bp.messages_get') }}">Cancel</a></p>
                 </form>
             </div>

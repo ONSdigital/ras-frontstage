@@ -13,11 +13,16 @@
 
     <h1 class="saturn">Confirm organisation and survey</h1>
 
-    <ul>
-        <li>Enrolment code: <strong>{{ enrolment_code }}</strong></li>
-        <li>Organisation: <strong>{{ organisation_name }}</strong></li>
-        <li>Survey to complete: <strong>{{ survey_name }}</strong></li>
-    </ul>
+    <div class="grid">
+        <div class="grid__col col-4@m">Enrolment code:</div>
+        <div class="grid__col col-8@m"><strong>{{ enrolment_code }}</strong></div>
+        <div class="grid__col col-4@m">Organisation:</div>
+        <div class="grid__col col-8@m"><strong>{{ organisation_name }}</strong></div>
+        <div class="grid__col col-4@m">Survey to complete:</div>
+        <div class="grid__col col-8@m"><strong>{{ survey_name }}</strong></div>
+    </div>
+
+    <br/>
 
     <input type="hidden" id="enrolment_code" name="enrolment_code" value="{{ encrypted_enrolment_code }}">
 

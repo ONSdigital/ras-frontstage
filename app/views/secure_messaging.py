@@ -81,7 +81,7 @@ def reply_message():
 
     # if session.get('jwt_token'):
     if request.method == 'POST':
-        if request.form['submit'] == 'Reply to message':
+        if request.form['submit'] == 'Send message':
             logger.info("Reply to Message")
             data = {'msg_to': 'BRES',
                     'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
@@ -100,7 +100,7 @@ def reply_message():
             logger.debug(resp_data.get('msg_id', 'No response data.'))
             return render_template('message-success-temp.html', _theme='default')
 
-        if request.form['submit'] == 'Save reply draft':
+        if request.form['submit'] == 'Save draft':
             data = {'msg_to': 'BRES',
                     'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                     'subject': request.form['secure-message-subject'],

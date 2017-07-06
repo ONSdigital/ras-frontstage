@@ -4989,11 +4989,11 @@ input[type=file]::-webkit-file-upload-button:hover {
 }
 
 .details__link:before {
-  background-image: url("/static/s/img/icons/guidance.svg");
+  background-image: url("/static/images/guidance.svg");
 }
 
 .details__link:focus:before {
-  background-image: url("/static/s/img/icons/guidance-white.svg");
+  background-image: url("/static/images/guidance-white.svg");
 }
 
 .input--checkbox {
@@ -5126,7 +5126,7 @@ input[type=file]::-webkit-file-upload-button:hover {
   margin-right: 0.3rem;
   speak: none;
   content: "";
-  background: url("/s/img/icons/icons--guidance.svg") no-repeat center center;
+  background: url("/static/images/guidance.svg") no-repeat center center;
   background-size: auto;
   text-align: center;
   width: 18px;
@@ -5152,7 +5152,7 @@ input[type=file]::-webkit-file-upload-button:hover {
 }
 
 .guidance__link:focus:before {
-  background: url("/s/img/icons/icons--guidance-white.svg") no-repeat center center;
+  background: url("/static/images/guidance-white.svg") no-repeat center center;
 }
 
 .is-expanded .guidance__link:before {
@@ -5342,11 +5342,11 @@ input[type=file]::-webkit-file-upload-button:hover {
 }
 
 .details__link:before {
-  background-image: url("/static/s/img/icons/guidance.svg");
+  background-image: url("/static/images/guidance.svg");
 }
 
 .details__link:focus:before {
-  background-image: url("/static/s/img/icons/guidance-white.svg");
+  background-image: url("/static/images/guidance-white.svg");
 }
 
 .input--checkbox {
@@ -5479,7 +5479,7 @@ input[type=file]::-webkit-file-upload-button:hover {
   margin-right: 0.3rem;
   speak: none;
   content: "";
-  background: url("/s/img/icons/icons--guidance.svg") no-repeat center center;
+  background: url("/static/images/guidance.svg") no-repeat center center;
   background-size: auto;
   text-align: center;
   width: 18px;
@@ -5505,7 +5505,7 @@ input[type=file]::-webkit-file-upload-button:hover {
 }
 
 .guidance__link:focus:before {
-  background: url("/s/img/icons/icons--guidance-white.svg") no-repeat center center;
+  background: url("/static/images/guidance-white.svg") no-repeat center center;
 }
 
 .is-expanded .guidance__link:before {

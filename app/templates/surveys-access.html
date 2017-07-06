@@ -39,27 +39,30 @@
 
 <p>Please upload by <strong>{{ submit_by }}</strong></p>
 
-<!--TODO-->
-<!--<div class="guidance js-details upload-guidance is-expanded" data-guidance-label="Guidance for uploading"-->
-     <!--data-guidance="Guidance for uploading" data-hide-label="Hide guidance for uploading"-->
-     <!--data-show-label="Show guidance for uploading">-->
+<div class="guidance js-details upload-guidance"
+    data-guidance-label="Guidance for uploading"
+    data-guidance="Guidance for uploading"
+    data-hide-label="Hide guidance for uploading"
+    data-show-label="Show guidance for uploading">
 
-    <!--<a class="guidance__link js-details-trigger js-details-label mars" id="guidance-for-uploading"-->
-       <!--data-guidance-trigger="true" aria-expanded="true" href="#guidance-for-uploading"-->
-       <!--aria-controls="guidance-help-with-email-body">Hide guidance for uploading</a>-->
+<a class="guidance__link js-details-trigger js-details-label mars"
+    id="guidance-for-uploading"
+    data-guidance-trigger="true"
+    aria-expanded="false"
+    href="#guidance-for-uploading"
+    aria-controls="guidance-help-with-email-body">Show guidance for uploading</a>
 
-    <!--<div class="guidance__main js-details-body" id="guidance-help-with-email" aria-hidden="false">-->
-        <!--<div class="guidance__content mars">-->
-            <!--<div>-->
-                <!--<p>Your file needs to be:</p>-->
-                <!--<ul>-->
-                    <!--<li>.xls or .xlsx format</li>-->
-                    <!--<li>smaller than 20MB</li>-->
-                <!--</ul>-->
-            <!--</div>-->
-        <!--</div>-->
-    <!--</div>-->
-<!--</div>-->
+<div class="guidance__main js-details-body" id="guidance-help-with-email" aria-hidden="true">
+    <div class="guidance__content mars">
+        <div>
+            <p>Your file needs to be:</p>
+            <ul>
+                <li>.xls or .xlsx format</li>
+                <li>smaller than 20MB</li>
+            </ul>
+        </div>
+    </div>
+</div>
 
 <br/>
 
@@ -70,7 +73,3 @@
 
 
 {% endblock main %}
-
-
-
-

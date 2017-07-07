@@ -24,32 +24,18 @@ def create_message():
 
     if session.get('jwt_token'):
         if request.method == 'POST':
-            if request.form['submit'] == 'Send message':
-                data = {'msg_to': 'BRES',
-                        'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                        'subject': request.form['secure-message-subject'],
-                        'body': request.form['secure-message-body'],
-                        'collection_case': 'test',
-                        'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                        'survey': 'BRES'}
+            data = {'msg_to': 'BRES',
+                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                    'subject': request.form['secure-message-subject'],
+                    'body': request.form['secure-message-body'],
+                    'collection_case': 'test',
+                    'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                    'survey': 'BRES'}
 
-                response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
-                if response.status_code != 201:
-                    # TODO replace with custom error page when available
-                    return redirect(url_for('error_page'))
-                resp_data = json.loads(response.text)
-                logger.debug(resp_data['msg_id'])
-                return render_template('message-success-temp.html', _theme='default')
+            if request.form['submit'] == 'Send message':
+                return message_check_response(data)
 
             if request.form['submit'] == 'Save draft':
-                data = {'msg_to': 'BRES',
-                        'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                        'subject': request.form['secure-message-subject'],
-                        'body': request.form['secure-message-body'],
-                        'collection_case': 'test',
-                        'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                        'survey': 'BRES'}
-
                 if "msg_id" in request.form:
                     data['msg_id'] = request.form['msg_id']
                     response = requests.put(SecureMessaging.DRAFT_PUT_API_URL.format(request.form['msg_id']), data=json.dumps(data), headers=headers)
@@ -61,9 +47,11 @@ def create_message():
                     if response.status_code != 201:
                         # TODO replace with custom error page when available
                         return redirect(url_for('error_page'))
-                resp_data = json.loads(response.text)
-                logger.debug(resp_data['msg_id'])
-                get_draft = requests.get(SecureMessaging.DRAFT_GET_API_URL.format(resp_data['msg_id']), headers=headers)
+
+                response_data = json.loads(response.text)
+                logger.debug(response_data['msg_id'])
+                get_draft = requests.get(SecureMessaging.DRAFT_GET_API_URL.format(response_data['msg_id']), headers=headers)
+
                 if get_draft.status_code != 200:
                     # TODO replace with custom error page when available
                     return redirect(url_for('error_page'))
@@ -92,13 +80,7 @@ def reply_message():
                         'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                         'survey': 'BRES'}
 
-                response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
-                if response.status_code != 201:
-                    # TODO replace with custom error page when available
-                    return redirect(url_for('error_page'))
-                resp_data = json.loads(response.text)
-                logger.debug(resp_data.get('msg_id', 'No response data.'))
-                return render_template('message-success-temp.html', _theme='default')
+                return message_check_response(data)
 
             if request.form['submit'] == 'Save draft':
                 data = {'msg_to': 'BRES',
@@ -120,9 +102,11 @@ def reply_message():
                     if response.status_code != 201:
                         # TODO replace with custom error page when available
                         return redirect(url_for('error_page'))
-                resp_data = json.loads(response.text)
-                logger.debug(resp_data['msg_id'])
-                get_draft = requests.get(SecureMessaging.DRAFT_GET_API_URL.format(resp_data['msg_id']), headers=headers)
+
+                response_data = json.loads(response.text)
+                logger.debug(response_data['msg_id'])
+                get_draft = requests.get(SecureMessaging.DRAFT_GET_API_URL.format(response_data['msg_id']), headers=headers)
+
                 if get_draft.status_code != 200:
                     # TODO replace with custom error page when available
                     return redirect(url_for('error_page'))
@@ -135,6 +119,16 @@ def reply_message():
     return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
 
 
+def message_check_response(data):
+    response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
+    if response.status_code != 201:
+        # TODO replace with custom error page when available
+        return redirect(url_for('error_page'))
+    response_data = json.loads(response.text)
+    logger.debug(response_data.get('msg_id', 'No response data.'))
+    return render_template('message-success-temp.html', _theme='default')
+
+
 @secure_message_bp.route('/messages/<label>', methods=['GET'])
 @secure_message_bp.route('/messages', methods=['GET'])
 def messages_get(label='INBOX'):
@@ -142,18 +136,24 @@ def messages_get(label='INBOX'):
 
     if session.get('jwt_token'):
         url = SecureMessaging.MESSAGES_API_URL
+
         if label is not None:
             url = url + "&label=" + label
+
         resp = requests.get(url, headers=headers)
+
         if resp.status_code != 200:
             # TODO replace with custom error page when available
             return redirect(url_for('error_page'))
-        resp_data = json.loads(resp.text)
+
+        response_data = json.loads(resp.text)
         total_msgs = 0
-        for x in range(0, len(resp_data['messages'])):
-            if "UNREAD" in resp_data['messages'][x]["labels"]:
+
+        for x in range(0, len(response_data['messages'])):
+            if "UNREAD" in response_data['messages'][x]["labels"]:
                 total_msgs += 1
-        return render_template('secure-messages.html', _theme='default', messages=resp_data['messages'], links=resp_data['_links'], label=label, total=total_msgs)
+
+        return render_template('secure-messages.html', _theme='default', messages=response_data['messages'], links=response_data['_links'], label=label, total=total_msgs)
     return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
 
 
@@ -164,9 +164,11 @@ def draft_get(draft_id):
         url = SecureMessaging.DRAFT_GET_API_URL.format(draft_id)
 
         get_draft = requests.get(url, headers=headers)
+
         if get_draft.status_code != 200:
             # TODO replace with custom error page when available
             return redirect(url_for('error_page'))
+
         draft = json.loads(get_draft.text)
 
         return render_template('secure-messages-draft.html', _theme='default', draft=draft)
@@ -179,9 +181,9 @@ def message_get(msg_id):
 
     if session.get('jwt_token'):
         if request.method == 'GET':
-            data ={"label": 'UNREAD', "action": 'remove'}
-            resp = requests.put(SecureMessaging.MESSAGE_MODIFY_URL.format(msg_id), data=json.dumps(data), headers=headers)
-
+            data = {"label": 'UNREAD', "action": 'remove'}
+            response = requests.put(SecureMessaging.MESSAGE_MODIFY_URL.format(msg_id), data=json.dumps(data), headers=headers)
+            # TODO check this response
             url = SecureMessaging.MESSAGE_GET_URL.format(msg_id)
 
             get_message = requests.get(url, headers=headers)

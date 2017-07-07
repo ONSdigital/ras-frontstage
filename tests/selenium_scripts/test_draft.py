@@ -12,19 +12,20 @@ class TestDraft(unittest.TestCase):
         # navigate to the create message page
         self.driver.get("http://0.0.0.0:5001/secure-message/create-message")
 
-    def save_message_test(self):
-        # Save a draft
+    def test_check_saved_draft(self):
         self.subject_field = self.driver.find_element_by_id("secure-message-subject").send_keys('Test Subject ')
         self.body_field = self.driver.find_element_by_id("secure-message-body").send_keys('Test Body ')
         self.driver.find_element_by_id("draft").click()
         self.assertTrue(self.driver.find_element_by_id('inbox-link'))
 
-        # Open a saved draft
+    def test_open_saved_draft(self):
         self.driver.get("http://0.0.0.0:5001/secure-message/messages/DRAFT")
         self.driver.find_element_by_link_text("Test Subject").click()
         self.assertTrue(self.driver.find_element_by_id('inbox-link'))
 
-        # Change text in draft and save
+    def test_edit_saved_draft_then_save(self):
+        self.driver.get("http://0.0.0.0:5001/secure-message/messages/DRAFT")
+        self.driver.find_element_by_link_text("Test Subject").click()
         self.subject_field = self.driver.find_element_by_id("secure-message-subject").send_keys('Edited')
         self.body_field = self.driver.find_element_by_id("secure-message-body").send_keys('Edited')
         self.driver.find_element_by_id("draft").click()

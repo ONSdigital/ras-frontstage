@@ -112,6 +112,8 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('This should be a valid UK number e.g. 01632 496 0018. ')
 
     def validate_password(form, field):
+        if len(field.data) > Config.PASSWORD_MAX_LENGTH:
+            raise ValidationError(Config.PASSWORD_CRITERIA_ERROR_TEXT)
         password = field.data
         if password.isalnum() or \
             not any(char.isupper() for char in password) or \

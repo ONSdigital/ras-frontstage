@@ -6,7 +6,7 @@
                  class="logo__img"/>
         </div>
 
-        {% if session.jwt_token %}
+        {% if 'authorization' in request.cookies %}
         <a href="{{ url_for('logout') }}">Sign out</a>
         {% endif %}
     </header>

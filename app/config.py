@@ -71,7 +71,7 @@ class TestingConfig(Config):
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
-    # Local version:
+    # Local version for OAuth2 server:
     ONS_OAUTH_PROTOCOL = os.environ.get('ONS_OAUTH_PROTOCOL', 'http://')
     ONS_OAUTH_SERVER = os.environ.get('ONS_OAUTH_SERVER', 'localhost:8000')
     RAS_FRONTSTAGE_CLIENT_ID = os.environ.get('RAS_FRONTSTAGE_CLIENT_ID', 'ons@ons.gov')
@@ -80,6 +80,14 @@ class TestingConfig(Config):
     ONS_TOKEN_ENDPOINT = os.environ.get('ONS_TOKEN_ENDPOINT', '/api/v1/tokens/')
     ONS_ADMIN_ENDPOINT = os.environ.get('ONS_ADMIN_ENDPOINT', '/api/account/create')
 
+    # Local version of Party Service:
+    PARTY_SERVICE_URL = os.environ.get('PARTY_SERVICE_URL', 'https://localhost:5101/party-api/1.0.4/')
+
+    # Local version of Collection Instrument Service:
+    COLLECTION_INSTRUMENT_URL = os.environ.get('COLLECTION_INSTRUMENT_URL', 'https://api-dev.apps.mvp.onsclofo.uk:443/collection-instrument-api/1.0.2/')
+
+    # Local verions of Survey serivce:
+    SURVEYS_URL = os.environ.get('SURVEYS_URL', 'https://api-dev.apps.mvp.onsclofo.uk/api/1.0.0/surveys/')
 
 
 class OAuthConfig(Config):

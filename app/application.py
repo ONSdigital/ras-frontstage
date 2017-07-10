@@ -125,12 +125,10 @@ def login():
 
         # Creates a 'session client' to interact with OAuth2. This provides a client ID to our client that is used to
         # interact with the server.
-        client = LegacyApplicationClient(
-            client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID)
+        client = LegacyApplicationClient(client_id=app.config['RAS_FRONTSTAGE_CLIENT_ID'])
 
         # Populates the request body with username and password from the user
-        client.prepare_request_body(username=username, password=password, scope=[
-                                    'ci.write', 'ci.read'])
+        client.prepare_request_body(username=username, password=password, scope=['ci.write', 'ci.read'])
 
         # passes our 'client' to the session management object. this deals with
         # the transactions between the OAuth2 server
@@ -138,8 +136,8 @@ def login():
         token_url = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_TOKEN_ENDPOINT']
 
         try:
-            token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID,
-                                      client_secret=OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
+            token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=app.config['RAS_FRONTSTAGE_CLIENT_ID'],
+                                      client_secret=app.config['RAS_FRONTSTAGE_CLIENT_SECRET'])
             app.logger.debug(" *** Access Token Granted *** ")
             app.logger.debug(" Values are: ")
             for key in token:
@@ -313,8 +311,7 @@ def register_enter_your_details():
         OAuth_payload = {"username": email_address, "password": password,
                          "client_id": OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, "client_secret": OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET}
         headers = {'content-type': 'application/x-www-form-urlencoded'}
-        authorisation = (OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID,
-                         OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
+        authorisation = (app.config['RAS_FRONTSTAGE_CLIENT_ID'],app.config['RAS_FRONTSTAGE_CLIENT_SECRET'])
 
         try:
             OAuthurl = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_ADMIN_ENDPOINT']
@@ -382,8 +379,7 @@ def register_enter_your_details():
         # Step 1
         # Creates a 'session client' to interact with OAuth2. This provides a client ID to our client that is used to
         # interact with the server.
-        client = BackendApplicationClient(
-            client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID)
+        client = BackendApplicationClient(client_id=app.config['RAS_FRONTSTAGE_CLIENT_ID'])
 
         # Populates the request body with username and password from the user
         client.prepare_request_body(scope=['ps.write', ])
@@ -395,8 +391,8 @@ def register_enter_your_details():
         logger.debug("Our Token Endpoint is: {}".format(token_url))
 
         try:
-            token = oauth.fetch_token(token_url=token_url, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID,
-                                      client_secret=OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
+            token = oauth.fetch_token(token_url=token_url, client_id=app.config['RAS_FRONTSTAGE_CLIENT_ID'],
+                                      client_secret=app.config['RAS_FRONTSTAGE_CLIENT_SECRET'])
             app.logger.debug(" *** Access Token Granted *** ")
             app.logger.debug(" Values are: ")
             for key in token:

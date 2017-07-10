@@ -37,34 +37,33 @@
 
         <h1 class="saturn">Sign in</h1>
 
-        <fieldset id="sign-in-details">
-            {% if errorType == "failed" %}
-            <div class="panel panel--simple panel--error">
-            {% endif %}
-                {{ form.csrf_token}}
-                <div class="field">
-                    {{ form.username.label(class_='label') }}
-                    {{ form.username(class_='input input--text input-type__input') }}
-                </div>
-                <br />
-
-                <div class="field js-password-obfuscation-group">
-                    {{ form.password.label(class_='label') }}
-                    <span>
-                        <input class="js-password-obfuscation-toggle" type="checkbox" id="password-toggle" />
-                        <label for="password-toggle">Show password</label>
-                    </span>
-                    {{ form.password(class_='input input--text input-type__input js-password-obfuscation-field') }}
-
-                    <a href="/forgot-password">Forgot password</a>
-                </div>
-                <br />
-
-                <button class="btn btn--primary venus" type="submit">Sign in</button>
-            {% if errorType == "failed" %}
+        {% if errorType == "failed" %}
+        <div class="panel panel--simple panel--error">
+        {% endif %}
+            {{ form.csrf_token}}
+            <div class="field">
+                {{ form.username.label(class_='label') }}
+                {{ form.username(class_='input input--text input-type__input') }}
             </div>
-            {% endif %}
-        </fieldset>
+            <br />
+
+            <div class="field js-password-obfuscation-group">
+                {{ form.password.label(class_='label') }}
+                <span>
+                    <input class="js-password-obfuscation-toggle" type="checkbox" id="password-toggle" />
+                    <label for="password-toggle">Show password</label>
+                </span>
+                {{ form.password(class_='input input--text input-type__input js-password-obfuscation-field') }}
+
+                <a href="/forgot-password">Forgot password</a>
+            </div>
+            <br />
+
+            <button class="btn btn--primary venus" type="submit">Sign in</button>
+        {% if errorType == "failed" %}
+        </div>
+        {% endif %}
+
         {% if errorType == "failed" %}
         <br />
         {% endif %}

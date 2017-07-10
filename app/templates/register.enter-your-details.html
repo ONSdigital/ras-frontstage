@@ -16,28 +16,29 @@
         {{ form.enrolment_code }}
 
         <div class="section">
-            <h2 class="section__title neptune">Your name</h2>
-            <div class="field">
-                {{ form.first_name.label(class_='label') }}
-                {{ form.first_name(class_='input input--text input-type__input') }}
-            </div>
-            <br />
+            <fieldset>
+                <legend class="section__title neptune u-mb-s@m">Your name</legend>
+                <div class="field">
+                    {{ form.first_name.label(class_='label') }}
+                    {{ form.first_name(class_='input input--text input-type__input') }}
+                </div>
+                <br />
 
-            <div class="field">
-                {{ form.last_name.label(class_='label') }}
-                {{ form.last_name(class_='input input--text input-type__input') }}
-            </div>
+                <div class="field">
+                    {{ form.last_name.label(class_='label') }}
+                    {{ form.last_name(class_='input input--text input-type__input') }}
+                </div>
+            </fieldset>
         </div>
 
-
-
         {%  if errors.email_address %}
-        <div class="panel panel--error">
+        <div class="panel panel--error u-mb-m@l">
             {% for email_error in errors.email_address %}
                 <div class="panel__header">
                     <h1 class="panel__title venus">{{ email_error }}</h1>
                 </div>
             {% endfor %}
+            <div class="panel__body" data-qa="error-body">
         {% else %}
         <div class="section">
         {%  endif %}
@@ -50,59 +51,56 @@
                 </div>
             </fieldset>
         </div>
-
-        <br />
+        {%  if errors.email_address %}
+            </div>
+        {%  endif %}
 
         {%  if errors.password or errors.password_confirm %}
-        <div class="panel panel--error">
-           <h2 class="section__title neptune">Create a password</h2>
-            <p class="section__description mars">Your password must have:</p>
-            <ul>
-                <li>at least 8 characters </li>
-                <li>at least one symbol (eg ?!£%) </li>
-                <li>at least one capital letter</li>
-                <li>at least one number</li>
-            </ul>
-
-            <fieldset class="js-new-password-group">
-                <div class="field">
-                    {{ form.password.label(class_='label') }}
-                    {{ form.password(class_='input input--text input-type__input js-new-password') }}
-                </div>
-                <br />
-
-                <div class="field">
-                    {{ form.password_confirm.label(class_='label') }}
-                    {{ form.password_confirm(class_='input input--text input-type__input js-confirm-new-password') }}
-                </div>
-            </fieldset>
-
+        <div class="panel panel--error u-mb-m@l">
             {% for password_error in errors.password_confirm %}
-                <div class="panel__header">
-                    <h1 class="panel__title venus">{{ password_error }}</h1>
-                </div>
-            {% endfor %}
-            {% for password_error in errors.password_confirm %}
-                <div class="panel__header">
-                    <h1 class="panel__title venus">{{ password_error }}</h1>
-                </div>
+            <div class="panel__header">
+                <h1 class="panel__title venus">{{ password_error }}</h1>
+            </div>
             {% endfor %}
 
+            <div class="panel__body" data-qa="error-body">
+                <fieldset class="js-new-password-group">
+                    <legend class="section__title neptune u-mb-s@m">Create a password</legend>
+                    <p class="section__description mars">Your password must have:</p>
+                    <ul>
+                        <li>at least 8 characters </li>
+                        <li>at least one symbol (eg ?!£%) </li>
+                        <li>at least one capital letter</li>
+                        <li>at least one number</li>
+                    </ul>
+
+                    <div class="field">
+                        {{ form.password.label(class_='label') }}
+                        {{ form.password(class_='input input--text input-type__input js-new-password') }}
+                    </div>
+                    <br />
+
+                    <div class="field">
+                        {{ form.password_confirm.label(class_='label') }}
+                        {{ form.password_confirm(class_='input input--text input-type__input js-confirm-new-password') }}
+                    </div>
+                </fieldset>
+            </div>
         </div>
 
         {% else %}
 
         <div class="section">
-            <h2 class="section__title neptune">Create a password</h2>
-            <p class="section__description mars">Your password must have:</p>
-            <ul>
-                <li>at least 8 characters </li>
-                <li>at least one symbol (eg ?!£%) </li>
-                <li>at least one capital letter</li>
-                <li>at least one number</li>
-            </ul>
-
             <fieldset class="js-new-password-group">
+                <legend class="section__title neptune u-mb-m@l">Create a password</legend>
+                <p class="section__description mars">Your password must have:</p>
+                <ul>
+                    <li>at least 8 characters </li>
+                    <li>at least one symbol (eg ?!£%) </li>
+                    <li>at least one capital letter</li>
+                    <li>at least one number</li>
+                </ul>
+
                 <div class="field">
                     {{ form.password.label(class_='label') }}
                     {{ form.password(class_='input input--text input-type__input js-new-password') }}
@@ -120,24 +118,26 @@
 
        {%  if errors.phone_number %}
        <div class="panel panel--error">
-           <div class="section">
-
-                <h2 class="section__title neptune">Phone number</h2>
-
-                <p class="section__description mars">We may sometimes need to call you to discuss information you have provided.</p>
-
-                <div class="field">
-                    {{ form.phone_number.label(class_='label') }}
-                    {{ form.phone_number(class_='input input--text input-type__input') }}
-                </div>
-
-           </div>
-
            {% for phone_error in errors.phone_number %}
-                <div class="panel__header">
-                    <h1 class="panel__title venus">{{ phone_error }}</h1>
-                </div>
+           <div class="panel__header">
+               <h1 class="panel__title venus">{{ phone_error }}</h1>
+           </div>
            {% endfor %}
+
+           <div class="panel__body" data-qa="error-body">
+               <div class="section">
+
+                    <h2 class="section__title neptune">Phone number</h2>
+
+                    <p class="section__description mars">We may sometimes need to call you to discuss information you have provided.</p>
+
+                    <div class="field">
+                        {{ form.phone_number.label(class_='label') }}
+                        {{ form.phone_number(class_='input input--text input-type__input') }}
+                    </div>
+
+               </div>
+           </div>
        </div>
        {% else %}
 

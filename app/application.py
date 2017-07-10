@@ -332,6 +332,8 @@ def register_confirm_organisation_survey():
 
     case_id = validate_enrolment_code(enrolment_code)
 
+    print('case_id ' + str(case_id))
+
     # Ensure we have got a valid enrolment code, otherwise go to the sign in page
     if not case_id:
         ons_env.logger.error('Confirm organisation screen - Case ID not available')
@@ -346,12 +348,20 @@ def register_confirm_organisation_survey():
     logger.debug('Result => {} {} : {}'.format(case.status_code, case.reason, case.text))
     case = json.loads(case.text)
 
+    print('case ' + str(case))
+
     business_party_id = case['caseGroup']['partyId']
     collection_exercise_id = case['caseGroup']['collectionExerciseId']
 
     # Look up the organisation
     url = Config.API_GATEWAY_PARTY_URL + 'businesses/id/' + business_party_id
+
+    print('url ' + str(url))
+
     party = requests.get(url, verify=False)
+
+    print('party ' + str(party))
+
     logger.debug('Result => {} {} : {}'.format(party.status_code, party.reason, party.text))
     party = json.loads(party.text)
 

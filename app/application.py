@@ -9,7 +9,7 @@ import os
 from datetime import datetime
 from functools import wraps, update_wrapper
 import requests
-from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, abort
+from flask import Flask, make_response, render_template, request, flash, redirect, url_for, abort #session, abort
 from jose import JWTError
 from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError
 from requests import ConnectionError
@@ -73,17 +73,24 @@ def hello_world():
 
 @app.route('/error', methods=['GET', 'POST'])
 def error_page():
-    session.pop('jwt_token', None)
-    return render_template('error.html', _theme='default', data={"error": {"type": "failed"}})
+    #
+    #session.pop('jwt_token', None)
+    response = make_response(render_template('error.html', _theme='default', data={"error": {"type": "failed"}}))
+    response.set_cookie('authorization', value='', expires=0)
+    return response
+
+#    return render_template('error.html', _theme='default', data={"error": {"type": "failed"}})
 
 
 # ===== Log out =====
 @app.route('/logout')
 def logout():
-    if 'jwt_token' in session:
-        session.pop('jwt_token')
-
-    return redirect(url_for('login'))
+    # No more sessions!
+    #if 'jwt_token' in session:
+    #    session.pop('jwt_token')
+    response = make_response(redirect(url_for('login')))
+    response.set_cookie('authorization', value='', expires=0)
+    return response
 
 
 # ===== Sign in using OAuth2 =====
@@ -161,11 +168,14 @@ def login():
             "expires_at": token['expires_at'],
             "username": username
         }
-
         encoded_jwt_token = encode(data_dict_for_jwt_token)
-        session['jwt_token'] = encoded_jwt_token
+        # No more sessions!
+        #session['jwt_token'] = encoded_jwt_token
+        response = make_response(redirect(url_for('surveys_bp.logged_in')))
+        response.set_cookie('authorization', value=encoded_jwt_token)
+        return response
 
-        return redirect(url_for('surveys_bp.logged_in'))
+        #return redirect(url_for('surveys_bp.logged_in'))
 
     template_data = {
         "error": {

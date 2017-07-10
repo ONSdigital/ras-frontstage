@@ -1,19 +1,14 @@
 import json
 import logging
 import requests
-from flask import Blueprint, render_template, request, redirect, url_for, session
+from flask import Blueprint, render_template, request, redirect, url_for #, session
 from jose import JWTError
 from structlog import wrap_logger
-
-# TODO get jwt decorator validation working
-# from ons_ras_common import ons_env
-# from ons_ras_common.ons_decorators import validate_jwt
-
+from ons_ras_common.ons_decorators import jwt_session
 from app.config import Config
 from app.jwt import decode
 
 logger = wrap_logger(logging.getLogger(__name__))
-
 surveys_bp = Blueprint('surveys_bp', __name__, static_folder='static', template_folder='templates')
 
 
@@ -36,179 +31,95 @@ def build_survey_data(status_filter):
 
 
 # ===== Surveys To Do =====
-# TODO get jwt decorator validation working
-# not_logged_in = {
-#     'file': 'not-signed-in.html',
-#     'error': {"error": {"type": "failed"}}
-# }
-# @surveys_bp.route('/', methods=['GET', 'POST'])
-# @validate_jwt(['ci:read', 'ci:write'], request, on_error=not_logged_in)
-# def logged_in():
-#     """Logged in page for users only."""
-#
-#     # Filters the data array to remove surveys that shouldn't appear on the To Do page
-#     status_filter = {'status_filter': '["not started", "in progress"]'}
-#
-#     # Get the survey data (To Do survey type)
-#     data_array = build_survey_data(status_filter)
-#
-#     return render_template('surveys-todo.html', _theme='default', data_array=data_array)
-
-
 @surveys_bp.route('/', methods=['GET', 'POST'])
-def logged_in():
+@jwt_session(request)
+def logged_in(session):
     """Logged in page for users only."""
 
-    if session.get('jwt_token'):
-        jwttoken = session.get('jwt_token')
-
-        try:
-            decodedJWT = decode(jwttoken)
-            for key in decodedJWT:
-                logger.debug(" {} is: {}".format(key, decodedJWT[key]))
-
-            # Filters the data array to remove surveys that shouldn't appear on the To Do page
-            status_filter = {'status_filter': '["not started", "in progress"]'}
-
-            # Get the survey data (To Do survey type)
-            data_array = build_survey_data(status_filter)
-
-            # TODO: pass in data={"error": {"type": "success"}, "user_id": userName} to get the user name working ?
-            return render_template('surveys-todo.html', _theme='default', data_array=data_array)
-
-        except JWTError:
-            logger.error('This is not a valid JWT Token')
-            return redirect(url_for('error_page'))
-
-        except Exception as e:
-            logger.error("Error obtaining survey data: " + str(e))
-            return redirect(url_for('error_page'))
-
-    return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
+    # Filters the data array to remove surveys that shouldn't appear on the To Do page
+    status_filter = {'status_filter': '["not started", "in progress"]'}
+    # Get the survey data (To Do survey type)
+    data_array = build_survey_data(status_filter)
+    # TODO: pass in data={"error": {"type": "success"}, "user_id": userName} to get the user name working ?
+    return render_template('surveys-todo.html', _theme='default', data_array=data_array)
 
 
 # ===== Surveys History =====
 @surveys_bp.route('/history')
-def surveys_history():
+@jwt_session(request)
+def surveys_history(session):
     """Logged in page for users only."""
 
-    if session.get('jwt_token'):
-        jwttoken = session.get('jwt_token')
+    # Filters the data array to remove surveys that shouldn't appear on the History page
+    status_filter = {'status_filter': '["complete"]'}
 
-        try:
-            decodedJWT = decode(jwttoken)
-            for key in decodedJWT:
-                logger.debug(" {} is: {}".format(key, decodedJWT[key]))
+    # Get the survey data (History survey type)
+    data_array = build_survey_data(status_filter)
 
-            # Filters the data array to remove surveys that shouldn't appear on the History page
-            status_filter = {'status_filter': '["complete"]'}
-
-            # Get the survey data (History survey type)
-            data_array = build_survey_data(status_filter)
-
-            # Render the template
-            return render_template('surveys-history.html',  _theme='default', data_array=data_array)
-
-        except JWTError:
-            logger.error('This is not a valid JWT Token')
-            return redirect(url_for('error_page'))
-
-        except Exception as e:
-            logger.error("Error obtaining survey history data: " + str(e))
-            return redirect(url_for('error_page'))
-
-    return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
+    # Render the template
+    return render_template('surveys-history.html',  _theme='default', data_array=data_array)
 
 
 @surveys_bp.route('/access_survey', methods=['GET', 'POST'])
-def access_survey():
+@jwt_session(request)
+def access_survey(session):
     """Logged in page for users only."""
+    # TODO: this is totally insecure as it doesn't validate the user is allowed access
+    #       to the passed collection_instrument_id
 
-    if session.get('jwt_token'):
-        jwttoken = session.get('jwt_token')
+    case_id = request.form.get('case_id', None)
+    collection_instrument_id = request.form.get('collection_instrument_id', None)
+    survey = request.form.get('survey', None)
+    survey_abbr = request.form.get('survey_abbr', None)
+    business = request.form.get('business', None)
+    period_start = request.form.get('period_start', None)
+    period_end = request.form.get('period_end', None)
+    submit_by = request.form.get('submit_by', None)
 
-        try:
-            decodedJWT = decode(jwttoken)
-            for key in decodedJWT:
-                logger.debug(' {} is: {}'.format(key, decodedJWT[key]))
+    url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'collectioninstrument/id/{}'.format(collection_instrument_id)
+    logger.debug('Access_survey URL is: {}'.format(url))
 
-            case_id = request.form.get('case_id', None)
-            collection_instrument_id = request.form.get('collection_instrument_id', None)
-            survey = request.form.get('survey', None)
-            survey_abbr = request.form.get('survey_abbr', None)
-            business = request.form.get('business', None)
-            period_start = request.form.get('period_start', None)
-            period_end = request.form.get('period_end', None)
-            submit_by = request.form.get('submit_by', None)
+    req = requests.get(url, verify=False)
+    ci_data = req.json()
 
-            url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'collectioninstrument/id/{}'.format(collection_instrument_id)
-            logger.debug('Access_survey URL is: {}'.format(url))
-
-            req = requests.get(url, verify=False)
-            ci_data = req.json()
-
-            # Render the template
-            return render_template('surveys-access.html', _theme='default', case_id=case_id, ci_data=ci_data,
-                                   survey=survey, survey_abbr=survey_abbr, business=business, period_start=period_start,
-                                   period_end=period_end, submit_by=submit_by)
-
-        except JWTError:
-            logger.error('This is not a valid JWT Token')
-            return redirect(url_for('error_page'))
-
-        except Exception as e:
-            logger.error("Error accessing survey: " + str(e))
-            return redirect(url_for('error_page'))
+    # Render the template
+    return render_template('surveys-access.html', _theme='default', case_id=case_id, ci_data=ci_data,
+                           survey=survey, survey_abbr=survey_abbr, business=business, period_start=period_start,
+                           period_end=period_end, submit_by=submit_by)
 
 
 @surveys_bp.route('/upload_survey', methods=['POST'])
-def upload_survey():
+@jwt_session(request)
+def upload_survey(session):
     """Logged in page for users only."""
 
     case_id = request.args.get('case_id', None)
 
-    if session.get('jwt_token'):
-        jwttoken = session.get('jwt_token')
+    # TODO - Add security headers
+    # headers = {'authorization': jwttoken}
+    headers = {}
 
-        try:
-            decodedJWT = decode(jwttoken)
-            for key in decodedJWT:
-                logger.debug(' {} is: {}'.format(key, decodedJWT[key]))
+    # Get the uploaded file
+    upload_file = request.files['file']
+    upload_filename = upload_file.filename
+    upload_file = {'file': (upload_filename, upload_file.stream, upload_file.mimetype, {'Expires': 0})}
 
-            # TODO - Add security headers
-            # headers = {'authorization': jwttoken}
-            headers = {}
+    # Build the URL
+    url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'survey_responses/{}'.format(case_id)
+    logger.debug('upload_survey URL is: {}'.format(url))
 
-            # Get the uploaded file
-            upload_file = request.files['file']
-            upload_filename = upload_file.filename
-            upload_file = {'file': (upload_filename, upload_file.stream, upload_file.mimetype, {'Expires': 0})}
+    # Call the API Gateway Service to upload the selected file
+    result = requests.post(url, headers, files=upload_file, verify=False)
+    logger.debug('Result => {} {} : {}'.format(result.status_code, result.reason, result.text))
 
-            # Build the URL
-            url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'survey_responses/{}'.format(case_id)
-            logger.debug('upload_survey URL is: {}'.format(url))
-
-            # Call the API Gateway Service to upload the selected file
-            result = requests.post(url, headers, files=upload_file, verify=False)
-            logger.debug('Result => {} {} : {}'.format(result.status_code, result.reason, result.text))
-
-            if result.status_code == 200:
-                logger.debug('Upload successful')
-                return render_template('surveys-upload-success.html', _theme='default', upload_filename=upload_filename)
-            else:
-                logger.debug('Upload failed')
-                error_info = json.loads(result.text)
-                return render_template('surveys-upload-failure.html',  _theme='default', error_info=error_info,
-                                       case_id=case_id)
-
-        except JWTError:
-            logger.error('This is not a valid JWT Token')
-            return redirect(url_for('error_page'))
-
-        except Exception as e:
-            logger.error("Error uploading survey: " + str(e))
-            return redirect(url_for('error_page'))
-
+    if result.status_code == 200:
+        logger.debug('Upload successful')
+        return render_template('surveys-upload-success.html', _theme='default', upload_filename=upload_filename)
+    else:
+        logger.debug('Upload failed')
+        error_info = json.loads(result.text)
+        return render_template('surveys-upload-failure.html',  _theme='default', error_info=error_info,
+                               case_id=case_id)
 
 @surveys_bp.route('/surveys-upload-failure', methods=['GET'])
 def surveys_upload_failure():

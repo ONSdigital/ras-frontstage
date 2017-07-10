@@ -2,11 +2,10 @@ import json
 import logging
 import requests
 from flask import Blueprint, render_template, request, redirect, url_for #, session
-from jose import JWTError
 from structlog import wrap_logger
 from ons_ras_common.ons_decorators import jwt_session
+from ons_ras_common import ons_env
 from app.config import Config
-from app.jwt import decode
 
 logger = wrap_logger(logging.getLogger(__name__))
 surveys_bp = Blueprint('surveys_bp', __name__, static_folder='static', template_folder='templates')
@@ -59,33 +58,23 @@ def surveys_history(session):
     # Render the template
     return render_template('surveys-history.html',  _theme='default', data_array=data_array)
 
+not_logged_in = {
+    'file': 'not-signed-in.html',
+    'error': {"error": {"type": "failed"}}
+}
+
 
 @surveys_bp.route('/access_survey', methods=['GET', 'POST'])
 @jwt_session(request)
 def access_survey(session):
     """Logged in page for users only."""
-    # TODO: this is totally insecure as it doesn't validate the user is allowed access
-    #       to the passed collection_instrument_id
-
+    instrument_id = request.form.get('collection_instrument_id', None)
     case_id = request.form.get('case_id', None)
-    collection_instrument_id = request.form.get('collection_instrument_id', None)
-    survey = request.form.get('survey', None)
-    survey_abbr = request.form.get('survey_abbr', None)
-    business = request.form.get('business', None)
-    period_start = request.form.get('period_start', None)
-    period_end = request.form.get('period_end', None)
-    submit_by = request.form.get('submit_by', None)
-
-    url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'collectioninstrument/id/{}'.format(collection_instrument_id)
-    logger.debug('Access_survey URL is: {}'.format(url))
-
-    req = requests.get(url, verify=False)
-    ci_data = req.json()
-
-    # Render the template
-    return render_template('surveys-access.html', _theme='default', case_id=case_id, ci_data=ci_data,
-                           survey=survey, survey_abbr=survey_abbr, business=business, period_start=period_start,
-                           period_end=period_end, submit_by=submit_by)
+    code, instrument = ons_env.collection_instrument.get_by_id(instrument_id)
+    if code != 200:
+        return redirect(url_for('error_page'))
+    return render_template('surveys-access.html', _theme='default', case_id=case_id,
+                           form=request.form, ci_data=instrument['instrument'])
 
 
 @surveys_bp.route('/upload_survey', methods=['POST'])

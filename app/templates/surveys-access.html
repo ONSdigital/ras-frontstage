@@ -12,12 +12,13 @@
 
 <br/>
 
-<h1 class="saturn">{{ survey }}</h1>
+<h1 class="saturn">{{ form.survey }}</h1>
 
 <h2 class="neptune">Download</h2>
 
 
-<p>{{ survey_abbr }} spreadsheet for <strong>{{ business }}</strong> for the period {{ period_start }} to {{ period_end }}</p>
+<p>{{ form.survey_abbr or 'no survey' }} spreadsheet for <strong>{{ form.business or 'no business' }}</strong> for the
+    period {{ form.period_start or 'no start period' }} to {{ form.period_end or 'no end period' }}</p>
 
 <p>If actual figures are not available, please provide informed estimates.</p>
 
@@ -37,7 +38,7 @@
 
 <h2 class="neptune">Upload</h2>
 
-<p>Please upload by <strong>{{ submit_by }}</strong></p>
+<p>Please upload by <strong>{{ form.submit_by or 'no submission deadline' }}</strong></p>
 
 <div class="guidance js-details upload-guidance"
     data-guidance-label="Guidance for uploading"

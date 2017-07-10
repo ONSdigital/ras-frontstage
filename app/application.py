@@ -286,9 +286,6 @@ def register():
 
         enrolment_code = request.form.get('enrolment_code')
         logger.debug("Enrolment code is: {}".format(enrolment_code))
-        # print("Enrolment code is: {}".format(enrolment_code))
-
-        # case_id = ons_env.case_service.get_by_id(case_id)
 
         case_id = validate_enrolment_code(enrolment_code)
 
@@ -328,14 +325,14 @@ def register_confirm_organisation_survey():
         enrolment_code = ons_env.crypt.decrypt(encrypted_enrolment_code.encode()).decode()
     else:
         ons_env.logger.error('Confirm organisation screen - Enrolment code not specified')
-        return redirect(url_for('login'))
+        return redirect(url_for('error_page'))
 
     case_id = validate_enrolment_code(enrolment_code)
 
     # Ensure we have got a valid enrolment code, otherwise go to the sign in page
     if not case_id:
         ons_env.logger.error('Confirm organisation screen - Case ID not available')
-        return redirect(url_for('login'))
+        return redirect(url_for('error_page'))
 
     # TODO More error handling e.g. cater for case not coming back from the case service, etc.
 
@@ -401,7 +398,7 @@ def register_enter_your_details():
 
     # Ensure we have got a valid enrolment code, otherwise go to the sign in page
     if not validate_enrolment_code(enrolment_code):
-        return redirect(url_for('login'))
+        return redirect(url_for('error_page'))
 
     if request.method == 'POST' \
             and 'create-account/enter-account-details' in request.headers['referer'] \

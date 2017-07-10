@@ -135,7 +135,7 @@ def login():
         # passes our 'client' to the session management object. this deals with
         # the transactions between the OAuth2 server
         oauth = OAuth2Session(client=client)
-        token_url = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
+        token_url = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_TOKEN_ENDPOINT']
 
         try:
             token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID,
@@ -150,9 +150,9 @@ def login():
             logger.warning("Failed validation")
             return render_template('sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
 
-        except Exception as e:
-            logger.error("Error logging in: {}", str(e))
-            return redirect(url_for('error_page'))
+ #       except Exception as e:
+ #           logger.error("Error logging in: {}", str(e))
+ #           return redirect(url_for('error_page'))
 
         data_dict_for_jwt_token = {
             "refresh_token": token['refresh_token'],
@@ -317,7 +317,7 @@ def register_enter_your_details():
                          OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
 
         try:
-            OAuthurl = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_ADMIN_ENDPOINT
+            OAuthurl = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_ADMIN_ENDPOINT']
             OAuth_response = requests.post(OAuthurl, auth=authorisation, headers=headers, data=OAuth_payload)
             logger.debug("OAuth response is: {}".format(OAuth_response.content))
 
@@ -391,7 +391,7 @@ def register_enter_your_details():
         # passes our 'client' to the session management object. this deals with
         # the transactions between the OAuth2 server
         oauth = OAuth2Session(client=client)
-        token_url = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
+        token_url = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_TOKEN_ENDPOINT']
         logger.debug("Our Token Endpoint is: {}".format(token_url))
 
         try:

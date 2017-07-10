@@ -5,7 +5,6 @@
 {% block page_title %}Confirm organisation and survey{% endblock %}
 
 {% block main %}
-    {% if not session.jwt_token %}
         <h1 class="saturn">Oops! Something went wrong...</h1>
 
         <div class="panel panel--simple panel--error">
@@ -14,5 +13,4 @@
             <p><a href="{{ url_for('login') }}">Please Login.</a></p>
 
         </div>
-    {% endif %}
 {% endblock main %}

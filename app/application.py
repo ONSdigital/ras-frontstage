@@ -73,21 +73,14 @@ def hello_world():
 
 @app.route('/error', methods=['GET', 'POST'])
 def error_page():
-    #
-    #session.pop('jwt_token', None)
     response = make_response(render_template('error.html', _theme='default', data={"error": {"type": "failed"}}))
     response.set_cookie('authorization', value='', expires=0)
     return response
-
-#    return render_template('error.html', _theme='default', data={"error": {"type": "failed"}})
 
 
 # ===== Log out =====
 @app.route('/logout')
 def logout():
-    # No more sessions!
-    #if 'jwt_token' in session:
-    #    session.pop('jwt_token')
     response = make_response(redirect(url_for('login')))
     response.set_cookie('authorization', value='', expires=0)
     return response
@@ -169,13 +162,9 @@ def login():
             "username": username
         }
         encoded_jwt_token = encode(data_dict_for_jwt_token)
-        # No more sessions!
-        #session['jwt_token'] = encoded_jwt_token
         response = make_response(redirect(url_for('surveys_bp.logged_in')))
         response.set_cookie('authorization', value=encoded_jwt_token)
         return response
-
-        #return redirect(url_for('surveys_bp.logged_in'))
 
     template_data = {
         "error": {
@@ -190,9 +179,6 @@ def login():
 @app.route('/sign-in/error', methods=['GET'])
 def sign_in_error():
     """Handles any sign in errors"""
-
-    # password = request.form.get('pass')
-    # password = request.form.get('emailaddress')
 
     template_data = {
         "error": {

@@ -125,6 +125,8 @@ def login():
     """
     form = LoginForm(request.form)
 
+    account_activated = request.args.get('account_activated', None)
+
     if request.method == 'POST' and form.validate():
         username = request.form.get('username')
         password = request.form.get('password')
@@ -181,7 +183,8 @@ def login():
         "error": {
             "type": request.args.get("error"),
             "logged_in": "False"
-        }
+        },
+        'account_activated': account_activated
     }
 
     return render_template('sign-in.html', _theme='default', form=form, data=template_data)
@@ -296,9 +299,6 @@ def register():
 
         enrolment_code = request.form.get('enrolment_code')
         logger.debug("Enrolment code is: {}".format(enrolment_code))
-        # print("Enrolment code is: {}".format(enrolment_code))
-
-        # case_id = ons_env.case_service.get_by_id(case_id)
 
         case_id = validate_enrolment_code(enrolment_code)
 
@@ -590,13 +590,34 @@ def register_almost_done():
     return render('register.almost-done.html')
 
 
-@app.route('/create-account/activate-account/', methods=['GET', 'POST'])
+@app.route('/activate-account', methods=['GET'])
 def register_activate_account():
-    if request.method == 'POST':
-        # TODO call back end service to activate the account?
-        return redirect(url_for('login'))
+    token = request.args.get('token', None)
+
+    # If the token was not provided then show the link expired page
+    if not token:
+        logger.warning('Missing email activation token')
+        return redirect(url_for('register_resend_email'))
+
+    # Call the Party service to try to activate the account corresponding to the token that was supplied
+    url = Config.API_GATEWAY_PARTY_URL + 'emailverification/' + token
+    result = requests.post(url)
+    logger.debug('Activate account - response from party service is: {}'.format(result.content))
+
+    if result.status_code == 200 and json.loads(result.text)['active']:
+        return redirect(url_for('login', account_activated=True))
     else:
-        return render('register.activate-account.html')
+        return redirect(url_for('register_resend_email'))
+
+
+@app.route('/create-account/resend-email/', methods=['GET'])
+def register_resend_email():
+    return render('register.link-expired.html')
+
+
+@app.route('/create-account/email-resent/', methods=['GET'])
+def register_email_resent():
+    return render('register.email-resent.html')
 
 
 # Disable cache for development

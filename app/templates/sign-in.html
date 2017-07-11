@@ -30,12 +30,15 @@
           action="{{ url_for('login') }}"
           role="form">
 
-        <p>
-            Have an enrolment code?<br/>
+        {% if data['account_activated'] %}
+            <h1 class="saturn">You've activated your account</h1>
+            <p>You may now sign in.</p>
+        {% else %}
+            <p>Have an enrolment code?<br/>
             Use it to <a href="/create-account">create an account</a>
-        </p>
-
-        <h1 class="saturn">Sign in</h1>
+            </p>
+            <h1 class="saturn">Sign in</h1>
+        {% endif %}
 
         <fieldset id="sign-in-details">
             {% if errorType == "failed" %}
@@ -56,7 +59,8 @@
                     </span>
                     {{ form.password(class_='input input--text input-type__input js-password-obfuscation-field') }}
 
-                    <a href="/forgot-password">Forgot password</a>
+                    <br />
+                    <a href="/forgot-password">Forgot password?</a>
                 </div>
                 <br />
 

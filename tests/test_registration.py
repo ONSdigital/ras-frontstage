@@ -52,7 +52,7 @@ class TestRegistration(unittest.TestCase):
         response = self.app.get('/create-account/', headers=self.headers)
 
         # Check successful response and the correct values are on the page
-        self.assertTrue(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue(bytes('Create an account', encoding='UTF-8') in response.data)
         self.assertTrue(bytes('Enrolment Code', encoding='UTF-8') in response.data)
         self.assertTrue(bytes('You\'ll find this in the letter we sent you', encoding='UTF-8') in response.data)
@@ -118,30 +118,30 @@ class TestRegistration(unittest.TestCase):
         url_validate_active_iac = Config.API_GATEWAY_IAC_URL + '{}'.format(enrolment_code)
         iac_active_response = {
             "iac": enrolment_code,
-            "active": False,
+            "active": True,
             "lastUsedDateTime": "2017-05-15T10:00:00Z",
             "caseId": case_id,
             "questionSet": "H1"
         }
         mock_object.get(url_validate_active_iac, status_code=200, json=iac_active_response)
 
-        # A POST with a valid, active enrolment code should result in the page being displayed
-        post_data = {
-            'enrolment_code': encrypted_enrolment_code
+        # A GET with a valid, active enrolment code should result in the page being displayed
+        params = {
+            'enrolment_code': encrypted_enrolment_code,
+            'organisation_name': 'Bolts and Ratchets Ltd',
+            'survey_name': 'Business Register and Employment Survey'
         }
-        response = self.app.post('/create-account/enter-account-details', data=post_data, headers=self.headers)
 
-        # TODO
-        # self.assertTrue(response.status_code, 200)
+        # 'enrolment_code=mQsp74%2F%2BrFxONgwWgrDWWp%2BSrDQsSi1h6ZBNGbkOEXk%3D&organisation_name=Bolts+and+Ratchets+Ltd&survey_name=Business+Register+and+Employment+Survey'
+        response = self.app.get('/create-account/enter-account-details', query_string=params, headers=self.headers)
+        self.assertEqual(response.status_code, 200)
 
-        # print(response.data)
-
-        # TODO Check that the correct details are displayed on the screen after it is successfully accessed
-        # self.assertTrue(bytes('Enter your account details', encoding='UTF-8') in response.data)
-        # self.assertTrue(bytes('Your name', encoding='UTF-8') in response.data)
-        # self.assertTrue(bytes('Email address', encoding='UTF-8') in response.data)
-        # self.assertTrue(bytes('Create a password', encoding='UTF-8') in response.data)
-        # self.assertTrue(bytes('Phone number', encoding='UTF-8') in response.data)
+        # Check that the correct details are displayed on the screen after it is successfully accessed
+        self.assertTrue(bytes('Enter your account details', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('Your name', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('Email address', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('Create a password', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('Phone number', encoding='UTF-8') in response.data)
 
     # Trying to access the enter account details page with a invalid encrypted (inactive) enrolment code should
     # result in the error page being displayed
@@ -182,7 +182,7 @@ class TestRegistration(unittest.TestCase):
 
         # A GET with no enrolment code should result in an error
         response = self.app.get('/create-account/enter-account-details', headers=self.headers)
-        self.assertTrue(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
         self.assertTrue('/error'.encode() in response.data)
 
     # TODO Fix this test as part of the 'enter your account details' story

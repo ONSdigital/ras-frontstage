@@ -397,6 +397,7 @@ def register_enter_your_details():
 
     # Ensure we have got a valid enrolment code, otherwise go to the sign in page
     if not decrypted_enrolment_code or not validate_enrolment_code(decrypted_enrolment_code):
+        logger.error('Enter Account Details page - invalid enrolment code: ' + str(decrypted_enrolment_code))
         return redirect(url_for('error_page'))
 
     form = RegistrationForm(request.values, enrolment_code=encrypted_enrolment_code)

@@ -64,15 +64,15 @@ else:
     app.config.from_object(TestingConfig)
     logger.info("testing server started...")
 
-@app.before_request
-def before_request():
-    g.jwt = request.cookies.get('authorization')
-    print("JWT:", g.jwt)
+#@app.before_request
+#def before_request():
+#    g.jwt = request.cookies.get('authorization')
+#    print("JWT:", g.jwt)
 
-@app.after_request
-def after_request(response):
-    response.headers.add('authorization', getattr(g, 'jwt', ''))
-    return response
+#@app.after_request
+#def after_request(response):
+#    response.headers.add('authorization', getattr(g, 'jwt', ''))
+#    return response
 
 
 # TODO Remove this before production
@@ -169,7 +169,8 @@ def login():
             "access_token": token['access_token'],
             "scope": token['scope'],
             "expires_at": token['expires_at'],
-            "username": username
+            "username": username,
+            "party_id": "db036fd7-ce17-40c2-a8fc-932e7c228397"
         }
         encoded_jwt_token = encode(data_dict_for_jwt_token)
         response = make_response(redirect(url_for('surveys_bp.logged_in')))
@@ -268,11 +269,11 @@ def validate_enrolment_code(enrolment_code):
 
     # Build the URL
     url = Config.API_GATEWAY_IAC_URL + '{}'.format(enrolment_code)
-    logger.debug('Validate IAC URL is: {}'.format(url))
+    ons_env.logger.info('Validate IAC URL is: {}'.format(url))
 
     # Call the API Gateway Service to validate the enrolment code
     result = requests.get(url, verify=False)
-    logger.debug('Result => {} {} : {}'.format(result.status_code, result.reason, result.text))
+    ons_env.logger.info('Result => {} {} : {}'.format(result.status_code, result.reason, result.text))
 
     if result.status_code == 200 and json.loads(result.text)['active']:
         case_id = json.loads(result.text)['caseId']
@@ -304,9 +305,12 @@ def register():
         if case_id:
 
             # Post an authentication case event to the case service
+            # Demo codes
+            # fb747cq725lj
             ons_env.case_service.post_event(case_id,
                                             category='ACCESS_CODE_AUTHENTICATION_ATTEMPT',
-                                            created_by='TODO',
+                                            created_by='SYSTEM',
+#                                            party_id='3b136c4b-7a14-4904-9e01-13364dd7b972',
                                             party_id='db036fd7-ce17-40c2-a8fc-932e7c228397',
                                             description='Enrolment code entered "{}"'.format(enrolment_code))
 

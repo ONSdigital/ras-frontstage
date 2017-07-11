@@ -81,7 +81,7 @@ class TestingConfig(Config):
     ONS_ADMIN_ENDPOINT = os.environ.get('ONS_ADMIN_ENDPOINT', '/api/account/create')
 
     # Local version of Party Service:
-    PARTY_SERVICE_URL = os.environ.get('PARTY_SERVICE_URL', 'https://localhost:5101/party-api/1.0.4/')
+    PARTY_SERVICE_URL = os.environ.get('PARTY_SERVICE_URL', 'http://localhost:5201/party-api/v1/')
 
     # Local version of Collection Instrument Service:
     COLLECTION_INSTRUMENT_URL = os.environ.get('COLLECTION_INSTRUMENT_URL', 'https://api-dev.apps.mvp.onsclofo.uk:443/collection-instrument-api/1.0.2/')

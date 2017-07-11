@@ -308,50 +308,56 @@ def register_enter_your_details():
         logger.debug("T's&C's is: {}".format(terms_and_conditions))
 
         # Lets try and create this user on the OAuth2 server
-        OAuth_payload = {"username": email_address, "password": password,
-                         "client_id": OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID, "client_secret": OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET}
+        OAuth_payload = {
+            "username": email_address,
+            "password": password,
+            "client_id": app.config['RAS_FRONTSTAGE_CLIENT_ID'],
+            "client_secret": app.config['RAS_FRONTSTAGE_CLIENT_SECRET']
+        }
+
         headers = {'content-type': 'application/x-www-form-urlencoded'}
-        authorisation = (app.config['RAS_FRONTSTAGE_CLIENT_ID'],app.config['RAS_FRONTSTAGE_CLIENT_SECRET'])
 
-        try:
-            OAuthurl = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_ADMIN_ENDPOINT']
-            OAuth_response = requests.post(OAuthurl, auth=authorisation, headers=headers, data=OAuth_payload)
-            logger.debug("OAuth response is: {}".format(OAuth_response.content))
+        authorisation = (app.config['RAS_FRONTSTAGE_CLIENT_ID'], app.config['RAS_FRONTSTAGE_CLIENT_SECRET'])
 
-            # json.loads(myResponse.content.decode('utf-8'))
-            response_body = json.loads(OAuth_response.content.decode('utf-8'))
-            logger.debug("OAuth2 response is: {}".format(OAuth_response.status_code))
-
-            if OAuth_response.status_code == 401:
-                # This looks like the user is not authorized to use the system. it could be a duplicate email. check our
-                # exact error. if it is, then tell the user else fail as our server is not allowed to access the OAuth2
-                # system.
-                # TODO add logging
-                # {"detail":"Duplicate user credentials"}
-                if response_body["detail"]:
-                    if response_body["detail"] == 'Duplicate user credentials':
-                        logger.warning("We have duplicate user credentials")
-                        errors = {'email_address_confirm': ['Please try a different email, this one is in use', ]}
-                        return render_template('register.enter-your-details.html', _theme='default', form=form, errors=errors)
-
-            # Deal with all other errors from OAuth2 registration
-            if OAuth_response.status_code > 401:
-                OAuth_response.raise_for_status()  # A stop gap until we know all the correct error pages
-                logger.warning("OAuth error")
-
-            # TODO A utility function to allow us to route to a page for 'user is registered already'.
-            # We need a html page for this.
-
-        except requests.exceptions.ConnectionError:
-            logger.critical("There seems to be no server listening on this connection?")
-            # TODO A redirect to a page that helps the user
-
-        except requests.exceptions.Timeout:
-            logger.critical("Timeout error. Is the OAuth Server overloaded?")
-            # TODO A redirect to a page that helps the user
-        except requests.exceptions.RequestException as e:
-            # TODO catastrophic error. bail. A page that tells the user something horrid has happened and who to inform
-            logger.debug(e)
+        # try:
+        #     OAuthurl = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_ADMIN_ENDPOINT']
+        #     OAuth_response = requests.post(OAuthurl, auth=authorisation, headers=headers, data=OAuth_payload)
+        #     logger.debug("OAuth response is: {}".format(OAuth_response.content))
+        #
+        #     # json.loads(myResponse.content.decode('utf-8'))
+        #     response_body = json.loads(OAuth_response.content.decode('utf-8'))
+        #     logger.debug("OAuth2 response is: {}".format(OAuth_response.status_code))
+        #
+        #     if OAuth_response.status_code == 401:
+        #         # This looks like the user is not authorized to use the system. it could be a duplicate email. check our
+        #         # exact error. if it is, then tell the user else fail as our server is not allowed to access the OAuth2
+        #         # system.
+        #         # TODO add logging
+        #         # {"detail":"Duplicate user credentials"}
+        #         if response_body["detail"]:
+        #             if response_body["detail"] == 'Duplicate user credentials':
+        #                 logger.warning("We have duplicate user credentials")
+        #                 errors = {'email_address_confirm': ['Please try a different email, this one is in use', ]}
+        #                 return render_template('register.enter-your-details.html', _theme='default', form=form, errors=errors)
+        #
+        #     # Deal with all other errors from OAuth2 registration
+        #     if OAuth_response.status_code > 401:
+        #         OAuth_response.raise_for_status()  # A stop gap until we know all the correct error pages
+        #         logger.warning("OAuth error")
+        #
+        #     # TODO A utility function to allow us to route to a page for 'user is registered already'.
+        #     # We need a html page for this.
+        #
+        # except requests.exceptions.ConnectionError:
+        #     logger.critical("There seems to be no server listening on this connection?")
+        #     # TODO A redirect to a page that helps the user
+        #
+        # except requests.exceptions.Timeout:
+        #     logger.critical("Timeout error. Is the OAuth Server overloaded?")
+        #     # TODO A redirect to a page that helps the user
+        # except requests.exceptions.RequestException as e:
+        #     # TODO catastrophic error. bail. A page that tells the user something horrid has happened and who to inform
+        #     logger.debug(e)
 
         # if OAuth_response.status_code == 401:
         #     # This looks like the user is not authorized to use the system. it could be a duplicate email. check our
@@ -430,13 +436,15 @@ def register_enter_your_details():
             'emailAddress': email_address,
             'firstName': first_name,
             'lastName': last_name,
+            'password':password,
             'telephone': phone_number,
+            'enrolmentCode':"012345",
             'status': 'CREATED'
         }
 
         headers = {'authorization': encoded_jwt_token, 'content-type': 'application/json'}
 
-        party_service_url = Config.API_GATEWAY_PARTY_URL + 'respondents'
+        party_service_url = app.config['PARTY_SERVICE_URL'] + 'respondents'
         app.logger.debug("Party service URL is: {}".format(party_service_url))
 
         try:

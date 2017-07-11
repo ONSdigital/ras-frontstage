@@ -604,17 +604,27 @@ def register_activate_account():
     result = requests.post(url)
     logger.debug('Activate account - response from party service is: {}'.format(result.content))
 
-    # TODO If the token was not recognised, we don't know who the user is so redirect them off to the error page
-    # logger.warning('Unrecognised email activation token: ' + str(token))
-    # return redirect(url_for('error_page'))
+    if result.status_code == 200:
+        json_response = json.loads(result.text)
 
-    # TODO Derive the ID that identifies the person who tried to activate their account
-    user_id='1234567890'
-
-    if result.status_code == 200 and json.loads(result.text)['active']:
-        return redirect(url_for('login', account_activated=True))
+        if json_response['active']:
+            # Successful account activation therefore redirect off to the login screen
+            return redirect(url_for('login', account_activated=True))
+        else:
+            # Try to get the user id
+            user_id = json_response['userId']
+            if user_id:
+                # Unable to activate account therefore give the user the option to send out a new email token
+                logger.debug('Expired activation token: ' + str(token))
+                return redirect(url_for('register_resend_email', user_id=user_id))
+            else:
+                logger.error('Unable to determine user for activation token: ' + str(token))
+                return redirect(url_for('error_page'))
     else:
-        return redirect(url_for('register_resend_email', user_id=user_id))
+        # If the token was not recognised, we don't know who the user is so redirect them off to the error page
+        logger.warning('Unrecognised email activation token: ' + str(token) +
+                       ' Response code: ' + str(result.status_code))
+        return redirect(url_for('error_page'))
 
 
 @app.route('/create-account/resend-email', methods=['GET'])

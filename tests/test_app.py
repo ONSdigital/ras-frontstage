@@ -49,7 +49,7 @@ class TestApplication(unittest.TestCase):
         self.app = app.test_client()
         self.headers = {
             "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"  # NOQA
-            }
+        }
 
     # Test we can encode a token with the format shown in data_dict_for_jwt_token
     def test_encode_jwt(self):
@@ -184,5 +184,4 @@ class TestApplication(unittest.TestCase):
         #   |                           |                                               |
         #   |     / response    |                                               |
         #   |<------------------------- |                                               |
-
         self.assertTrue(bytes(my_surveys_data['rows'][0]['businessData']['businessRef'], encoding='UTF-8') in response.data)

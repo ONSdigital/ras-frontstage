@@ -592,31 +592,41 @@ def register_almost_done():
 
 @app.route('/activate-account', methods=['GET'])
 def register_activate_account():
-    token = request.args.get('token', None)
+    token = request.args.get('t', None)
 
-    # If the token was not provided then show the link expired page
+    # If the token was not provided then redirect off to the error page
     if not token:
         logger.warning('Missing email activation token')
-        return redirect(url_for('register_resend_email'))
+        return redirect(url_for('error_page'))
 
     # Call the Party service to try to activate the account corresponding to the token that was supplied
     url = Config.API_GATEWAY_PARTY_URL + 'emailverification/' + token
     result = requests.post(url)
     logger.debug('Activate account - response from party service is: {}'.format(result.content))
 
+    # TODO If the token was not recognised, we don't know who the user is so redirect them off to the error page
+    # logger.warning('Unrecognised email activation token: ' + str(token))
+    # return redirect(url_for('error_page'))
+
+    # TODO Derive the ID that identifies the person who tried to activate their account
+    user_id='1234567890'
+
     if result.status_code == 200 and json.loads(result.text)['active']:
         return redirect(url_for('login', account_activated=True))
     else:
-        return redirect(url_for('register_resend_email'))
+        return redirect(url_for('register_resend_email', user_id=user_id))
 
 
-@app.route('/create-account/resend-email/', methods=['GET'])
+@app.route('/create-account/resend-email', methods=['GET'])
 def register_resend_email():
-    return render('register.link-expired.html')
+    user_id = request.args.get('user_id', None)
+    return render_template('register.link-expired.html', _theme='default', user_id=user_id)
 
 
-@app.route('/create-account/email-resent/', methods=['GET'])
+@app.route('/create-account/email-resent', methods=['GET'])
 def register_email_resent():
+    # TODO Call the service that will request a new email to be sent out
+
     return render('register.email-resent.html')
 
 

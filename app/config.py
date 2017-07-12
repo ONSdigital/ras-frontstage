@@ -62,7 +62,11 @@ class Config(object):
                                            'https://ras-api-gateway-int.apps.devtest.onsclofo.uk/party-api/1.0.4/')
     API_GATEWAY_IAC_URL = os.environ.get('API_GATEWAY_IAC_URL',
                                          'https://ras-api-gateway-int.apps.devtest.onsclofo.uk/api/1.0.0/iacs/')
-
+    
+    PASSWORD_MATCH_ERROR_TEXT = 'Your passwords do not match'
+    PASSWORD_CRITERIA_ERROR_TEXT = 'Your password does not meet the requirements'
+    PASSWORD_MIN_LENGTH = 8
+    PASSWORD_MAX_LENGTH = 160
 
 class ProductionConfig(Config):
     """

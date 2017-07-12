@@ -42,7 +42,7 @@ encoded_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZWZyZXNoX3Rva2VuIjoiZT
 
 
 class TestApplication(unittest.TestCase):
-    """Test case for application endpoints and functionality"""
+    # TODO reinstate tests after horrific merge problem
 
     def setUp(self):
 

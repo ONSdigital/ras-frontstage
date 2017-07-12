@@ -4,6 +4,21 @@
 {% block page_title %}Enter your account details{% endblock %}
 
 {% block main %}
+
+{% if errors.password or errors.password_confirm %}
+{% set errorType = errors.password[0] if errors.password else errors.password_confirm[0] %}
+<div class="panel panel--error">
+    <div class="panel__header">
+        <h1 class="panel__title venus">{{ errorType }}</h1>
+    </div>
+    <div class="panel__body" data-qa="error-body">
+        <p class="mars"><a class="js-inpagelink" href="#create-a-password">Please check the passwords and try again</a></p>
+    </div>
+</div>
+<br/>
+{% endif %}
+
+
     <form
             method="post"
             action="{{ url_for('register_enter_your_details') }}"
@@ -11,8 +26,7 @@
             role="form">
 
         <h1 class="saturn">Enter your account details</h1>
-        {{ form.csrf_token }}
-
+        {{ form.csrf_token}}
         {{ form.enrolment_code }}
 
         <div class="section">
@@ -29,10 +43,13 @@
             </div>
         </div>
 
-
-
-        {%  if errors.email_address %}
+        {%  if errors.email_address_confirm or errors.email_address %}
         <div class="panel panel--error">
+            {% for email_error in errors.email_address_confirm %}
+                <div class="panel__header">
+                    <h1 class="panel__title venus">{{ email_error }}</h1>
+                </div>
+            {% endfor %}
             {% for email_error in errors.email_address %}
                 <div class="panel__header">
                     <h1 class="panel__title venus">{{ email_error }}</h1>
@@ -48,49 +65,15 @@
                     {{ form.email_address.label(class_='label') }}
                     {{ form.email_address(class_='input input--text input-type__input') }}
                 </div>
-            </fieldset>
-        </div>
-
-        <br />
-
-        {%  if errors.password or errors.password_confirm %}
-        <div class="panel panel--error">
-           <h2 class="section__title neptune">Create a password</h2>
-            <p class="section__description mars">Your password must have:</p>
-            <ul>
-                <li>at least 8 characters </li>
-                <li>at least one symbol (eg ?!£%) </li>
-                <li>at least one capital letter</li>
-                <li>at least one number</li>
-            </ul>
-
-            <fieldset class="js-new-password-group">
-                <div class="field">
-                    {{ form.password.label(class_='label') }}
-                    {{ form.password(class_='input input--text input-type__input js-new-password') }}
-                </div>
                 <br />
 
                 <div class="field">
-                    {{ form.password_confirm.label(class_='label') }}
-                    {{ form.password_confirm(class_='input input--text input-type__input js-confirm-new-password') }}
+                    {{ form.email_address_confirm.label(class_='label') }}
+                    {{ form.email_address_confirm(class_='input input--text input-type__input') }}
                 </div>
             </fieldset>
-
-            {% for password_error in errors.password_confirm %}
-                <div class="panel__header">
-                    <h1 class="panel__title venus">{{ password_error }}</h1>
-                </div>
-            {% endfor %}
-            {% for password_error in errors.password_confirm %}
-                <div class="panel__header">
-                    <h1 class="panel__title venus">{{ password_error }}</h1>
-                </div>
-            {% endfor %}
-
         </div>
 
-        {% else %}
 
         <div class="section">
             <h2 class="section__title neptune">Create a password</h2>
@@ -103,20 +86,25 @@
             </ul>
 
             <fieldset class="js-new-password-group">
-                <div class="field">
-                    {{ form.password.label(class_='label') }}
-                    {{ form.password(class_='input input--text input-type__input js-new-password') }}
+                {% if errors.password %}
+                <div class="panel panel--simple panel--error">
+                    <p class="error-message">{{ errorType }}</p>
+                {% endif %}
+                    <div class="field" id="create-a-password">
+                        {{ form.password.label(class_='label') }}
+                        {{ form.password(class_='input input--text input-type__input js-new-password') }}
+                    </div>
+                    <br />
+                    <div class="field">
+                        {{ form.password_confirm.label(class_='label') }}
+                        {{ form.password_confirm(class_='input input--text input-type__input js-confirm-new-password') }}
+                    </div>
+                {% if errors.password %}
                 </div>
-                <br />
-
-                <div class="field">
-                    {{ form.password_confirm.label(class_='label') }}
-                    {{ form.password_confirm(class_='input input--text input-type__input js-confirm-new-password') }}
-                </div>
+                {% endif %}
             </fieldset>
         </div>
 
-        {%  endif %}
 
        {%  if errors.phone_number %}
        <div class="panel panel--error">
@@ -154,7 +142,6 @@
         </div>
 
         {% endif %}
-
         <br />
 
         <button class="btn btn--primary venus" type="submit">Continue</button>

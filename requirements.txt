@@ -1,3 +1,4 @@
+git+https://github.com/ONSdigital/ras-common.git@TBL074/ras_common_integration
 arrow==0.10.0
 flake8==2.5.4
 alembic==0.9.1

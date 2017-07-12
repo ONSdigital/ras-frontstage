@@ -30,6 +30,11 @@
           action="{{ url_for('login') }}"
           role="form">
 
+        <p>
+            Have an enrolment code?<br/>
+            Use it to <a href="/create-account">create an account</a>
+        </p>
+
         <h1 class="saturn">Sign in</h1>
 
         <fieldset id="sign-in-details">
@@ -63,8 +68,6 @@
         {% if errorType == "failed" %}
         <br />
         {% endif %}
-
-        <p>Have an activation code? Use it to <a href="/create-account">create an account</a></p>
 
     </form>
 {% endblock main %}

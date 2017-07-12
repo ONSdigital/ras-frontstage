@@ -4,13 +4,10 @@ from app.config import Config
 import requests_mock
 
 token = 'TOKEN_ABC'
-
 user_id = 'USER_12345'
 
 # Build the mock URL and that is used to validate the email token
 url_email_verification = Config.API_GATEWAY_PARTY_URL + 'emailverification/{}'.format(token)
-print('url_email_verification: ' + url_email_verification)
-
 
 @requests_mock.mock()
 class TestAccountActivation(unittest.TestCase):
@@ -102,7 +99,7 @@ class TestAccountActivation(unittest.TestCase):
         self.assertTrue(bytes('Help with email', encoding='UTF-8') in response.data)
 
     # ============== SIGN IN PAGE WITH 'ACCOUNT ACTIVATED' MESSAGE ===============
-    
+
     # Check the content of the 'We've re-sent your email' page
     def test_login_account_activated_page(self, mock_object):
         response = self.app.get('sign-in?account_activated=True', headers=self.headers)

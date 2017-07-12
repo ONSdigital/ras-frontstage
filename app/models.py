@@ -96,8 +96,6 @@ class RegistrationForm(FlaskForm):
     email_address = StringField('Enter your email address', validators=[InputRequired(), Email(message="Your email shoud be of the form 'myname@email.com' "),
                                 Length(max=254, message='Your email must be less than 254 characters')])
 
-    email_address_confirm = StringField('Re-type your email address', validators=[DataRequired(), EqualTo('email_address', message='Emails must match'),
-                                        Length(max=254, message='Your email must be less than 254 characters')])
     password = PasswordField('Create a password', validators=[DataRequired(message=Config.PASSWORD_CRITERIA_ERROR_TEXT),
                                                               EqualTo('password_confirm', message=Config.PASSWORD_MATCH_ERROR_TEXT),
                                                               Length(min=Config.PASSWORD_MIN_LENGTH,
@@ -145,17 +143,10 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', [InputRequired()])
 
 
-class SignIn(FlaskForm):
-    """Sign in form."""
-
-    username = StringField('Username', [InputRequired()])
-    password = PasswordField('Password', [InputRequired()])
-
-
-class ActivationCodeForm(FlaskForm):
+class EnrolmentCodeForm(FlaskForm):
     """
     This is our Register form and part 1 of registration. It's used for the user to pass the 'Activation Code'. The
     activation code will be sent to the party service, in turn get resolved in the 'case service'. If successful we can
     progress with registration. The 'Activation Code' is a string in our case.
     """
-    activation_code = StringField('Activation Code', [InputRequired()])
+    enrolment_code = StringField('Enrolment Code', [InputRequired()])

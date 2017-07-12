@@ -1,10 +1,12 @@
 import unittest
 from selenium import webdriver
 
+from app.config import SecureMessaging
+
 
 class SaveDraft(unittest.TestCase):
     def setUp(self):
-        self.driver = webdriver.Chrome()
+        self.driver = webdriver.Chrome(executable_path=SecureMessaging.chrome_driver)
         self.driver.implicitly_wait(30)
 
         # navigate to the application home page

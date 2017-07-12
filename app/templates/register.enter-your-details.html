@@ -5,21 +5,25 @@
 
 {% block main %}
 
-{% if errors.password or errors.password_confirm %}
-{% set errorType = errors.password[0] if errors.password else errors.password_confirm[0] %}
-<div class="panel panel--error">
-    <div class="panel__header">
-        <h1 class="panel__title venus">{{ errorType }}</h1>
-    </div>
-    <div class="panel__body" data-qa="error-body">
-        <p class="mars"><a class="js-inpagelink" href="#create-a-password">Please check the passwords and try again</a></p>
-    </div>
-</div>
-<br/>
-{% endif %}
+        {% if errors|length > 0 %}
+        <div class="panel panel--error">
+            <div class="panel__header">
+                {% for error in errors %}
+                    <h1 class="panel__title venus">{{ errors[error][0] }}</h1>
+                {% endfor %}
+            </div>
+            <div class="panel__body" data-qa="error-body">
+                {% for error in errors %}
+                    {% set error = 'passwords' if error == 'password' else error %}
+                    <p class="mars"><a class="js-inpagelink" href="#{{error}}_field">Please check the {{error}} and try again</a></p>
+                {% endfor %}
+            </div>
+        </div>
+        <br/>
+        {% endif %}
 
 
-    <form
+        <form
             method="post"
             action="{{ url_for('register_enter_your_details') }}" class="form"
             class="form"
@@ -30,51 +34,46 @@
 
         <div class="section">
             <h2 class="section__title neptune">Your name</h2>
-            <div class="field">
-                {{ form.first_name.label(class_='label') }}
-                {{ form.first_name(class_='input input--text input-type__input') }}
+            {% if errors.first_name %}
+            <div class="panel panel--simple panel--error">
+                <p class="error-message">{{ errors['first_name'][0] }}</p>
+            {% endif %}
+                <div class="field" id="first_name_field">
+                    {{ form.first_name.label(class_='label') }}
+                    {{ form.first_name(class_='input input--text input-type__input') }}
+                </div>
+            {% if errors.first_name %}
             </div>
+            {% endif %}
             <br />
-
-            <div class="field">
-                {{ form.last_name.label(class_='label') }}
-                {{ form.last_name(class_='input input--text input-type__input') }}
+            {% if errors.last_name %}
+            <div class="panel panel--simple panel--error">
+                <p class="error-message">{{ errors['last_name'][0] }}</p>
+            {% endif %}
+                <div class="field" id="last_name_field">
+                    {{ form.last_name.label(class_='label') }}
+                    {{ form.last_name(class_='input input--text input-type__input') }}
+                </div>
+            {% if errors.last_name %}
             </div>
+            {% endif %}
         </div>
 
-
-
-        {%  if errors.email_address_confirm or errors.email_address %}
-        <div class="panel panel--error">
-            {% for email_error in errors.email_address_confirm %}
-                <div class="panel__header">
-                    <h1 class="panel__title venus">{{ email_error }}</h1>
-                </div>
-            {% endfor %}
-            {% for email_error in errors.email_address %}
-                <div class="panel__header">
-                    <h1 class="panel__title venus">{{ email_error }}</h1>
-                </div>
-            {% endfor %}
-        {% else %}
         <div class="section">
-        {%  endif %}
             <h2 class="section__title neptune">Email address</h2>
-            <p class="section__description mars">We'll send you an email so you can activate your account.</p>
-            <fieldset>
-                <div class="field">
+            <p class="section__description mars">We'll send you an email so you can activate your account</p>
+            {% if errors.email_address %}
+            <div class="panel panel--simple panel--error">
+                <p class="error-message">{{ errors['email_address'][0] }}</p>
+            {% endif %}
+                <div class="field" id="email_address_field">
                     {{ form.email_address.label(class_='label') }}
                     {{ form.email_address(class_='input input--text input-type__input') }}
                 </div>
-                <br />
-
-                <div class="field">
-                    {{ form.email_address_confirm.label(class_='label') }}
-                    {{ form.email_address_confirm(class_='input input--text input-type__input') }}
-                </div>
-            </fieldset>
+            {% if errors.email_address %}
+            </div>
+            {% endif %}
         </div>
-
 
         <div class="section">
             <h2 class="section__title neptune">Create a password</h2>
@@ -85,13 +84,12 @@
                 <li>at least one capital letter</li>
                 <li>at least one number</li>
             </ul>
-
             <fieldset class="js-new-password-group">
                 {% if errors.password %}
                 <div class="panel panel--simple panel--error">
-                    <p class="error-message">{{ errorType }}</p>
+                    <p class="error-message">{{ errors['password'][0] }}</p>
                 {% endif %}
-                    <div class="field" id="create-a-password">
+                    <div class="field" id="password_field">
                         {{ form.password.label(class_='label') }}
                         {{ form.password(class_='input input--text input-type__input js-new-password') }}
                     </div>
@@ -107,57 +105,32 @@
         </div>
 
 
-       {%  if errors.phone_number %}
-       <div class="panel panel--error">
-           <div class="section">
-
-                <h2 class="section__title neptune">Phone number</h2>
-
-                <p class="section__description mars">We may sometimes need to call you to discuss information you have provided.</p>
-
-                <div class="field">
+        <div class="section">
+            <h2 class="section__title neptune">Phone number</h2>
+            <p class="section__description mars">We may sometimes need to call you to discuss information you have provided</p>
+            {% if errors.phone_number %}
+            <div class="panel panel--simple panel--error">
+                <p class="error-message">{{ errors['phone_number'][0] }}</p>
+            {% endif %}
+                <div class="field" id="phone_number_field">
                     {{ form.phone_number.label(class_='label') }}
                     {{ form.phone_number(class_='input input--text input-type__input') }}
                 </div>
-
-           </div>
-
-           {% for phone_error in errors.phone_number %}
-                <div class="panel__header">
-                    <h1 class="panel__title venus">{{ phone_error }}</h1>
-                </div>
-           {% endfor %}
-       </div>
-       {% else %}
-
-        <div class="section">
-
-            <h2 class="section__title neptune">Phone number</h2>
-            <p class="section__description mars">We may sometimes need to call you to discuss information you have provided.</p>
-
-            <div class="field">
-                {{ form.phone_number.label(class_='label') }}
-                {{ form.phone_number(class_='input input--text input-type__input') }}
+            {% if errors.phone_number %}
             </div>
-
+            {% endif %}
         </div>
 
-        {% endif %}
         <div class="section">
-
             <h2 class="section__title neptune">Terms and Conditions</h2>
-
             <div class="field field--checkbox"><!-- field--multiplechoice - class displays border -->
-                <fieldset>
-                    <div class="field__item js-focusable-box is-checked">
-                        <!--<input class="input input&#45;&#45;checkbox js-focusable" type="checkbox" id="checkbox1" />-->
-                        {{ form.terms_and_conditions(class_='input input--checkbox js-focusable') }}
-                        {{ form.terms_and_conditions.label(class_='label label--inline venus') }}
-                        <!--<label class="label label&#45;&#45;inline venus" for="checkbox1">Please confirm you accept our <a href="#">Terms of use (Opens in a new window.)</a></label>-->
-                    </div>
-                </fieldset>
+                <div class="field__item js-focusable-box is-checked">
+                    <!--<input class="input input&#45;&#45;checkbox js-focusable" type="checkbox" id="checkbox1" />-->
+                    {{ form.terms_and_conditions(class_='input input--checkbox js-focusable') }}
+                    {{ form.terms_and_conditions.label(class_='label label--inline venus') }}
+                    <!--<label class="label label&#45;&#45;inline venus" for="checkbox1">Please confirm you accept our <a href="#">Terms of use (Opens in a new window.)</a></label>-->
+                </div>
             </div>
-
         </div>
         <br />
 

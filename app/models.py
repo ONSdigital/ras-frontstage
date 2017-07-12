@@ -75,25 +75,35 @@ class RegistrationForm(FlaskForm):
     The form data will be used to create the account on the OAuth2 server and to provide the Case Service with a valid
     account name that is not verified.
     """
+    req = " is required"
+    first_name = StringField('First name',
+                             validators=[InputRequired("First name" + req),
+                                         Length(max=254,
+                                                message='Your first name must be less than 254 characters')])
+    last_name = StringField('Last name',
+                            validators=[InputRequired("Last name" + req),
+                                        Length(max=254, message='Your last name must be less than 254 characters')])
+    email_address = StringField('Enter your email address',
+                                validators=[InputRequired("Email address" + req),
+                                            Email(message="Your email shoud be of the form 'myname@email.com' "),
+                                            Length(max=254,
+                                                   message='Your email must be less than 254 characters')])
+    password = PasswordField('Create a password',
+                             validators=[DataRequired("Password" + req),
+                                         EqualTo('password_confirm', message=Config.PASSWORD_MATCH_ERROR_TEXT),
+                                         Length(min=Config.PASSWORD_MIN_LENGTH,
+                                                max=Config.PASSWORD_MAX_LENGTH,
+                                                message=Config.PASSWORD_CRITERIA_ERROR_TEXT)])
+    password_confirm = PasswordField('Re-type your password')
+    phone_number = StringField('Enter your phone number',
+                               validators=[DataRequired("Phone number" + req),
+                                           Length(min=9,
+                                                  max=15,
+                                                  message="This should be a valid phone number between 9 and 15 digits")],
+                               default=None)
 
-    first_name = StringField('First name', validators=[InputRequired(), Length(max=254, message='Your first name must be less than 254 characters')])
-    last_name = StringField('Last name', validators=[InputRequired(), Length(max=254, message='Your last name must be less than 254 characters')])
-    email_address = StringField('Enter your email address', validators=[InputRequired(), Email(message="Your email shoud be of the form 'myname@email.com' "),
-                                Length(max=254, message='Your email must be less than 254 characters')])
-    email_address_confirm = StringField('Re-type your email address', validators=[DataRequired(), EqualTo('email_address', message='Emails must match'),
-                                        Length(max=254, message='Your email must be less than 254 characters')])
-    password = PasswordField('Create a password', validators=[DataRequired(message=Config.PASSWORD_CRITERIA_ERROR_TEXT),
-                                                              EqualTo('password_confirm', message=Config.PASSWORD_MATCH_ERROR_TEXT),
-                                                              Length(min=Config.PASSWORD_MIN_LENGTH,
-                                                                     max=Config.PASSWORD_MAX_LENGTH,
-                                                                     message=Config.PASSWORD_CRITERIA_ERROR_TEXT)])
-    password_confirm = PasswordField('Re-type your password', validators=[Length(min=Config.PASSWORD_MIN_LENGTH,
-                                                                                 max=Config.PASSWORD_MAX_LENGTH,
-                                                                                 message=Config.PASSWORD_CRITERIA_ERROR_TEXT)])
-    phone_number = StringField('Enter your phone number', validators=[DataRequired(),
-                               Length(min=9, max=15, message="This should be a valid phone number between 9 and 15 digits")], default=None)
+    terms_and_conditions = BooleanField('Please confirm you accept our terms and conditions')
 
-    terms_and_conditions = BooleanField('Please confirm you accept our terms and conditions ')
 
     def validate_phone_number(form, field):
         if len(field.data) > 16:
@@ -112,8 +122,6 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('This should be a valid UK number e.g. 01632 496 0018. ')
 
     def validate_password(form, field):
-        if len(field.data) > Config.PASSWORD_MAX_LENGTH:
-            raise ValidationError(Config.PASSWORD_CRITERIA_ERROR_TEXT)
         password = field.data
         if password.isalnum() or \
             not any(char.isupper() for char in password) or \

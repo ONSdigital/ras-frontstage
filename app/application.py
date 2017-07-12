@@ -334,7 +334,7 @@ def register_enter_your_details():
                 if response_body["detail"]:
                     if response_body["detail"] == 'Duplicate user credentials':
                         logger.warning("We have duplicate user credentials")
-                        errors = {'email_address_confirm': ['Please try a different email, this one is in use', ]}
+                        errors = {'email_address': ['Please try a different email, this one is in use', ]}
                         return render_template('register.enter-your-details.html', _theme='default', form=form, errors=errors)
 
             # Deal with all other errors from OAuth2 registration
@@ -365,7 +365,7 @@ def register_enter_your_details():
         #     if response_body["detail"]:
         #         if response_body["detail"] == 'Duplicate user credentials':
         #             logger.warning("We have duplicate user credentials2")
-        #             errors = {'email_address_confirm': ['Please try a different email, this one is in use', ]}
+        #             errors = {'email_address': ['Please try a different email, this one is in use', ]}
         #             return render_template('register.enter-your-details.html', _theme='default', form=form, errors=errors)
         #
         # # Deal with all other errors from OAuth2 registration

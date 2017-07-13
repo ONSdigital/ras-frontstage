@@ -1,11 +1,11 @@
 from flask import Blueprint, render_template, request, json, redirect, url_for, session
 import requests
-import logging
-from structlog import wrap_logger
+#import logging
+#from structlog import wrap_logger
 from app.config import SecureMessaging
+from ons_ras_common import ons_env
 
-
-logger = wrap_logger(logging.getLogger(__name__))
+#logger = wrap_logger(logging.getLogger(__name__))
 
 
 headers = {'Content-Type': 'application/json',
@@ -34,7 +34,7 @@ def create_message():
                     # TODO replace with custom error page when available
                     return redirect(url_for('error_page'))
                 resp_data = json.loads(response.text)
-                logger.debug(resp_data['msg_id'])
+                ons_env.logger.debug(resp_data['msg_id'])
                 return render_template('message-success-temp.html', _theme='default')
 
             if request.form['submit'] == 'Save draft':
@@ -54,7 +54,7 @@ def create_message():
                         # TODO replace with custom error page when available
                         return redirect(url_for('error_page'))
                 resp_data = json.loads(response.text)
-                logger.debug(resp_data['msg_id'])
+                ons_env.logger.debug(resp_data['msg_id'])
                 get_draft = requests.get(SecureMessaging.DRAFT_GET_API_URL.format(resp_data['msg_id']), headers=headers)
                 if get_draft.status_code != 200:
                     # TODO replace with custom error page when available
@@ -73,7 +73,7 @@ def reply_message():
 
     if session.get('jwt_token'):
         if request.method == 'POST':
-            logger.info("Reply to Message")
+            ons_env.logger.info("Reply to Message")
             data = {'msg_to': 'BRES', 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                     'subject': 'reply_subject', 'body': request.form['secure-message-body'],
                     'thread_id': 'test', 'collection_case': 'test', 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'survey': 'BRES'}
@@ -83,7 +83,7 @@ def reply_message():
                 # TODO replace with custom error page when available
                 return redirect(url_for('error_page'))
             resp_data = json.loads(response.text)
-            logger.debug(resp_data.get('msg_id', 'No response data.'))
+            ons_env.logger.debug(resp_data.get('msg_id', 'No response data.'))
             return render_template('message-success-temp.html', _theme='default')
     return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
 

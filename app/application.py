@@ -4,18 +4,19 @@ Main file that is run
 """
 
 import json
-import logging
+#import logging
 import os
 from datetime import datetime
 from functools import wraps, update_wrapper
 import requests
-from flask import Flask, make_response, render_template, request, flash, redirect, url_for, abort, g
+from flask import Flask, make_response, render_template, request, flash, redirect, url_for, abort
 from jose import JWTError
 from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError
 from requests import ConnectionError
 from requests_oauthlib import OAuth2Session
 from structlog import wrap_logger
 from ons_ras_common import ons_env
+from ons_ras_common.ons_logger import log
 
 from app.views.secure_messaging import secure_message_bp
 from app.views.surveys import surveys_bp
@@ -26,7 +27,7 @@ from app.filters.file_size_filter import file_size_filter
 from app.config import OAuthConfig, Config, TestingConfig, ProductionConfig
 from app.jwt import encode
 from app.models import LoginForm, RegistrationForm, EnrolmentCodeForm, db
-from app.logger_config import logger_initial_config
+#from app.logger_config import logger_initial_config
 
 app = Flask(__name__)
 app.debug = True
@@ -43,9 +44,8 @@ db.init_app(app)
 app.jinja_env.filters['case_status_filter'] = case_status_filter
 app.jinja_env.filters['file_size_filter'] = file_size_filter
 
-logger_initial_config(service_name='ras-frontstage')
-
-logger = wrap_logger(logging.getLogger(__name__))
+#logger_initial_config(service_name='ras-frontstage')
+#logger = wrap_logger(logging.getLogger(__name__))
 
 app.register_blueprint(surveys_bp, url_prefix='/surveys')
 app.register_blueprint(secure_message_bp, url_prefix='/secure-message')
@@ -57,12 +57,16 @@ if 'APP_SETTINGS' in os.environ:
 # If our PRODUCTION_VERSION environment variable is set as true (this should be set in our manifest.yml file in the root
 # folder.) we will use those settings. If not we will default to our TEST settings.
 if 'PRODUCTION_VERSION' in os.environ:
-    logger.info(" *** Production server settings are being used. ***")
+    ons_env.logger.info(" *** Production server settings are being used. ***")
+    #logger.info(" *** Production server settings are being used. ***")
     app.config.from_object(ProductionConfig)
 else:
-    logger.info(" *** APP.Info Testing server settings are being used. ***")
+    ons_env.logger.info(" *** APP.Info Testing server settings are being used. ***")
+    #logger.info(" *** APP.Info Testing server settings are being used. ***")
     app.config.from_object(TestingConfig)
-    logger.info("testing server started...")
+    #logger.info("testing server started...")
+    ons_env.logger.info("testing server started...")
+
 
 #@app.before_request
 #def before_request():
@@ -101,7 +105,8 @@ def logout():
 def login():
     """Handles sign in using OAuth2"""
 
-    logger.debug("*** Hitting login for OAuth() function.... ***")
+    #logger.debug("*** Hitting login for OAuth() function.... ***")
+    ons_env.logger.debug("*** Hitting login for OAuth() function.... ***")
     """ Login OAuth Page.
     This function uses the OAuth 2 server to receive a token upon successful sign in. If the user presents the correct
     password and username and is accepted by the OAuth 2 server we receive an access token, a refresh token and a TTL.
@@ -131,8 +136,10 @@ def login():
     if request.method == 'POST' and form.validate():
         username = request.form.get('username')
         password = request.form.get('password')
-        logger.debug("Username is: {}".format(username))
-        logger.debug("Password is: {}".format(password))
+        #logger.debug("Username is: {}".format(username))
+        #logger.debug("Password is: {}".format(password))
+        ons_env.logger.debug("Username is: {}".format(username))
+        ons_env.logger.debug("Password is: {}".format(password))
 
         # Creates a 'session client' to interact with OAuth2. This provides a client ID to our client that is used to
         # interact with the server.
@@ -150,18 +157,24 @@ def login():
         try:
             token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID,
                                       client_secret=OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
-            app.logger.debug(" *** Access Token Granted *** ")
-            app.logger.debug(" Values are: ")
+            #app.logger.debug(" *** Access Token Granted *** ")
+            #app.logger.debug(" Values are: ")
+            ons_env.logger.debug(" *** Access Token Granted *** ")
+            ons_env.logger.debug(" Values are: ")
+
             for key in token:
-                logger.debug("{} Value is: {}".format(key, token[key]))
+                #logger.debug("{} Value is: {}".format(key, token[key]))
+                ons_env.debug("{} Value is: {}".format(key, token[key]))
 
         except MissingTokenError as e:
-            logger.warning("Missing token error, error is: {}".format(e))
-            logger.warning("Failed validation")
+            #logger.warning("Missing token error, error is: {}".format(e))
+            #logger.warning("Failed validation")
+            ons_env.logger.warning("Missing token error, error is: {}".format(e))
+            ons_env.logger.warning("Failed validation")
             return render_template('sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
 
         except Exception as e:
-            logger.error("Error logging in: {}", str(e))
+            ons_env.logger.error("Error logging in: {}", str(e))
             return redirect(url_for('error_page'))
 
         data_dict_for_jwt_token = {
@@ -253,7 +266,7 @@ def reset_password():
     }
 
     if 'error' in request.args:
-        logger.debug(request.args.get("error"))
+        ons_env.logger.debug(request.args.get("error"))
 
     # data variables configured: {"error": <undefined, password-mismatch>}
     return render_template('reset-password.html', _theme='default', data=template_data)
@@ -295,7 +308,7 @@ def register():
     if request.method == 'POST' and form.validate():
 
         enrolment_code = request.form.get('enrolment_code')
-        logger.debug("Enrolment code is: {}".format(enrolment_code))
+        ons_env.logger.debug("Enrolment code is: {}".format(enrolment_code))
         # print("Enrolment code is: {}".format(enrolment_code))
 
         # case_id = ons_env.case_service.get_by_id(case_id)
@@ -319,7 +332,7 @@ def register():
 
             return redirect(url_for('register_confirm_organisation_survey', enrolment_code=coded_token))
         else:
-            logger.info('Invalid IAC code: {}'.format(enrolment_code))
+            ons_env.logger.info('Invalid IAC code: {}'.format(enrolment_code))
             template_data = {
                 "error": {
                     "type": "failed"
@@ -348,7 +361,7 @@ def register_confirm_organisation_survey():
     # Ensure we have got a valid enrolment code, otherwise go to the sign in page
     if not case_id:
         ons_env.logger.error('Confirm organisation screen - Case ID not available')
-        return redirect(url_for('login'))
+        return redirect(url_for('error_page'))
 
     # TODO More error handling e.g. cater for case not coming back from the case service, etc.
 
@@ -356,7 +369,7 @@ def register_confirm_organisation_survey():
     # Look up the case by case_id
     url = Config.API_GATEWAY_CASE_URL + case_id
     case = requests.get(url, verify=False)
-    logger.debug('Result => {} {} : {}'.format(case.status_code, case.reason, case.text))
+    ons_env.logger.debug('Result => {} {} : {}'.format(case.status_code, case.reason, case.text))
     case = json.loads(case.text)
 
     business_party_id = case['caseGroup']['partyId']
@@ -365,7 +378,7 @@ def register_confirm_organisation_survey():
     # Look up the organisation
     url = Config.API_GATEWAY_PARTY_URL + 'businesses/id/' + business_party_id
     party = requests.get(url, verify=False)
-    logger.debug('Result => {} {} : {}'.format(party.status_code, party.reason, party.text))
+    ons_env.logger.debug('Result => {} {} : {}'.format(party.status_code, party.reason, party.text))
     party = json.loads(party.text)
 
     # Get the organisation name
@@ -375,7 +388,7 @@ def register_confirm_organisation_survey():
     # Look up the collection exercise
     url = Config.API_GATEWAY_COLLECTION_EXERCISE_URL + collection_exercise_id
     collection_exercise = requests.get(url, verify=False)
-    logger.debug('Result => {} {} : {}'.format(collection_exercise.status_code, collection_exercise.reason,
+    ons_env.logger.debug('Result => {} {} : {}'.format(collection_exercise.status_code, collection_exercise.reason,
                                                collection_exercise.text))
     collection_exercise = json.loads(collection_exercise.text)
     survey_id = collection_exercise['surveyId']
@@ -383,7 +396,7 @@ def register_confirm_organisation_survey():
     # Look up the survey
     url = Config.API_GATEWAY_SURVEYS_URL + survey_id
     survey = requests.get(url, verify=False)
-    logger.debug('Result => {} {} : {}'.format(survey.status_code, survey.reason, survey.text))
+    ons_env.logger.debug('Result => {} {} : {}'.format(survey.status_code, survey.reason, survey.text))
     survey = json.loads(survey.text)
 
     # Get the survey name
@@ -427,11 +440,11 @@ def register_enter_your_details():
         password_confirm = request.form.get('password_confirm')
         phone_number = request.form.get('phone_number')
 
-        logger.debug("User name is: {} {}".format(first_name, last_name))
-        logger.debug("Email is: {}".format(email_address))
-        logger.debug("password is: {}".format(password))
-        logger.debug("Confirmation password is: {}".format(password_confirm))
-        logger.debug("phone number is: {}".format(phone_number))
+        ons_env.logger.debug("User name is: {} {}".format(first_name, last_name))
+        ons_env.logger.debug("Email is: {}".format(email_address))
+        ons_env.logger.debug("password is: {}".format(password))
+        ons_env.logger.debug("Confirmation password is: {}".format(password_confirm))
+        ons_env.logger.debug("phone number is: {}".format(phone_number))
 
         # Lets try and create this user on the OAuth2 server
         OAuth_payload = {"username": email_address, "password": password,
@@ -443,11 +456,11 @@ def register_enter_your_details():
         try:
             OAuthurl = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_ADMIN_ENDPOINT
             OAuth_response = requests.post(OAuthurl, auth=authorisation, headers=headers, data=OAuth_payload)
-            logger.debug("OAuth response is: {}".format(OAuth_response.content))
+            ons_env.logger.debug("OAuth response is: {}".format(OAuth_response.content))
 
             # json.loads(myResponse.content.decode('utf-8'))
             response_body = json.loads(OAuth_response.content.decode('utf-8'))
-            logger.debug("OAuth2 response is: {}".format(OAuth_response.status_code))
+            ons_env.logger.debug("OAuth2 response is: {}".format(OAuth_response.status_code))
 
             if OAuth_response.status_code == 401:
                 # This looks like the user is not authorized to use the system. it could be a duplicate email. check our
@@ -457,28 +470,28 @@ def register_enter_your_details():
                 # {"detail":"Duplicate user credentials"}
                 if response_body["detail"]:
                     if response_body["detail"] == 'Duplicate user credentials':
-                        logger.warning("We have duplicate user credentials")
+                        ons_env.logger.warning("We have duplicate user credentials")
                         errors = {'email_address': ['Please try a different email, this one is in use', ]}
                         return render_template('register.enter-your-details.html', _theme='default', form=form, errors=errors)
 
             # Deal with all other errors from OAuth2 registration
             if OAuth_response.status_code > 401:
                 OAuth_response.raise_for_status()  # A stop gap until we know all the correct error pages
-                logger.warning("OAuth error")
+                ons_env.logger.warning("OAuth error")
 
             # TODO A utility function to allow us to route to a page for 'user is registered already'.
             # We need a html page for this.
 
         except requests.exceptions.ConnectionError:
-            logger.critical("There seems to be no server listening on this connection?")
+            ons_env.logger.error("There seems to be no server listening on this connection?")
             # TODO A redirect to a page that helps the user
 
         except requests.exceptions.Timeout:
-            logger.critical("Timeout error. Is the OAuth Server overloaded?")
+            ons_env.logger.error("Timeout error. Is the OAuth Server overloaded?")
             # TODO A redirect to a page that helps the user
         except requests.exceptions.RequestException as e:
             # TODO catastrophic error. bail. A page that tells the user something horrid has happened and who to inform
-            logger.debug(e)
+            ons_env.logger.debug(e)
 
         # if OAuth_response.status_code == 401:
         #     # This looks like the user is not authorized to use the system. it could be a duplicate email. check our
@@ -516,15 +529,15 @@ def register_enter_your_details():
         # the transactions between the OAuth2 server
         oauth = OAuth2Session(client=client)
         token_url = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
-        logger.debug("Our Token Endpoint is: {}".format(token_url))
+        ons_env.logger.debug("Our Token Endpoint is: {}".format(token_url))
 
         try:
             token = oauth.fetch_token(token_url=token_url, client_id=OAuthConfig.RAS_FRONTSTAGE_CLIENT_ID,
                                       client_secret=OAuthConfig.RAS_FRONTSTAGE_CLIENT_SECRET)
-            app.logger.debug(" *** Access Token Granted *** ")
-            app.logger.debug(" Values are: ")
+            ons_env.logger.debug(" *** Access Token Granted *** ")
+            ons_env.logger.debug(" Values are: ")
             for key in token:
-                logger.debug("{} Value is: {}".format(key, token[key]))
+                ons_env.logger.debug("{} Value is: {}".format(key, token[key]))
 
             # TODO Check that this token has not expired. This should never happen, as we just got this token to
             # register the user
@@ -543,12 +556,12 @@ def register_enter_your_details():
 
         except JWTError:
             # TODO Provide proper logging
-            logger.warning('JWT scope could not be validated.')
+            ons_env.logger.warning('JWT scope could not be validated.')
             return abort(500, '{"message":"There was a problem with the Authentication service please contact a member of the ONS staff"}')
 
         except MissingTokenError as e:
-            app.logger.warning("Missing token error, error is: {}".format(e))
-            app.logger.warning("Failed validation")
+            ons_env.logger.warning("Missing token error, error is: {}".format(e))
+            ons_env.logger.warning("Failed validation")
 
             return abort(500, '{"message":"There was a problem with the Authentication service please contact a member of the ONS staff"}')
 
@@ -565,11 +578,11 @@ def register_enter_your_details():
         headers = {'authorization': encoded_jwt_token, 'content-type': 'application/json'}
 
         party_service_url = Config.API_GATEWAY_PARTY_URL + 'respondents'
-        app.logger.debug("Party service URL is: {}".format(party_service_url))
+        ons_env.logger.debug("Party service URL is: {}".format(party_service_url))
 
         try:
             register_user = requests.post(party_service_url, headers=headers, data=json.dumps(registration_data))
-            logger.debug("Response from party service is: {}".format(register_user.content))
+            ons_env.logger.debug("Response from party service is: {}".format(register_user.content))
 
             if register_user.ok:
                 return render_template('register.almost-done.html', _theme='default', email=email_address)
@@ -577,13 +590,13 @@ def register_enter_your_details():
                 return abort(500, '{"message":"There was a problem with the registration service, please contact a member of the ONS staff"}')
 
         except ConnectionError:
-            logger.critical("We could not connect to the party service")
+            ons_env.logger.error("We could not connect to the party service")
             return abort(500, '{"message":"There was a problem establishing a connection with an ONS micro service."}')
         # TODO We need to add an exception timeout catch and handle this type of error
 
     else:
-        logger.debug("either this is not a POST, or form validation failed")
-        logger.warning("Form failed validation, errors are: {}".format(form.errors))
+        ons_env.logger.debug("either this is not a POST, or form validation failed")
+        ons_env.logger.warning("Form failed validation, errors are: {}".format(form.errors))
 
     return render_template('register.enter-your-details.html', _theme='default', form=form, errors=form.errors)
 

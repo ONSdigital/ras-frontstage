@@ -1,16 +1,19 @@
 <div class="container">
     <header class="header">
+
         <div class="logo header__logo">
-            <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Office for National Statistics" class="logo__img" />
+            <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Office for National Statistics"
+                 class="logo__img"/>
         </div>
-        {% if session.jwt_token %}
-            <a href="{{ url_for('logout') }}">Sign out</a>
+
+        {% if 'authorization' in request.cookies %}
+        <a href="{{ url_for('logout') }}">Sign out</a>
         {% endif %}
     </header>
 </div>
 <div class="bar " role="banner">
     <div class="bar__inner container">
-        <div class="bar__title venus">ONS Business Surveys</div>&nbsp;
+        <div class="ons-application-title bar__title venus">ONS Business Surveys</div>&nbsp;
         <div class="badge badge--amber u-mr-xs">BETA</div>
     </div>
 </div>

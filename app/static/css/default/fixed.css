@@ -3490,6 +3490,11 @@ dd.grid__col {
   margin-left: 0;
 }
 
+.ons-application-title {
+  margin-right: 16px;
+  margin-right: 1rem;
+}
+
 input[type=file]::-webkit-file-upload-button {
   font-size: 20px;
   font-size: 1.25rem;
@@ -3517,11 +3522,6 @@ input[type=file]::-webkit-file-upload-button:hover {
   cursor: pointer;
 }
 
-input[type=file]:focus,
-input[type=file]::-webkit-file-upload-button:focus {
-  outline: none;
-}
-
 @media only screen and (min-width: 650px) and (max-width: 767px) {
   input[type=file] {
     width: 80%;
@@ -3539,11 +3539,11 @@ input[type=file]::-webkit-file-upload-button:focus {
 }
 
 .details__link:before {
-  background-image: url("/static/s/img/icons/guidance.svg");
+  background-image: url("/static/images/guidance.svg");
 }
 
 .details__link:focus:before {
-  background-image: url("/static/s/img/icons/guidance-white.svg");
+  background-image: url("/static/images/guidance-white.svg");
 }
 
 .input--checkbox {
@@ -3635,6 +3635,152 @@ input[type=file]::-webkit-file-upload-button:focus {
   .pluto {
     font-size: 0.77778rem;
   }
+}
+
+.guidance {
+  margin: 12.6px 0 0 -1.8px;
+  margin: 11.2px 0 0 -1.6px;
+  margin: 0.7rem 0 0 -0.1rem;
+}
+
+.guidance__link {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+  text-decoration: underline;
+  padding: 3.6px 9px 3.6px 3.6px;
+  padding: 3.2px 8px 3.2px 3.2px;
+  padding: 0.2rem 0.5rem 0.2rem 0.2rem;
+  *display: inline;
+  *zoom: 1;
+  *display: inline;
+  *zoom: 1;
+}
+
+.guidance__link span {
+  display: inline-block;
+  vertical-align: middle;
+  *display: inline;
+  *zoom: 1;
+  *display: inline;
+  *zoom: 1;
+}
+
+.guidance__link:before {
+  -webkit-transition: -webkit-transform 300ms ease-in-out;
+  transition: -webkit-transform 300ms ease-in-out;
+  transition: transform 300ms ease-in-out;
+  transition: transform 300ms ease-in-out, -webkit-transform 300ms ease-in-out;
+  margin-right: 5.399px;
+  margin-right: 4.8px;
+  margin-right: 0.3rem;
+  speak: none;
+  content: "";
+  background: url("/static/images/guidance.svg") no-repeat center center;
+  background-size: auto;
+  text-align: center;
+  width: 18px;
+  width: 16px;
+  width: 1rem;
+  height: 18px;
+  height: 16px;
+  height: 1rem;
+  position: relative;
+  left: -1.8px;
+  left: -1.6px;
+  left: -0.1rem;
+  vertical-align: middle;
+  display: inline-block;
+  *display: inline;
+  *zoom: 1;
+  *display: inline;
+  *zoom: 1;
+}
+
+.guidance__link:focus {
+  outline: none;
+}
+
+.guidance__link:focus:before {
+  background: url("/static/images/guidance-white.svg") no-repeat center center;
+}
+
+.is-expanded .guidance__link:before {
+  -webkit-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+
+.no-js .guidance__link {
+  display: none;
+}
+
+.guidance__main {
+  overflow: hidden;
+  width: 100%;
+  border-radius: 3px;
+  opacity: 0;
+  -webkit-transition: all 0;
+  transition: all 0;
+  max-height: 0;
+  margin-left: 9px;
+  margin-left: 8px;
+  margin-left: 0.5rem;
+}
+
+.no-js .guidance__main,
+.is-expanded .guidance__main {
+  max-height: 10000em;
+  height: auto;
+  opacity: 1;
+  -webkit-transition: opacity 300ms ease-out, max-height 300ms ease-out;
+  transition: opacity 300ms ease-out, max-height 300ms ease-out;
+}
+
+.guidance__content {
+  padding: 0;
+  width: 100%;
+  display: table;
+  table-layout: fixed;
+  margin-top: 18px;
+  margin-top: 16px;
+  margin-top: 1rem;
+  border-left: 2px solid #999;
+  padding-left: 18px;
+  padding-left: 16px;
+  padding-left: 1rem;
+  margin-left: 1px;
+}
+
+@media only screen and (min-width: 500px) {
+  .guidance__content div {
+    display: table-cell;
+  }
+  .guidance__content div:first-of-type {
+    padding-left: 0.25rem;
+    padding-right: 0.5rem;
+  }
+  .guidance__content div:last-of-type {
+    padding-left: 1rem;
+  }
+}
+
+.guidance__content div ul {
+  padding-left: 18px;
+  padding-left: 16px;
+  padding-left: 1rem;
+}
+
+@media only screen and (min-width: 500px) {
+  .guidance__content div ul {
+    margin-bottom: 0;
+  }
+}
+
+.lt-ie8 .guidance__content div ul {
+  margin-bottom: 18px;
+  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
 
 .navigation-tabs {

@@ -9,12 +9,13 @@ import os
 from datetime import datetime
 from functools import wraps, update_wrapper
 import requests
-from flask import Flask, make_response, render_template, request, flash, redirect, url_for, session, abort
+from flask import Flask, make_response, render_template, request, flash, redirect, url_for, abort #session, abort
 from jose import JWTError
 from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError
 from requests import ConnectionError
 from requests_oauthlib import OAuth2Session
 from structlog import wrap_logger
+from ons_ras_common import ons_env
 
 from app.views.secure_messaging import secure_message_bp
 from app.views.surveys import surveys_bp
@@ -24,7 +25,7 @@ from app.filters.file_size_filter import file_size_filter
 
 from app.config import OAuthConfig, Config, TestingConfig, ProductionConfig
 from app.jwt import encode
-from app.models import LoginForm, RegistrationForm, ActivationCodeForm, db
+from app.models import LoginForm, RegistrationForm, EnrolmentCodeForm, db
 from app.logger_config import logger_initial_config
 
 app = Flask(__name__)
@@ -72,17 +73,17 @@ def hello_world():
 
 @app.route('/error', methods=['GET', 'POST'])
 def error_page():
-    session.pop('jwt_token', None)
-    return render_template('error.html', _theme='default', data={"error": {"type": "failed"}})
+    response = make_response(render_template('error.html', _theme='default', data={"error": {"type": "failed"}}))
+    response.set_cookie('authorization', value='', expires=0)
+    return response
 
 
 # ===== Log out =====
 @app.route('/logout')
 def logout():
-    if 'jwt_token' in session:
-        session.pop('jwt_token')
-
-    return redirect(url_for('login'))
+    response = make_response(redirect(url_for('login')))
+    response.set_cookie('authorization', value='', expires=0)
+    return response
 
 
 # ===== Sign in using OAuth2 =====
@@ -116,6 +117,8 @@ def login():
 
     """
     form = LoginForm(request.form)
+
+    account_activated = request.args.get('account_activated', None)
 
     if request.method == 'POST' and form.validate():
         username = request.form.get('username')
@@ -161,14 +164,16 @@ def login():
         }
 
         encoded_jwt_token = encode(data_dict_for_jwt_token)
-        session['jwt_token'] = encoded_jwt_token
-        return redirect(url_for('surveys_bp.logged_in'))
+        response = make_response(redirect(url_for('surveys_bp.logged_in')))
+        response.set_cookie('authorization', value=encoded_jwt_token)
+        return response
 
     template_data = {
         "error": {
             "type": request.args.get("error"),
             "logged_in": "False"
-        }
+        },
+        'account_activated': account_activated
     }
 
     return render_template('sign-in.html', _theme='default', form=form, data=template_data)
@@ -177,9 +182,6 @@ def login():
 @app.route('/sign-in/error', methods=['GET'])
 def sign_in_error():
     """Handles any sign in errors"""
-
-    # password = request.form.get('pass')
-    # password = request.form.get('emailaddress')
 
     template_data = {
         "error": {
@@ -251,61 +253,174 @@ def reset_password_confirmation():
     return render('reset-password.confirmation.html')
 
 
+def validate_enrolment_code(enrolment_code):
+    case_id = None
+
+    # Build the URL
+    url = Config.API_GATEWAY_IAC_URL + '{}'.format(enrolment_code)
+    logger.debug('Validate IAC URL is: {}'.format(url))
+
+    # Call the API Gateway Service to validate the enrolment code
+    result = requests.get(url, verify=False)
+    logger.debug('Result => {} {} : {}'.format(result.status_code, result.reason, result.text))
+
+    if result.status_code == 200 and json.loads(result.text)['active']:
+        case_id = json.loads(result.text)['caseId']
+
+    return case_id
+
+
 # ===== Registration =====
 @app.route('/create-account/', methods=['GET', 'POST'])
 def register():
     """Handles user registration"""
 
-    form = ActivationCodeForm(request.form)
+    form = EnrolmentCodeForm(request.form)
+
+    template_data = {
+        "error": {}
+    }
 
     if request.method == 'POST' and form.validate():
-        activation_code = request.form.get('activation_code')
-        logger.debug("Activation code is: {}".format(activation_code))
 
-        # TODO Enrolment logic
-        return redirect(url_for('register_confirm_organisation_survey'))
+        enrolment_code = request.form.get('enrolment_code')
+        logger.debug("Enrolment code is: {}".format(enrolment_code))
+
+        case_id = validate_enrolment_code(enrolment_code)
+
+        if case_id:
+
+            # Post an authentication case event to the case service
+            ons_env.case_service.post_event(case_id,
+                                            category='ACCESS_CODE_AUTHENTICATION_ATTEMPT',
+                                            created_by='TODO',
+                                            party_id='db036fd7-ce17-40c2-a8fc-932e7c228397',
+                                            description='Enrolment code entered "{}"'.format(enrolment_code))
+
+            # Encrypt the enrolment code
+            coded_token = ons_env.crypt.encrypt(enrolment_code.encode()).decode()
+
+            return redirect(url_for('register_confirm_organisation_survey', enrolment_code=coded_token))
+        else:
+            logger.info('Invalid IAC code: {}'.format(enrolment_code))
+            template_data = {
+                "error": {
+                    "type": "failed"
+                }
+            }
 
     if form.errors:
         flash(form.errors, 'danger')
 
-    template_data = {
-        "error": {
-            "type": request.args.get("error")
-        }
-    }
-
-    return render_template('register.html', _theme='default', form=form, data=template_data)
+    return render_template('register.enter-enrolment-code.html', _theme='default', form=form, data=template_data)
 
 
-@app.route('/create-account/confirm-organisation-survey/')
+@app.route('/create-account/confirm-organisation-survey/', methods=['GET', 'POST'])
 def register_confirm_organisation_survey():
-    return render('register.confirm-organisation-survey.html')
+
+    encrypted_enrolment_code = request.args.get('enrolment_code', None)
+    if not encrypted_enrolment_code:
+        encrypted_enrolment_code = request.form.get('enrolment_code')
+
+    # Decrypt the enrolment code if we have one
+    if encrypted_enrolment_code:
+        decrypted_enrolment_code = ons_env.crypt.decrypt(encrypted_enrolment_code.encode()).decode()
+    else:
+        ons_env.logger.error('Confirm organisation screen - Enrolment code not specified')
+        return redirect(url_for('error_page'))
+
+    case_id = validate_enrolment_code(decrypted_enrolment_code)
+
+    # Ensure we have got a valid enrolment code, otherwise go to the sign in page
+    if not case_id:
+        ons_env.logger.error('Confirm organisation screen - Case ID not available')
+        return redirect(url_for('error_page'))
+
+    # TODO More error handling e.g. cater for case not coming back from the case service, etc.
+
+    # TODO Use ras-common for this lookup
+    # Look up the case by case_id
+    url = Config.API_GATEWAY_CASE_URL + case_id
+    case = requests.get(url, verify=False)
+    logger.debug('Result => {} {} : {}'.format(case.status_code, case.reason, case.text))
+    case = json.loads(case.text)
+
+    business_party_id = case['caseGroup']['partyId']
+    collection_exercise_id = case['caseGroup']['collectionExerciseId']
+
+    # Look up the organisation
+    url = Config.API_GATEWAY_PARTY_URL + 'businesses/id/' + business_party_id
+    party = requests.get(url, verify=False)
+    logger.debug('Result => {} {} : {}'.format(party.status_code, party.reason, party.text))
+    party = json.loads(party.text)
+
+    # Get the organisation name
+    organisation_name = party['name']
+
+    # TODO Use ras-common for this lookup
+    # Look up the collection exercise
+    url = Config.API_GATEWAY_COLLECTION_EXERCISE_URL + collection_exercise_id
+    collection_exercise = requests.get(url, verify=False)
+    logger.debug('Result => {} {} : {}'.format(collection_exercise.status_code, collection_exercise.reason,
+                                               collection_exercise.text))
+    collection_exercise = json.loads(collection_exercise.text)
+    survey_id = collection_exercise['surveyId']
+
+    # Look up the survey
+    url = Config.API_GATEWAY_SURVEYS_URL + survey_id
+    survey = requests.get(url, verify=False)
+    logger.debug('Result => {} {} : {}'.format(survey.status_code, survey.reason, survey.text))
+    survey = json.loads(survey.text)
+
+    # Get the survey name
+    survey_name = survey['longName']
+
+    if request.method == 'POST':
+        return redirect(url_for('register_enter_your_details', enrolment_code=encrypted_enrolment_code,
+                                organisation_name=organisation_name, survey_name=survey_name))
+    else:
+        return render_template('register.confirm-organisation-survey.html', _theme='default',
+                               enrolment_code=decrypted_enrolment_code,
+                               encrypted_enrolment_code=encrypted_enrolment_code, organisation_name=organisation_name,
+                               survey_name=survey_name)
 
 
 # This take all the user credentials and then creates an account on the OAuth2 server
-@app.route('/create-account/enter-account-details/', methods=['GET', 'POST'])
+@app.route('/create-account/enter-account-details', methods=['GET', 'POST'])
 def register_enter_your_details():
+    encrypted_enrolment_code = request.args.get('enrolment_code', None)
+    if not encrypted_enrolment_code:
+        encrypted_enrolment_code = request.form.get('enrolment_code', None)
 
-    form = RegistrationForm(request.form)
+    # Decrypt the enrolment_code if we have one
+    if encrypted_enrolment_code:
+        decrypted_enrolment_code = ons_env.crypt.decrypt(encrypted_enrolment_code.encode()).decode()
+    else:
+        decrypted_enrolment_code = None
 
-    if request.method == 'POST' and form.validate():
+    # Ensure we have got a valid enrolment code, otherwise go to the sign in page
+    if not decrypted_enrolment_code or not validate_enrolment_code(decrypted_enrolment_code):
+        logger.error('Enter Account Details page - invalid enrolment code: ' + str(decrypted_enrolment_code))
+        return redirect(url_for('error_page'))
+
+    form = RegistrationForm(request.values, enrolment_code=encrypted_enrolment_code)
+
+    if request.method == 'POST' \
+            and 'create-account/enter-account-details' in request.headers['referer'] \
+            and form.validate():
 
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
         email_address = request.form.get('email_address')
-        email_address_confirm = request.form.get('email_address_confirm')
         password = request.form.get('password')
         password_confirm = request.form.get('password_confirm')
         phone_number = request.form.get('phone_number')
-        terms_and_conditions = request.form.get('terms_and_conditions')
 
         logger.debug("User name is: {} {}".format(first_name, last_name))
         logger.debug("Email is: {}".format(email_address))
-        logger.debug("Confirmation email is: {}".format(email_address_confirm))
         logger.debug("password is: {}".format(password))
         logger.debug("Confirmation password is: {}".format(password_confirm))
         logger.debug("phone number is: {}".format(phone_number))
-        logger.debug("T's&C's is: {}".format(terms_and_conditions))
 
         # Lets try and create this user on the OAuth2 server
         OAuth_payload = {
@@ -368,7 +483,7 @@ def register_enter_your_details():
         #     if response_body["detail"]:
         #         if response_body["detail"] == 'Duplicate user credentials':
         #             logger.warning("We have duplicate user credentials2")
-        #             errors = {'email_address_confirm': ['Please try a different email, this one is in use', ]}
+        #             errors = {'email_address': ['Please try a different email, this one is in use', ]}
         #             return render_template('register.enter-your-details.html', _theme='default', form=form, errors=errors)
         #
         # # Deal with all other errors from OAuth2 registration
@@ -475,13 +590,54 @@ def register_almost_done():
     return render('register.almost-done.html')
 
 
-@app.route('/create-account/activate-account/', methods=['GET', 'POST'])
+@app.route('/activate-account', methods=['GET'])
 def register_activate_account():
-    if request.method == 'POST':
-        # TODO call back end service to activate the account?
-        return redirect(url_for('login'))
+    token = request.args.get('t', None)
+
+    # If the token was not provided then redirect off to the error page
+    if not token:
+        logger.warning('Missing email activation token')
+        return redirect(url_for('error_page'))
+
+    # Call the Party service to try to activate the account corresponding to the token that was supplied
+    url = Config.API_GATEWAY_PARTY_URL + 'emailverification/' + token
+    result = requests.post(url)
+    logger.debug('Activate account - response from party service is: {}'.format(result.content))
+
+    if result.status_code == 200:
+        json_response = json.loads(result.text)
+
+        if json_response.get('active'):
+            # Successful account activation therefore redirect off to the login screen
+            return redirect(url_for('login', account_activated=True))
+        else:
+            # Try to get the user id
+            user_id = json_response.get('userId')
+            if user_id:
+                # Unable to activate account therefore give the user the option to send out a new email token
+                logger.debug('Expired activation token: ' + str(token))
+                return redirect(url_for('register_resend_email', user_id=user_id))
+            else:
+                logger.error('Unable to determine user for activation token: ' + str(token))
+                return redirect(url_for('error_page'))
     else:
-        return render('register.activate-account.html')
+        # If the token was not recognised, we don't know who the user is so redirect them off to the error page
+        logger.warning('Unrecognised email activation token: ' + str(token) +
+                       ' Response code: ' + str(result.status_code))
+        return redirect(url_for('error_page'))
+
+
+@app.route('/create-account/resend-email', methods=['GET'])
+def register_resend_email():
+    user_id = request.args.get('user_id', None)
+    return render_template('register.link-expired.html', _theme='default', user_id=user_id)
+
+
+@app.route('/create-account/email-resent', methods=['GET'])
+def register_email_resent():
+    # TODO Call the service that will request a new email to be sent out
+
+    return render('register.email-resent.html')
 
 
 # Disable cache for development

@@ -27,6 +27,7 @@
 
         <h1 class="saturn">Enter your account details</h1>
         {{ form.csrf_token}}
+        {{ form.enrolment_code }}
 
         <div class="section">
             <h2 class="section__title neptune">Your name</h2>
@@ -42,13 +43,8 @@
             </div>
         </div>
 
-        {%  if errors.email_address_confirm or errors.email_address %}
+        {%  if errors.email_address %}
         <div class="panel panel--error">
-            {% for email_error in errors.email_address_confirm %}
-                <div class="panel__header">
-                    <h1 class="panel__title venus">{{ email_error }}</h1>
-                </div>
-            {% endfor %}
             {% for email_error in errors.email_address %}
                 <div class="panel__header">
                     <h1 class="panel__title venus">{{ email_error }}</h1>
@@ -63,12 +59,6 @@
                 <div class="field">
                     {{ form.email_address.label(class_='label') }}
                     {{ form.email_address(class_='input input--text input-type__input') }}
-                </div>
-                <br />
-
-                <div class="field">
-                    {{ form.email_address_confirm.label(class_='label') }}
-                    {{ form.email_address_confirm(class_='input input--text input-type__input') }}
                 </div>
             </fieldset>
         </div>

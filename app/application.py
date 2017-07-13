@@ -73,21 +73,14 @@ def hello_world():
 
 @app.route('/error', methods=['GET', 'POST'])
 def error_page():
-    #
-    #session.pop('jwt_token', None)
     response = make_response(render_template('error.html', _theme='default', data={"error": {"type": "failed"}}))
     response.set_cookie('authorization', value='', expires=0)
     return response
-
-#    return render_template('error.html', _theme='default', data={"error": {"type": "failed"}})
 
 
 # ===== Log out =====
 @app.route('/logout')
 def logout():
-    # No more sessions!
-    #if 'jwt_token' in session:
-    #    session.pop('jwt_token')
     response = make_response(redirect(url_for('login')))
     response.set_cookie('authorization', value='', expires=0)
     return response
@@ -171,13 +164,9 @@ def login():
             "username": username
         }
         encoded_jwt_token = encode(data_dict_for_jwt_token)
-        # No more sessions!
-        #session['jwt_token'] = encoded_jwt_token
         response = make_response(redirect(url_for('surveys_bp.logged_in')))
         response.set_cookie('authorization', value=encoded_jwt_token)
         return response
-
-        #return redirect(url_for('surveys_bp.logged_in'))
 
     template_data = {
         "error": {
@@ -193,9 +182,6 @@ def login():
 @app.route('/sign-in/error', methods=['GET'])
 def sign_in_error():
     """Handles any sign in errors"""
-
-    # password = request.form.get('pass')
-    # password = request.form.get('emailaddress')
 
     template_data = {
         "error": {
@@ -329,23 +315,26 @@ def register():
     return render_template('register.enter-enrolment-code.html', _theme='default', form=form, data=template_data)
 
 
-@app.route('/create-account/confirm-organisation-survey/')
+@app.route('/create-account/confirm-organisation-survey/', methods=['GET', 'POST'])
 def register_confirm_organisation_survey():
+
     encrypted_enrolment_code = request.args.get('enrolment_code', None)
+    if not encrypted_enrolment_code:
+        encrypted_enrolment_code = request.form.get('enrolment_code')
 
     # Decrypt the enrolment code if we have one
     if encrypted_enrolment_code:
-        enrolment_code = ons_env.crypt.decrypt(encrypted_enrolment_code.encode()).decode()
+        decrypted_enrolment_code = ons_env.crypt.decrypt(encrypted_enrolment_code.encode()).decode()
     else:
         ons_env.logger.error('Confirm organisation screen - Enrolment code not specified')
-        return redirect(url_for('login'))
+        return redirect(url_for('error_page'))
 
-    case_id = validate_enrolment_code(enrolment_code)
+    case_id = validate_enrolment_code(decrypted_enrolment_code)
 
     # Ensure we have got a valid enrolment code, otherwise go to the sign in page
     if not case_id:
         ons_env.logger.error('Confirm organisation screen - Case ID not available')
-        return redirect(url_for('login'))
+        return redirect(url_for('error_page'))
 
     # TODO More error handling e.g. cater for case not coming back from the case service, etc.
 
@@ -389,29 +378,32 @@ def register_confirm_organisation_survey():
     if request.method == 'POST':
         return redirect(url_for('register_enter_your_details', enrolment_code=encrypted_enrolment_code,
                                 organisation_name=organisation_name, survey_name=survey_name))
-
-    return render_template('register.confirm-organisation-survey.html', _theme='default', enrolment_code=enrolment_code,
-                           encrypted_enrolment_code=encrypted_enrolment_code, organisation_name=organisation_name,
-                           survey_name=survey_name)
+    else:
+        return render_template('register.confirm-organisation-survey.html', _theme='default',
+                               enrolment_code=decrypted_enrolment_code,
+                               encrypted_enrolment_code=encrypted_enrolment_code, organisation_name=organisation_name,
+                               survey_name=survey_name)
 
 
 # This take all the user credentials and then creates an account on the OAuth2 server
 @app.route('/create-account/enter-account-details', methods=['GET', 'POST'])
 def register_enter_your_details():
-
-    enrolment_code = request.args.get('enrolment_code', None)
-    if not enrolment_code:
-        enrolment_code = request.form.get('enrolment_code')
-
-    form = RegistrationForm(request.values, enrolment_code=enrolment_code)
+    encrypted_enrolment_code = request.args.get('enrolment_code', None)
+    if not encrypted_enrolment_code:
+        encrypted_enrolment_code = request.form.get('enrolment_code', None)
 
     # Decrypt the enrolment_code if we have one
-    if enrolment_code:
-        enrolment_code = ons_env.crypt.decrypt(enrolment_code.encode()).decode()
+    if encrypted_enrolment_code:
+        decrypted_enrolment_code = ons_env.crypt.decrypt(encrypted_enrolment_code.encode()).decode()
+    else:
+        decrypted_enrolment_code = None
 
     # Ensure we have got a valid enrolment code, otherwise go to the sign in page
-    if not validate_enrolment_code(enrolment_code):
-        return redirect(url_for('login'))
+    if not decrypted_enrolment_code or not validate_enrolment_code(decrypted_enrolment_code):
+        logger.error('Enter Account Details page - invalid enrolment code: ' + str(decrypted_enrolment_code))
+        return redirect(url_for('error_page'))
+
+    form = RegistrationForm(request.values, enrolment_code=encrypted_enrolment_code)
 
     if request.method == 'POST' \
             and 'create-account/enter-account-details' in request.headers['referer'] \

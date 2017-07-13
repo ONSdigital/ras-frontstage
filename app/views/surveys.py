@@ -38,9 +38,10 @@ def logged_in(session):
 
     # Filters the data array to remove surveys that shouldn't appear on the To Do page
     status_filter = {'status_filter': '["not started", "in progress"]'}
+
     # Get the survey data (To Do survey type)
     data_array = build_survey_data(status_filter)
-    # TODO: pass in data={"error": {"type": "success"}, "user_id": userName} to get the user name working ?
+
     return render_template('surveys-todo.html', _theme='default', data_array=data_array)
 
 

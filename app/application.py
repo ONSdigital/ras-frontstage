@@ -317,7 +317,7 @@ def register_enter_your_details():
 
         headers = {'content-type': 'application/x-www-form-urlencoded'}
 
-        authorisation = (app.config['RAS_FRONTSTAGE_CLIENT_ID'], app.config['RAS_FRONTSTAGE_CLIENT_SECRET'])
+        authorisation = {app.config['RAS_FRONTSTAGE_CLIENT_ID']: app.config['RAS_FRONTSTAGE_CLIENT_SECRET']}
 
         # try:
         #     OAuthurl = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_ADMIN_ENDPOINT']
@@ -436,7 +436,7 @@ def register_enter_your_details():
             'emailAddress': email_address,
             'firstName': first_name,
             'lastName': last_name,
-            'password':password,
+            'password': password,
             'telephone': phone_number,
             'enrolmentCode':"012345",
             'status': 'CREATED'
@@ -454,6 +454,8 @@ def register_enter_your_details():
             if register_user.ok:
                 return render_template('register.almost-done.html', _theme='default', email=email_address)
             else:
+                # TODO If the party service does not work we should render a nice ONS page and let the user know that
+                # part of the system is not working. We should not display the 500 error.
                 return abort(500, '{"message":"There was a problem with the registration service, please contact a member of the ONS staff"}')
 
         except ConnectionError:

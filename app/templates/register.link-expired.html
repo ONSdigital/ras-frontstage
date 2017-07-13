@@ -1,0 +1,14 @@
+{% import 'partials/section.html' as section %}
+{% extends "layouts/_twocol.html" %}
+
+{% block page_title %}Link Expired{% endblock %}
+
+{% block main %}
+
+<h1 class="saturn">Your link has expired</h1>
+
+<div>
+    <a href="/create-account/email-resent?user_id={{ user_id }}">Request another email with a new link</a>.
+</div>
+
+{% endblock main %}

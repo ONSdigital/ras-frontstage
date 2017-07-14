@@ -1,3 +1,5 @@
+#!/bin/bash
+
 function display_result {
   RESULT=$1
   EXIT_STATUS=$2
@@ -11,5 +13,12 @@ function display_result {
   fi
 }
 
-flake8 --count
+if ! [ -a .build ] ; then
+	echo "Creating Virtual Environment"
+	virtualenv .build -p python3
+fi
+source .build/bin/activate
+
+flake8 app/**/*.py --max-complexity 10 --count
+
 display_result $? 1 "Flake 8 code style check"

@@ -1,12 +1,10 @@
 import json
 import logging
 import requests
-from flask import Blueprint, render_template, request, redirect, url_for #, session
-from jose import JWTError
+from flask import Blueprint, render_template, request
 from structlog import wrap_logger
 from ons_ras_common.ons_decorators import jwt_session
 from app.config import Config
-from app.jwt import decode
 
 logger = wrap_logger(logging.getLogger(__name__))
 surveys_bp = Blueprint('surveys_bp', __name__, static_folder='static', template_folder='templates')
@@ -121,6 +119,7 @@ def upload_survey(session):
         error_info = json.loads(result.text)
         return render_template('surveys-upload-failure.html',  _theme='default', error_info=error_info,
                                case_id=case_id)
+
 
 @surveys_bp.route('/surveys-upload-failure', methods=['GET'])
 def surveys_upload_failure():

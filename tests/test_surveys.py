@@ -1,6 +1,6 @@
 import unittest
 from app.application import app
-from app.config import OAuthConfig, Config
+from app.config import Config, TestingConfig
 import json
 import requests_mock
 
@@ -44,7 +44,7 @@ class TestSurveys(unittest.TestCase):
         """Test we display survey data after signing in correctly"""
 
         # Build mock URL's which are used to provide application data
-        url_get_token = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
+        url_get_token = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_TOKEN_ENDPOINT
         url_get_survey_data = Config.API_GATEWAY_AGGREGATED_SURVEYS_URL + 'todo/' + party_id
 
         mock_object.post(url_get_token, status_code=200, json=returned_token)
@@ -89,7 +89,7 @@ class TestSurveys(unittest.TestCase):
         """Test we display survey data after signing in correctly"""
 
         # Build mock URL's which are used to provide application data
-        url_get_token = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
+        url_get_token = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_TOKEN_ENDPOINT
         url_get_survey_data = Config.API_GATEWAY_AGGREGATED_SURVEYS_URL + 'todo/' + party_id
         url_get_collection_instrument_data = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'collectioninstrument/id/' + collection_instrument_id
 

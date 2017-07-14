@@ -1,7 +1,7 @@
 import unittest
 from app.application import app
 from app.jwt import encode, decode
-from app.config import OAuthConfig, Config
+from app.config import TestingConfig, Config
 import json
 import requests_mock
 
@@ -102,7 +102,7 @@ class TestApplication(unittest.TestCase):
     def test_sign_in_wrong_details(self, mock_object):
         """Test incorrect detail message is returned with invalid details entered"""
         # data = {'refresh_token': '007', 'access_token': '007', 'scope': '[foo,bar]', 'expires_at': 'today', 'username': 'nherriot' }
-        url = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
+        url = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_TOKEN_ENDPOINT
 
         # Here we place a listener on this URL. This is the URL of the OAuth2 server. We send a 401 to reject the request
         # from the ras_frontstage to get a token for this user. See application.py login(). And the call to oauth.fetch_token
@@ -125,8 +125,7 @@ class TestApplication(unittest.TestCase):
         """Test we display survey data after signing in correctly"""
 
         # Build URL's which is used to talk to the OAuth2 server
-        # url_sign_in_user = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_ADMIN_ENDPOINT
-        url_get_token = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
+        url_get_token = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_TOKEN_ENDPOINT
         url_get_survey_data = Config.API_GATEWAY_AGGREGATED_SURVEYS_URL + 'todo/' + party_id
 
         # Here we place a listener on the URL's The flow of events are:

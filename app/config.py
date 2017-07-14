@@ -23,6 +23,13 @@ import os
 # export API_GATEWAY_PARTY_URL=http://localhost:8050/api/party-api/
 # export API_GATEWAY_IAC_URL=http://localhost:8050/api/iacs/
 
+# export ONS_OAUTH_SERVER=ras-django-int.apps.devtest.onsclofo.uk
+# Log is as testuser@email.com , password
+# OR
+# Log in using your account on:
+# export ONS_OAUTH_SERVER=ons-oauth2.cfapps.io
+
+
 # Default values
 if "APP_SETTINGS" not in os.environ:
     os.environ["APP_SETTINGS"] = "config.Config"
@@ -109,8 +116,8 @@ class TestingConfig(Config):
     ONS_TOKEN_ENDPOINT = os.environ.get('ONS_TOKEN_ENDPOINT', '/api/v1/tokens/')
     ONS_ADMIN_ENDPOINT = os.environ.get('ONS_ADMIN_ENDPOINT', '/api/account/create')
 
-    # Local version of Party Service:
-    PARTY_SERVICE_URL = os.environ.get('PARTY_SERVICE_URL', 'http://localhost:5201/party-api/v1/')
+    API_GATEWAY_PARTY_URL = os.environ.get('API_GATEWAY_PARTY_URL',
+                                           'http://localhost:5201/party-api/v1/')
 
     # Local version of Collection Instrument Service:
     COLLECTION_INSTRUMENT_URL = os.environ.get('COLLECTION_INSTRUMENT_URL', 'https://api-dev.apps.mvp.onsclofo.uk:443/collection-instrument-api/1.0.2/')

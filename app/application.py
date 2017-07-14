@@ -141,6 +141,7 @@ def login():
         try:
             token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=app.config['RAS_FRONTSTAGE_CLIENT_ID'],
                                       client_secret=app.config['RAS_FRONTSTAGE_CLIENT_SECRET'])
+
             app.logger.debug(" *** Access Token Granted *** ")
             app.logger.debug(" Values are: ")
             for key in token:
@@ -559,23 +560,23 @@ def register_enter_your_details():
 
         headers = {'authorization': encoded_jwt_token, 'content-type': 'application/json'}
 
-        party_service_url = app.config['PARTY_SERVICE_URL'] + 'respondents'
+        party_service_url = app.config['API_GATEWAY_PARTY_URL'] + 'respondents'
         app.logger.debug("Party service URL is: {}".format(party_service_url))
 
         try:
-            register_user = requests.post(party_service_url, headers=headers, data=json.dumps(registration_data))
-            logger.debug("Response from party service is: {}".format(register_user.content))
+            result = requests.post(party_service_url, headers=headers, data=json.dumps(registration_data))
+            logger.debug("Response from party service is: {}".format(result.content))
 
-            if register_user.ok:
+            if result.status_code == 200:
                 return render_template('register.almost-done.html', _theme='default', email=email_address)
             else:
-                # TODO If the party service does not work we should render a nice ONS page and let the user know that
-                # part of the system is not working. We should not display the 500 error.
-                return abort(500, '{"message":"There was a problem with the registration service, please contact a member of the ONS staff"}')
+                logger.error('Unable to register user - Party service error user')
+                return redirect(url_for('error_page'))
 
         except ConnectionError:
             logger.critical("We could not connect to the party service")
-            return abort(500, '{"message":"There was a problem establishing a connection with an ONS micro service."}')
+            return redirect(url_for('error_page'))
+
         # TODO We need to add an exception timeout catch and handle this type of error
 
     else:

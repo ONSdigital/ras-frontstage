@@ -11,8 +11,8 @@ TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 SQL_SCRIPTS = 'sql_scripts'
 COLLECTION_INSTRUMENT_BUILD = 'ras_frontstage_backup_D0001_initial_build.sql'
 
-Postgres = testing.postgresql.PostgresqlFactory(cache_initialized_db=True)
-postgresql = Postgres()
+# Postgres = testing.postgresql.PostgresqlFactory(cache_initialized_db=True)
+# postgresql = Postgres()
 
 config.Config.SQLALCHEMY_DATABASE_URI = postgresql.url()
 config.Config.CSRF_ENABLED = False

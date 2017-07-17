@@ -102,8 +102,6 @@ class RegistrationForm(FlaskForm):
                                                   message="This should be a valid phone number between 9 and 15 digits")],
                                default=None)
 
-    terms_and_conditions = BooleanField('Please confirm you accept our terms and conditions')
-
 
     def validate_phone_number(form, field):
         if len(field.data) > 16:

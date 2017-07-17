@@ -8,14 +8,16 @@
         {% if errors|length > 0 %}
         <div class="panel panel--error">
             <div class="panel__header">
-                {% for error in errors %}
-                    <h1 class="panel__title venus">{{ errors[error][0] }}</h1>
-                {% endfor %}
+                {% if errors|length == 1 %}
+                <h1 class="panel__title venus">{{ errors[error][0] }}</h1>
+                {% elif errors|length > 1 %}
+                <h1 class="panel__title venus">There are {{ errors|length }} errors on this page</h1>
+                {% endif %}
             </div>
             <div class="panel__body" data-qa="error-body">
                 {% for error in errors %}
-                    {% set error = 'passwords' if error == 'password' else error %}
-                    <p class="mars"><a class="js-inpagelink" href="#{{error}}_field">Please check the {{error}} and try again</a></p>
+                    {% set passwords = 'passwords' if error == 'password' else error %}
+                    <p class="mars"><a class="js-inpagelink" href="#{{error}}_field">Please check the {{passwords}} and try again</a></p>
                 {% endfor %}
             </div>
         </div>
@@ -121,17 +123,6 @@
             {% endif %}
         </div>
 
-        <div class="section">
-            <h2 class="section__title neptune">Terms and Conditions</h2>
-            <div class="field field--checkbox"><!-- field--multiplechoice - class displays border -->
-                <div class="field__item js-focusable-box is-checked">
-                    <!--<input class="input input&#45;&#45;checkbox js-focusable" type="checkbox" id="checkbox1" />-->
-                    {{ form.terms_and_conditions(class_='input input--checkbox js-focusable') }}
-                    {{ form.terms_and_conditions.label(class_='label label--inline venus') }}
-                    <!--<label class="label label&#45;&#45;inline venus" for="checkbox1">Please confirm you accept our <a href="#">Terms of use (Opens in a new window.)</a></label>-->
-                </div>
-            </div>
-        </div>
         <br />
 
         <button class="btn btn--primary venus" type="submit">Continue</button>

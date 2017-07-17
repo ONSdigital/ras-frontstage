@@ -9,7 +9,9 @@
         <div class="panel panel--error">
             <div class="panel__header">
                 {% if errors|length == 1 %}
+                {% for error in errors %}
                 <h1 class="panel__title venus">{{ errors[error][0] }}</h1>
+                {% endfor %}
                 {% elif errors|length > 1 %}
                 <h1 class="panel__title venus">There are {{ errors|length }} errors on this page</h1>
                 {% endif %}

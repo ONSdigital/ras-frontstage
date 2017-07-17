@@ -10,7 +10,7 @@ from phonenumbers.phonenumberutil import NumberParseException
 from sqlalchemy import DateTime, Column, String, Integer
 from structlog import wrap_logger
 from werkzeug.security import generate_password_hash, check_password_hash
-from wtforms import PasswordField, StringField
+from wtforms import HiddenField, PasswordField, StringField
 from wtforms.validators import InputRequired, EqualTo, Length, DataRequired, Email, ValidationError
 from app.config import Config
 
@@ -117,8 +117,7 @@ class RegistrationForm(FlaskForm):
                                default=None)
     enrolment_code = HiddenField('Enrolment Code')
 
-    @staticmethod
-    def validate_phone_number(field):
+    def validate_phone_number(form, field):
         try:
             logger.debug("Checking this is a valid GB Number")
             input_number = phonenumbers.parse(field.data, "GB")  # Tell the parser we are looking for a GB number
@@ -132,8 +131,7 @@ class RegistrationForm(FlaskForm):
             logger.debug(" There is a number parse exception in the phonenumber field")
             raise ValidationError('This should be a valid UK number e.g. 01632 496 0018. ')
 
-    @staticmethod
-    def validate_password(field):
+    def validate_password(form, field):
         password = field.data
         if password.isalnum() or \
             not any(char.isupper() for char in password) or \

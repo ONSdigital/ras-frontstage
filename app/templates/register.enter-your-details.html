@@ -27,12 +27,13 @@
 
         <form
             method="post"
-            action="{{ url_for('register_enter_your_details') }}" class="form"
+            action="{{ url_for('register_enter_your_details') }}"
             class="form"
             role="form">
 
         <h1 class="saturn">Enter your account details</h1>
         {{ form.csrf_token}}
+        {{ form.enrolment_code }}
 
         <div class="section">
             <h2 class="section__title neptune">Your name</h2>

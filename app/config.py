@@ -8,8 +8,27 @@ import os
 # export APP_SETTINGS=config.Config
 # export FLASK_APP=application.py
 # export OAUTHLIB_INSECURE_TRANSPORT=1
+
+# Environment variables for running locally using the server.js Node server in ras-backstage-ui)
+# To use these stubs:
+#   git clone ras-backstage-ui
+#   npm install
+#   node server.js to run the app on localhost:8050
+#
+# And set these environment variables on the ras-frontstage terminal:
+# export API_GATEWAY_CASE_URL=http://localhost:8050/api/cases/
 # export API_GATEWAY_COLLECTION_INSTRUMENT_URL=http://localhost:8050/api/collection-instruments/
-# export API_GATEWAY_SURVEYS_URL=http://localhost:8050/api/my-surveys/
+# export API_GATEWAY_SURVEYS_URL=http://localhost:8050/api/surveys/
+# export API_GATEWAY_AGGREGATED_SURVEYS_URL=http://localhost:8050/api/my-surveys/
+# export API_GATEWAY_PARTY_URL=http://localhost:8050/api/party-api/
+# export API_GATEWAY_IAC_URL=http://localhost:8050/api/iacs/
+
+# export ONS_OAUTH_SERVER=ras-django-int.apps.devtest.onsclofo.uk
+# Log is as testuser@email.com , password
+# OR
+# Log in using your account on:
+# export ONS_OAUTH_SERVER=ons-oauth2.cfapps.io
+
 
 # Default values
 if "APP_SETTINGS" not in os.environ:
@@ -31,17 +50,30 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI', 'postgresql://ras_frontstage_backup:password@localhost:5431/postgres')
 
     # Cloud Foundry config
+
+    # TODO - Define default CF endpoints
+    API_GATEWAY_CASE_URL = os.environ.get('API_GATEWAY_CASE_URL',
+                                          'http://localhost:8050/api/cases/')
+
+    # TODO - Define default CF endpoints
+    API_GATEWAY_COLLECTION_EXERCISE_URL = os.environ.get('API_GATEWAY_COLLECTION_EXERCISE_URL',
+                                                         'http://localhost:8050/api/collectionexercises/')
+
     API_GATEWAY_COLLECTION_INSTRUMENT_URL = os.environ.get('API_GATEWAY_COLLECTION_INSTRUMENT_URL',
-                                                           'https://api-dev.apps.mvp.onsclofo.uk:443/collection-instrument-api/1.0.2/')
+                                                           'http://ras-api-gateway-int.apps.devtest.onsclofo.uk:80/collection-instrument-api/1.0.2/')
     API_GATEWAY_SURVEYS_URL = os.environ.get('API_GATEWAY_SURVEYS_URL',
-                                             'https://api-dev.apps.mvp.onsclofo.uk/api/1.0.0/surveys/')
+                                             'https://ras-api-gateway-int.apps.devtest.onsclofo.uk/api/1.0.0/surveys/')
+    API_GATEWAY_AGGREGATED_SURVEYS_URL = os.environ.get('API_GATEWAY_AGGREGATED_SURVEYS_URL',
+                                                        'https://ras-api-gateway-int.apps.devtest.onsclofo.uk/api/1.0.0/surveys/')
     API_GATEWAY_PARTY_URL = os.environ.get('API_GATEWAY_PARTY_URL',
-                                           'https://api-dev.apps.mvp.onsclofo.uk/party-api/1.0.4/')
+                                           'https://ras-api-gateway-int.apps.devtest.onsclofo.uk/party-api/1.0.4/')
+    API_GATEWAY_IAC_URL = os.environ.get('API_GATEWAY_IAC_URL',
+                                         'https://ras-api-gateway-int.apps.devtest.onsclofo.uk/api/1.0.0/iacs/')
+    
     PASSWORD_MATCH_ERROR_TEXT = 'Your passwords do not match'
     PASSWORD_CRITERIA_ERROR_TEXT = 'Your password does not meet the requirements'
     PASSWORD_MIN_LENGTH = 8
     PASSWORD_MAX_LENGTH = 160
-
 
 class ProductionConfig(Config):
     """
@@ -75,6 +107,24 @@ class TestingConfig(Config):
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
+    # Local version for OAuth2 server:
+    ONS_OAUTH_PROTOCOL = os.environ.get('ONS_OAUTH_PROTOCOL', 'http://')
+    ONS_OAUTH_SERVER = os.environ.get('ONS_OAUTH_SERVER', 'localhost:8000')
+    RAS_FRONTSTAGE_CLIENT_ID = os.environ.get('RAS_FRONTSTAGE_CLIENT_ID', 'ons@ons.gov')
+    RAS_FRONTSTAGE_CLIENT_SECRET = os.environ.get('RAS_FRONTSTAGE_CLIENT_SECRET', 'password')
+    ONS_AUTHORIZATION_ENDPOINT = os.environ.get('ONS_AUTHORIZATION_ENDPOINT', '/web/authorize/')
+    ONS_TOKEN_ENDPOINT = os.environ.get('ONS_TOKEN_ENDPOINT', '/api/v1/tokens/')
+    ONS_ADMIN_ENDPOINT = os.environ.get('ONS_ADMIN_ENDPOINT', '/api/account/create')
+
+    API_GATEWAY_PARTY_URL = os.environ.get('API_GATEWAY_PARTY_URL',
+                                           'http://localhost:5201/party-api/v1/')
+
+    # Local version of Collection Instrument Service:
+    COLLECTION_INSTRUMENT_URL = os.environ.get('COLLECTION_INSTRUMENT_URL', 'https://api-dev.apps.mvp.onsclofo.uk:443/collection-instrument-api/1.0.2/')
+
+    # Local verions of Survey serivce:
+    SURVEYS_URL = os.environ.get('SURVEYS_URL', 'https://api-dev.apps.mvp.onsclofo.uk/api/1.0.0/surveys/')
+
 
 class OAuthConfig(Config):
     """
@@ -90,15 +140,6 @@ class OAuthConfig(Config):
     ONS_AUTHORIZATION_ENDPOINT = os.environ.get('ONS_AUTHORIZATION_ENDPOINT', '/web/authorize/')
     ONS_TOKEN_ENDPOINT = os.environ.get('ONS_TOKEN_ENDPOINT', '/api/v1/tokens/')
     ONS_ADMIN_ENDPOINT = os.environ.get('ONS_ADMIN_ENDPOINT', '/api/account/create')
-
-    # Local version:
-    # ONS_OAUTH_PROTOCOL = os.environ.get('ONS_OAUTH_PROTOCOL', 'http://')
-    # ONS_OAUTH_SERVER = os.environ.get('ONS_OAUTH_SERVER', 'localhost:8040')
-    # RAS_FRONTSTAGE_CLIENT_ID = os.environ.get('RAS_FRONTSTAGE_CLIENT_ID', 'ons@ons.gov')
-    # RAS_FRONTSTAGE_CLIENT_SECRET = os.environ.get('RAS_FRONTSTAGE_CLIENT_SECRET', 'password')
-    # ONS_AUTHORIZATION_ENDPOINT = os.environ.get('ONS_AUTHORIZATION_ENDPOINT', '/web/authorize/')
-    # ONS_TOKEN_ENDPOINT = os.environ.get('ONS_TOKEN_ENDPOINT', '/api/v1/tokens/')
-    # ONS_ADMIN_ENDPOINT = os.environ.get('ONS_ADMIN_ENDPOINT', '/api/account/create')
 
 
 class SecureMessaging(Config):

@@ -3,6 +3,9 @@ from sqlalchemy import create_engine
 import os
 import psycopg2
 import testing.postgresql
+from ons_ras_common import ons_env
+
+ons_env.setup()
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 SQL_SCRIPTS = 'sql_scripts'

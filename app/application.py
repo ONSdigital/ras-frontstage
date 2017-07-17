@@ -25,7 +25,7 @@ from app.filters.file_size_filter import file_size_filter
 
 from app.config import OAuthConfig, Config, TestingConfig, ProductionConfig
 from app.jwt import encode
-from app.models import LoginForm, RegistrationForm, EnrolmentCodeForm, db
+from app.models import LoginForm, RegistrationForm, EnrolmentCodeForm
 from app.logger_config import logger_initial_config
 
 app = Flask(__name__)
@@ -36,9 +36,6 @@ app.config.update(
     TESTING=True,
     TEMPLATES_AUTO_RELOAD=True
 )
-
-db.init_app(app)
-
 
 app.jinja_env.filters['case_status_filter'] = case_status_filter
 app.jinja_env.filters['file_size_filter'] = file_size_filter

@@ -214,7 +214,7 @@ class TestRegistration(unittest.TestCase):
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes('This field is required', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('Email address is required', encoding='UTF-8') in response.data)
 
     @requests_mock.mock()
     def test_create_account_register_no_password(self, mock_object):
@@ -232,7 +232,7 @@ class TestRegistration(unittest.TestCase):
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes('Your password does not meet the requirements', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('Password is required', encoding='UTF-8') in response.data)
 
     @requests_mock.mock()
     def test_create_account_register_wrong_password(self, mock_object):
@@ -266,7 +266,7 @@ class TestRegistration(unittest.TestCase):
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes('This field is required.', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('Phone number is required', encoding='UTF-8') in response.data)
 
     @requests_mock.mock()
     def test_create_account_register_illegal_phone_number(self, mock_object):

@@ -2,16 +2,16 @@
 This module contains the data model for the collection instrument
 """
 import datetime
+import logging
+from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
-from sqlalchemy import DateTime, Column, String, Integer
-from werkzeug.security import generate_password_hash, check_password_hash
-from wtforms import PasswordField, StringField, BooleanField
-from wtforms.validators import InputRequired, EqualTo, Length, DataRequired, Email, ValidationError
 import phonenumbers
 from phonenumbers.phonenumberutil import NumberParseException
-from flask_sqlalchemy import SQLAlchemy
-import logging
+from sqlalchemy import DateTime, Column, String, Integer
 from structlog import wrap_logger
+from werkzeug.security import generate_password_hash, check_password_hash
+from wtforms import PasswordField, StringField
+from wtforms.validators import InputRequired, EqualTo, Length, DataRequired, Email, ValidationError
 from app.config import Config
 
 db = SQLAlchemy()
@@ -75,40 +75,37 @@ class RegistrationForm(FlaskForm):
     The form data will be used to create the account on the OAuth2 server and to provide the Case Service with a valid
     account name that is not verified.
     """
-    req = " is required"
     first_name = StringField('First name',
-                             validators=[InputRequired("First name" + req),
+                             validators=[InputRequired("First name is required"),
                                          Length(max=254,
                                                 message='Your first name must be less than 254 characters')])
     last_name = StringField('Last name',
-                            validators=[InputRequired("Last name" + req),
+                            validators=[InputRequired("Last name is required"),
                                         Length(max=254, message='Your last name must be less than 254 characters')])
     email_address = StringField('Enter your email address',
-                                validators=[InputRequired("Email address" + req),
-                                            Email(message="Your email shoud be of the form 'myname@email.com' "),
+                                validators=[InputRequired("Email address is required"),
+                                            Email(message="Your email should be of the form 'myname@email.com' "),
                                             Length(max=254,
                                                    message='Your email must be less than 254 characters')])
     password = PasswordField('Create a password',
-                             validators=[DataRequired("Password" + req),
+                             validators=[DataRequired("Password is required"),
                                          EqualTo('password_confirm', message=Config.PASSWORD_MATCH_ERROR_TEXT),
                                          Length(min=Config.PASSWORD_MIN_LENGTH,
                                                 max=Config.PASSWORD_MAX_LENGTH,
                                                 message=Config.PASSWORD_CRITERIA_ERROR_TEXT)])
     password_confirm = PasswordField('Re-type your password')
     phone_number = StringField('Enter your phone number',
-                               validators=[DataRequired("Phone number" + req),
+                               validators=[DataRequired("Phone number is required"),
                                            Length(min=9,
                                                   max=15,
                                                   message="This should be a valid phone number between 9 and 15 digits")],
                                default=None)
 
-
-    def validate_phone_number(form, field):
-        if len(field.data) > 16:
-            raise ValidationError('This should be a valid phone number between 9 and 15 digits')
+    @staticmethod
+    def validate_phone_number(field):
         try:
             logger.debug("Checking this is a valid GB Number")
-            input_number = phonenumbers.parse(field.data, "GB")                 # Tell the parser we are looking for a GB number
+            input_number = phonenumbers.parse(field.data, "GB")  # Tell the parser we are looking for a GB number
 
             if not (phonenumbers.is_possible_number(input_number)):
                 raise ValidationError('This should be a valid phone number between 9 and 15 digits')
@@ -119,12 +116,13 @@ class RegistrationForm(FlaskForm):
             logger.debug(" There is a number parse exception in the phonenumber field")
             raise ValidationError('This should be a valid UK number e.g. 01632 496 0018. ')
 
-    def validate_password(form, field):
+    @staticmethod
+    def validate_password(field):
         password = field.data
         if password.isalnum() or \
             not any(char.isupper() for char in password) or \
             not any(char.isdigit() for char in password):
-                raise ValidationError(Config.PASSWORD_CRITERIA_ERROR_TEXT)
+            raise ValidationError(Config.PASSWORD_CRITERIA_ERROR_TEXT)
 
 
 class LoginForm(FlaskForm):

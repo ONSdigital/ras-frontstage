@@ -16,8 +16,8 @@
             </div>
             <div class="panel__body" data-qa="error-body">
                 {% for error in errors %}
-                    {% set passwords = 'passwords' if error == 'password' else error %}
-                    <p class="mars"><a class="js-inpagelink" href="#{{error}}_field">Please check the {{passwords}} and try again</a></p>
+                    {% set error_text = 'passwords' if error == 'password' else error %}
+                    <p class="mars"><a class="js-inpagelink" href="#{{error}}_field">Please check the {{error_text}} and try again</a></p>
                 {% endfor %}
             </div>
         </div>

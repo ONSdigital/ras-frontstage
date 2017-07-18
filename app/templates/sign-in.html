@@ -4,7 +4,7 @@
 {% set errorType = data['error']['type'] %}
 
 {% block page_title %}
-    {% if errorType == "failed" %}
+    {% if errorType %}
         Error signing in - ONS Business Surveys
     {% else %}
         Complete a survey on behalf of a business - ONS Business Surveys
@@ -13,10 +13,18 @@
 
 {% block main %}
 
-    {% if errorType == "failed" %}
+    {% if errorType %}
     <div class="panel panel--error">
         <div class="panel__header">
+            {% if errorType == "failed" %}
             <h1 class="panel__title venus">Incorrect email or password</h1>
+            {% elif errorType|length > 1 %}
+            <h1 class="panel__title venus">There are {{ errorType|length }} errors on this page</h1>
+            {% else %}
+            {% for error in errorType %}
+            <h1 class="panel__title venus">{{ errorType[error][0] }}</h1>
+            {% endfor %}
+            {% endif %}
         </div>
         <div class="panel__body" data-qa="error-body">
             <p class="mars"><a href="#sign-in-details" class="js-inpagelink">Please try again</a></p>
@@ -31,13 +39,13 @@
           role="form">
 
         {% if data['account_activated'] %}
-            <h1 class="saturn">You've activated your account</h1>
-            <p>You may now sign in.</p>
+        <h1 class="saturn">You've activated your account</h1>
+        <p>You may now sign in.</p>
         {% else %}
-            <p>Have an enrolment code?<br/>
-            Use it to <a href="/create-account">create an account</a>
-            </p>
-            <h1 class="saturn">Sign in</h1>
+        <p>Have an enrolment code?<br/>
+           Use it to <a href="/create-account">create an account</a>
+        </p>
+        <h1 class="saturn">Sign in</h1>
         {% endif %}
 
         <fieldset id="sign-in-details">
@@ -46,21 +54,34 @@
             {% endif %}
                 {{ form.csrf_token}}
                 <div class="field">
+                    {% if errorType.username %}
+                    <div class="panel panel--simple panel--error">
+                        <p class="error-message">{{ errorType['username'][0] }}</p>
+                    {% endif %}
                     {{ form.username.label(class_='label') }}
                     {{ form.username(class_='input input--text input-type__input') }}
+                    {% if errorType.username %}
+                    </div>
+                    {% endif %}
                 </div>
                 <br />
 
                 <div class="field js-password-obfuscation-group">
-                    {{ form.password.label(class_='label') }}
-                    <span>
-                        <input class="js-password-obfuscation-toggle" type="checkbox" id="password-toggle" />
-                        <label for="password-toggle">Show password</label>
-                    </span>
-                    {{ form.password(class_='input input--text input-type__input js-password-obfuscation-field') }}
-
-                    <br />
-                    <a href="/forgot-password">Forgot password?</a>
+                    {% if errorType.password %}
+                    <div class="panel panel--simple panel--error">
+                        <p class="error-message">{{ errorType['password'][0] }}</p>
+                    {% endif %}
+                        <span>
+                            <input class="js-password-obfuscation-toggle" type="checkbox" id="password-toggle" />
+                            <label for="password-toggle">Show password</label>
+                        </span>
+                        {{ form.password.label(class_='label') }}
+                        {{ form.password(class_='input input--text input-type__input js-password-obfuscation-field') }}
+                        <br />
+                        <a href="/forgot-password">Forgot password?</a>
+                    {% if errorType.password %}
+                    </div>
+                    {% endif %}
                 </div>
                 <br />
 
@@ -69,9 +90,6 @@
             </div>
             {% endif %}
         </fieldset>
-        {% if errorType == "failed" %}
-        <br />
-        {% endif %}
 
     </form>
 {% endblock main %}

@@ -168,7 +168,7 @@ def login():
 
     template_data = {
         "error": {
-            "type": request.args.get("error"),
+            "type": form.errors,
             "logged_in": "False"
         },
         'account_activated': account_activated

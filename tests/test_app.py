@@ -117,37 +117,22 @@ class TestApplication(unittest.TestCase):
         # Check this guy has an incorrect email.
         self.assertTrue(bytes('Incorrect email or password', encoding='UTF-8') in response.data)
 
-    # Test we get an email is required message when no email is provided
-    @requests_mock.mock()
-    def test_sign_in_no_email(self, mock_object):
-        """Test incorrect detail message is returned with invalid details entered"""
-        url = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_TOKEN_ENDPOINT
-        mock_object.post(url, status_code=401, json={'detail': 'Unauthorized user credentials'})
-
+    def test_sign_in_no_email(self):
+        """Test no email message is returned with no email entered"""
         response = self.app.post('/sign-in', data={'username': '', 'password': 'test'}, headers=self.headers)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(bytes('Email Address is required', encoding='UTF-8') in response.data)
 
-    # Test we get a password is required message when no email is provided
-    @requests_mock.mock()
-    def test_sign_in_no_password(self, mock_object):
-        """Test incorrect detail message is returned with invalid details entered"""
-        url = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_TOKEN_ENDPOINT
-        mock_object.post(url, status_code=401, json={'detail': 'Unauthorized user credentials'})
-
+    def test_sign_in_no_password(self):
+        """Test no password message is returned with no password entered"""
         response = self.app.post('/sign-in', data={'username': 'test@test.test', 'password': ''}, headers=self.headers)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(bytes('Password is required', encoding='UTF-8') in response.data)
 
-    # Test we get a multiple errors message when no details are provided
-    @requests_mock.mock()
-    def test_sign_in_no_details(self, mock_object):
-        """Test incorrect detail message is returned with invalid details entered"""
-        url = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_TOKEN_ENDPOINT
-        mock_object.post(url, status_code=401, json={'detail': 'Unauthorized user credentials'})
-
+    def test_sign_in_no_details(self):
+        """Test multiple error message is returned when no details entered"""
         response = self.app.post('/sign-in', data={'username': '', 'password': ''}, headers=self.headers)
 
         self.assertEqual(response.status_code, 200)

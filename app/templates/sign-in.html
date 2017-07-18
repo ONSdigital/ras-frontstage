@@ -90,6 +90,9 @@
             </div>
             {% endif %}
         </fieldset>
+        {% if errorType == "failed" %}
+        <br />
+        {% endif %}
 
     </form>
 {% endblock main %}

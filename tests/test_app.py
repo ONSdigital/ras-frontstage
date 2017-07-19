@@ -109,13 +109,34 @@ class TestApplication(unittest.TestCase):
         mock_object.post(url, status_code=401, json={'detail': 'Unauthorized user credentials'})
 
         # Lets send a post message to the ras_frontstage at the endpoint /sign-in.
-        response = self.app.post('/sign-in/', data={'username': 'test', 'password': 'test'}, headers=self.headers)
+        response = self.app.post('/sign-in/', data={'username': 'test@test.com', 'password': 'test'}, headers=self.headers)
 
         # Our system should still handle this.
         self.assertEqual(response.status_code, 200)
 
         # Check this guy has an incorrect email.
         self.assertTrue(bytes('Incorrect email or password', encoding='UTF-8') in response.data)
+
+    def test_sign_in_no_email(self):
+        """Test no email message is returned with no email entered"""
+        response = self.app.post('/sign-in/', data={'username': '', 'password': 'test'}, headers=self.headers)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(bytes('Email Address is required', encoding='UTF-8') in response.data)
+
+    def test_sign_in_no_password(self):
+        """Test no password message is returned with no password entered"""
+        response = self.app.post('/sign-in/', data={'username': 'test@test.test', 'password': ''}, headers=self.headers)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(bytes('Password is required', encoding='UTF-8') in response.data)
+
+    def test_sign_in_no_details(self):
+        """Test multiple error message is returned when no details entered"""
+        response = self.app.post('/sign-in/', data={'username': '', 'password': ''}, headers=self.headers)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(bytes('There are 2 errors on this page', encoding='UTF-8') in response.data)
 
     # Test we get survey data once a user signs in properly. This means we have to mock up OAuth2 server sending a
     # Token. The ras_frontstage will then send a request for data to the API Gateway / Party Service, we Mock this too

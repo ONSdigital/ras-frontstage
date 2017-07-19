@@ -55,7 +55,7 @@
 
                 <form
                         method="post"
-                        action="{{ url_for('.access_survey') }}"
+                        action="{{ url_for('surveys_bp.access_survey') }}"
                         class="form"
                         role="form">
                     <input type="hidden" name="case_id" value="{{ data.case.id }}">

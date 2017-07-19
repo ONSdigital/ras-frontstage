@@ -80,7 +80,7 @@ def register():
             # Encrypt the enrolment code
             coded_token = ons_env.crypt.encrypt(enrolment_code.encode()).decode()
 
-            return redirect(url_for('.register_confirm_organisation_survey', enrolment_code=coded_token))
+            return redirect(url_for('register_bp.register_confirm_organisation_survey', enrolment_code=coded_token))
         else:
             logger.info('Invalid IAC code: {}'.format(enrolment_code))
             template_data = {
@@ -156,7 +156,7 @@ def register_confirm_organisation_survey():
     survey_name = survey['longName']
 
     if request.method == 'POST':
-        return redirect(url_for('.register_enter_your_details', enrolment_code=encrypted_enrolment_code,
+        return redirect(url_for('register_bp.register_enter_your_details', enrolment_code=encrypted_enrolment_code,
                                 organisation_name=organisation_name, survey_name=survey_name))
     else:
         return render_template('register/register.confirm-organisation-survey.html', _theme='default',
@@ -396,7 +396,7 @@ def register_activate_account():
             if user_id:
                 # Unable to activate account therefore give the user the option to send out a new email token
                 logger.debug('Expired activation token: ' + str(token))
-                return redirect(url_for('.register_resend_email', user_id=user_id))
+                return redirect(url_for('register_bp.register_resend_email', user_id=user_id))
             else:
                 logger.error('Unable to determine user for activation token: ' + str(token))
                 return redirect(url_for('error_page'))

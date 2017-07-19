@@ -23,7 +23,6 @@ from app.filters.file_size_filter import file_size_filter
 
 from app.config import Config, TestingConfig, ProductionConfig
 from app.jwt import encode
-from app.models import LoginForm
 from app.logger_config import logger_initial_config
 
 app = Flask(__name__)
@@ -66,7 +65,7 @@ else:
 # TODO Remove this before production
 @app.route('/home', methods=['GET', 'POST'])
 def hello_world():
-    return render_template('_temp.html', _theme='default')
+    return render_template('_DEV_ONLY_HOME_PAGE.html', _theme='default')
 
 
 @app.route('/error', methods=['GET', 'POST'])

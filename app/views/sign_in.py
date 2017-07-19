@@ -35,24 +35,20 @@ def login():
     password and username and is accepted by the OAuth 2 server we receive an access token, a refresh token and a TTL.
     Otherwise we fail.
     This uses the flow Resource Owner Password Credentials Grant. See: https://tools.ietf.org/html/rfc6749#section-4.3
-
     To make this work the server application (thats us!) needs a client ID and a client secret. This has to exist on the
     OAuth server. We then use Basic Auth to access the OAuth2 server and provide the user ID, and user password in the
     POST Body message. In the real world this would be done over https - for now all this works over http since it is
     behind our firewall.
-
     Parms_to_OAuth:
         client_id
         client_secret
         user_id
         user_password
         oauth2_url
-
     Returned_from_OAuth:
         access_token
         refresh_token
         ttl
-
     """
     form = LoginForm(request.form)
 
@@ -90,9 +86,9 @@ def login():
             logger.warning("Failed validation")
             return render_template('sign-in/sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
 
-        # except Exception as e:
-        #     logger.error("Error logging in: {}", str(e))
-        #     return redirect(url_for('error_page'))
+ #       except Exception as e:
+ #           logger.error("Error logging in: {}", str(e))
+ #           return redirect(url_for('error_page'))
 
         data_dict_for_jwt_token = {
             "refresh_token": token['refresh_token'],
@@ -109,7 +105,7 @@ def login():
 
     template_data = {
         "error": {
-            "type": request.args.get("error"),
+            "type": form.errors,
             "logged_in": "False"
         },
         'account_activated': account_activated

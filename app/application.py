@@ -140,6 +140,10 @@ def login():
         oauth = OAuth2Session(client=client)
         token_url = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_TOKEN_ENDPOINT']
 
+        ons_env.logger.debug('Calling oAuth endpoint "{}"'.format(token_url))
+        ons_env.logger.debug('Client ID> {}'.format(app.config['RAS_FRONTSTAGE_CLIENT_ID']))
+        ons_env.logger.debug('Client Secret> {}'.format(app.config['RAS_FRONTSTAGE_CLIENT_SECRET']))
+
         try:
             token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=app.config['RAS_FRONTSTAGE_CLIENT_ID'],
                                       client_secret=app.config['RAS_FRONTSTAGE_CLIENT_SECRET'])
@@ -409,7 +413,7 @@ def register_enter_your_details():
 
     # Ensure we have got a valid enrolment code, otherwise go to the sign in page
     if not decrypted_enrolment_code or not validate_enrolment_code(decrypted_enrolment_code):
-        logger.error('Enter Account Details page - invalid enrolment code: ' + str(decrypted_enrolment_code))
+        ons_env.logger.error('Enter Account Details page - invalid enrolment code: ' + str(decrypted_enrolment_code))
         return redirect(url_for('error_page'))
 
     form = RegistrationForm(request.values, enrolment_code=encrypted_enrolment_code)
@@ -606,7 +610,7 @@ def register_activate_account():
 
     # If the token was not provided then redirect off to the error page
     if not token:
-        logger.warning('Missing email activation token')
+        ons_env.logger.warning('Missing email activation token')
         return redirect(url_for('error_page'))
 
     # Call the Party service to try to activate the account corresponding to the token that was supplied

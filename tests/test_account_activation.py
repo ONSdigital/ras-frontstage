@@ -28,7 +28,7 @@ class TestAccountActivation(unittest.TestCase):
 
     # Test that the user ends up on the error page if they try to access the account activation page without a token
     def test_activate_account_no_token_specified(self, mock_object):
-        response = self.app.get('/activate-account', headers=self.headers)
+        response = self.app.get('/register/activate-account', headers=self.headers)
 
         # Token not specified so user should be redirected to the error page
         self.assertEqual(response.status_code, 302)
@@ -42,7 +42,7 @@ class TestAccountActivation(unittest.TestCase):
 
         mock_object.post(url_email_verification, status_code=404)
 
-        response = self.app.get('/activate-account?t=' + token, headers=self.headers)
+        response = self.app.get('/register/activate-account?t=' + token, headers=self.headers)
 
         self.assertEqual(response.status_code, 302)
         self.assertTrue(
@@ -56,30 +56,30 @@ class TestAccountActivation(unittest.TestCase):
         self.emailverification_response['active'] = False
         mock_object.post(url_email_verification, status_code=200, json=self.emailverification_response)
 
-        response = self.app.get('/activate-account?t=' + token, headers=self.headers)
+        response = self.app.get('/register/activate-account?t=' + token, headers=self.headers)
 
         self.assertEqual(response.status_code, 302)
         self.assertTrue(
             bytes('You should be redirected automatically to target URL', encoding='UTF-8') in response.data)
-        self.assertTrue(('/create-account/resend-email?user_id=' + user_id).encode() in response.data)
+        self.assertTrue(('/register/create-account/resend-email?user_id=' + user_id).encode() in response.data)
 
     # Test that the user ends up on the 'You've activated your account' login page if they try to access the
     # account activation page with a valid, non-expired token
     def test_activate_account_valid_token_specified(self, mock_object):
         mock_object.post(url_email_verification, status_code=200, json=self.emailverification_response)
 
-        response = self.app.get('/activate-account?t=' + token, headers=self.headers)
+        response = self.app.get('/register/activate-account?t=' + token, headers=self.headers)
 
         self.assertEqual(response.status_code, 302)
         self.assertTrue(
             bytes('You should be redirected automatically to target URL', encoding='UTF-8') in response.data)
-        self.assertTrue('/sign-in?account_activated=True'.encode() in response.data)
+        self.assertTrue('/sign-in/?account_activated=True'.encode() in response.data)
 
     # ============== YOUR LINK HAS EXPIRED PAGE ===============
 
     # Check the content of the 'Your link has expired' page
     def test_link_expired_page(self, mock_object):
-        response = self.app.get('create-account/resend-email?user_id=' + user_id, headers=self.headers)
+        response = self.app.get('/register/create-account/resend-email?user_id=' + user_id, headers=self.headers)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(bytes('Your link has expired', encoding='UTF-8') in response.data)
@@ -89,7 +89,7 @@ class TestAccountActivation(unittest.TestCase):
 
     # Check the content of the 'We've re-sent your email' page
     def test_email_resent_page(self, mock_object):
-        response = self.app.get('create-account/email-resent?user_id=' + user_id, headers=self.headers)
+        response = self.app.get('/register/create-account/email-resent?user_id=' + user_id, headers=self.headers)
 
         # TODO check that the email was actually re-sent once the backend functionality has been developed
 
@@ -102,7 +102,7 @@ class TestAccountActivation(unittest.TestCase):
 
     # Check the content of the 'We've re-sent your email' page
     def test_login_account_activated_page(self, mock_object):
-        response = self.app.get('sign-in?account_activated=True', headers=self.headers)
+        response = self.app.get('/sign-in/?account_activated=True', headers=self.headers)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(bytes('You\'ve activated your account', encoding='UTF-8') in response.data)

@@ -89,7 +89,7 @@ class TestApplication(unittest.TestCase):
     def test_sign_in_page(self):
         """Test user sign in appears"""
 
-        response = self.app.get('/sign-in', headers=self.headers)
+        response = self.app.get('/sign-in/', headers=self.headers)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Sign in', response.data)
@@ -102,14 +102,14 @@ class TestApplication(unittest.TestCase):
     def test_sign_in_wrong_details(self, mock_object):
         """Test incorrect detail message is returned with invalid details entered"""
         # data = {'refresh_token': '007', 'access_token': '007', 'scope': '[foo,bar]', 'expires_at': 'today', 'username': 'nherriot' }
-        url = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_TOKEN_ENDPOINT
+        url = Config.ONS_OAUTH_PROTOCOL + Config.ONS_OAUTH_SERVER + Config.ONS_TOKEN_ENDPOINT
 
         # Here we place a listener on this URL. This is the URL of the OAuth2 server. We send a 401 to reject the request
         # from the ras_frontstage to get a token for this user. See application.py login(). And the call to oauth.fetch_token
         mock_object.post(url, status_code=401, json={'detail': 'Unauthorized user credentials'})
 
         # Lets send a post message to the ras_frontstage at the endpoint /sign-in.
-        response = self.app.post('/sign-in', data={'username': 'test', 'password': 'test'}, headers=self.headers)
+        response = self.app.post('/sign-in/', data={'username': 'test', 'password': 'test'}, headers=self.headers)
 
         # Our system should still handle this.
         self.assertEqual(response.status_code, 200)
@@ -125,7 +125,7 @@ class TestApplication(unittest.TestCase):
         """Test we display survey data after signing in correctly"""
 
         # Build URL's which is used to talk to the OAuth2 server
-        url_get_token = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_TOKEN_ENDPOINT
+        url_get_token = Config.ONS_OAUTH_PROTOCOL + Config.ONS_OAUTH_SERVER + Config.ONS_TOKEN_ENDPOINT
         url_get_survey_data = Config.API_GATEWAY_AGGREGATED_SURVEYS_URL + 'todo/' + party_id
 
         # Here we place a listener on the URL's The flow of events are:
@@ -147,7 +147,7 @@ class TestApplication(unittest.TestCase):
         #   ----                        --                      ------                  --
         #           Sign-in             |
         #   --------------------------->|
-        response = self.app.post('/sign-in', data={'username': 'testuser@email.com', 'password': 'password'}, headers=self.headers)
+        response = self.app.post('/sign-in/', data={'username': 'testuser@email.com', 'password': 'password'}, headers=self.headers)
 
         # 2) Mock object gets returned from our simulated OAuth2 server
         #   User                        FS                      OAuth2                  PS

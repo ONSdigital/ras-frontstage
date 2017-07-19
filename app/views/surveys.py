@@ -106,3 +106,4 @@ def my_surveys_page(session, page=None, not_started=False, in_progress=False, co
     except Exception as e:
         ons_env.logger.error('unexpected error "{}"'.format(e))
         return redirect(url_for('error_page'))
+

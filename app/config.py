@@ -164,3 +164,4 @@ class SecureMessaging(Config):
 
     # Selenium Driver Path
     chrome_driver = "{}/tests/selenium_scripts/drivers/chromedriver".format(os.environ.get('RAS_FRONTSTAGE_PATH'))
+

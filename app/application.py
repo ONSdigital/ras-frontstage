@@ -666,3 +666,4 @@ def nocache(view):
 
 def render(template):
     return render_template(template, _theme='default')
+

@@ -96,3 +96,4 @@ class EnrolmentCodeForm(FlaskForm):
     progress with registration. The 'Activation Code' is a string in our case.
     """
     enrolment_code = StringField('Enrolment Code', [InputRequired()])
+

@@ -44,13 +44,13 @@ class TestSurveys(unittest.TestCase):
         """Test we display survey data after signing in correctly"""
 
         # Build mock URL's which are used to provide application data
-        url_get_token = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_TOKEN_ENDPOINT
+        url_get_token = Config.ONS_OAUTH_PROTOCOL + Config.ONS_OAUTH_SERVER + Config.ONS_TOKEN_ENDPOINT
         url_get_survey_data = Config.API_GATEWAY_AGGREGATED_SURVEYS_URL + 'todo/' + party_id
 
         mock_object.post(url_get_token, status_code=200, json=returned_token)
         mock_object.get(url_get_survey_data, status_code=200, json=my_surveys_data)
 
-        response = self.app.post('/sign-in', data={'username': 'testuser@email.com', 'password': 'password'}, headers=self.headers)
+        response = self.app.post('/sign-in/', data={'username': 'testuser@email.com', 'password': 'password'}, headers=self.headers)
 
         # Our system should check the response data.
         self.assertEqual(response.status_code, 302)
@@ -89,7 +89,7 @@ class TestSurveys(unittest.TestCase):
         """Test we display survey data after signing in correctly"""
 
         # Build mock URL's which are used to provide application data
-        url_get_token = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_TOKEN_ENDPOINT
+        url_get_token = Config.ONS_OAUTH_PROTOCOL + Config.ONS_OAUTH_SERVER + Config.ONS_TOKEN_ENDPOINT
         url_get_survey_data = Config.API_GATEWAY_AGGREGATED_SURVEYS_URL + 'todo/' + party_id
         url_get_collection_instrument_data = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'collectioninstrument/id/' + collection_instrument_id
 
@@ -97,7 +97,7 @@ class TestSurveys(unittest.TestCase):
         mock_object.get(url_get_survey_data, status_code=200, json=my_surveys_data)
         mock_object.get(url_get_collection_instrument_data, status_code=200, json=collection_instrument_data)
 
-        self.app.post('/sign-in', data={'username': 'testuser@email.com', 'password': 'password'}, headers=self.headers)
+        self.app.post('/sign-in/', data={'username': 'testuser@email.com', 'password': 'password'}, headers=self.headers)
 
         survey_params = {
             'case_id': case_id,

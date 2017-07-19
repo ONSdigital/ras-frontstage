@@ -68,12 +68,6 @@ logger = wrap_logger(logging.getLogger(__name__))
 #         self.scope = scope
 
 
-class LoginForm(FlaskForm):
-    """Login form."""
-    username = StringField('Email Address', [InputRequired()])
-    password = PasswordField('Password', [InputRequired()])
-
-
 class EnrolmentCodeForm(FlaskForm):
     """
     This is our Register form and part 1 of registration. It's used for the user to pass the 'Activation Code'. The
@@ -142,8 +136,9 @@ class RegistrationForm(FlaskForm):
 class LoginForm(FlaskForm):
     """Login form."""
 
-    username = StringField('Email Address', [InputRequired()])
-    password = PasswordField('Password', [InputRequired()])
+    username = StringField('Email Address', [InputRequired("Email Address is required"),
+                                             Email("Your email should be of the form 'myname@email.com' ")])
+    password = PasswordField('Password', [InputRequired("Password is required")])
 
 
 class EnrolmentCodeForm(FlaskForm):

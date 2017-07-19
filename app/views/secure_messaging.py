@@ -1,11 +1,11 @@
 from flask import Blueprint, render_template, request, json, redirect, url_for, session
 import requests
-import logging
-from structlog import wrap_logger
+#import logging
+#from structlog import wrap_logger
 from app.config import SecureMessaging
+from ons_ras_common import ons_env
 
-
-logger = wrap_logger(logging.getLogger(__name__))
+#logger = wrap_logger(logging.getLogger(__name__))
 
 
 headers = {'Content-Type': 'application/json',

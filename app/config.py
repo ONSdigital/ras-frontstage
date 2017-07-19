@@ -75,6 +75,7 @@ class Config(object):
     PASSWORD_MIN_LENGTH = 8
     PASSWORD_MAX_LENGTH = 160
 
+
 class ProductionConfig(Config):
     """
     Production config class

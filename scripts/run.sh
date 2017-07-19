@@ -5,4 +5,7 @@ if ! [ -a .build ] ; then
 fi
 source .build/bin/activate
 pip3 install -r requirements.txt --upgrade
+API_GATEWAY_AGGREGATED_SURVEYS_URL=http://localhost:8080/api/1.0.0/surveys/ \
+SM_URL=http://localhost:8080/ \
+ONS_OAUTH_SERVER=ras-django-int.apps.devtest.onsclofo.uk \
 python3 run.py

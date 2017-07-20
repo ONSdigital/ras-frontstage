@@ -370,14 +370,8 @@ def register_almost_done():
     return render_template('register/register.almost-done.html', _theme='default')
 
 
-@register_bp.route('/activate-account', methods=['GET'])
-def register_activate_account():
-    token = request.args.get('t', None)
-
-    # If the token was not provided then redirect off to the error page
-    if not token:
-        logger.warning('Missing email activation token')
-        return redirect(url_for('error_page'))
+@register_bp.route('/activate-account/<token>', methods=['GET'])
+def register_activate_account(token):
 
     # Call the Party service to try to activate the account corresponding to the token that was supplied
     url = Config.API_GATEWAY_PARTY_URL + 'emailverification/' + token

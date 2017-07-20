@@ -2,6 +2,7 @@ import unittest
 from app.application import app
 from app.config import Config
 from app.config import TestingConfig
+from app.config import OAuthConfig
 import json
 import requests_mock
 from ons_ras_common import ons_env
@@ -84,7 +85,7 @@ class TestRegistration(unittest.TestCase):
     @requests_mock.mock()
     def test_enter_enrolment_code_page(self, mock_object):
         # GET the Create Account (Enter Enrolment Code) page
-        response = self.app.get('/create-account/', headers=self.headers)
+        response = self.app.get('/register/create-account/', headers=self.headers)
 
         # Check successful response and the correct values are on the page
         self.assertEqual(response.status_code, 200)
@@ -109,14 +110,14 @@ class TestRegistration(unittest.TestCase):
         }
 
         # POST to the Create Account (Enter Enrolment Code) page
-        response = self.app.post('/create-account/', data=post_data, headers=self.headers)
+        response = self.app.post('/register/create-account/', data=post_data, headers=self.headers)
 
         # After a successful POST the user should be redirected to the Confirm Org screen
         self.assertEqual(response.status_code, 302)
         self.assertTrue(
             bytes('You should be redirected automatically to target URL', encoding='UTF-8') in response.data)
         self.assertTrue(
-            bytes('/create-account/confirm-organisation-survey/?enrolment_code=', encoding='UTF-8') in response.data)
+            bytes('/register/create-account/confirm-organisation-survey/?enrolment_code=', encoding='UTF-8') in response.data)
 
     # ============== CONFIRM ORG AND SURVEY ===============
     @requests_mock.mock()
@@ -137,7 +138,7 @@ class TestRegistration(unittest.TestCase):
         mock_object.get(url_get_survey, status_code=200, json=survey_json)
 
         # A GET request with the correct enrolment codes should bring up the page
-        response = self.app.get('/create-account/confirm-organisation-survey/', query_string=params, headers=self.headers)
+        response = self.app.get('/register/create-account/confirm-organisation-survey/', query_string=params, headers=self.headers)
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
@@ -154,7 +155,7 @@ class TestRegistration(unittest.TestCase):
         mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)
 
         # A POST with an invalid or inactive enrolment code should result in an error page being displayed
-        response = self.app.get('/create-account/confirm-organisation-survey/', query_string=params, headers=self.headers)
+        response = self.app.get('/register/create-account/confirm-organisation-survey/', query_string=params, headers=self.headers)
         self.assertEqual(response.status_code, 302)
         self.assertTrue('/error'.encode() in response.data)
 
@@ -165,7 +166,7 @@ class TestRegistration(unittest.TestCase):
         mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)
 
         # A GET with a valid, active enrolment code should result in the page being displayed
-        response = self.app.get('/create-account/enter-account-details', query_string=params, headers=self.headers)
+        response = self.app.get('/register/create-account/enter-account-details', query_string=params, headers=self.headers)
         self.assertEqual(response.status_code, 200)
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
@@ -186,7 +187,7 @@ class TestRegistration(unittest.TestCase):
         mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)
 
         # A GET with a valid, inactive enrolment code should result in the error page being displayed
-        response = self.app.get('/create-account/enter-account-details', query_string=params, headers=self.headers)
+        response = self.app.get('/register/create-account/enter-account-details', query_string=params, headers=self.headers)
         self.assertEqual(response.status_code, 302)
         self.assertTrue('/error'.encode() in response.data)
 
@@ -195,7 +196,7 @@ class TestRegistration(unittest.TestCase):
         """Test create account page is not rendered for an invalid get request"""
 
         # A GET with no enrolment code should result in the error page being displayed
-        response = self.app.get('/create-account/enter-account-details', headers=self.headers)
+        response = self.app.get('/register/create-account/enter-account-details', headers=self.headers)
         self.assertEqual(response.status_code, 302)
         self.assertTrue('/error'.encode() in response.data)
 
@@ -209,8 +210,8 @@ class TestRegistration(unittest.TestCase):
         del self.test_user['email_address']
 
         # A POST with no email should prompt the user
-        self.headers['referer'] = 'create-account/enter-account-details'
-        response = self.app.post('create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
+        self.headers['referer'] = '/register/create-account/enter-account-details'
+        response = self.app.post('/register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
@@ -227,8 +228,8 @@ class TestRegistration(unittest.TestCase):
         del self.test_user['password_confirm']
 
         # A POST with no password should prompt the user
-        self.headers['referer'] = 'create-account/enter-account-details'
-        response = self.app.post('create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
+        self.headers['referer'] = 'register/create-account/enter-account-details'
+        response = self.app.post('register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
@@ -244,8 +245,8 @@ class TestRegistration(unittest.TestCase):
         self.test_user['password_confirm'] = 'wrongpassword'
 
         # A POST with non-matching passwords should prompt the user
-        self.headers['referer'] = 'create-account/enter-account-details'
-        response = self.app.post('create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
+        self.headers['referer'] = 'register/create-account/enter-account-details'
+        response = self.app.post('register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
@@ -261,8 +262,8 @@ class TestRegistration(unittest.TestCase):
         del self.test_user['phone_number']
 
         # A POST with no phone number should prompt the user
-        self.headers['referer'] = 'create-account/enter-account-details'
-        response = self.app.post('create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
+        self.headers['referer'] = 'register/create-account/enter-account-details'
+        response = self.app.post('register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
@@ -278,8 +279,8 @@ class TestRegistration(unittest.TestCase):
         self.test_user['phone_number'] = 'not a number'
 
         # A POST with an invalid phone number should prompt the user
-        self.headers['referer'] = 'create-account/enter-account-details'
-        response = self.app.post('create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
+        self.headers['referer'] = 'register/create-account/enter-account-details'
+        response = self.app.post('register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
@@ -295,8 +296,8 @@ class TestRegistration(unittest.TestCase):
         self.test_user['phone_number'] = '12345678'
 
         # A POST with an invalid phone number should prompt the user
-        self.headers['referer'] = 'create-account/enter-account-details'
-        response = self.app.post('create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
+        self.headers['referer'] = 'register/create-account/enter-account-details'
+        response = self.app.post('register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
@@ -312,8 +313,8 @@ class TestRegistration(unittest.TestCase):
         self.test_user['phone_number'] = '1234567890123456'
 
         # A POST with an invalid phone number should prompt the user
-        self.headers['referer'] = 'create-account/enter-account-details'
-        response = self.app.post('create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
+        self.headers['referer'] = 'register/create-account/enter-account-details'
+        response = self.app.post('register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
@@ -324,9 +325,9 @@ class TestRegistration(unittest.TestCase):
         """Test successful create account"""
 
         # Build URL's which is used to talk to the OAuth2 server
-        url_create_user = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_ADMIN_ENDPOINT
-        url_get_token = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_TOKEN_ENDPOINT
-        url_get_party_data = TestingConfig.API_GATEWAY_PARTY_URL + 'respondents'
+        url_create_user = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_ADMIN_ENDPOINT
+        url_get_token = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
+        url_get_party_data = OAuthConfig.API_GATEWAY_PARTY_URL + 'respondents'
 
         # Here we place a listener on the URL's The flow of events are:
         # 1) The ras_frontstage creates a user on the OAuth2 server.
@@ -343,16 +344,15 @@ class TestRegistration(unittest.TestCase):
         mock_object.post(url_get_party_data, status_code=200, json={})
 
         # A POST with valid user data should reveal the page
-        self.headers['referer'] = 'create-account/enter-account-details'
-        response = self.app.post('create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
+        self.headers['referer'] = 'register/create-account/enter-account-details'
+        response = self.app.post('/register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
         self.assertTrue(bytes('Please follow the link in the email to confirm your email address and finish setting up your account.',
                               encoding='UTF-8') in response.data)
 
-    # TODO fix this test
-    # This test will need updated once we better understand the response that ras party service returns when attempting to create a duplicate account
+    # TODO This test needs to be uncommented and fixed. It was broken when oauth changes were committed to master on approx 13/7/2017
     # @requests_mock.mock()
     # def test_create_duplicate_account(self, mock_object):
     #     """Test create a duplicate account returns 'try a different email this ones in use' """

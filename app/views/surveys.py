@@ -1,10 +1,13 @@
 import json
 import logging
 import requests
+
 from flask import Blueprint, render_template, request
-from structlog import wrap_logger
 from ons_ras_common.ons_decorators import jwt_session
+from structlog import wrap_logger
+
 from app.config import Config
+
 
 logger = wrap_logger(logging.getLogger(__name__))
 surveys_bp = Blueprint('surveys_bp', __name__, static_folder='static', template_folder='templates/surveys')
@@ -66,25 +69,40 @@ def access_survey(session):
     # TODO: this is totally insecure as it doesn't validate the user is allowed access
     #       to the passed collection_instrument_id
 
-    case_id = request.form.get('case_id', None)
-    collection_instrument_id = request.form.get('collection_instrument_id', None)
-    survey = request.form.get('survey', None)
-    survey_abbr = request.form.get('survey_abbr', None)
-    business = request.form.get('business', None)
-    period_start = request.form.get('period_start', None)
-    period_end = request.form.get('period_end', None)
-    submit_by = request.form.get('submit_by', None)
+    if request.method == 'POST':
+        case_id = request.form.get('case_id', None)
+        collection_instrument_id = request.form.get('collection_instrument_id', None)
+        survey = request.form.get('survey', None)
+        survey_abbr = request.form.get('survey_abbr', None)
+        business = request.form.get('business', None)
+        period_start = request.form.get('period_start', None)
+        period_end = request.form.get('period_end', None)
+        submit_by = request.form.get('submit_by', None)
 
-    url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'collectioninstrument/id/{}'.format(collection_instrument_id)
-    logger.debug('Access_survey URL is: {}'.format(url))
+        url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'collectioninstrument/id/{}'.format(collection_instrument_id)
+        logger.debug('Access_survey URL is: {}'.format(url))
 
-    req = requests.get(url, verify=False)
-    ci_data = req.json()
+        req = requests.get(url, verify=False)
+        ci_data = req.json()
 
-    # Render the template
-    return render_template('surveys/surveys-access.html', _theme='default', case_id=case_id, ci_data=ci_data,
-                           survey=survey, survey_abbr=survey_abbr, business=business, period_start=period_start,
-                           period_end=period_end, submit_by=submit_by)
+
+        # Render the template
+        return render_template('surveys/surveys-access.html', _theme='default', case_id=case_id, ci_data=ci_data,
+                               survey=survey, survey_abbr=survey_abbr, business=business, period_start=period_start,
+                               period_end=period_end, submit_by=submit_by)
+
+    # GET request here downloads the xlsx file
+    if request.method == 'GET':
+        collection_instrument_id = request.args.get('cid')
+        url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'download/' + collection_instrument_id
+        logger.info("Requesting spreadsheet file", collection_instrument=collection_instrument_id)
+        response = requests.get(url, verify=False)
+        if response.status_code == 200:
+            return response.content, response.status_code, response.headers.items()
+        else:
+            # TODO Decide how to handle this error
+            return render_template("error.html")
+
 
 
 @surveys_bp.route('/upload_survey', methods=['POST'])

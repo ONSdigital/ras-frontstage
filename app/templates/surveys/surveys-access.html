@@ -24,7 +24,7 @@
 
 
 <a id="DOWNLOAD_SURVEY_BUTTON" class="btn action-button btn--primary" target="_blank"
-   href="{{ config.API_GATEWAY_COLLECTION_INSTRUMENT_URL }}download/{{ ci_data.id }}">
+   href="{{ url_for('surveys_bp.access_survey', cid=ci_data.id) }}">
 
     <div>
         <span class="download__text">Download spreadsheet&nbsp;&nbsp;&nbsp;</span>

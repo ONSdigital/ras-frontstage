@@ -353,6 +353,7 @@ class TestRegistration(unittest.TestCase):
                               encoding='UTF-8') in response.data)
 
     # TODO This test needs to be uncommented and fixed. It was broken when oauth changes were committed to master on approx 13/7/2017
+    # This test will need updated once we better understand the response that ras party service returns when attempting to create a duplicate account
     # @requests_mock.mock()
     # def test_create_duplicate_account(self, mock_object):
     #     """Test create a duplicate account returns 'try a different email this ones in use' """

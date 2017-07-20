@@ -1,45 +1,69 @@
 import logging
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect, url_for
 from structlog import wrap_logger
+
+from app.models import ForgotPasswordForm, ResetPasswordForm
 
 logger = wrap_logger(logging.getLogger(__name__))
 passwords_bp = Blueprint('passwords_bp', __name__, static_folder='static', template_folder='templates/passwords')
 
 
 # ===== Forgot password =====
-@passwords_bp.route('/forgot-password/')
+@passwords_bp.route('/forgot-password/', methods=['GET', 'POST'])
 def forgot_password():
+
+    form = ForgotPasswordForm(request.form)
+
+    if request.method == 'POST' and form.validate():
+
+        email_address = request.form.get('email_address')
+
+        # TODO do some kind of back end processing to validate the email address, error handling, logging
+        # print('Email address=' + email_address)
+
+        return redirect(url_for('passwords_bp.forgot_password_check_email'))
+
     template_data = {
         "error": {
-            "type": request.args.get("error")
+            "type": form.errors,
+            "logged_in": "False"
         }
     }
 
-    # data variables configured: {"error": <undefined, failed>}
-    return render_template('passwords/forgot-password.html', _theme='default', data=template_data)
+    return render_template('passwords/forgot-password.html', _theme='default', form=form, data=template_data)
 
 
-@passwords_bp.route('/forgot-password/check-email/')
+@passwords_bp.route('/forgot-password/check-email/', methods=['GET', 'POST'])
 def forgot_password_check_email():
     return render_template('passwords/forgot-password.check-email.html', _theme='default')
 
 
 # ===== Reset password =====
-@passwords_bp.route('/reset-password/')
+@passwords_bp.route('/reset-password/', methods=['GET', 'POST'])
 def reset_password():
+
+    form = ResetPasswordForm(request.form)
+
+    if request.method == 'POST' and form.validate():
+        password = request.form.get('password')
+        password_confirm = request.form.get('password_confirm')
+
+        print('password=' + password)
+        print('password_confirm=' + password_confirm)
+
+        # TODO do some kind of back end processing to change the password, error handling, logging
+
+        return redirect(url_for('passwords_bp.reset_password_confirmation'))
+
     template_data = {
         "error": {
-            "type": request.args.get("error")
+            "type": form.errors,
+            "logged_in": "False"
         }
     }
-
-    if 'error' in request.args:
-        logger.debug(request.args.get("error"))
-
-    # data variables configured: {"error": <undefined, password-mismatch>}
-    return render_template('passwords/reset-password.html', _theme='default', data=template_data)
+    return render_template('passwords/reset-password.html', _theme='default', form=form, data=template_data)
 
 
-@passwords_bp.route('/reset-password/confirmation/')
+@passwords_bp.route('/reset-password/confirmation/', methods=['GET', 'POST'])
 def reset_password_confirmation():
     return render_template('passwords/reset-password.confirmation.html', _theme='default')

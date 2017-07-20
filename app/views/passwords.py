@@ -39,10 +39,12 @@ def forgot_password_check_email():
 
 
 # ===== Reset password =====
-@passwords_bp.route('/reset-password/', methods=['GET', 'POST'])
-def reset_password():
+@passwords_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
 
     form = ResetPasswordForm(request.form)
+
+    # TODO validate the token
 
     if request.method == 'POST' and form.validate():
         password = request.form.get('password')
@@ -59,7 +61,8 @@ def reset_password():
         "error": {
             "type": form.errors,
             "logged_in": "False"
-        }
+        },
+        'token': token
     }
     return render_template('passwords/reset-password.html', _theme='default', form=form, data=template_data)
 

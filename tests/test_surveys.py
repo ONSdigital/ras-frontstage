@@ -112,21 +112,3 @@ class TestSurveys(unittest.TestCase):
 
         # There should be an Upload button
         self.assertTrue(bytes('UPLOAD_SURVEY_BUTTON', encoding='UTF-8') in response.data)
-
-    @requests_mock.mock()
-    def test_download_spreadsheet(self, mock_object):
-        """Test download link is just returning response from download endpoint"""
-
-        # Build mock URL's which are used to provide application data
-        url_get_token = Config.ONS_OAUTH_PROTOCOL + Config.ONS_OAUTH_SERVER + Config.ONS_TOKEN_ENDPOINT
-        url_download_collection_instrument = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'download/' + collection_instrument_id
-        mock_object.post(url_get_token, status_code=200, json=returned_token)
-        # download_headers = {"content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}
-        mock_object.get(url_download_collection_instrument, status_code=200, file=open('tests/test_data/collection-instrument.xlsx'))
-
-        self.app.post('/sign-in/', data={'username': 'testuser@email.com', 'password': 'password'}, headers=self.headers)
-        response = self.app.get('/surveys/access_survey?cid=' + collection_instrument_id, headers=self.headers)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), collection_instrument_data)
-

@@ -95,7 +95,9 @@ def login():
             "access_token": token['access_token'],
             "scope": token['scope'],
             "expires_at": token['expires_at'],
-            "username": username
+            "username": username,
+            "user_uuid": "ce12b958-2a5f-44f4-a6da-861e59070a32",
+            "role": "respondent"
         }
 
         encoded_jwt_token = encode(data_dict_for_jwt_token)

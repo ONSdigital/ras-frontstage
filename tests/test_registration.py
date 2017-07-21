@@ -320,7 +320,7 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(bytes('This should be a valid phone number between 9 and 15 digits', encoding='UTF-8') in response.data)
 
-    @requests_mock.mock()
+    # @requests_mock.mock()
     # def test_create_account_register_new_user(self, mock_object):
     #     """Test successful create account"""
     # 

@@ -148,3 +148,26 @@ class EnrolmentCodeForm(FlaskForm):
     progress with registration. The 'Activation Code' is a string in our case.
     """
     enrolment_code = StringField('Enrolment Code', [InputRequired()])
+
+
+class ForgotPasswordForm(FlaskForm):
+    """
+    Forgot Password form.
+    """
+    email_address = StringField('Enter your email address',
+                                validators=[InputRequired("Email address is required"),
+                                            Email(message="Your email should be of the form 'myname@email.com' "),
+                                            Length(max=254,
+                                                   message='Your email must be less than 254 characters')])
+
+class ResetPasswordForm(FlaskForm):
+    """
+    Reset Password form.
+    """
+    password = PasswordField('New password',
+                             validators=[DataRequired("Password is required"),
+                                         EqualTo('password_confirm', message=Config.PASSWORD_MATCH_ERROR_TEXT),
+                                         Length(min=Config.PASSWORD_MIN_LENGTH,
+                                                max=Config.PASSWORD_MAX_LENGTH,
+                                                message=Config.PASSWORD_CRITERIA_ERROR_TEXT)])
+    password_confirm = PasswordField('Re-type new password')

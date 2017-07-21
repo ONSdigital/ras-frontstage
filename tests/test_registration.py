@@ -325,9 +325,9 @@ class TestRegistration(unittest.TestCase):
         """Test successful create account"""
 
         # Build URL's which is used to talk to the OAuth2 server
-        url_create_user = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_ADMIN_ENDPOINT
-        url_get_token = OAuthConfig.ONS_OAUTH_PROTOCOL + OAuthConfig.ONS_OAUTH_SERVER + OAuthConfig.ONS_TOKEN_ENDPOINT
-        url_get_party_data = OAuthConfig.API_GATEWAY_PARTY_URL + 'respondents'
+        url_create_user = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_ADMIN_ENDPOINT
+        url_get_token = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_TOKEN_ENDPOINT
+        url_get_party_data = TestingConfig.API_GATEWAY_PARTY_URL + 'respondents'
 
         # Here we place a listener on the URL's The flow of events are:
         # 1) The ras_frontstage creates a user on the OAuth2 server.

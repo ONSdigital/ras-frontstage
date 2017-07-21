@@ -326,7 +326,10 @@ class TestRegistration(unittest.TestCase):
 
         # Build URL's which is used to talk to the OAuth2 server
         url_create_user = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_ADMIN_ENDPOINT
-        url_get_token = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_TOKEN_ENDPOINT
+
+        url_get_token = 'http://ons-oauth2.cfapps.io/api/v1/tokens/'
+        # url_get_token = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_TOKEN_ENDPOINT
+
         url_get_party_data = TestingConfig.API_GATEWAY_PARTY_URL + 'respondents'
 
         # Here we place a listener on the URL's The flow of events are:

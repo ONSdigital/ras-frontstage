@@ -25,8 +25,7 @@ def forgot_password():
 
     template_data = {
         "error": {
-            "type": form.errors,
-            "logged_in": "False"
+            "type": form.errors
         }
     }
 
@@ -59,8 +58,7 @@ def reset_password(token):
 
     template_data = {
         "error": {
-            "type": form.errors,
-            "logged_in": "False"
+            "type": form.errors
         },
         'token': token
     }

@@ -6,6 +6,7 @@
 
 """
 import json
+import requests
 from flask import Blueprint, render_template, request, redirect, url_for
 from app.config import Config
 from ons_ras_common.ons_decorators import jwt_session
@@ -67,17 +68,43 @@ def upload_survey(session):
     """
     party_id = session.get('party_id', 'no-party-id')
     case_id = request.args.get('case_id', None)
-    try:
-        file_obj = request.files['file']
-    except Exception as e:
-        print(e)
-        raise Exception
 
-    code, msg = ons_env.collection_instrument.upload(case_id, party_id, file_obj)
-    if code == 200:
-        return render_template('surveys-upload-success.html', _theme='default', upload_filename=file_obj.filename)
+    # TODO - Add security headers
+    # headers = {'authorization': jwttoken}
+    headers = {}
 
-    return render_template('surveys-upload-failure.html',  _theme='default', error_info=msg, case_id=case_id)
+    # Get the uploaded file
+    upload_file = request.files['file']
+    upload_filename = upload_file.filename
+    upload_file = {'file': (upload_filename, upload_file.stream, upload_file.mimetype, {'Expires': 0})}
+
+    # Build the URL
+    #url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'survey_responses/{}'.format(case_id)
+    url = '{}collection-instrument-api/1.0.2/survey_responses/{}'.format(Config.RAS_CI_SERVICE, case_id)
+    ons_env.logger.debug('upload_survey URL is: {}'.format(url))
+
+    # Call the API Gateway Service to upload the selected file
+    result = requests.post(url, headers, files=upload_file, verify=False)
+    ons_env.logger.debug('Result => {} {} : {}'.format(result.status_code, result.reason, result.text))
+
+    from ..post_event import post_event
+
+    category = 'SUCCESSFUL_RESPONSE_UPLOAD' if result.status_code == 200 else 'UNSUCCESSFUL_RESPONSE_UPLOAD'
+    code, msg = post_event(case_id,
+                              category=category,
+                              created_by='SYSTEM',
+                              party_id=party_id,
+                              description='Instrument response uploaded "{}"'.format(case_id))
+    if code != 200:
+        ons_env.logger.error('error code = {} logging to case service: "{}"'.format(code, msg))
+    if result.status_code == 200:
+        ons_env.logger.debug('Upload successful')
+        return render_template('surveys-upload-success.html', _theme='default', upload_filename=upload_filename)
+    else:
+        ons_env.logger.debug('Upload failed')
+        error_info = json.loads(result.text)
+        return render_template('surveys-upload-failure.html', _theme='default', error_info=error_info, case_id=case_id)
+
 
 
 def my_surveys_page(session, page=None, not_started=False, in_progress=False, complete=False):

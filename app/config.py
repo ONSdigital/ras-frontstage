@@ -69,7 +69,22 @@ class Config(object):
                                            'https://ras-api-gateway-int.apps.devtest.onsclofo.uk/party-api/1.0.4/')
     API_GATEWAY_IAC_URL = os.environ.get('API_GATEWAY_IAC_URL',
                                          'https://ras-api-gateway-int.apps.devtest.onsclofo.uk/api/1.0.0/iacs/')
-    
+
+    #
+    #   These settings are to support the new post_event routine which has been ported
+    #   into ras-frontstage from ras-common. The style of environment variable over-ride
+    #   has been taken from JB's new common code implementation.
+    #
+    RM_CASE_SERVICE_HOST = os.getenv('RM_CASE_SERVICE_HOST', 'localhost')
+    RM_CASE_SERVICE_PORT = os.getenv('RM_CASE_SERVICE_PORT', 8171)
+    RM_CASE_SERVICE_PROTOCOL = os.getenv('RM_CASE_SERVICE_PROTOCOL', 'http')
+    RM_CASE_SERVICE = '{}://{}:{}/'.format(RM_CASE_SERVICE_PROTOCOL, RM_CASE_SERVICE_HOST, RM_CASE_SERVICE_PORT)
+
+    RAS_CI_SERVICE_HOST = os.getenv('RAS_COLLECTION_INSTRUMENT_SERVICE_HOST', 'localhost')
+    RAS_CI_SERVICE_PORT = os.getenv('RAS_COLLECTION_INSTRUMENT_SERVICE_PORT', 8002)
+    RAS_CI_SERVICE_PROTOCOL = os.getenv('RAS_COLLECTION_INSTRUMENT_SERVICE_PROTOCOL', 'http')
+    RAS_CI_SERVICE = '{}://{}:{}/'.format(RAS_CI_SERVICE_PROTOCOL, RAS_CI_SERVICE_HOST, RAS_CI_SERVICE_PORT)
+
     PASSWORD_MATCH_ERROR_TEXT = 'Your passwords do not match'
     PASSWORD_CRITERIA_ERROR_TEXT = 'Your password does not meet the requirements'
     PASSWORD_MIN_LENGTH = 8

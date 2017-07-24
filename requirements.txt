@@ -1,4 +1,4 @@
-git+https://github.com/ONSdigital/ras-common.git@integration_baseline_1
+git+https://github.com/ONSdigital/ras-common.git@TBL081/static_routing
 flake8==2.5.4
 alembic==0.9.1
 appdirs==1.4.3

@@ -102,6 +102,7 @@ def login():
 
         encoded_jwt_token = encode(data_dict_for_jwt_token)
         response = make_response(redirect(url_for('surveys_bp.logged_in')))
+        logger.info('Encoded JWT %s', encoded_jwt_token)
         response.set_cookie('authorization', value=encoded_jwt_token)
         return response
 

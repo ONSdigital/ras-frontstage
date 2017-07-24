@@ -27,7 +27,7 @@
             {% endif %}
         </div>
         <div class="panel__body" data-qa="error-body">
-            <p class="mars"><a href="#sign-in-details" class="js-inpagelink">Please try again</a></p>
+            <p class="mars"><a href="#sign-in-details" id="try-again-link" class="js-inpagelink">Please try again</a></p>
         </div>
     </div>
     <br />
@@ -43,7 +43,7 @@
         <p>You may now sign in.</p>
         {% else %}
         <p>Have an enrolment code?<br/>
-           Use it to <a href="/register/create-account">create an account</a>
+           Use it to <a id="create-account" href="/register/create-account">create an account</a>
         </p>
         <h1 class="saturn">Sign in</h1>
         {% endif %}

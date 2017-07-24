@@ -12,15 +12,14 @@ Send secure message
             <div class="system-feedback"> 
                 <ul class="system-feedback__list"> 
                     <li class="system-feedback__list-item system-feedback__list-item--success"> 
-                        <i class="fa fa-check-circle system-feedback__icon" aria-hidden="true"> Draft saved.<a href="{{ url_for('secure_message_bp.messages_get', label='DRAFT') }}">View your inbox</a> </i>  </li> 
+                        <i class="fa fa-check-circle system-feedback__icon" aria-hidden="true" id="inbox-link"> Draft saved.<a href="{{ url_for('secure_message_bp.messages_get', label='DRAFT') }}">View your inbox</a> </i>  </li> 
                 </ul> 
             </div>
             <h1 class="saturn">Edit a draft message</h1>
 
             <div class="secure-message-form">
-                <form method="post">
+                <form action="{{ url_for('secure_message_bp.reply_message') }}" method="post">
                     <p>To: BRES</p>
-
 
                     <input
                             id="msg_id"
@@ -48,9 +47,7 @@ Send secure message
                             class="secure-message-form__body input"
                             rows="10"
                             name="secure-message-body"
-                            required>{{ draft['body']}}
-                        </textarea>
-
+                            required>{{draft['body']}}</textarea>
                     </fieldset>
 
                     <br />

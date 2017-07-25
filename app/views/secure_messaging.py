@@ -28,7 +28,7 @@ def create_message(session):
 
     if request.method == 'POST':
         data = {'msg_to': ['BRES'],
-                'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                'msg_from': session['user_uuid'],
                 'subject': request.form['secure-message-subject'],
                 'body': request.form['secure-message-body'],
                 'collection_case': 'test',
@@ -74,7 +74,7 @@ def reply_message(session):
         if request.form['submit'] == 'Send message':
             logger.info("Reply to Message")
             data = {'msg_to': ['BRES'],
-                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                    'msg_from': session['user_uuid'],
                     'subject': request.form['secure-message-subject'],
                     'body': request.form['secure-message-body'],
                     'thread_id': 'test',
@@ -86,7 +86,7 @@ def reply_message(session):
 
         if request.form['submit'] == 'Save draft':
             data = {'msg_to': ['BRES'],
-                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                    'msg_from': session['user_uuid'],
                     'subject': request.form['secure-message-subject'],
                     'body': request.form['secure-message-body'],
                     'collection_case': 'test',
@@ -120,6 +120,7 @@ def reply_message(session):
 
 
 def message_check_response(data):
+    headers['Authorization'] = request.cookies['authorization']
     response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
     if response.status_code != 201:
         # TODO replace with custom error page when available

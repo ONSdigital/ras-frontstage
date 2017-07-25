@@ -70,6 +70,11 @@ class Config(object):
     API_GATEWAY_IAC_URL = os.environ.get('API_GATEWAY_IAC_URL',
                                          'https://ras-api-gateway-int.apps.devtest.onsclofo.uk/api/1.0.0/iacs/')
 
+    PASSWORD_MATCH_ERROR_TEXT = 'Your passwords do not match'
+    PASSWORD_CRITERIA_ERROR_TEXT = 'Your password does not meet the requirements'
+    PASSWORD_MIN_LENGTH = 8
+    PASSWORD_MAX_LENGTH = 160
+
     #
     #   These settings are to support the new post_event routine which has been ported
     #   into ras-frontstage from ras-common. The style of environment variable over-ride
@@ -80,15 +85,15 @@ class Config(object):
     RM_CASE_SERVICE_PROTOCOL = os.getenv('RM_CASE_SERVICE_PROTOCOL', 'http')
     RM_CASE_SERVICE = '{}://{}:{}/'.format(RM_CASE_SERVICE_PROTOCOL, RM_CASE_SERVICE_HOST, RM_CASE_SERVICE_PORT)
 
-    RAS_CI_SERVICE_HOST = os.getenv('RAS_COLLECTION_INSTRUMENT_SERVICE_HOST', 'localhost')
-    RAS_CI_SERVICE_PORT = os.getenv('RAS_COLLECTION_INSTRUMENT_SERVICE_PORT', 8002)
-    RAS_CI_SERVICE_PROTOCOL = os.getenv('RAS_COLLECTION_INSTRUMENT_SERVICE_PROTOCOL', 'http')
-    RAS_CI_SERVICE = '{}://{}:{}/'.format(RAS_CI_SERVICE_PROTOCOL, RAS_CI_SERVICE_HOST, RAS_CI_SERVICE_PORT)
+    RAS_COLLECTION_INSTRUMENT_SERVICE_HOST = os.getenv('RAS_COLLECTION_INSTRUMENT_SERVICE_HOST', 'localhost')
+    RAS_COLLECTION_INSTRUMENT_SERVICE_PORT = os.getenv('RAS_COLLECTION_INSTRUMENT_SERVICE_PORT', 8002)
+    RAS_COLLECTION_INSTRUMENT_SERVICE_PROTOCOL = os.getenv('RAS_COLLECTION_INSTRUMENT_SERVICE_PROTOCOL', 'http')
+    RAS_COLLECTION_INSTRUMENT_SERVICE = '{}://{}:{}/'.format(RAS_COLLECTION_INSTRUMENT_SERVICE_PROTOCOL, RAS_COLLECTION_INSTRUMENT_SERVICE_HOST, RAS_COLLECTION_INSTRUMENT_SERVICE_PORT)
 
-    PASSWORD_MATCH_ERROR_TEXT = 'Your passwords do not match'
-    PASSWORD_CRITERIA_ERROR_TEXT = 'Your password does not meet the requirements'
-    PASSWORD_MIN_LENGTH = 8
-    PASSWORD_MAX_LENGTH = 160
+    RAS_API_GATEWAY_SERVICE_HOST = os.getenv('RAS_API_GATEWAY_SERVICE_HOST', 'localhost')
+    RAS_API_GATEWAY_SERVICE_PORT = os.getenv('RAS_API_GATEWAY_SERVICE_PORT', 8080)
+    RAS_API_GATEWAY_SERVICE_PROTOCOL = os.getenv('RAS_API_GATEWAY_SERVICE_PROTOCOL', 'http')
+    RAS_API_GATEWAY_SERVICE = '{}://{}:{}/'.format(RAS_API_GATEWAY_SERVICE_PROTOCOL, RAS_API_GATEWAY_SERVICE_HOST, RAS_API_GATEWAY_SERVICE_PORT)
 
 
 class ProductionConfig(Config):

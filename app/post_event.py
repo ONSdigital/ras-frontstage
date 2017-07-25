@@ -37,10 +37,11 @@ def post_event(case_id, description=None, category=None, party_id=None, created_
     if not _categories:
         ons_env.logger.info('@ caching event category list')
         resp = requests.get('{}categories'.format(Config.RM_CASE_SERVICE))
-        if not resp.status_code:
+        if resp.status_code != 200:
             return 404, {'code': 404, 'text': 'error loading categories'}
         _categories = {}
         categories = loads(resp.text)
+        print("Categories>", categories)
         for cat in categories:
             action = cat.get('name')
             if action:

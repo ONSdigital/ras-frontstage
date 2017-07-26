@@ -53,7 +53,7 @@
 
 <ul class="message-list">
     {% for message in messages %}
-    <li class="message-list__item">
+    <li id="message-list" class="message-list__item">
         {% if 'UNREAD' in message['labels'] and 'DRAFT' in message['labels'] %}
             <b><a href="{{ url_for('secure_message_bp.draft_get', draft_id=message['msg_id']) }}">{{ message['subject'] }}</a></b>
         {% elif 'UNREAD' in message['labels'] and 'DRAFT' not in message['labels'] %}

@@ -7,7 +7,7 @@ from ons_ras_common.ons_decorators import jwt_session
 from structlog import wrap_logger
 
 from app.config import Config
-from .post_event import post_event
+from ..common.post_event import post_event
 
 logger = wrap_logger(logging.getLogger(__name__))
 surveys_bp = Blueprint('surveys_bp', __name__, static_folder='static', template_folder='templates/surveys')
@@ -70,6 +70,8 @@ def access_survey(session):
     # TODO: this is totally insecure as it doesn't validate the user is allowed access
     #       to the passed collection_instrument_id
 
+    party_id = session.get('party_id', 'no-party-id')
+
     if request.method == 'POST':
         case_id = request.form.get('case_id', None)
         collection_instrument_id = request.form.get('collection_instrument_id', None)
@@ -95,15 +97,28 @@ def access_survey(session):
     # GET request here downloads the xlsx file
     if request.method == 'GET':
         collection_instrument_id = request.args.get('cid')
+        case_id = request.args.get('case_id')
         url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'download/' + collection_instrument_id
         logger.info("Requesting spreadsheet file", collection_instrument=collection_instrument_id)
         response = requests.get(url, verify=False)
+
         if response.status_code == 200:
+
+            category = 'COLLECTION_INSTRUMENT_DOWNLOADED'
+            code, msg = post_event(case_id,
+                                   category=category,
+                                   created_by='SYSTEM',
+                                   party_id=party_id,
+                                   description='Instrument response uploaded "{}"'.format(case_id))
+            if code != 201:
+                logger.error('error "{}" logging case event'.format(code))
+                logger.error(str(msg))
+
             return response.content, response.status_code, response.headers.items()
         else:
             # TODO Decide how to handle this error
-            return render_template("error.html")
-
+            logger.error('ci download of "{}" failed with "{}"'.format(collection_instrument_id, response.status_code))
+            return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
 
 @surveys_bp.route('/upload_survey', methods=['POST'])

@@ -91,7 +91,8 @@ def post_event(case_id, description=None, category=None, party_id=None, created_
     ons_env.logger.debug(loads(resp.text))
     return resp.status_code, {'code': resp.status_code, 'text': resp.text}
 
-
+# TODO: this commented code should probably make it's way into the imminent integration testing
+#
 #if __name__ == '__main__':
 #    """
 #    Try a test post against the currently defined case logging service.

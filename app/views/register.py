@@ -14,7 +14,7 @@ from app.models import RegistrationForm, EnrolmentCodeForm
 
 from ons_ras_common import ons_env
 from app.config import Config
-from .post_event import post_event
+from ..common.post_event import post_event
 
 app = Flask(__name__)
 app.debug = True

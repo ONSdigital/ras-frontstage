@@ -88,9 +88,9 @@
             </dt>
             <dd class="grid__col col-9@m pull-1@m">
                 {% if 'UNREAD' in message['labels'] %}
-                    <b>{{ message['@msg_from']['email'] }}</b>
+                    <b>{{ message['@msg_from']['firstname'] }}</b>
                 {% else %}
-                    {{ message['@msg_from']['email'] }}
+                    {{ message['@msg_from']['firstname'] }}
                 {% endif %}
             </dd>
         </dl>

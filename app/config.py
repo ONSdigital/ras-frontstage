@@ -84,6 +84,27 @@ class Config(object):
     PASSWORD_MIN_LENGTH = 8
     PASSWORD_MAX_LENGTH = 160
 
+    #
+    #   These settings are to support the new post_event routine which has been ported
+    #   into ras-frontstage from ras-common. The style of environment variable over-ride
+    #   has been taken from JB's new common code implementation.
+    #
+    RM_CASE_SERVICE_HOST = os.getenv('RM_CASE_SERVICE_HOST', 'localhost')
+    RM_CASE_SERVICE_PORT = os.getenv('RM_CASE_SERVICE_PORT', 8171)
+    RM_CASE_SERVICE_PROTOCOL = os.getenv('RM_CASE_SERVICE_PROTOCOL', 'http')
+    RM_CASE_SERVICE = '{}://{}:{}/'.format(RM_CASE_SERVICE_PROTOCOL, RM_CASE_SERVICE_HOST, RM_CASE_SERVICE_PORT)
+
+    RAS_COLLECTION_INSTRUMENT_SERVICE_HOST = os.getenv('RAS_COLLECTION_INSTRUMENT_SERVICE_HOST', 'localhost')
+    RAS_COLLECTION_INSTRUMENT_SERVICE_PORT = os.getenv('RAS_COLLECTION_INSTRUMENT_SERVICE_PORT', 8002)
+    RAS_COLLECTION_INSTRUMENT_SERVICE_PROTOCOL = os.getenv('RAS_COLLECTION_INSTRUMENT_SERVICE_PROTOCOL', 'http')
+    RAS_COLLECTION_INSTRUMENT_SERVICE = '{}://{}:{}/'.format(RAS_COLLECTION_INSTRUMENT_SERVICE_PROTOCOL, RAS_COLLECTION_INSTRUMENT_SERVICE_HOST, RAS_COLLECTION_INSTRUMENT_SERVICE_PORT)
+
+    RAS_API_GATEWAY_SERVICE_HOST = os.getenv('RAS_API_GATEWAY_SERVICE_HOST', 'localhost')
+    RAS_API_GATEWAY_SERVICE_PORT = os.getenv('RAS_API_GATEWAY_SERVICE_PORT', 8080)
+    RAS_API_GATEWAY_SERVICE_PROTOCOL = os.getenv('RAS_API_GATEWAY_SERVICE_PROTOCOL', 'http')
+    RAS_API_GATEWAY_SERVICE = '{}://{}:{}/'.format(RAS_API_GATEWAY_SERVICE_PROTOCOL, RAS_API_GATEWAY_SERVICE_HOST, RAS_API_GATEWAY_SERVICE_PORT)
+
+
 class ProductionConfig(Config):
     """
     Production config class

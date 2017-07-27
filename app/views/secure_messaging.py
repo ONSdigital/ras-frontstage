@@ -6,8 +6,6 @@ from ons_ras_common.ons_decorators import jwt_session
 import requests
 from structlog import wrap_logger
 
-#from app.config import SecureMessaging
-
 
 logger = wrap_logger(logging.getLogger(__name__))
 

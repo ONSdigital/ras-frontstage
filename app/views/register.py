@@ -14,6 +14,7 @@ from app.models import RegistrationForm, EnrolmentCodeForm
 
 from ons_ras_common import ons_env
 from app.config import Config
+from .post_event import post_event
 
 app = Flask(__name__)
 app.debug = True
@@ -71,11 +72,11 @@ def register():
             # TODO pass in the user who is creating the post event
 
             # Post an authentication case event to the case service
-            ons_env.case_service.post_event(case_id,
-                                            category='ACCESS_CODE_AUTHENTICATION_ATTEMPT',
-                                            created_by='TODO',
-                                            party_id='db036fd7-ce17-40c2-a8fc-932e7c228397',
-                                            description='Enrolment code entered "{}"'.format(enrolment_code))
+            post_event(case_id,
+                        category='ACCESS_CODE_AUTHENTICATION_ATTEMPT',
+                        created_by='TODO',
+                        party_id='db036fd7-ce17-40c2-a8fc-932e7c228397',
+                        description='Enrolment code entered "{}"'.format(enrolment_code))
 
             # Encrypt the enrolment code
             coded_token = ons_env.crypt.encrypt(enrolment_code.encode()).decode()
@@ -106,14 +107,14 @@ def register_confirm_organisation_survey():
     if encrypted_enrolment_code:
         decrypted_enrolment_code = ons_env.crypt.decrypt(encrypted_enrolment_code.encode()).decode()
     else:
-        ons_env.logger.error('Confirm organisation screen - Enrolment code not specified')
+        logger.error('Confirm organisation screen - Enrolment code not specified')
         return redirect(url_for('error_page'))
 
     case_id = validate_enrolment_code(decrypted_enrolment_code)
 
     # Ensure we have got a valid enrolment code, otherwise go to the sign in page
     if not case_id:
-        ons_env.logger.error('Confirm organisation screen - Case ID not available')
+        logger.error('Confirm organisation screen - Case ID not available')
         return redirect(url_for('error_page'))
 
     # TODO More error handling e.g. cater for case not coming back from the case service, etc.

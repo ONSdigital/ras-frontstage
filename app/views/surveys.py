@@ -7,17 +7,18 @@ from ons_ras_common.ons_decorators import jwt_session
 from structlog import wrap_logger
 
 from app.config import Config
-
+from .post_event import post_event
 
 logger = wrap_logger(logging.getLogger(__name__))
 surveys_bp = Blueprint('surveys_bp', __name__, static_folder='static', template_folder='templates/surveys')
 
 
-def build_survey_data(status_filter):
+def build_survey_data(session, status_filter):
     """Helper method used to query for Surveys (To Do and History)"""
 
-    # TODO - Derive the Party Id
-    party_id = "3b136c4b-7a14-4904-9e01-13364dd7b972"
+    # #done# TODO - Derive the Party Id
+    # party_id = "3b136c4b-7a14-4904-9e01-13364dd7b972"
+    party_id = session.get('party_id', 'no-party-id')
 
     # TODO - Add security headers
     # headers = {'authorization': jwttoken}
@@ -41,7 +42,7 @@ def logged_in(session):
     status_filter = {'status_filter': '["not started", "in progress"]'}
 
     # Get the survey data (To Do survey type)
-    data_array = build_survey_data(status_filter)
+    data_array = build_survey_data(session, status_filter)
 
     return render_template('surveys/surveys-todo.html', _theme='default', data_array=data_array)
 
@@ -56,7 +57,7 @@ def surveys_history(session):
     status_filter = {'status_filter': '["complete"]'}
 
     # Get the survey data (History survey type)
-    data_array = build_survey_data(status_filter)
+    data_array = build_survey_data(session, status_filter)
 
     # Render the template
     return render_template('surveys/surveys-history.html',  _theme='default', data_array=data_array)
@@ -110,6 +111,7 @@ def access_survey(session):
 def upload_survey(session):
     """Logged in page for users only."""
 
+    party_id = session.get('party_id', 'no-party-id')
     case_id = request.args.get('case_id', None)
 
     # TODO - Add security headers
@@ -128,6 +130,16 @@ def upload_survey(session):
     # Call the API Gateway Service to upload the selected file
     result = requests.post(url, headers, files=upload_file, verify=False)
     logger.debug('Result => {} {} : {}'.format(result.status_code, result.reason, result.text))
+
+    category = 'SUCCESSFUL_RESPONSE_UPLOAD' if result.status_code == 200 else 'UNSUCCESSFUL_RESPONSE_UPLOAD'
+    code, msg = post_event(case_id,
+                              category=category,
+                              created_by='SYSTEM',
+                              party_id=party_id,
+                              description='Instrument response uploaded "{}"'.format(case_id))
+    if code != 201:
+        logger.error('error "{}" logging case event'.format(code))
+        logger.error(str(msg))
 
     if result.status_code == 200:
         logger.debug('Upload successful')

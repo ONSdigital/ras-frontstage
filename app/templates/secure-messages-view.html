@@ -39,7 +39,7 @@
         </fieldset>
 
         <fieldset>
-            <label class="venus" for="secure-message-body">Add a message</label>
+            <label class="venus" for="secure-message-body">Reply</label>
             <textarea
                 id="secure-message-body"
                 class="input input--textarea input--textarea-message"
@@ -50,7 +50,7 @@
         <br />
 
         <input class="btn btn--secondary" type="submit" name ="submit" value="Save draft" id="draft">
-        <input class="btn" type="submit" name="submit" value="Send">
+        <input class="btn" type="submit" name="submit" value="Send" id="submit-btn">
 
         <p><a href="{{ url_for('secure_message_bp.messages_get') }}">Cancel</a></p>
     </form>

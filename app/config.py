@@ -153,25 +153,3 @@ class OAuthConfig(Config):
     ONS_TOKEN_ENDPOINT = os.environ.get('ONS_TOKEN_ENDPOINT', '/api/v1/tokens/')
     ONS_ADMIN_ENDPOINT = os.environ.get('ONS_ADMIN_ENDPOINT', '/api/account/create')
 
-
-class SecureMessaging(Config):
-    """Used to configure Secure Messaging"""
-
-    MESSAGE_LIMIT = 1000
-
-    SM_API_URL = os.environ.get('SM_URL', 'http://localhost:5050')
-    SM_UI_URL = os.environ.get('SM_UI_URL', 'http://localhost:5001/secure-message')
-    CREATE_MESSAGE_API_URL = SM_API_URL + '/message/send'
-    CREATE_MESSAGE_UI_URL = SM_UI_URL + '/create-message'
-    MESSAGE_DRAFT_URL = SM_UI_URL + '/DRAFT'
-    MESSAGES_API_URL = SM_API_URL + '/messages?limit=' + str(MESSAGE_LIMIT)
-    MESSAGE_GET_URL = SM_API_URL + '/message/{0}'
-    MESSAGE_MODIFY_URL = SM_API_URL + '/message/{0}/modify'
-    MESSAGES_UI_URL = SM_UI_URL + '/messages'
-    DRAFT_SAVE_API_URL = SM_API_URL + '/draft/save'
-    DRAFT_GET_API_URL = SM_API_URL + '/draft/{0}'
-    DRAFT_ID_API_URL = SM_API_URL + '/draft/<draft_id>'
-    DRAFT_PUT_API_URL = SM_API_URL + '/draft/{0}/modify'
-
-    # Selenium Driver Path
-    chrome_driver = "{}/tests/selenium_scripts/drivers/chromedriver".format(os.environ.get('RAS_FRONTSTAGE_PATH'))

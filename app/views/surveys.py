@@ -25,7 +25,9 @@ def build_survey_data(session, status_filter):
     headers = {}
 
     # Call the API Gateway Service to get the To Do survey list
-    url = Config.API_GATEWAY_AGGREGATED_SURVEYS_URL + 'todo/' + party_id
+    # url = Config.API_GATEWAY_AGGREGATED_SURVEYS_URL + 'todo/' + party_id
+
+    url = Config.RAS_AGGREGATOR_TODO.format(Config.RAS_API_GATEWAY_SERVICE, session.get('party_id'))
     logger.debug("build_survey_data URL is: {}".format(url))
     req = requests.get(url, headers=headers, params=status_filter, verify=False)
 
@@ -82,12 +84,12 @@ def access_survey(session):
         period_end = request.form.get('period_end', None)
         submit_by = request.form.get('submit_by', None)
 
-        url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'collectioninstrument/id/{}'.format(collection_instrument_id)
-        logger.debug('Access_survey URL is: {}'.format(url))
+        #url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'collectioninstrument/id/{}'.format(collection_instrument_id)
+        url = Config.RAS_CI_GET.format(Config.RAS_COLLECTION_INSTRUMENT_SERVICE, collection_instrument_id)
 
+        logger.debug('Access_survey URL is: {}'.format(url))
         req = requests.get(url, verify=False)
         ci_data = req.json()
-
 
         # Render the template
         return render_template('surveys/surveys-access.html', _theme='default', case_id=case_id, ci_data=ci_data,
@@ -98,22 +100,23 @@ def access_survey(session):
     if request.method == 'GET':
         collection_instrument_id = request.args.get('cid')
         case_id = request.args.get('case_id')
-        url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'download/' + collection_instrument_id
+        #url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'download/' + collection_instrument_id
+
+        url = Config.RAS_CI_DOWNLOAD.format(Config.RAS_COLLECTION_INSTRUMENT_SERVICE, collection_instrument_id)
         logger.info("Requesting spreadsheet file", collection_instrument=collection_instrument_id)
         response = requests.get(url, verify=False)
 
+        category = 'COLLECTION_INSTRUMENT_DOWNLOADED' if response.status_code == 200 else 'COLLECTION_INSTRUMENT_ERROR'
+        code, msg = post_event(case_id,
+                               category=category,
+                               created_by='SYSTEM',
+                               party_id=party_id,
+                               description='Instrument response uploaded "{}"'.format(case_id))
+        if code != 201:
+            logger.error('error "{}" logging case event'.format(code))
+            logger.error(str(msg))
+
         if response.status_code == 200:
-
-            category = 'COLLECTION_INSTRUMENT_DOWNLOADED'
-            code, msg = post_event(case_id,
-                                   category=category,
-                                   created_by='SYSTEM',
-                                   party_id=party_id,
-                                   description='Instrument response uploaded "{}"'.format(case_id))
-            if code != 201:
-                logger.error('error "{}" logging case event'.format(code))
-                logger.error(str(msg))
-
             return response.content, response.status_code, response.headers.items()
         else:
             # TODO Decide how to handle this error
@@ -139,7 +142,10 @@ def upload_survey(session):
     upload_file = {'file': (upload_filename, upload_file.stream, upload_file.mimetype, {'Expires': 0})}
 
     # Build the URL
-    url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'survey_responses/{}'.format(case_id)
+    #url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'survey_responses/{}'.format(case_id)
+
+
+    url = Config.RAS_CI_UPLOAD.format(Config.RAS_COLLECTION_INSTRUMENT_SERVICE, case_id)
     logger.debug('upload_survey URL is: {}'.format(url))
 
     # Call the API Gateway Service to upload the selected file

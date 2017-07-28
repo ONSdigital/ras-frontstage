@@ -2,7 +2,6 @@ import unittest
 from app.application import app
 from app.config import Config
 from app.config import TestingConfig
-from app.config import OAuthConfig
 import json
 import requests_mock
 from ons_ras_common import ons_env

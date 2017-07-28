@@ -1,20 +1,24 @@
 import json
 import logging
 import requests
+
 from flask import Blueprint, render_template, request
-from structlog import wrap_logger
 from ons_ras_common.ons_decorators import jwt_session
+from structlog import wrap_logger
+
 from app.config import Config
+from ..common.post_event import post_event
 
 logger = wrap_logger(logging.getLogger(__name__))
 surveys_bp = Blueprint('surveys_bp', __name__, static_folder='static', template_folder='templates/surveys')
 
 
-def build_survey_data(status_filter):
+def build_survey_data(session, status_filter):
     """Helper method used to query for Surveys (To Do and History)"""
 
-    # TODO - Derive the Party Id
-    party_id = "3b136c4b-7a14-4904-9e01-13364dd7b972"
+    # #done# TODO - Derive the Party Id
+    # party_id = "3b136c4b-7a14-4904-9e01-13364dd7b972"
+    party_id = session.get('party_id', 'no-party-id')
 
     # TODO - Add security headers
     # headers = {'authorization': jwttoken}
@@ -38,7 +42,7 @@ def logged_in(session):
     status_filter = {'status_filter': '["not started", "in progress"]'}
 
     # Get the survey data (To Do survey type)
-    data_array = build_survey_data(status_filter)
+    data_array = build_survey_data(session, status_filter)
 
     return render_template('surveys/surveys-todo.html', _theme='default', data_array=data_array)
 
@@ -53,7 +57,7 @@ def surveys_history(session):
     status_filter = {'status_filter': '["complete"]'}
 
     # Get the survey data (History survey type)
-    data_array = build_survey_data(status_filter)
+    data_array = build_survey_data(session, status_filter)
 
     # Render the template
     return render_template('surveys/surveys-history.html',  _theme='default', data_array=data_array)
@@ -66,25 +70,55 @@ def access_survey(session):
     # TODO: this is totally insecure as it doesn't validate the user is allowed access
     #       to the passed collection_instrument_id
 
-    case_id = request.form.get('case_id', None)
-    collection_instrument_id = request.form.get('collection_instrument_id', None)
-    survey = request.form.get('survey', None)
-    survey_abbr = request.form.get('survey_abbr', None)
-    business = request.form.get('business', None)
-    period_start = request.form.get('period_start', None)
-    period_end = request.form.get('period_end', None)
-    submit_by = request.form.get('submit_by', None)
+    party_id = session.get('party_id', 'no-party-id')
 
-    url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'collectioninstrument/id/{}'.format(collection_instrument_id)
-    logger.debug('Access_survey URL is: {}'.format(url))
+    if request.method == 'POST':
+        case_id = request.form.get('case_id', None)
+        collection_instrument_id = request.form.get('collection_instrument_id', None)
+        survey = request.form.get('survey', None)
+        survey_abbr = request.form.get('survey_abbr', None)
+        business = request.form.get('business', None)
+        period_start = request.form.get('period_start', None)
+        period_end = request.form.get('period_end', None)
+        submit_by = request.form.get('submit_by', None)
 
-    req = requests.get(url, verify=False)
-    ci_data = req.json()
+        url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'collectioninstrument/id/{}'.format(collection_instrument_id)
+        logger.debug('Access_survey URL is: {}'.format(url))
 
-    # Render the template
-    return render_template('surveys/surveys-access.html', _theme='default', case_id=case_id, ci_data=ci_data,
-                           survey=survey, survey_abbr=survey_abbr, business=business, period_start=period_start,
-                           period_end=period_end, submit_by=submit_by)
+        req = requests.get(url, verify=False)
+        ci_data = req.json()
+
+
+        # Render the template
+        return render_template('surveys/surveys-access.html', _theme='default', case_id=case_id, ci_data=ci_data,
+                               survey=survey, survey_abbr=survey_abbr, business=business, period_start=period_start,
+                               period_end=period_end, submit_by=submit_by)
+
+    # GET request here downloads the xlsx file
+    if request.method == 'GET':
+        collection_instrument_id = request.args.get('cid')
+        case_id = request.args.get('case_id')
+        url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'download/' + collection_instrument_id
+        logger.info("Requesting spreadsheet file", collection_instrument=collection_instrument_id)
+        response = requests.get(url, verify=False)
+
+        if response.status_code == 200:
+
+            category = 'COLLECTION_INSTRUMENT_DOWNLOADED'
+            code, msg = post_event(case_id,
+                                   category=category,
+                                   created_by='SYSTEM',
+                                   party_id=party_id,
+                                   description='Instrument response uploaded "{}"'.format(case_id))
+            if code != 201:
+                logger.error('error "{}" logging case event'.format(code))
+                logger.error(str(msg))
+
+            return response.content, response.status_code, response.headers.items()
+        else:
+            # TODO Decide how to handle this error
+            logger.error('ci download of "{}" failed with "{}"'.format(collection_instrument_id, response.status_code))
+            return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
 
 @surveys_bp.route('/upload_survey', methods=['POST'])
@@ -92,6 +126,7 @@ def access_survey(session):
 def upload_survey(session):
     """Logged in page for users only."""
 
+    party_id = session.get('party_id', 'no-party-id')
     case_id = request.args.get('case_id', None)
 
     # TODO - Add security headers
@@ -110,6 +145,16 @@ def upload_survey(session):
     # Call the API Gateway Service to upload the selected file
     result = requests.post(url, headers, files=upload_file, verify=False)
     logger.debug('Result => {} {} : {}'.format(result.status_code, result.reason, result.text))
+
+    category = 'SUCCESSFUL_RESPONSE_UPLOAD' if result.status_code == 200 else 'UNSUCCESSFUL_RESPONSE_UPLOAD'
+    code, msg = post_event(case_id,
+                              category=category,
+                              created_by='SYSTEM',
+                              party_id=party_id,
+                              description='Instrument response uploaded "{}"'.format(case_id))
+    if code != 201:
+        logger.error('error "{}" logging case event'.format(code))
+        logger.error(str(msg))
 
     if result.status_code == 200:
         logger.debug('Upload successful')

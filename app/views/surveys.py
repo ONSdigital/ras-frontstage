@@ -100,10 +100,9 @@ def access_survey(session):
     if request.method == 'GET':
         collection_instrument_id = request.args.get('cid')
         case_id = request.args.get('case_id')
-        #url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'download/' + collection_instrument_id
-
         url = Config.RAS_CI_DOWNLOAD.format(Config.RAS_COLLECTION_INSTRUMENT_SERVICE, collection_instrument_id)
-        logger.info("Requesting spreadsheet file", collection_instrument=collection_instrument_id)
+        user_id = session['user_uuid']
+        logger.info("User {} downloaded spreadsheet {} for case {}".format(user_id, collection_instrument_id, case_id))
         response = requests.get(url, verify=False)
 
         category = 'COLLECTION_INSTRUMENT_DOWNLOADED' if response.status_code == 200 else 'COLLECTION_INSTRUMENT_ERROR'

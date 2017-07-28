@@ -8,11 +8,9 @@
 
 <div class="grid">
     <div class="grid__col col-12@m">
-        <div class="panel panel--success upload--success">
-            <div class="panel__header">
-                <div class="venus">File uploaded successfully</div>
-            </div>
+        <div class="panel panel--simple panel--success upload--success">
             <div class="panel__body">
+                <h1 class="venus">File uploaded successfully</h1>
                 <p>{{ upload_filename }} has been uploaded.</p>
                 <p>Business Register and Employment Survey has now moved into your <a href="{{ url_for('surveys_bp.surveys_history') }}">history</a>.</p>
                 <a href="{{ url_for('surveys_bp.logged_in') }}">Return to my to do list</a>

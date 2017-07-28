@@ -1,11 +1,10 @@
 import logging
+import os
 
 from flask import Blueprint, json, redirect, render_template, request, session, url_for
 from ons_ras_common.ons_decorators import jwt_session
 import requests
 from structlog import wrap_logger
-
-from app.config import SecureMessaging
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -18,6 +17,27 @@ modify_data = {'action': '',
                'label': ''}
 
 secure_message_bp = Blueprint('secure_message_bp', __name__, static_folder='static', template_folder='templates')
+
+
+# Constants
+MESSAGE_LIMIT = 1000
+
+SM_API_URL = os.environ.get('SM_URL', 'http://localhost:5050')
+SM_UI_URL = os.environ.get('SM_UI_URL', 'http://localhost:5001/secure-message')
+CREATE_MESSAGE_API_URL = SM_API_URL + '/message/send'
+CREATE_MESSAGE_UI_URL = SM_UI_URL + '/create-message'
+MESSAGE_DRAFT_URL = SM_UI_URL + '/DRAFT'
+MESSAGES_API_URL = SM_API_URL + '/messages?limit=' + str(MESSAGE_LIMIT)
+MESSAGE_GET_URL = SM_API_URL + '/message/{0}'
+MESSAGE_MODIFY_URL = SM_API_URL + '/message/{0}/modify'
+MESSAGES_UI_URL = SM_UI_URL + '/messages'
+DRAFT_SAVE_API_URL = SM_API_URL + '/draft/save'
+DRAFT_GET_API_URL = SM_API_URL + '/draft/{0}'
+DRAFT_ID_API_URL = SM_API_URL + '/draft/<draft_id>'
+DRAFT_PUT_API_URL = SM_API_URL + '/draft/{0}/modify'
+
+# Selenium Driver Path
+chrome_driver = "{}/tests/selenium_scripts/drivers/chromedriver".format(os.environ.get('RAS_FRONTSTAGE_PATH'))
 
 
 @secure_message_bp.route('/create-message', methods=['GET', 'POST'])
@@ -40,19 +60,19 @@ def create_message(session):
         if request.form['submit'] == 'Save draft':
             if "msg_id" in request.form:
                 data['msg_id'] = request.form['msg_id']
-                response = requests.put(SecureMessaging.DRAFT_PUT_API_URL.format(request.form['msg_id']), data=json.dumps(data), headers=headers)
+                response = requests.put(DRAFT_PUT_API_URL.format(request.form['msg_id']), data=json.dumps(data), headers=headers)
                 if response.status_code != 200:
                     # TODO replace with custom error page when available
                     return redirect(url_for('error_page'))
             else:
-                response = requests.post(SecureMessaging.DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
+                response = requests.post(DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
                 if response.status_code != 201:
                     # TODO replace with custom error page when available
                     return redirect(url_for('error_page'))
 
             response_data = json.loads(response.text)
             logger.debug(response_data['msg_id'])
-            get_draft = requests.get(SecureMessaging.DRAFT_GET_API_URL.format(response_data['msg_id']), headers=headers)
+            get_draft = requests.get(DRAFT_GET_API_URL.format(response_data['msg_id']), headers=headers)
 
             if get_draft.status_code != 200:
                 # TODO replace with custom error page when available
@@ -94,19 +114,19 @@ def reply_message(session):
 
             if "msg_id" in request.form:
                 data['msg_id'] = request.form['msg_id']
-                response = requests.put(SecureMessaging.DRAFT_PUT_API_URL.format(request.form['msg_id']), data=json.dumps(data), headers=headers)
+                response = requests.put(DRAFT_PUT_API_URL.format(request.form['msg_id']), data=json.dumps(data), headers=headers)
                 if response.status_code != 200:
                     # TODO replace with custom error page when available
                     return redirect(url_for('error_page'))
             else:
-                response = requests.post(SecureMessaging.DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
+                response = requests.post(DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
                 if response.status_code != 201:
                     # TODO replace with custom error page when available
                     return redirect(url_for('error_page'))
 
             response_data = json.loads(response.text)
             logger.debug(response_data['msg_id'])
-            get_draft = requests.get(SecureMessaging.DRAFT_GET_API_URL.format(response_data['msg_id']), headers=headers)
+            get_draft = requests.get(DRAFT_GET_API_URL.format(response_data['msg_id']), headers=headers)
 
             if get_draft.status_code != 200:
                 # TODO replace with custom error page when available
@@ -120,7 +140,7 @@ def reply_message(session):
 
 def message_check_response(data):
     headers['Authorization'] = request.cookies['authorization']
-    response = requests.post(SecureMessaging.CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
+    response = requests.post(CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
     if response.status_code != 201:
         # TODO replace with custom error page when available
         return redirect(url_for('error_page'))
@@ -137,7 +157,7 @@ def messages_get(session, label="INBOX"):
 
     headers['Authorization'] = request.cookies['authorization']
     headers['Content-Type'] = 'application/json'
-    url = SecureMessaging.MESSAGES_API_URL
+    url = MESSAGES_API_URL
 
     if label is not None:
         url = url + "&label=" + label
@@ -163,7 +183,7 @@ def messages_get(session, label="INBOX"):
 @jwt_session(request)
 def draft_get(session, draft_id):
     """Get draft message"""
-    url = SecureMessaging.DRAFT_GET_API_URL.format(draft_id)
+    url = DRAFT_GET_API_URL.format(draft_id)
 
     get_draft = requests.get(url, headers=headers)
 
@@ -183,9 +203,9 @@ def message_get(session, msg_id):
 
     if request.method == 'GET':
         data = {"label": 'UNREAD', "action": 'remove'}
-        response = requests.put(SecureMessaging.MESSAGE_MODIFY_URL.format(msg_id), data=json.dumps(data), headers=headers)  # noqa: F841
+        response = requests.put(MESSAGE_MODIFY_URL.format(msg_id), data=json.dumps(data), headers=headers)  # noqa: F841
         # TODO check this response
-        url = SecureMessaging.MESSAGE_GET_URL.format(msg_id)
+        url = MESSAGE_GET_URL.format(msg_id)
 
         get_message = requests.get(url, headers=headers)
         if get_message.status_code != 200:

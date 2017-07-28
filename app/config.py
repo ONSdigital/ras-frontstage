@@ -104,6 +104,40 @@ class Config(object):
     RAS_API_GATEWAY_SERVICE_PROTOCOL = os.getenv('RAS_API_GATEWAY_SERVICE_PROTOCOL', 'http')
     RAS_API_GATEWAY_SERVICE = '{}://{}:{}/'.format(RAS_API_GATEWAY_SERVICE_PROTOCOL, RAS_API_GATEWAY_SERVICE_HOST, RAS_API_GATEWAY_SERVICE_PORT)
 
+    RM_IAC_SERVICE_HOST = os.getenv('RM_IAC_SERVICE_HOST', 'localhost')
+    RM_IAC_SERVICE_PORT = os.getenv('RM_IAC_SERVICE_PORT', 8121)
+    RM_IAC_SERVICE_PROTOCOL = os.getenv('RM_IAC_SERVICE_PROTOCOL', 'http')
+    RM_IAC_SERVICE = '{}://{}:{}/'.format(RM_IAC_SERVICE_PROTOCOL, RM_IAC_SERVICE_HOST, RM_IAC_SERVICE_PORT)
+
+    RAS_PARTY_SERVICE_HOST = os.getenv('RAS_PARTY_SERVICE_HOST', 'localhost')
+    RAS_PARTY_SERVICE_PORT = os.getenv('RAS_PARTY_SERVICE_PORT', 8001)
+    RAS_PARTY_SERVICE_PROTOCOL = os.getenv('RAS_PARTY_SERVICE_PROTOCOL', 'http')
+    RAS_PARTY_SERVICE = '{}://{}:{}/'.format(RAS_PARTY_SERVICE_PROTOCOL, RAS_PARTY_SERVICE_HOST, RAS_PARTY_SERVICE_PORT)
+
+    RM_COLLECTION_EXERCISE_SERVICE_HOST = os.getenv('RM_COLLECTION_EXERCISE_SERVICE_HOST', 'localhost')
+    RM_COLLECTION_EXERCISE_SERVICE_PORT = os.getenv('RM_COLLECTION_EXERCISE_SERVICE_PORT', 8145)
+    RM_COLLECTION_EXERCISE_SERVICE_PROTOCOL = os.getenv('RM_COLLECTION_EXERCISE_SERVICE_PROTOCOL', 'http')
+    RM_COLLECTION_EXERCISE_SERVICE = '{}://{}:{}/'.format(RM_COLLECTION_EXERCISE_SERVICE_PROTOCOL, RM_COLLECTION_EXERCISE_SERVICE_HOST, RM_COLLECTION_EXERCISE_SERVICE_PORT)
+
+    RM_SURVEY_SERVICE_HOST = os.getenv('RM_SURVEY_SERVICE_HOST', 'localhost')
+    RM_SURVEY_SERVICE_PORT = os.getenv('RM_SURVEY_SERVICE_PORT', 8080)
+    RM_SURVEY_SERVICE_PROTOCOL = os.getenv('RM_SURVEY_SERVICE_PROTOCOL', 'http')
+    RM_SURVEY_SERVICE = '{}://{}:{}/'.format(RM_SURVEY_SERVICE_PROTOCOL, RM_SURVEY_SERVICE_HOST, RM_SURVEY_SERVICE_PORT)
+
+    RAS_AGGREGATOR_TODO = '{}api/1.0.0/surveys/todo/{}'
+    RAS_CI_UPLOAD = '{}collection-instrument-api/1.0.2/survey_responses/{}'
+    RAS_CI_GET = '{}collection-instrument-api/1.0.2/collectioninstrument/id/{}'
+    RAS_CI_DOWNLOAD = '{}collection-instrument-api/1.0.2/download/{}'
+    RM_CASE_GET = '{}cases/{}'
+    RAS_PARTY_GET_BY_BUSINESS = '{}party-api/v1/businesses/id/{}'
+    RM_COLLECTION_EXERCISES_GET = '{}collectionexercises/{}'
+    RM_SURVEY_GET = '{}surveys/{}'
+    RAS_PARTY_POST_RESPONDENTS = '{}party-api/v1/respondents'
+    RAS_PARTY_VERIFY_EMAIL = '{}party-api/v1/emailverification/{}'
+    RM_IAC_GET = '{}iacs/{}'
+
+# url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'download/' + collection_instrument_id
+
 
 class ProductionConfig(Config):
     """

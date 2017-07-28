@@ -5,8 +5,11 @@
 {% block messages %}
 
 <div class="secure-message-view-component">
-    <h1 class="saturn">Subject: {{ message['subject'] }}</h1>
-
+    {% if message['subject'].startswith('Re: ') %}
+        <h1 class="saturn">{{ message['subject'][4:] }}</h1>
+    {% else %}
+        <h1 class="saturn">{{ message['subject'] }}</h1>
+    {% endif %}
     <div class="grid">
         <dl>
             <dt class="grid__col col-2@s">From:</dt>
@@ -30,12 +33,23 @@
     <form action="{{ url_for('secure_message_bp.reply_message') }}" method="post">
         <fieldset>
             <label for="secure-message-subject">Subject</label>
-            <input
-                id="secure-message-subject"
-                class="secure-message-form__subject input input--text"
-                type="text"
-                name="secure-message-subject"
-                required/>
+            {% if message['subject'].startswith('Re: ') %}
+                <input
+                    id="secure-message-subject-thread"
+                    class="secure-message-form__subject input input--text"
+                    type="text"
+                    name="secure-message-subject"
+                    value="{{ message['subject']}}"
+                    required/>
+            {% else %}
+                <input
+                    id="secure-message-subject"
+                    class="secure-message-form__subject input input--text"
+                    type="text"
+                    name="secure-message-subject"
+                    value="Re: {{message['subject']}}"
+                    required/>
+            {% endif %}
         </fieldset>
 
         <fieldset>

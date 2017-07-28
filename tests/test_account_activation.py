@@ -21,7 +21,7 @@ class TestAccountActivation(unittest.TestCase):
         self.emailverification_response = {
             "token": token,
             "active": True,
-            "userId": user_id
+            "userId": user_id,
         }
 
     # ============== ACTIVATE ACCOUNT PAGE ===============

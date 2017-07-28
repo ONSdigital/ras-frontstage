@@ -84,6 +84,27 @@ class Config(object):
     PASSWORD_MIN_LENGTH = 8
     PASSWORD_MAX_LENGTH = 160
 
+    #
+    #   These settings are to support the new post_event routine which has been ported
+    #   into ras-frontstage from ras-common. The style of environment variable over-ride
+    #   has been taken from JB's new common code implementation.
+    #
+    RM_CASE_SERVICE_HOST = os.getenv('RM_CASE_SERVICE_HOST', 'localhost')
+    RM_CASE_SERVICE_PORT = os.getenv('RM_CASE_SERVICE_PORT', 8171)
+    RM_CASE_SERVICE_PROTOCOL = os.getenv('RM_CASE_SERVICE_PROTOCOL', 'http')
+    RM_CASE_SERVICE = '{}://{}:{}/'.format(RM_CASE_SERVICE_PROTOCOL, RM_CASE_SERVICE_HOST, RM_CASE_SERVICE_PORT)
+
+    RAS_COLLECTION_INSTRUMENT_SERVICE_HOST = os.getenv('RAS_COLLECTION_INSTRUMENT_SERVICE_HOST', 'localhost')
+    RAS_COLLECTION_INSTRUMENT_SERVICE_PORT = os.getenv('RAS_COLLECTION_INSTRUMENT_SERVICE_PORT', 8002)
+    RAS_COLLECTION_INSTRUMENT_SERVICE_PROTOCOL = os.getenv('RAS_COLLECTION_INSTRUMENT_SERVICE_PROTOCOL', 'http')
+    RAS_COLLECTION_INSTRUMENT_SERVICE = '{}://{}:{}/'.format(RAS_COLLECTION_INSTRUMENT_SERVICE_PROTOCOL, RAS_COLLECTION_INSTRUMENT_SERVICE_HOST, RAS_COLLECTION_INSTRUMENT_SERVICE_PORT)
+
+    RAS_API_GATEWAY_SERVICE_HOST = os.getenv('RAS_API_GATEWAY_SERVICE_HOST', 'localhost')
+    RAS_API_GATEWAY_SERVICE_PORT = os.getenv('RAS_API_GATEWAY_SERVICE_PORT', 8080)
+    RAS_API_GATEWAY_SERVICE_PROTOCOL = os.getenv('RAS_API_GATEWAY_SERVICE_PROTOCOL', 'http')
+    RAS_API_GATEWAY_SERVICE = '{}://{}:{}/'.format(RAS_API_GATEWAY_SERVICE_PROTOCOL, RAS_API_GATEWAY_SERVICE_HOST, RAS_API_GATEWAY_SERVICE_PORT)
+
+
 class ProductionConfig(Config):
     """
     Production config class
@@ -136,42 +157,3 @@ class TestingConfig(Config):
 
     # Local verions of Survey serivce:
     SURVEYS_URL = os.environ.get('SURVEYS_URL', 'https://api-dev.apps.mvp.onsclofo.uk/api/1.0.0/surveys/')
-
-
-class OAuthConfig(Config):
-    """
-    This class is used to configure OAuth2 parameters for the microservice.
-    This is temporary until an admin config feature
-    is added to allow manual config of the microservice
-    """
-
-    ONS_OAUTH_PROTOCOL = os.environ.get('ONS_OAUTH_PROTOCOL', 'https://')
-    ONS_OAUTH_SERVER = os.environ.get('ONS_OAUTH_SERVER', 'ons-oauth2.cfapps.io')
-    RAS_FRONTSTAGE_CLIENT_ID = os.environ.get('RAS_FRONTSTAGE_CLIENT_ID', 'ons@ons.gov')
-    RAS_FRONTSTAGE_CLIENT_SECRET = os.environ.get('RAS_FRONTSTAGE_CLIENT_SECRET', 'password')
-    ONS_AUTHORIZATION_ENDPOINT = os.environ.get('ONS_AUTHORIZATION_ENDPOINT', '/web/authorize/')
-    ONS_TOKEN_ENDPOINT = os.environ.get('ONS_TOKEN_ENDPOINT', '/api/v1/tokens/')
-    ONS_ADMIN_ENDPOINT = os.environ.get('ONS_ADMIN_ENDPOINT', '/api/account/create')
-
-
-class SecureMessaging(Config):
-    """Used to configure Secure Messaging"""
-
-    MESSAGE_LIMIT = 1000
-
-    SM_API_URL = os.environ.get('SM_URL', 'http://localhost:5050')
-    SM_UI_URL = os.environ.get('SM_UI_URL', 'http://localhost:5001/secure-message')
-    CREATE_MESSAGE_API_URL = SM_API_URL + '/message/send'
-    CREATE_MESSAGE_UI_URL = SM_UI_URL + '/create-message'
-    MESSAGE_DRAFT_URL = SM_UI_URL + '/DRAFT'
-    MESSAGES_API_URL = SM_API_URL + '/messages?limit=' + str(MESSAGE_LIMIT)
-    MESSAGE_GET_URL = SM_API_URL + '/message/{0}'
-    MESSAGE_MODIFY_URL = SM_API_URL + '/message/{0}/modify'
-    MESSAGES_UI_URL = SM_UI_URL + '/messages'
-    DRAFT_SAVE_API_URL = SM_API_URL + '/draft/save'
-    DRAFT_GET_API_URL = SM_API_URL + '/draft/{0}'
-    DRAFT_ID_API_URL = SM_API_URL + '/draft/<draft_id>'
-    DRAFT_PUT_API_URL = SM_API_URL + '/draft/{0}/modify'
-
-    # Selenium Driver Path
-    chrome_driver = "{}/tests/selenium_scripts/drivers/chromedriver".format(os.environ.get('RAS_FRONTSTAGE_PATH'))

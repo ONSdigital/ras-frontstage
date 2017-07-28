@@ -8,6 +8,7 @@ source .build/bin/activate
 LOG_LEVEL=debug \
 DEBUG=true \
 APP_SETTINGS=config.DevelopmentConfig \
+RAS_FRONTSTAGE_LOGGING_LEVEL=DEBUG \
 API_GATEWAY_AGGREGATED_SURVEYS_URL=http://localhost:8080/api/1.0.0/surveys/ \
 SM_URL=http://ras-secure-messaging-int.apps.devtest.onsclofo.uk \
 ONS_OAUTH_SERVER=ras-django-int.apps.devtest.onsclofo.uk \

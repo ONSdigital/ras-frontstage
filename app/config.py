@@ -135,6 +135,7 @@ class Config(object):
     RAS_PARTY_POST_RESPONDENTS = '{}party-api/v1/respondents'
     RAS_PARTY_VERIFY_EMAIL = '{}party-api/v1/emailverification/{}'
     RM_IAC_GET = '{}iacs/{}'
+    RM_CASE_GET_BY_PARTY = '{}cases/partyid/{}'
 
 # url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'download/' + collection_instrument_id
 

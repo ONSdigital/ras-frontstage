@@ -54,7 +54,7 @@ def create_message(session):
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': 'BRES'}
 
-        if request.form['submit'] == 'Send message':
+        if request.form['submit'] == 'Send':
             return message_check_response(data)
 
         if request.form['submit'] == 'Save draft':
@@ -90,7 +90,7 @@ def reply_message(session):
     """Handles replying to an existing message"""
 
     if request.method == 'POST':
-        if request.form['submit'] == 'Send message':
+        if request.form['submit'] == 'Send':
             logger.info("Reply to Message")
             data = {'msg_to': ['BRES'],
                     'msg_from': session['user_uuid'],

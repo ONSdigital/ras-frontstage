@@ -347,7 +347,7 @@ def register_enter_your_details():
             'lastName': last_name,
             'password': password,
             'telephone': phone_number,
-            'enrolmentCode': "012345",
+            'enrolmentCode': decrypted_enrolment_code,
             'status': 'CREATED'
         }
 

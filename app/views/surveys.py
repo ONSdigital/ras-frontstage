@@ -84,6 +84,8 @@ def access_survey(session):
         period_start = request.form.get('period_start', None)
         period_end = request.form.get('period_end', None)
         submit_by = request.form.get('submit_by', None)
+
+        # TODO: Authorization - this is *not* DRY and should be refactored
         #
         #   Need a check here to make sure that party_id is allowed to access collection_instrument_id
         #   - we can do this by calling "get cases by party" and ensuring the instrument_id is in the result set
@@ -122,6 +124,30 @@ def access_survey(session):
         case_id = request.args.get('case_id')
         #url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'download/' + collection_instrument_id
 
+        # TODO: Authorization - this is *not* DRY and should be refactored
+        #
+        #   Need a check here to make sure that party_id is allowed to access collection_instrument_id
+        #   - we can do this by calling "get cases by party" and ensuring the instrument_id is in the result set
+        #
+        url = Config.RM_CASE_GET_BY_PARTY.format(Config.RM_CASE_SERVICE, party_id)
+        req = requests.get(url, verify=False)
+        if req.status_code != 200:
+            logger.error('unable to lookup cases for party "{}"'.format(party_id))
+            return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+
+        logger.debug('successfully read cases for party "{}"'.format(party_id))
+        valid = False
+        for case in req.json():
+            if case.get('collectionInstrumentId') == collection_instrument_id:
+                logger.debug('matched case to collection_instrument_id "{}"'.format(collection_instrument_id))
+                valid = True
+                break
+
+        if not valid:
+            logger.error('party "{}" does not have access to instrument "{}"'.format(party_id, collection_instrument_id))
+            return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+
+
         url = Config.RAS_CI_DOWNLOAD.format(Config.RAS_COLLECTION_INSTRUMENT_SERVICE, collection_instrument_id)
         logger.info("Requesting spreadsheet file", collection_instrument=collection_instrument_id)
         response = requests.get(url, verify=False)
@@ -151,6 +177,29 @@ def upload_survey(session):
 
     party_id = session.get('party_id', 'no-party-id')
     case_id = request.args.get('case_id', None)
+
+    # TODO: Authorization - this is *not* DRY and should be refactored (GB)
+    #
+    #   Need a check here to make sure that party_id is allowed to access case_id
+    #   - we can do this by calling "get cases by party" and ensuring the case_id is in the result set
+    #
+    url = Config.RM_CASE_GET_BY_PARTY.format(Config.RM_CASE_SERVICE, party_id)
+    req = requests.get(url, verify=False)
+    if req.status_code != 200:
+        logger.error('unable to lookup cases for party "{}"'.format(party_id))
+        return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+
+    logger.debug('successfully read cases for party "{}"'.format(party_id))
+    valid = False
+    for case in req.json():
+        if case.get('id') == case_id:
+            logger.debug('matched case_id "{}"'.format(case_id))
+            valid = True
+            break
+
+    if not valid:
+        logger.error('party "{}" does not have access to case "{}"'.format(party_id, case_id))
+        return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
     # TODO - Add security headers
     # headers = {'authorization': jwttoken}

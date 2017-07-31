@@ -1,91 +1,86 @@
-<div class="grid">
+<ul class="survey-list">
 
-    <ul class="survey-list">
+    <li class="header-row">
 
-        <li class="header-row">
+        <div id="SURVEY_COLUMN_HEADING" class="grid__col col-4@m">
+            Survey
+        </div>
 
-            <div id="SURVEY_COLUMN_HEADING" class="grid__col col-4@m">
-                Survey
-            </div>
+        <div id="PERIOD_COVERED_COLUMN_HEADING" class="grid__col col-2@m">
+            Period covered
+        </div>
 
-            <div id="PERIOD_COVERED_COLUMN_HEADING" class="grid__col col-2@m">
-                Period covered
-            </div>
+        <div id="SUBMIT_BY_COLUMN_HEADING" class="grid__col col-2@m">
+            Submit by
+        </div>
 
-            <div id="SUBMIT_BY_COLUMN_HEADING" class="grid__col col-2@m">
-                Submit by
-            </div>
+        <div id="STATUS_COLUMN_HEADING" class="grid__col col-2@m">
+            Status
+        </div>
 
-            <div id="STATUS_COLUMN_HEADING" class="grid__col col-2@m">
-                Status
-            </div>
+    </li>
 
-        </li>
+    {% for data in data_array.rows %}
 
-        {% for data in data_array.rows %}
+    <li class="grid card">
 
-        <li class="card">
+        <div class="grid__col col-4@m">
+            <span class="survey-list-item__label mercury">SURVEY: </span>
+            <span>{{ data.surveyData.longName }}</span><br/>
+            <span class="survey-list-item pluto">
+                BUSINESS: {{ data.businessData.name }}<br/>
+                REF: {{data.case.caseGroup.sampleUnitRef }}
+            </span>
+        </div>
 
-            <div class="grid__col col-4@m">
-                <span class="survey-list-item__label mercury">SURVEY: </span>
-                <span>{{ data.surveyData.longName }}</span><br/>
-                <span class="survey-list-item pluto">
-                    BUSINESS: {{ data.businessData.name }}<br/>
-                    REF: {{data.case.caseGroup.sampleUnitRef }}
-                </span>
-            </div>
+        <div class="grid__col col-2@m">
+            <span class="survey-list-item__label mercury">PERIOD COVERED: </span>
+            <span class="survey-list-item__nowrap">{{ data.collectionExerciseData.periodStartFormatted }} - </span>
+            <span class="survey-list-item__nowrap">{{ data.collectionExerciseData.periodEndFormatted }}</span>
+        </div>
 
-            <div class="grid__col col-2@m">
-                <span class="survey-list-item__label mercury">PERIOD COVERED: </span>
-                <span class="survey-list-item__nowrap">{{ data.collectionExerciseData.periodStartFormatted }} - </span>
-                <span class="survey-list-item__nowrap">{{ data.collectionExerciseData.periodEndFormatted }}</span>
-            </div>
+        <div class="grid__col col-2@m">
+            <span class="survey-list-item__label mercury">SUBMIT BY: </span>
+            <span>{{ data.collectionExerciseData.scheduledReturnFormatted }}</span>
+        </div>
 
-            <div class="grid__col col-2@m">
-                <span class="survey-list-item__label mercury">SUBMIT BY: </span>
-                <span>{{ data.collectionExerciseData.scheduledReturnFormatted }}</span>
-            </div>
+        <div class="grid__col col-2@m">
+            <span class="survey-list-item__label mercury">STATUS: </span>
+            <span>{{ data.status | case_status_filter }}</span>
+        </div>
 
-            <div class="grid__col col-2@m">
-                <span class="survey-list-item__label mercury">STATUS: </span>
-                <span>{{ data.status | case_status_filter }}</span>
-            </div>
+        <div class="grid__col col-2@m">
 
-            <div class="grid__col col-2@m">
+            <form
+                    method="post"
+                    action="{{ url_for('surveys_bp.access_survey') }}"
+                    class="form"
+                    role="form">
+                <input type="hidden" name="case_id" value="{{ data.case.id }}">
+                <input type="hidden" name="collection_instrument_id" value="{{ data.case.collectionInstrumentId }}">
+                <input type="hidden" name="business" value="{{ data.businessData.name }}">
+                <input type="hidden" name="survey" value="{{ data.surveyData.longName }}">
+                <input type="hidden" name="survey_abbr" value="{{ data.surveyData.shortName }}">
+                <input type="hidden" name="period_start"
+                       value="{{ data.collectionExerciseData.periodStartFormatted }}">
+                <input type="hidden" name="period_end" value="{{ data.collectionExerciseData.periodEndFormatted }}">
+                <input type="hidden" name="submit_by" value="{{ data.collectionExerciseData.scheduledReturnFormatted }}">
 
-                <form
-                        method="post"
-                        action="{{ url_for('surveys_bp.access_survey') }}"
-                        class="form"
-                        role="form">
-                    <input type="hidden" name="case_id" value="{{ data.case.id }}">
-                    <input type="hidden" name="collection_instrument_id" value="{{ data.case.collectionInstrumentId }}">
-                    <input type="hidden" name="business" value="{{ data.businessData.name }}">
-                    <input type="hidden" name="survey" value="{{ data.surveyData.longName }}">
-                    <input type="hidden" name="survey_abbr" value="{{ data.surveyData.shortName }}">
-                    <input type="hidden" name="period_start"
-                           value="{{ data.collectionExerciseData.periodStartFormatted }}">
-                    <input type="hidden" name="period_end" value="{{ data.collectionExerciseData.periodEndFormatted }}">
-                    <input type="hidden" name="submit_by" value="{{ data.collectionExerciseData.scheduledReturnFormatted }}">
-
-                    <button id="ACCESS_SURVEY_BUTTON_{{loop.index}}" class="btn action-button btn--primary"
-                            type="submit">Access survey
-                    </button>
-                </form>
-            </div>
+                <button id="ACCESS_SURVEY_BUTTON_{{loop.index}}" class="btn action-button btn--primary"
+                        type="submit">Access survey
+                </button>
+            </form>
+        </div>
 
 
-        </li>
+    </li>
 
-        {% endfor %}
+    {% endfor %}
 
-        {% if data_array.rows|length == 0 %}
-        <li class="card">
-            <div class="grid__col col-12@m">You have no surveys to complete</div>
-        </li>
-        {% endif %}
+    {% if data_array.rows|length == 0 %}
+    <li class="card">
+        <div class="grid__col col-12@m">You have no surveys to complete</div>
+    </li>
+    {% endif %}
 
-    </ul>
-
-</div>
-
+</ul>

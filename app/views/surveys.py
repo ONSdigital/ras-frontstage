@@ -122,7 +122,6 @@ def access_survey(session):
     if request.method == 'GET':
         collection_instrument_id = request.args.get('cid')
         case_id = request.args.get('case_id')
-        #url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'download/' + collection_instrument_id
 
         # TODO: Authorization - this is *not* DRY and should be refactored
         #
@@ -149,7 +148,7 @@ def access_survey(session):
 
 
         url = Config.RAS_CI_DOWNLOAD.format(Config.RAS_COLLECTION_INSTRUMENT_SERVICE, collection_instrument_id)
-        logger.info("Requesting spreadsheet file", collection_instrument=collection_instrument_id)
+        logger.info("User {} downloaded spreadsheet {} for case {}".format(user_id, collection_instrument_id, case_id))
         response = requests.get(url, verify=False)
 
         category = 'COLLECTION_INSTRUMENT_DOWNLOADED' if response.status_code == 200 else 'COLLECTION_INSTRUMENT_ERROR'
@@ -211,9 +210,6 @@ def upload_survey(session):
     upload_file = {'file': (upload_filename, upload_file.stream, upload_file.mimetype, {'Expires': 0})}
 
     # Build the URL
-    #url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'survey_responses/{}'.format(case_id)
-
-
     url = Config.RAS_CI_UPLOAD.format(Config.RAS_COLLECTION_INSTRUMENT_SERVICE, case_id)
     logger.debug('upload_survey URL is: {}'.format(url))
 
@@ -239,7 +235,6 @@ def upload_survey(session):
         error_info = json.loads(result.text)
         return render_template('surveys/surveys-upload-failure.html',  _theme='default', error_info=error_info,
                                case_id=case_id)
-
 
 @surveys_bp.route('/surveys-upload-failure', methods=['GET'])
 def surveys_upload_failure():

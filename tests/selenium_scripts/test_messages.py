@@ -1,7 +1,9 @@
 import unittest
+
 from selenium import webdriver
 from test_send_message import SendMessage
-from app.config import SecureMessaging
+
+from config import SecureMessaging
 
 
 class MessagesGet(unittest.TestCase):

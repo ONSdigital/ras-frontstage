@@ -1,6 +1,6 @@
 import logging
 import os
-from app import config
+
 
 def logger_initial_config(service_name=None, log_level=None, logger_format=None, logger_date_format=None):
 

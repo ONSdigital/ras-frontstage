@@ -1,10 +1,11 @@
-import unittest
-from app.application import app
-from app.config import Config
-from app.config import TestingConfig
 import json
+import unittest
+
 import requests_mock
 from ons_ras_common import ons_env
+
+from app.application import app
+from config import Config
 
 with open('tests/test_data/my_surveys.json') as json_data:
     my_surveys_data = json.load(json_data)

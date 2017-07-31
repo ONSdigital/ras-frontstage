@@ -148,7 +148,7 @@ def access_survey(session):
 
 
         url = Config.RAS_CI_DOWNLOAD.format(Config.RAS_COLLECTION_INSTRUMENT_SERVICE, collection_instrument_id)
-        logger.info("User {} downloaded spreadsheet {} for case {}".format(user_id, collection_instrument_id, case_id))
+        logger.info("User {} downloaded spreadsheet {} for case {}".format(party_id, collection_instrument_id, case_id))
         response = requests.get(url, verify=False)
 
         category = 'COLLECTION_INSTRUMENT_DOWNLOADED' if response.status_code == 200 else 'COLLECTION_INSTRUMENT_ERROR'

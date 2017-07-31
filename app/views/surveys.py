@@ -201,7 +201,7 @@ def upload_survey(session):
         logger.error('party "{}" does not have access to case "{}"'.format(party_id, case_id))
         return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
-    # TODO - Add security headers
+    # TODO - Add security headers ??
     # headers = {'authorization': jwttoken}
     headers = {}
 

@@ -15,6 +15,9 @@ with open('tests/test_data/collection_instrument.json') as json_data:
 with open('tests/test_data/cases.json') as json_data:
     cases_data = json.load(json_data)
 
+with open('tests/test_data/my_party.json') as json_data:
+    my_party_data = json.load(json_data)
+
 
 # print("Test data JSON values are:{}".format(collection_instrument_data))
 
@@ -25,7 +28,7 @@ returned_token = {
     "token_type": "Bearer",
     "scope": "",
     "refresh_token": "37ca04d2-6b6c-4854-8e85-f59c2cc7d3de",
-    "party_id": "3b136c4b-7a14-4904-9e01-13364dd7b972"
+    "party_id": "db036fd7-ce17-40c2-a8fc-932e7c228397"
 
 }
 
@@ -57,6 +60,8 @@ class TestSurveys(unittest.TestCase):
         #url_get_survey_data = Config.API_GATEWAY_AGGREGATED_SURVEYS_URL + 'todo/' + party_id
         url_get_survey_data = Config.RAS_AGGREGATOR_TODO.format(Config.RAS_API_GATEWAY_SERVICE, party_id)
 
+        url_get_party_by_email = Config.RAS_PARTY_GET_BY_EMAIL.format(Config.RAS_PARTY_SERVICE, 'testuser@email.com')
+        mock_object.get(url_get_party_by_email, status_code=200, json=my_party_data)
         mock_object.post(url_get_token, status_code=200, json=returned_token)
         mock_object.get(url_get_survey_data, status_code=200, json=my_surveys_data)
 
@@ -109,12 +114,13 @@ class TestSurveys(unittest.TestCase):
         url_get_collection_instrument_data = Config.RAS_CI_GET.format(Config.RAS_COLLECTION_INSTRUMENT_SERVICE, collection_instrument_id)
 
         url_get_cases = Config.RM_CASE_GET_BY_PARTY.format(Config.RM_CASE_SERVICE, party_id)
+        url_get_party_by_email = Config.RAS_PARTY_GET_BY_EMAIL.format(Config.RAS_PARTY_SERVICE, 'testuser@email.com')
+        mock_object.get(url_get_party_by_email, status_code=200, json=my_party_data)
 
         mock_object.post(url_get_token, status_code=200, json=returned_token)
         mock_object.get(url_get_survey_data, status_code=200, json=my_surveys_data)
         mock_object.get(url_get_collection_instrument_data, status_code=200, json=collection_instrument_data)
         mock_object.get(url_get_cases, status_code=200, json=cases_data)
-        print("Cases>", url_get_cases)
 
         self.app.post('/sign-in/', data={'username': 'testuser@email.com', 'password': 'password'}, headers=self.headers)
 
@@ -122,9 +128,10 @@ class TestSurveys(unittest.TestCase):
             'case_id': case_id,
             'collection_instrument_id': collection_instrument_id
         }
-
         response = self.app.post('/surveys/access_survey', headers=self.headers, data=survey_params)
         self.assertEqual(response.status_code, 200)
+
+        print("Response>", response)
 
         # There should be a Download button
         self.assertTrue(bytes('download-survey-button', encoding='UTF-8') in response.data)

@@ -131,8 +131,6 @@ class TestSurveys(unittest.TestCase):
         response = self.app.post('/surveys/access_survey', headers=self.headers, data=survey_params)
         self.assertEqual(response.status_code, 200)
 
-        print("Response>", response)
-
         # There should be a Download button
         self.assertTrue(bytes('download-survey-button', encoding='UTF-8') in response.data)
 

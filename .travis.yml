@@ -14,7 +14,7 @@ install:
   - pip install coverage
 
 script:
-  - pytest --cov=app --cov-report xml --ignore=node_modules --ignore=tests/selenium_scripts/
+  - pytest --cov=frontstage --cov-report xml --ignore=node_modules --ignore=tests/selenium_scripts/
   - coverage report
 
 after_success:

@@ -73,7 +73,7 @@ class Config(object):
     API_GATEWAY_SURVEYS_URL = os.environ.get('API_GATEWAY_SURVEYS_URL',
                                              'http://ras-api-gateway-int.apps.devtest.onsclofo.uk:80/surveys/')
     API_GATEWAY_AGGREGATED_SURVEYS_URL = os.environ.get('API_GATEWAY_AGGREGATED_SURVEYS_URL',
-                                                        'https://ras-api-gateway-int.apps.devtest.onsclofo.uk/api/1.0.0/surveys/')
+                                                        'http://ras-api-gateway-int.apps.devtest.onsclofo.uk/api/1.0.0/surveys/')
     API_GATEWAY_PARTY_URL = os.environ.get('API_GATEWAY_PARTY_URL',
                                            'http://ras-api-gateway-int.apps.devtest.onsclofo.uk/party-api/v1/')
     API_GATEWAY_IAC_URL = os.environ.get('API_GATEWAY_IAC_URL',

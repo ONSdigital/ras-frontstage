@@ -10,6 +10,10 @@ from config import Config
 with open('tests/test_data/my_surveys.json') as json_data:
     my_surveys_data = json.load(json_data)
 
+with open('tests/test_data/my_party.json') as json_data:
+    my_party_data = json.load(json_data)
+
+
 returned_token = {
     "id": 6,
     "access_token": "a712f0f9-d00d-447a-b143-49984ca3db68",
@@ -152,7 +156,7 @@ class TestApplication(unittest.TestCase):
         # Build URL's which is used to talk to the OAuth2 server
         url_get_token = Config.ONS_OAUTH_PROTOCOL + Config.ONS_OAUTH_SERVER + Config.ONS_TOKEN_ENDPOINT
         url_get_survey_data = Config.API_GATEWAY_AGGREGATED_SURVEYS_URL + 'todo/' + party_id
-
+        url_get_party_by_email = Config.RAS_PARTY_GET_BY_EMAIL.format(Config.RAS_PARTY_SERVICE, 'testuser@email.com')
         # Here we place a listener on the URL's The flow of events are:
         # 1) The ras_frontstage signs in OAuth2 user.
         # 2) The OAuth2 replies with a HTTP 200 OK and token data.
@@ -166,6 +170,7 @@ class TestApplication(unittest.TestCase):
 
         mock_object.post(url_get_token, status_code=200, json=returned_token)
         mock_object.get(url_get_survey_data, status_code=200, json=my_surveys_data)
+        mock_object.get(url_get_party_by_email, status_code=200, json=my_party_data)
 
         # 1) Send a POST message to sign in as a test user
         #   User                        FS                      OAuth2                  PS

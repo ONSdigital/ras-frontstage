@@ -1,12 +1,14 @@
-import os
 import logging
+import os
+
 from flask import Flask, Blueprint, make_response, render_template, request, redirect, url_for
-from structlog import wrap_logger
 from oauthlib.oauth2 import LegacyApplicationClient, MissingTokenError
 from requests_oauthlib import OAuth2Session
-from app.config import Config
+from structlog import wrap_logger
+
 from app.jwt import encode
 from app.models import LoginForm
+from config import Config
 
 app = Flask(__name__)
 app.debug = True

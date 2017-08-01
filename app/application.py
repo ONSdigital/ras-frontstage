@@ -7,23 +7,19 @@ import logging
 import os
 from datetime import datetime
 from functools import wraps, update_wrapper
-from flask import Flask, make_response, render_template, redirect, url_for
-from oauthlib.oauth2 import LegacyApplicationClient, BackendApplicationClient, MissingTokenError
-from requests_oauthlib import OAuth2Session
-from structlog import wrap_logger
 
-from app.views.passwords import passwords_bp
-from app.views.register import register_bp
-from app.views.sign_in import sign_in_bp
-from app.views.secure_messaging import secure_message_bp
-from app.views.surveys import surveys_bp
+from flask import Flask, make_response, render_template, redirect, url_for
+from structlog import wrap_logger
 
 from app.filters.case_status_filter import case_status_filter
 from app.filters.file_size_filter import file_size_filter
-
-from app.config import Config, TestingConfig, ProductionConfig
-from app.jwt import encode
 from app.logger_config import logger_initial_config
+from app.views.passwords import passwords_bp
+from app.views.register import register_bp
+from app.views.secure_messaging import secure_message_bp
+from app.views.sign_in import sign_in_bp
+from app.views.surveys import surveys_bp
+from config import Config, TestingConfig, ProductionConfig
 
 app = Flask(__name__)
 app.debug = True

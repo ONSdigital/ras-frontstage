@@ -75,9 +75,9 @@ class Config(object):
     API_GATEWAY_AGGREGATED_SURVEYS_URL = os.environ.get('API_GATEWAY_AGGREGATED_SURVEYS_URL',
                                                         'https://ras-api-gateway-int.apps.devtest.onsclofo.uk/api/1.0.0/surveys/')
     API_GATEWAY_PARTY_URL = os.environ.get('API_GATEWAY_PARTY_URL',
-                                           'https://ras-api-gateway-int.apps.devtest.onsclofo.uk/party-api/v1/')
+                                           'http://ras-api-gateway-int.apps.devtest.onsclofo.uk/party-api/v1/')
     API_GATEWAY_IAC_URL = os.environ.get('API_GATEWAY_IAC_URL',
-                                         'https://ras-api-gateway-int.apps.devtest.onsclofo.uk/api/1.0.0/iacs/')
+                                         'http://ras-api-gateway-int.apps.devtest.onsclofo.uk/api/1.0.0/iacs/')
     
     PASSWORD_MATCH_ERROR_TEXT = 'Your passwords do not match'
     PASSWORD_CRITERIA_ERROR_TEXT = 'Your password doesn\'t meet the requirements'
@@ -161,7 +161,7 @@ class DevelopmentConfig(Config):
     """
     DEVELOPMENT = True
     DEBUG = True
-    
+    TEMPLATES_AUTO_RELOAD = True
     RAS_FRONTSTAGE_CLIENT_ID = os.environ.get('RAS_FRONTSTAGE_CLIENT_ID', 'ons@ons.gov')
     RAS_FRONTSTAGE_CLIENT_SECRET = os.environ.get('RAS_FRONTSTAGE_CLIENT_SECRET', 'password')
 

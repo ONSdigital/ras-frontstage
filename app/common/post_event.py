@@ -5,10 +5,12 @@
    Copyright (c) 2017 Crown Copyright (Office for National Statistics)
 
 """
-import requests
 from json import loads, dumps
+
+import requests
 from ons_ras_common import ons_env
-from app.config import Config
+
+from config import Config
 
 _categories = None
 

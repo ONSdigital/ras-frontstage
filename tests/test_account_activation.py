@@ -1,7 +1,9 @@
 import unittest
-from app.application import app
-from app.config import Config
+
 import requests_mock
+
+from app.application import app
+from config import Config
 
 token = 'TOKEN_ABC'
 user_id = 'USER_12345'

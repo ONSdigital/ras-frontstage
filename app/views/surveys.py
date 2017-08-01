@@ -25,7 +25,9 @@ def build_survey_data(session, status_filter):
     headers = {}
 
     # Call the API Gateway Service to get the To Do survey list
-    url = Config.API_GATEWAY_AGGREGATED_SURVEYS_URL + 'todo/' + party_id
+    # url = Config.API_GATEWAY_AGGREGATED_SURVEYS_URL + 'todo/' + party_id
+
+    url = Config.RAS_AGGREGATOR_TODO.format(Config.RAS_API_GATEWAY_SERVICE, session.get('party_id'))
     logger.debug("build_survey_data URL is: {}".format(url))
     req = requests.get(url, headers=headers, params=status_filter, verify=False)
 
@@ -72,6 +74,7 @@ def access_survey(session):
 
     party_id = session.get('party_id', 'no-party-id')
 
+    # UPLOAD instrument response
     if request.method == 'POST':
         case_id = request.form.get('case_id', None)
         collection_instrument_id = request.form.get('collection_instrument_id', None)
@@ -82,12 +85,33 @@ def access_survey(session):
         period_end = request.form.get('period_end', None)
         submit_by = request.form.get('submit_by', None)
 
-        url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'collectioninstrument/id/{}'.format(collection_instrument_id)
-        logger.debug('Access_survey URL is: {}'.format(url))
+        # TODO: Authorization - this is *not* DRY and should be refactored
+        #
+        #   Need a check here to make sure that party_id is allowed to access collection_instrument_id
+        #   - we can do this by calling "get cases by party" and ensuring the instrument_id is in the result set
+        #
+        url = Config.RM_CASE_GET_BY_PARTY.format(Config.RM_CASE_SERVICE, party_id)
+        req = requests.get(url, verify=False)
+        if req.status_code != 200:
+            logger.error('unable to lookup cases for party "{}"'.format(party_id))
+            return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
+        logger.debug('successfully read cases for party "{}"'.format(party_id))
+        valid = False
+        for case in req.json():
+            if case.get('collectionInstrumentId') == collection_instrument_id:
+                logger.debug('matched case to collection_instrument_id "{}"'.format(collection_instrument_id))
+                valid = True
+                break
+
+        if not valid:
+            logger.error('party "{}" does not have access to instrument "{}"'.format(party_id, collection_instrument_id))
+            return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+
+        url = Config.RAS_CI_GET.format(Config.RAS_COLLECTION_INSTRUMENT_SERVICE, collection_instrument_id)
+        logger.debug('Access_survey URL is: {}'.format(url))
         req = requests.get(url, verify=False)
         ci_data = req.json()
-
 
         # Render the template
         return render_template('surveys/surveys-access.html', _theme='default', case_id=case_id, ci_data=ci_data,
@@ -98,23 +122,46 @@ def access_survey(session):
     if request.method == 'GET':
         collection_instrument_id = request.args.get('cid')
         case_id = request.args.get('case_id')
-        url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'download/' + collection_instrument_id
-        user_id = session['user_uuid']
-        logger.info("User {} downloaded spreadsheet {} for case {}".format(user_id, collection_instrument_id, case_id))
+
+        # TODO: Authorization - this is *not* DRY and should be refactored
+        #
+        #   Need a check here to make sure that party_id is allowed to access collection_instrument_id
+        #   - we can do this by calling "get cases by party" and ensuring the instrument_id is in the result set
+        #
+        url = Config.RM_CASE_GET_BY_PARTY.format(Config.RM_CASE_SERVICE, party_id)
+        req = requests.get(url, verify=False)
+        if req.status_code != 200:
+            logger.error('unable to lookup cases for party "{}"'.format(party_id))
+            return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+
+        logger.debug('successfully read cases for party "{}"'.format(party_id))
+        valid = False
+        for case in req.json():
+            if case.get('collectionInstrumentId') == collection_instrument_id:
+                logger.debug('matched case to collection_instrument_id "{}"'.format(collection_instrument_id))
+                valid = True
+                break
+
+        if not valid:
+            logger.error('party "{}" does not have access to instrument "{}"'.format(party_id, collection_instrument_id))
+            return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+
+
+        url = Config.RAS_CI_DOWNLOAD.format(Config.RAS_COLLECTION_INSTRUMENT_SERVICE, collection_instrument_id)
+        logger.info("User {} downloaded spreadsheet {} for case {}".format(party_id, collection_instrument_id, case_id))
         response = requests.get(url, verify=False)
 
+        category = 'COLLECTION_INSTRUMENT_DOWNLOADED' if response.status_code == 200 else 'COLLECTION_INSTRUMENT_ERROR'
+        code, msg = post_event(case_id,
+                               category=category,
+                               created_by='SYSTEM',
+                               party_id=party_id,
+                               description='Instrument response uploaded "{}"'.format(case_id))
+        if code != 201:
+            logger.error('error "{}" logging case event'.format(code))
+            logger.error(str(msg))
+
         if response.status_code == 200:
-
-            category = 'COLLECTION_INSTRUMENT_DOWNLOADED'
-            code, msg = post_event(case_id,
-                                   category=category,
-                                   created_by='SYSTEM',
-                                   party_id=party_id,
-                                   description='Instrument response uploaded "{}"'.format(case_id))
-            if code != 201:
-                logger.error('error "{}" logging case event'.format(code))
-                logger.error(str(msg))
-
             return response.content, response.status_code, response.headers.items()
         else:
             # TODO Decide how to handle this error
@@ -130,7 +177,30 @@ def upload_survey(session):
     party_id = session.get('party_id', 'no-party-id')
     case_id = request.args.get('case_id', None)
 
-    # TODO - Add security headers
+    # TODO: Authorization - this is *not* DRY and should be refactored (GB)
+    #
+    #   Need a check here to make sure that party_id is allowed to access case_id
+    #   - we can do this by calling "get cases by party" and ensuring the case_id is in the result set
+    #
+    url = Config.RM_CASE_GET_BY_PARTY.format(Config.RM_CASE_SERVICE, party_id)
+    req = requests.get(url, verify=False)
+    if req.status_code != 200:
+        logger.error('unable to lookup cases for party "{}"'.format(party_id))
+        return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+
+    logger.debug('successfully read cases for party "{}"'.format(party_id))
+    valid = False
+    for case in req.json():
+        if case.get('id') == case_id:
+            logger.debug('matched case_id "{}"'.format(case_id))
+            valid = True
+            break
+
+    if not valid:
+        logger.error('party "{}" does not have access to case "{}"'.format(party_id, case_id))
+        return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+
+    # TODO - Add security headers ??
     # headers = {'authorization': jwttoken}
     headers = {}
 
@@ -140,7 +210,7 @@ def upload_survey(session):
     upload_file = {'file': (upload_filename, upload_file.stream, upload_file.mimetype, {'Expires': 0})}
 
     # Build the URL
-    url = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'survey_responses/{}'.format(case_id)
+    url = Config.RAS_CI_UPLOAD.format(Config.RAS_COLLECTION_INSTRUMENT_SERVICE, case_id)
     logger.debug('upload_survey URL is: {}'.format(url))
 
     # Call the API Gateway Service to upload the selected file
@@ -165,7 +235,6 @@ def upload_survey(session):
         error_info = json.loads(result.text)
         return render_template('surveys/surveys-upload-failure.html',  _theme='default', error_info=error_info,
                                case_id=case_id)
-
 
 @surveys_bp.route('/surveys-upload-failure', methods=['GET'])
 def surveys_upload_failure():

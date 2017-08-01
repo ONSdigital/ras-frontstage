@@ -51,6 +51,9 @@ survey_json = {
 # Build the URL and that is used to validate the IAC
 url_validate_iac = Config.API_GATEWAY_IAC_URL + '{}'.format(enrolment_code)
 
+url_validate_iac = Config.RM_IAC_GET.format(Config.RM_IAC_SERVICE, enrolment_code)
+
+
 params = {
     "enrolment_code": encrypted_enrolment_code
 }
@@ -128,16 +131,23 @@ class TestRegistration(unittest.TestCase):
 
         # Multiple GET requests are made on this page so all need to be mocked with the correct data response
         mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)
-        url_get_case = Config.API_GATEWAY_CASE_URL + case_id
+        #url_get_case = Config.API_GATEWAY_CASE_URL + case_id
+        url_get_case = Config.RM_CASE_GET.format(Config.RM_CASE_SERVICE, case_id)
         mock_object.get(url_get_case, status_code=200, json=case_json)
+
         business_party_id = case_json['caseGroup']['partyId']
-        url_get_party = Config.API_GATEWAY_PARTY_URL + 'businesses/id/' + business_party_id
+        #url_get_party = Config.API_GATEWAY_PARTY_URL + 'businesses/id/' + business_party_id
+        url_get_party = Config. RAS_PARTY_GET_BY_BUSINESS.format(Config.RAS_PARTY_SERVICE, party_id)
         mock_object.get(url_get_party, status_code=200, json=party_json)
+
         collection_exercise_id = case_json['caseGroup']['collectionExerciseId']
-        url_get_coll = Config.API_GATEWAY_COLLECTION_EXERCISE_URL + collection_exercise_id
+        #url_get_coll = Config.API_GATEWAY_COLLECTION_EXERCISE_URL + collection_exercise_id
+        url_get_coll = Config.RM_COLLECTION_EXERCISES_GET.format(Config.RM_COLLECTION_EXERCISE_SERVICE, collection_exercise_id)
         mock_object.get(url_get_coll, status_code=200, json=coll_json)
+
         survey_id = coll_json['surveyId']
-        url_get_survey = Config.API_GATEWAY_SURVEYS_URL + survey_id
+        #url_get_survey = Config.API_GATEWAY_SURVEYS_URL + survey_id
+        url_get_survey = Config.RM_SURVEY_GET.format(Config.RM_SURVEY_SERVICE, survey_id)
         mock_object.get(url_get_survey, status_code=200, json=survey_json)
 
         # A GET request with the correct enrolment codes should bring up the page

@@ -9,5 +9,5 @@ coverage:
 comment: false
 
 ignore:
-  - "app/tests/"
+  - "frontstage/tests/"
   - "tests/"

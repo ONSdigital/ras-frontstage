@@ -1,7 +1,8 @@
 import unittest
+
 from selenium import webdriver
 
-from app.config import SecureMessaging
+from config import SecureMessaging
 
 
 class SaveDraft(unittest.TestCase):

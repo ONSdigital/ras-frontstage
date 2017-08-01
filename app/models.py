@@ -1,18 +1,16 @@
 """
 This module contains the data model for the application
 """
-import datetime
 import logging
-from flask_sqlalchemy import SQLAlchemy
-from flask_wtf import FlaskForm
+
 import phonenumbers
+from flask_wtf import FlaskForm
 from phonenumbers.phonenumberutil import NumberParseException
-from sqlalchemy import DateTime, Column, String, Integer
 from structlog import wrap_logger
-from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms import HiddenField, PasswordField, StringField
 from wtforms.validators import InputRequired, EqualTo, Length, DataRequired, Email, ValidationError
-from app.config import Config
+
+from config import Config
 
 # db = SQLAlchemy()
 

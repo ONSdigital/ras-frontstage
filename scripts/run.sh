@@ -4,7 +4,7 @@ if ! [ -a .build ] ; then
 	virtualenv .build -p python3
 fi
 source .build/bin/activate
-#pip3 install -r requirements.txt --upgrade
+pip3 install -r requirements.txt --upgrade
 LOG_LEVEL=debug \
 DEBUG=true \
 APP_SETTINGS=config.DevelopmentConfig \

@@ -116,7 +116,7 @@ def login():
             "username": username,
             "user_uuid": "ce12b958-2a5f-44f4-a6da-861e59070a32",
             "role": "respondent",
-            "party_id": party_id    #"db036fd7-ce17-40c2-a8fc-932e7c228397"
+            "party_id": party_id
         }
 
         encoded_jwt_token = encode(data_dict_for_jwt_token)

@@ -1,6 +1,7 @@
 import unittest
-from app.logger_config import logger_initial_config
 from unittest import mock
+
+from frontstage.logger_config import logger_initial_config
 
 
 class LoggingTestCase(unittest.TestCase):

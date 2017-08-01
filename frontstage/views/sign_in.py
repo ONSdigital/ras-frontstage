@@ -1,30 +1,20 @@
 import logging
-import os
 
-from flask import Flask, Blueprint, make_response, render_template, request, redirect, url_for
+from flask import Blueprint, make_response, render_template, request, redirect, url_for
 from oauthlib.oauth2 import LegacyApplicationClient, MissingTokenError
+import requests
 from requests_oauthlib import OAuth2Session
 from structlog import wrap_logger
 
-from app.jwt import encode
-from app.models import LoginForm
 from config import Config
-import requests
+from frontstage import app
+from frontstage.jwt import encode
+from frontstage.models import LoginForm
 
-app = Flask(__name__)
-app.debug = True
-
-app.config.update(
-    DEBUG=True,
-    TESTING=True,
-    TEMPLATES_AUTO_RELOAD=True
-)
-
-if 'APP_SETTINGS' in os.environ:
-    app.config.from_object(Config)
 
 logger = wrap_logger(logging.getLogger(__name__))
-sign_in_bp = Blueprint('sign_in_bp', __name__, static_folder='static', template_folder='templates/sign-in')
+
+sign_in_bp = Blueprint('sign_in_bp', __name__, static_folder='static', template_folder='frontstage/templates/sign-in')
 
 
 # ===== Sign in using OAuth2 =====
@@ -79,8 +69,8 @@ def login():
             token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=app.config['RAS_FRONTSTAGE_CLIENT_ID'],
                                       client_secret=app.config['RAS_FRONTSTAGE_CLIENT_SECRET'])
 
-            app.logger.debug(" *** Access Token Granted *** ")
-            app.logger.debug(" Values are: ")
+            logger.debug(" *** Access Token Granted *** ")
+            logger.debug(" Values are: ")
             for key in token:
                 logger.debug("{} Value is: {}".format(key, token[key]))
 
@@ -163,3 +153,10 @@ def sign_in_last_attempt():
 @sign_in_bp.route('/sign-in/account-locked/')
 def sign_in_account_locked():
     return render_template('sign-in/sign-in.locked-account.html', _theme='default')
+
+
+@sign_in_bp.route('/logout')
+def logout():
+    response = make_response(redirect(url_for('sign_in_bp.login')))
+    response.set_cookie('authorization', value='', expires=0)
+    return response

@@ -3,9 +3,10 @@ import unittest
 
 import requests_mock
 
-from app.application import app
-from app.jwt import encode, decode
 from config import Config
+from frontstage import app
+from frontstage.jwt import encode, decode
+
 
 with open('tests/test_data/my_surveys.json') as json_data:
     my_surveys_data = json.load(json_data)

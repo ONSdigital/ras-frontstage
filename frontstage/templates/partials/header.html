@@ -7,7 +7,7 @@
         </div>
 
         {% if 'authorization' in request.cookies %}
-        <a href="{{ url_for('logout') }}">Sign out</a>
+        <a href="{{ url_for('sign_in_bp.logout') }}">Sign out</a>
         {% endif %}
     </header>
 </div>

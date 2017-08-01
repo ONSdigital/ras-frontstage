@@ -1,15 +1,17 @@
 import json
 import logging
 
-import requests
 from flask import Blueprint, render_template, request
 from ons_ras_common.ons_decorators import jwt_session
+import requests
 from structlog import wrap_logger
 
 from config import Config
-from ..common.post_event import post_event
+from frontstage.common.post_event import post_event
+
 
 logger = wrap_logger(logging.getLogger(__name__))
+
 surveys_bp = Blueprint('surveys_bp', __name__, static_folder='static', template_folder='templates/surveys')
 
 

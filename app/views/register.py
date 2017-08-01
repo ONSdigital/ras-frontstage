@@ -1,19 +1,18 @@
 import json
 import logging
 import os
-from flask import Flask, Blueprint, render_template, request, flash, redirect, url_for, abort
+
 import requests
-from structlog import wrap_logger
+from flask import Flask, Blueprint, render_template, request, flash, redirect, url_for, abort
 from jose import JWTError
-
 from oauthlib.oauth2 import BackendApplicationClient, MissingTokenError
-from requests_oauthlib import OAuth2Session
-from app.jwt import encode
-
-from app.models import RegistrationForm, EnrolmentCodeForm
-
 from ons_ras_common import ons_env
-from app.config import Config
+from requests_oauthlib import OAuth2Session
+from structlog import wrap_logger
+
+from app.jwt import encode
+from app.models import RegistrationForm, EnrolmentCodeForm
+from config import Config
 from ..common.post_event import post_event
 
 app = Flask(__name__)

@@ -1,12 +1,12 @@
 import json
 import logging
-import requests
 
+import requests
 from flask import Blueprint, render_template, request
 from ons_ras_common.ons_decorators import jwt_session
 from structlog import wrap_logger
 
-from app.config import Config
+from config import Config
 from ..common.post_event import post_event
 
 logger = wrap_logger(logging.getLogger(__name__))

@@ -9,15 +9,12 @@ from structlog import wrap_logger
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-
 headers = {}
-
 
 modify_data = {'action': '',
                'label': ''}
 
 secure_message_bp = Blueprint('secure_message_bp', __name__, static_folder='static', template_folder='templates')
-
 
 # Constants
 MESSAGE_LIMIT = 1000

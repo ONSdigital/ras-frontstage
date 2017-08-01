@@ -2,8 +2,9 @@ import unittest
 
 import requests_mock
 
-from app.application import app
 from config import Config
+from frontstage import app
+
 
 token = 'TOKEN_ABC'
 user_id = 'USER_12345'

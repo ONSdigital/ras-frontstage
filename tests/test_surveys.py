@@ -3,8 +3,9 @@ import unittest
 
 import requests_mock
 
-from app.application import app
 from config import Config
+from frontstage import app
+
 
 with open('tests/test_data/my_surveys.json') as json_data:
     my_surveys_data = json.load(json_data)
@@ -17,9 +18,6 @@ with open('tests/test_data/cases.json') as json_data:
 
 with open('tests/test_data/my_party.json') as json_data:
     my_party_data = json.load(json_data)
-
-
-# print("Test data JSON values are:{}".format(collection_instrument_data))
 
 returned_token = {
     "id": 6,
@@ -34,7 +32,6 @@ returned_token = {
 
 case_id = '7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
 collection_instrument_id = '40c7c047-4fb3-4abe-926e-bf19fa2c0a1e'
-#party_id = '3b136c4b-7a14-4904-9e01-13364dd7b972'
 party_id = "db036fd7-ce17-40c2-a8fc-932e7c228397"
 
 

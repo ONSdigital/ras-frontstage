@@ -1,10 +1,13 @@
 import logging
+
 from flask import Blueprint, render_template, request, redirect, url_for
 from structlog import wrap_logger
 
-from app.models import ForgotPasswordForm, ResetPasswordForm
+from frontstage.models import ForgotPasswordForm, ResetPasswordForm
+
 
 logger = wrap_logger(logging.getLogger(__name__))
+
 passwords_bp = Blueprint('passwords_bp', __name__, static_folder='static', template_folder='templates/passwords')
 
 

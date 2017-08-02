@@ -7,10 +7,10 @@ from frontstage import app
 from frontstage.jwt import encode, decode
 
 
-with open('test_data/my_surveys.json') as json_data:
+with open('tests/test_data/my_surveys.json') as json_data:
     my_surveys_data = json.load(json_data)
 
-with open('test_data/my_party.json') as json_data:
+with open('tests/test_data/my_party.json') as json_data:
     my_party_data = json.load(json_data)
 
 

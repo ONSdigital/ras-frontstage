@@ -6,16 +6,16 @@ import requests_mock
 from frontstage import app
 
 
-with open('test_data/my_surveys.json') as json_data:
+with open('tests/test_data/my_surveys.json') as json_data:
     my_surveys_data = json.load(json_data)
 
-with open('test_data/collection_instrument.json') as json_data:
+with open('tests/test_data/collection_instrument.json') as json_data:
     collection_instrument_data = json.load(json_data)
 
-with open('test_data/cases.json') as json_data:
+with open('tests/test_data/cases.json') as json_data:
     cases_data = json.load(json_data)
 
-with open('test_data/my_party.json') as json_data:
+with open('tests/test_data/my_party.json') as json_data:
     my_party_data = json.load(json_data)
 
 returned_token = {

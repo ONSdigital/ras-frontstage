@@ -7,7 +7,7 @@ from ons_ras_common import ons_env
 from frontstage import app
 
 
-with open('test_data/my_surveys.json') as json_data:
+with open('tests/test_data/my_surveys.json') as json_data:
     my_surveys_data = json.load(json_data)
 
 returned_token = {

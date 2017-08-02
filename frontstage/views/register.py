@@ -147,7 +147,7 @@ def register_confirm_organisation_survey():
     # Look up the survey
     # url = app.config['API_GATEWAY_SURVEYS_URL'] + survey_id
 
-    url = app.config['RM_SURVEY_GET.format'](app.config['RM_SURVEY_SERVICE'], survey_id)
+    url = app.config['RM_SURVEY_GET'].format(app.config['RM_SURVEY_SERVICE'], survey_id)
     logger.debug('survey url {}'.format(url))
 
     survey = requests.get(url, verify=False)

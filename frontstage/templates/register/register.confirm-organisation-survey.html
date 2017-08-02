@@ -11,7 +11,7 @@
         class="form"
         role="form">
 
-    <h1 class="saturn">Confirm organisation and survey</h1>
+    <h1 class="saturn">Confirm organisation and survey details</h1>
 
     <div class="grid">
         <div class="grid__col col-4@m">Enrolment code:</div>
@@ -26,15 +26,15 @@
 
     <input type="hidden" id="enrolment_code" name="enrolment_code" value="{{ encrypted_enrolment_code }}">
 
-    <p>If this is the organisation and survey you are expecting, please confirm and continue to create your account.</p>
+    <button class="btn btn--primary venus" type="submit" id="CONFIRM_AND_CONTINUE_BUTTON">Confirm</button>
 
-    <button class="btn btn--primary venus" type="submit" id="CONFIRM_AND_CONTINUE_BUTTON">Confirm and continue</button>
+    <p>If the organisation or survey details aren't what you were expecting.<br />
+        Please contact us on <a href="tel:+4403001234931">0300 1234 931</a></p>
 
-    <br>
+    <br />
 
-    <p>If you already have an account you can still use this enrolment code after you
-        <a href="/sign-in">sign in</a>.
-    </p>
+    <h2 class="neptune">Already have an account?</h2>
+    <p>You can still use this enrolment code after you <a href="/sign-in">sign in</a>.</p>
 
 </form>
 {% endblock main %}

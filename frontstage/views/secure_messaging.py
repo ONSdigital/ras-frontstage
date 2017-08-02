@@ -6,6 +6,8 @@ from ons_ras_common.ons_decorators import jwt_session
 import requests
 from structlog import wrap_logger
 
+from frontstage import app
+
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -42,13 +44,25 @@ chrome_driver = "{}/tests/selenium_scripts/drivers/chromedriver".format(os.envir
 def create_message(session):
     """Handles sending of new message"""
 
+    url = app.config['RAS_PARTY_GET_BY_RESPONDENT'].format(app.config['RAS_PARTY_SERVICE'], session['user_uuid'])
+    # url = "http://localhost:8050/api/party-api/respondents/id/" + session['user_uuid']
+    party_response = requests.get(url)
+    if party_response.status_code != 200:
+        return redirect(url_for('error_bp.error_page'))
+    party_response_json = party_response.json()
+    associations = party_response_json.get('associations')
+    if associations:
+        ru_id = associations[0].get('partyId')
+    else:
+        ru_id = None
+
     if request.method == 'POST':
         data = {'msg_to': ['BRES'],
                 'msg_from': session['user_uuid'],
                 'subject': request.form['secure-message-subject'],
                 'body': request.form['secure-message-body'],
                 'collection_case': 'test',
-                'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                'ru_id': ru_id,
                 'survey': 'BRES'}
 
         if request.form['submit'] == 'Send':

@@ -10,7 +10,7 @@ from json import loads, dumps
 import requests
 from ons_ras_common import ons_env
 
-from config import Config
+from frontstage import app
 
 _categories = None
 
@@ -43,7 +43,7 @@ def post_event(case_id, description=None, category=None, party_id=None, created_
     global _categories
     if not _categories:
         ons_env.logger.debug('@ caching event category list')
-        resp = requests.get('{}categories'.format(Config.RM_CASE_SERVICE))
+        resp = requests.get('{}categories'.format(app.config['RM_CASE_SERVICE']))
         if resp.status_code != 200:
             return 404, {'code': 404, 'text': 'error loading categories'}
         _categories = {}
@@ -83,7 +83,7 @@ def post_event(case_id, description=None, category=None, party_id=None, created_
 
     headers = {'Content-Type': 'application/json'}
     resp = requests.post(
-                    '{}cases/{}/events'.format(Config.RM_CASE_SERVICE, case_id),
+                    '{}cases/{}/events'.format(app.config['RM_CASE_SERVICE'], case_id),
                     data=dumps(message),
                     headers=headers)
     if resp.status_code == 200:

@@ -6,7 +6,6 @@ import requests
 from requests_oauthlib import OAuth2Session
 from structlog import wrap_logger
 
-from config import Config
 from frontstage import app
 from frontstage.jwt import encode
 from frontstage.models import LoginForm
@@ -79,13 +78,12 @@ def login():
             logger.warning("Failed validation")
             return render_template('sign-in/sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
 
- #       except Exception as e:
- #           logger.error("Error logging in: {}", str(e))
- #           return redirect(url_for('error_page'))
-
+        # except Exception as e:
+        #     logger.error("Error logging in: {}", str(e))
+        #     return redirect(url_for('error_page'))
 
         logger.debug('Email Address: {}'.format(username))
-        url = Config.RAS_PARTY_GET_BY_EMAIL.format(Config.RAS_PARTY_SERVICE, username)
+        url = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], username)
         req = requests.get(url, verify=False)
         if req.status_code != 200:
             logger.error('unable to lookup email for "{}"'.format(username))

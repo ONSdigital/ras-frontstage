@@ -6,7 +6,7 @@ from ons_ras_common.ons_decorators import jwt_session
 import requests
 from structlog import wrap_logger
 
-from config import Config
+from frontstage import app
 from frontstage.common.post_event import post_event
 
 
@@ -27,9 +27,9 @@ def build_survey_data(session, status_filter):
     headers = {}
 
     # Call the API Gateway Service to get the To Do survey list
-    # url = Config.API_GATEWAY_AGGREGATED_SURVEYS_URL + 'todo/' + party_id
+    # url = app.config['API_GATEWAY_AGGREGATED_SURVEYS_URL'] + 'todo/' + party_id
 
-    url = Config.RAS_AGGREGATOR_TODO.format(Config.RAS_API_GATEWAY_SERVICE, session.get('party_id'))
+    url = app.config['RAS_AGGREGATOR_TODO'].format(app.config['RAS_API_GATEWAY_SERVICE'], session.get('party_id'))
     logger.debug("build_survey_data URL is: {}".format(url))
     req = requests.get(url, headers=headers, params=status_filter, verify=False)
 
@@ -92,7 +92,7 @@ def access_survey(session):
         #   Need a check here to make sure that party_id is allowed to access collection_instrument_id
         #   - we can do this by calling "get cases by party" and ensuring the instrument_id is in the result set
         #
-        url = Config.RM_CASE_GET_BY_PARTY.format(Config.RM_CASE_SERVICE, party_id)
+        url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
         req = requests.get(url, verify=False)
         if req.status_code != 200:
             logger.error('unable to lookup cases for party "{}"'.format(party_id))
@@ -110,7 +110,7 @@ def access_survey(session):
             logger.error('party "{}" does not have access to instrument "{}"'.format(party_id, collection_instrument_id))
             return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
-        url = Config.RAS_CI_GET.format(Config.RAS_COLLECTION_INSTRUMENT_SERVICE, collection_instrument_id)
+        url = app.config['RAS_CI_GET'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], collection_instrument_id)
         logger.debug('Access_survey URL is: {}'.format(url))
         req = requests.get(url, verify=False)
         ci_data = req.json()
@@ -130,7 +130,7 @@ def access_survey(session):
         #   Need a check here to make sure that party_id is allowed to access collection_instrument_id
         #   - we can do this by calling "get cases by party" and ensuring the instrument_id is in the result set
         #
-        url = Config.RM_CASE_GET_BY_PARTY.format(Config.RM_CASE_SERVICE, party_id)
+        url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
         req = requests.get(url, verify=False)
         if req.status_code != 200:
             logger.error('unable to lookup cases for party "{}"'.format(party_id))
@@ -148,8 +148,7 @@ def access_survey(session):
             logger.error('party "{}" does not have access to instrument "{}"'.format(party_id, collection_instrument_id))
             return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
-
-        url = Config.RAS_CI_DOWNLOAD.format(Config.RAS_COLLECTION_INSTRUMENT_SERVICE, collection_instrument_id)
+        url = app.config['RAS_CI_DOWNLOAD'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], collection_instrument_id)
         logger.info("User {} downloaded spreadsheet {} for case {}".format(party_id, collection_instrument_id, case_id))
         response = requests.get(url, verify=False)
 
@@ -184,7 +183,7 @@ def upload_survey(session):
     #   Need a check here to make sure that party_id is allowed to access case_id
     #   - we can do this by calling "get cases by party" and ensuring the case_id is in the result set
     #
-    url = Config.RM_CASE_GET_BY_PARTY.format(Config.RM_CASE_SERVICE, party_id)
+    url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
     req = requests.get(url, verify=False)
     if req.status_code != 200:
         logger.error('unable to lookup cases for party "{}"'.format(party_id))
@@ -212,7 +211,7 @@ def upload_survey(session):
     upload_file = {'file': (upload_filename, upload_file.stream, upload_file.mimetype, {'Expires': 0})}
 
     # Build the URL
-    url = Config.RAS_CI_UPLOAD.format(Config.RAS_COLLECTION_INSTRUMENT_SERVICE, case_id)
+    url = app.config['RAS_CI_UPLOAD'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], case_id)
     logger.debug('upload_survey URL is: {}'.format(url))
 
     # Call the API Gateway Service to upload the selected file

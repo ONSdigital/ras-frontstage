@@ -3,7 +3,6 @@ import unittest
 
 import requests_mock
 
-from config import Config
 from frontstage import app
 
 
@@ -53,11 +52,12 @@ class TestSurveys(unittest.TestCase):
         """Test we display survey data after signing in correctly"""
 
         # Build mock URL's which are used to provide application data
-        url_get_token = Config.ONS_OAUTH_PROTOCOL + Config.ONS_OAUTH_SERVER + Config.ONS_TOKEN_ENDPOINT
-        #url_get_survey_data = Config.API_GATEWAY_AGGREGATED_SURVEYS_URL + 'todo/' + party_id
-        url_get_survey_data = Config.RAS_AGGREGATOR_TODO.format(Config.RAS_API_GATEWAY_SERVICE, party_id)
+        url_get_token = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER']+ app.config['ONS_TOKEN_ENDPOINT']
 
-        url_get_party_by_email = Config.RAS_PARTY_GET_BY_EMAIL.format(Config.RAS_PARTY_SERVICE, 'testuser@email.com')
+        url_get_survey_data = app.config['RAS_AGGREGATOR_TODO'].format(app.config['RAS_API_GATEWAY_SERVICE'], party_id)
+
+        url_get_party_by_email = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], 'testuser@email.com')
+
         mock_object.get(url_get_party_by_email, status_code=200, json=my_party_data)
         mock_object.post(url_get_token, status_code=200, json=returned_token)
         mock_object.get(url_get_survey_data, status_code=200, json=my_surveys_data)
@@ -103,15 +103,16 @@ class TestSurveys(unittest.TestCase):
         """Test we display survey data after signing in correctly"""
 
         # Build mock URL's which are used to provide application data
-        url_get_token = Config.ONS_OAUTH_PROTOCOL + Config.ONS_OAUTH_SERVER + Config.ONS_TOKEN_ENDPOINT
-        #url_get_survey_data = Config.API_GATEWAY_AGGREGATED_SURVEYS_URL + 'todo/' + party_id
-        url_get_survey_data = Config.RAS_AGGREGATOR_TODO.format(Config.RAS_API_GATEWAY_SERVICE, party_id)
+        url_get_token = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_TOKEN_ENDPOINT']
 
-        #url_get_collection_instrument_data = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'collectioninstrument/id/' + collection_instrument_id
-        url_get_collection_instrument_data = Config.RAS_CI_GET.format(Config.RAS_COLLECTION_INSTRUMENT_SERVICE, collection_instrument_id)
+        url_get_survey_data = app.config['RAS_AGGREGATOR_TODO'].format(app.config['RAS_API_GATEWAY_SERVICE'], party_id)
 
-        url_get_cases = Config.RM_CASE_GET_BY_PARTY.format(Config.RM_CASE_SERVICE, party_id)
-        url_get_party_by_email = Config.RAS_PARTY_GET_BY_EMAIL.format(Config.RAS_PARTY_SERVICE, 'testuser@email.com')
+        url_get_collection_instrument_data = app.config['RAS_CI_GET'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], collection_instrument_id)
+
+        url_get_cases = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
+
+        url_get_party_by_email = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], 'testuser@email.com')
+
         mock_object.get(url_get_party_by_email, status_code=200, json=my_party_data)
 
         mock_object.post(url_get_token, status_code=200, json=returned_token)

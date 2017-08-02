@@ -10,7 +10,7 @@ from structlog import wrap_logger
 from wtforms import HiddenField, PasswordField, StringField
 from wtforms.validators import InputRequired, EqualTo, Length, DataRequired, Email, ValidationError
 
-from config import Config
+from frontstage import app
 
 # db = SQLAlchemy()
 
@@ -96,10 +96,10 @@ class RegistrationForm(FlaskForm):
                                                    message='Your email must be less than 254 characters')])
     password = PasswordField('Create a password',
                              validators=[DataRequired("Password is required"),
-                                         EqualTo('password_confirm', message=Config.PASSWORD_MATCH_ERROR_TEXT),
-                                         Length(min=Config.PASSWORD_MIN_LENGTH,
-                                                max=Config.PASSWORD_MAX_LENGTH,
-                                                message=Config.PASSWORD_CRITERIA_ERROR_TEXT)])
+                                         EqualTo('password_confirm', message=app.config['PASSWORD_MATCH_ERROR_TEXT']),
+                                         Length(min=app.config['PASSWORD_MIN_LENGTH'],
+                                                max=app.config['PASSWORD_MAX_LENGTH'],
+                                                message=app.config['PASSWORD_CRITERIA_ERROR_TEXT'])])
     password_confirm = PasswordField('Re-type your password')
     phone_number = StringField('Enter your phone number',
                                validators=[DataRequired("Phone number is required"),
@@ -128,7 +128,7 @@ class RegistrationForm(FlaskForm):
         if password.isalnum() or \
             not any(char.isupper() for char in password) or \
                 not any(char.isdigit() for char in password):
-                    raise ValidationError(Config.PASSWORD_CRITERIA_ERROR_TEXT)
+                    raise ValidationError(app.config['PASSWORD_CRITERIA_ERROR_TEXT'])
 
 
 class LoginForm(FlaskForm):
@@ -164,8 +164,8 @@ class ResetPasswordForm(FlaskForm):
     """
     password = PasswordField('New password',
                              validators=[DataRequired("Password is required"),
-                                         EqualTo('password_confirm', message=Config.PASSWORD_MATCH_ERROR_TEXT),
-                                         Length(min=Config.PASSWORD_MIN_LENGTH,
-                                                max=Config.PASSWORD_MAX_LENGTH,
-                                                message=Config.PASSWORD_CRITERIA_ERROR_TEXT)])
+                                         EqualTo('password_confirm', message=app.config['PASSWORD_MATCH_ERROR_TEXT']),
+                                         Length(min=app.config['PASSWORD_MIN_LENGTH'],
+                                                max=app.config['PASSWORD_MAX_LENGTH'],
+                                                message=app.config['PASSWORD_CRITERIA_ERROR_TEXT'])])
     password_confirm = PasswordField('Re-type new password')

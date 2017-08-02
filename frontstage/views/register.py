@@ -9,7 +9,7 @@ import requests
 from requests_oauthlib import OAuth2Session
 from structlog import wrap_logger
 
-from config import Config
+from frontstage import app
 from frontstage.common.post_event import post_event
 from frontstage.jwt import encode
 from frontstage.models import RegistrationForm, EnrolmentCodeForm
@@ -24,8 +24,8 @@ def validate_enrolment_code(enrolment_code):
     case_id = None
 
     # Build the URL
-    #url = Config.API_GATEWAY_IAC_URL + '{}'.format(enrolment_code)
-    url = Config.RM_IAC_GET.format(Config.RM_IAC_SERVICE, enrolment_code)
+    # url = app.config['API_GATEWAY_IAC_URL'] + '{}'.format(enrolment_code)
+    url = app.config['RM_IAC_GET'].format(app.config['RM_IAC_SERVICE'], enrolment_code)
     logger.debug('Validate IAC URL is: {}'.format(url))
 
     # Call the API Gateway Service to validate the enrolment code
@@ -110,9 +110,9 @@ def register_confirm_organisation_survey():
 
     # TODO Use ras-common for this lookup
     # Look up the case by case_id
-    #url = Config.API_GATEWAY_CASE_URL + case_id
+    # url = app.config['API_GATEWAY_CASE_URL'] + case_id
 
-    url = Config.RM_CASE_GET.format(Config.RM_CASE_SERVICE, case_id)
+    url = app.config['RM_CASE_GET'].format(app.config['RM_CASE_SERVICE'], case_id)
     case = requests.get(url, verify=False)
     logger.debug('case result => {} {} : {}'.format(case.status_code, case.reason, case.text))
     case = json.loads(case.text)
@@ -121,9 +121,9 @@ def register_confirm_organisation_survey():
     collection_exercise_id = case['caseGroup']['collectionExerciseId']
 
     # Look up the organisation
-    #url = Config.API_GATEWAY_PARTY_URL + 'businesses/id/' + business_party_id
+    # url = app.config['API_GATEWAY_PARTY_URL'] + 'businesses/id/' + business_party_id
 
-    url = Config.RAS_PARTY_GET_BY_BUSINESS.format(Config.RAS_PARTY_SERVICE, business_party_id)
+    url = app.config['RAS_PARTY_GET_BY_BUSINESS'].format(app.config['RAS_PARTY_SERVICE'], business_party_id)
     party = requests.get(url, verify=False)
     logger.debug('party result => {} {} : {}'.format(party.status_code, party.reason, party.text))
     party = json.loads(party.text)
@@ -133,9 +133,9 @@ def register_confirm_organisation_survey():
 
     # TODO Use ras-common for this lookup
     # Look up the collection exercise
-    #url = Config.API_GATEWAY_COLLECTION_EXERCISE_URL + collection_exercise_id
+    # url = app.config['API_GATEWAY_COLLECTION_EXERCISE_URL'] + collection_exercise_id
 
-    url = Config.RM_COLLECTION_EXERCISES_GET.format(Config.RM_COLLECTION_EXERCISE_SERVICE, collection_exercise_id)
+    url = app.config['RM_COLLECTION_EXERCISES_GET'].format(app.config['RM_COLLECTION_EXERCISE_SERVICE'], collection_exercise_id)
     logger.debug('collection URL {}'.format(url))
 
     collection_exercise = requests.get(url, verify=False)
@@ -145,9 +145,9 @@ def register_confirm_organisation_survey():
     survey_id = collection_exercise['surveyId']
 
     # Look up the survey
-    #url = Config.API_GATEWAY_SURVEYS_URL + survey_id
+    # url = app.config['API_GATEWAY_SURVEYS_URL'] + survey_id
 
-    url = Config.RM_SURVEY_GET.format(Config.RM_SURVEY_SERVICE, survey_id)
+    url = app.config['RM_SURVEY_GET.format'](app.config['RM_SURVEY_SERVICE'], survey_id)
     logger.debug('survey url {}'.format(url))
 
     survey = requests.get(url, verify=False)
@@ -341,8 +341,8 @@ def register_enter_your_details():
 
         headers = {'authorization': encoded_jwt_token, 'content-type': 'application/json'}
 
-        #party_service_url = app.config['API_GATEWAY_PARTY_URL'] + 'respondents'
-        party_service_url = Config.RAS_PARTY_POST_RESPONDENTS.format(Config.RAS_PARTY_SERVICE)
+        # party_service_url = app.config['API_GATEWAY_PARTY_URL'] + 'respondents'
+        party_service_url = app.config['RAS_PARTY_POST_RESPONDENTS'].format(app.config['RAS_PARTY_SERVICE'])
         logger.debug("Party service URL is: {}".format(party_service_url))
 
         try:
@@ -377,9 +377,9 @@ def register_almost_done():
 def register_activate_account(token):
 
     # Call the Party service to try to activate the account corresponding to the token that was supplied
-    #url = Config.API_GATEWAY_PARTY_URL + 'emailverification/' + token
+    # url = app.config['API_GATEWAY_PARTY_URL'] + 'emailverification/' + token
 
-    url = Config.RAS_PARTY_VERIFY_EMAIL.format(Config.RAS_PARTY_SERVICE, token)
+    url = app.config['RAS_PARTY_VERIFY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], token)
     result = requests.post(url)
     logger.debug('Activate account - response from party service is: {}'.format(result.content))
 

@@ -58,15 +58,28 @@ def get_party_ru_id(party_id):
 def create_message(session):
     """Handles sending of new message"""
 
-    party_id = session['user_uuid']
+    url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], session['party_id'])
+    # url = "http://localhost:8050/api/party-api/respondents/id/" + session['user_uuid']
+    collection_response = requests.get(url)
+    if collection_response.status_code != 200:
+        return redirect(url_for('error_bp.error_page'))
+
+    collection_response_json = collection_response.json()
+    collection_id = collection_response_json[0].get('id')
+    if collection_id:
+        collection_case = collection_id
+    else:
+        collection_case = None
+
+    party_id = session['party_id']
     ru_id = get_party_ru_id(party_id)
 
     if request.method == 'POST':
         data = {'msg_to': ['BRES'],
-                'msg_from': party_id,
+                'msg_from': session['party_id'],
                 'subject': request.form['secure-message-subject'],
                 'body': request.form['secure-message-body'],
-                'collection_case': 'test',
+                'collection_case': collection_case,
                 'ru_id': ru_id,
                 'survey': 'BRES'}
 
@@ -105,30 +118,34 @@ def create_message(session):
 def reply_message(session):
     """Handles replying to an existing message"""
 
-    party_id = session['user_uuid']
+    party_id = session['party_id']
     ru_id = get_party_ru_id(party_id)
 
     if request.method == 'POST':
         if request.form['submit'] == 'Send':
             logger.info("Reply to Message")
             data = {'msg_to': ['BRES'],
-                    'msg_from': session['user_uuid'],
+                    'msg_from': session['party_id'],
                     'subject': request.form['secure-message-subject'],
                     'body': request.form['secure-message-body'],
-                    'thread_id': 'test',
+                    'thread_id': '',
                     'collection_case': 'test',
                     'ru_id': ru_id,
                     'survey': 'BRES'}
+
+            # Message already saved as draft
+            if "msg_id" in request.form:
+                data["msg_id"] = request.form['msg_id']
 
             return message_check_response(data)
 
         if request.form['submit'] == 'Save draft':
             data = {'msg_to': ['BRES'],
-                    'msg_from': session['user_uuid'],
+                    'msg_from': session['party_id'],
                     'subject': request.form['secure-message-subject'],
                     'body': request.form['secure-message-body'],
                     'collection_case': 'test',
-                    'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                    'ru_id': ru_id,
                     'survey': 'BRES'}
 
             if "msg_id" in request.form:

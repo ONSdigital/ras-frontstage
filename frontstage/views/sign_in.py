@@ -102,7 +102,7 @@ def login():
             "scope": token['scope'],
             "expires_at": token['expires_at'],
             "username": username,
-            "user_uuid": "ce12b958-2a5f-44f4-a6da-861e59070a32",
+            "user_uuid": "db036fd7-ce17-40c2-a8fc-932e7c228397",
             "role": "respondent",
             "party_id": party_id
         }

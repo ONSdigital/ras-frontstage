@@ -1,7 +1,6 @@
-import json
 import logging
 
-from flask import Blueprint, render_template, request
+from flask import Blueprint, redirect, render_template, request, url_for
 from ons_ras_common.ons_decorators import jwt_session
 import requests
 from structlog import wrap_logger
@@ -152,6 +151,9 @@ def access_survey(session):
         logger.info("User {} downloaded spreadsheet {} for case {}".format(party_id, collection_instrument_id, case_id))
         response = requests.get(url, verify=False)
 
+        if response.status_code != 200:
+            return redirect(url_for('surveys_bp.surveys_download_failure'))
+
         category = 'COLLECTION_INSTRUMENT_DOWNLOADED' if response.status_code == 200 else 'COLLECTION_INSTRUMENT_ERROR'
         code, msg = post_event(case_id,
                                category=category,
@@ -240,10 +242,13 @@ def upload_survey(session):
         #return render_template('surveys/surveys-upload-failure.html',  _theme='default', error_info=error_info,
                                #case_id=case_id)
 
+
 @surveys_bp.route('/surveys-download-failure', methods=['GET'])
 def surveys_download_failure():
+    logger.error("User failed to download survey")
     error_info = request.args.get('error_info', None)
     return render_template('surveys/surveys-download-failure.html', _theme='default', error_info=error_info)
+
 
 @surveys_bp.route('/surveys-upload-failure', methods=['GET'])
 def surveys_upload_failure():

@@ -44,7 +44,7 @@ def create_message(session):
 
     if request.method == 'POST':
         data = {'msg_to': ['BRES'],
-                'msg_from': session['user_uuid'],
+                'msg_from': session['party_id'],
                 'subject': request.form['secure-message-subject'],
                 'body': request.form['secure-message-body'],
                 'collection_case': 'test',
@@ -90,7 +90,7 @@ def reply_message(session):
         if request.form['submit'] == 'Send':
             logger.info("Reply to Message")
             data = {'msg_to': ['BRES'],
-                    'msg_from': session['user_uuid'],
+                    'msg_from': session['party_id'],
                     'subject': request.form['secure-message-subject'],
                     'body': request.form['secure-message-body'],
                     'thread_id': 'test',
@@ -105,7 +105,7 @@ def reply_message(session):
 
         if request.form['submit'] == 'Save draft':
             data = {'msg_to': ['BRES'],
-                    'msg_from': session['user_uuid'],
+                    'msg_from': session['party_id'],
                     'subject': request.form['secure-message-subject'],
                     'body': request.form['secure-message-body'],
                     'collection_case': 'test',

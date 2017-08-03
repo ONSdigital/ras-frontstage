@@ -3,7 +3,6 @@ import unittest
 
 import requests_mock
 
-from config import Config
 from frontstage import app
 from frontstage.jwt import encode, decode
 
@@ -111,7 +110,7 @@ class TestApplication(unittest.TestCase):
     def test_sign_in_wrong_details(self, mock_object):
         """Test incorrect detail message is returned with invalid details entered"""
         # data = {'refresh_token': '007', 'access_token': '007', 'scope': '[foo,bar]', 'expires_at': 'today', 'username': 'nherriot' }
-        url = Config.ONS_OAUTH_PROTOCOL + Config.ONS_OAUTH_SERVER + Config.ONS_TOKEN_ENDPOINT
+        url = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_TOKEN_ENDPOINT']
 
         # Here we place a listener on this URL. This is the URL of the OAuth2 server. We send a 401 to reject the request
         # from the ras_frontstage to get a token for this user. See application.py login(). And the call to oauth.fetch_token
@@ -155,9 +154,9 @@ class TestApplication(unittest.TestCase):
         """Test we display survey data after signing in correctly"""
 
         # Build URL's which is used to talk to the OAuth2 server
-        url_get_token = Config.ONS_OAUTH_PROTOCOL + Config.ONS_OAUTH_SERVER + Config.ONS_TOKEN_ENDPOINT
-        url_get_survey_data = Config.API_GATEWAY_AGGREGATED_SURVEYS_URL + 'todo/' + party_id
-        url_get_party_by_email = Config.RAS_PARTY_GET_BY_EMAIL.format(Config.RAS_PARTY_SERVICE, 'testuser@email.com')
+        url_get_token = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_TOKEN_ENDPOINT']
+        url_get_survey_data = app.config['API_GATEWAY_AGGREGATED_SURVEYS_URL'] + 'todo/' + party_id
+        url_get_party_by_email = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], 'testuser@email.com')
         # Here we place a listener on the URL's The flow of events are:
         # 1) The ras_frontstage signs in OAuth2 user.
         # 2) The OAuth2 replies with a HTTP 200 OK and token data.

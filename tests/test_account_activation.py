@@ -2,7 +2,6 @@ import unittest
 
 import requests_mock
 
-from config import Config
 from frontstage import app
 
 
@@ -10,8 +9,7 @@ token = 'TOKEN_ABC'
 user_id = 'USER_12345'
 
 # Build the mock URL and that is used to validate the email token
-# url_email_verification = Config.API_GATEWAY_PARTY_URL + 'emailverification/{}'.format(token)
-url_email_verification = Config.RAS_PARTY_VERIFY_EMAIL.format(Config.RAS_PARTY_SERVICE, token)
+url_email_verification = app.config['RAS_PARTY_VERIFY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], token)
 
 
 @requests_mock.mock()

@@ -165,8 +165,7 @@ def access_survey(session):
         if response.status_code == 200:
             return response.content, response.status_code, response.headers.items()
         else:
-            # TODO Decide how to handle this error
-            logger.error('ci download of "{}" failed with "{}"'.format(collection_instrument_id, response.status_code))
+            logger.error('Collection Instrument download of "{}" failed with "{}"'.format(collection_instrument_id, response.status_code))
             return render_template('surveys/surveys-download-failure.html', _theme='default', error_info=request.args.get('error_info', None))
 
 

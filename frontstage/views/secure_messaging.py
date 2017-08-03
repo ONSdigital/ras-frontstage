@@ -5,7 +5,7 @@ from flask import Blueprint, json, redirect, render_template, request, session, 
 from ons_ras_common.ons_decorators import jwt_session
 import requests
 from structlog import wrap_logger
-
+from frontstage import app
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -42,12 +42,24 @@ chrome_driver = "{}/tests/selenium_scripts/drivers/chromedriver".format(os.envir
 def create_message(session):
     """Handles sending of new message"""
 
+    url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], session['party_id'])
+    # url = "http://localhost:8050/api/party-api/respondents/id/" + session['user_uuid']
+    collection_response = requests.get(url)
+    if collection_response.status_code != 200:
+        return redirect(url_for('error_bp.error_page'))
+    collection_response_json = collection_response.json()
+    collection_id = collection_response_json[0].get('id')
+    if collection_id:
+        collection_case = collection_id
+    else:
+        collection_case = None
+
     if request.method == 'POST':
         data = {'msg_to': ['BRES'],
                 'msg_from': session['party_id'],
                 'subject': request.form['secure-message-subject'],
                 'body': request.form['secure-message-body'],
-                'collection_case': 'test',
+                'collection_case': collection_case,
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': 'BRES'}
 

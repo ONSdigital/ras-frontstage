@@ -37,13 +37,9 @@ DRAFT_PUT_API_URL = SM_API_URL + '/draft/{0}/modify'
 chrome_driver = "{}/tests/selenium_scripts/drivers/chromedriver".format(os.environ.get('RAS_FRONTSTAGE_PATH'))
 
 
-@secure_message_bp.route('/create-message', methods=['GET', 'POST'])
-@jwt_session(request)
-def create_message(session):
-    """Handles sending of new message"""
-
-    url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], session['party_id'])
-    # url = "http://localhost:8050/api/party-api/respondents/id/" + session['user_uuid']
+def get_collection_case(party_id):
+    # url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
+    url = "http://localhost:8050/api/cases/partyid/" + party_id
     collection_response = requests.get(url)
     if collection_response.status_code != 200:
         return redirect(url_for('error_bp.error_page'))
@@ -53,6 +49,16 @@ def create_message(session):
         collection_case = collection_id
     else:
         collection_case = None
+    return collection_case
+
+
+@secure_message_bp.route('/create-message', methods=['GET', 'POST'])
+@jwt_session(request)
+def create_message(session):
+    """Handles sending of new message"""
+
+    party_id = session['party_id']
+    collection_case = get_collection_case(party_id)
 
     if request.method == 'POST':
         data = {'msg_to': ['BRES'],
@@ -98,6 +104,9 @@ def create_message(session):
 def reply_message(session):
     """Handles replying to an existing message"""
 
+    party_id = session['party_id']
+    collection_case = get_collection_case(party_id)
+
     if request.method == 'POST':
         if request.form['submit'] == 'Send':
             logger.info("Reply to Message")
@@ -106,7 +115,7 @@ def reply_message(session):
                     'subject': request.form['secure-message-subject'],
                     'body': request.form['secure-message-body'],
                     'thread_id': '',
-                    'collection_case': 'test',
+                    'collection_case': collection_case,
                     'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                     'survey': 'BRES'}
 

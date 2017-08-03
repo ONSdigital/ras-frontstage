@@ -1,3 +1,4 @@
+import json
 import logging
 
 from flask import Blueprint, redirect, render_template, request, url_for
@@ -230,8 +231,14 @@ def upload_survey(session):
         logger.error('error "{}" logging case event'.format(code))
         logger.error(str(msg))
 
-    return render_template('surveys/surveys-upload-failure.html',  _theme='default', error_info=request.args.get('error_info', None),
-                                   case_id=case_id)
+    if result.status_code == 200:
+        logger.debug('Upload successful')
+        return render_template('surveys/surveys-upload-success.html', _theme='default', upload_filename=upload_filename)
+    else:
+        logger.debug('Upload failed')
+        error_info = json.loads(result.text)
+        return render_template('surveys/surveys-upload-failure.html',  _theme='default', error_info=error_info,
+                               case_id=case_id)
 
 
 @surveys_bp.route('/surveys-download-failure', methods=['GET'])

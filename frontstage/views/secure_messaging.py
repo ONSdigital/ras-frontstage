@@ -98,6 +98,7 @@ def reply_message(session):
                     'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                     'survey': 'BRES'}
 
+            # Message already saved as draft
             if "msg_id" in request.form:
                 data["msg_id"] = request.form['msg_id']
 

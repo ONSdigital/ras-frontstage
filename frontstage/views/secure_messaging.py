@@ -6,6 +6,8 @@ from ons_ras_common.ons_decorators import jwt_session
 import requests
 from structlog import wrap_logger
 
+from frontstage import app
+
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -37,18 +39,35 @@ DRAFT_PUT_API_URL = SM_API_URL + '/draft/{0}/modify'
 chrome_driver = "{}/tests/selenium_scripts/drivers/chromedriver".format(os.environ.get('RAS_FRONTSTAGE_PATH'))
 
 
+def get_party_ru_id(party_id):
+    # url = app.config['RAS_PARTY_GET_BY_RESPONDENT'].format(app.config['RAS_PARTY_SERVICE'], session['user_uuid'])
+    url = "http://localhost:8050/api/party-api/respondents/id/" + party_id
+    party_response = requests.get(url)
+    if party_response.status_code != 200:
+        return redirect(url_for('error_bp.error_page'))
+    party_response_json = party_response.json()
+    associations = party_response_json.get('associations')
+    if associations:
+        ru_id = associations[0].get('partyId')
+    else:
+        ru_id = None
+    return ru_id
+
 @secure_message_bp.route('/create-message', methods=['GET', 'POST'])
 @jwt_session(request)
 def create_message(session):
     """Handles sending of new message"""
 
+    party_id = session['user_uuid']
+    ru_id = get_party_ru_id(party_id)
+
     if request.method == 'POST':
         data = {'msg_to': ['BRES'],
-                'msg_from': session['user_uuid'],
+                'msg_from': party_id,
                 'subject': request.form['secure-message-subject'],
                 'body': request.form['secure-message-body'],
                 'collection_case': 'test',
-                'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                'ru_id': ru_id,
                 'survey': 'BRES'}
 
         if request.form['submit'] == 'Send':
@@ -86,6 +105,9 @@ def create_message(session):
 def reply_message(session):
     """Handles replying to an existing message"""
 
+    party_id = session['user_uuid']
+    ru_id = get_party_ru_id(party_id)
+
     if request.method == 'POST':
         if request.form['submit'] == 'Send':
             logger.info("Reply to Message")
@@ -95,7 +117,7 @@ def reply_message(session):
                     'body': request.form['secure-message-body'],
                     'thread_id': 'test',
                     'collection_case': 'test',
-                    'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                    'ru_id': ru_id,
                     'survey': 'BRES'}
 
             return message_check_response(data)

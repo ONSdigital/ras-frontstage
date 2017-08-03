@@ -42,7 +42,7 @@ chrome_driver = "{}/tests/selenium_scripts/drivers/chromedriver".format(os.envir
 def create_message(session):
     """Handles sending of new message"""
 
-    url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], session['partyId'])
+    url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], session['party_id'])
     # url = "http://localhost:8050/api/party-api/respondents/id/" + session['user_uuid']
     collection_response = requests.get(url)
     if collection_response.status_code != 200:

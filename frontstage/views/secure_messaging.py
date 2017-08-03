@@ -43,7 +43,6 @@ def create_message(session):
     """Handles sending of new message"""
 
     url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], session['party_id'])
-    # url = "http://localhost:8050/api/party-api/respondents/id/" + session['user_uuid']
     collection_response = requests.get(url)
     if collection_response.status_code != 200:
         return redirect(url_for('error_bp.error_page'))
@@ -53,6 +52,18 @@ def create_message(session):
         collection_case = collection_id
     else:
         collection_case = None
+
+    # url = app.config['RM_SURVEY_GET'].format(app.config['RM_SURVEY_SERVICE'], 'cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87')
+    # # to get cb0711..... need associations -> enrolments -> surveyID
+    # survey_response = requests.get(url)
+    # if survey_response.status_code != 200:
+    #     return redirect(url_for('error_bp.error_page'))
+    # survey_response_json = survey_response.json()
+    # survey_id = survey_response_json.get('shortName')
+    # if survey_id:
+    #     survey_name = survey_id
+    # else:
+    #     survey_name = None
 
     if request.method == 'POST':
         data = {'msg_to': ['BRES'],

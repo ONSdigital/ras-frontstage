@@ -38,8 +38,7 @@ chrome_driver = "{}/tests/selenium_scripts/drivers/chromedriver".format(os.envir
 
 
 def get_collection_case(party_id):
-    # url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
-    url = "http://localhost:8050/api/cases/partyid/" + party_id
+    url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
     collection_response = requests.get(url)
     if collection_response.status_code != 200:
         return redirect(url_for('error_bp.error_page'))

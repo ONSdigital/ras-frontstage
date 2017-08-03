@@ -167,7 +167,7 @@ def access_survey(session):
         else:
             # TODO Decide how to handle this error
             logger.error('ci download of "{}" failed with "{}"'.format(collection_instrument_id, response.status_code))
-            return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+            return render_template('surveys/surveys-download-failure.html', _theme='default', error_info=request.args.get('error_info', None))
 
 
 @surveys_bp.route('/upload_survey', methods=['POST'])

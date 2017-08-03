@@ -1,29 +1,19 @@
 import logging
-import os
 
-from flask import Flask, Blueprint, make_response, render_template, request, redirect, url_for
+from flask import Blueprint, make_response, render_template, request, redirect, url_for
 from oauthlib.oauth2 import LegacyApplicationClient, MissingTokenError
+import requests
 from requests_oauthlib import OAuth2Session
 from structlog import wrap_logger
 
-from app.jwt import encode
-from app.models import LoginForm
-from config import Config
+from frontstage import app
+from frontstage.jwt import encode
+from frontstage.models import LoginForm
 
-app = Flask(__name__)
-app.debug = True
-
-app.config.update(
-    DEBUG=True,
-    TESTING=True,
-    TEMPLATES_AUTO_RELOAD=True
-)
-
-if 'APP_SETTINGS' in os.environ:
-    app.config.from_object(Config)
 
 logger = wrap_logger(logging.getLogger(__name__))
-sign_in_bp = Blueprint('sign_in_bp', __name__, static_folder='static', template_folder='templates/sign-in')
+
+sign_in_bp = Blueprint('sign_in_bp', __name__, static_folder='static', template_folder='frontstage/templates/sign-in')
 
 
 # ===== Sign in using OAuth2 =====
@@ -78,8 +68,8 @@ def login():
             token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=app.config['RAS_FRONTSTAGE_CLIENT_ID'],
                                       client_secret=app.config['RAS_FRONTSTAGE_CLIENT_SECRET'])
 
-            app.logger.debug(" *** Access Token Granted *** ")
-            app.logger.debug(" Values are: ")
+            logger.debug(" *** Access Token Granted *** ")
+            logger.debug(" Values are: ")
             for key in token:
                 logger.debug("{} Value is: {}".format(key, token[key]))
 
@@ -88,9 +78,23 @@ def login():
             logger.warning("Failed validation")
             return render_template('sign-in/sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
 
- #       except Exception as e:
- #           logger.error("Error logging in: {}", str(e))
- #           return redirect(url_for('error_page'))
+        # except Exception as e:
+        #     logger.error("Error logging in: {}", str(e))
+        #     return redirect(url_for('error_page'))
+
+        logger.debug('Email Address: {}'.format(username))
+        url = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], username)
+        req = requests.get(url, verify=False)
+        if req.status_code != 200:
+            logger.error('unable to lookup email for "{}"'.format(username))
+            return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+
+        try:
+            party_id = req.json().get('id')
+        except Exception as e:
+            logger.error(str(e))
+            logger.error('error trying to get username from party service')
+            return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
         data_dict_for_jwt_token = {
             "refresh_token": token['refresh_token'],
@@ -98,9 +102,8 @@ def login():
             "scope": token['scope'],
             "expires_at": token['expires_at'],
             "username": username,
-            "user_uuid": "ce12b958-2a5f-44f4-a6da-861e59070a32",
             "role": "respondent",
-            "party_id": "db036fd7-ce17-40c2-a8fc-932e7c228397"
+            "party_id": party_id
         }
 
         encoded_jwt_token = encode(data_dict_for_jwt_token)
@@ -147,3 +150,10 @@ def sign_in_last_attempt():
 @sign_in_bp.route('/sign-in/account-locked/')
 def sign_in_account_locked():
     return render_template('sign-in/sign-in.locked-account.html', _theme='default')
+
+
+@sign_in_bp.route('/logout')
+def logout():
+    response = make_response(redirect(url_for('sign_in_bp.login')))
+    response.set_cookie('authorization', value='', expires=0)
+    return response

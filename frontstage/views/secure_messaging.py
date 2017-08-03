@@ -5,19 +5,16 @@ from flask import Blueprint, json, redirect, render_template, request, session, 
 from ons_ras_common.ons_decorators import jwt_session
 import requests
 from structlog import wrap_logger
-
+from frontstage import app
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-
 headers = {}
-
 
 modify_data = {'action': '',
                'label': ''}
 
 secure_message_bp = Blueprint('secure_message_bp', __name__, static_folder='static', template_folder='templates')
-
 
 # Constants
 MESSAGE_LIMIT = 1000
@@ -45,12 +42,24 @@ chrome_driver = "{}/tests/selenium_scripts/drivers/chromedriver".format(os.envir
 def create_message(session):
     """Handles sending of new message"""
 
+    url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], session['party_id'])
+    # url = "http://localhost:8050/api/party-api/respondents/id/" + session['user_uuid']
+    collection_response = requests.get(url)
+    if collection_response.status_code != 200:
+        return redirect(url_for('error_bp.error_page'))
+    collection_response_json = collection_response.json()
+    collection_id = collection_response_json[0].get('id')
+    if collection_id:
+        collection_case = collection_id
+    else:
+        collection_case = None
+
     if request.method == 'POST':
         data = {'msg_to': ['BRES'],
-                'msg_from': session['user_uuid'],
+                'msg_from': session['party_id'],
                 'subject': request.form['secure-message-subject'],
                 'body': request.form['secure-message-body'],
-                'collection_case': 'test',
+                'collection_case': collection_case,
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': 'BRES'}
 
@@ -63,12 +72,12 @@ def create_message(session):
                 response = requests.put(DRAFT_PUT_API_URL.format(request.form['msg_id']), data=json.dumps(data), headers=headers)
                 if response.status_code != 200:
                     # TODO replace with custom error page when available
-                    return redirect(url_for('error_page'))
+                    return redirect(url_for('error_bp.error_page'))
             else:
                 response = requests.post(DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
                 if response.status_code != 201:
                     # TODO replace with custom error page when available
-                    return redirect(url_for('error_page'))
+                    return redirect(url_for('error_bp.error_page'))
 
             response_data = json.loads(response.text)
             logger.debug(response_data['msg_id'])
@@ -76,7 +85,7 @@ def create_message(session):
 
             if get_draft.status_code != 200:
                 # TODO replace with custom error page when available
-                return redirect(url_for('error_page'))
+                return redirect(url_for('error_bp.error_page'))
             get_json = json.loads(get_draft.content)
 
             return render_template('secure-messages-draft.html', _theme='default', draft=get_json)
@@ -93,19 +102,23 @@ def reply_message(session):
         if request.form['submit'] == 'Send':
             logger.info("Reply to Message")
             data = {'msg_to': ['BRES'],
-                    'msg_from': session['user_uuid'],
+                    'msg_from': session['party_id'],
                     'subject': request.form['secure-message-subject'],
                     'body': request.form['secure-message-body'],
-                    'thread_id': 'test',
+                    'thread_id': '',
                     'collection_case': 'test',
                     'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                     'survey': 'BRES'}
+
+            # Message already saved as draft
+            if "msg_id" in request.form:
+                data["msg_id"] = request.form['msg_id']
 
             return message_check_response(data)
 
         if request.form['submit'] == 'Save draft':
             data = {'msg_to': ['BRES'],
-                    'msg_from': session['user_uuid'],
+                    'msg_from': session['party_id'],
                     'subject': request.form['secure-message-subject'],
                     'body': request.form['secure-message-body'],
                     'collection_case': 'test',
@@ -117,12 +130,12 @@ def reply_message(session):
                 response = requests.put(DRAFT_PUT_API_URL.format(request.form['msg_id']), data=json.dumps(data), headers=headers)
                 if response.status_code != 200:
                     # TODO replace with custom error page when available
-                    return redirect(url_for('error_page'))
+                    return redirect(url_for('error_bp.error_page'))
             else:
                 response = requests.post(DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
                 if response.status_code != 201:
                     # TODO replace with custom error page when available
-                    return redirect(url_for('error_page'))
+                    return redirect(url_for('error_bp.error_page'))
 
             response_data = json.loads(response.text)
             logger.debug(response_data['msg_id'])
@@ -130,7 +143,7 @@ def reply_message(session):
 
             if get_draft.status_code != 200:
                 # TODO replace with custom error page when available
-                return redirect(url_for('error_page'))
+                return redirect(url_for('error_bp.error_page'))
             get_json = json.loads(get_draft.content)
 
             return render_template('secure-messages-draft.html', _theme='default', draft=get_json)
@@ -143,7 +156,7 @@ def message_check_response(data):
     response = requests.post(CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
     if response.status_code != 201:
         # TODO replace with custom error page when available
-        return redirect(url_for('error_page'))
+        return redirect(url_for('error_bp.error_page'))
     response_data = json.loads(response.text)
     logger.debug(response_data.get('msg_id', 'No response data.'))
     return render_template('message-success-temp.html', _theme='default')
@@ -166,7 +179,7 @@ def messages_get(session, label="INBOX"):
 
     if resp.status_code != 200:
         # TODO replace with custom error page when available
-        return redirect(url_for('error_page'))
+        return redirect(url_for('error_bp.error_page'))
 
     response_data = json.loads(resp.text)
     total_msgs = 0
@@ -189,7 +202,7 @@ def draft_get(session, draft_id):
 
     if get_draft.status_code != 200:
         # TODO replace with custom error page when available
-        return redirect(url_for('error_page'))
+        return redirect(url_for('error_bp.error_page'))
 
     draft = json.loads(get_draft.text)
 
@@ -210,7 +223,7 @@ def message_get(session, msg_id):
         get_message = requests.get(url, headers=headers)
         if get_message.status_code != 200:
             # TODO replace with custom error page when available
-            return redirect(url_for('error_page'))
+            return redirect(url_for('error_bp.error_page'))
         message = json.loads(get_message.text)
 
         return render_template('secure-messages-view.html', _theme='default', message=message)

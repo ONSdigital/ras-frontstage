@@ -1,33 +1,22 @@
 import json
 import logging
-import os
 
-import requests
-from flask import Flask, Blueprint, render_template, request, flash, redirect, url_for, abort
+from flask import Blueprint, render_template, request, flash, redirect, url_for, abort
 from jose import JWTError
 from oauthlib.oauth2 import BackendApplicationClient, MissingTokenError
 from ons_ras_common import ons_env
+import requests
 from requests_oauthlib import OAuth2Session
 from structlog import wrap_logger
 
-from app.jwt import encode
-from app.models import RegistrationForm, EnrolmentCodeForm
-from config import Config
-from ..common.post_event import post_event
+from frontstage import app
+from frontstage.common.post_event import post_event
+from frontstage.jwt import encode
+from frontstage.models import RegistrationForm, EnrolmentCodeForm
 
-app = Flask(__name__)
-app.debug = True
-
-app.config.update(
-    DEBUG=True,
-    TESTING=True,
-    TEMPLATES_AUTO_RELOAD=True
-)
-
-if 'APP_SETTINGS' in os.environ:
-    app.config.from_object(Config)
 
 logger = wrap_logger(logging.getLogger(__name__))
+
 register_bp = Blueprint('register_bp', __name__, static_folder='static', template_folder='templates/register')
 
 
@@ -35,8 +24,8 @@ def validate_enrolment_code(enrolment_code):
     case_id = None
 
     # Build the URL
-    #url = Config.API_GATEWAY_IAC_URL + '{}'.format(enrolment_code)
-    url = Config.RM_IAC_GET.format(Config.RM_IAC_SERVICE, enrolment_code)
+    # url = app.config['API_GATEWAY_IAC_URL'] + '{}'.format(enrolment_code)
+    url = app.config['RM_IAC_GET'].format(app.config['RM_IAC_SERVICE'], enrolment_code)
     logger.debug('Validate IAC URL is: {}'.format(url))
 
     # Call the API Gateway Service to validate the enrolment code
@@ -108,22 +97,22 @@ def register_confirm_organisation_survey():
         decrypted_enrolment_code = ons_env.crypt.decrypt(encrypted_enrolment_code.encode()).decode()
     else:
         logger.error('Confirm organisation screen - Enrolment code not specified')
-        return redirect(url_for('error_page'))
+        return redirect(url_for('error_bp.error_page'))
 
     case_id = validate_enrolment_code(decrypted_enrolment_code)
 
     # Ensure we have got a valid enrolment code, otherwise go to the sign in page
     if not case_id:
         logger.error('Confirm organisation screen - Case ID not available')
-        return redirect(url_for('error_page'))
+        return redirect(url_for('error_bp.error_page'))
 
     # TODO More error handling e.g. cater for case not coming back from the case service, etc.
 
     # TODO Use ras-common for this lookup
     # Look up the case by case_id
-    #url = Config.API_GATEWAY_CASE_URL + case_id
+    # url = app.config['API_GATEWAY_CASE_URL'] + case_id
 
-    url = Config.RM_CASE_GET.format(Config.RM_CASE_SERVICE, case_id)
+    url = app.config['RM_CASE_GET'].format(app.config['RM_CASE_SERVICE'], case_id)
     case = requests.get(url, verify=False)
     logger.debug('case result => {} {} : {}'.format(case.status_code, case.reason, case.text))
     case = json.loads(case.text)
@@ -132,9 +121,9 @@ def register_confirm_organisation_survey():
     collection_exercise_id = case['caseGroup']['collectionExerciseId']
 
     # Look up the organisation
-    #url = Config.API_GATEWAY_PARTY_URL + 'businesses/id/' + business_party_id
+    # url = app.config['API_GATEWAY_PARTY_URL'] + 'businesses/id/' + business_party_id
 
-    url = Config.RAS_PARTY_GET_BY_BUSINESS.format(Config.RAS_PARTY_SERVICE, business_party_id)
+    url = app.config['RAS_PARTY_GET_BY_BUSINESS'].format(app.config['RAS_PARTY_SERVICE'], business_party_id)
     party = requests.get(url, verify=False)
     logger.debug('party result => {} {} : {}'.format(party.status_code, party.reason, party.text))
     party = json.loads(party.text)
@@ -144,9 +133,9 @@ def register_confirm_organisation_survey():
 
     # TODO Use ras-common for this lookup
     # Look up the collection exercise
-    #url = Config.API_GATEWAY_COLLECTION_EXERCISE_URL + collection_exercise_id
+    # url = app.config['API_GATEWAY_COLLECTION_EXERCISE_URL'] + collection_exercise_id
 
-    url = Config.RM_COLLECTION_EXERCISES_GET.format(Config.RM_COLLECTION_EXERCISE_SERVICE, collection_exercise_id)
+    url = app.config['RM_COLLECTION_EXERCISES_GET'].format(app.config['RM_COLLECTION_EXERCISE_SERVICE'], collection_exercise_id)
     logger.debug('collection URL {}'.format(url))
 
     collection_exercise = requests.get(url, verify=False)
@@ -156,9 +145,9 @@ def register_confirm_organisation_survey():
     survey_id = collection_exercise['surveyId']
 
     # Look up the survey
-    #url = Config.API_GATEWAY_SURVEYS_URL + survey_id
+    # url = app.config['API_GATEWAY_SURVEYS_URL'] + survey_id
 
-    url = Config.RM_SURVEY_GET.format(Config.RM_SURVEY_SERVICE, survey_id)
+    url = app.config['RM_SURVEY_GET'].format(app.config['RM_SURVEY_SERVICE'], survey_id)
     logger.debug('survey url {}'.format(url))
 
     survey = requests.get(url, verify=False)
@@ -194,7 +183,7 @@ def register_enter_your_details():
     # Ensure we have got a valid enrolment code, otherwise go to the sign in page
     if not decrypted_enrolment_code or not validate_enrolment_code(decrypted_enrolment_code):
         logger.error('Enter Account Details page - invalid enrolment code: ' + str(decrypted_enrolment_code))
-        return redirect(url_for('error_page'))
+        return redirect(url_for('error_bp.error_page'))
 
     form = RegistrationForm(request.values, enrolment_code=encrypted_enrolment_code)
 
@@ -307,8 +296,8 @@ def register_enter_your_details():
         try:
             token = oauth.fetch_token(token_url=token_url, client_id=app.config['RAS_FRONTSTAGE_CLIENT_ID'],
                                       client_secret=app.config['RAS_FRONTSTAGE_CLIENT_SECRET'])
-            app.logger.debug(" *** Access Token Granted *** ")
-            app.logger.debug(" Values are: ")
+            logger.debug(" *** Access Token Granted *** ")
+            logger.debug(" Values are: ")
             for key in token:
                 logger.debug("{} Value is: {}".format(key, token[key]))
 
@@ -333,8 +322,8 @@ def register_enter_your_details():
             return abort(500, '{"message":"There was a problem with the Authentication service please contact a member of the ONS staff"}')
 
         except MissingTokenError as e:
-            app.logger.warning("Missing token error, error is: {}".format(e))
-            app.logger.warning("Failed validation")
+            logger.warning("Missing token error, error is: {}".format(e))
+            logger.warning("Failed validation")
 
             return abort(500, '{"message":"There was a problem with the Authentication service please contact a member of the ONS staff"}')
 
@@ -352,9 +341,9 @@ def register_enter_your_details():
 
         headers = {'authorization': encoded_jwt_token, 'content-type': 'application/json'}
 
-        #party_service_url = app.config['API_GATEWAY_PARTY_URL'] + 'respondents'
-        party_service_url = Config.RAS_PARTY_POST_RESPONDENTS.format(Config.RAS_PARTY_SERVICE)
-        app.logger.debug("Party service URL is: {}".format(party_service_url))
+        # party_service_url = app.config['API_GATEWAY_PARTY_URL'] + 'respondents'
+        party_service_url = app.config['RAS_PARTY_POST_RESPONDENTS'].format(app.config['RAS_PARTY_SERVICE'])
+        logger.debug("Party service URL is: {}".format(party_service_url))
 
         try:
             result = requests.post(party_service_url, headers=headers, data=json.dumps(registration_data))
@@ -364,11 +353,11 @@ def register_enter_your_details():
                 return render_template('register/register.almost-done.html', _theme='default', email=email_address)
             else:
                 logger.error('Unable to register user - Party service error user')
-                return redirect(url_for('error_page'))
+                return redirect(url_for('error_bp.error_page'))
 
         except ConnectionError:
             logger.critical("We could not connect to the party service")
-            return redirect(url_for('error_page'))
+            return redirect(url_for('error_bp.error_page'))
 
         # TODO We need to add an exception timeout catch and handle this type of error
 
@@ -388,9 +377,9 @@ def register_almost_done():
 def register_activate_account(token):
 
     # Call the Party service to try to activate the account corresponding to the token that was supplied
-    #url = Config.API_GATEWAY_PARTY_URL + 'emailverification/' + token
+    # url = app.config['API_GATEWAY_PARTY_URL'] + 'emailverification/' + token
 
-    url = Config.RAS_PARTY_VERIFY_EMAIL.format(Config.RAS_PARTY_SERVICE, token)
+    url = app.config['RAS_PARTY_VERIFY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], token)
     result = requests.post(url)
     logger.debug('Activate account - response from party service is: {}'.format(result.content))
 
@@ -409,12 +398,12 @@ def register_activate_account(token):
                 return redirect(url_for('register_bp.register_resend_email', user_id=user_id))
             else:
                 logger.error('Unable to determine user for activation token: ' + str(token))
-                return redirect(url_for('error_page'))
+                return redirect(url_for('error_bp.error_page'))
     else:
         # If the token was not recognised, we don't know who the user is so redirect them off to the error page
         logger.warning('Unrecognised email activation token: ' + str(token) +
                        ' Response code: ' + str(result.status_code))
-        return redirect(url_for('error_page'))
+        return redirect(url_for('error_bp.error_page'))
 
 
 @register_bp.route('/create-account/resend-email', methods=['GET'])

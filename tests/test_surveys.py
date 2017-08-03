@@ -3,8 +3,8 @@ import unittest
 
 import requests_mock
 
-from app.application import app
-from config import Config
+from frontstage import app
+
 
 with open('tests/test_data/my_surveys.json') as json_data:
     my_surveys_data = json.load(json_data)
@@ -15,8 +15,8 @@ with open('tests/test_data/collection_instrument.json') as json_data:
 with open('tests/test_data/cases.json') as json_data:
     cases_data = json.load(json_data)
 
-
-# print("Test data JSON values are:{}".format(collection_instrument_data))
+with open('tests/test_data/my_party.json') as json_data:
+    my_party_data = json.load(json_data)
 
 returned_token = {
     "id": 6,
@@ -25,13 +25,12 @@ returned_token = {
     "token_type": "Bearer",
     "scope": "",
     "refresh_token": "37ca04d2-6b6c-4854-8e85-f59c2cc7d3de",
-    "party_id": "3b136c4b-7a14-4904-9e01-13364dd7b972"
+    "party_id": "db036fd7-ce17-40c2-a8fc-932e7c228397"
 
 }
 
 case_id = '7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
 collection_instrument_id = '40c7c047-4fb3-4abe-926e-bf19fa2c0a1e'
-#party_id = '3b136c4b-7a14-4904-9e01-13364dd7b972'
 party_id = "db036fd7-ce17-40c2-a8fc-932e7c228397"
 
 
@@ -53,10 +52,13 @@ class TestSurveys(unittest.TestCase):
         """Test we display survey data after signing in correctly"""
 
         # Build mock URL's which are used to provide application data
-        url_get_token = Config.ONS_OAUTH_PROTOCOL + Config.ONS_OAUTH_SERVER + Config.ONS_TOKEN_ENDPOINT
-        #url_get_survey_data = Config.API_GATEWAY_AGGREGATED_SURVEYS_URL + 'todo/' + party_id
-        url_get_survey_data = Config.RAS_AGGREGATOR_TODO.format(Config.RAS_API_GATEWAY_SERVICE, party_id)
+        url_get_token = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER']+ app.config['ONS_TOKEN_ENDPOINT']
 
+        url_get_survey_data = app.config['RAS_AGGREGATOR_TODO'].format(app.config['RAS_API_GATEWAY_SERVICE'], party_id)
+
+        url_get_party_by_email = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], 'testuser@email.com')
+
+        mock_object.get(url_get_party_by_email, status_code=200, json=my_party_data)
         mock_object.post(url_get_token, status_code=200, json=returned_token)
         mock_object.get(url_get_survey_data, status_code=200, json=my_surveys_data)
 
@@ -101,20 +103,22 @@ class TestSurveys(unittest.TestCase):
         """Test we display survey data after signing in correctly"""
 
         # Build mock URL's which are used to provide application data
-        url_get_token = Config.ONS_OAUTH_PROTOCOL + Config.ONS_OAUTH_SERVER + Config.ONS_TOKEN_ENDPOINT
-        #url_get_survey_data = Config.API_GATEWAY_AGGREGATED_SURVEYS_URL + 'todo/' + party_id
-        url_get_survey_data = Config.RAS_AGGREGATOR_TODO.format(Config.RAS_API_GATEWAY_SERVICE, party_id)
+        url_get_token = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_TOKEN_ENDPOINT']
 
-        #url_get_collection_instrument_data = Config.API_GATEWAY_COLLECTION_INSTRUMENT_URL + 'collectioninstrument/id/' + collection_instrument_id
-        url_get_collection_instrument_data = Config.RAS_CI_GET.format(Config.RAS_COLLECTION_INSTRUMENT_SERVICE, collection_instrument_id)
+        url_get_survey_data = app.config['RAS_AGGREGATOR_TODO'].format(app.config['RAS_API_GATEWAY_SERVICE'], party_id)
 
-        url_get_cases = Config.RM_CASE_GET_BY_PARTY.format(Config.RM_CASE_SERVICE, party_id)
+        url_get_collection_instrument_data = app.config['RAS_CI_GET'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], collection_instrument_id)
+
+        url_get_cases = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
+
+        url_get_party_by_email = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], 'testuser@email.com')
+
+        mock_object.get(url_get_party_by_email, status_code=200, json=my_party_data)
 
         mock_object.post(url_get_token, status_code=200, json=returned_token)
         mock_object.get(url_get_survey_data, status_code=200, json=my_surveys_data)
         mock_object.get(url_get_collection_instrument_data, status_code=200, json=collection_instrument_data)
         mock_object.get(url_get_cases, status_code=200, json=cases_data)
-        print("Cases>", url_get_cases)
 
         self.app.post('/sign-in/', data={'username': 'testuser@email.com', 'password': 'password'}, headers=self.headers)
 
@@ -122,7 +126,6 @@ class TestSurveys(unittest.TestCase):
             'case_id': case_id,
             'collection_instrument_id': collection_instrument_id
         }
-
         response = self.app.post('/surveys/access_survey', headers=self.headers, data=survey_params)
         self.assertEqual(response.status_code, 200)
 

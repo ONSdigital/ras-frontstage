@@ -105,10 +105,14 @@ def reply_message(session):
                     'msg_from': session['party_id'],
                     'subject': request.form['secure-message-subject'],
                     'body': request.form['secure-message-body'],
-                    'thread_id': 'test',
+                    'thread_id': '',
                     'collection_case': 'test',
                     'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                     'survey': 'BRES'}
+
+            # Message already saved as draft
+            if "msg_id" in request.form:
+                data["msg_id"] = request.form['msg_id']
 
             return message_check_response(data)
 

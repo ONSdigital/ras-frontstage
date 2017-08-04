@@ -45,11 +45,10 @@ def create_message(session):
     """Handles sending of new message"""
 
     url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], session['party_id'])
-    # url = "http://localhost:8050/api/party-api/respondents/id/" + session['user_uuid']
 
     collection_response = requests.get(url)
-
     if collection_response.status_code == 204:
+        logger.error("No case found for party id: {}".format(session['party_id']))
         return redirect(url_for('error_bp.default_error_page'))
     elif collection_response.status_code != 200:
         raise ExternalServiceError(collection_response)
@@ -77,22 +76,17 @@ def create_message(session):
             if "msg_id" in request.form:
                 data['msg_id'] = request.form['msg_id']
                 response = requests.put(DRAFT_PUT_API_URL.format(request.form['msg_id']), data=json.dumps(data), headers=headers)
-                if response.status_code != 200:
-                    # TODO replace with custom error page when available
-                    return redirect(url_for('error_bp.default_error_page'))
             else:
                 response = requests.post(DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
-                if response.status_code != 201:
-                    # TODO replace with custom error page when available
-                    return redirect(url_for('error_bp.default_error_page'))
+            if response.status_code != 200 and response.status_code != 201:
+                raise ExternalServiceError(response)
 
             response_data = json.loads(response.text)
             logger.debug(response_data['msg_id'])
             get_draft = requests.get(DRAFT_GET_API_URL.format(response_data['msg_id']), headers=headers)
 
             if get_draft.status_code != 200:
-                # TODO replace with custom error page when available
-                return redirect(url_for('error_bp.default_error_page'))
+                raise ExternalServiceError
             get_json = json.loads(get_draft.content)
 
             return render_template('secure-messages-draft.html', _theme='default', draft=get_json)

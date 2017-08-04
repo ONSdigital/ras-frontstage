@@ -5,7 +5,9 @@ from flask import Blueprint, json, redirect, render_template, request, session, 
 from ons_ras_common.ons_decorators import jwt_session
 import requests
 from structlog import wrap_logger
+
 from frontstage import app
+from frontstage.exceptions.exceptions import ExternalServiceError
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -44,9 +46,14 @@ def create_message(session):
 
     url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], session['party_id'])
     # url = "http://localhost:8050/api/party-api/respondents/id/" + session['user_uuid']
+
     collection_response = requests.get(url)
-    if collection_response.status_code != 200:
+
+    if collection_response.status_code == 204:
         return redirect(url_for('error_bp.default_error_page'))
+    elif collection_response.status_code != 200:
+        raise ExternalServiceError(collection_response)
+
     collection_response_json = collection_response.json()
     collection_id = collection_response_json[0].get('id')
     if collection_id:

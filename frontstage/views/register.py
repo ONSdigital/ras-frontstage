@@ -97,14 +97,14 @@ def register_confirm_organisation_survey():
         decrypted_enrolment_code = ons_env.crypt.decrypt(encrypted_enrolment_code.encode()).decode()
     else:
         logger.error('Confirm organisation screen - Enrolment code not specified')
-        return redirect(url_for('error_bp.error_page'))
+        return redirect(url_for('error_bp.default_error_page'))
 
     case_id = validate_enrolment_code(decrypted_enrolment_code)
 
     # Ensure we have got a valid enrolment code, otherwise go to the sign in page
     if not case_id:
         logger.error('Confirm organisation screen - Case ID not available')
-        return redirect(url_for('error_bp.error_page'))
+        return redirect(url_for('error_bp.default_error_page'))
 
     # TODO More error handling e.g. cater for case not coming back from the case service, etc.
 
@@ -183,7 +183,7 @@ def register_enter_your_details():
     # Ensure we have got a valid enrolment code, otherwise go to the sign in page
     if not decrypted_enrolment_code or not validate_enrolment_code(decrypted_enrolment_code):
         logger.error('Enter Account Details page - invalid enrolment code: ' + str(decrypted_enrolment_code))
-        return redirect(url_for('error_bp.error_page'))
+        return redirect(url_for('error_bp.default_error_page'))
 
     form = RegistrationForm(request.values, enrolment_code=encrypted_enrolment_code)
 
@@ -353,11 +353,11 @@ def register_enter_your_details():
                 return render_template('register/register.almost-done.html', _theme='default', email=email_address)
             else:
                 logger.error('Unable to register user - Party service error user')
-                return redirect(url_for('error_bp.error_page'))
+                return redirect(url_for('error_bp.default_error_page'))
 
         except ConnectionError:
             logger.critical("We could not connect to the party service")
-            return redirect(url_for('error_bp.error_page'))
+            return redirect(url_for('error_bp.default_error_page'))
 
         # TODO We need to add an exception timeout catch and handle this type of error
 
@@ -398,12 +398,12 @@ def register_activate_account(token):
                 return redirect(url_for('register_bp.register_resend_email', user_id=user_id))
             else:
                 logger.error('Unable to determine user for activation token: ' + str(token))
-                return redirect(url_for('error_bp.error_page'))
+                return redirect(url_for('error_bp.default_error_page'))
     else:
         # If the token was not recognised, we don't know who the user is so redirect them off to the error page
         logger.warning('Unrecognised email activation token: ' + str(token) +
                        ' Response code: ' + str(result.status_code))
-        return redirect(url_for('error_bp.error_page'))
+        return redirect(url_for('error_bp.default_error_page'))
 
 
 @register_bp.route('/create-account/resend-email', methods=['GET'])

@@ -86,7 +86,7 @@ def create_message(session):
             get_draft = requests.get(DRAFT_GET_API_URL.format(response_data['msg_id']), headers=headers)
 
             if get_draft.status_code != 200:
-                raise ExternalServiceError
+                raise ExternalServiceError(get_draft)
             get_json = json.loads(get_draft.content)
 
             return render_template('secure-messages-draft.html', _theme='default', draft=get_json)
@@ -130,21 +130,18 @@ def reply_message(session):
                 data['msg_id'] = request.form['msg_id']
                 response = requests.put(DRAFT_PUT_API_URL.format(request.form['msg_id']), data=json.dumps(data), headers=headers)
                 if response.status_code != 200:
-                    # TODO replace with custom error page when available
-                    return redirect(url_for('error_bp.default_error_page'))
+                    raise ExternalServiceError(response)
             else:
                 response = requests.post(DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
                 if response.status_code != 201:
-                    # TODO replace with custom error page when available
-                    return redirect(url_for('error_bp.default_error_page'))
+                    raise ExternalServiceError(response)
 
             response_data = json.loads(response.text)
             logger.debug(response_data['msg_id'])
             get_draft = requests.get(DRAFT_GET_API_URL.format(response_data['msg_id']), headers=headers)
 
             if get_draft.status_code != 200:
-                # TODO replace with custom error page when available
-                return redirect(url_for('error_bp.default_error_page'))
+                raise ExternalServiceError(get_draft)
             get_json = json.loads(get_draft.content)
 
             return render_template('secure-messages-draft.html', _theme='default', draft=get_json)
@@ -156,8 +153,7 @@ def message_check_response(data):
     headers['Authorization'] = request.cookies['authorization']
     response = requests.post(CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
     if response.status_code != 201:
-        # TODO replace with custom error page when available
-        return redirect(url_for('error_bp.default_error_page'))
+        return ExternalServiceError(response)
     response_data = json.loads(response.text)
     logger.debug(response_data.get('msg_id', 'No response data.'))
     return render_template('message-success-temp.html', _theme='default')
@@ -179,8 +175,7 @@ def messages_get(session, label="INBOX"):
     resp = requests.get(url, headers=headers)
 
     if resp.status_code != 200:
-        # TODO replace with custom error page when available
-        return redirect(url_for('error_bp.default_error_page'))
+        raise ExternalServiceError(resp)
 
     response_data = json.loads(resp.text)
     total_msgs = 0
@@ -202,8 +197,7 @@ def draft_get(session, draft_id):
     get_draft = requests.get(url, headers=headers)
 
     if get_draft.status_code != 200:
-        # TODO replace with custom error page when available
-        return redirect(url_for('error_bp.default_error_page'))
+        raise ExternalServiceError(get_draft)
 
     draft = json.loads(get_draft.text)
 
@@ -218,13 +212,13 @@ def message_get(session, msg_id):
     if request.method == 'GET':
         data = {"label": 'UNREAD', "action": 'remove'}
         response = requests.put(MESSAGE_MODIFY_URL.format(msg_id), data=json.dumps(data), headers=headers)  # noqa: F841
-        # TODO check this response
-        url = MESSAGE_GET_URL.format(msg_id)
+        if response.status_code != 200:
+            raise ExternalServiceError(response)
 
+        url = MESSAGE_GET_URL.format(msg_id)
         get_message = requests.get(url, headers=headers)
         if get_message.status_code != 200:
-            # TODO replace with custom error page when available
-            return redirect(url_for('error_bp.default_error_page'))
+            raise ExternalServiceError(get_message)
         message = json.loads(get_message.text)
 
         return render_template('secure-messages-view.html', _theme='default', message=message)

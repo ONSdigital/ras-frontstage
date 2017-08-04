@@ -90,7 +90,7 @@ def create_message(session):
 
             return render_template('secure-messages-draft.html', _theme='default', draft=get_json)
 
-    return render_template('secure-messages-create.html', _theme='default')
+    return render_template('secure-messages-create.html', _theme='default', data={})
 
 
 @secure_message_bp.route('/reply-message', methods=['GET', 'POST'])

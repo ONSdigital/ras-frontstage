@@ -1,10 +1,24 @@
 {% extends "messages.html" %}
 
+{% set errors = data['errors'] %}
+
 {% block page_title %}
 Send secure message
 {% endblock %}
 
 {% block messages %}
+
+    {% if "subject" in errors %}
+    <div class="panel panel--error">
+        <div class=“panel__header”>
+            <h1 class=“panel__title venus”>There are {{ len(errors) }} errors on this page</h1>
+        </div>
+        <div class=“panel__body” data-qa=“error-body”>
+            <p class=“mars”><a onclick=“focusOn(‘enrolment_code’);” href=“#enrolment_code”>Please re-enter the code and try again</a></p>
+        </div>
+    </div>
+    <br/>
+    {% endif %}
 
     <div class="grid grid--reverse">
         <div class="grid__col col-4@m"></div>

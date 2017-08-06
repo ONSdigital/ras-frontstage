@@ -386,7 +386,7 @@ def register_activate_account(token):
     if result.status_code == 200:
         json_response = json.loads(result.text)
 
-        if json_response.get('status')==RespondentStatus.ACTIVE:
+        if json_response.get('status')==RespondentStatus.ACTIVE.name:
             # Successful account activation therefore redirect off to the login screen
             return redirect(url_for('sign_in_bp.login', account_activated=True))
         else:

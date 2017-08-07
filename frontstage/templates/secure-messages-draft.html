@@ -9,15 +9,21 @@ Send secure message
 {% block messages %}
 
     {% if "subject" in errors %}
-    <div class="panel panel--error">
-        <div class=“panel__header”>
-            <h1 class=“panel__title venus”>There are {{ len(errors) }} errors on this page</h1>
+        <div class="panel panel--error">
+            <div class="panel__header">
+                {% if errors|length == 1 %}
+
+                <h1 class="panel__title venus">There is 1 error on this page</h1>
+
+                {% elif errors|length > 1 %}
+                <h1 class="panel__title venus">There are {{ errors|length }} errors on this page</h1>
+                {% endif %}
+            </div>
+            <div class="panel__body" data-qa="error-body">
+                <p class=“mars”>{{ errors['subject'] }}</p>
+            </div>
         </div>
-        <div class=“panel__body” data-qa=“error-body”>
-            <p class=“mars”><a onclick=“focusOn(‘enrolment_code’);” href=“#enrolment_code”>Please re-enter the code and try again</a></p>
-        </div>
-    </div>
-    <br/>
+        <br/>
     {% endif %}
 
     <div class="grid grid--reverse">
@@ -34,7 +40,7 @@ Send secure message
             <h1 class="saturn">Edit a draft message</h1>
 
             <div class="secure-message-form">
-                <form action="{{ url_for('secure_message_bp.reply_message') }}" method="post">
+                <form action="{{ url_for('secure_message_bp.create_message') }}" method="post">
                     <p>To: BRES</p>
 
                     <input

@@ -171,6 +171,7 @@ class ResetPasswordForm(FlaskForm):
                                                 message=app.config['PASSWORD_CRITERIA_ERROR_TEXT'])])
     password_confirm = PasswordField('Re-type new password')
 
+
 class RespondentStatus(enum.IntEnum):
     CREATED = 0
     ACTIVE = 1

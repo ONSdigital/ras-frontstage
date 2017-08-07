@@ -386,12 +386,12 @@ def register_activate_account(token):
     if result.status_code == 200:
         json_response = json.loads(result.text)
 
-        if json_response.get('status')==RespondentStatus.ACTIVE.name:
+        if json_response.get('active') == RespondentStatus.ACTIVE.name:
             # Successful account activation therefore redirect off to the login screen
             return redirect(url_for('sign_in_bp.login', account_activated=True))
         else:
             # Try to get the user id
-            user_id = json_response.get('id')
+            user_id = json_response.get('userId')
             if user_id:
                 # Unable to activate account therefore give the user the option to send out a new email token
                 logger.debug('Expired activation token: ' + str(token))

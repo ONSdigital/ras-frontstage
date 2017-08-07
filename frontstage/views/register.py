@@ -79,6 +79,9 @@ def register():
                 }
             }
 
+        return render_template('register/register.enter-enrolment-code.html', _theme='default', form=form,
+                               data=template_data), 202
+
     if form.errors:
         flash(form.errors, 'danger')
 

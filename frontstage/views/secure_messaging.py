@@ -73,14 +73,13 @@ def create_message(session):
                 response = requests.put(DRAFT_PUT_API_URL.format(request.form['msg_id']), data=json.dumps(data), headers=headers)
                 if response.status_code != 200:
                     get_json = json.loads(response.content)
-                    return render_template('secure-messages-draft.html', _theme='default', draft=get_json,
-                                       data={"subject": "Subject field exceeds 100 characters."})
+                    return render_template('secure-messages-draft.html', _theme='default', draft=data, errors=get_json)
 
             else:
                 response = requests.post(DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
                 if response.status_code != 201:
                     get_json = json.loads(response.content)
-                    return render_template('secure-messages-draft.html', _theme='default', draft=data, data=get_json)
+                    return render_template('secure-messages-draft.html', _theme='default', draft=data, errors=get_json)
 
             response_data = json.loads(response.text)
             logger.debug(response_data['msg_id'])
@@ -90,8 +89,7 @@ def create_message(session):
                 # TODO replace with custom error page when available
                 return redirect(url_for('error_bp.error_page'))
             get_json = json.loads(get_draft.content)
-
-            return render_template('secure-messages-draft.html', _theme='default', draft=get_json, data={})
+            return render_template('secure-messages-draft.html', _theme='default', draft=data, errors=get_json)
 
     return render_template('secure-messages-create.html', _theme='default', data={})
 

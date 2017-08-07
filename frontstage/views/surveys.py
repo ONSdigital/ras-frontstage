@@ -8,6 +8,7 @@ from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.common.post_event import post_event
+from frontstage.exceptions.exceptions import ExternalServiceError
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -96,7 +97,7 @@ def access_survey(session):
         req = requests.get(url, verify=False)
         if req.status_code != 200:
             logger.error('unable to lookup cases for party "{}"'.format(party_id))
-            return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+            raise ExternalServiceError
 
         logger.debug('successfully read cases for party "{}"'.format(party_id))
         valid = False
@@ -113,6 +114,9 @@ def access_survey(session):
         url = app.config['RAS_CI_GET'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], collection_instrument_id)
         logger.debug('Access_survey URL is: {}'.format(url))
         req = requests.get(url, verify=False)
+
+        if req.status_code != 200:
+            raise ExternalServiceError(req)
         ci_data = req.json()
 
         # Render the template
@@ -134,7 +138,7 @@ def access_survey(session):
         req = requests.get(url, verify=False)
         if req.status_code != 200:
             logger.error('unable to lookup cases for party "{}"'.format(party_id))
-            return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+            raise ExternalServiceError(req)
 
         logger.debug('successfully read cases for party "{}"'.format(party_id))
         valid = False
@@ -186,7 +190,7 @@ def upload_survey(session):
     req = requests.get(url, verify=False)
     if req.status_code != 200:
         logger.error('unable to lookup cases for party "{}"'.format(party_id))
-        return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+        raise ExternalServiceError(req)
 
     logger.debug('successfully read cases for party "{}"'.format(party_id))
     valid = False
@@ -235,8 +239,3 @@ def upload_survey(session):
         error_info = json.loads(result.text)
         return render_template('surveys/surveys-upload-failure.html',  _theme='default', error_info=error_info,
                                case_id=case_id)
-
-@surveys_bp.route('/surveys-upload-failure', methods=['GET'])
-def surveys_upload_failure():
-    error_info = request.args.get('error_info', None)
-    return render_template('surveys/surveys-upload-failure.html', _theme='default', error_info=error_info)

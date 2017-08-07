@@ -35,6 +35,8 @@ def validate_enrolment_code(enrolment_code):
 
     if result.status_code == 200 and json.loads(result.text)['active']:
         case_id = json.loads(result.text)['caseId']
+    elif result.status_code == 404:
+        logger.error("Iac code not found code: {}".format(enrolment_code))
     elif result.status_code != 200:
         raise ExternalServiceError(result)
 

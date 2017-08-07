@@ -49,6 +49,11 @@ Send secure message
                             name="msg_id"
                             value="{{draft['msg_id']}}">
 
+                    {% if "subject" in errors %}
+                    <div class="panel panel--simple panel--error panel--spacious">
+                        <p class="error-message">Subject must be less than 100 characters</p>
+                    {% endif %}
+
                     <fieldset>
                         <label for="secure-message-subject">Subject</label>
                         <input
@@ -59,6 +64,11 @@ Send secure message
                             value="{{draft['subject']}}"
                             required/>
                     </fieldset>
+
+                    {% if "subject" in errors %}
+                    </div>
+                    {% endif %}
+
 
                     <br />
 

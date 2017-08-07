@@ -37,7 +37,7 @@ Send secure message
 
                     {% if "subject" in errors %}
                     <div class="panel panel--simple panel--error panel--spacious">
-                    <p class="error-message">Subject must be less than 100 characters</p>
+                    <p class="error-message">{{ errors['subject'] }}</p>
                     {% endif %}
 
                     <fieldset>

@@ -80,8 +80,7 @@ def create_message(session):
                 response = requests.post(DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
                 if response.status_code != 201:
                     get_json = json.loads(response.content)
-                    return render_template('secure-messages-draft.html', _theme='default', draft=get_json,
-                                           data={"subject": "Subject field exceeds 100 characters."})
+                    return render_template('secure-messages-draft.html', _theme='default', draft=data, data=get_json)
 
             response_data = json.loads(response.text)
             logger.debug(response_data['msg_id'])
@@ -95,7 +94,6 @@ def create_message(session):
             return render_template('secure-messages-draft.html', _theme='default', draft=get_json, data={})
 
     return render_template('secure-messages-create.html', _theme='default', data={})
-
 
 @secure_message_bp.route('/reply-message', methods=['GET', 'POST'])
 @jwt_session(request)

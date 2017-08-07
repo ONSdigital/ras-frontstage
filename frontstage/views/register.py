@@ -15,6 +15,7 @@ from frontstage.jwt import encode
 from frontstage.models import RegistrationForm, EnrolmentCodeForm
 from frontstage.exceptions.exceptions import ExternalServiceError
 
+
 logger = wrap_logger(logging.getLogger(__name__))
 
 register_bp = Blueprint('register_bp', __name__, static_folder='static', template_folder='templates/register')
@@ -395,13 +396,13 @@ def register_activate_account(token):
     # url = app.config['API_GATEWAY_PARTY_URL'] + 'emailverification/' + token
 
     url = app.config['RAS_PARTY_VERIFY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], token)
-    result = requests.post(url)
+    result = requests.put(url)
     logger.debug('Activate account - response from party service is: {}'.format(result.content))
 
     if result.status_code == 200:
         json_response = json.loads(result.text)
 
-        if json_response.get('active'):
+        if json_response.get('active') == RespondentStatus.ACTIVE.name:
             # Successful account activation therefore redirect off to the login screen
             return redirect(url_for('sign_in_bp.login', account_activated=True))
         else:

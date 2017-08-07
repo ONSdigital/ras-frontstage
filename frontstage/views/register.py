@@ -12,7 +12,7 @@ from structlog import wrap_logger
 from frontstage import app
 from frontstage.common.post_event import post_event
 from frontstage.jwt import encode
-from frontstage.models import RegistrationForm, EnrolmentCodeForm
+from frontstage.models import RegistrationForm, EnrolmentCodeForm, RespondentStatus
 from frontstage.exceptions.exceptions import ExternalServiceError
 
 

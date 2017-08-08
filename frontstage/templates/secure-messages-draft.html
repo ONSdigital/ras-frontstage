@@ -13,6 +13,7 @@ Send secure message
     <div class="grid grid--reverse">
         <div class="grid__col col-4@m"></div>
         <div class="grid__col col-7@m pull-1@m">
+            {% if errors|length == 0 %}
             <div class="system-feedback"> 
                 <ul class="system-feedback__list"> 
                     <li class="system-feedback__list-item system-feedback__list-item--success"> 
@@ -21,6 +22,7 @@ Send secure message
                             <a href="{{ url_for('secure_message_bp.messages_get', label='DRAFT') }}">View your inbox</a> </li> 
                 </ul> 
             </div>
+            {% endif %}
             <h1 class="saturn">Edit a draft message</h1>
             <div class="secure-message-form">
                 <form action="{{ url_for('secure_message_bp.create_message') }}" method="post">
@@ -34,7 +36,7 @@ Send secure message
 
                         {% if "subject" in errors %}
                         <div class="panel panel--simple panel--error panel--spacious">
-                            <p class="error-message">{{ errors['subject'] }}</p>
+                            <p class="error-message">{{ errors['subject'][0] }}</p>
                         {% endif %}
 
                         <fieldset>
@@ -56,7 +58,7 @@ Send secure message
 
                         {% if "body" in errors %}
                         <div class="panel panel--simple panel--error panel--spacious">
-                            <p class="error-message">{{ errors['body'] }}</p>
+                            <p class="error-message">{{ errors['body'][0] }}</p>
                         {% endif %}
 
                         <fieldset>

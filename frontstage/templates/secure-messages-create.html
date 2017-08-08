@@ -21,7 +21,7 @@ Send secure message
 
                     {% if "subject" in errors %}
                     <div class="panel panel--simple panel--error panel--spacious">
-                    <p class="error-message">{{ errors['subject'] }}</p>
+                    <p class="error-message">{{ errors['subject'][0] }}</p>
                     {% endif %}
 
                     <fieldset>
@@ -42,7 +42,7 @@ Send secure message
 
                     {% if "body" in errors %}
                     <div class="panel panel--simple panel--error panel--spacious">
-                        <p class="error-message">{{ errors['body'] }}</p>
+                        <p class="error-message">{{ errors['body'][0] }}</p>
                     {% endif %}
 
                     <fieldset>

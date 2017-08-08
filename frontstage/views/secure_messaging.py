@@ -80,11 +80,20 @@ def create_message(session):
         if request.form['submit'] == 'Save draft':
             if "msg_id" in request.form:
                 data['msg_id'] = request.form['msg_id']
+                headers['Authorization'] = request.cookies['authorization']
                 response = requests.put(DRAFT_PUT_API_URL.format(request.form['msg_id']), data=json.dumps(data), headers=headers)
+                if response.status_code == 400:
+                    get_json = json.loads(response.content)
+                    return render_template('secure-messages-draft.html', _theme='default', draft=data, errors=get_json)
+                elif response.status_code != 200:
+                    raise ExternalServiceError(response)
             else:
                 response = requests.post(DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
-            if response.status_code != 200 and response.status_code != 201:
-                raise ExternalServiceError(response)
+                if response.status_code == 400:
+                    get_json = json.loads(response.content)
+                    return render_template('secure-messages-draft.html', _theme='default', draft=data, errors=get_json)
+                elif response.status_code != 201:
+                    raise ExternalServiceError(response)
 
             response_data = json.loads(response.text)
             logger.debug(response_data['msg_id'])
@@ -93,11 +102,9 @@ def create_message(session):
             if get_draft.status_code != 200:
                 raise ExternalServiceError(get_draft)
             get_json = json.loads(get_draft.content)
+            return render_template('secure-messages-draft.html', _theme='default', draft=get_json, errors={})
 
-            return render_template('secure-messages-draft.html', _theme='default', draft=get_json)
-
-    return render_template('secure-messages-create.html', _theme='default')
-
+    return render_template('secure-messages-create.html', _theme='default', draft={})
 
 @secure_message_bp.route('/reply-message', methods=['GET', 'POST'])
 @jwt_session(request)
@@ -137,11 +144,17 @@ def reply_message(session):
             if "msg_id" in request.form:
                 data['msg_id'] = request.form['msg_id']
                 response = requests.put(DRAFT_PUT_API_URL.format(request.form['msg_id']), data=json.dumps(data), headers=headers)
-                if response.status_code != 200:
-                    raise ExternalServiceError(response)
+                if response.status_code == 400:
+                    get_json = json.loads(response.content)
+                    return render_template('secure-messages-draft.html', _theme='default', draft=data, data=get_json)
+                elif response.status_code != 200:
+                    raise ExternalServiceError(response)            
             else:
                 response = requests.post(DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
-                if response.status_code != 201:
+                if response.status_code == 400:
+                    get_json = json.loads(response.content)
+                    return render_template('secure-messages-draft.html', _theme='default', draft=data, data=get_json)
+                elif response.status_code != 201:
                     raise ExternalServiceError(response)
 
             response_data = json.loads(response.text)
@@ -160,7 +173,10 @@ def reply_message(session):
 def message_check_response(data):
     headers['Authorization'] = request.cookies['authorization']
     response = requests.post(CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
-    if response.status_code != 201:
+    if response.status_code == 400:
+        get_json = json.loads(response.content)
+        return render_template('secure-messages-create.html', _theme='default', draft=data, errors=get_json)
+    elif response.status_code != 201:
         return ExternalServiceError(response)
     response_data = json.loads(response.text)
     logger.debug(response_data.get('msg_id', 'No response data.'))

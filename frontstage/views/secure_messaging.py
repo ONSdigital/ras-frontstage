@@ -89,7 +89,7 @@ def create_message(session):
                 # TODO replace with custom error page when available
                 return redirect(url_for('error_bp.error_page'))
             get_json = json.loads(get_draft.content)
-            return render_template('secure-messages-draft.html', _theme='default', draft=data, errors=get_json)
+            return render_template('secure-messages-draft.html', _theme='default', draft=get_json, errors={})
 
     return render_template('secure-messages-create.html', _theme='default', draft={})
 

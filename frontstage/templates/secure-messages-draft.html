@@ -1,14 +1,19 @@
 {% extends "messages.html" %}
 
+{% set errors = errors %}
+
 {% block page_title %}
 Send secure message
 {% endblock %}
 
 {% block messages %}
 
+    {% include 'message-error-summary.html' %}
+
     <div class="grid grid--reverse">
         <div class="grid__col col-4@m"></div>
         <div class="grid__col col-7@m pull-1@m">
+            {% if errors|length == 0 %}
             <div class="system-feedback"> 
                 <ul class="system-feedback__list"> 
                     <li class="system-feedback__list-item system-feedback__list-item--success"> 
@@ -17,11 +22,11 @@ Send secure message
                             <a href="{{ url_for('secure_message_bp.messages_get', label='DRAFT') }}">View your inbox</a> </li> 
                 </ul> 
             </div>
+            {% endif %}
             <h1 class="saturn">Edit a draft message</h1>
-
             <div class="secure-message-form">
-                <form action="{{ url_for('secure_message_bp.reply_message') }}" method="post">
-                    <p>To: BRES</p>
+                <form action="{{ url_for('secure_message_bp.create_message') }}" method="post">
+                    <p>To: ONS Business Surveys team</p>
 
                     <input
                             id="msg_id"
@@ -29,27 +34,45 @@ Send secure message
                             name="msg_id"
                             value="{{draft['msg_id']}}">
 
-                    <fieldset>
-                        <label for="secure-message-subject">Subject</label>
-                        <input
-                            id="secure-message-subject"
-                            class="secure-message-form__subject input input--text"
-                            type="text"
-                            name="secure-message-subject"
-                            value="{{draft['subject']}}"
-                            required/>
-                    </fieldset>
+                        {% if "subject" in errors %}
+                        <div class="panel panel--simple panel--error panel--spacious">
+                            <p class="error-message">{{ errors['subject'][0] }}</p>
+                        {% endif %}
 
-                    <br />
+                        <fieldset>
+                            <label for="secure-message-subject">Subject</label>
+                            <input
+                                id="secure-message-subject"
+                                class="secure-message-form__subject input input--text"
+                                type="text"
+                                name="secure-message-subject"
+                                value="{{draft['subject']}}"
+                                required/>
+                        </fieldset>
 
-                    <fieldset>
-                        <label for="secure-message-body">Message</label>
-                        <textarea
-                            id="secure-message-body"
-                            class="secure-message-form__body input"
-                            rows="10"
-                            name="secure-message-body">{{draft['body']}}</textarea>
-                    </fieldset>
+                        {% if "subject" in errors %}
+                        </div>
+                        {% endif %}
+
+                        <br />
+
+                        {% if "body" in errors %}
+                        <div class="panel panel--simple panel--error panel--spacious">
+                            <p class="error-message">{{ errors['body'][0] }}</p>
+                        {% endif %}
+
+                        <fieldset>
+                            <label for="secure-message-body">Message</label>
+                            <textarea
+                                id="secure-message-body"
+                                class="secure-message-form__body input"
+                                rows="10"
+                                name="secure-message-body">{{ draft['body'] }}</textarea>
+                        </fieldset>
+
+                        {% if "body" in errors %}
+                        </div>
+                        {% endif %}
 
                     <br />
 

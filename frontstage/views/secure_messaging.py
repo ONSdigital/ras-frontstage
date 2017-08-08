@@ -176,7 +176,7 @@ def message_check_response(data):
     if response.status_code == 400:
         get_json = json.loads(response.content)
         return render_template('secure-messages-create.html', _theme='default', draft=data, errors=get_json)
-    elif response.status_code != 201
+    elif response.status_code != 201:
         return ExternalServiceError(response)
     response_data = json.loads(response.text)
     logger.debug(response_data.get('msg_id', 'No response data.'))

@@ -11,10 +11,10 @@
             </div>
             <div class="panel__body" data-qa="error-body">
                 {% if "subject" in errors %}
-                <p class=“mars”>{{ errors['subject'] }}</p>
+                <p class=“mars”>{{ errors['subject'][0] }}</p>
                 {% endif %}
                 {% if "body" in errors %}
-                <p class=“mars”>{{ errors['body'] }}</p>
+                <p class=“mars”>{{ errors['body'][0] }}</p>
                 {% endif %}
             </div>
         </div>

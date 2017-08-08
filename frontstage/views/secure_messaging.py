@@ -91,7 +91,7 @@ def create_message(session):
             get_json = json.loads(get_draft.content)
             return render_template('secure-messages-draft.html', _theme='default', draft=data, errors=get_json)
 
-    return render_template('secure-messages-create.html', _theme='default', data={})
+    return render_template('secure-messages-create.html', _theme='default', draft={})
 
 @secure_message_bp.route('/reply-message', methods=['GET', 'POST'])
 @jwt_session(request)

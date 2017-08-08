@@ -155,8 +155,8 @@ def message_check_response(data):
     headers['Authorization'] = request.cookies['authorization']
     response = requests.post(CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
     if response.status_code != 201:
-        # TODO replace with custom error page when available
-        return redirect(url_for('error_bp.error_page'))
+        get_json = json.loads(response.content)
+        return render_template('secure-messages-create.html', _theme='default', draft=data, errors=get_json)
     response_data = json.loads(response.text)
     logger.debug(response_data.get('msg_id', 'No response data.'))
     return render_template('message-success-temp.html', _theme='default')

@@ -79,10 +79,6 @@ def login():
             logger.warning("Failed validation")
             return render_template('sign-in/sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
 
-        # except Exception as e:
-        #     logger.error("Error logging in: {}", str(e))
-        #     return redirect(url_for('error_page'))
-
         logger.debug('Email Address: {}'.format(username))
         url = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], username)
         req = requests.get(url, verify=False)
@@ -123,7 +119,7 @@ def login():
 
     return render_template('sign-in/sign-in.html', _theme='default', form=form, data=template_data)
 
-
+  
 @sign_in_bp.route('/logout')
 def logout():
     response = make_response(redirect(url_for('sign_in_bp.login')))

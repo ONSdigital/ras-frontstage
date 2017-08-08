@@ -24,8 +24,8 @@ class TestAccountActivation(unittest.TestCase):
             }
         self.emailverification_response = {
             "token": token,
-            "active": RespondentStatus.ACTIVE.name,
-            "userId": user_id,
+            "status": RespondentStatus.ACTIVE.name,
+            "id": user_id,
         }
 
     # ============== ACTIVATE ACCOUNT PAGE ===============
@@ -47,7 +47,7 @@ class TestAccountActivation(unittest.TestCase):
     # with an expired token
     def test_activate_account_expired_token_specified(self, mock_object):
 
-        self.emailverification_response['active'] = RespondentStatus.CREATED.name
+        self.emailverification_response['status'] = RespondentStatus.CREATED.name
         mock_object.put(url_email_verification, status_code=200, json=self.emailverification_response)
 
         response = self.app.get('/register/activate-account/' + token, headers=self.headers)

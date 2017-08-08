@@ -12,7 +12,8 @@ from structlog import wrap_logger
 from frontstage import app
 from frontstage.common.post_event import post_event
 from frontstage.jwt import encode
-from frontstage.models import RegistrationForm, EnrolmentCodeForm
+from frontstage.models import RegistrationForm, EnrolmentCodeForm, RespondentStatus
+from frontstage.exceptions.exceptions import ExternalServiceError
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -34,6 +35,10 @@ def validate_enrolment_code(enrolment_code):
 
     if result.status_code == 200 and json.loads(result.text)['active']:
         case_id = json.loads(result.text)['caseId']
+    elif result.status_code == 404:
+        logger.error("Iac code not found code: {}".format(enrolment_code))
+    elif result.status_code != 200:
+        raise ExternalServiceError(result)
 
     return case_id
 
@@ -79,6 +84,9 @@ def register():
                 }
             }
 
+        return render_template('register/register.enter-enrolment-code.html', _theme='default', form=form,
+                               data=template_data), 202
+
     if form.errors:
         flash(form.errors, 'danger')
 
@@ -97,14 +105,14 @@ def register_confirm_organisation_survey():
         decrypted_enrolment_code = ons_env.crypt.decrypt(encrypted_enrolment_code.encode()).decode()
     else:
         logger.error('Confirm organisation screen - Enrolment code not specified')
-        return redirect(url_for('error_bp.error_page'))
+        return redirect(url_for('error_bp.default_error_page'))
 
     case_id = validate_enrolment_code(decrypted_enrolment_code)
 
     # Ensure we have got a valid enrolment code, otherwise go to the sign in page
     if not case_id:
         logger.error('Confirm organisation screen - Case ID not available')
-        return redirect(url_for('error_bp.error_page'))
+        return redirect(url_for('error_bp.default_error_page'))
 
     # TODO More error handling e.g. cater for case not coming back from the case service, etc.
 
@@ -115,10 +123,14 @@ def register_confirm_organisation_survey():
     url = app.config['RM_CASE_GET'].format(app.config['RM_CASE_SERVICE'], case_id)
     case = requests.get(url, verify=False)
     logger.debug('case result => {} {} : {}'.format(case.status_code, case.reason, case.text))
-    case = json.loads(case.text)
 
-    business_party_id = case['caseGroup']['partyId']
-    collection_exercise_id = case['caseGroup']['collectionExerciseId']
+    if case.status_code == 200:
+        case = json.loads(case.text)
+        business_party_id = case['caseGroup']['partyId']
+        collection_exercise_id = case['caseGroup']['collectionExerciseId']
+
+    elif case.status_code != 200:
+        raise ExternalServiceError(case)
 
     # Look up the organisation
     # url = app.config['API_GATEWAY_PARTY_URL'] + 'businesses/id/' + business_party_id
@@ -126,10 +138,14 @@ def register_confirm_organisation_survey():
     url = app.config['RAS_PARTY_GET_BY_BUSINESS'].format(app.config['RAS_PARTY_SERVICE'], business_party_id)
     party = requests.get(url, verify=False)
     logger.debug('party result => {} {} : {}'.format(party.status_code, party.reason, party.text))
-    party = json.loads(party.text)
 
-    # Get the organisation name
-    organisation_name = party['name']
+    if party.status_code == 200:
+        party = json.loads(party.text)
+        # Get the organisation name
+        organisation_name = party['name']
+
+    elif party.status_code != 200:
+        raise ExternalServiceError(party)
 
     # TODO Use ras-common for this lookup
     # Look up the collection exercise
@@ -141,8 +157,13 @@ def register_confirm_organisation_survey():
     collection_exercise = requests.get(url, verify=False)
     logger.debug('CE result => {} {} : {}'.format(collection_exercise.status_code, collection_exercise.reason,
                                                collection_exercise.text))
-    collection_exercise = json.loads(collection_exercise.text)
-    survey_id = collection_exercise['surveyId']
+
+    if collection_exercise.status_code == 200:
+        collection_exercise = json.loads(collection_exercise.text)
+        survey_id = collection_exercise['surveyId']
+
+    elif collection_exercise != 200:
+        raise ExternalServiceError(collection_exercise)
 
     # Look up the survey
     # url = app.config['API_GATEWAY_SURVEYS_URL'] + survey_id
@@ -152,7 +173,12 @@ def register_confirm_organisation_survey():
 
     survey = requests.get(url, verify=False)
     logger.debug('survey result => {} {} : {}'.format(survey.status_code, survey.reason, survey.text))
-    survey = json.loads(survey.text)
+
+    if survey.status_code == 200:
+        survey = json.loads(survey.text)
+
+    elif survey.status_code != 200:
+        raise ExternalServiceError(collection_exercise)
 
     # Get the survey name
     survey_name = survey['longName']
@@ -183,7 +209,7 @@ def register_enter_your_details():
     # Ensure we have got a valid enrolment code, otherwise go to the sign in page
     if not decrypted_enrolment_code or not validate_enrolment_code(decrypted_enrolment_code):
         logger.error('Enter Account Details page - invalid enrolment code: ' + str(decrypted_enrolment_code))
-        return redirect(url_for('error_bp.error_page'))
+        return redirect(url_for('error_bp.default_error_page'))
 
     form = RegistrationForm(request.values, enrolment_code=encrypted_enrolment_code)
 
@@ -345,19 +371,14 @@ def register_enter_your_details():
         party_service_url = app.config['RAS_PARTY_POST_RESPONDENTS'].format(app.config['RAS_PARTY_SERVICE'])
         logger.debug("Party service URL is: {}".format(party_service_url))
 
-        try:
-            result = requests.post(party_service_url, headers=headers, data=json.dumps(registration_data))
-            logger.debug("Response from party service is: {}".format(result.content))
 
-            if result.status_code == 200:
-                return render_template('register/register.almost-done.html', _theme='default', email=email_address)
-            else:
-                logger.error('Unable to register user - Party service error user')
-                return redirect(url_for('error_bp.error_page'))
+        result = requests.post(party_service_url, headers=headers, data=json.dumps(registration_data))
+        logger.debug("Response from party service is: {}".format(result.content))
 
-        except ConnectionError:
-            logger.critical("We could not connect to the party service")
-            return redirect(url_for('error_bp.error_page'))
+        if result.status_code == 200:
+            return render_template('register/register.almost-done.html', _theme='default', email=email_address)
+        elif result.status_code != 200:
+            raise ExternalServiceError(result)
 
         # TODO We need to add an exception timeout catch and handle this type of error
 
@@ -380,30 +401,30 @@ def register_activate_account(token):
     # url = app.config['API_GATEWAY_PARTY_URL'] + 'emailverification/' + token
 
     url = app.config['RAS_PARTY_VERIFY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], token)
-    result = requests.post(url)
+    result = requests.put(url)
     logger.debug('Activate account - response from party service is: {}'.format(result.content))
 
     if result.status_code == 200:
         json_response = json.loads(result.text)
 
-        if json_response.get('active'):
+        if json_response.get('status') == RespondentStatus.ACTIVE.name:
             # Successful account activation therefore redirect off to the login screen
             return redirect(url_for('sign_in_bp.login', account_activated=True))
         else:
             # Try to get the user id
-            user_id = json_response.get('userId')
+            user_id = json_response.get('id')
             if user_id:
                 # Unable to activate account therefore give the user the option to send out a new email token
                 logger.debug('Expired activation token: ' + str(token))
                 return redirect(url_for('register_bp.register_resend_email', user_id=user_id))
             else:
                 logger.error('Unable to determine user for activation token: ' + str(token))
-                return redirect(url_for('error_bp.error_page'))
-    else:
+                return redirect(url_for('error_bp.default_error_page'))
+    elif result.status_code != 200:
         # If the token was not recognised, we don't know who the user is so redirect them off to the error page
         logger.warning('Unrecognised email activation token: ' + str(token) +
                        ' Response code: ' + str(result.status_code))
-        return redirect(url_for('error_bp.error_page'))
+        return redirect(url_for('error_bp.default_error_page'))
 
 
 @register_bp.route('/create-account/resend-email', methods=['GET'])

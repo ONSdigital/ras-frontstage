@@ -27,4 +27,5 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 import frontstage.views
+import frontstage.error_handlers
 

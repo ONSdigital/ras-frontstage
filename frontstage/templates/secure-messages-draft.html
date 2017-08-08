@@ -8,28 +8,7 @@ Send secure message
 
 {% block messages %}
 
-    {% if "subject" in errors or "body" in errors %}
-        <div class="panel panel--error">
-            <div class="panel__header">
-                {% if errors|length == 1 %}
-
-                <h1 class="panel__title venus">There is 1 error on this page</h1>
-
-                {% elif errors|length > 1 %}
-                <h1 class="panel__title venus">There are {{ errors|length }} errors on this page</h1>
-                {% endif %}
-            </div>
-            <div class="panel__body" data-qa="error-body">
-                {% if "subject" in errors %}
-                <p class=“mars”>{{ errors['subject'] }}</p>
-                {% endif %}
-                {% if "body" in errors %}
-                <p class=“mars”>{{ errors['body'] }}</p>
-                {% endif %}
-            </div>
-        </div>
-        <br/>
-    {% endif %}
+    {% include 'message-error-summary.html' %}
 
     <div class="grid grid--reverse">
         <div class="grid__col col-4@m"></div>
@@ -43,7 +22,6 @@ Send secure message
                 </ul> 
             </div>
             <h1 class="saturn">Edit a draft message</h1>
-
             <div class="secure-message-form">
                 <form action="{{ url_for('secure_message_bp.create_message') }}" method="post">
                     <p>To: BRES</p>
@@ -54,45 +32,7 @@ Send secure message
                             name="msg_id"
                             value="{{draft['msg_id']}}">
 
-                    {% if "subject" in errors %}
-                    <div class="panel panel--simple panel--error panel--spacious">
-                        <p class="error-message">{{ errors['subject'] }}</p>
-                    {% endif %}
-
-                    <fieldset>
-                        <label for="secure-message-subject">Subject</label>
-                        <input
-                            id="secure-message-subject"
-                            class="secure-message-form__subject input input--text"
-                            type="text"
-                            name="secure-message-subject"
-                            value="{{draft['subject']}}"
-                            required/>
-                    </fieldset>
-
-                    {% if "subject" in errors %}
-                    </div>
-                    {% endif %}
-
-                    <br />
-
-                    {% if "body" in errors %}
-                    <div class="panel panel--simple panel--error panel--spacious">
-                        <p class="error-message">{{ errors['body'] }}</p>
-                    {% endif %}
-
-                    <fieldset>
-                        <label for="secure-message-body">Message</label>
-                        <textarea
-                            id="secure-message-body"
-                            class="secure-message-form__body input"
-                            rows="10"
-                            name="secure-message-body">{{draft['body']}}</textarea>
-                    </fieldset>
-
-                    {% if "body" in errors %}
-                    </div>
-                    {% endif %}
+                    {% include 'message-body.html' %}
 
                     <br />
 

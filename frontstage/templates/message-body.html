@@ -1,0 +1,39 @@
+                    {% if "subject" in errors %}
+                    <div class="panel panel--simple panel--error panel--spacious">
+                        <p class="error-message">{{ errors['subject'] }}</p>
+                    {% endif %}
+
+                    <fieldset>
+                        <label for="secure-message-subject">Subject</label>
+                        <input
+                            id="secure-message-subject"
+                            class="secure-message-form__subject input input--text"
+                            type="text"
+                            name="secure-message-subject"
+                            value="{{draft['subject']}}"
+                            required/>
+                    </fieldset>
+
+                    {% if "subject" in errors %}
+                    </div>
+                    {% endif %}
+
+                    <br />
+
+                    {% if "body" in errors %}
+                    <div class="panel panel--simple panel--error panel--spacious">
+                        <p class="error-message">{{ errors['body'] }}</p>
+                    {% endif %}
+
+                    <fieldset>
+                        <label for="secure-message-body">Message</label>
+                        <textarea
+                            id="secure-message-body"
+                            class="secure-message-form__body input"
+                            rows="10"
+                            name="secure-message-body">{{draft['body']}}</textarea>
+                    </fieldset>
+
+                    {% if "body" in errors %}
+                    </div>
+                    {% endif %}

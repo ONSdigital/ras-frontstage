@@ -124,35 +124,6 @@ def login():
     return render_template('sign-in/sign-in.html', _theme='default', form=form, data=template_data)
 
 
-@sign_in_bp.route('/sign-in/error', methods=['GET'])
-def sign_in_error():
-    """Handles any sign in errors"""
-
-    template_data = {
-        "error": {
-            "type": "failed"
-        }
-    }
-
-    # data variables configured: {"error": <undefined, failed, last-attempt>}
-    return render_template('sign-in/sign-in.html', _theme='default', data=template_data)
-
-
-@sign_in_bp.route('/sign-in/troubleshoot')
-def sign_in_troubleshoot():
-    return render_template('sign-in/sign-in.trouble.html', _theme='default')
-
-
-@sign_in_bp.route('/sign-in/final-sign-in')
-def sign_in_last_attempt():
-    return render_template('sign-in/sign-in.last-attempt.html', _theme='default')
-
-
-@sign_in_bp.route('/sign-in/account-locked/')
-def sign_in_account_locked():
-    return render_template('sign-in/sign-in.locked-account.html', _theme='default')
-
-
 @sign_in_bp.route('/logout')
 def logout():
     response = make_response(redirect(url_for('sign_in_bp.login')))

@@ -7,6 +7,7 @@ from requests_oauthlib import OAuth2Session
 from structlog import wrap_logger
 
 from frontstage import app
+from frontstage.exceptions.exceptions import ExternalServiceError
 from frontstage.jwt import encode
 from frontstage.models import LoginForm
 
@@ -87,7 +88,7 @@ def login():
         req = requests.get(url, verify=False)
         if req.status_code != 200:
             logger.error('unable to lookup email for "{}"'.format(username))
-            return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+            raise ExternalServiceError(req)
 
         try:
             party_id = req.json().get('id')

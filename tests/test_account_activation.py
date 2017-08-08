@@ -3,6 +3,7 @@ import unittest
 import requests_mock
 
 from frontstage import app
+from frontstage.models import RespondentStatus
 
 
 token = 'TOKEN_ABC'
@@ -23,8 +24,8 @@ class TestAccountActivation(unittest.TestCase):
             }
         self.emailverification_response = {
             "token": token,
-            "active": True,
-            "userId": user_id,
+            "status": RespondentStatus.ACTIVE.name,
+            "id": user_id,
         }
 
     # ============== ACTIVATE ACCOUNT PAGE ===============
@@ -33,7 +34,7 @@ class TestAccountActivation(unittest.TestCase):
     # invalid (not found) token
     def test_activate_account_invalid_token_specified(self, mock_object):
 
-        mock_object.post(url_email_verification, status_code=404)
+        mock_object.put(url_email_verification, status_code=404)
 
         response = self.app.get('/register/activate-account/' + token, headers=self.headers)
 
@@ -46,8 +47,8 @@ class TestAccountActivation(unittest.TestCase):
     # with an expired token
     def test_activate_account_expired_token_specified(self, mock_object):
 
-        self.emailverification_response['active'] = False
-        mock_object.post(url_email_verification, status_code=200, json=self.emailverification_response)
+        self.emailverification_response['status'] = RespondentStatus.CREATED.name
+        mock_object.put(url_email_verification, status_code=200, json=self.emailverification_response)
 
         response = self.app.get('/register/activate-account/' + token, headers=self.headers)
 
@@ -59,7 +60,7 @@ class TestAccountActivation(unittest.TestCase):
     # Test that the user ends up on the 'You've activated your account' login page if they try to access the
     # account activation page with a valid, non-expired token
     def test_activate_account_valid_token_specified(self, mock_object):
-        mock_object.post(url_email_verification, status_code=200, json=self.emailverification_response)
+        mock_object.put(url_email_verification, status_code=200, json=self.emailverification_response)
 
         response = self.app.get('/register/activate-account/' + token, headers=self.headers)
 

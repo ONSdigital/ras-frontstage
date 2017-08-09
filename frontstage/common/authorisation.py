@@ -21,6 +21,6 @@ def jwt_authorisation(request):
                 session = None
             if not session:
                 return render_template('not-signed-in.html', _theme='default', data={"error": {"type": "failed"}})
-            return original_function(session)
+            return original_function(session, **kwargs)
         return extract_session_wrapper
     return extract_session

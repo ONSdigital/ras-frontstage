@@ -116,10 +116,7 @@ def register_confirm_organisation_survey():
 
     # TODO More error handling e.g. cater for case not coming back from the case service, etc.
 
-    # TODO Use ras-common for this lookup
     # Look up the case by case_id
-    # url = app.config['API_GATEWAY_CASE_URL'] + case_id
-
     url = app.config['RM_CASE_GET'].format(app.config['RM_CASE_SERVICE'], case_id)
     case = requests.get(url, verify=False)
     logger.debug('case result => {} {} : {}'.format(case.status_code, case.reason, case.text))
@@ -133,8 +130,6 @@ def register_confirm_organisation_survey():
         raise ExternalServiceError(case)
 
     # Look up the organisation
-    # url = app.config['API_GATEWAY_PARTY_URL'] + 'businesses/id/' + business_party_id
-
     url = app.config['RAS_PARTY_GET_BY_BUSINESS'].format(app.config['RAS_PARTY_SERVICE'], business_party_id)
     party = requests.get(url, verify=False)
     logger.debug('party result => {} {} : {}'.format(party.status_code, party.reason, party.text))
@@ -147,10 +142,7 @@ def register_confirm_organisation_survey():
     elif party.status_code != 200:
         raise ExternalServiceError(party)
 
-    # TODO Use ras-common for this lookup
     # Look up the collection exercise
-    # url = app.config['API_GATEWAY_COLLECTION_EXERCISE_URL'] + collection_exercise_id
-
     url = app.config['RM_COLLECTION_EXERCISES_GET'].format(app.config['RM_COLLECTION_EXERCISE_SERVICE'], collection_exercise_id)
     logger.debug('collection URL {}'.format(url))
 
@@ -166,8 +158,6 @@ def register_confirm_organisation_survey():
         raise ExternalServiceError(collection_exercise)
 
     # Look up the survey
-    # url = app.config['API_GATEWAY_SURVEYS_URL'] + survey_id
-
     url = app.config['RM_SURVEY_GET'].format(app.config['RM_SURVEY_SERVICE'], survey_id)
     logger.debug('survey url {}'.format(url))
 
@@ -230,91 +220,13 @@ def register_enter_your_details():
         logger.debug("Confirmation password is: {}".format(password_confirm))
         logger.debug("phone number is: {}".format(phone_number))
 
-        # Lets try and create this user on the OAuth2 server
-        # OAuth_payload = {
-        #     "username": email_address,
-        #     "password": password,
-        #     "client_id": app.config['RAS_FRONTSTAGE_CLIENT_ID'],
-        #     "client_secret": app.config['RAS_FRONTSTAGE_CLIENT_SECRET']
-        # }
-
-        headers = {'content-type': 'application/x-www-form-urlencoded'}
-
-        # authorisation = {app.config['RAS_FRONTSTAGE_CLIENT_ID']: app.config['RAS_FRONTSTAGE_CLIENT_SECRET']}
-
-        # try:
-        #     OAuthurl = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_ADMIN_ENDPOINT']
-        #     OAuth_response = requests.post(OAuthurl, auth=authorisation, headers=headers, data=OAuth_payload)
-        #     logger.debug("OAuth response is: {}".format(OAuth_response.content))
-        #
-        #     # json.loads(myResponse.content.decode('utf-8'))
-        #     response_body = json.loads(OAuth_response.content.decode('utf-8'))
-        #     logger.debug("OAuth2 response is: {}".format(OAuth_response.status_code))
-        #
-        #     if OAuth_response.status_code == 401:
-        #         # This looks like the user is not authorized to use the system. it could be a duplicate email. check our
-        #         # exact error. if it is, then tell the user else fail as our server is not allowed to access the OAuth2
-        #         # system.
-        #         # TODO add logging
-        #         # {"detail":"Duplicate user credentials"}
-        #         if response_body["detail"]:
-        #             if response_body["detail"] == 'Duplicate user credentials':
-        #                 logger.warning("We have duplicate user credentials")
-        #                 errors = {'email_address_confirm': ['Please try a different email, this one is in use', ]}
-        #                 return render_template('register/register.enter-your-details.html', _theme='default', form=form, errors=errors)
-        #
-        #     # Deal with all other errors from OAuth2 registration
-        #     if OAuth_response.status_code > 401:
-        #         OAuth_response.raise_for_status()  # A stop gap until we know all the correct error pages
-        #         logger.warning("OAuth error")
-        #
-        #     # TODO A utility function to allow us to route to a page for 'user is registered already'.
-        #     # We need a html page for this.
-        #
-        # except requests.exceptions.ConnectionError:
-        #     logger.critical("There seems to be no server listening on this connection?")
-        #     # TODO A redirect to a page that helps the user
-        #
-        # except requests.exceptions.Timeout:
-        #     logger.critical("Timeout error. Is the OAuth Server overloaded?")
-        #     # TODO A redirect to a page that helps the user
-        # except requests.exceptions.RequestException as e:
-        #     # TODO catastrophic error. bail. A page that tells the user something horrid has happened and who to inform
-        #     logger.debug(e)
-
-        # if OAuth_response.status_code == 401:
-        #     # This looks like the user is not authorized to use the system. it could be a duplicate email. check our
-        #     # exact error. if it is, then tell the user else fail as our server is not allowed to access the OAuth2
-        #     # system.
-        #     # TODO add logging
-        #     # {"detail":"Duplicate user credentials"}
-        #     if response_body["detail"]:
-        #         if response_body["detail"] == 'Duplicate user credentials':
-        #             logger.warning("We have duplicate user credentials2")
-        #             errors = {'email_address': ['Please try a different email, this one is in use', ]}
-        #             return render_template('register/register.enter-your-details.html', _theme='default', form=form, errors=errors)
-        #
-        # # Deal with all other errors from OAuth2 registration
-        # if OAuth_response.status_code > 401:
-        #     OAuth_response.raise_for_status()  # A stop gap until we know all the correct error pages
-        #     logger.warning("OAuth error")
-
-        # We now have a successful user setup on the OAuth2 server. The next 2 steps we have to do are:
-        # 1) Get a valid token for service to service communication. This is done so that the front stage service can
-        #   talk with the party service to create a user.
-        # 2) Create the user on the party service using the party service
-        # /respondent/ endpoint
-
-        # Step 1
-        # Creates a 'session client' to interact with OAuth2. This provides a client ID to our client that is used to
-        # interact with the server.
         client = BackendApplicationClient(client_id=app.config['RAS_FRONTSTAGE_CLIENT_ID'])
 
         # Populates the request body with username and password from the user
         client.prepare_request_body(scope=['ps.write', ])
 
-        # passes our 'client' to the session management object. this deals with
-        # the transactions between the OAuth2 server
+        # passes our 'client' to the session management object
+        # this deals with the transactions between the OAuth2 server
         oauth = OAuth2Session(client=client)
         token_url = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_TOKEN_ENDPOINT']
         logger.debug("Our Token Endpoint is: {}".format(token_url))
@@ -371,7 +283,6 @@ def register_enter_your_details():
         party_service_url = app.config['RAS_PARTY_POST_RESPONDENTS'].format(app.config['RAS_PARTY_SERVICE'])
         logger.debug("Party service URL is: {}".format(party_service_url))
 
-
         result = requests.post(party_service_url, headers=headers, data=json.dumps(registration_data))
         logger.debug("Response from party service is: {}".format(result.content))
 
@@ -398,8 +309,6 @@ def register_almost_done():
 def register_activate_account(token):
 
     # Call the Party service to try to activate the account corresponding to the token that was supplied
-    # url = app.config['API_GATEWAY_PARTY_URL'] + 'emailverification/' + token
-
     url = app.config['RAS_PARTY_VERIFY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], token)
     result = requests.put(url)
     logger.debug('Activate account - response from party service is: {}'.format(result.content))

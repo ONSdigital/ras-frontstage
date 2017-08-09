@@ -2,12 +2,12 @@ import json
 import logging
 
 from flask import Blueprint, render_template, request
-from ons_ras_common.ons_decorators import jwt_session
 import requests
 from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.common.post_event import post_event
+from frontstage.common.authorisation import jwt_authorisation
 from frontstage.exceptions.exceptions import ExternalServiceError
 
 
@@ -39,7 +39,7 @@ def build_survey_data(session, status_filter):
 
 # ===== Surveys To Do =====
 @surveys_bp.route('/', methods=['GET', 'POST'])
-@jwt_session(request)
+@jwt_authorisation(request)
 def logged_in(session):
     """Logged in page for users only."""
 
@@ -54,7 +54,7 @@ def logged_in(session):
 
 # ===== Surveys History =====
 @surveys_bp.route('/history')
-@jwt_session(request)
+@jwt_authorisation(request)
 def surveys_history(session):
     """Logged in page for users only."""
 
@@ -69,7 +69,7 @@ def surveys_history(session):
 
 
 @surveys_bp.route('/access_survey', methods=['GET', 'POST'])
-@jwt_session(request)
+@jwt_authorisation(request)
 def access_survey(session):
     """Logged in page for users only."""
     # TODO: this is totally insecure as it doesn't validate the user is allowed access
@@ -174,7 +174,7 @@ def access_survey(session):
 
 
 @surveys_bp.route('/upload_survey', methods=['POST'])
-@jwt_session(request)
+@jwt_authorisation(request)
 def upload_survey(session):
     """Logged in page for users only."""
 

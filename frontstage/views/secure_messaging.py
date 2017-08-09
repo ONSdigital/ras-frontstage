@@ -43,7 +43,7 @@ def get_collection_case(party_id):
     url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
     collection_response = requests.get(url)
     if collection_response.status_code == 204:
-        logger.error("No case found for party id: {}".format(session['party_id']))
+        logger.error("No case found for party id: {}".format(party_id))
         return redirect(url_for('error_bp.default_error_page'))
     elif collection_response.status_code != 200:
         raise ExternalServiceError(collection_response)

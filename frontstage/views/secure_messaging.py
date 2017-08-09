@@ -2,7 +2,7 @@ import logging
 import os
 
 from flask import Blueprint, json, redirect, render_template, request, session, url_for
-from frontstage.common.authorisation import jwt_authorisation
+from frontstage.common.authorisation import jwt_authorization
 import requests
 from structlog import wrap_logger
 
@@ -58,7 +58,7 @@ def get_collection_case(party_id):
 
 
 @secure_message_bp.route('/create-message', methods=['GET', 'POST'])
-@jwt_authorisation(request)
+@jwt_authorization(request)
 def create_message(session):
     """Handles sending of new message"""
 
@@ -109,7 +109,7 @@ def create_message(session):
 
 
 @secure_message_bp.route('/reply-message', methods=['GET', 'POST'])
-@jwt_authorisation(request)
+@jwt_authorization(request)
 def reply_message(session):
     """Handles replying to an existing message"""
 
@@ -187,7 +187,7 @@ def message_check_response(data):
 
 @secure_message_bp.route('/messages/', methods=['GET'])
 @secure_message_bp.route('/messages/<label>', methods=['GET'])
-@jwt_authorisation(request)
+@jwt_authorization(request)
 def messages_get(session, label="INBOX"):
     """Gets users messages"""
 
@@ -215,7 +215,7 @@ def messages_get(session, label="INBOX"):
 
 
 @secure_message_bp.route('/draft/<draft_id>', methods=['GET'])
-@jwt_authorisation(request)
+@jwt_authorization(request)
 def draft_get(session, draft_id):
     """Get draft message"""
     url = DRAFT_GET_API_URL.format(draft_id)
@@ -231,7 +231,7 @@ def draft_get(session, draft_id):
 
 
 @secure_message_bp.route('/message/<msg_id>', methods=['GET'])
-@jwt_authorisation(request)
+@jwt_authorization(request)
 def message_get(session, msg_id):
     """Get message"""
 

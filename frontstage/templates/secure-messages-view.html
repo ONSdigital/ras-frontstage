@@ -39,16 +39,14 @@
                     class="secure-message-form__subject input input--text"
                     type="text"
                     name="secure-message-subject"
-                    value="{{ message['subject']}}"
-                    required/>
+                    value="{{ message['subject']}}"/>
             {% else %}
                 <input
                     id="secure-message-subject"
                     class="secure-message-form__subject input input--text"
                     type="text"
                     name="secure-message-subject"
-                    value="Re: {{message['subject']}}"
-                    required/>
+                    value="Re: {{message['subject']}}"/>
             {% endif %}
         </fieldset>
 

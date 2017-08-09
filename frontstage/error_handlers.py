@@ -13,7 +13,6 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 @app.errorhandler(404)
 def connection_error(error):
-    logger.error("Page not found at {}".format(error.request.url))
     return redirect(url_for('error_bp.not_found_error_page'))
 
 

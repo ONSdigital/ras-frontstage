@@ -78,7 +78,7 @@ def create_message(session):
             return message_check_response(data)
 
         if request.form['submit'] == 'Save draft':
-            if "msg_id" in request.form:
+            if "msg_id" in request.form and len(request.form['msg_id']) != 0:
                 data['msg_id'] = request.form['msg_id']
                 headers['Authorization'] = request.cookies['authorization']
                 response = requests.put(DRAFT_PUT_API_URL.format(request.form['msg_id']), data=json.dumps(data), headers=headers)
@@ -87,6 +87,7 @@ def create_message(session):
                     return render_template('secure-messages-draft.html', _theme='default', draft=data, errors=get_json)
                 elif response.status_code != 200:
                     raise ExternalServiceError(response)
+
             else:
                 response = requests.post(DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
                 if response.status_code == 400:
@@ -105,6 +106,7 @@ def create_message(session):
             return render_template('secure-messages-draft.html', _theme='default', draft=get_json, errors={})
 
     return render_template('secure-messages-create.html', _theme='default', draft={})
+
 
 @secure_message_bp.route('/reply-message', methods=['GET', 'POST'])
 @jwt_session(request)

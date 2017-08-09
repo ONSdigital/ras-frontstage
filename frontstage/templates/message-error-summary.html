@@ -10,6 +10,14 @@
                 {% endif %}
             </div>
             <div class="panel__body" data-qa="error-body">
+                {% if errors|length == 1 %}
+
+                <p>This <b>must be corrected </b>to continue.</p>
+
+                {% elif errors|length > 1 %}
+                <p>These <b>must be corrected </b>to continue.</p>
+                {% endif %}
+
                 {% if "subject" in errors %}
                 <p class=“mars”>{{ errors['subject'][0] }}</p>
                 {% endif %}

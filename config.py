@@ -138,6 +138,8 @@ class Config(object):
     RM_CASE_GET_BY_PARTY = '{}cases/partyid/{}'
     RAS_PARTY_GET_BY_EMAIL = '{}party-api/v1/respondents/email/{}'
 
+    SERVER_NAME = 'localhost:5001'
+
 
 class ProductionConfig(Config):
     """

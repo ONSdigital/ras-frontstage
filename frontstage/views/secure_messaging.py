@@ -2,7 +2,7 @@ import logging
 import os
 
 from flask import Blueprint, json, redirect, render_template, request, session, url_for
-from ons_ras_common.ons_decorators import jwt_session
+from frontstage.common.authorisation import jwt_authorization
 import requests
 from structlog import wrap_logger
 
@@ -58,7 +58,7 @@ def get_collection_case(party_id):
 
 
 @secure_message_bp.route('/create-message', methods=['GET', 'POST'])
-@jwt_session(request)
+@jwt_authorization(request)
 def create_message(session):
     """Handles sending of new message"""
 
@@ -78,7 +78,7 @@ def create_message(session):
             return message_check_response(data)
 
         if request.form['submit'] == 'Save draft':
-            if "msg_id" in request.form:
+            if "msg_id" in request.form and len(request.form['msg_id']) != 0:
                 data['msg_id'] = request.form['msg_id']
                 headers['Authorization'] = request.cookies['authorization']
                 response = requests.put(DRAFT_PUT_API_URL.format(request.form['msg_id']), data=json.dumps(data), headers=headers)
@@ -87,6 +87,7 @@ def create_message(session):
                     return render_template('secure-messages-draft.html', _theme='default', draft=data, errors=get_json)
                 elif response.status_code != 200:
                     raise ExternalServiceError(response)
+
             else:
                 response = requests.post(DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
                 if response.status_code == 400:
@@ -108,7 +109,7 @@ def create_message(session):
 
 
 @secure_message_bp.route('/reply-message', methods=['GET', 'POST'])
-@jwt_session(request)
+@jwt_authorization(request)
 def reply_message(session):
     """Handles replying to an existing message"""
 
@@ -186,7 +187,7 @@ def message_check_response(data):
 
 @secure_message_bp.route('/messages/', methods=['GET'])
 @secure_message_bp.route('/messages/<label>', methods=['GET'])
-@jwt_session(request)
+@jwt_authorization(request)
 def messages_get(session, label="INBOX"):
     """Gets users messages"""
 
@@ -214,7 +215,7 @@ def messages_get(session, label="INBOX"):
 
 
 @secure_message_bp.route('/draft/<draft_id>', methods=['GET'])
-@jwt_session(request)
+@jwt_authorization(request)
 def draft_get(session, draft_id):
     """Get draft message"""
     url = DRAFT_GET_API_URL.format(draft_id)
@@ -230,7 +231,7 @@ def draft_get(session, draft_id):
 
 
 @secure_message_bp.route('/message/<msg_id>', methods=['GET'])
-@jwt_session(request)
+@jwt_authorization(request)
 def message_get(session, msg_id):
     """Get message"""
 

@@ -2,7 +2,7 @@ from functools import wraps
 from flask import render_template
 from jose.jwt import encode, decode
 
-def jwt_authorisation(request):
+def jwt_authorization(request):
     """
     Validate an incoming session and only proceed with a decoded session if the session is valid,
     otherwise render the not-logged-in page.

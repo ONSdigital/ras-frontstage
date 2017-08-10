@@ -229,6 +229,19 @@ def draft_get(session, draft_id):
 
     return render_template('secure-messages-draft.html', _theme='default', draft=draft)
 
+@secure_message_bp.route('/sent/<sent_id>', methods=['GET'])
+@jwt_authorization(request)
+def sent_get(session, sent_id):
+    """Get sent message"""
+    url =  MESSAGE_GET_URL.format(sent_id) + '&label=sent'
+    get_sent = requests.get(url, headers=headers)
+
+    if get_sent.status_code != 200:
+        raise ExternalServiceError(get_sent)
+
+    sent = json.loads(get_sent.text)
+
+    return render_template('secure-messages-view.html', _theme='default', message=sent)
 
 @secure_message_bp.route('/message/<msg_id>', methods=['GET'])
 @jwt_authorization(request)

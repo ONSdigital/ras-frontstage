@@ -103,6 +103,8 @@
             <b><a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">Read full message</a></b>
         {% elif 'DRAFT' in message['labels'] %}
             <a href="{{ url_for('secure_message_bp.draft_get', draft_id=message['msg_id']) }}">Read full message</a>
+        {% elif 'SENT' in message['labels'] %}
+            <a href="{{ url_for('secure_message_bp.sent_get', sent_id=message['msg_id']) }}">Read full message</a>
         {% else %}
             <a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">Read full message</a>
         {% endif %}

@@ -5,7 +5,7 @@ from requests.exceptions import ConnectionError
 from structlog import wrap_logger
 
 from frontstage import app
-from frontstage.exceptions.exceptions import ExternalServiceError
+from frontstage.exceptions.exceptions import ExternalServiceError, JWTValidationError
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -28,6 +28,12 @@ def connection_error(error):
 
 
 @app.errorhandler(ExternalServiceError)
+def connection_error(error):
+    logger.error("Error in external service at: {} status code: {}".format(error.url, error.status_code))
+    return redirect(url_for('error_bp.server_error_page'))
+
+
+@app.errorhandler(JWTValidationError)
 def connection_error(error):
     logger.error("Error in external service at: {} status code: {}".format(error.url, error.status_code))
     return redirect(url_for('error_bp.server_error_page'))

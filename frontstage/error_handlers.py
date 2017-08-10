@@ -35,6 +35,4 @@ def connection_error(error):
 
 @app.errorhandler(JWTValidationError)
 def connection_error(error):
-    logger.error("Error in external service at: {} status code: {}".format(error.url, error.status_code))
-    return redirect(url_for('error_bp.server_error_page'))
-
+    return redirect(url_for('error_bp.not_logged_in_error_page'))

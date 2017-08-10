@@ -43,15 +43,15 @@ def jwt_authorization(request):
     def extract_session(original_function):
         @wraps(original_function)
         def extract_session_wrapper(*args, **kwargs):
-            encrypted_jwt_token = request.cookies.get('authorization')
-            if encrypted_jwt_token:
-                logger.debug('event="Attempting to authorize token", "{}"'.format(encrypted_jwt_token))
+            encoded_jwt_token = request.cookies.get('authorization')
+            if encoded_jwt_token:
+                logger.debug('event="Attempting to authorize token", "{}"'.format(encoded_jwt_token))
                 try:
-                    jwt_token = decode(request.cookies['authorization'], jwt_secret, algorithms=jwt_algorithm)
+                    jwt_token = decode(request.cookies.get('authorization'), jwt_secret, algorithms=jwt_algorithm)
                     logger.debug('event="Token decoded successfully"')
                 except JWTError:
                     logger.warning('event="Unable to decode token", encrypted_jwt_token="{}"'
-                                   .format(encrypted_jwt_token))
+                                   .format(encoded_jwt_token))
                     raise JWTValidationError
             else:
                 logger.warning('event="No authorization token provided"')

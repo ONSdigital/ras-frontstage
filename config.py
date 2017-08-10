@@ -47,8 +47,8 @@ class Config(object):
     WTF_CSRF_ENABLED = False
     SECRET_KEY = 'this-really-needs-to-be-changed'
     dbname = "ras_frontstage_backup"
-    # SQLALCHEMY_DATABASE_URI = "postgresql://" + dbname + ":password@localhost:5431/postgres"
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI', 'postgresql://ras_frontstage_backup:password@localhost:5431/postgres')
+    VALIDATE_JWT = True
 
     ONS_OAUTH_PROTOCOL = os.environ.get('ONS_OAUTH_PROTOCOL', 'http://')
     ONS_OAUTH_SERVER = os.environ.get('ONS_OAUTH_SERVER', 'ons-oauth2.cfapps.io')

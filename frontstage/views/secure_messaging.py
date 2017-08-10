@@ -242,7 +242,7 @@ def sent_get(session, sent_id):
 
     sent = json.loads(get_sent.text)
 
-    return render_template('secure-messages/secure-messages-view.html', _theme='default', message=sent)
+    return render_template('secure-messages/secure-messages-sent-view.html', _theme='default', message=sent)
 
 @secure_message_bp.route('/message/<msg_id>', methods=['GET'])
 @jwt_authorization(request)

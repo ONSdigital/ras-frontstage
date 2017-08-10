@@ -1,4 +1,4 @@
-{% extends "messages.html" %}
+{% extends "secure-messages/messages.html" %}
 
 {% set errors = errors %}
 
@@ -8,7 +8,7 @@ Send secure message
 
 {% block messages %}
 
-    {% include 'message-error-summary.html' %}
+    {% include 'secure-messages/message-error-summary.html' %}
 
     <div class="grid grid--reverse">
         <div class="grid__col col-4@m"></div>

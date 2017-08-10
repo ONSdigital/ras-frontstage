@@ -14,13 +14,14 @@ from frontstage.common.post_event import post_event
 from frontstage.jwt import encode
 from frontstage.models import RegistrationForm, EnrolmentCodeForm, RespondentStatus
 from frontstage.exceptions.exceptions import ExternalServiceError
-from frontstage.common.cryptographer import encrypt, decrypt
+from frontstage.common.cryptographer import Cryptographer
 
 
 logger = wrap_logger(logging.getLogger(__name__))
 
 register_bp = Blueprint('register_bp', __name__, static_folder='static', template_folder='templates/register')
 
+cryptographer = Cryptographer()
 
 def validate_enrolment_code(enrolment_code):
     case_id = None
@@ -92,7 +93,7 @@ def register():
                        description='Access code authentication attempted')
 
             # Encrypt the enrolment code
-            coded_token = encrypt(enrolment_code.encode()).decode()
+            coded_token = cryptographer.encrypt(enrolment_code.encode()).decode()
 
             return redirect(url_for('register_bp.register_confirm_organisation_survey',
                                     enrolment_code=coded_token,
@@ -118,7 +119,7 @@ def register_confirm_organisation_survey():
         encrypted_enrolment_code = request.form.get('enrolment_code')
 
     if encrypted_enrolment_code:
-        decrypted_enrolment_code = decrypt(encrypted_enrolment_code.encode()).decode()
+        decrypted_enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
     else:
         logger.error('Enrolment code not specified')
         return redirect(url_for('error_bp.default_error_page'))
@@ -205,7 +206,7 @@ def register_enter_your_details():
         encrypted_enrolment_code = request.form.get('enrolment_code')
 
     if encrypted_enrolment_code:
-        decrypted_enrolment_code = decrypt(encrypted_enrolment_code.encode()).decode()
+        decrypted_enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
     else:
         logger.error('Enrolment code not specified')
         return redirect(url_for('error_bp.default_error_page'))

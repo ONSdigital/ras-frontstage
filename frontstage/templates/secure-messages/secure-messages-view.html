@@ -1,4 +1,4 @@
-{% extends "messages.html" %}
+{% extends "secure-messages/messages.html" %}
 
 {% block page_title %}Secure message view{% endblock %}
 
@@ -21,7 +21,7 @@
                 {% endif %}
             </dd>
             <dt class="grid__col col-2@s">Sent:</dt>
-            <dd class="grid__col col-10@s">{{ message['sent_date'] }}</dd>
+            <dd class="grid__col col-10@s">{{ message['sent_date'][:19] }}</dd>
         </dl>
     </div>
 

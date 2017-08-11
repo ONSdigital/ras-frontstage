@@ -324,8 +324,7 @@ def register_activate_account(token):
                 return redirect(url_for('error_bp.default_error_page'))
     elif result.status_code != 200:
         # If the token was not recognised, we don't know who the user is so redirect them off to the error page
-        logger.warning('"event" : "unrecognised email token", "Token" : "{}", "Response code" : "{}"'
-                       .format(str(token,result.status_code)))
+        logger.warning('"event" : "unrecognised email token", "Token" : "{}", "Response code" : "{}"'.format(str(token), (str(result.status_code))))
         return redirect(url_for('error_bp.default_error_page'))
 
 

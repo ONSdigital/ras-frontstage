@@ -37,7 +37,7 @@ def validate_enrolment_code(enrolment_code):
     if result.status_code == 200 and json.loads(result.text)['active']:
         case_id = json.loads(result.text)['caseId']
     elif result.status_code == 404:
-        logger.error('"event" : "error", "Iac code not found: code" : "{}"'.format(enrolment_code))
+        logger.error('"event" : "Iac code not found", "Iac code" : "{}"'.format(enrolment_code))
     elif result.status_code != 200:
         raise ExternalServiceError(result)
 
@@ -78,7 +78,7 @@ def register():
 
             return redirect(url_for('register_bp.register_confirm_organisation_survey', enrolment_code=coded_token))
         else:
-            logger.info('"event" : "error", "Iac code invalid" : "{}"'.format(enrolment_code))
+            logger.info('"event" : "Iac code invalid", "Iac code" : "{}"'.format(enrolment_code))
             template_data = {
                 "error": {
                     "type": "failed"
@@ -105,14 +105,14 @@ def register_confirm_organisation_survey():
     if encrypted_enrolment_code:
         decrypted_enrolment_code = ons_env.crypt.decrypt(encrypted_enrolment_code.encode()).decode()
     else:
-        logger.error('"event" : "error", "message" : "Confirm organisation screen - Enrolment code not specified"')
+        logger.error('"event" : "Confirm organisation screen - Enrolment code not specified"')
         return redirect(url_for('error_bp.default_error_page'))
 
     case_id = validate_enrolment_code(decrypted_enrolment_code)
 
     # Ensure we have got a valid enrolment code, otherwise go to the sign in page
     if not case_id:
-        logger.error('"event" : "error", "message" : "Confirm organisation screen - Case ID not available"')
+        logger.error('"event" : "Confirm organisation screen - Case ID not available"')
         return redirect(url_for('error_bp.default_error_page'))
 
     # TODO More error handling e.g. cater for case not coming back from the case service, etc.
@@ -225,15 +225,12 @@ def register_enter_your_details():
         # this deals with the transactions between the OAuth2 server
         oauth = OAuth2Session(client=client)
         token_url = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_TOKEN_ENDPOINT']
-        logger.debug('"event" : "token url", "Our Token Endpoint" : "{}"'.format(token_url))
+        logger.debug('event : "fetching oauth token", "URL" : "{}"'.format(token_url))
 
         try:
             token = oauth.fetch_token(token_url=token_url, client_id=app.config['RAS_FRONTSTAGE_CLIENT_ID'],
                                       client_secret=app.config['RAS_FRONTSTAGE_CLIENT_SECRET'])
-            logger.debug(" *** Access Token Granted *** ")
-            logger.debug(" Values are: ")
-            for key in token:
-                logger.debug("{} Value is: {}".format(key, token[key]))
+            logger.debug('"event" : "Access token granted"')
 
             # TODO Check that this token has not expired. This should never happen, as we just got this token to
             # register the user
@@ -253,13 +250,13 @@ def register_enter_your_details():
         except JWTError:
             # TODO Provide proper logging
             logger.warning('"event" : "JWT scope could not be validated."')
-            return abort(500, '{"message" : "There was a problem with the Authentication service please contact a member of the ONS staff"}')
+            return abort(500, '{"event" : "There was a problem with the Authentication service please contact a member of the ONS staff"}')
 
         except MissingTokenError as e:
             logger.warning('"event" : "missing token", "Missing token, error is" : "{}"'.format(e))
             logger.warning('"event" : "failed validation"')
 
-            return abort(500, '{"message" : "There was a problem with the Authentication service please contact a member of the ONS staff"}')
+            return abort(500, '{"event" : "There was a problem with the Authentication service please contact a member of the ONS staff"}')
 
         # Step 2
         # Register with the party service

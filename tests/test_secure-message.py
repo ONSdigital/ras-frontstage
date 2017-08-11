@@ -26,11 +26,11 @@ url_sm_get_draft = 'http://localhost:5050/draft/7bc5d41b-0549-40b3-ba76-42f6d4cf
 url_sm_get_messages = 'http://localhost:5050/messages?limit=1000'
 url_sm_get_single_draft = 'http://localhost:5050/draft/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
 
-encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoX3Rva2VuIjoiNDljZmI5YjYtMDM1Ny00OGFiLWE1ZTQtZDE" \
-                    "0ZGFmOWRhODRiIiwiYWNjZXNzX3Rva2VuIjoiNDg4MTc0NmMtY2UwNS00MzY2LWJlYzgtNmJiMGFkNjAyMzI2Iiwic2NvcGU" \
-                    "iOlsiIl0sImV4cGlyZXNfYXQiOjE1MDIyODc1NTEuNTM2NjU2OSwidXNlcm5hbWUiOiJ0ZXN0dXNlckBlbWFpbC5jb20iLCJ" \
-                    "yb2xlIjoicmVzcG9uZGVudCIsInBhcnR5X2lkIjoiZGIwMzZmZDctY2UxNy00MGMyLWE4ZmMtOTMyZTdjMjI4Mzk3In0.YCI" \
-                    "840GM7ihdSPKRtHI8ab33sQbZFkJfpD3mX82LFrg"
+encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoX3Rva2VuIjoiNmY5NjM0ZGEtYTI3ZS00ZDk3LWJhZjktNjN" \
+                    "jOGRjY2IyN2M2IiwiYWNjZXNzX3Rva2VuIjoiMjUwMDM4YzUtM2QxOS00OGVkLThlZWMtODFmNTQyMDRjNDE1Iiwic2NvcGU" \
+                    "iOlsiIl0sImV4cGlyZXNfYXQiOjE4OTM0NTk2NjEuMCwidXNlcm5hbWUiOiJ0ZXN0dXNlckBlbWFpbC5jb20iLCJyb2xlIjo" \
+                    "icmVzcG9uZGVudCIsInBhcnR5X2lkIjoiZGIwMzZmZDctY2UxNy00MGMyLWE4ZmMtOTMyZTdjMjI4Mzk3In0.hh9sFpiPA-O" \
+                    "8kugpDi3_GSDnxWh5rz2e5GQuBx7kmLM"
 
 
 class TestSecureMessage(unittest.TestCase):
@@ -86,9 +86,9 @@ class TestSecureMessage(unittest.TestCase):
         self.assertTrue(bytes("Create message", encoding='UTF-8') in response.data)
 
     def test_create_message_get_not_logged_in(self):
-        response = self.app.get("secure-message/create-message")
+        response = self.app.get("secure-message/create-message", follow_redirects=True)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 403)
         self.assertTrue(bytes("not logged in", encoding='UTF-8') in response.data)
 
     @requests_mock.mock()

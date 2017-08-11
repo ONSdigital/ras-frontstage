@@ -21,37 +21,12 @@ sign_in_bp = Blueprint('sign_in_bp', __name__, static_folder='static', template_
 @sign_in_bp.route('/', methods=['GET', 'POST'])
 def login():
     """Handles sign in using OAuth2"""
-
-    logger.debug("*** Hitting login for OAuth() function.... ***")
-    """ Login OAuth Page.
-    This function uses the OAuth 2 server to receive a token upon successful sign in. If the user presents the correct
-    password and username and is accepted by the OAuth 2 server we receive an access token, a refresh token and a TTL.
-    Otherwise we fail.
-    This uses the flow Resource Owner Password Credentials Grant. See: https://tools.ietf.org/html/rfc6749#section-4.3
-    To make this work the server application (thats us!) needs a client ID and a client secret. This has to exist on the
-    OAuth server. We then use Basic Auth to access the OAuth2 server and provide the user ID, and user password in the
-    POST Body message. In the real world this would be done over https - for now all this works over http since it is
-    behind our firewall.
-    Parms_to_OAuth:
-        client_id
-        client_secret
-        user_id
-        user_password
-        oauth2_url
-    Returned_from_OAuth:
-        access_token
-        refresh_token
-        ttl
-    """
     form = LoginForm(request.form)
-
     account_activated = request.args.get('account_activated', None)
 
     if request.method == 'POST' and form.validate():
         username = request.form.get('username')
         password = request.form.get('password')
-        logger.debug("Username is: {}".format(username))
-        logger.debug("Password is: {}".format(password))
 
         # Creates a 'session client' to interact with OAuth2. This provides a client ID to our client that is used to
         # interact with the server.
@@ -69,28 +44,24 @@ def login():
             token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=app.config['RAS_FRONTSTAGE_CLIENT_ID'],
                                       client_secret=app.config['RAS_FRONTSTAGE_CLIENT_SECRET'])
 
-            logger.debug(" *** Access Token Granted *** ")
-            logger.debug(" Values are: ")
-            for key in token:
-                logger.debug("{} Value is: {}".format(key, token[key]))
+            logger.debug('"event" : "Access Token Granted"')
 
         except MissingTokenError as e:
-            logger.warning("Missing token error, error is: {}".format(e))
-            logger.warning("Failed validation")
+            logger.warning('"event" : Missing token, "Missing token error is" "{}"'.format(e))
+            logger.warning('"event" : "Failed validation"')
             return render_template('sign-in/sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
 
-        logger.debug('Email Address: {}'.format(username))
         url = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], username)
         req = requests.get(url, verify=False)
         if req.status_code != 200:
-            logger.error('unable to lookup email for "{}"'.format(username))
+            logger.error('"event" : "email fetch error", "unable to lookup email for" : "{}"'.format(username))
             raise ExternalServiceError(req)
 
         try:
             party_id = req.json().get('id')
         except Exception as e:
             logger.error(str(e))
-            logger.error('error trying to get username from party service')
+            logger.error('"event" : "error trying to get username from party service"')
             return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
         data_dict_for_jwt_token = {
@@ -105,7 +76,7 @@ def login():
 
         encoded_jwt_token = encode(data_dict_for_jwt_token)
         response = make_response(redirect(url_for('surveys_bp.logged_in')))
-        logger.info('Encoded JWT {}'.format(encoded_jwt_token))
+        logger.info('"event" : "JWT token", "Encoded JWT" : "{}"'.format(encoded_jwt_token))
         response.set_cookie('authorization', value=encoded_jwt_token)
         return response
 

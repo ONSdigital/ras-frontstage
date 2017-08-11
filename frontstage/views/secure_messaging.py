@@ -43,7 +43,7 @@ def get_collection_case(party_id):
     url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
     collection_response = requests.get(url)
     if collection_response.status_code == 204:
-        logger.error("No case found for party id: {}".format(party_id))
+        logger.error('"event" : "204 status code", "No case found for party id" : "{}"'.format(party_id))
         return redirect(url_for('error_bp.default_error_page'))
     elif collection_response.status_code != 200:
         raise ExternalServiceError(collection_response)
@@ -97,7 +97,7 @@ def create_message(session):
                     raise ExternalServiceError(response)
 
             response_data = json.loads(response.text)
-            logger.debug(response_data['msg_id'])
+            logger.debug('"event" : "save draft response", "response data" : ' + response_data['msg_id'])
             get_draft = requests.get(DRAFT_GET_API_URL.format(response_data['msg_id']), headers=headers)
 
             if get_draft.status_code != 200:
@@ -118,7 +118,7 @@ def reply_message(session):
 
     if request.method == 'POST':
         if request.form['submit'] == 'Send':
-            logger.info("Reply to Message")
+            logger.info('"event" : "Reply to Message"')
             data = {'msg_to': ['BRES'],
                     'msg_from': session['party_id'],
                     'subject': request.form['secure-message-subject'],
@@ -160,7 +160,7 @@ def reply_message(session):
                     raise ExternalServiceError(response)
 
             response_data = json.loads(response.text)
-            logger.debug(response_data['msg_id'])
+            logger.debug('"event" : "save draft response", "response data" : ' + response_data['msg_id'])
             get_draft = requests.get(DRAFT_GET_API_URL.format(response_data['msg_id']), headers=headers)
 
             if get_draft.status_code != 200:
@@ -181,7 +181,7 @@ def message_check_response(data):
     elif response.status_code != 201:
         return ExternalServiceError(response)
     response_data = json.loads(response.text)
-    logger.debug(response_data.get('msg_id', 'No response data.'))
+    logger.debug('"event" : "check response data", "response data" : ' + response_data.get('msg_id', 'No response data.'))
     return render_template('message-success-temp.html', _theme='default')
 
 

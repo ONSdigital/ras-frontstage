@@ -47,14 +47,14 @@ def login():
             logger.debug('"event" : "Access Token Granted"')
 
         except MissingTokenError as e:
-            logger.warning('"event" : Missing token, "Missing token error is" "{}"'.format(e))
+            logger.warning('"event" : Missing token, "Token" : "{}"'.format(e))
             logger.warning('"event" : "Failed validation"')
             return render_template('sign-in/sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
 
         url = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], username)
         req = requests.get(url, verify=False)
         if req.status_code != 200:
-            logger.error('"event" : "email fetch error", "unable to lookup email for" : "{}"'.format(username))
+            logger.error('"event" : "unable to fetch email", "Username" : "{}"'.format(username))
             raise ExternalServiceError(req)
 
         try:
@@ -76,7 +76,6 @@ def login():
 
         encoded_jwt_token = encode(data_dict_for_jwt_token)
         response = make_response(redirect(url_for('surveys_bp.logged_in')))
-        logger.info('"event" : "JWT token", "Encoded JWT" : "{}"'.format(encoded_jwt_token))
         response.set_cookie('authorization', value=encoded_jwt_token)
         return response
 

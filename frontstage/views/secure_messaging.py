@@ -43,7 +43,7 @@ def get_collection_case(party_id):
     url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
     collection_response = requests.get(url)
     if collection_response.status_code == 204:
-        logger.error('"event" : "204 status code", "No case found for party id" : "{}"'.format(party_id))
+        logger.error('"event" : "No case found for party id", "ID" : "{}"'.format(party_id))
         return redirect(url_for('error_bp.default_error_page'))
     elif collection_response.status_code != 200:
         raise ExternalServiceError(collection_response)
@@ -97,7 +97,7 @@ def create_message(session):
                     raise ExternalServiceError(response)
 
             response_data = json.loads(response.text)
-            logger.debug('"event" : "save draft response", "response data" : ' + response_data['msg_id'])
+            logger.debug('"event" : "save draft response", "Data" : ' + response_data['msg_id'])
             get_draft = requests.get(DRAFT_GET_API_URL.format(response_data['msg_id']), headers=headers)
 
             if get_draft.status_code != 200:
@@ -160,7 +160,7 @@ def reply_message(session):
                     raise ExternalServiceError(response)
 
             response_data = json.loads(response.text)
-            logger.debug('"event" : "save draft response", "response data" : ' + response_data['msg_id'])
+            logger.debug('"event" : "save draft response", "Data" : ' + response_data['msg_id'])
             get_draft = requests.get(DRAFT_GET_API_URL.format(response_data['msg_id']), headers=headers)
 
             if get_draft.status_code != 200:
@@ -181,7 +181,7 @@ def message_check_response(data):
     elif response.status_code != 201:
         raise ExternalServiceError(response)
     response_data = json.loads(response.text)
-    logger.debug('"event" : "check response data", "response data" : ' + response_data.get('msg_id', 'No response data.'))
+    logger.debug('"event" : "check response data", "Data" : ' + response_data.get('msg_id', 'No response data.'))
     return render_template('secure-messages/message-success-temp.html', _theme='default')
 
 @secure_message_bp.route('/messages/', methods=['GET'])

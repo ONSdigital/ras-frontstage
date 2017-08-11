@@ -31,8 +31,8 @@ def validate_enrolment_code(enrolment_code):
 
     # Call the API Gateway Service to validate the enrolment code
     result = requests.get(url, verify=False)
-    logger.debug('"event" : "Validate enrolment code", "result status code": "{}:, "result reason" : "{}", '
-                 '"result text" : "{}"'.format(result.status_code, result.reason, result.text))
+    logger.debug('"event" : "Validate enrolment code", "status code": "{}:, "reason" : "{}", '
+                 '"text" : "{}"'.format(result.status_code, result.reason, result.text))
 
     if result.status_code == 200 and json.loads(result.text)['active']:
         case_id = json.loads(result.text)['caseId']
@@ -58,7 +58,7 @@ def register():
     if request.method == 'POST' and form.validate():
 
         enrolment_code = request.form.get('enrolment_code')
-        logger.debug('"event" : "Logging enrolment code", "Enrolment code" : "{}"'.format(enrolment_code))
+        logger.debug('"event" : "Logging IAC code", "IAC code" : "{}"'.format(enrolment_code))
 
         case_id = validate_enrolment_code(enrolment_code)
 
@@ -120,7 +120,7 @@ def register_confirm_organisation_survey():
     # Look up the case by case_id
     url = app.config['RM_CASE_GET'].format(app.config['RM_CASE_SERVICE'], case_id)
     case = requests.get(url, verify=False)
-    logger.debug('"event" : "Lookup case", "case status code" : "{}", "case reason" : "{}", "case text" : "{}"'.format(case.status_code, case.reason, case.text))
+    logger.debug('"event" : "Lookup case", "status code" : "{}", "reason" : "{}", "text" : "{}"'.format(case.status_code, case.reason, case.text))
 
     if case.status_code == 200:
         case = json.loads(case.text)
@@ -133,7 +133,7 @@ def register_confirm_organisation_survey():
     # Look up the organisation
     url = app.config['RAS_PARTY_GET_BY_BUSINESS'].format(app.config['RAS_PARTY_SERVICE'], business_party_id)
     party = requests.get(url, verify=False)
-    logger.debug('"event" : "organisation_request", "party status code" : "{}", "party reason" : "{}", "party text" : '
+    logger.debug('"event" : "organisation lookup request", "status code" : "{}", "reason" : "{}", "text" : '
                  '"{}"'.format(party.status_code, party.reason, party.text))
 
     if party.status_code == 200:
@@ -146,10 +146,10 @@ def register_confirm_organisation_survey():
 
     # Look up the collection exercise
     url = app.config['RM_COLLECTION_EXERCISES_GET'].format(app.config['RM_COLLECTION_EXERCISE_SERVICE'], collection_exercise_id)
-    logger.debug('"event" : "get collection exercise", "collection URL" : "{}"'.format(url))
+    logger.debug('"event" : "get collection exercise", "URL" : "{}"'.format(url))
 
     collection_exercise = requests.get(url, verify=False)
-    logger.debug('"event" : "collection exercise result", "CE status code" : "{}", "CE reason" : "{}", "CE text" : "{}"'
+    logger.debug('"event" : "collection exercise result", "status code" : "{}", "reason" : "{}", "text" : "{}"'
                  .format(collection_exercise.status_code, collection_exercise.reason, collection_exercise.text))
 
     if collection_exercise.status_code == 200:
@@ -161,10 +161,10 @@ def register_confirm_organisation_survey():
 
     # Look up the survey
     url = app.config['RM_SURVEY_GET'].format(app.config['RM_SURVEY_SERVICE'], survey_id)
-    logger.debug('"event" : "get_survey", "survey url" : "{}"'.format(url))
+    logger.debug('"event" : "get survey url", "URL" : "{}"'.format(url))
 
     survey = requests.get(url, verify=False)
-    logger.debug('"event" : "survey result", "survey status code" : "{}", "survey reason" : "{}", "survey text" : "{}"'
+    logger.debug('"event" : "survey result", "status code" : "{}", "reason" : "{}", "text" : "{}"'
                  .format(survey.status_code, survey.reason, survey.text))
 
     if survey.status_code == 200:
@@ -201,7 +201,7 @@ def register_enter_your_details():
 
     # Ensure we have got a valid enrolment code, otherwise go to the sign in page
     if not decrypted_enrolment_code or not validate_enrolment_code(decrypted_enrolment_code):
-        logger.error('"event" : "invalid code", "error" : "Enter Account Details page - invalid enrolment code: "' + str(decrypted_enrolment_code))
+        logger.error('"event" : "invalid enrolment code", "Iac code : "' + str(decrypted_enrolment_code))
         return redirect(url_for('error_bp.default_error_page'))
 
     form = RegistrationForm(request.values, enrolment_code=encrypted_enrolment_code)
@@ -253,7 +253,7 @@ def register_enter_your_details():
             return abort(500, '{"event" : "There was a problem with the Authentication service please contact a member of the ONS staff"}')
 
         except MissingTokenError as e:
-            logger.warning('"event" : "missing token", "Missing token, error is" : "{}"'.format(e))
+            logger.warning('"event" : "missing token error", "Token" : "{}"'.format(e))
             logger.warning('"event" : "failed validation"')
 
             return abort(500, '{"event" : "There was a problem with the Authentication service please contact a member of the ONS staff"}')
@@ -274,10 +274,10 @@ def register_enter_your_details():
 
         # party_service_url = app.config['API_GATEWAY_PARTY_URL'] + 'respondents'
         party_service_url = app.config['RAS_PARTY_POST_RESPONDENTS'].format(app.config['RAS_PARTY_SERVICE'])
-        logger.debug('"event" : "get party url", "Party service URL is" : "{}"'.format(party_service_url))
+        logger.debug('"event" : "get party url", "URL" : "{}"'.format(party_service_url))
 
         result = requests.post(party_service_url, headers=headers, data=json.dumps(registration_data))
-        logger.debug('"event" : "party url", "Response from party service is" : "{}"'.format(result.content))
+        logger.debug('"event" : "party url response", "URL" : "{}"'.format(result.content))
 
         if result.status_code == 200:
             return render_template('register/register.almost-done.html', _theme='default', email=email_address)
@@ -287,8 +287,8 @@ def register_enter_your_details():
         # TODO We need to add an exception timeout catch and handle this type of error
 
     else:
-        logger.debug('"event" : "either this is not a POST, or form validation failed"')
-        logger.warning('"event" : "form failed", "Form failed validation, errors are" "{}"'.format(form.errors))
+        logger.debug('"event" : "either this is not a POST or form validation failed"')
+        logger.warning('"event" : "form failed validation", "Errors" : "{}"'.format(form.errors))
 
     return render_template('register/register.enter-your-details.html', _theme='default', form=form, errors=form.errors)
 
@@ -304,7 +304,7 @@ def register_activate_account(token):
     # Call the Party service to try to activate the account corresponding to the token that was supplied
     url = app.config['RAS_PARTY_VERIFY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], token)
     result = requests.put(url)
-    logger.debug('"event" : "call party service", "Activate account - response from party service is" : "{}"'.format(result.content))
+    logger.debug('"event" : "call party service", "URL" : "{}"'.format(result.content))
 
     if result.status_code == 200:
         json_response = json.loads(result.text)
@@ -317,14 +317,14 @@ def register_activate_account(token):
             user_id = json_response.get('id')
             if user_id:
                 # Unable to activate account therefore give the user the option to send out a new email token
-                logger.debug('"event" : "expired token", "Expired activation token: "' + str(token))
+                logger.debug('"event" : "expired token", "Token: "' + str(token))
                 return redirect(url_for('register_bp.register_resend_email', user_id=user_id))
             else:
-                logger.error('"event" : "unverified user", "Unable to determine user for activation token: "' + str(token))
+                logger.error('"event" : "unverified user token", "Token: "' + str(token))
                 return redirect(url_for('error_bp.default_error_page'))
     elif result.status_code != 200:
         # If the token was not recognised, we don't know who the user is so redirect them off to the error page
-        logger.warning('"event" : "unrecognised email", "Unrecognised email activation token: "' + str(token) +
+        logger.warning('"event" : "unrecognised email token", "Token: "' + str(token) +
                        ' Response code: ' + str(result.status_code))
         return redirect(url_for('error_bp.default_error_page'))
 

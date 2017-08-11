@@ -43,6 +43,7 @@ class Config(object):
     NAME = os.getenv('NAME', 'ras-frontstage')
     VERSION = os.getenv('VERSION', '0.2.0')
 
+    RAS_FS_CRYPTO_KEY = 'ONS_DUMMY_KEY'
     DEBUG = False
     TESTING = False
     CSRF_ENABLED = False

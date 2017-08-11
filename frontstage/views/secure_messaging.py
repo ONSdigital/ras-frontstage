@@ -181,7 +181,6 @@ def message_check_response(data):
     elif response.status_code != 201:
         raise ExternalServiceError(response)
     response_data = json.loads(response.text)
-
     logger.debug('"event" : "check response data", "response data" : ' + response_data.get('msg_id', 'No response data.'))
     return render_template('secure-messages/message-success-temp.html', _theme='default')
 

@@ -1,6 +1,9 @@
 from Crypto import Random
 from Crypto.Cipher import AES
 from base64 import b64encode, b64decode
+from hashlib import sha256
+from os import getenv
+
 
 class Cryptographer:
     """Manage the encryption and decryption of random byte strings"""
@@ -13,7 +16,12 @@ class Cryptographer:
 
         :param key: The encryption key to use when encrypting the data
         """
-        self._key = '1234567812345678'
+        key = 'ONS_DUMMY_KEY'
+
+        self._key = sha256(key.encode('utf-8')).digest()
+        # key = getenv('ONS_CRYPTOKEY', self._env.get('crypto_key', 'NO_KEY'))
+        # self.debug('Setting crypto key to "{}"'.format(key))
+        # self._key = sha256(key.encode('utf-8')).digest()
 
 
     def encrypt(self, raw_text):

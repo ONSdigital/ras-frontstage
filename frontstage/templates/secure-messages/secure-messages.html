@@ -1,5 +1,5 @@
 
-{% extends "messages.html" %}
+{% extends "secure-messages/messages.html" %}
 
 {% block page_title %}Messages{% endblock %}
 
@@ -54,14 +54,16 @@
 <ul class="message-list">
     {% for message in messages %}
     <li id="message-list" class="message-list__item">
-        {% if 'UNREAD' in message['labels'] and 'DRAFT' in message['labels'] %}
-            <b><a href="{{ url_for('secure_message_bp.draft_get', draft_id=message['msg_id']) }}">{{ message['subject'] }}</a></b>
-        {% elif 'UNREAD' in message['labels'] and 'DRAFT' not in message['labels'] %}
-            <b><a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">{{ message['subject'] }}</a></b>
-        {% elif 'DRAFT' in message['labels'] %}
+        {% if 'DRAFT' in message['labels'] %}
             <a href="{{ url_for('secure_message_bp.draft_get', draft_id=message['msg_id']) }}">{{ message['subject'] }}</a>
-        {% else %}
+        {% elif 'SENT' in message['labels'] %}
+            <a href="{{ url_for('secure_message_bp.sent_get', sent_id=message['msg_id']) }}">{{ message['subject'] }}</a>
+        {% elif 'INBOX' in message['labels'] %}
+            {% if 'UNREAD' in message['labels'] %}
+                <b><a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">{{ message['subject'] }}</a></b>
+            {% else %}
             <a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">{{ message['subject'] }}</a>
+            {% endif %}
         {% endif %}
 
         <dl class="grid">
@@ -97,15 +99,18 @@
 
         <p>{{ message['body']|truncate(100) }}</p>
 
-        {% if 'UNREAD' in message['labels'] and 'DRAFT' in message['labels'] %}
-            <b><a href="{{ url_for('secure_message_bp.draft_get', draft_id=message['msg_id']) }}">Read full message</a></b>
-        {% elif 'UNREAD' in message['labels'] and 'DRAFT' not in message['labels'] %}
-            <b><a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">Read full message</a></b>
-        {% elif 'DRAFT' in message['labels'] %}
+        {% if 'DRAFT' in message['labels'] %}
             <a href="{{ url_for('secure_message_bp.draft_get', draft_id=message['msg_id']) }}">Read full message</a>
-        {% else %}
+        {% elif 'SENT' in message['labels'] %}
+            <a href="{{ url_for('secure_message_bp.sent_get', sent_id=message['msg_id']) }}">Read full message</a>
+        {% elif 'INBOX' in message['labels'] %}
+            {% if 'UNREAD' in message['labels'] %}
+            <b><a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">Read full message</a></b>
+            {% else %}
             <a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">Read full message</a>
+            {% endif %}
         {% endif %}
+
     </li>
     {% else %}
        <li>You have no messages</li>

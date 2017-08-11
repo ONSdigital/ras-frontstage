@@ -1,19 +1,11 @@
-"""
-
-   Case Service Integration
-   License: MIT
-   Copyright (c) 2017 Crown Copyright (Office for National Statistics)
-
-"""
-from json import loads, dumps
-
 import requests
-from ons_ras_common import ons_env
-
+import logging
+from json import loads, dumps
 from frontstage import app
-
+from structlog import wrap_logger
 _categories = None
 
+logger = wrap_logger(logging.getLogger(__name__))
 
 def post_event(case_id, description=None, category=None, party_id=None, created_by=None, payload=None):
     """
@@ -34,7 +26,7 @@ def post_event(case_id, description=None, category=None, party_id=None, created_
         msg = 'description={} category={} party_id={} created_by={}'.format(
             description, category, party_id, created_by
         )
-        ons_env.logger.error('Insufficient arguments', arguments=msg)
+        logger.error('Insufficient arguments', arguments=msg)
         return 500, {'code': 500, 'text': 'insufficient arguments'}
     #
     #   If this is our first time, we need to acquire the current set of valid categories
@@ -42,7 +34,7 @@ def post_event(case_id, description=None, category=None, party_id=None, created_
     #
     global _categories
     if not _categories:
-        ons_env.logger.debug('@ caching event category list')
+        logger.debug('@ caching event category list')
         resp = requests.get('{}categories'.format(app.config['RM_CASE_SERVICE']))
         if resp.status_code != 200:
             return 404, {'code': 404, 'text': 'error loading categories'}
@@ -53,13 +45,13 @@ def post_event(case_id, description=None, category=None, party_id=None, created_
             if action:
                 _categories[action] = cat
             else:
-                ons_env.logger.error('received unknown category "{}"'.format(str(cat)))
-        ons_env.logger.debug('@ cached ({}) categories'.format(len(categories)))
+                logger.error('received unknown category "{}"'.format(str(cat)))
+        logger.debug('@ cached ({}) categories'.format(len(categories)))
     #
     #   Make sure the category we have is valid
     #
     if category not in _categories:
-        ons_env.logger.error(error='invalid category code', category=category)
+        logger.error(error='invalid category code', category=category)
         return 404, {'code': 404, 'text': 'invalid category code - {}'.format(category)}
     #
     #   Build a message to post
@@ -79,7 +71,7 @@ def post_event(case_id, description=None, category=None, party_id=None, created_
     #   Call the poster, returning the actual status and text to the caller
     #
 
-    ons_env.logger.info(message)
+    logger.info(message)
 
     headers = {'Content-Type': 'application/json'}
     resp = requests.post(
@@ -87,10 +79,10 @@ def post_event(case_id, description=None, category=None, party_id=None, created_
                     data=dumps(message),
                     headers=headers)
     if resp.status_code == 200:
-        ons_env.logger.debug('case event posted OK')
+        logger.debug('case event posted OK')
         return 200, 'OK'
 
-    ons_env.logger.debug(loads(resp.text))
+    logger.debug(loads(resp.text))
     return resp.status_code, {'code': resp.status_code, 'text': resp.text}
 
 # TODO: this commented code should probably make it's way into the imminent integration testing

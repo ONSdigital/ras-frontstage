@@ -138,10 +138,10 @@ def access_survey(session):
         url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
         req = requests.get(url, verify=False)
         if req.status_code != 200:
-            logger.error('"event" : "unable to lookup cases for party", "party" : "{}"'.format(party_id))
+            logger.error('"event" : "unable to lookup cases for party", "PartyID" : "{}"'.format(party_id))
             raise ExternalServiceError(req)
 
-        logger.debug('"event" : "successfully read cases for party", "party" : "{}"'.format(party_id))
+        logger.debug('"event" : "successfully read cases for party", "PartyID" : "{}"'.format(party_id))
         valid = False
         for case in req.json():
             if case.get('collectionInstrumentId') == collection_instrument_id:
@@ -167,7 +167,7 @@ def access_survey(session):
                                party_id=party_id,
                                description='Instrument response uploaded "{}"'.format(case_id))
         if code != 201:
-            logger.error('"event" : "error logging case event", "Case" : "{}"'.format(code))
+            logger.error('"event" : "status code error", "Code" : "{}"'.format(code))
             logger.error(str(msg))
 
         if response.status_code == 200:
@@ -206,7 +206,7 @@ def upload_survey(session):
             break
 
     if not valid:
-        logger.error('"event" : "party cannot access case", "Party" : "{}", "Case" '
+        logger.error('"event" : "party cannot access case", "PartyID" : "{}", "Case" '
                      ': "{}"'.format(party_id, case_id))
         return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
@@ -235,7 +235,7 @@ def upload_survey(session):
                               party_id=party_id,
                               description='Instrument response uploaded "{}"'.format(case_id))
     if code != 201:
-        logger.error('"event" : "error logging case event", "Case" : "{}"'.format(code))
+        logger.error('"event" : "status code error", "Code" : "{}"'.format(code))
         logger.error(str(msg))
 
     if result.status_code == 200:

@@ -253,7 +253,7 @@ def register_enter_your_details():
             return abort(500, '{"event" : "There was a problem with the Authentication service please contact a member of the ONS staff"}')
 
         except MissingTokenError as e:
-            logger.warning('"event" : "missing token error", "Token" : "{}"'.format(e))
+            logger.warning('"event" : "missing token error", "Exception" : "{}"'.format(e))
             logger.warning('"event" : "failed validation"')
 
             return abort(500, '{"event" : "There was a problem with the Authentication service please contact a member of the ONS staff"}')
@@ -317,15 +317,15 @@ def register_activate_account(token):
             user_id = json_response.get('id')
             if user_id:
                 # Unable to activate account therefore give the user the option to send out a new email token
-                logger.debug('"event" : "expired token", "Token: "' + str(token))
+                logger.debug('"event" : "expired token", "Token" : "{}"'.format(str(token)))
                 return redirect(url_for('register_bp.register_resend_email', user_id=user_id))
             else:
-                logger.error('"event" : "unverified user token", "Token: "' + str(token))
+                logger.error('"event" : "unverified user token", "Token" : "{}"'.format(str(token)))
                 return redirect(url_for('error_bp.default_error_page'))
     elif result.status_code != 200:
         # If the token was not recognised, we don't know who the user is so redirect them off to the error page
-        logger.warning('"event" : "unrecognised email token", "Token: "' + str(token) +
-                       ' Response code: ' + str(result.status_code))
+        logger.warning('"event" : "unrecognised email token", "Token" : "{}", "Response code" : "{}"'
+                       .format(str(token,result.status_code)))
         return redirect(url_for('error_bp.default_error_page'))
 
 

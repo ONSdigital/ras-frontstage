@@ -255,6 +255,7 @@ class TestSecureMessage(unittest.TestCase):
     @requests_mock.mock()
     def test_get_single_message_success(self, mock_object):
         mock_object.get(url_sm_get_single_message, status_code=200, json=draft_message_data)
+        mock_object.get(url_sm_get_single_message, status_code=200, json=draft_message_data)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
 
         response = self.app.get("secure-message/message/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb", data=self.message_form)

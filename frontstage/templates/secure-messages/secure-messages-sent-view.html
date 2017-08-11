@@ -1,0 +1,38 @@
+{% extends "secure-messages/messages.html" %}
+
+{% block page_title %}Secure message view{% endblock %}
+
+{% block messages %}
+
+<div class="secure-message-view-component">
+    {% if message['subject'].startswith('Re: ') %}
+        <h1 class="saturn">{{ message['subject'][4:] }}</h1>
+    {% else %}
+        <h1 class="saturn">{{ message['subject'] }}</h1>
+    {% endif %}
+    <div class="grid">
+        <dl>
+            <dt class="grid__col col-2@s">From:</dt>
+            <dd class="grid__col col-10@s">
+                {% if message['@msg_from']['id'] == 'BRES' %}
+                    {{ message['@msg_from']['id'] }}
+                {% else %}
+                    {{ message['@msg_from']['email'] }}
+                {% endif %}
+            </dd>
+            <dt class="grid__col col-2@s">Sent:</dt>
+            <dd class="grid__col col-10@s">{{ message['sent_date'][:19] }}</dd>
+        </dl>
+    </div>
+
+    <br />
+
+    <p>
+        {{ message['body'] }}
+    </p>
+
+        <p><a href="{{ url_for('secure_message_bp.messages_get') }}">Cancel</a></p>
+    </form>
+</div>
+
+{% endblock messages %}

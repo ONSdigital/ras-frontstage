@@ -1,0 +1,57 @@
+{
+  "_links": {
+    "first": {
+      "href": "http://localhost:5050/messages"
+    },
+    "self": {
+      "href": "http://localhost:5050/messages&?label=SENTpage=1&limit=1000"
+    }
+  },
+  "messages": [
+    {
+      "@msg_from": {
+        "email": "peter.smith@hostmail.com",
+        "firstname": "Peter",
+        "id": "db036fd7-ce17-40c2-a8fc-932e7c228397",
+        "status": "ACTIVE",
+        "surname": "Smith",
+        "telephone": "+447894056785"
+      },
+      "@msg_to": [
+        {
+          "email": "",
+          "firstname": "BRES",
+          "id": "BRES",
+          "status": "",
+          "surname": "",
+          "telephone": ""
+        }
+      ],
+      "@ru_id": {
+        "business_name": "Apple",
+        "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc"
+      },
+      "_links": {
+        "self": {
+          "href": "http://localhost:5050/message/8802f23d-3c32-4efa-bc8c-02b389fd7cad"
+        }
+      },
+      "body": "aaaabbbbaaaa",
+      "collection_case": "ab548d78-c2f1-400f-9899-79d944b87300",
+      "collection_exercise": "",
+      "labels": [
+        "SENT"
+      ],
+      "msg_from": "db036fd7-ce17-40c2-a8fc-932e7c228397",
+      "msg_id": "8802f23d-3c32-4efa-bc8c-02b389fd7cad",
+      "msg_to": [
+        "BRES"
+      ],
+      "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+      "sent_date": "2017-08-09 15:26:50.371175",
+      "subject": "aaaabbbbaaaa",
+      "survey": "BRES",
+      "thread_id": "8802f23d-3c32-4efa-bc8c-02b389fd7cad"
+    }
+  ]
+}

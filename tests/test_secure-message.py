@@ -58,7 +58,6 @@ class TestSecureMessage(unittest.TestCase):
 
         self.assertEqual(collection_case_id, "7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb")
 
-    # FIXME see if this can work
     # @requests_mock.mock()
     # def test_get_collection_case_not_found(self, mock_object):
     #     mock_object.get(url_case_get_by_party, status_code=204)
@@ -67,7 +66,6 @@ class TestSecureMessage(unittest.TestCase):
     #         collection_case_response = get_collection_case("db036fd7-ce17-40c2-a8fc-932e7c228397")
     #
     #     self.assertEqual(collection_case_response.status_code, 302)
-    #     self.assertTrue(bytes("errors", encoding='UTF-8') in collection_case_response.data)
 
     @requests_mock.mock()
     def test_get_collection_case_failed(self, mock_object):

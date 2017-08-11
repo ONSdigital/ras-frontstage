@@ -71,12 +71,6 @@ class TestApplication(unittest.TestCase):
         # now compare that values are the same in the dictionary
         self.assertEqual(my_decoded_dictionary, data_dict_for_jwt_token)
 
-    # FIXME Look at this test
-    # TODO Fix this test?
-    # Test we get an error when our token is zero length
-    # def test_encode_bad_data(self):
-    #     self.assertEqual(encode(data_dict_zero_length), 'No data')
-
     # TODO Test that over a certain size our encode returns the correct error and handles gracefully
 
     # Test that we can decode our token

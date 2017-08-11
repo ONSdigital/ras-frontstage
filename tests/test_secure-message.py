@@ -25,6 +25,7 @@ url_sm_modify_draft = 'http://localhost:5050/draft/7bc5d41b-0549-40b3-ba76-42f6d
 url_sm_get_draft = 'http://localhost:5050/draft/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
 url_sm_get_messages = 'http://localhost:5050/messages?limit=1000'
 url_sm_get_single_draft = 'http://localhost:5050/draft/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
+url_sm_get_single_message = 'http://localhost:5050/message/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
 
 encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoX3Rva2VuIjoiNmY5NjM0ZGEtYTI3ZS00ZDk3LWJhZjktNjN" \
                     "jOGRjY2IyN2M2IiwiYWNjZXNzX3Rva2VuIjoiMjUwMDM4YzUtM2QxOS00OGVkLThlZWMtODFmNTQyMDRjNDE1Iiwic2NvcGU" \
@@ -240,3 +241,23 @@ class TestSecureMessage(unittest.TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertTrue(bytes("errors", encoding='UTF-8') in response.data)
+
+    @requests_mock.mock()
+    def test_get_single_draft_failure(self, mock_object):
+        mock_object.get(url_sm_get_single_draft, status_code=500)
+        self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
+
+        response = self.app.get("secure-message/draft/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb", data=self.message_form)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(bytes("errors", encoding='UTF-8') in response.data)
+
+    @requests_mock.mock()
+    def test_get_single_message_success(self, mock_object):
+        mock_object.get(url_sm_get_single_message, status_code=200, json=draft_message_data)
+        self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
+
+        response = self.app.get("secure-message/message/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb", data=self.message_form)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(bytes("Reply", encoding='UTF-8') in response.data)

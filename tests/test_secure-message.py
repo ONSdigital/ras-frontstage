@@ -94,7 +94,7 @@ class TestSecureMessage(unittest.TestCase):
         mock_object.post(url_sm_create_message, status_code=201, json=self.send_response)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
 
-        response = self.app.post("secure-message/create-message", data=self.message_form)
+        response = self.app.post("secure-message/create-message", data=self.message_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
 

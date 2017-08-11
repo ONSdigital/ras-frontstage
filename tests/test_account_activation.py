@@ -39,9 +39,6 @@ class TestAccountActivation(unittest.TestCase):
         response = self.app.get('/register/activate-account/' + token, headers=self.headers)
 
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(
-            bytes('You should be redirected automatically to target URL', encoding='UTF-8') in response.data)
-        self.assertTrue('/error'.encode() in response.data)
 
     # Test that the user ends up on the 'Your Link Has Expired' page if they try to access the account activation page
     # with an expired token
@@ -53,9 +50,6 @@ class TestAccountActivation(unittest.TestCase):
         response = self.app.get('/register/activate-account/' + token, headers=self.headers)
 
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(
-            bytes('You should be redirected automatically to target URL', encoding='UTF-8') in response.data)
-        self.assertTrue(('/register/create-account/resend-email?user_id=' + user_id).encode() in response.data)
 
     # Test that the user ends up on the 'You've activated your account' login page if they try to access the
     # account activation page with a valid, non-expired token
@@ -65,9 +59,6 @@ class TestAccountActivation(unittest.TestCase):
         response = self.app.get('/register/activate-account/' + token, headers=self.headers)
 
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(
-            bytes('You should be redirected automatically to target URL', encoding='UTF-8') in response.data)
-        self.assertTrue('/sign-in/?account_activated=True'.encode() in response.data)
 
     # ============== YOUR LINK HAS EXPIRED PAGE ===============
 
@@ -76,8 +67,6 @@ class TestAccountActivation(unittest.TestCase):
         response = self.app.get('/register/create-account/resend-email?user_id=' + user_id, headers=self.headers)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes('Your link has expired', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('Request another email with a new link', encoding='UTF-8') in response.data)
 
     # ==============EMAIL RE-SENT PAGE ===============
 
@@ -88,9 +77,6 @@ class TestAccountActivation(unittest.TestCase):
         # TODO check that the email was actually re-sent once the backend functionality has been developed
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes('We\'ve re-sent your email', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('Please check your email', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('Help with email', encoding='UTF-8') in response.data)
 
     # ============== SIGN IN PAGE WITH 'ACCOUNT ACTIVATED' MESSAGE ===============
 
@@ -99,6 +85,3 @@ class TestAccountActivation(unittest.TestCase):
         response = self.app.get('/sign-in/?account_activated=True', headers=self.headers)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes('You\'ve activated your account', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('You may now sign in', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('SIGN_IN_BUTTON', encoding='UTF-8') in response.data)

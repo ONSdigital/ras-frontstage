@@ -98,9 +98,3 @@ class TestSurveys(unittest.TestCase):
         }
         response = self.app.post('/surveys/access_survey', headers=self.headers, data=survey_params)
         self.assertEqual(response.status_code, 200)
-
-        # There should be a Download button
-        self.assertTrue(bytes('download-survey-button', encoding='UTF-8') in response.data)
-
-        # There should be an Upload button
-        self.assertTrue(bytes('upload-survey-button', encoding='UTF-8') in response.data)

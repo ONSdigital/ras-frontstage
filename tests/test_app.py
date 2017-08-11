@@ -86,9 +86,9 @@ class TestApplication(unittest.TestCase):
     # data={"error": {"type": "success"}}
     def test_logged_in(self):
         "Testing Logged In"
-        response = self.app.get('/surveys/', headers=self.headers)
+        response = self.app.get('/surveys/', headers=self.headers, follow_redirects=True)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 403)
         self.assertTrue(bytes('Error! You are not logged in!', encoding='UTF-8') in response.data)
 
     # By passing an incorrect token this function should get an HTTP 200 with a data dictionary  type set as failed

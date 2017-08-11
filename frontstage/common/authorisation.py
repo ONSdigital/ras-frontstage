@@ -2,7 +2,6 @@ import logging
 
 from datetime import datetime
 from functools import wraps
-from flask import render_template
 from jose import JWTError
 from jose.jwt import decode
 from structlog import wrap_logger

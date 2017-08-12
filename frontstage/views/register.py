@@ -25,8 +25,10 @@ cryptographer = Cryptographer()
 def validate_enrolment_code(enrolment_code):
     case_id = None
 
-    # Build the URL
-    # url = app.config['API_GATEWAY_IAC_URL'] + '{}'.format(enrolment_code)
+    # TODO Calling methods have been written to expect a 'None' case_id to be returned if
+    # the IAC code has already been used (active=false). This makes the following implementation
+    # unnecessarily complicated.
+
     url = app.config['RM_IAC_GET'].format(app.config['RM_IAC_SERVICE'], enrolment_code)
     logger.debug('Validate IAC URL is: {}'.format(url))
 
@@ -34,8 +36,18 @@ def validate_enrolment_code(enrolment_code):
     result = requests.get(url, verify=False)
     logger.debug('Result => {} {} : {}'.format(result.status_code, result.reason, result.text))
 
-    if result.status_code == 200 and json.loads(result.text)['active']:
-        case_id = json.loads(result.text)['caseId']
+    if result.status_code == 200:
+        # The IAC does exist
+        result = json.loads(result.text)
+        active = result['active']
+        if active:
+            # assign the case_id as expected by calling methods
+            case_id = result['caseId']
+            logger.info("Active IAC code found for case_id {}".format(case_id))
+        else:
+            # don't assign the case_id even though one does exist
+            logger.info("Inactive IAC code found for case_id {}".format(result['caseId']))
+
     elif result.status_code == 404:
         logger.info("IAC code not found {}".format(enrolment_code))
     elif result.status_code != 200:

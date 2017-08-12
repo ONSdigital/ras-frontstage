@@ -78,9 +78,10 @@ def post_event(case_id, description=None, category=None, party_id=None, created_
                     '{}cases/{}/events'.format(app.config['RM_CASE_SERVICE'], case_id),
                     data=dumps(message),
                     headers=headers)
-    if resp.status_code == 200:
+    if resp.status_code == 201:
         logger.debug('case event posted OK')
         return 200, 'OK'
 
-    logger.debug(loads(resp.text))
+    logger.debug(str(loads(resp.text)))
+
     return resp.status_code, {'code': resp.status_code, 'text': resp.text}

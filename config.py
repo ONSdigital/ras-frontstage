@@ -40,7 +40,7 @@ class Config(object):
     """
     Base config class
     """
-    DEBUG = True
+    DEBUG = False
     TESTING = False
     CSRF_ENABLED = False
     # WTF_CSRF_CHECK_DEFAULT = False

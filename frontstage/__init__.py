@@ -14,8 +14,6 @@ app = Flask(__name__)
 
 app_config = os.environ.get('APP_SETTINGS', 'config.DevelopmentConfig')
 app.config.from_object(app_config)
-if not app.config['DEBUG']:
-    sslify = SSLify(app)
 
 app.jinja_env.filters['case_status_filter'] = case_status_filter
 app.jinja_env.filters['file_size_filter'] = file_size_filter
@@ -25,9 +23,11 @@ if app.config['DEBUG']:
     log_level = 'DEBUG'
 
 logger_initial_config(service_name='ras-frontstage', log_level=log_level)
-
 logger = wrap_logger(logging.getLogger(__name__))
-logger.info(str(app.debug))
+
+if not app.config['DEBUG']:
+    logger.info("Redirecting all http requests to https")
+    sslify = SSLify(app)
 
 
 import frontstage.views

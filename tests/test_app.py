@@ -83,7 +83,7 @@ class TestApplication(unittest.TestCase):
         """Testing Logged In"""
         response = self.app.get('/surveys/', headers=self.headers, follow_redirects=True)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 403)
         self.assertTrue('Not logged in'.encode() in response.data)
 
     # By passing an incorrect token this function should get an HTTP 200 with a data dictionary  type set as failed

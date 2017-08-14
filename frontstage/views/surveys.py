@@ -236,11 +236,14 @@ def upload_survey(session):
         logger.error('error "{}" logging case event'.format(code))
         logger.error(str(msg))
 
-    if result.status_code == 200:
+    if result.status_code != 200:
         logger.debug('Upload successful')
         return render_template('surveys/surveys-upload-success.html', _theme='default', upload_filename=upload_filename)
     else:
         logger.debug('Upload failed')
-        error_info = json.loads(result.text)
+        if result.text is None:
+            logger.error('Upload failed due to error')
+        else:
+            error_info = json.loads(result.text)
         return render_template('surveys/surveys-upload-failure.html',  _theme='default', error_info=error_info,
                                case_id=case_id)

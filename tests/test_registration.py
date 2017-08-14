@@ -2,6 +2,7 @@ import json
 import unittest
 
 import requests_mock
+from ons_ras_common import ons_env
 
 from frontstage import app
 

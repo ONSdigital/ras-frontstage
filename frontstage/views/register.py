@@ -24,8 +24,10 @@ register_bp = Blueprint('register_bp', __name__, static_folder='static', templat
 def validate_enrolment_code(enrolment_code):
     case_id = None
 
-    # Build the URL
-    # url = app.config['API_GATEWAY_IAC_URL'] + '{}'.format(enrolment_code)
+    # TODO Calling methods have been written to expect a 'None' case_id to be returned if
+    # the IAC code has already been used (active=false). This makes the following implementation
+    # unnecessarily complicated.
+
     url = app.config['RM_IAC_GET'].format(app.config['RM_IAC_SERVICE'], enrolment_code)
     logger.debug('Validate IAC URL is: {}'.format(url))
 
@@ -33,10 +35,20 @@ def validate_enrolment_code(enrolment_code):
     result = requests.get(url, verify=False)
     logger.debug('Result => {} {} : {}'.format(result.status_code, result.reason, result.text))
 
-    if result.status_code == 200 and json.loads(result.text)['active']:
-        case_id = json.loads(result.text)['caseId']
+    if result.status_code == 200:
+        # The IAC does exist
+        result = json.loads(result.text)
+        active = result['active']
+        if active:
+            # assign the case_id as expected by calling methods
+            case_id = result['caseId']
+            logger.info("Active IAC code found for case_id {}".format(case_id))
+        else:
+            # don't assign the case_id even though one does exist
+            logger.info("Inactive IAC code found for case_id {}".format(result['caseId']))
+
     elif result.status_code == 404:
-        logger.error("Iac code not found code: {}".format(enrolment_code))
+        logger.info("IAC code not found {}".format(enrolment_code))
     elif result.status_code != 200:
         raise ExternalServiceError(result)
 
@@ -57,27 +69,35 @@ def register():
     if request.method == 'POST' and form.validate():
 
         enrolment_code = request.form.get('enrolment_code')
-        logger.debug("Enrolment code is: {}".format(enrolment_code))
+
+        logger.info('Validating IAC code')
 
         case_id = validate_enrolment_code(enrolment_code)
 
         if case_id:
 
-            # TODO pass in the user who is creating the post event
+            logger.info("Valid IAC code entered registering respondent for case_id: {}".format(case_id))
 
-            # Post an authentication case event to the case service
+            url = app.config['RM_CASE_GET_BY_IAC'].format(app.config['RM_CASE_SERVICE'], enrolment_code)
+            case = requests.get(url, verify=False)
+
+            if case.status_code == 200:
+                case = json.loads(case.text)
+                business_party_id = case['partyId']
+            elif case.status_code != 200:
+                raise ExternalServiceError(case)
+
             post_event(case_id,
                         category='ACCESS_CODE_AUTHENTICATION_ATTEMPT',
-                        created_by='TODO',
-                        party_id='db036fd7-ce17-40c2-a8fc-932e7c228397',
-                        description='Enrolment code entered "{}"'.format(enrolment_code))
+                        created_by='FRONTSTAGE',
+                        party_id=business_party_id,
+                        description='Access code authentication attempted')
 
             # Encrypt the enrolment code
             coded_token = ons_env.crypt.encrypt(enrolment_code.encode()).decode()
 
             return redirect(url_for('register_bp.register_confirm_organisation_survey', enrolment_code=coded_token))
         else:
-            logger.info('Invalid IAC code: {}'.format(enrolment_code))
             template_data = {
                 "error": {
                     "type": "failed"

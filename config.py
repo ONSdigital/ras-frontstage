@@ -136,6 +136,7 @@ class Config(object):
     RAS_PARTY_VERIFY_EMAIL = '{}party-api/v1/emailverification/{}'
     RM_IAC_GET = '{}iacs/{}'
     RM_CASE_GET_BY_PARTY = '{}cases/partyid/{}'
+    RM_CASE_GET_BY_IAC = '{}cases/iac/{}'
     RAS_PARTY_GET_BY_EMAIL = '{}party-api/v1/respondents/email/{}'
 
 

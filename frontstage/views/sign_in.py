@@ -1,4 +1,5 @@
 import logging
+from os import getenv
 
 from flask import Blueprint, make_response, render_template, request, redirect, url_for
 from oauthlib.oauth2 import LegacyApplicationClient, MissingTokenError
@@ -104,7 +105,9 @@ def login():
         }
 
         encoded_jwt_token = encode(data_dict_for_jwt_token)
-        response = make_response(redirect(url_for('surveys_bp.logged_in')))
+        response = make_response(redirect(url_for('surveys_bp.logged_in',
+                                                  _external=True,
+                                                  _scheme=getenv('SCHEME', 'http'))))
         logger.info('Encoded JWT {}'.format(encoded_jwt_token))
         response.set_cookie('authorization', value=encoded_jwt_token)
         return response

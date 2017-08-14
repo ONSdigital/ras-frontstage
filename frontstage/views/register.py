@@ -1,5 +1,6 @@
 import json
 import logging
+from os import getenv
 
 from flask import Blueprint, render_template, request, flash, redirect, url_for, abort
 from jose import JWTError
@@ -96,7 +97,10 @@ def register():
             # Encrypt the enrolment code
             coded_token = ons_env.crypt.encrypt(enrolment_code.encode()).decode()
 
-            return redirect(url_for('register_bp.register_confirm_organisation_survey', enrolment_code=coded_token))
+            return redirect(url_for('register_bp.register_confirm_organisation_survey',
+                                    enrolment_code=coded_token,
+                                    _external=True,
+                                    _scheme=getenv('SCHEME', 'http')))
         else:
             template_data = {
                 "error": {
@@ -194,8 +198,12 @@ def register_confirm_organisation_survey():
     survey_name = survey['longName']
 
     if request.method == 'POST':
-        return redirect(url_for('register_bp.register_enter_your_details', enrolment_code=encrypted_enrolment_code,
-                                organisation_name=organisation_name, survey_name=survey_name))
+        return redirect(url_for('register_bp.register_enter_your_details',
+                                enrolment_code=encrypted_enrolment_code,
+                                organisation_name=organisation_name,
+                                survey_name=survey_name,
+                                _external=True,
+                                _scheme=getenv('SCHEME', 'http')))
     else:
         return render_template('register/register.confirm-organisation-survey.html', _theme='default',
                                enrolment_code=decrypted_enrolment_code,
@@ -338,14 +346,20 @@ def register_activate_account(token):
 
         if json_response.get('status') == RespondentStatus.ACTIVE.name:
             # Successful account activation therefore redirect off to the login screen
-            return redirect(url_for('sign_in_bp.login', account_activated=True))
+            return redirect(url_for('sign_in_bp.login',
+                                    account_activated=True,
+                                    _external=True,
+                                    _scheme=getenv('SCHEME', 'http')))
         else:
             # Try to get the user id
             user_id = json_response.get('id')
             if user_id:
                 # Unable to activate account therefore give the user the option to send out a new email token
                 logger.debug('Expired activation token: ' + str(token))
-                return redirect(url_for('register_bp.register_resend_email', user_id=user_id))
+                return redirect(url_for('register_bp.register_resend_email',
+                                        user_id=user_id,
+                                        _external=True,
+                                        _scheme=getenv('SCHEME', 'http')))
             else:
                 logger.error('Unable to determine user for activation token: ' + str(token))
                 return redirect(url_for('error_bp.default_error_page'))

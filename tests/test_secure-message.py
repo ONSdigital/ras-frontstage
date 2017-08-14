@@ -86,7 +86,7 @@ class TestSecureMessage(unittest.TestCase):
     def test_create_message_get_not_logged_in(self):
         response = self.app.get("secure-message/create-message", follow_redirects=True)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 403)
         self.assertTrue(bytes("not logged in", encoding='UTF-8') in response.data)
 
     @requests_mock.mock()
@@ -119,7 +119,7 @@ class TestSecureMessage(unittest.TestCase):
 
         response = self.app.post("secure-message/create-message", data=self.message_form, follow_redirects=True)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 500)
         self.assertTrue(bytes("500", encoding='UTF-8') in response.data)
 
     @requests_mock.mock()
@@ -196,7 +196,7 @@ class TestSecureMessage(unittest.TestCase):
 
         response = self.app.post("secure-message/create-message", data=self.message_form, follow_redirects=True)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 500)
         self.assertTrue(bytes("500", encoding='UTF-8') in response.data)
 
     @requests_mock.mock()
@@ -216,7 +216,7 @@ class TestSecureMessage(unittest.TestCase):
 
         response = self.app.get("secure-message/messages/", data=self.message_form, follow_redirects=True)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 500)
         self.assertTrue(bytes("500", encoding='UTF-8') in response.data)
 
     @requests_mock.mock()
@@ -236,5 +236,5 @@ class TestSecureMessage(unittest.TestCase):
 
         response = self.app.get("secure-message/draft/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb", data=self.message_form, follow_redirects=True)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 500)
         self.assertTrue(bytes("500", encoding='UTF-8') in response.data)

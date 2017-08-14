@@ -148,14 +148,20 @@ def reply_message(session):
                 response = requests.put(DRAFT_PUT_API_URL.format(request.form['msg_id']), data=json.dumps(data), headers=headers)
                 if response.status_code == 400:
                     get_json = json.loads(response.content)
-                    return render_template('secure-messages/secure-messages-draft.html', _theme='default', draft=data, data=get_json)
+                    return render_template('secure-messages/secure-messages-draft.html',
+                                           _theme='default',
+                                           draft=data,
+                                           errors=get_json)
                 elif response.status_code != 200:
                     raise ExternalServiceError(response)            
             else:
                 response = requests.post(DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
                 if response.status_code == 400:
                     get_json = json.loads(response.content)
-                    return render_template('secure-messages/secure-messages-draft.html', _theme='default', draft=data, data=get_json)
+                    return render_template('secure-messages/secure-messages-draft.html',
+                                           _theme='default',
+                                           draft=data,
+                                           errors=get_json)
                 elif response.status_code != 201:
                     raise ExternalServiceError(response)
 
@@ -169,7 +175,7 @@ def reply_message(session):
 
             return render_template('secure-messages/secure-messages-draft.html', _theme='default', draft=get_json)
 
-    return render_template('secure-messages/secure-messages-create.html', _theme='default')
+    return render_template('secure-messages/secure-messages-create.html', _theme='default', draft={})
 
 
 def message_check_response(data):

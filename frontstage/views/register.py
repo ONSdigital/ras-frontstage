@@ -1,9 +1,11 @@
 import json
 import logging
+from os import getenv
 
 from flask import Blueprint, render_template, request, flash, redirect, url_for, abort
 from jose import JWTError
 from oauthlib.oauth2 import BackendApplicationClient, MissingTokenError
+from ons_ras_common import ons_env
 import requests
 from requests_oauthlib import OAuth2Session
 from structlog import wrap_logger
@@ -13,20 +15,20 @@ from frontstage.common.post_event import post_event
 from frontstage.jwt import encode
 from frontstage.models import RegistrationForm, EnrolmentCodeForm, RespondentStatus
 from frontstage.exceptions.exceptions import ExternalServiceError
-from frontstage.common.cryptographer import Cryptographer
 
 
 logger = wrap_logger(logging.getLogger(__name__))
 
 register_bp = Blueprint('register_bp', __name__, static_folder='static', template_folder='templates/register')
 
-cryptographer = Cryptographer()
 
 def validate_enrolment_code(enrolment_code):
     case_id = None
 
-    # Build the URL
-    # url = app.config['API_GATEWAY_IAC_URL'] + '{}'.format(enrolment_code)
+    # TODO Calling methods have been written to expect a 'None' case_id to be returned if
+    # the IAC code has already been used (active=false). This makes the following implementation
+    # unnecessarily complicated.
+
     url = app.config['RM_IAC_GET'].format(app.config['RM_IAC_SERVICE'], enrolment_code)
     logger.debug('"event" : "Logging IAC URL", "URL": "{}"'.format(url))
 
@@ -35,8 +37,18 @@ def validate_enrolment_code(enrolment_code):
     logger.debug('"event" : "Validate enrolment code", "status code": "{}:, "reason" : "{}", '
                  '"text" : "{}"'.format(result.status_code, result.reason, result.text))
 
-    if result.status_code == 200 and json.loads(result.text)['active']:
-        case_id = json.loads(result.text)['caseId']
+    if result.status_code == 200:
+        # The IAC does exist
+        result = json.loads(result.text)
+        active = result['active']
+        if active:
+            # assign the case_id as expected by calling methods
+            case_id = result['caseId']
+            logger.info("Active IAC code found for case_id {}".format(case_id))
+        else:
+            # don't assign the case_id even though one does exist
+            logger.info("Inactive IAC code found for case_id {}".format(result['caseId']))
+
     elif result.status_code == 404:
         logger.error('"event" : "Iac code not found", "Iac code" : "{}"'.format(enrolment_code))
     elif result.status_code != 200:
@@ -65,19 +77,30 @@ def register():
 
         if case_id:
 
-            # TODO pass in the user who is creating the post event
+            logger.info("Valid IAC code entered registering respondent for case_id: {}".format(case_id))
 
-            # Post an authentication case event to the case service
+            url = app.config['RM_CASE_GET_BY_IAC'].format(app.config['RM_CASE_SERVICE'], enrolment_code)
+            case = requests.get(url, verify=False)
+
+            if case.status_code == 200:
+                case = json.loads(case.text)
+                business_party_id = case['partyId']
+            elif case.status_code != 200:
+                raise ExternalServiceError(case)
+
             post_event(case_id,
                         category='ACCESS_CODE_AUTHENTICATION_ATTEMPT',
-                        created_by='TODO',
-                        party_id='db036fd7-ce17-40c2-a8fc-932e7c228397',
-                        description='Enrolment code entered "{}"'.format(enrolment_code))
+                        created_by='FRONTSTAGE',
+                        party_id=business_party_id,
+                        description='Access code authentication attempted')
 
             # Encrypt the enrolment code
-            coded_token = cryptographer.encrypt(enrolment_code.encode()).decode()
+            coded_token = ons_env.crypt.encrypt(enrolment_code.encode()).decode()
 
-            return redirect(url_for('register_bp.register_confirm_organisation_survey', enrolment_code=coded_token))
+            return redirect(url_for('register_bp.register_confirm_organisation_survey',
+                                    enrolment_code=coded_token,
+                                    _external=True,
+                                    _scheme=getenv('SCHEME', 'http')))
         else:
             logger.info('"event" : "Iac code invalid", "Iac code" : "{}"'.format(enrolment_code))
             template_data = {
@@ -104,7 +127,7 @@ def register_confirm_organisation_survey():
 
     # Decrypt the enrolment code if we have one
     if encrypted_enrolment_code:
-        decrypted_enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
+        decrypted_enrolment_code = ons_env.crypt.decrypt(encrypted_enrolment_code.encode()).decode()
     else:
         logger.error('"event" : "Confirm organisation screen - Enrolment code not specified"')
         return redirect(url_for('error_bp.default_error_page'))
@@ -178,8 +201,12 @@ def register_confirm_organisation_survey():
     survey_name = survey['longName']
 
     if request.method == 'POST':
-        return redirect(url_for('register_bp.register_enter_your_details', enrolment_code=encrypted_enrolment_code,
-                                organisation_name=organisation_name, survey_name=survey_name))
+        return redirect(url_for('register_bp.register_enter_your_details',
+                                enrolment_code=encrypted_enrolment_code,
+                                organisation_name=organisation_name,
+                                survey_name=survey_name,
+                                _external=True,
+                                _scheme=getenv('SCHEME', 'http')))
     else:
         return render_template('register/register.confirm-organisation-survey.html', _theme='default',
                                enrolment_code=decrypted_enrolment_code,
@@ -196,7 +223,7 @@ def register_enter_your_details():
 
     # Decrypt the enrolment_code if we have one
     if encrypted_enrolment_code:
-        decrypted_enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
+        decrypted_enrolment_code = ons_env.crypt.decrypt(encrypted_enrolment_code.encode()).decode()
     else:
         decrypted_enrolment_code = None
 
@@ -312,14 +339,20 @@ def register_activate_account(token):
 
         if json_response.get('status') == RespondentStatus.ACTIVE.name:
             # Successful account activation therefore redirect off to the login screen
-            return redirect(url_for('sign_in_bp.login', account_activated=True))
+            return redirect(url_for('sign_in_bp.login',
+                                    account_activated=True,
+                                    _external=True,
+                                    _scheme=getenv('SCHEME', 'http')))
         else:
             # Try to get the user id
             user_id = json_response.get('id')
             if user_id:
                 # Unable to activate account therefore give the user the option to send out a new email token
                 logger.debug('"event" : "expired token", "Token" : "{}"'.format(str(token)))
-                return redirect(url_for('register_bp.register_resend_email', user_id=user_id))
+                return redirect(url_for('register_bp.register_resend_email',
+                                        user_id=user_id,
+                                        _external=True,
+                                        _scheme=getenv('SCHEME', 'http')))
             else:
                 logger.error('"event" : "unverified user token", "Token" : "{}"'.format(str(token)))
                 return redirect(url_for('error_bp.default_error_page'))

@@ -88,6 +88,7 @@ def access_survey(session):
         period_end = request.form.get('period_end', None)
         submit_by = request.form.get('submit_by', None)
 
+        logger.info("Survey access requested for collection instrument {} by user {} for case {}".format(collection_instrument_id, party_id, case_id))
         # TODO: Authorization - this is *not* DRY and should be refactored
         #
         #   Need a check here to make sure that party_id is allowed to access collection_instrument_id
@@ -130,6 +131,8 @@ def access_survey(session):
         collection_instrument_id = request.args.get('cid')
         case_id = request.args.get('case_id')
 
+        logger.info("Download request for collection instrument {} by user {} for case {}".format(collection_instrument_id, party_id, case_id))
+
         # TODO: Authorization - this is *not* DRY and should be refactored
         #
         #   Need a check here to make sure that party_id is allowed to access collection_instrument_id
@@ -163,9 +166,9 @@ def access_survey(session):
         category = 'COLLECTION_INSTRUMENT_DOWNLOADED' if response.status_code == 200 else 'COLLECTION_INSTRUMENT_ERROR'
         code, msg = post_event(case_id,
                                category=category,
-                               created_by='SYSTEM',
+                               created_by='FRONTSTAGE',
                                party_id=party_id,
-                               description='Instrument response uploaded "{}"'.format(case_id))
+                               description='Instrument {} downloaded by {} for case {}'.format(collection_instrument_id, party_id, case_id))
         if code != 201:
             logger.error('"event" : "status code error", "Code" : "{}"'.format(code))
             logger.error(str(msg))
@@ -185,6 +188,8 @@ def upload_survey(session):
 
     party_id = session.get('party_id', 'no-party-id')
     case_id = request.args.get('case_id', None)
+
+    logger.info('Survey upload attempt by user {} for case {}'.format(party_id, case_id))
 
     # TODO: Authorization - this is *not* DRY and should be refactored (GB)
     #
@@ -231,9 +236,9 @@ def upload_survey(session):
     category = 'SUCCESSFUL_RESPONSE_UPLOAD' if result.status_code == 200 else 'UNSUCCESSFUL_RESPONSE_UPLOAD'
     code, msg = post_event(case_id,
                               category=category,
-                              created_by='SYSTEM',
+                              created_by='FRONTSTAGE',
                               party_id=party_id,
-                              description='Instrument response uploaded "{}"'.format(case_id))
+                              description='Survey response for case {} uploaded by {}'.format(case_id, party_id))
     if code != 201:
         logger.error('"event" : "status code error", "Code" : "{}"'.format(code))
         logger.error(str(msg))

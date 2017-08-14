@@ -2,6 +2,7 @@ import json
 import unittest
 
 import requests_mock
+from ons_ras_common import ons_env
 
 from frontstage import app
 
@@ -106,7 +107,7 @@ class TestRegistration(unittest.TestCase):
         def my_post_event(*args, **kwargs):
             print('Called POST EVENT service with args={},kwargs={}'.format(str(args), str(kwargs)))
 
-        post_event = my_post_event
+        ons_env.case_service.post_event = my_post_event
 
         # Enrolment code post data
         post_data = {

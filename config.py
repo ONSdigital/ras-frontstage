@@ -40,7 +40,6 @@ class Config(object):
     """
     Base config class
     """
-    RAS_FS_CRYPTO_KEY = 'ONS_DUMMY_KEY'
     DEBUG = False
     TESTING = False
     CSRF_ENABLED = False

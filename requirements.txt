@@ -9,7 +9,6 @@ Flask-Moment==0.5.1
 Flask-OAuth==0.12
 Flask-OpenID==1.2.5
 Flask-Script==2.0.5
-Flask-SSLify==0.1.5
 Flask-SQLAlchemy==2.1
 Flask-WTF==0.14.2
 future==0.16.0

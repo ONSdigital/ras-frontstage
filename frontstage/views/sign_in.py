@@ -105,7 +105,6 @@ def login():
         }
 
         encoded_jwt_token = encode(data_dict_for_jwt_token)
-        logger.debug('am I here {}'.format(str(app.config['PREFERRED_URL_SCHEME'])))
         response = make_response(redirect(url_for('surveys_bp.logged_in',
                                                   _external=True,
                                                   _scheme=getenv('SCHEME', 'http'))))

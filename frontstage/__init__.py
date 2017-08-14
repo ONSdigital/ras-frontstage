@@ -2,7 +2,6 @@ import logging
 import os
 
 from flask import Flask
-from flask_sslify import SSLify
 from structlog import wrap_logger
 
 from frontstage.filters.case_status_filter import case_status_filter
@@ -24,10 +23,6 @@ if app.config['DEBUG']:
 
 logger_initial_config(service_name='ras-frontstage', log_level=log_level)
 logger = wrap_logger(logging.getLogger(__name__))
-
-# if not app.config['DEBUG']:
-#     logger.info("Redirecting all http requests to https")
-#     sslify = SSLify(app)
 
 
 import frontstage.views

@@ -40,7 +40,7 @@ class Config(object):
     """
     Base config class
     """
-    DEBUG = False
+    DEBUG = True
     TESTING = False
     CSRF_ENABLED = False
     # WTF_CSRF_CHECK_DEFAULT = False
@@ -143,7 +143,7 @@ class ProductionConfig(Config):
     """
     Production config class
     """
-    DEBUG = False
+    DEBUG = True
 
 
 class StagingConfig(Config):

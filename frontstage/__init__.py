@@ -2,6 +2,7 @@ import logging
 import os
 
 from flask import Flask
+from flask_sslify import SSLify
 from structlog import wrap_logger
 
 from frontstage.filters.case_status_filter import case_status_filter
@@ -10,6 +11,7 @@ from frontstage.logger_config import logger_initial_config
 
 
 app = Flask(__name__)
+# sslify = SSLify(app)
 
 app_config = os.environ.get('APP_SETTINGS', 'config.DevelopmentConfig')
 app.config.from_object(app_config)

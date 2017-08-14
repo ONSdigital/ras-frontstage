@@ -144,7 +144,7 @@ class ProductionConfig(Config):
     """
     Production config class
     """
-    DEBUG = True
+    DEBUG = False
 
 
 class StagingConfig(Config):

@@ -25,9 +25,9 @@ if app.config['DEBUG']:
 logger_initial_config(service_name='ras-frontstage', log_level=log_level)
 logger = wrap_logger(logging.getLogger(__name__))
 
-if not app.config['DEBUG']:
-    logger.info("Redirecting all http requests to https")
-    sslify = SSLify(app)
+# if not app.config['DEBUG']:
+#     logger.info("Redirecting all http requests to https")
+#     sslify = SSLify(app)
 
 
 import frontstage.views

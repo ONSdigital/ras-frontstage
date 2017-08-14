@@ -11,7 +11,7 @@ from frontstage.logger_config import logger_initial_config
 
 
 app = Flask(__name__)
-# sslify = SSLify(app)
+sslify = SSLify(app)
 
 app_config = os.environ.get('APP_SETTINGS', 'config.DevelopmentConfig')
 app.config.from_object(app_config)

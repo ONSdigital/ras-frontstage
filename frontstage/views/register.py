@@ -4,6 +4,7 @@ import logging
 from flask import Blueprint, render_template, request, flash, redirect, url_for, abort
 from jose import JWTError
 from oauthlib.oauth2 import BackendApplicationClient, MissingTokenError
+from ons_ras_common import ons_env
 import requests
 from requests_oauthlib import OAuth2Session
 from structlog import wrap_logger
@@ -13,14 +14,12 @@ from frontstage.common.post_event import post_event
 from frontstage.jwt import encode
 from frontstage.models import RegistrationForm, EnrolmentCodeForm, RespondentStatus
 from frontstage.exceptions.exceptions import ExternalServiceError
-from frontstage.common.cryptographer import Cryptographer
 
 
 logger = wrap_logger(logging.getLogger(__name__))
 
 register_bp = Blueprint('register_bp', __name__, static_folder='static', template_folder='templates/register')
 
-cryptographer = Cryptographer()
 
 def validate_enrolment_code(enrolment_code):
     case_id = None
@@ -74,7 +73,7 @@ def register():
                         description='Enrolment code entered "{}"'.format(enrolment_code))
 
             # Encrypt the enrolment code
-            coded_token = cryptographer.encrypt(enrolment_code.encode()).decode()
+            coded_token = ons_env.crypt.encrypt(enrolment_code.encode()).decode()
 
             return redirect(url_for('register_bp.register_confirm_organisation_survey', enrolment_code=coded_token))
         else:
@@ -103,7 +102,7 @@ def register_confirm_organisation_survey():
 
     # Decrypt the enrolment code if we have one
     if encrypted_enrolment_code:
-        decrypted_enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
+        decrypted_enrolment_code = ons_env.crypt.decrypt(encrypted_enrolment_code.encode()).decode()
     else:
         logger.error('Confirm organisation screen - Enrolment code not specified')
         return redirect(url_for('error_bp.default_error_page'))
@@ -193,7 +192,7 @@ def register_enter_your_details():
 
     # Decrypt the enrolment_code if we have one
     if encrypted_enrolment_code:
-        decrypted_enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
+        decrypted_enrolment_code = ons_env.crypt.decrypt(encrypted_enrolment_code.encode()).decode()
     else:
         decrypted_enrolment_code = None
 

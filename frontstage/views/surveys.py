@@ -88,6 +88,7 @@ def access_survey(session):
         period_end = request.form.get('period_end', None)
         submit_by = request.form.get('submit_by', None)
 
+        logger.info("Survey access requested for collection instrument {} by user {} for case {}".format(collection_instrument_id, party_id, case_id))
         # TODO: Authorization - this is *not* DRY and should be refactored
         #
         #   Need a check here to make sure that party_id is allowed to access collection_instrument_id
@@ -108,7 +109,7 @@ def access_survey(session):
                 break
 
         if not valid:
-            logger.error('party "{}" does not have access to instrument "{}"'.format(party_id, collection_instrument_id))
+            logger.error('User {} does not have permission to access collection instrument {}'.format(party_id, collection_instrument_id))
             return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
         url = app.config['RAS_CI_GET'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], collection_instrument_id)
@@ -128,6 +129,8 @@ def access_survey(session):
     if request.method == 'GET':
         collection_instrument_id = request.args.get('cid')
         case_id = request.args.get('case_id')
+
+        logger.info("Download request for collection instrument {} by user {} for case {}".format(collection_instrument_id, party_id, case_id))
 
         # TODO: Authorization - this is *not* DRY and should be refactored
         #
@@ -149,19 +152,19 @@ def access_survey(session):
                 break
 
         if not valid:
-            logger.error('party "{}" does not have access to instrument "{}"'.format(party_id, collection_instrument_id))
+            logger.error('User {} does not have permission to access collection instrument {}'.format(party_id, collection_instrument_id))
             return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
         url = app.config['RAS_CI_DOWNLOAD'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], collection_instrument_id)
-        logger.info("User {} downloaded spreadsheet {} for case {}".format(party_id, collection_instrument_id, case_id))
+
         response = requests.get(url, verify=False)
 
         category = 'COLLECTION_INSTRUMENT_DOWNLOADED' if response.status_code == 200 else 'COLLECTION_INSTRUMENT_ERROR'
         code, msg = post_event(case_id,
                                category=category,
-                               created_by='SYSTEM',
+                               created_by='FRONTSTAGE',
                                party_id=party_id,
-                               description='Instrument response uploaded "{}"'.format(case_id))
+                               description='Instrument {} downloaded by {} for case {}'.format(collection_instrument_id, party_id, case_id))
         if code != 201:
             logger.error('error "{}" logging case event'.format(code))
             logger.error(str(msg))
@@ -169,7 +172,7 @@ def access_survey(session):
         if response.status_code == 200:
             return response.content, response.status_code, response.headers.items()
         else:
-            logger.error('Collection Instrument download of "{}" failed with "{}"'.format(collection_instrument_id, response.status_code))
+            logger.error('Collection Instrument {} download by {} failed with "{}"'.format(collection_instrument_id, party_id, response.status_code))
             return render_template('surveys/surveys-download-failure.html', _theme='default', error_info=request.args.get('error_info', None))
 
 
@@ -180,6 +183,8 @@ def upload_survey(session):
 
     party_id = session.get('party_id', 'no-party-id')
     case_id = request.args.get('case_id', None)
+
+    logger.info('Survey upload attempt by user {} for case {}'.format(party_id, case_id))
 
     # TODO: Authorization - this is *not* DRY and should be refactored (GB)
     #
@@ -201,7 +206,7 @@ def upload_survey(session):
             break
 
     if not valid:
-        logger.error('party "{}" does not have access to case "{}"'.format(party_id, case_id))
+        logger.error('User {} does not have permission to upload a survey response for case {}'.format(party_id, case_id))
         return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
     # TODO - Add security headers ??
@@ -224,9 +229,9 @@ def upload_survey(session):
     category = 'SUCCESSFUL_RESPONSE_UPLOAD' if result.status_code == 200 else 'UNSUCCESSFUL_RESPONSE_UPLOAD'
     code, msg = post_event(case_id,
                               category=category,
-                              created_by='SYSTEM',
+                              created_by='FRONTSTAGE',
                               party_id=party_id,
-                              description='Instrument response uploaded "{}"'.format(case_id))
+                              description='Survey response for case {} uploaded by {}'.format(case_id, party_id))
     if code != 201:
         logger.error('error "{}" logging case event'.format(code))
         logger.error(str(msg))

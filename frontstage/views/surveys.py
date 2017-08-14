@@ -236,7 +236,7 @@ def upload_survey(session):
         logger.error('error "{}" logging case event'.format(code))
         logger.error(str(msg))
 
-    if result.status_code != 200:
+    if result.status_code == 200:
         logger.debug('Upload successful')
         return render_template('surveys/surveys-upload-success.html', _theme='default', upload_filename=upload_filename)
     else:

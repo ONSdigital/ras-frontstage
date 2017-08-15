@@ -244,7 +244,7 @@ def upload_survey(session):
         if type(result.text) == str:
             logger.error('Upload failed due to error')
             error_info = {'status code': result.status_code,
-                          'message': result.text}
+                          'text': result.text}
             return render_template('surveys/surveys-upload-failure.html', _theme='default', error_info=error_info,
                                    case_id=case_id)
         else:

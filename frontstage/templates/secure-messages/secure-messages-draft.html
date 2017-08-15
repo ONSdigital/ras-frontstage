@@ -1,4 +1,4 @@
-{% extends "messages.html" %}
+{% extends "secure-messages/messages.html" %}
 
 {% set errors = errors %}
 
@@ -8,7 +8,7 @@ Send secure message
 
 {% block messages %}
 
-    {% include 'message-error-summary.html' %}
+    {% include 'secure-messages/message-error-summary.html' %}
 
     <div class="grid grid--reverse">
         <div class="grid__col col-4@m"></div>
@@ -46,8 +46,7 @@ Send secure message
                                 class="secure-message-form__subject input input--text"
                                 type="text"
                                 name="secure-message-subject"
-                                value="{{draft['subject']}}"
-                                required/>
+                                value="{{ draft['subject'] }}"/>
                         </fieldset>
 
                         {% if "subject" in errors %}

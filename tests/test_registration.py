@@ -94,36 +94,6 @@ class TestRegistration(unittest.TestCase):
 
         # Check successful response and the correct values are on the page
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes('Create an account', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('Enrolment Code', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('You\'ll find this in the letter we sent you', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('CONTINUE_BUTTON', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('sign in here', encoding='UTF-8') in response.data)
-
-        # Mock the IAC service to validate the enrolment code
-        mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)
-
-        # Mock the post event service
-        def my_post_event(*args, **kwargs):
-            print('Called POST EVENT service with args={},kwargs={}'.format(str(args), str(kwargs)))
-
-        ons_env.case_service.post_event = my_post_event
-
-        # Enrolment code post data
-        post_data = {
-            'enrolment_code': enrolment_code
-        }
-
-        # POST to the Create Account (Enter Enrolment Code) page
-        # TODO: this test was disabled - doesn't seem to work (GB/LB)
-        #response = self.app.post('/register/create-account/', data=post_data, headers=self.headers)
-
-        # After a successful POST the user should be redirected to the Confirm Org screen
-        #self.assertEqual(response.status_code, 302)
-        #self.assertTrue(
-        #    bytes('You should be redirected automatically to target URL', encoding='UTF-8') in response.data)
-        #self.assertTrue(
-        #    bytes('/register/create-account/confirm-organisation-survey/?enrolment_code=', encoding='UTF-8') in response.data)
 
     # ============== CONFIRM ORG AND SURVEY ===============
     @requests_mock.mock()
@@ -147,14 +117,11 @@ class TestRegistration(unittest.TestCase):
         mock_object.get(url_get_survey, status_code=200, json=survey_json)
 
         # A GET request with the correct enrolment codes should bring up the page
-        response = self.app.get('/register/create-account/confirm-organisation-survey/', query_string=params, headers=self.headers)
+        response = self.app.get('/register/create-account/confirm-organisation-survey/', query_string=params, headers=self.headers, follow_redirects=True)
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes('Enrolment code', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('Organisation', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('Survey to complete', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('CONFIRM_AND_CONTINUE_BUTTON', encoding='UTF-8') in response.data)
+        self.assertTrue('Confirm organisation'.encode() in response.data)
 
     @requests_mock.mock()
     def test_confirm_org_page_inactive_enrolment_code(self, mock_object):
@@ -164,9 +131,10 @@ class TestRegistration(unittest.TestCase):
         mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)
 
         # A POST with an invalid or inactive enrolment code should result in an error page being displayed
-        response = self.app.get('/register/create-account/confirm-organisation-survey/', query_string=params, headers=self.headers)
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue('/error'.encode() in response.data)
+        response = self.app.get('/register/create-account/confirm-organisation-survey/', query_string=params, headers=self.headers, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Oops!'.encode() in response.data)
 
     # ============== ENTER YOUR ACCOUNT DETAILS ===============
     @requests_mock.mock()
@@ -175,18 +143,10 @@ class TestRegistration(unittest.TestCase):
         mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)
 
         # A GET with a valid, active enrolment code should result in the page being displayed
-        response = self.app.get('/register/create-account/enter-account-details', query_string=params, headers=self.headers)
-        self.assertEqual(response.status_code, 200)
+        response = self.app.get('/register/create-account/enter-account-details', query_string=params, headers=self.headers, follow_redirects=True)
 
-        # Check that the correct details are displayed on the screen after it is successfully accessed
-        self.assertTrue(bytes('Enter your account details', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('Your name', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('First name', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('Last name', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('Email address', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('Create a password', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('Phone number', encoding='UTF-8') in response.data)
-        self.assertTrue(bytes('Enter your phone number', encoding='UTF-8') in response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('send you an email'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_account_get_page_with_inactive_enrolment_code(self, mock_object):
@@ -196,18 +156,20 @@ class TestRegistration(unittest.TestCase):
         mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)
 
         # A GET with a valid, inactive enrolment code should result in the error page being displayed
-        response = self.app.get('/register/create-account/enter-account-details', query_string=params, headers=self.headers)
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue('/error'.encode() in response.data)
+        response = self.app.get('/register/create-account/enter-account-details', query_string=params, headers=self.headers, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Oops!'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_account_get_page_without_enrolment_code(self, mock_object):
         """Test create account page is not rendered for an invalid get request"""
 
         # A GET with no enrolment code should result in the error page being displayed
-        response = self.app.get('/register/create-account/enter-account-details', headers=self.headers)
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue('/error'.encode() in response.data)
+        response = self.app.get('/register/create-account/enter-account-details', headers=self.headers, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Oops!'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_account_register_no_email_address(self, mock_object):
@@ -220,11 +182,11 @@ class TestRegistration(unittest.TestCase):
 
         # A POST with no email should prompt the user
         self.headers['referer'] = '/register/create-account/enter-account-details'
-        response = self.app.post('/register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
+        response = self.app.post('/register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers, follow_redirects=True)
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes('Email address is required', encoding='UTF-8') in response.data)
+        self.assertTrue('Enter your account details'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_account_register_no_password(self, mock_object):
@@ -238,11 +200,11 @@ class TestRegistration(unittest.TestCase):
 
         # A POST with no password should prompt the user
         self.headers['referer'] = 'register/create-account/enter-account-details'
-        response = self.app.post('register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
+        response = self.app.post('register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers, follow_redirects=True)
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes('Password is required', encoding='UTF-8') in response.data)
+        self.assertTrue('Please check the passwords'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_account_register_wrong_password(self, mock_object):
@@ -255,11 +217,11 @@ class TestRegistration(unittest.TestCase):
 
         # A POST with non-matching passwords should prompt the user
         self.headers['referer'] = 'register/create-account/enter-account-details'
-        response = self.app.post('register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
+        response = self.app.post('register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers, follow_redirects=True)
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes('Your passwords do not match', encoding='UTF-8') in response.data)
+        self.assertTrue('Please check the passwords'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_account_register_no_phone_number(self, mock_object):
@@ -272,11 +234,11 @@ class TestRegistration(unittest.TestCase):
 
         # A POST with no phone number should prompt the user
         self.headers['referer'] = 'register/create-account/enter-account-details'
-        response = self.app.post('register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
+        response = self.app.post('register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers, follow_redirects=True)
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes('Phone number is required', encoding='UTF-8') in response.data)
+        self.assertTrue('Please check the phone_number'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_account_register_illegal_phone_number(self, mock_object):
@@ -289,11 +251,11 @@ class TestRegistration(unittest.TestCase):
 
         # A POST with an invalid phone number should prompt the user
         self.headers['referer'] = 'register/create-account/enter-account-details'
-        response = self.app.post('register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
+        response = self.app.post('register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers, follow_redirects=True)
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes('This should be a valid UK number e.g. 01632 496 0018', encoding='UTF-8') in response.data)
+        self.assertTrue('Please check the phone_number'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_account_register_phone_number_too_small(self, mock_object):
@@ -306,11 +268,11 @@ class TestRegistration(unittest.TestCase):
 
         # A POST with an invalid phone number should prompt the user
         self.headers['referer'] = 'register/create-account/enter-account-details'
-        response = self.app.post('register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
+        response = self.app.post('register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers, follow_redirects=True)
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes('This should be a valid phone number between 9 and 15 digits', encoding='UTF-8') in response.data)
+        self.assertTrue('Please check the phone_number'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_account_register_phone_number_too_big(self, mock_object):
@@ -323,70 +285,8 @@ class TestRegistration(unittest.TestCase):
 
         # A POST with an invalid phone number should prompt the user
         self.headers['referer'] = 'register/create-account/enter-account-details'
-        response = self.app.post('register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
+        response = self.app.post('register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers, follow_redirects=True)
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes('This should be a valid phone number between 9 and 15 digits', encoding='UTF-8') in response.data)
-
-    # @requests_mock.mock()
-    # def test_create_account_register_new_user(self, mock_object):
-    #     """Test successful create account"""
-    # 
-    #     # Build URL's which is used to talk to the OAuth2 server
-    #     url_create_user = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_ADMIN_ENDPOINT
-    # 
-    #     url_get_token = 'http://ons-oauth2.cfapps.io/api/v1/tokens/'
-    #     # url_get_token = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_TOKEN_ENDPOINT
-    # 
-    #     url_get_party_data = TestingConfig.API_GATEWAY_PARTY_URL + 'respondents'
-    # 
-    #     # Here we place a listener on the URL's The flow of events are:
-    #     # 1) The ras_frontstage creates a user on the OAuth2 server.
-    #     # 2) The OAuth2 replies with a HTTP 200 OK.
-    #     # 3) The ras_frontstage requests a client Token from the OAuth2 to allow it to speak with the PartyServer.
-    #     # 4) The OAuth2 sends a token, refresh token, TTL and scopes.
-    #     # 5) The ras_frontstage requests survey data from the Party Service.
-    #     # 6) The Party Servie replys with survey data.
-    #     # This means we need to mock 2) 4) and  6)
-    # 
-    #     mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)
-    #     mock_object.post(url_create_user, status_code=200, json={"account": "testuser2@email.com", "created": "success"})
-    #     mock_object.post(url_get_token, status_code=200, json=returned_token)
-    #     mock_object.post(url_get_party_data, status_code=200, json={})
-    # 
-    #     # A POST with valid user data should reveal the page
-    #     self.headers['referer'] = 'register/create-account/enter-account-details'
-    #     response = self.app.post('/register/create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
-    # 
-    #     # Check that the correct details are displayed on the screen after it is successfully accessed
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertTrue(bytes('Please follow the link in the email to confirm your email address and finish setting up your account.',
-    #                           encoding='UTF-8') in response.data)
-
-    # TODO This test needs to be uncommented and fixed. It was broken when oauth changes were committed to master on approx 13/7/2017
-    # @requests_mock.mock()
-    # def test_create_duplicate_account(self, mock_object):
-    #     """Test create a duplicate account returns 'try a different email this ones in use' """
-    #
-    #     # Build URL's which is used to talk to the OAuth2 server
-    #     url_get_token = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_TOKEN_ENDPOINT
-    #     url_create_user = TestingConfig.ONS_OAUTH_PROTOCOL + TestingConfig.ONS_OAUTH_SERVER + TestingConfig.ONS_ADMIN_ENDPOINT
-    #     url_get_party_data = TestingConfig.API_GATEWAY_PARTY_URL + 'respondents'
-    #
-    #     mock_object.post(url_get_token, status_code=200, json=returned_token)
-    #     mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)
-    #     mock_object.post(url_get_party_data, status_code=200)
-    #
-    #     # Here we place a listener on this URL. This is the URL of the OAuth2 server. We send a 401 to reject the request
-    #     # from the ras_frontstage to get a token for this user. See application.py login()
-    #
-    #     mock_object.post(url_create_user, status_code=401, json={"detail": "Duplicate user credentials"})
-    #
-    #     # A POST with replicated user data response from the mock should reveal the page
-    #     self.headers['referer'] = 'create-account/enter-account-details'
-    #     response = self.app.post('create-account/enter-account-details', query_string=params, data=self.test_user, headers=self.headers)
-    #
-    #     # Check that the correct details are displayed on the screen after it is successfully accessed
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertTrue(bytes('Please try a different email, this one is in use', encoding='UTF-8') in response.data)
+        self.assertTrue('Please check the phone_number'.encode() in response.data)

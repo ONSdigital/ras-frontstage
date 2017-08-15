@@ -71,11 +71,6 @@ class TestApplication(unittest.TestCase):
         # now compare that values are the same in the dictionary
         self.assertEqual(my_decoded_dictionary, data_dict_for_jwt_token)
 
-    # TODO Fix this test?
-    # Test we get an error when our token is zero length
-    # def test_encode_bad_data(self):
-    #     self.assertEqual(encode(data_dict_zero_length), 'No data')
-
     # TODO Test that over a certain size our encode returns the correct error and handles gracefully
 
     # Test that we can decode our token
@@ -85,11 +80,11 @@ class TestApplication(unittest.TestCase):
     # By passing a correct token this function should get a HTTP 200
     # data={"error": {"type": "success"}}
     def test_logged_in(self):
-        "Testing Logged In"
-        response = self.app.get('/surveys/', headers=self.headers)
+        """Testing Logged In"""
+        response = self.app.get('/surveys/', headers=self.headers, follow_redirects=True)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes('Error! You are not logged in!', encoding='UTF-8') in response.data)
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue('Not logged in'.encode() in response.data)
 
     # By passing an incorrect token this function should get an HTTP 200 with a data dictionary  type set as failed
     # data={"error": {"type": "failed"}}
@@ -97,12 +92,10 @@ class TestApplication(unittest.TestCase):
     def test_sign_in_page(self):
         """Test user sign in appears"""
 
-        response = self.app.get('/sign-in/', headers=self.headers)
+        response = self.app.get('/sign-in/', headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Sign in', response.data)
-        self.assertTrue('Email Address', response.data)
-        self.assertTrue('Password', response.data)
+        self.assertTrue('Have an enrolment code?'.encode() in response.data)
 
     # Test we get an incorrect email or password message when a user who does not exist on the OAuth2 server sign's in
     # We are using the requests_mock library to fake the call to an OAuth2 server. See: https://requests-mock.readthedocs.io/en/latest/response.html
@@ -117,34 +110,32 @@ class TestApplication(unittest.TestCase):
         mock_object.post(url, status_code=401, json={'detail': 'Unauthorized user credentials'})
 
         # Lets send a post message to the ras_frontstage at the endpoint /sign-in.
-        response = self.app.post('/sign-in/', data={'username': 'test@test.com', 'password': 'test'}, headers=self.headers)
+        response = self.app.post('/sign-in/', data={'username': 'test@test.com', 'password': 'test'}, headers=self.headers, follow_redirects=True)
 
         # Our system should still handle this.
         self.assertEqual(response.status_code, 200)
-
-        # Check this guy has an incorrect email.
-        self.assertTrue(bytes('Incorrect email or password', encoding='UTF-8') in response.data)
+        self.assertTrue('Incorrect email or password'.encode() in response.data)
 
     def test_sign_in_no_email(self):
         """Test no email message is returned with no email entered"""
-        response = self.app.post('/sign-in/', data={'username': '', 'password': 'test'}, headers=self.headers)
+        response = self.app.post('/sign-in/', data={'username': '', 'password': 'test'}, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes('Email Address is required', encoding='UTF-8') in response.data)
+        self.assertTrue('Have an enrolment code?'.encode() in response.data)
 
     def test_sign_in_no_password(self):
         """Test no password message is returned with no password entered"""
-        response = self.app.post('/sign-in/', data={'username': 'test@test.test', 'password': ''}, headers=self.headers)
+        response = self.app.post('/sign-in/', data={'username': 'test@test.test', 'password': ''}, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes('Password is required', encoding='UTF-8') in response.data)
+        self.assertTrue('Have an enrolment code?'.encode() in response.data)
 
     def test_sign_in_no_details(self):
         """Test multiple error message is returned when no details entered"""
-        response = self.app.post('/sign-in/', data={'username': '', 'password': ''}, headers=self.headers)
+        response = self.app.post('/sign-in/', data={'username': '', 'password': ''}, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes('There are 2 errors on this page', encoding='UTF-8') in response.data)
+        self.assertTrue('Have an enrolment code?'.encode() in response.data)
 
     # Test we get survey data once a user signs in properly. This means we have to mock up OAuth2 server sending a
     # Token. The ras_frontstage will then send a request for data to the API Gateway / Party Service, we Mock this too

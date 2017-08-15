@@ -2,7 +2,7 @@ import logging
 import os
 
 from flask import Blueprint, json, redirect, render_template, request, session, url_for
-from ons_ras_common.ons_decorators import jwt_session
+from frontstage.common.authorisation import jwt_authorization
 import requests
 from structlog import wrap_logger
 
@@ -61,7 +61,7 @@ def get_collection_case(party_id):
     url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
     collection_response = requests.get(url)
     if collection_response.status_code == 204:
-        logger.error("No case found for party id: {}".format(session['party_id']))
+        logger.error('"event" : "No case found for party id", "ID" : "{}"'.format(party_id))
         return redirect(url_for('error_bp.default_error_page'))
     elif collection_response.status_code != 200:
         raise ExternalServiceError(collection_response)
@@ -75,7 +75,7 @@ def get_collection_case(party_id):
 
 
 @secure_message_bp.route('/create-message', methods=['GET', 'POST'])
-@jwt_session(request)
+@jwt_authorization(request)
 def create_message(session):
     """Handles sending of new message"""
 
@@ -96,37 +96,39 @@ def create_message(session):
             return message_check_response(data)
 
         if request.form['submit'] == 'Save draft':
-            if "msg_id" in request.form:
+            if "msg_id" in request.form and len(request.form['msg_id']) != 0:
                 data['msg_id'] = request.form['msg_id']
                 headers['Authorization'] = request.cookies['authorization']
                 response = requests.put(DRAFT_PUT_API_URL.format(request.form['msg_id']), data=json.dumps(data), headers=headers)
                 if response.status_code == 400:
                     get_json = json.loads(response.content)
-                    return render_template('secure-messages-draft.html', _theme='default', draft=data, errors=get_json)
+                    return render_template('secure-messages/secure-messages-draft.html', _theme='default', draft=data, errors=get_json)
                 elif response.status_code != 200:
                     raise ExternalServiceError(response)
+
             else:
                 response = requests.post(DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
                 if response.status_code == 400:
                     get_json = json.loads(response.content)
-                    return render_template('secure-messages-draft.html', _theme='default', draft=data, errors=get_json)
+                    return render_template('secure-messages/secure-messages-draft.html', _theme='default', draft=data, errors=get_json)
                 elif response.status_code != 201:
                     raise ExternalServiceError(response)
 
             response_data = json.loads(response.text)
-            logger.debug(response_data['msg_id'])
+            logger.debug('"event" : "save draft response", "Data" : ' + response_data['msg_id'])
             get_draft = requests.get(DRAFT_GET_API_URL.format(response_data['msg_id']), headers=headers)
 
             if get_draft.status_code != 200:
                 raise ExternalServiceError(get_draft)
             get_json = json.loads(get_draft.content)
-            return render_template('secure-messages-draft.html', _theme='default', draft=get_json, errors={})
+            return render_template('secure-messages/secure-messages-draft.html', _theme='default', draft=get_json, errors={})
 
-    return render_template('secure-messages-create.html', _theme='default', draft={})
+    return render_template('secure-messages/secure-messages-create.html', _theme='default', draft={})
+
 
 
 @secure_message_bp.route('/reply-message', methods=['GET', 'POST'])
-@jwt_session(request)
+@jwt_authorization(request)
 def reply_message(session):
     """Handles replying to an existing message"""
 
@@ -136,7 +138,7 @@ def reply_message(session):
 
     if request.method == 'POST':
         if request.form['submit'] == 'Send':
-            logger.info("Reply to Message")
+            logger.info('"event" : "Reply to Message"')
             data = {'msg_to': ['BRES'],
                     'msg_from': session['party_id'],
                     'subject': request.form['secure-message-subject'],
@@ -166,28 +168,34 @@ def reply_message(session):
                 response = requests.put(DRAFT_PUT_API_URL.format(request.form['msg_id']), data=json.dumps(data), headers=headers)
                 if response.status_code == 400:
                     get_json = json.loads(response.content)
-                    return render_template('secure-messages-draft.html', _theme='default', draft=data, data=get_json)
+                    return render_template('secure-messages/secure-messages-draft.html',
+                                           _theme='default',
+                                           draft=data,
+                                           errors=get_json)
                 elif response.status_code != 200:
                     raise ExternalServiceError(response)            
             else:
                 response = requests.post(DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
                 if response.status_code == 400:
                     get_json = json.loads(response.content)
-                    return render_template('secure-messages-draft.html', _theme='default', draft=data, data=get_json)
+                    return render_template('secure-messages/secure-messages-draft.html',
+                                           _theme='default',
+                                           draft=data,
+                                           errors=get_json)
                 elif response.status_code != 201:
                     raise ExternalServiceError(response)
 
             response_data = json.loads(response.text)
-            logger.debug(response_data['msg_id'])
+            logger.debug('"event" : "save draft response", "Data" : ' + response_data['msg_id'])
             get_draft = requests.get(DRAFT_GET_API_URL.format(response_data['msg_id']), headers=headers)
 
             if get_draft.status_code != 200:
                 raise ExternalServiceError(get_draft)
             get_json = json.loads(get_draft.content)
 
-            return render_template('secure-messages-draft.html', _theme='default', draft=get_json)
+            return render_template('secure-messages/secure-messages-draft.html', _theme='default', draft=get_json)
 
-    return render_template('secure-messages-create.html', _theme='default')
+    return render_template('secure-messages/secure-messages-create.html', _theme='default', draft={})
 
 
 def message_check_response(data):
@@ -195,17 +203,16 @@ def message_check_response(data):
     response = requests.post(CREATE_MESSAGE_API_URL, data=json.dumps(data), headers=headers)
     if response.status_code == 400:
         get_json = json.loads(response.content)
-        return render_template('secure-messages-create.html', _theme='default', draft=data, errors=get_json)
+        return render_template('secure-messages/secure-messages-create.html', _theme='default', draft=data, errors=get_json)
     elif response.status_code != 201:
-        return ExternalServiceError(response)
+        raise ExternalServiceError(response)
     response_data = json.loads(response.text)
-    logger.debug(response_data.get('msg_id', 'No response data.'))
-    return render_template('message-success-temp.html', _theme='default')
-
+    logger.debug('"event" : "check response data", "Data" : ' + response_data.get('msg_id', 'No response data.'))
+    return render_template('secure-messages/message-success-temp.html', _theme='default')
 
 @secure_message_bp.route('/messages/', methods=['GET'])
 @secure_message_bp.route('/messages/<label>', methods=['GET'])
-@jwt_session(request)
+@jwt_authorization(request)
 def messages_get(session, label="INBOX"):
     """Gets users messages"""
 
@@ -228,12 +235,12 @@ def messages_get(session, label="INBOX"):
         if "UNREAD" in response_data['messages'][x]["labels"]:
             total_msgs += 1
 
-    return render_template('secure-messages.html', _theme='default', messages=response_data['messages'],
+    return render_template('secure-messages/secure-messages.html', _theme='default', messages=response_data['messages'],
                            links=response_data['_links'], label=label, total=total_msgs)
 
 
 @secure_message_bp.route('/draft/<draft_id>', methods=['GET'])
-@jwt_session(request)
+@jwt_authorization(request)
 def draft_get(session, draft_id):
     """Get draft message"""
     url = DRAFT_GET_API_URL.format(draft_id)
@@ -245,11 +252,25 @@ def draft_get(session, draft_id):
 
     draft = json.loads(get_draft.text)
 
-    return render_template('secure-messages-draft.html', _theme='default', draft=draft)
+    return render_template('secure-messages/secure-messages-draft.html', _theme='default', draft=draft)
 
+
+@secure_message_bp.route('/sent/<sent_id>', methods=['GET'])
+@jwt_authorization(request)
+def sent_get(session, sent_id):
+    """Get sent message"""
+    url = MESSAGE_GET_URL.format(sent_id)
+    get_sent = requests.get(url, headers=headers)
+
+    if get_sent.status_code != 200:
+        raise ExternalServiceError(get_sent)
+
+    sent = json.loads(get_sent.text)
+
+    return render_template('secure-messages/secure-messages-sent-view.html', _theme='default', message=sent)
 
 @secure_message_bp.route('/message/<msg_id>', methods=['GET'])
-@jwt_session(request)
+@jwt_authorization(request)
 def message_get(session, msg_id):
     """Get message"""
 
@@ -265,4 +286,4 @@ def message_get(session, msg_id):
             raise ExternalServiceError(get_message)
         message = json.loads(get_message.text)
 
-        return render_template('secure-messages-view.html', _theme='default', message=message)
+        return render_template('secure-messages/secure-messages-view.html', _theme='default', message=message)

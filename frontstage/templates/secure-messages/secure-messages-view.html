@@ -1,4 +1,4 @@
-{% extends "messages.html" %}
+{% extends "secure-messages/messages.html" %}
 
 {% block page_title %}Secure message view{% endblock %}
 
@@ -21,7 +21,7 @@
                 {% endif %}
             </dd>
             <dt class="grid__col col-2@s">Sent:</dt>
-            <dd class="grid__col col-10@s">{{ message['sent_date'] }}</dd>
+            <dd class="grid__col col-10@s">{{ message['sent_date'][:19] }}</dd>
         </dl>
     </div>
 
@@ -39,16 +39,14 @@
                     class="secure-message-form__subject input input--text"
                     type="text"
                     name="secure-message-subject"
-                    value="{{ message['subject']}}"
-                    required/>
+                    value="{{ message['subject']}}"/>
             {% else %}
                 <input
                     id="secure-message-subject"
                     class="secure-message-form__subject input input--text"
                     type="text"
                     name="secure-message-subject"
-                    value="Re: {{message['subject']}}"
-                    required/>
+                    value="Re: {{message['subject']}}"/>
             {% endif %}
         </fieldset>
 

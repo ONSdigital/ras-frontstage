@@ -77,7 +77,7 @@ Send secure message
 
                     <input class="btn btn--secondary" type="submit" name ="submit" value="Save draft" id="draft">
                     <input class="btn" type="submit" name='submit' value="Send" id="send-message">
-                    <p><a href="{{ url_for('secure_message_bp.messages_get') }}">Cancel</a></p>
+                    <p><a href="{{ url_for('secure_message_bp.messages_get', label='DRAFT') }}">Cancel</a></p>
                 </form>
             </div>
         </div>

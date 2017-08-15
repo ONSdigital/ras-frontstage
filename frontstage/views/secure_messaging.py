@@ -74,15 +74,32 @@ def get_collection_case(party_id):
     return collection_case
 
 
+def get_survey_id(party_id):
+    url = app.config['RAS_PARTY_GET_BY_RESPONDENT'].format(app.config['RAS_PARTY_SERVICE'], party_id)
+    survey_response = requests.get(url)
+    if survey_response.status_code == 204:
+        logger.error('"event" : "No case found for party id", "ID" : "{}"'.format(party_id))
+        return redirect(url_for('error_bp.default_error_page'))
+    elif survey_response.status_code != 200:
+        raise ExternalServiceError(survey_response)
+    survey_response_json = survey_response.json()
+    associations = survey_response_json.get('associations')
+    if associations:
+        survey_name = associations[0].get('enrolments')[0].get('surveyId')
+    else:
+        survey_name = None
+
+    return survey_name
+
+
 @secure_message_bp.route('/create-message', methods=['GET', 'POST'])
 @jwt_authorization(request)
 def create_message(session):
     """Handles sending of new message"""
-
     party_id = session['party_id']
     collection_case = get_collection_case(party_id)
     ru_id = get_party_ru_id(party_id)
-
+    survey_name = get_survey_id(party_id)
     if request.method == 'POST':
         data = {'msg_to': ['BRES'],
                 'msg_from': session['party_id'],
@@ -90,7 +107,7 @@ def create_message(session):
                 'body': request.form['secure-message-body'],
                 'collection_case': collection_case,
                 'ru_id': ru_id,
-                'survey': 'BRES'}
+                'survey': survey_name}
 
         if request.form['submit'] == 'Send':
             return message_check_response(data)
@@ -134,6 +151,7 @@ def reply_message(session):
     party_id = session['party_id']
     ru_id = get_party_ru_id(party_id)
     collection_case = get_collection_case(party_id)
+    survey_name = get_survey_id(party_id)
 
     if request.method == 'POST':
         if request.form['submit'] == 'Send':
@@ -145,7 +163,7 @@ def reply_message(session):
                     'thread_id': '',
                     'collection_case': collection_case,
                     'ru_id': ru_id,
-                    'survey': 'BRES'}
+                    'survey': survey_name}
 
             # Message already saved as draft
             if "msg_id" in request.form:

@@ -1,0 +1,16 @@
+{% import 'partials/section.html' as section %}
+{% extends "layouts/_twocol.html" %}
+{% set errorType = data['error']['type'] %}
+
+{% block page_title %}Error page{% endblock %}
+
+{% block main %}
+        <h1 class="saturn">404 Page not found</h1>
+
+        <div class="panel panel--simple panel--error">
+
+            <p>The page you were looking for does not exist or some other error occured</p>
+            <p><a id="please-login" href="{{ url_for('surveys_bp.logged_in') }}">Return to your todo page</a></p>
+
+        </div>
+{% endblock main %}

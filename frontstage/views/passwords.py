@@ -1,4 +1,5 @@
 import logging
+from os import getenv
 
 from flask import Blueprint, render_template, request, redirect, url_for
 from structlog import wrap_logger
@@ -24,7 +25,9 @@ def forgot_password():
         # TODO do some kind of back end processing to validate the email address, error handling, logging
         # print('Email address=' + email_address)
 
-        return redirect(url_for('passwords_bp.forgot_password_check_email'))
+        return redirect(url_for('passwords_bp.forgot_password_check_email',
+                                _external=True,
+                                _scheme=getenv('SCHEME', 'http')))
 
     template_data = {
         "error": {

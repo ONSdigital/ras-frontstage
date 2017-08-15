@@ -1,0 +1,15 @@
+{% import 'partials/section.html' as section %}
+{% extends "layouts/_twocol.html" %}
+{% set errorType = data['error']['type'] %}
+
+{% block page_title %}Not logged in{% endblock %}
+
+{% block main %}
+    <h1 class="saturn">Error! You are not logged in!</h1>
+    <div class="panel panel--simple panel--error">
+    <p>You can not access protected endpoints. <a href="{{ url_for('sign_in_bp.login') }}"> Please Login first from here.</a></p>
+    {% if errorType == "failed" %}
+        <p>Perhaps you have cleared your session cookies, or browsing from a different browser without logging in on that browser?</p>
+    {% endif %}
+    </div>
+{% endblock main %}

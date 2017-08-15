@@ -1,0 +1,20 @@
+{
+  "@msg_from":
+  {
+    "id": "db036fd7-ce17-40c2-a8fc-932e7c228397"
+  },
+  "@msg_to": [
+    {
+      "id": "BRES"
+    }
+  ],
+  "@ru_id":
+  {
+    "business_name": "Apple",
+    "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc"
+  },
+  "body": "body",
+  "subject": "subject",
+  "labels": ["DRAFT"],
+  "sent_date": "2017-08-09 15:26:50.371175"
+}

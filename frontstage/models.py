@@ -4,6 +4,7 @@ This module contains the data model for the application
 import logging
 
 import phonenumbers
+import enum
 from flask_wtf import FlaskForm
 from phonenumbers.phonenumberutil import NumberParseException
 from structlog import wrap_logger
@@ -111,7 +112,7 @@ class RegistrationForm(FlaskForm):
 
     def validate_phone_number(form, field):
         try:
-            logger.debug("Checking this is a valid GB Number")
+            logger.debug('"event" : "Checking this is a valid GB Number"')
             input_number = phonenumbers.parse(field.data, "GB")  # Tell the parser we are looking for a GB number
 
             if not (phonenumbers.is_possible_number(input_number)):
@@ -120,7 +121,7 @@ class RegistrationForm(FlaskForm):
             if not (phonenumbers.is_valid_number(input_number)):
                 raise ValidationError('Please use a valid UK number e.g. 01632 496 0018.')
         except NumberParseException:
-            logger.debug(" There is a number parse exception in the phonenumber field")
+            logger.debug('"event" : "There is a number parse exception in the phonenumber field"')
             raise ValidationError('This should be a valid UK number e.g. 01632 496 0018. ')
 
     def validate_password(form, field):
@@ -169,3 +170,9 @@ class ResetPasswordForm(FlaskForm):
                                                 max=app.config['PASSWORD_MAX_LENGTH'],
                                                 message=app.config['PASSWORD_CRITERIA_ERROR_TEXT'])])
     password_confirm = PasswordField('Re-type new password')
+
+
+class RespondentStatus(enum.IntEnum):
+    CREATED = 0
+    ACTIVE = 1
+    SUSPENDED = 2

@@ -79,40 +79,16 @@ def post_event(case_id, description=None, category=None, party_id=None, created_
     #   Call the poster, returning the actual status and text to the caller
     #
 
-    ons_env.logger.info(message)
+
+    ons_env.logger.info("Posting case event: {} for case_id: {} party_id: {} ".format(category, case_id, party_id))
 
     headers = {'Content-Type': 'application/json'}
     resp = requests.post(
                     '{}cases/{}/events'.format(app.config['RM_CASE_SERVICE'], case_id),
                     data=dumps(message),
                     headers=headers)
-    if resp.status_code == 200:
-        ons_env.logger.debug('case event posted OK')
-        return 200, 'OK'
 
-    ons_env.logger.debug(loads(resp.text))
+    if resp.status_code != 201:
+        ons_env.logger.debug(str(loads(resp.text)))
+
     return resp.status_code, {'code': resp.status_code, 'text': resp.text}
-
-# TODO: this commented code should probably make it's way into the imminent integration testing
-#
-#if __name__ == '__main__':
-#    """
-#    Try a test post against the currently defined case logging service.
-#    HINT: set RM_CASE_SERVICE_PORT and RM_CASE_SERVICE_HOST
-#    """
-#    ons_env.setup()
-#    post_event(
-#        'ab548d78-c2f1-400f-9899-79d944b87300',
-#        description="Test Event",
-#        category='UNSUCCESSFUL_RESPONSE_UPLOAD',
-#        party_id='db036fd7-ce17-40c2-a8fc-932e7c228397',
-#        created_by='SYSTEM',
-#        payload=None)
-
-#    post_event(
-#        'ab548d78-c2f1-400f-9899-79d944b87300',
-#        description="Test Event",
-#        category='SUCCESSFUL_RESPONSE_UPLOAD',
-#        party_id='db036fd7-ce17-40c2-a8fc-932e7c228397',
-#        created_by='SYSTEM',
-#        payload=None)

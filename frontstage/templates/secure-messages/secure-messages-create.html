@@ -1,0 +1,72 @@
+{% extends "secure-messages/messages.html" %}
+
+{% set errors = errors %}
+
+{% block page_title %}
+Send secure message
+{% endblock %}
+
+{% block messages %}
+
+    {% include 'secure-messages/message-error-summary.html' %}
+
+    <div class="grid grid--reverse">
+        <div class="grid__col col-4@m"></div>
+        <div class="grid__col col-7@m pull-1@m">
+            <h1 class="saturn">Create message</h1>
+
+            <div class="secure-message-form">
+                <form method="post">
+                    <p>To: ONS Business Surveys team</p>
+
+                    {% if "subject" in errors %}
+                    <div class="panel panel--simple panel--error panel--spacious">
+                    <p class="error-message">{{ errors['subject'][0] }}</p>
+                    {% endif %}
+
+                    <fieldset>
+                        <label for="secure-message-subject">Subject</label>
+                        <input
+                            id="secure-message-subject"
+                            class="secure-message-form__subject input input--text"
+                            type="text"
+                            name="secure-message-subject"
+                            value="{{ draft['subject'] }}" />
+                    </fieldset>
+
+                    {% if "subject" in errors %}
+                    </div>
+                    {% endif %}
+
+                    <br />
+
+                    {% if "body" in errors %}
+                    <div class="panel panel--simple panel--error panel--spacious">
+                        <p class="error-message">{{ errors['body'][0] }}</p>
+                    {% endif %}
+
+                    <fieldset>
+                        <label for="secure-message-body">Message</label>
+                        <textarea
+                            id="secure-message-body"
+                            class="secure-message-form__body input"
+                            rows="10"
+                            name="secure-message-body">{{ draft['body'] }}</textarea>
+                    </fieldset>
+
+                    {% if "body" in errors %}
+                    </div>
+                    {% endif %}
+
+                    <br/>
+
+                    <input class="btn btn--secondary" type="submit" name="submit" value="Save draft" id="draft">
+                    <input class="btn" type="submit" name='submit' value="Send" id="send-message">
+
+                    <p><a href="{{ url_for('secure_message_bp.messages_get') }}">Cancel</a></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock messages %}

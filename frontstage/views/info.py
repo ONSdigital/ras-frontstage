@@ -1,21 +1,28 @@
+import json
 import logging
+from pathlib import Path
 
-from flask import jsonify, Blueprint
+from flask import Blueprint, jsonify, make_response
 from structlog import wrap_logger
+
+from frontstage import app
 
 logger = wrap_logger(logging.getLogger(__name__))
 
 info_bp = Blueprint('info_bp', __name__, static_folder='static', template_folder='templates')
 
+_health_check = {}
+if Path('git_info').exists():
+    with open('git_info') as io:
+        _health_check = json.loads(io.read())
+
 
 @info_bp.route('/', methods=['GET'])
 def get_info():
-    """Rest endpoint to provide application information"""
-    details = {'name': 'secure_message',
-               'version': '0.0.1',
-               'origin': 'https://github.com/ONSdigital/ras-secure-message.git',
-               'commit': 'not specified',
-               'branch': 'not specified',
-               'built': '01-01-1900 00:00:00.000'}
+    info = {
+        "name": app.config['NAME'],
+        "version": app.config['VERSION'],
+    }
+    info = dict(_health_check, **info)
 
-    return jsonify(details)
+    return make_response(jsonify(info), 200)

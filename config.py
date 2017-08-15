@@ -40,6 +40,9 @@ class Config(object):
     """
     Base config class
     """
+    NAME = os.getenv('NAME', 'ras-frontstage')
+    VERSION = os.getenv('VERSION', '0.1.0')
+
     DEBUG = False
     TESTING = False
     CSRF_ENABLED = False

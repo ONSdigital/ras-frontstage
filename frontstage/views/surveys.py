@@ -240,10 +240,13 @@ def upload_survey(session):
         logger.debug('Upload successful')
         return render_template('surveys/surveys-upload-success.html', _theme='default', upload_filename=upload_filename)
     else:
-        logger.debug('Upload failed')
-        if result.text is None:
+        logger.error('Upload failed. url: {}, status code: {}'.format(url, result.status_code))
+        if type(result.text) == str:
             logger.error('Upload failed due to error')
+            error_info = {'status code': result.status_code,
+                          'message': result.text}
+            return render_template('surveys/surveys-upload-failure.html', _theme='default', error_info=error_info,
+                                   case_id=case_id)
         else:
             error_info = json.loads(result.text)
-        return render_template('surveys/surveys-upload-failure.html',  _theme='default', error_info=error_info,
-                               case_id=case_id)
+            return render_template('surveys/surveys-upload-failure.html',  _theme='default', error_info=error_info, case_id=case_id)

@@ -12,6 +12,9 @@ if __name__ == '__main__':
     if cf.detected:
         port = cf.port
         protocol = cf.protocol
+        logger.info('* Cloud Foundry environment detected.')
+        logger.info('* Cloud Foundry port "{}"'.format(port))
+        logger.info('* Cloud Foundry protocol "{}'.format(protocol))
     else:
         port = os.getenv('FS_DEV_PORT', 5001)
     logger.info('* starting listening port "{}"'.format(port))

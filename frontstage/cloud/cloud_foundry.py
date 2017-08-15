@@ -3,9 +3,8 @@ import cfenv
 
 class ONSCloudFoundry(object):
 
-    def __init__(self, env):
+    def __init__(self):
 
-        self._env = env
         self._cf_env = cfenv.AppEnv()
         self._host = self._cf_env.uris[0].split(':') if self.detected else 'localhost'
         self._protocol = 'https' if self.detected else 'http'

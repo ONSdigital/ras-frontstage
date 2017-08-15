@@ -5,7 +5,7 @@ import requests_mock
 
 from frontstage import app
 from frontstage.exceptions.exceptions import ExternalServiceError
-from frontstage.views.secure_messaging import get_collection_case, get_party_ru_id
+from frontstage.views.secure_messaging import get_collection_case, get_party_ru_id, get_survey_id
 
 
 with open('tests/test_data/cases.json') as json_data:
@@ -94,6 +94,13 @@ class TestSecureMessage(unittest.TestCase):
 
         with app.app_context():
             self.assertRaises(ExternalServiceError, lambda: get_party_ru_id("db036fd7-ce17-40c2-a8fc-932e7c228397"))
+
+    @requests_mock.mock()
+    def test_get_survey_id_failure(self, mock_object):
+        mock_object.get(url_ru_id_get_by_party, status_code=500)
+
+        with app.app_context():
+            self.assertRaises(ExternalServiceError, lambda: get_survey_id("db036fd7-ce17-40c2-a8fc-932e7c228397"))
 
     @requests_mock.mock()
     def test_create_message_get(self, mock_object):

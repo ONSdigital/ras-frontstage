@@ -11,8 +11,8 @@ from frontstage.views.secure_messaging import get_collection_case
 with open('tests/test_data/cases.json') as json_data:
     cases_data = json.load(json_data)
 
-with open('tests/test_data/draft_message.json') as json_data:
-    draft_message_data = json.load(json_data)
+with open('tests/test_data/example_message.json') as json_data:
+    example_message_data = json.load(json_data)
 
 with open('tests/test_data/messages_get.json') as json_data:
     messages_get_data = json.load(json_data)
@@ -22,9 +22,11 @@ url_case_get_by_party = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM
 url_sm_create_message = 'http://localhost:5050/message/send'
 url_sm_save_draft = 'http://localhost:5050/draft/save'
 url_sm_modify_draft = 'http://localhost:5050/draft/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb/modify'
+url_sm_modify_message = 'http://localhost:5050/message/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb/modify'
 url_sm_get_draft = 'http://localhost:5050/draft/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
 url_sm_get_messages = 'http://localhost:5050/messages?limit=1000'
 url_sm_get_single_draft = 'http://localhost:5050/draft/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
+url_sm_get_single_message = 'http://localhost:5050/message/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
 
 encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoX3Rva2VuIjoiNmY5NjM0ZGEtYTI3ZS00ZDk3LWJhZjktNjN" \
                     "jOGRjY2IyN2M2IiwiYWNjZXNzX3Rva2VuIjoiMjUwMDM4YzUtM2QxOS00OGVkLThlZWMtODFmNTQyMDRjNDE1Iiwic2NvcGU" \
@@ -126,7 +128,7 @@ class TestSecureMessage(unittest.TestCase):
     def test_create_message_post_draft_new_success(self, mock_object):
         mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
         mock_object.post(url_sm_save_draft, status_code=201, json=self.send_response)
-        mock_object.get(url_sm_get_draft, status_code=200, json=draft_message_data)
+        mock_object.get(url_sm_get_draft, status_code=200, json=example_message_data)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
         self.message_form['submit'] = 'Save draft'
 
@@ -163,7 +165,7 @@ class TestSecureMessage(unittest.TestCase):
     def test_create_message_post_draft_old_success(self, mock_object):
         mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
         mock_object.put(url_sm_modify_draft, status_code=200, json=self.send_response)
-        mock_object.get(url_sm_get_draft, status_code=200, json=draft_message_data)
+        mock_object.get(url_sm_get_draft, status_code=200, json=example_message_data)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
         self.message_form['submit'] = 'Save draft'
         self.message_form['msg_id'] = '7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
@@ -200,6 +202,156 @@ class TestSecureMessage(unittest.TestCase):
         self.assertTrue(bytes("500", encoding='UTF-8') in response.data)
 
     @requests_mock.mock()
+    def test_reply_message_get(self, mock_object):
+        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
+
+        response = self.app.get("secure-message/reply-message")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(bytes("Create message", encoding='UTF-8') in response.data)
+
+    def test_reply_message_get_not_logged_in(self):
+        response = self.app.get("secure-message/reply-message", follow_redirects=True)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(bytes("not logged in", encoding='UTF-8') in response.data)
+
+    @requests_mock.mock()
+    def test_reply_message_post_new_success(self, mock_object):
+        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.post(url_sm_create_message, status_code=201, json=self.send_response)
+        self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
+
+        response = self.app.post("secure-message/reply-message", data=self.message_form)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(bytes("Message sent", encoding='UTF-8') in response.data)
+
+    @requests_mock.mock()
+    def test_reply_message_post_400(self, mock_object):
+        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.post(url_sm_create_message, status_code=400, json=self.send_error_response)
+        self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
+
+        response = self.app.post("secure-message/reply-message", data=self.message_form)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(bytes("must be corrected", encoding='UTF-8') in response.data)
+
+    @requests_mock.mock()
+    def test_reply_message_post_new_500(self, mock_object):
+        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.post(url_sm_create_message, status_code=500)
+        self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
+
+        response = self.app.post("secure-message/reply-message", data=self.message_form)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(bytes("errors", encoding='UTF-8'))
+
+    @requests_mock.mock()
+    def test_reply_message_post_old_success(self, mock_object):
+        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.post(url_sm_create_message, status_code=201, json=self.send_response)
+        self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
+        self.message_form['msg_id'] = '7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
+
+        response = self.app.post("secure-message/reply-message", data=self.message_form)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(bytes("Message sent", encoding='UTF-8') in response.data)
+
+    @requests_mock.mock()
+    def test_reply_message_post_old_500(self, mock_object):
+        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.post(url_sm_create_message, status_code=500)
+        self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
+        self.message_form['msg_id'] = '7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
+
+        response = self.app.post("secure-message/reply-message", data=self.message_form)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(bytes("errors", encoding='UTF-8'))
+
+    @requests_mock.mock()
+    def test_reply_message_post_draft_new_success(self, mock_object):
+        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.post(url_sm_save_draft, status_code=201, json=self.send_response)
+        mock_object.get(url_sm_get_draft, status_code=200, json=example_message_data)
+        self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
+        self.message_form['submit'] = 'Save draft'
+
+        response = self.app.post("secure-message/reply-message", data=self.message_form)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(bytes("Draft saved", encoding='UTF-8') in response.data)
+
+    @requests_mock.mock()
+    def test_reply_message_post_draft_new_400(self, mock_object):
+        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.post(url_sm_save_draft, status_code=400, json=self.send_error_response)
+        self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
+        self.message_form['submit'] = 'Save draft'
+
+        response = self.app.post("secure-message/reply-message", data=self.message_form)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(bytes("must be correct", encoding='UTF-8') in response.data)
+
+    @requests_mock.mock()
+    def test_reply_message_post_draft_new_500(self, mock_object):
+        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.post(url_sm_save_draft, status_code=500)
+        self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
+        self.message_form['submit'] = 'Save draft'
+
+        response = self.app.post("secure-message/reply-message", data=self.message_form)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(bytes("errors", encoding='UTF-8'))
+
+    @requests_mock.mock()
+    def test_reply_message_post_draft_old_success(self, mock_object):
+        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.put(url_sm_modify_draft, status_code=200, json=self.send_response)
+        mock_object.get(url_sm_get_draft, status_code=200, json=example_message_data)
+        self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
+        self.message_form['submit'] = 'Save draft'
+        self.message_form['msg_id'] = '7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
+
+        response = self.app.post("secure-message/reply-message", data=self.message_form)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(bytes("Draft saved", encoding='UTF-8') in response.data)
+
+    @requests_mock.mock()
+    def test_reply_message_post_draft_old_400(self, mock_object):
+        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.put(url_sm_modify_draft, status_code=400, json=self.send_error_response)
+        self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
+        self.message_form['submit'] = 'Save draft'
+        self.message_form['msg_id'] = '7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
+
+        response = self.app.post("secure-message/reply-message", data=self.message_form)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(bytes("must be correct", encoding='UTF-8') in response.data)
+
+    @requests_mock.mock()
+    def test_reply_message_post_draft_new_500(self, mock_object):
+        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.put(url_sm_modify_draft, status_code=500)
+        self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
+        self.message_form['submit'] = 'Save draft'
+        self.message_form['msg_id'] = '7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
+
+        response = self.app.post("secure-message/reply-message", data=self.message_form)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(bytes("errors", encoding='UTF-8') in response.data)
+
+    @requests_mock.mock()
     def test_get_messages_success(self, mock_object):
         mock_object.get(url_sm_get_messages, status_code=200, json=messages_get_data)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
@@ -221,7 +373,7 @@ class TestSecureMessage(unittest.TestCase):
 
     @requests_mock.mock()
     def test_get_single_draft_success(self, mock_object):
-        mock_object.get(url_sm_get_single_draft, status_code=200, json=draft_message_data)
+        mock_object.get(url_sm_get_single_draft, status_code=200, json=example_message_data)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
 
         response = self.app.get("secure-message/draft/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb", data=self.message_form, follow_redirects=True)
@@ -235,6 +387,35 @@ class TestSecureMessage(unittest.TestCase):
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
 
         response = self.app.get("secure-message/draft/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb", data=self.message_form, follow_redirects=True)
+        
+    @requests_mock.mock()
+    def test_get_single_message_success(self, mock_object):
+        mock_object.put(url_sm_modify_message, status_code=200, json=example_message_data)
+        mock_object.get(url_sm_get_single_message, status_code=200, json=example_message_data)
+        self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
 
-        self.assertEqual(response.status_code, 500)
-        self.assertTrue(bytes("500", encoding='UTF-8') in response.data)
+        response = self.app.get("secure-message/message/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb", data=self.message_form)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(bytes("Reply", encoding='UTF-8') in response.data)
+
+    @requests_mock.mock()
+    def test_get_single_message_get_failure(self, mock_object):
+        mock_object.put(url_sm_modify_message, status_code=200, json=example_message_data)
+        mock_object.get(url_sm_get_single_message, status_code=500)
+        self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
+
+        response = self.app.get("secure-message/message/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb", data=self.message_form)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(bytes("errors", encoding='UTF-8') in response.data)
+
+    @requests_mock.mock()
+    def test_get_single_message_modify_failure(self, mock_object):
+        mock_object.put(url_sm_modify_message, status_code=500, json=example_message_data)
+        self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
+
+        response = self.app.get("secure-message/message/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb", data=self.message_form)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(bytes("errors", encoding='UTF-8') in response.data)

@@ -110,6 +110,10 @@ def create_message(session):
                 'ru_id': ru_id,
                 'survey': survey_name}
 
+        # Message already saved as draft
+        if "msg_id" in request.form:
+            data["msg_id"] = request.form['msg_id']
+
         if request.form['submit'] == 'Send':
             return message_check_response(data)
 

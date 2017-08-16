@@ -45,7 +45,7 @@ def get_party_ru_id(party_id):
     party_response = requests.get(url)
     if party_response.status_code == 404:
         logger.error("No respondent with party_id: {}".format(party_id))
-        return redirect(url_for('error_bp.default_error_page'))
+        return None
     elif party_response.status_code != 200:
         raise ExternalServiceError(party_response)
     party_response_json = party_response.json()
@@ -62,24 +62,19 @@ def get_collection_case(party_id):
     collection_response = requests.get(url)
     if collection_response.status_code == 204:
         logger.error('"event" : "No case found for party id", "ID" : "{}"'.format(party_id))
-        return redirect(url_for('error_bp.default_error_page'))
+        return None
     elif collection_response.status_code != 200:
         raise ExternalServiceError(collection_response)
     collection_response_json = collection_response.json()
-    collection_id = collection_response_json[0].get('id')
-    if collection_id:
-        collection_case = collection_id
-    else:
-        collection_case = None
-    return collection_case
+    return collection_response_json[0].get('id')
 
 
 def get_survey_id(party_id):
     url = app.config['RAS_PARTY_GET_BY_RESPONDENT'].format(app.config['RAS_PARTY_SERVICE'], party_id)
     survey_response = requests.get(url)
-    if survey_response.status_code == 204:
+    if survey_response is None:
         logger.error('"event" : "No case found for party id", "ID" : "{}"'.format(party_id))
-        return redirect(url_for('error_bp.default_error_page'))
+        return None
     elif survey_response.status_code != 200:
         raise ExternalServiceError(survey_response)
     survey_response_json = survey_response.json()
@@ -96,11 +91,17 @@ def get_survey_id(party_id):
 @jwt_authorization(request)
 def create_message(session):
     """Handles sending of new message"""
-    party_id = session['party_id']
-    collection_case = get_collection_case(party_id)
-    ru_id = get_party_ru_id(party_id)
-    survey_name = get_survey_id(party_id)
     if request.method == 'POST':
+        party_id = session['party_id']
+        collection_case = get_collection_case(party_id)
+        if collection_case is None:
+            return redirect(url_for('error_bp.default_error_page'))
+        ru_id = get_party_ru_id(party_id)
+        if ru_id is None:
+            return redirect(url_for('error_bp.default_error_page'))
+        survey_name = get_survey_id(party_id)
+        if survey_name is None:
+            return redirect(url_for('error_bp.default_error_page'))
         data = {'msg_to': ['BRES'],
                 'msg_from': session['party_id'],
                 'subject': request.form['secure-message-subject'],
@@ -122,7 +123,6 @@ def create_message(session):
                     return render_template('secure-messages/secure-messages-draft.html', _theme='default', draft=data, errors=get_json)
                 elif response.status_code != 200:
                     raise ExternalServiceError(response)
-
             else:
                 response = requests.post(DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
                 if response.status_code == 400:
@@ -148,12 +148,18 @@ def create_message(session):
 def reply_message(session):
     """Handles replying to an existing message"""
 
-    party_id = session['party_id']
-    ru_id = get_party_ru_id(party_id)
-    collection_case = get_collection_case(party_id)
-    survey_name = get_survey_id(party_id)
-
     if request.method == 'POST':
+        party_id = session['party_id']
+        collection_case = get_collection_case(party_id)
+        if collection_case is None:
+            return redirect(url_for('error_bp.default_error_page'))
+        ru_id = get_party_ru_id(party_id)
+        if ru_id is None:
+            return redirect(url_for('error_bp.default_error_page'))
+        survey_name = get_survey_id(party_id)
+        if survey_name is None:
+            return redirect(url_for('error_bp.default_error_page'))
+
         if request.form['submit'] == 'Send':
             logger.info('"event" : "Reply to Message"')
             data = {'msg_to': ['BRES'],
@@ -190,7 +196,7 @@ def reply_message(session):
                                            draft=data,
                                            errors=get_json)
                 elif response.status_code != 200:
-                    raise ExternalServiceError(response)            
+                    raise ExternalServiceError(response)
             else:
                 response = requests.post(DRAFT_SAVE_API_URL, data=json.dumps(data), headers=headers)
                 if response.status_code == 400:

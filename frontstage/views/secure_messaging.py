@@ -106,6 +106,7 @@ def create_message(session):
                 'msg_from': session['party_id'],
                 'subject': request.form['secure-message-subject'],
                 'body': request.form['secure-message-body'],
+                'thread_id': '',
                 'collection_case': collection_case,
                 'ru_id': ru_id,
                 'survey': survey_name}
@@ -113,7 +114,6 @@ def create_message(session):
         # Message already saved as draft
         if "msg_id" in request.form:
             data["msg_id"] = request.form['msg_id']
-            data["thread_id"] = request.form['msg_id']
 
         if request.form['submit'] == 'Send':
             return message_check_response(data)

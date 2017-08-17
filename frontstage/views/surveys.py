@@ -31,7 +31,7 @@ def build_survey_data(session, status_filter):
     # url = app.config['API_GATEWAY_AGGREGATED_SURVEYS_URL'] + 'todo/' + party_id
 
     url = app.config['RAS_AGGREGATOR_TODO'].format(app.config['RAS_API_GATEWAY_SERVICE'], session.get('party_id'))
-    logger.debug('"event" : "build survey url", "URL" : "{}"'.format(url))
+    logger.debug('Retrieving survey data', url=url)
     req = requests.get(url, headers=headers, params=status_filter, verify=False)
 
     return req.json()
@@ -88,7 +88,11 @@ def access_survey(session):
         period_end = request.form.get('period_end', None)
         submit_by = request.form.get('submit_by', None)
 
-        logger.info("Survey access requested for collection instrument {} by user {} for case {}".format(collection_instrument_id, party_id, case_id))
+        logger.info('Survey access requested',
+                    collection_instrument=collection_instrument_id,
+                    party_id=party_id,
+                    case=case_id)
+
         # TODO: Authorization - this is *not* DRY and should be refactored
         #
         #   Need a check here to make sure that party_id is allowed to access collection_instrument_id
@@ -97,24 +101,27 @@ def access_survey(session):
         url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
         req = requests.get(url, verify=False)
         if req.status_code != 200:
-            logger.error('"event" : "unable to lookup cases for party", "PartyID" : "{}"'.format(party_id))
+            logger.error('Failed to retrieve case', party_id=party_id)
             raise ExternalServiceError
 
-        logger.debug('"event" : "successfully read cases for party", "PartyID" : "{}"'.format(party_id))
+        logger.debug('Successfully read cases for party', party_id=party_id)
         valid = False
         for case in req.json():
             if case.get('collectionInstrumentId') == collection_instrument_id:
-                logger.debug('"event" : "case matches collection_instrument_id", "CI_ID" : "{}"'.format(collection_instrument_id))
+                logger.debug('Party has permission to access collection instrument',
+                             party_id=party_id,
+                             collection_instrument_id=collection_instrument_id)
                 valid = True
                 break
 
         if not valid:
-            logger.error('"event" : "Party does not have access to instrument", "party" : "{}", "instrument" : "{}"'
-                         .format(party_id, collection_instrument_id))
+            logger.error('Party does not have permission to access collection instrument',
+                         party_id=party_id,
+                         collection_instrument_id=collection_instrument_id)
             return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
         url = app.config['RAS_CI_GET'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], collection_instrument_id)
-        logger.debug('"event" : "Access survey URL", "URL" : "{}"'.format(url))
+        logger.debug('Retrieving collection instrument', url=url)
         req = requests.get(url, verify=False)
 
         if req.status_code != 200:
@@ -131,7 +138,9 @@ def access_survey(session):
         collection_instrument_id = request.args.get('cid')
         case_id = request.args.get('case_id')
 
-        logger.info("Download request for collection instrument {} by user {} for case {}".format(collection_instrument_id, party_id, case_id))
+        logger.info('Attempting to download collection instrument', party_id=party_id,
+                    collection_instrument_id=collection_instrument_id,
+                    case_id=case_id)
 
         # TODO: Authorization - this is *not* DRY and should be refactored
         #
@@ -141,26 +150,30 @@ def access_survey(session):
         url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
         req = requests.get(url, verify=False)
         if req.status_code != 200:
-            logger.error('"event" : "unable to lookup cases for party", "PartyID" : "{}"'.format(party_id))
+            logger.error('Failed to retrieve case', party_id=party_id)
             raise ExternalServiceError(req)
 
-        logger.debug('"event" : "successfully read cases for party", "PartyID" : "{}"'.format(party_id))
+        logger.debug('Successfully read cases for party', party_id=party_id)
         valid = False
         for case in req.json():
             if case.get('collectionInstrumentId') == collection_instrument_id:
-                logger.debug('"event" : "case matches Collection Instrument ID", "CID"'
-                             ' : "{}"'.format(collection_instrument_id))
+                logger.debug('Party has permission to access collection instrument',
+                             party_id=party_id,
+                             collection_instrument_id=collection_instrument_id)
                 valid = True
                 break
 
         if not valid:
-            logger.error('"event" : "party does not have access to instrument", "party" : "{}", "instrument" '
-                         ': "{}"'.format(party_id, collection_instrument_id))
+            logger.warning('Party does not have permission to access collection instrument',
+                           party_id=party_id,
+                           collection_instrument_id=collection_instrument_id)
             return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
         url = app.config['RAS_CI_DOWNLOAD'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], collection_instrument_id)
-        logger.info('"event" : "User downloaded collection instrument for case", "User" : "{}", "CID" : "{}", '
-                    '"Case" : "{}"'.format(party_id, collection_instrument_id, case_id))
+        logger.info('Successfully downloaded collection instrument',
+                    party_id=party_id,
+                    collection_instrument_id=collection_instrument_id,
+                    case_id=case_id)
         response = requests.get(url, verify=False)
 
         category = 'COLLECTION_INSTRUMENT_DOWNLOADED' if response.status_code == 200 else 'COLLECTION_INSTRUMENT_ERROR'
@@ -170,14 +183,17 @@ def access_survey(session):
                                party_id=party_id,
                                description='Instrument {} downloaded by {} for case {}'.format(collection_instrument_id, party_id, case_id))
         if code != 201:
-            logger.error('"event" : "status code error", "Code" : "{}"'.format(code))
+            ##### REPLACE THIS WHEN WE REMOVE post_event #####
+            logger.error('status code error', code=code)
             logger.error(str(msg))
 
         if response.status_code == 200:
             return response.content, response.status_code, response.headers.items()
         else:
-            logger.error('"event" : "collection instrument download failed", "Collection Instrument" : '
-                         '"{}", "Status code" : "{}"'.format(collection_instrument_id, response.status_code))
+            logger.error('Failed to download collection instrument',
+                         collection_instrument_id=collection_instrument_id,
+                         party_id=party_id,
+                         status_code=response.status_code)
             return render_template('surveys/surveys-download-failure.html', _theme='default', error_info=request.args.get('error_info', None))
 
 
@@ -189,7 +205,7 @@ def upload_survey(session):
     party_id = session.get('party_id', 'no-party-id')
     case_id = request.args.get('case_id', None)
 
-    logger.info('Survey upload attempt by user {} for case {}'.format(party_id, case_id))
+    logger.info('Attempting to upload survey', party_id=party_id, case_id=case_id)
 
     # TODO: Authorization - this is *not* DRY and should be refactored (GB)
     #
@@ -199,20 +215,23 @@ def upload_survey(session):
     url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
     req = requests.get(url, verify=False)
     if req.status_code != 200:
-        logger.error('"event" : "unable to lookup cases for party", "PartyID" : "{}"'.format(party_id))
+        logger.error('Failed to retrieve case', party_id=party_id)
         raise ExternalServiceError(req)
 
-    logger.debug('"event" : "successfully read cases for party", "PartyID" : "{}"'.format(party_id))
+    logger.debug('Successfully read cases for party', party_id=party_id)
     valid = False
     for case in req.json():
         if case.get('id') == case_id:
-            logger.debug('"event" : "case id matches case id", "Case_id" : "{}"'.format(case_id))
+            logger.debug('Party has permission to upload survey',
+                           party_id=party_id,
+                           case_id=case_id)
             valid = True
             break
 
     if not valid:
-        logger.error('"event" : "party cannot access case", "PartyID" : "{}", "Case" '
-                     ': "{}"'.format(party_id, case_id))
+        logger.warning('Party does not have permission to upload survey',
+                       party_id=party_id,
+                       case_id=case_id)
         return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
     # TODO - Add security headers ??
@@ -226,27 +245,25 @@ def upload_survey(session):
 
     # Build the URL
     url = app.config['RAS_CI_UPLOAD'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], case_id)
-    logger.debug('"event" : "upload survey URL", "URL" : "{}"'.format(url))
+    logger.info('Attempting to upload survey', url=url, case_id=case_id, party_id=party_id)
 
     # Call the API Gateway Service to upload the selected file
     result = requests.post(url, headers, files=upload_file, verify=False)
-    logger.debug('"event" : "API call results", "status_code" : "{}", "reason" : "{}", "text" : "{}"'
-                 .format(result.status_code, result.reason, result.text))
+    logger.debug('Upload survey response', result=result.status_code, reason=result.reason, text=result.text)
 
     category = 'SUCCESSFUL_RESPONSE_UPLOAD' if result.status_code == 200 else 'UNSUCCESSFUL_RESPONSE_UPLOAD'
     code, msg = post_event(case_id,
-                              category=category,
-                              created_by='FRONTSTAGE',
-                              party_id=party_id,
-                              description='Survey response for case {} uploaded by {}'.format(case_id, party_id))
+                           category=category,
+                           created_by='FRONTSTAGE',
+                           party_id=party_id,
+                           description='Survey response for case {} uploaded by {}'.format(case_id, party_id))
     if code != 201:
-        logger.error('"event" : "status code error", "Code" : "{}"'.format(code))
-        logger.error(str(msg))
+        logger.error('Error posting to case service', status_code=code, error_message=str(msg))
 
     if result.status_code == 200:
-        logger.debug('"event" : "Upload successful"')
+        logger.info('Upload successful', party_id=party_id, case_id=case_id)
         return render_template('surveys/surveys-upload-success.html', _theme='default', upload_filename=upload_filename)
     else:
-        logger.error('Upload failed. url: {}, status code: {}'.format(url, result.status_code))
+        logger.error('Upload failed', status_code=result.status_code, party_id=party_id, case_id=case_id)
         error_info = {'status code': result.status_code, 'text': result.text}
         return render_template('surveys/surveys-upload-failure.html', _theme='default', error_info=error_info, case_id=case_id)

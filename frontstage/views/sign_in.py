@@ -45,19 +45,19 @@ def login():
             token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=app.config['RAS_FRONTSTAGE_CLIENT_ID'],
                                       client_secret=app.config['RAS_FRONTSTAGE_CLIENT_SECRET'])
 
-            logger.debug('"event" : "Access Token Granted"')
+            logger.debug('Access Token Granted')
 
         except MissingTokenError as e:
-            logger.warning('"event" : Missing token, "Token" : "{}"'.format(e))
-            logger.warning('"event" : "Failed validation"')
+            logger.warning('Missing token', exception=e)
             return render_template('sign-in/sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
 
         url = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], username)
         req = requests.get(url, verify=False)
         if req.status_code != 200:
-            logger.error('"event" : "unable to fetch email", "Username" : "{}"'.format(username))
+            logger.error('Email not found in party service', email=username)
             raise ExternalServiceError(req)
 
+        ##### THIS EXCEPTION CAN NEVER BE HIT??? #####
         try:
             party_id = req.json().get('id')
         except Exception as e:
@@ -76,7 +76,6 @@ def login():
         }
 
         encoded_jwt_token = encode(data_dict_for_jwt_token)
-        logger.info('Encoded JWT {}'.format(encoded_jwt_token))
         response = make_response(redirect(url_for('surveys_bp.logged_in',
                                                   _external=True,
                                                   _scheme=getenv('SCHEME', 'http'))))

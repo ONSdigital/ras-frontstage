@@ -340,7 +340,7 @@ def register_activate_account(token):
                                 _external=True,
                                 _scheme=getenv('SCHEME', 'http')))
     else:
-        logger.error('Token status is not ACTIVE and status code is not 409', status_code=result.status_code)
+        logger.error('Token status is not ACTIVE and status code is not 409 (You shouldnt get here)', status_code=result.status_code)
         return redirect(url_for('error_bp.default_error_page'))
 
 

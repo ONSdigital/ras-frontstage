@@ -248,6 +248,5 @@ def upload_survey(session):
         return render_template('surveys/surveys-upload-success.html', _theme='default', upload_filename=upload_filename)
     else:
         logger.error('Upload failed. url: {}, status code: {}'.format(url, result.status_code))
-        error_info = {'status code': result.status_code,
-                      'text': result.text}
+        error_info = {'status code': result.status_code, 'text': result.text}
         return render_template('surveys/surveys-upload-failure.html', _theme='default', error_info=error_info, case_id=case_id)

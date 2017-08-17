@@ -90,7 +90,7 @@ class TestRegistration(unittest.TestCase):
     @requests_mock.mock()
     def test_enter_enrolment_code_page(self, mock_object):
         # GET the Create Account (Enter Enrolment Code) page
-        response = self.app.get('/register/create-account/', headers=self.headers)
+        response = self.app.get('/register/create-account', headers=self.headers)
 
         # Check successful response and the correct values are on the page
         self.assertEqual(response.status_code, 200)
@@ -117,7 +117,7 @@ class TestRegistration(unittest.TestCase):
         mock_object.get(url_get_survey, status_code=200, json=survey_json)
 
         # A GET request with the correct enrolment codes should bring up the page
-        response = self.app.get('/register/create-account/confirm-organisation-survey/', query_string=params, headers=self.headers, follow_redirects=True)
+        response = self.app.get('/register/create-account/confirm-organisation-survey', query_string=params, headers=self.headers, follow_redirects=True)
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
@@ -131,7 +131,7 @@ class TestRegistration(unittest.TestCase):
         mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)
 
         # A POST with an invalid or inactive enrolment code should result in an error page being displayed
-        response = self.app.get('/register/create-account/confirm-organisation-survey/', query_string=params, headers=self.headers, follow_redirects=True)
+        response = self.app.get('/register/create-account/confirm-organisation-survey', query_string=params, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Oops!'.encode() in response.data)

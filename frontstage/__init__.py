@@ -14,6 +14,8 @@ app = Flask(__name__)
 app_config = os.environ.get('APP_SETTINGS', 'config.DevelopmentConfig')
 app.config.from_object(app_config)
 
+app.url_map.strict_slashes = False
+
 app.jinja_env.filters['case_status_filter'] = case_status_filter
 app.jinja_env.filters['file_size_filter'] = file_size_filter
 

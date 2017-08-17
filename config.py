@@ -40,6 +40,9 @@ class Config(object):
     """
     Base config class
     """
+    NAME = os.getenv('NAME', 'ras-frontstage')
+    VERSION = os.getenv('VERSION', '0.1.0')
+
     DEBUG = False
     TESTING = False
     CSRF_ENABLED = False
@@ -130,6 +133,7 @@ class Config(object):
     RAS_CI_DOWNLOAD = '{}collection-instrument-api/1.0.2/download/{}'
     RM_CASE_GET = '{}cases/{}'
     RAS_PARTY_GET_BY_BUSINESS = '{}party-api/v1/businesses/id/{}'
+    RAS_PARTY_GET_BY_RESPONDENT = '{}party-api/v1/respondents/id/{}'
     RM_COLLECTION_EXERCISES_GET = '{}collectionexercises/{}'
     RM_SURVEY_GET = '{}surveys/{}'
     RAS_PARTY_POST_RESPONDENTS = '{}party-api/v1/respondents'

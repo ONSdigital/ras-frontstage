@@ -331,41 +331,47 @@ def register_activate_account(token):
 
     # Call the Party service to try to activate the account corresponding to the token that was supplied
     url = app.config['RAS_PARTY_VERIFY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], token)
+    logger.info('trying to verify email', URL=url)
     result = requests.put(url)
-    logger.debug('"event" : "call party service", "URL" : "{}"'.format(result.content))
 
-    if result.status_code == 200:
+    if result.status_code == 409:
+        # Token is expired
         json_response = json.loads(result.text)
-
-        if json_response.get('status') == RespondentStatus.ACTIVE.name:
-            # Successful account activation therefore redirect off to the login screen
-            return redirect(url_for('sign_in_bp.login',
-                                    account_activated=True,
+        party_id = json_response.get('id')
+        if party_id:
+            logger.warning("expired token", token=token, party_id=party_id)
+            return redirect(url_for('register_bp.register_resend_email',
+                                    party_id=party_id,
                                     _external=True,
                                     _scheme=getenv('SCHEME', 'http')))
         else:
-            # Try to get the user id
-            user_id = json_response.get('id')
-            if user_id:
-                # Unable to activate account therefore give the user the option to send out a new email token
-                logger.debug('"event" : "expired token", "Token" : "{}"'.format(str(token)))
-                return redirect(url_for('register_bp.register_resend_email',
-                                        user_id=user_id,
-                                        _external=True,
-                                        _scheme=getenv('SCHEME', 'http')))
-            else:
-                logger.error('"event" : "unverified user token", "Token" : "{}"'.format(str(token)))
-                return redirect(url_for('error_bp.default_error_page'))
+            logger.error("unverified user token", token=token)
+            return redirect(url_for('error_bp.default_error_page'))
+    elif result.status_code == 404:
+        # Token not recognised
+        logger.warning("unrecognised email token", token=token)
+        return redirect(url_for('error_bp.not_found_error_page'))
     elif result.status_code != 200:
-        # If the token was not recognised, we don't know who the user is so redirect them off to the error page
-        logger.warning('"event" : "unrecognised email token", "Token" : "{}", "Response code" : "{}"'.format(str(token), (str(result.status_code))))
+        raise ExternalServiceError(result)
+
+    json_response = json.loads(result.text)
+
+    if json_response.get('status') == RespondentStatus.ACTIVE.name:
+        # Successful account activation therefore redirect off to the login screen
+        logger.info('user account validated', party_id=json_response.get('id'))
+        return redirect(url_for('sign_in_bp.login',
+                                account_activated=True,
+                                _external=True,
+                                _scheme=getenv('SCHEME', 'http')))
+    else:
+        logger.error('token status is not ACTIVE and status code is not 409', status_code=result.status_code)
         return redirect(url_for('error_bp.default_error_page'))
 
 
 @register_bp.route('/create-account/resend-email', methods=['GET'])
 def register_resend_email():
-    user_id = request.args.get('user_id', None)
-    return render_template('register/register.link-expired.html', _theme='default', user_id=user_id)
+    user_id = request.args.get('party_id', None)
+    return render_template('register/register.link-expired.html', _theme='default', party_id=user_id)
 
 
 @register_bp.route('/create-account/email-resent', methods=['GET'])

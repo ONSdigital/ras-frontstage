@@ -48,7 +48,7 @@ def login():
             logger.debug('Access Token Granted')
 
         except MissingTokenError as e:
-            logger.warning('Missing token', exception=e)
+            logger.warning('Missing token', exception=str(e))
             return render_template('sign-in/sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
 
         url = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], username)
@@ -61,7 +61,7 @@ def login():
         try:
             party_id = req.json().get('id')
         except Exception as e:
-            logger.error('error trying to get username from party service', exception=e)
+            logger.error('error trying to get username from party service', exception=str(e))
             return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
         data_dict_for_jwt_token = {

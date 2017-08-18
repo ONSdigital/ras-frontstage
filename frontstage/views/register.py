@@ -263,7 +263,7 @@ def register_enter_your_details():
             return abort(500, '{"event" : "There was a problem with the Authentication service please contact a member of the ONS staff"}')
 
         except MissingTokenError as e:
-            logger.warning('Missing token error', exception=e)
+            logger.warning('Missing token error', exception=str(e))
             return abort(500, '{"event" : "There was a problem with the Authentication service please contact a member of the ONS staff"}')
 
         # Step 2

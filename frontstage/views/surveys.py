@@ -1,4 +1,3 @@
-import json
 import logging
 
 from flask import Blueprint, render_template, request
@@ -115,13 +114,13 @@ def access_survey(session):
                 break
 
         if not valid:
-            logger.error('Party does not have permission to access collection instrument',
-                         party_id=party_id,
-                         collection_instrument_id=collection_instrument_id)
+            logger.warning('Party does not have permission to access collection instrument',
+                           party_id=party_id,
+                           collection_instrument_id=collection_instrument_id)
             return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
         url = app.config['RAS_CI_GET'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], collection_instrument_id)
-        logger.debug('Retrieving collection instrument', url=url)
+        logger.info('Retrieving collection instrument', url=url)
         req = requests.get(url, verify=False)
 
         if req.status_code != 200:
@@ -223,8 +222,8 @@ def upload_survey(session):
     for case in req.json():
         if case.get('id') == case_id:
             logger.debug('Party has permission to upload survey',
-                           party_id=party_id,
-                           case_id=case_id)
+                         party_id=party_id,
+                         case_id=case_id)
             valid = True
             break
 
@@ -243,11 +242,9 @@ def upload_survey(session):
     upload_filename = upload_file.filename
     upload_file = {'file': (upload_filename, upload_file.stream, upload_file.mimetype, {'Expires': 0})}
 
-    # Build the URL
+    # Upload the survey
     url = app.config['RAS_CI_UPLOAD'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], case_id)
     logger.info('Attempting to upload survey', url=url, case_id=case_id, party_id=party_id)
-
-    # Call the API Gateway Service to upload the selected file
     result = requests.post(url, headers, files=upload_file, verify=False)
     logger.debug('Upload survey response', result=result.status_code, reason=result.reason, text=result.text)
 

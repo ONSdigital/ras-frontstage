@@ -61,8 +61,7 @@ def login():
         try:
             party_id = req.json().get('id')
         except Exception as e:
-            logger.error(str(e))
-            logger.error('"event" : "error trying to get username from party service"')
+            logger.error('error trying to get username from party service', exception=e)
             return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
         data_dict_for_jwt_token = {

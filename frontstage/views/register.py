@@ -58,7 +58,7 @@ def validate_enrolment_code(enrolment_code):
 
 
 # ===== Registration =====
-@register_bp.route('/create-account/', methods=['GET', 'POST'])
+@register_bp.route('/create-account', methods=['GET', 'POST'])
 def register():
     """Handles user registration"""
 
@@ -118,7 +118,7 @@ def register():
     return render_template('register/register.enter-enrolment-code.html', _theme='default', form=form, data=template_data)
 
 
-@register_bp.route('/create-account/confirm-organisation-survey/', methods=['GET', 'POST'])
+@register_bp.route('/create-account/confirm-organisation-survey', methods=['GET', 'POST'])
 def register_confirm_organisation_survey():
 
     encrypted_enrolment_code = request.args.get('enrolment_code', None)
@@ -321,7 +321,7 @@ def register_enter_your_details():
     return render_template('register/register.enter-your-details.html', _theme='default', form=form, errors=form.errors)
 
 
-@register_bp.route('/create-account/check-email/')
+@register_bp.route('/create-account/check-email')
 def register_almost_done():
     return render_template('register/register.almost-done.html', _theme='default')
 

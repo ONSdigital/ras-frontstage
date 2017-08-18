@@ -13,7 +13,7 @@ passwords_bp = Blueprint('passwords_bp', __name__, static_folder='static', templ
 
 
 # ===== Forgot password =====
-@passwords_bp.route('/forgot-password/', methods=['GET', 'POST'])
+@passwords_bp.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
 
     form = ForgotPasswordForm(request.form)
@@ -38,7 +38,7 @@ def forgot_password():
     return render_template('passwords/forgot-password.html', _theme='default', form=form, data=template_data)
 
 
-@passwords_bp.route('/forgot-password/check-email/', methods=['GET', 'POST'])
+@passwords_bp.route('/forgot-password/check-email', methods=['GET', 'POST'])
 def forgot_password_check_email():
     return render_template('passwords/forgot-password.check-email.html', _theme='default')
 
@@ -71,6 +71,6 @@ def reset_password(token):
     return render_template('passwords/reset-password.html', _theme='default', form=form, data=template_data)
 
 
-@passwords_bp.route('/reset-password/confirmation/', methods=['GET', 'POST'])
+@passwords_bp.route('/reset-password/confirmation', methods=['GET', 'POST'])
 def reset_password_confirmation():
     return render_template('passwords/reset-password.confirmation.html', _theme='default')

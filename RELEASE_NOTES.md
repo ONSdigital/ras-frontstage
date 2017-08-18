@@ -1,16 +1,21 @@
 Front Stage Server
 ============================
 
-Author: Nicholas Herriot
-Version: 0.1.0
+Author: Andrew Millar
+Version: 0.2.0
 
 Changes For ras-front-stage Server
 ============================================
 
-This is the first formal release of the Front Stage Server. 
+* Updated logging content and format
+* Fixed HTTP redirect errors
+* survey_id and ru_id no longer hardcoded for secure messages
+* Improved error handling from external services
+* Fixed bug where draft was still saved after sending
 
- 
+
 Known Issues For Front Stage Server
 ============================================
 * Sign in with 10 bad passwords does not show you a different error message
 * HTTP 500 errors are displayed on the screen when coming from other micro services
+* Error when logging in with unverified user

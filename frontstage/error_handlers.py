@@ -28,7 +28,7 @@ def connection_error(error):
 
 @app.errorhandler(ConnectionError)
 def connection_error(error):
-    logger.error("Failed to connect to {}".format(error.request.url))
+    logger.error('Failed to connect to external service', url=error.request.url)
     return redirect(url_for('error_bp.server_error_page',
                             _external=True,
                             _scheme=getenv('SCHEME', 'http')))
@@ -36,7 +36,7 @@ def connection_error(error):
 
 @app.errorhandler(ExternalServiceError)
 def connection_error(error):
-    logger.error("Error in external service at: {} status code: {}".format(error.url, error.status_code))
+    logger.error('Error in external service', status_code=error.status_code, url=error.url)
     return redirect(url_for('error_bp.server_error_page',
                             _external=True,
                             _scheme=getenv('SCHEME', 'http')))

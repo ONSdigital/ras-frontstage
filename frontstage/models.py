@@ -112,7 +112,7 @@ class RegistrationForm(FlaskForm):
 
     def validate_phone_number(form, field):
         try:
-            logger.debug('"event" : "Checking this is a valid GB Number"')
+            logger.debug('Checking this is a valid GB phone number')
             input_number = phonenumbers.parse(field.data, "GB")  # Tell the parser we are looking for a GB number
 
             if not (phonenumbers.is_possible_number(input_number)):
@@ -121,7 +121,7 @@ class RegistrationForm(FlaskForm):
             if not (phonenumbers.is_valid_number(input_number)):
                 raise ValidationError('Please use a valid UK number e.g. 01632 496 0018.')
         except NumberParseException:
-            logger.debug('"event" : "There is a number parse exception in the phonenumber field"')
+            logger.debug('There is a number parse exception in the phonenumber field')
             raise ValidationError('This should be a valid UK number e.g. 01632 496 0018. ')
 
     def validate_password(form, field):

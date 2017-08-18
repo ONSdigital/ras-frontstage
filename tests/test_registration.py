@@ -238,7 +238,7 @@ class TestRegistration(unittest.TestCase):
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Please check the phone_number'.encode() in response.data)
+        self.assertTrue('Please check the phone number'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_account_register_illegal_phone_number(self, mock_object):
@@ -255,7 +255,7 @@ class TestRegistration(unittest.TestCase):
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Please check the phone_number'.encode() in response.data)
+        self.assertTrue('Please check the phone number'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_account_register_phone_number_too_small(self, mock_object):
@@ -272,7 +272,7 @@ class TestRegistration(unittest.TestCase):
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Please check the phone_number'.encode() in response.data)
+        self.assertTrue('Please check the phone number'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_account_register_phone_number_too_big(self, mock_object):
@@ -289,4 +289,4 @@ class TestRegistration(unittest.TestCase):
 
         # Check that the correct details are displayed on the screen after it is successfully accessed
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Please check the phone_number'.encode() in response.data)
+        self.assertTrue('Please check the phone number'.encode() in response.data)

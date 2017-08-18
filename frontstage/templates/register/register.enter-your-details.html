@@ -19,7 +19,7 @@
             <div class="panel__body" data-qa="error-body">
                 {% for error in errors %}
                     {% set error_text = 'passwords' if error == 'password' else error %}
-                    <p class="mars"><a class="js-inpagelink" href="#{{error}}_field">Please check the {{error_text}} and try again</a></p>
+                    <p class="mars"><a class="js-inpagelink" href="#{{error}}_field">Please check the {{error_text.replace('_', ' ')}} and try again</a></p>
                 {% endfor %}
             </div>
         </div>

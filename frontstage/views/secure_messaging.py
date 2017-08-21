@@ -12,7 +12,8 @@ from frontstage.exceptions.exceptions import ExternalServiceError
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-headers = {}
+headers = {"Content-Type": "application/json"}
+
 modify_data = {'action': '',
                'label': ''}
 

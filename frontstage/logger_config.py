@@ -16,7 +16,7 @@ def logger_initial_config(service_name=None,
     if not log_level:
         log_level = os.getenv('SMS_LOG_LEVEL', 'INFO')
     if not logger_format:
-        logger_format = "%(message)s"
+        logger_format = "%(message)s , 'file'='%(name)s', 'line_number'=%(lineno)s"
     if not service_name:
         service_name = os.getenv('NAME', 'ras-frontstage')
 
@@ -30,10 +30,10 @@ def logger_initial_config(service_name=None,
     logging.basicConfig(level=log_level,
                         format=logger_format)
     configure(processors=[add_log_level,
-                          filter_by_level,
-                          add_service,
-                          TimeStamper(fmt=logger_date_format, utc=True, key="created_at"),
-                          JSONRenderer(indent=1)])
+              filter_by_level,
+              add_service,
+              TimeStamper(fmt=logger_date_format, utc=True, key="created_at"),
+              JSONRenderer(indent=1)])
     oauth_log = logging.getLogger("requests_oauthlib")
     oauth_log.addHandler(logging.NullHandler())
     oauth_log.propagate = False

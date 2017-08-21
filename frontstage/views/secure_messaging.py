@@ -12,7 +12,7 @@ from frontstage.exceptions.exceptions import ExternalServiceError
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-headers = {}
+headers = {"Content-Type": "application/json"}
 
 modify_data = {'action': '',
                'label': ''}
@@ -193,7 +193,9 @@ def reply_message(session):
 
             if "msg_id" in request.form:
                 data['msg_id'] = request.form['msg_id']
-                response = requests.put(DRAFT_PUT_API_URL.format(request.form['msg_id']), data=json.dumps(data), headers=headers)
+                response = requests.put(DRAFT_PUT_API_URL.format(request.form['msg_id']),
+                                        data=json.dumps(data),
+                                        headers=headers)
                 if response.status_code == 400:
                     get_json = json.loads(response.content)
                     return render_template('secure-messages/secure-messages-draft.html',

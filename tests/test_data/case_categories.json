@@ -1,0 +1,30 @@
+[
+  {
+    "group": "None",
+    "name": "COLLECTION_INSTRUMENT_DOWNLOADED",
+    "longDescription": "Collection Instrument Downloaded",
+    "shortDescription": "Collection Instrument Downloaded",
+    "role": "None"
+  },
+  {
+    "group": "None",
+    "name": "COLLECTION_INSTRUMENT_ERROR",
+    "longDescription": "Collection Instrument Error",
+    "shortDescription": "Collection Instrument Error",
+    "role": "None"
+  },
+  {
+    "group": "None",
+    "name": "SUCCESSFUL_RESPONSE_UPLOAD",
+    "longDescription": "Successful Response Upload",
+    "shortDescription": "Successful Response Upload",
+    "role": "None"
+  },
+  {
+    "group": "None",
+    "name": "UNSUCCESSFUL_RESPONSE_UPLOAD",
+    "longDescription": "Unsuccessful Response Upload",
+    "shortDescription": "Unsuccessful Response Upload",
+    "role": "None"
+  }
+]

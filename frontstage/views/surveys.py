@@ -16,23 +16,13 @@ surveys_bp = Blueprint('surveys_bp', __name__, static_folder='static', template_
 
 
 def build_survey_data(session, status_filter):
-    """Helper method used to query for Surveys (To Do and History)"""
-
-    # #done# TODO - Derive the Party Id
-    # party_id = "3b136c4b-7a14-4904-9e01-13364dd7b972"
     party_id = session.get('party_id', 'no-party-id')
-
-    # TODO - Add security headers
-    # headers = {'authorization': jwttoken}
-    headers = {}
-
-    # Call the API Gateway Service to get the To Do survey list
-    # url = app.config['API_GATEWAY_AGGREGATED_SURVEYS_URL'] + 'todo/' + party_id
-
-    url = app.config['RAS_AGGREGATOR_TODO'].format(app.config['RAS_API_GATEWAY_SERVICE'], session.get('party_id'))
-    logger.debug('Retrieving survey data', url=url)
-    req = requests.get(url, headers=headers, params=status_filter, verify=False)
-
+    logger.debug('Retrieving survey data', party_id)
+    url = app.config['RAS_AGGREGATOR_TODO'].format(app.config['RAS_API_GATEWAY_SERVICE'], party_id)
+    req = requests.get(url, params=status_filter, verify=False)
+    if req.status_code != 200:
+        logger.error('Failed to retrieve survey')
+        ExternalServiceError(req)
     return req.json()
 
 

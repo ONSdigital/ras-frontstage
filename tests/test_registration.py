@@ -2,7 +2,6 @@ import json
 import unittest
 
 import requests_mock
-from ons_ras_common import ons_env
 
 from frontstage import app
 
@@ -94,6 +93,36 @@ class TestRegistration(unittest.TestCase):
 
         # Check successful response and the correct values are on the page
         self.assertEqual(response.status_code, 200)
+        self.assertTrue(bytes('Create an account', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('Enrolment Code', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('You\'ll find this in the letter we sent you', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('CONTINUE_BUTTON', encoding='UTF-8') in response.data)
+        self.assertTrue(bytes('sign in here', encoding='UTF-8') in response.data)
+
+        # Mock the IAC service to validate the enrolment code
+        mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)
+
+        # Mock the post event service
+        def my_post_event(*args, **kwargs):
+            print('Called POST EVENT service with args={},kwargs={}'.format(str(args), str(kwargs)))
+
+        post_event = my_post_event
+
+        # Enrolment code post data
+        post_data = {
+            'enrolment_code': enrolment_code
+        }
+
+        # POST to the Create Account (Enter Enrolment Code) page
+        # TODO: this test was disabled - doesn't seem to work (GB/LB)
+        #response = self.app.post('/register/create-account/', data=post_data, headers=self.headers)
+
+        # After a successful POST the user should be redirected to the Confirm Org screen
+        #self.assertEqual(response.status_code, 302)
+        #self.assertTrue(
+        #    bytes('You should be redirected automatically to target URL', encoding='UTF-8') in response.data)
+        #self.assertTrue(
+        #    bytes('/register/create-account/confirm-organisation-survey/?enrolment_code=', encoding='UTF-8') in response.data)
 
     # ============== CONFIRM ORG AND SURVEY ===============
     @requests_mock.mock()

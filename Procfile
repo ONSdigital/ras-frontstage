@@ -1,1 +1,1 @@
-web: python run.py
+web: gunicorn -c gunicorn.py frontstage:app

@@ -366,7 +366,8 @@ def message_get(session, msg_id):
 
     loggerb.debug('Attempting to remove unread label')
     data = {"label": 'UNREAD', "action": 'remove'}
-    response = requests.put(MESSAGE_MODIFY_URL.format(msg_id), data=json.dumps(data), headers=headers)  # noqa: F841
+    url = app.config['MESSAGE_MODIFY_URL'].format(msg_id)
+    response = requests.put(url, data=json.dumps(data), headers=headers)  # noqa: F841
     if response.status_code != 200:
         loggerb.error("Failed to remove unread label")
         raise ExternalServiceError(response)

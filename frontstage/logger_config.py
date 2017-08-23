@@ -33,7 +33,7 @@ def logger_initial_config(service_name=None,
               filter_by_level,
               add_service,
               TimeStamper(fmt=logger_date_format, utc=True, key="created_at"),
-              JSONRenderer(indent=1)])
+              JSONRenderer(indent=os.getenv('JSON_INDENT_LOGGING', None))])
     oauth_log = logging.getLogger("requests_oauthlib")
     oauth_log.addHandler(logging.NullHandler())
     oauth_log.propagate = False

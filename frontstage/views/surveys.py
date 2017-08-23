@@ -16,23 +16,13 @@ surveys_bp = Blueprint('surveys_bp', __name__, static_folder='static', template_
 
 
 def build_survey_data(session, status_filter):
-    """Helper method used to query for Surveys (To Do and History)"""
-
-    # #done# TODO - Derive the Party Id
-    # party_id = "3b136c4b-7a14-4904-9e01-13364dd7b972"
     party_id = session.get('party_id', 'no-party-id')
-
-    # TODO - Add security headers
-    # headers = {'authorization': jwttoken}
-    headers = {}
-
-    # Call the API Gateway Service to get the To Do survey list
-    # url = app.config['API_GATEWAY_AGGREGATED_SURVEYS_URL'] + 'todo/' + party_id
-
-    url = app.config['RAS_AGGREGATOR_TODO'].format(app.config['RAS_API_GATEWAY_SERVICE'], session.get('party_id'))
-    logger.debug('Retrieving survey data', url=url)
-    req = requests.get(url, headers=headers, params=status_filter, verify=False)
-
+    logger.debug('Retrieving survey data', party_id=party_id)
+    url = app.config['RAS_AGGREGATOR_TODO'].format(app.config['RAS_API_GATEWAY_SERVICE'], party_id)
+    req = requests.get(url, params=status_filter, verify=False)
+    if req.status_code != 200:
+        logger.error('Failed to retrieve survey')
+        ExternalServiceError(req)
     return req.json()
 
 
@@ -101,7 +91,7 @@ def access_survey(session):
         req = requests.get(url, verify=False)
         if req.status_code != 200:
             logger.error('Failed to retrieve case', party_id=party_id)
-            raise ExternalServiceError
+            raise ExternalServiceError(req)
 
         logger.debug('Successfully read cases for party', party_id=party_id)
         valid = False
@@ -117,7 +107,7 @@ def access_survey(session):
             logger.warning('Party does not have permission to access collection instrument',
                            party_id=party_id,
                            collection_instrument_id=collection_instrument_id)
-            return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+            return render_template("errors/error.html", _theme='default', data={"error": {"type": "failed"}})
 
         url = app.config['RAS_CI_GET'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], collection_instrument_id)
         logger.info('Retrieving collection instrument', url=url)
@@ -169,10 +159,6 @@ def access_survey(session):
             return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
         url = app.config['RAS_CI_DOWNLOAD'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], collection_instrument_id)
-        logger.info('Successfully downloaded collection instrument',
-                    party_id=party_id,
-                    collection_instrument_id=collection_instrument_id,
-                    case_id=case_id)
         response = requests.get(url, verify=False)
 
         category = 'COLLECTION_INSTRUMENT_DOWNLOADED' if response.status_code == 200 else 'COLLECTION_INSTRUMENT_ERROR'
@@ -187,13 +173,17 @@ def access_survey(session):
             logger.error(str(msg))
 
         if response.status_code == 200:
+            logger.info('Successfully downloaded collection instrument',
+                        party_id=party_id,
+                        collection_instrument_id=collection_instrument_id,
+                        case_id=case_id)
             return response.content, response.status_code, response.headers.items()
         else:
             logger.error('Failed to download collection instrument',
                          collection_instrument_id=collection_instrument_id,
                          party_id=party_id,
                          status_code=response.status_code)
-            return render_template('surveys/surveys-download-failure.html', _theme='default', error_info=request.args.get('error_info', None))
+            return render_template('surveys/surveys-download-failure.html', _theme='default', error_info=request.args.get('error_info', None)), 500
 
 
 @surveys_bp.route('/upload_survey', methods=['POST'])
@@ -231,7 +221,7 @@ def upload_survey(session):
         logger.warning('Party does not have permission to upload survey',
                        party_id=party_id,
                        case_id=case_id)
-        return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+        return render_template("errors/error.html", _theme='default', data={"error": {"type": "failed"}})
 
     # TODO - Add security headers ??
     # headers = {'authorization': jwttoken}

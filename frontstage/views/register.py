@@ -23,6 +23,7 @@ register_bp = Blueprint('register_bp', __name__, static_folder='static', templat
 
 cryptographer = Cryptographer()
 
+
 def validate_enrolment_code(enrolment_code):
     case_id = None
 
@@ -33,7 +34,6 @@ def validate_enrolment_code(enrolment_code):
     url = app.config['RM_IAC_GET'].format(app.config['RM_IAC_SERVICE'], enrolment_code)
     logger.debug('Enrolment code validation attempt', url=url, enrolment_code=enrolment_code)
 
-    # Call the API Gateway Service to validate the enrolment code
     result = requests.get(url, verify=False)
     logger.debug('IAC service response', status_code=result.status_code, reason=result.reason, text=result.text)
 

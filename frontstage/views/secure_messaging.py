@@ -344,7 +344,7 @@ def sent_get(session, sent_id):
     party_id = session['party_id']
     loggerb = logger.bind(message_id=sent_id, party_id=party_id)
 
-    url = MESSAGE_GET_URL.format(sent_id)
+    url = app.config['MESSAGE_GET_URL'].format(sent_id)
     loggerb.debug('Retrieving message')
 
     get_sent = requests.get(url, headers=headers)

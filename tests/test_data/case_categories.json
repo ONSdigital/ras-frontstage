@@ -26,5 +26,12 @@
     "longDescription": "Unsuccessful Response Upload",
     "shortDescription": "Unsuccessful Response Upload",
     "role": "None"
+  },
+  {
+    "group": "None",
+    "name": "ACCESS_CODE_AUTHENTICATION_ATTEMPT",
+    "longDescription": "Access Code authentication attempted",
+    "shortDescription": "Access Code authentication attempted",
+    "role": "None"
   }
 ]

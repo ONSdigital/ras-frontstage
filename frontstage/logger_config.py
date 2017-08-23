@@ -19,6 +19,10 @@ def logger_initial_config(service_name=None,
         logger_format = "%(message)s , 'file'='%(name)s', 'line_number'=%(lineno)s"
     if not service_name:
         service_name = os.getenv('NAME', 'ras-frontstage')
+    try:
+        indent = int(os.getenv('JSON_INDENT_LOGGING'))
+    except ValueError:
+        indent = None
 
     def add_service(logger, method_name, event_dict):
         """
@@ -33,7 +37,7 @@ def logger_initial_config(service_name=None,
               filter_by_level,
               add_service,
               TimeStamper(fmt=logger_date_format, utc=True, key="created_at"),
-              JSONRenderer(indent=os.getenv('JSON_INDENT_LOGGING', None))])
+              JSONRenderer(indent=indent)])
     oauth_log = logging.getLogger("requests_oauthlib")
     oauth_log.addHandler(logging.NullHandler())
     oauth_log.propagate = False

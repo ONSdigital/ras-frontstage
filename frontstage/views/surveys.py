@@ -101,7 +101,7 @@ def access_survey(session):
         req = requests.get(url, verify=False)
         if req.status_code != 200:
             logger.error('Failed to retrieve case', party_id=party_id)
-            raise ExternalServiceError
+            raise ExternalServiceError(req)
 
         logger.debug('Successfully read cases for party', party_id=party_id)
         valid = False
@@ -117,7 +117,7 @@ def access_survey(session):
             logger.warning('Party does not have permission to access collection instrument',
                            party_id=party_id,
                            collection_instrument_id=collection_instrument_id)
-            return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+            return render_template("errors/error.html", _theme='default', data={"error": {"type": "failed"}})
 
         url = app.config['RAS_CI_GET'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], collection_instrument_id)
         logger.info('Retrieving collection instrument', url=url)
@@ -169,10 +169,6 @@ def access_survey(session):
             return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
         url = app.config['RAS_CI_DOWNLOAD'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], collection_instrument_id)
-        logger.info('Successfully downloaded collection instrument',
-                    party_id=party_id,
-                    collection_instrument_id=collection_instrument_id,
-                    case_id=case_id)
         response = requests.get(url, verify=False)
 
         category = 'COLLECTION_INSTRUMENT_DOWNLOADED' if response.status_code == 200 else 'COLLECTION_INSTRUMENT_ERROR'
@@ -187,13 +183,17 @@ def access_survey(session):
             logger.error(str(msg))
 
         if response.status_code == 200:
+            logger.info('Successfully downloaded collection instrument',
+                        party_id=party_id,
+                        collection_instrument_id=collection_instrument_id,
+                        case_id=case_id)
             return response.content, response.status_code, response.headers.items()
         else:
             logger.error('Failed to download collection instrument',
                          collection_instrument_id=collection_instrument_id,
                          party_id=party_id,
                          status_code=response.status_code)
-            return render_template('surveys/surveys-download-failure.html', _theme='default', error_info=request.args.get('error_info', None))
+            return render_template('surveys/surveys-download-failure.html', _theme='default', error_info=request.args.get('error_info', None)), 500
 
 
 @surveys_bp.route('/upload_survey', methods=['POST'])
@@ -231,7 +231,7 @@ def upload_survey(session):
         logger.warning('Party does not have permission to upload survey',
                        party_id=party_id,
                        case_id=case_id)
-        return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+        return render_template("errors/error.html", _theme='default', data={"error": {"type": "failed"}})
 
     # TODO - Add security headers ??
     # headers = {'authorization': jwttoken}

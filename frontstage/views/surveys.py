@@ -17,7 +17,7 @@ surveys_bp = Blueprint('surveys_bp', __name__, static_folder='static', template_
 
 def build_survey_data(session, status_filter):
     party_id = session.get('party_id', 'no-party-id')
-    logger.debug('Retrieving survey data', party_id)
+    logger.debug('Retrieving survey data', party_id=party_id)
     url = app.config['RAS_AGGREGATOR_TODO'].format(app.config['RAS_API_GATEWAY_SERVICE'], party_id)
     req = requests.get(url, params=status_filter, verify=False)
     if req.status_code != 200:

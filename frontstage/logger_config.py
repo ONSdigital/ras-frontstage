@@ -21,6 +21,8 @@ def logger_initial_config(service_name=None,
         service_name = os.getenv('NAME', 'ras-frontstage')
     try:
         indent = int(os.getenv('JSON_INDENT_LOGGING'))
+    except TypeError:
+        indent = None
     except ValueError:
         indent = None
 

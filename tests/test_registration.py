@@ -56,6 +56,14 @@ survey_json = {
 params = {
     "enrolment_code": encrypted_enrolment_code
 }
+oauth_token = {
+    "id": 503,
+    "access_token": "8c77e013-d8dc-472c-b4d3-d4fbe21f80e7",
+    "expires_in": 3600,
+    "token_type": "Bearer",
+    "scope": "",
+    "refresh_token": "b7ac07a6-4c28-43bd-a335-00250b490e9f"
+}
 
 url_validate_iac = app.config['RM_IAC_GET'].format(app.config['RM_IAC_SERVICE'], enrolment_code)
 url_case_from_iac = app.config['RM_CASE_GET_BY_IAC'].format(app.config['RM_CASE_SERVICE'], enrolment_code)
@@ -68,6 +76,8 @@ url_get_coll = app.config['RM_COLLECTION_EXERCISES_GET'].format(app.config['RM_C
                                                                 collection_exercise_id)
 survey_id = coll_json['surveyId']
 url_get_survey = app.config['RM_SURVEY_GET'].format(app.config['RM_SURVEY_SERVICE'], survey_id)
+url_oauth_token = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_TOKEN_ENDPOINT']
+url_create_party = app.config['RAS_PARTY_POST_RESPONDENTS'].format(app.config['RAS_PARTY_SERVICE'])
 
 
 class TestRegistration(unittest.TestCase):
@@ -334,3 +344,72 @@ class TestRegistration(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Please check the phone number'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_create_account_success(self, mock_object):
+        """Test create account phone no. too big returns length guidance"""
+        mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)
+        mock_object.post(url_oauth_token, status_code=201, json=oauth_token)
+        mock_object.post(url_create_party, status_code=200)
+        self.headers['referer'] = 'register/create-account/enter-account-details'
+
+        response = self.app.post('register/create-account/enter-account-details',
+                                 query_string=params,
+                                 data=self.test_user,
+                                 headers=self.headers,
+                                 follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Almost done'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_create_account_success(self, mock_object):
+        """Test create account phone no. too big returns length guidance"""
+        mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)
+        mock_object.post(url_oauth_token, status_code=201, json=oauth_token)
+        mock_object.post(url_create_party, status_code=200)
+        self.headers['referer'] = 'register/create-account/enter-account-details'
+
+        response = self.app.post('register/create-account/enter-account-details',
+                                 query_string=params,
+                                 data=self.test_user,
+                                 headers=self.headers,
+                                 follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Almost done'.encode() in response.data)
+
+    ### THIS TEST WILL COVER EMAIL DUPLICATION IN OTHER PULL REQUEST ###
+    # @requests_mock.mock()
+    # def test_create_account_duplicate_email(self, mock_object):
+    #     """Test create account phone no. too big returns length guidance"""
+    #     mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)
+    #     mock_object.post(url_oauth_token, status_code=201, json=oauth_token)
+    #     mock_object.post(url_create_party, status_code=400)
+    #     self.headers['referer'] = 'register/create-account/enter-account-details'
+    #
+    #     response = self.app.post('register/create-account/enter-account-details',
+    #                              query_string=params,
+    #                              data=self.test_user,
+    #                              headers=self.headers,
+    #                              follow_redirects=True)
+    #
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertTrue('This email has already been used'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_create_account_oauth_fail(self, mock_object):
+        """Test create account phone no. too big returns length guidance"""
+        mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)
+        mock_object.post(url_oauth_token, status_code=401, json=oauth_token)
+        mock_object.post(url_create_party, status_code=500)
+        self.headers['referer'] = 'register/create-account/enter-account-details'
+
+        response = self.app.post('register/create-account/enter-account-details',
+                                 query_string=params,
+                                 data=self.test_user,
+                                 headers=self.headers,
+                                 follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)

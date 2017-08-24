@@ -75,7 +75,13 @@
                 {% endif %}
             </dt>
             <dd class="grid__col col-9@m pull-1@m">
-                {% if 'SENT' in message['labels'] or 'INBOX' in message['labels'] %}
+                {% if 'INBOX' in message['labels'] %}
+                    {% if 'UNREAD' in message['labels'] %}
+                        <b>{{ message['sent_date'][:19] }}</b>
+                    {% else %}
+                        {{ message['sent_date'][:19] }}
+                    {% endif %}
+                {% elif 'SENT' in message['labels'] %}
                     {{ message['sent_date'][:19] }}
                 {% elif 'DRAFT' in message['labels'] %}
                     {{ message['modified_date'][:19] }}
@@ -90,9 +96,9 @@
             </dt>
             <dd class="grid__col col-9@m pull-1@m">
                 {% if 'UNREAD' in message['labels'] %}
-                    <b>{{ message['@msg_from']['firstname'] }}</b>
+                    <b>{{ message['@msg_from']['firstName'] }} {{ message['@msg_from']['lastName'] }}</b>
                 {% else %}
-                    {{ message['@msg_from']['firstname'] }}
+                    {{ message['@msg_from']['firstName'] }} {{ message['@msg_from']['lastName'] }}
                 {% endif %}
             </dd>
         </dl>

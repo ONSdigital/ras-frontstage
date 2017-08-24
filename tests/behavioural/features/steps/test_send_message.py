@@ -1,5 +1,7 @@
 from behave import given, when, then
 
+from tests.behavioural.features.steps.common import is_element_present_by_id
+
 
 @when('I go to the secure-message page')
 def step_impl_go_to_secure_message_create_page(context):
@@ -13,7 +15,7 @@ def step_impl_click_create_message(context):
 
 @then('The create message page will open')
 def step_impl_open_create_message_page(context):
-    context.browser.find_by_id('send-message')
+    assert is_element_present_by_id(context, 'send-message')
 
 
 @when('I am on the create message page')
@@ -30,4 +32,4 @@ def step_impl_add_text_to_subject_and_body(context):
 
 @then('The confirmation sent page opens')
 def step_impl_open_confirmation_page(context):
-    context.browser.find_by_id('message-sent')
+    assert is_element_present_by_id(context, 'message-sent')

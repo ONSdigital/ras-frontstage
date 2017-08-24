@@ -2,11 +2,6 @@ Feature: Open the sign in page
 
 
 
-  Scenario: User visits the sign-in page
-    Given I go to the sign-in page
-    Then the title should be something
-
-
   Scenario: User signs in
     Given I go to the sign-in page
     When I enter my credentials

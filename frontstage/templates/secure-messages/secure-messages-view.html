@@ -32,21 +32,21 @@
     </p>
     <form action="{{ url_for('secure_message_bp.reply_message') }}" method="post">
         <fieldset>
-            <label for="secure-message-subject">Subject</label>
+            <label>Subject</label>
             {% if message['subject'].startswith('Re: ') %}
-                <input
+                <textarea readonly
                     id="secure-message-subject-thread"
                     class="secure-message-form__subject input input--text"
                     type="text"
-                    name="secure-message-subject"
-                    value="{{ message['subject']}}"/>
+                    rows="1"
+                    name="secure-message-subject">{{ message['subject'] }} </textarea>
             {% else %}
-                <input
+                <textarea readonly
                     id="secure-message-subject"
                     class="secure-message-form__subject input input--text"
                     type="text"
-                    name="secure-message-subject"
-                    value="Re: {{message['subject']}}"/>
+                    rows="1"
+                    name="secure-message-subject">Re: {{ message['subject'] }} </textarea>
             {% endif %}
         </fieldset>
 

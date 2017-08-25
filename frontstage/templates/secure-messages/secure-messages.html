@@ -88,17 +88,27 @@
                 {% endif %}
             </dd>
             <dt class="grid__col col-2@m">
-                {% if 'UNREAD' in message['labels'] %}
-                    <b>From:</b>
-                  {% else %}
-                    From:
+                {% if 'INBOX' in message['labels'] %}
+                    {% if 'UNREAD' in message['labels'] %}
+                        <b>From:</b>
+                    {% else %}
+                        From:
+                    {% endif %}
+                {% else %}
+                    To:
                 {% endif %}
             </dt>
             <dd class="grid__col col-9@m pull-1@m">
-                {% if 'UNREAD' in message['labels'] %}
-                    <b>{{ message['@msg_from']['firstName'] }} {{ message['@msg_from']['lastName'] }}</b>
+                {% if 'INBOX' in message['labels'] %}
+                    {% if 'UNREAD' in message['labels'] %}
+                        <b>{{ message['@msg_from']['firstName'] }} {{ message['@msg_from']['lastName'] }}</b>
+                    {% else %}
+                        {{ message['@msg_from']['firstName'] }} {{ message['@msg_from']['lastName'] }}
+                    {% endif %}
                 {% else %}
-                    {{ message['@msg_from']['firstName'] }} {{ message['@msg_from']['lastName'] }}
+                    <!-- Functionality here to be used when BRES has been added to the party service -->
+                    <!-- {{ message['@msg_to']['firstName'] }} {{ message['@msg_to']['lastName'] }} -->
+                    BRES
                 {% endif %}
             </dd>
         </dl>

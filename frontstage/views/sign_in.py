@@ -45,14 +45,13 @@ def login():
                 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
             }
 
-            oauth2_response = requests.post(url=token_url, data=data , headers=headers, auth=(app.config['RAS_FRONTSTAGE_CLIENT_ID'],
+            oauth2_response = requests.post(url=token_url, data=data, headers=headers, auth=(app.config['RAS_FRONTSTAGE_CLIENT_ID'],
                                                                                               app.config['RAS_FRONTSTAGE_CLIENT_SECRET']))
-            oauth2_token = json.loads(oauth2_response.text)
             # Check to see that this user has not attempted to login too many times or that they have not forgot to
             # click on the activate account URL in their email by checking the error message back from the OAuth2 server
             if oauth2_response.status_code == 401:
                 oauth2Error = json.loads(oauth2_response.text)
-                if oauth2Error['detail'] == 'Unauthorized user credentials':
+                if 'Unauthorized user credentials' in oauth2Error['detail']:
                     return render_template('sign-in/sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
                 elif 'User account locked' in oauth2Error['detail']:
                     logger.warning('User account is locked on the OAuth2 server')
@@ -67,12 +66,13 @@ def login():
                     return render_template('sign-in/sign-in.html', _theme='default', form=form,
                                            data={"error": {"type": "failed"}})
             if oauth2_response.status_code != 201:
-                logger.error('Unknown error from the OAuth2 server', ouath2_response=oauth2_response.txt,  status_code=oauth2_response.status_code)
+                logger.error('Unknown error from the OAuth2 server')
                 raise ExternalServiceError(oauth2_response)
             logger.debug('Access Token Granted')
-        except (requests.ConnectTimeoutConnectionError, requests.ConnectionError) as e:
+        except requests.ConnectionError as e:
             logger.warning('Connection error between the server and the OAuth2 service of: {}'.format(exception=str(e)))
             raise ExternalServiceError(e)
+        oauth2_token = json.loads(oauth2_response.text)
 
         url = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], username)
         req = requests.get(url, verify=False)

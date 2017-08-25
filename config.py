@@ -55,7 +55,6 @@ class Config(object):
     VALIDATE_JWT = os.environ.get('VALIDATE_JWT', True)
     SELENIUM_TEST_URL = os.environ.get('SELENIUM_TEST_URL', 'http://localhost:5001')
 
-
     ONS_OAUTH_PROTOCOL = os.environ.get('ONS_OAUTH_PROTOCOL', 'http://')
     ONS_OAUTH_SERVER = os.environ.get('ONS_OAUTH_SERVER', 'ons-oauth2.cfapps.io')
     RAS_FRONTSTAGE_CLIENT_ID = os.environ.get('RAS_FRONTSTAGE_CLIENT_ID', 'ons@ons.gov')

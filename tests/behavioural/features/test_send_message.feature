@@ -15,3 +15,17 @@ Feature: Test send message
     When I have a message to send
     Then The confirmation sent page opens
 
+  Scenario: User receives a message from BRES
+    Given I am already logged in
+    And I have received a message from BRES
+    When I go to the inbox tab
+    When I open the internal message
+    Then I should see a reply message
+
+  Scenario: User replies to a message from BRES
+    Given I am already logged in
+    And I have received a message from BRES
+    When I go to the inbox tab
+    When I open the internal message
+    When I reply to a BRES message
+    Then The confirmation sent page opens

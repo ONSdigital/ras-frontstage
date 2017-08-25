@@ -19,5 +19,5 @@ def step_impl_go_to_draft_message(context):
 
 @then('the draft contains some text')
 def step_impl_draft_page(context):
-    assert is_element_present_by_id(context, 'secure-message-subject')  # TODO find the value in both
+    assert is_element_present_by_id(context, 'secure-message-subject')
     assert is_element_present_by_id(context, 'secure-message-body')

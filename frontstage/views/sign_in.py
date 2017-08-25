@@ -6,10 +6,10 @@ from oauthlib.oauth2 import LegacyApplicationClient, MissingTokenError
 import requests
 from requests_oauthlib import OAuth2Session
 from structlog import wrap_logger
-
+import json
 from frontstage import app
 from frontstage.exceptions.exceptions import ExternalServiceError
-from frontstage.jwt import encode
+from frontstage.jwt import encode, timestamp_token
 from frontstage.models import LoginForm
 
 
@@ -29,27 +29,50 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
 
-        # Creates a 'session client' to interact with OAuth2. This provides a client ID to our client that is used to
-        # interact with the server.
-        client = LegacyApplicationClient(client_id=app.config['RAS_FRONTSTAGE_CLIENT_ID'])
-
-        # Populates the request body with username and password from the user
-        client.prepare_request_body(username=username, password=password, scope=['ci.write', 'ci.read'])
-
-        # passes our 'client' to the session management object. this deals with
-        # the transactions between the OAuth2 server
-        oauth = OAuth2Session(client=client)
-        token_url = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_TOKEN_ENDPOINT']
-
+        # TODO Consider moving this to a helper function.
+        # Lets get a token from the OAuth2 server
         try:
-            token = oauth.fetch_token(token_url=token_url, username=username, password=password, client_id=app.config['RAS_FRONTSTAGE_CLIENT_ID'],
-                                      client_secret=app.config['RAS_FRONTSTAGE_CLIENT_SECRET'])
+            token_url = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_TOKEN_ENDPOINT']
+            data = {
+                'grant_type': 'password',
+                'client_id': app.config['RAS_FRONTSTAGE_CLIENT_ID'],
+                'client_secret': app.config['RAS_FRONTSTAGE_CLIENT_SECRET'],
+                'username': username,
+                'password': password,
+            }
+            headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+            }
 
+            oauth2_response = requests.post(url=token_url, data=data , headers=headers, auth=(app.config['RAS_FRONTSTAGE_CLIENT_ID'],
+                                                                                              app.config['RAS_FRONTSTAGE_CLIENT_SECRET']))
+            oauth2_token = json.loads(oauth2_response.text)
+            # Check to see that this user has not attempted to login too many times or that they have not forgot to
+            # click on the activate account URL in their email by checking the error message back from the OAuth2 server
+            if oauth2_response.status_code == 401:
+                oauth2Error = json.loads(oauth2_response.text)
+                if oauth2Error['detail'] == 'Unauthorized user credentials':
+                    return render_template('sign-in/sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
+                elif 'User account locked' in oauth2Error['detail']:
+                    logger.warning('User account is locked on the OAuth2 server')
+                    return render_template('sign-in/sign-in.trouble.html', _theme='default', form=form,
+                                           data={"error": {"type": "account locked"}})
+                elif 'User account not verified' in oauth2Error['detail']:
+                    logger.warning('User account is not verified on the OAuth2 server')
+                    return render_template('sign-in/sign-in.account-not-verified.html', _theme='default', form=form,
+                                           data={"error": {"type": "account not verified"}})
+                else:
+                    logger.error('OAuth 2 server generated 401 which is not understood', oauth2error=oauth2Error['detail'])
+                    return render_template('sign-in/sign-in.html', _theme='default', form=form,
+                                           data={"error": {"type": "failed"}})
+            if oauth2_response.status_code != 201:
+                logger.error('Unknown error from the OAuth2 server', ouath2_response=oauth2_response.txt,  status_code=oauth2_response.status_code)
+                raise ExternalServiceError(oauth2_response)
             logger.debug('Access Token Granted')
-
-        except MissingTokenError as e:
-            logger.warning('Missing token', exception=str(e))
-            return render_template('sign-in/sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
+        except (requests.ConnectTimeoutConnectionError, requests.ConnectionError) as e:
+            logger.warning('Connection error between the server and the OAuth2 service of: {}'.format(exception=str(e)))
+            raise ExternalServiceError(e)
 
         url = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], username)
         req = requests.get(url, verify=False)
@@ -64,20 +87,11 @@ def login():
             logger.error('error trying to get username from party service', exception=str(e))
             return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
-        data_dict_for_jwt_token = {
-            "refresh_token": token['refresh_token'],
-            "access_token": token['access_token'],
-            "scope": token['scope'],
-            "expires_at": token['expires_at'],
-            "username": username,
-            "role": "respondent",
-            "party_id": party_id
-        }
+        # Take our raw token and add a UTC timestamp to the expires_at attribute
+        data_dict_for_jwt_token = timestamp_token(oauth2_token, username, party_id)
 
         encoded_jwt_token = encode(data_dict_for_jwt_token)
-        response = make_response(redirect(url_for('surveys_bp.logged_in',
-                                                  _external=True,
-                                                  _scheme=getenv('SCHEME', 'http'))))
+        response = make_response(redirect(url_for('surveys_bp.logged_in', _external=True, _scheme=getenv('SCHEME', 'http'))))
         response.set_cookie('authorization', value=encoded_jwt_token)
         return response
 

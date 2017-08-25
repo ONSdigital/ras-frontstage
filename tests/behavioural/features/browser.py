@@ -1,11 +1,14 @@
 from selenium import webdriver
 
+from frontstage import app
+
 
 class Browser(object):
     # Localhost url
     base_url = 'http://localhost:5001'
     # Cloud foundry url
     # base_url = 'http://ras-frontstage-test.apps.devtest.onsclofo.uk'
+    url = app.config['SELENIUM_TEST_URL']
     driver = webdriver.Chrome()
     driver.implicitly_wait(10)
 

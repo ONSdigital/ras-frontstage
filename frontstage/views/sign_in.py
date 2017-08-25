@@ -9,7 +9,7 @@ from structlog import wrap_logger
 import json
 from frontstage import app
 from frontstage.exceptions.exceptions import ExternalServiceError
-from frontstage.jwt import encode
+from frontstage.jwt import encode, timestamp_token
 from frontstage.models import LoginForm
 
 
@@ -40,18 +40,19 @@ def login():
                 'username': username,
                 'password': password,
             }
-            headers ={
+            headers = {
                 'Accept': 'application/json',
                 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
             }
 
-            oauth2_response = requests.post(url=token_url, data=data , headers=headers, auth=(app.config['RAS_FRONTSTAGE_CLIENT_ID'], app.config['RAS_FRONTSTAGE_CLIENT_SECRET']))
+            oauth2_response = requests.post(url=token_url, data=data , headers=headers, auth=(app.config['RAS_FRONTSTAGE_CLIENT_ID'],
+                                                                                              app.config['RAS_FRONTSTAGE_CLIENT_SECRET']))
             oauth2_token = json.loads(oauth2_response.text)
             # Check to see that this user has not attempted to login too many times or that they have not forgot to
             # click on the activate account URL in their email by checking the error message back from the OAuth2 server
             if oauth2_response.status_code == 401:
                 oauth2Error = json.loads(oauth2_response.text)
-                if oauth2Error['detail']== 'Unauthorized user credentials':
+                if oauth2Error['detail'] == 'Unauthorized user credentials':
                     return render_template('sign-in/sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
                 elif 'User account locked' in oauth2Error['detail']:
                     logger.warning('User account is locked on the OAuth2 server')
@@ -62,11 +63,11 @@ def login():
                     return render_template('sign-in/sign-in.account-not-verified.html', _theme='default', form=form,
                                            data={"error": {"type": "account not verified"}})
                 else:
-                    logger.error('OAuth 2 server generated 401 which is not understood. Details are: {}'.format(oauth2Error['detail']))
+                    logger.error('OAuth 2 server generated 401 which is not understood', oauth2error=oauth2Error['detail'])
                     return render_template('sign-in/sign-in.html', _theme='default', form=form,
                                            data={"error": {"type": "failed"}})
             if oauth2_response.status_code != 201:
-                logger.error('Unknown error from the OAuth2 server which was: {}'.format(oauth2_response.text))
+                logger.error('Unknown error from the OAuth2 server', ouath2_response=oauth2_response.txt,  status_code=oauth2_response.status_code)
                 raise ExternalServiceError(oauth2_response.text)
             logger.debug('Access Token Granted')
         except (requests.ConnectTimeoutConnectionError, requests.ConnectionError) as e:
@@ -86,20 +87,11 @@ def login():
             logger.error('error trying to get username from party service', exception=str(e))
             return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
-        data_dict_for_jwt_token = {
-            "refresh_token": oauth2_token['refresh_token'],
-            "access_token": oauth2_token['access_token'],
-            "scope": oauth2_token['scope'],
-            "expires_at": oauth2_token['expires_in'],
-            "username": username,
-            "role": "respondent",
-            "party_id": party_id
-        }
+        # Take our raw token and add a UTC timestamp to the expires_at attribute
+        data_dict_for_jwt_token = timestamp_token(oauth2_token, username, party_id)
 
         encoded_jwt_token = encode(data_dict_for_jwt_token)
-        response = make_response(redirect(url_for('surveys_bp.logged_in',
-                                                  _external=True,
-                                                  _scheme=getenv('SCHEME', 'http'))))
+        response = make_response(redirect(url_for('surveys_bp.logged_in', _external=True, _scheme=getenv('SCHEME', 'http'))))
         response.set_cookie('authorization', value=encoded_jwt_token)
         return response
 

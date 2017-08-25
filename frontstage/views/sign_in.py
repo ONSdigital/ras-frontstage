@@ -68,7 +68,7 @@ def login():
                                            data={"error": {"type": "failed"}})
             if oauth2_response.status_code != 201:
                 logger.error('Unknown error from the OAuth2 server', ouath2_response=oauth2_response.txt,  status_code=oauth2_response.status_code)
-                raise ExternalServiceError(oauth2_response.text)
+                raise ExternalServiceError(oauth2_response)
             logger.debug('Access Token Granted')
         except (requests.ConnectTimeoutConnectionError, requests.ConnectionError) as e:
             logger.warning('Connection error between the server and the OAuth2 service of: {}'.format(exception=str(e)))

@@ -17,6 +17,6 @@ if __name__ == '__main__':
         logger.info('* Cloud Foundry port "{}"'.format(port))
         logger.info('* Cloud Foundry protocol "{}"'.format(protocol))
     else:
-        port = os.getenv('FS_DEV_PORT', 5001)
+        port = os.getenv('FS_DEV_PORT', 8080)
     logger.info('* starting listening port "{}"'.format(port))
     app.run(debug=True, host='0.0.0.0', port=int(port))

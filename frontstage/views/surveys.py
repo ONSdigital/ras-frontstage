@@ -57,11 +57,7 @@ def surveys_history(session):
     return render_template('surveys/surveys-history.html',  _theme='default', data_array=data_array)
 
 
-def access_surveys_permissions(collection_instrument_id, party_id):
-    logger.info('Collection instrument access requested',
-                collection_instrument=collection_instrument_id,
-                party_id=party_id)
-
+def get_cases_from_party(party_id):
     # Get cases for given party_id
     url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
     req = requests.get(url, verify=False)
@@ -69,9 +65,17 @@ def access_surveys_permissions(collection_instrument_id, party_id):
         logger.error('Failed to retrieve case', party_id=party_id)
         raise ExternalServiceError(req)
     logger.debug('Successfully read cases for party', party_id=party_id)
+    return req.json()
 
+
+def access_surveys_permissions(collection_instrument_id, party_id):
+    logger.info('Collection instrument access requested',
+                collection_instrument=collection_instrument_id,
+                party_id=party_id)
+
+    cases = get_cases_from_party(party_id)
     # Check if any case has matching collection instrument
-    for case in req.json():
+    for case in cases:
         if case.get('collectionInstrumentId') == collection_instrument_id:
             logger.debug('Party has permission to access collection instrument',
                          party_id=party_id,
@@ -80,6 +84,25 @@ def access_surveys_permissions(collection_instrument_id, party_id):
     logger.warning('Party does not have permission to access collection_instrument',
                    party_id=party_id,
                    collection_instrument_id=collection_instrument_id)
+    return False
+
+
+def upload_surveys_permissions(case_id, party_id):
+    logger.info('Collection instrument access requested',
+                case=case_id,
+                party_id=party_id)
+
+    cases = get_cases_from_party(party_id)
+    # Check if any case has matching id
+    for case in cases:
+        if case.get('id') == case_id:
+            logger.debug('Party has permission to upload survey',
+                         party_id=party_id,
+                         collection_instrument_id=case_id)
+            return True
+    logger.warning('Party does not have permission to upload survey',
+                   party_id=party_id,
+                   case_id=case_id)
     return False
 
 
@@ -108,7 +131,9 @@ def access_survey(session):
         if not valid:
             return render_template("errors/error.html", _theme='default', data={"error": {"type": "failed"}})
 
-        logger.info('Retrieving collection instrument', party_id, collection_instrument_id)
+        logger.info('Retrieving collection instrument',
+                    party_id=party_id,
+                    collection_instrument_id=collection_instrument_id)
         url = app.config['RAS_CI_GET'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], collection_instrument_id)
         req = requests.get(url, verify=False)
         if req.status_code != 200:
@@ -152,7 +177,10 @@ def access_survey(session):
                                party_id=party_id,
                                description='Instrument {} downloaded by {} for case {}'.format(collection_instrument_id, party_id, case_id))
         if code != 201:
+            # Should we error out if the case post fails or let the user continue?
             logger.error('Failed to post case event',
+                         error=msg,
+                         status_code=code,
                          case_id=case_id,
                          category=category,
                          party_id=party_id)
@@ -177,42 +205,16 @@ def access_survey(session):
 @jwt_authorization(request)
 def upload_survey(session):
     """Logged in page for users only."""
-
     party_id = session.get('party_id', 'no-party-id')
     case_id = request.args.get('case_id', None)
-
     logger.info('Attempting to upload survey', party_id=party_id, case_id=case_id)
 
-    # TODO: Authorization - this is *not* DRY and should be refactored (GB)
-    #
-    #   Need a check here to make sure that party_id is allowed to access case_id
-    #   - we can do this by calling "get cases by party" and ensuring the case_id is in the result set
-    #
-    url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
-    req = requests.get(url, verify=False)
-    if req.status_code != 200:
-        logger.error('Failed to retrieve case', party_id=party_id)
-        raise ExternalServiceError(req)
-
-    logger.debug('Successfully read cases for party', party_id=party_id)
-    valid = False
-    for case in req.json():
-        if case.get('id') == case_id:
-            logger.debug('Party has permission to upload survey',
-                         party_id=party_id,
-                         case_id=case_id)
-            valid = True
-            break
-
+    valid = upload_surveys_permissions(case_id, party_id)
     if not valid:
         logger.warning('Party does not have permission to upload survey',
                        party_id=party_id,
                        case_id=case_id)
         return render_template("errors/error.html", _theme='default', data={"error": {"type": "failed"}})
-
-    # TODO - Add security headers ??
-    # headers = {'authorization': jwttoken}
-    headers = {}
 
     # Get the uploaded file
     upload_file = request.files['file']
@@ -222,7 +224,7 @@ def upload_survey(session):
     # Upload the survey
     url = app.config['RAS_CI_UPLOAD'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], case_id)
     logger.info('Attempting to upload survey', url=url, case_id=case_id, party_id=party_id)
-    result = requests.post(url, headers, files=upload_file, verify=False)
+    result = requests.post(url, files=upload_file, verify=False)
     logger.debug('Upload survey response', result=result.status_code, reason=result.reason, text=result.text)
 
     category = 'SUCCESSFUL_RESPONSE_UPLOAD' if result.status_code == 200 else 'UNSUCCESSFUL_RESPONSE_UPLOAD'
@@ -232,7 +234,12 @@ def upload_survey(session):
                            party_id=party_id,
                            description='Survey response for case {} uploaded by {}'.format(case_id, party_id))
     if code != 201:
-        logger.error('Error posting to case service', status_code=code, error_message=str(msg))
+        logger.error('Failed to post case event',
+                     error=msg,
+                     status_code=code,
+                     case_id=case_id,
+                     category=category,
+                     party_id=party_id)
 
     if result.status_code == 200:
         logger.info('Upload successful', party_id=party_id, case_id=case_id)

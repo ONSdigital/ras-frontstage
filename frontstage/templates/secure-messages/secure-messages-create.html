@@ -20,7 +20,7 @@ Send secure message
                     <p>To: ONS Business Surveys team</p>
 
                     {% if "subject" in errors %}
-                    <div class="panel panel--simple panel--error panel--spacious">
+                    <div class="panel panel--simple panel--error panel--spacious" id="subject-error">
                     <p class="error-message">{{ errors['subject'][0] }}</p>
                     {% endif %}
 
@@ -31,6 +31,7 @@ Send secure message
                             class="secure-message-form__subject input input--text"
                             type="text"
                             name="secure-message-subject"
+                            maxlength="100"
                             value="{{ draft['subject'] }}" />
                     </fieldset>
 
@@ -41,7 +42,7 @@ Send secure message
                     <br />
 
                     {% if "body" in errors %}
-                    <div class="panel panel--simple panel--error panel--spacious">
+                    <div class="panel panel--simple panel--error panel--spacious" id="body-error">
                         <p class="error-message">{{ errors['body'][0] }}</p>
                     {% endif %}
 

@@ -286,11 +286,16 @@ def register_enter_your_details():
         result = requests.post(party_service_url, headers=headers, data=json.dumps(registration_data))
         logger.debug('Party service response', status_code=result.status_code, reason=result.reason, text=result.text)
 
-        if result.status_code == 200:
-            return render_template('register/register.almost-done.html', _theme='default', email=email_address)
+        if result.status_code == 400:
+            duplicate_error = {"email_address": ["This email has already been used to register an account"]}
+            return render_template('register/register.enter-your-details.html',
+                                   _theme='default',
+                                   form=form,
+                                   errors=duplicate_error)
         elif result.status_code != 200:
             raise ExternalServiceError(result)
-
+        else:
+            return render_template('register/register.almost-done.html', _theme='default', email=email_address)
         # TODO We need to add an exception timeout catch and handle this type of error
     else:
         if form.errors:

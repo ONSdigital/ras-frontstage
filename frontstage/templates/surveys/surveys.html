@@ -11,7 +11,9 @@
         </div>
 
         <div id="SUBMIT_BY_COLUMN_HEADING" class="grid__col col-2@m">
+            {% if not history %}
             Submit by
+            {% endif %}
         </div>
 
         <div id="STATUS_COLUMN_HEADING" class="grid__col col-2@m">
@@ -40,8 +42,10 @@
         </div>
 
         <div class="grid__col col-2@m">
+            {% if not history %}
             <span class="survey-list-item__label mercury">SUBMIT BY: </span>
             <span>{{ data.collectionExerciseData.scheduledReturnDateTimeFormatted}}</span>
+            {% endif %}
         </div>
 
         <div class="grid__col col-2@m">

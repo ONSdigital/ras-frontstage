@@ -356,7 +356,7 @@ def register_email_resent():
     response = requests.get(url)
     if response.status_code == 200:
         logger.info("Successfully re-sent email verification link", party_id=party_id)
-        return render_template('register/register.email-resent.html', _theme='default')
+        return render_template('register/register.email-resent.html', _theme='default', party_id=party_id)
     elif response.status_code == 404:
         logger.warning("Party not found to resend email verification link to", party_id=party_id)
         return redirect(url_for('error_bp.default_error_page'))

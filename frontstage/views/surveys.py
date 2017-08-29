@@ -76,6 +76,7 @@ def access_survey(session):
         period_start = request.form.get('period_start', None)
         period_end = request.form.get('period_end', None)
         submit_by = request.form.get('submit_by', None)
+        referer_header = request.headers['referer']
 
         logger.info('Survey access requested',
                     collection_instrument=collection_instrument_id,
@@ -120,7 +121,7 @@ def access_survey(session):
         # Render the template
         return render_template('surveys/surveys-access.html', _theme='default', case_id=case_id, ci_data=ci_data,
                                survey=survey, survey_abbr=survey_abbr, business=business, period_start=period_start,
-                               period_end=period_end, submit_by=submit_by)
+                               period_end=period_end, submit_by=submit_by, referer_header=referer_header)
 
     # GET request here downloads the xlsx file
     if request.method == 'GET':

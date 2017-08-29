@@ -1,7 +1,5 @@
 import logging
 import os
-import frontstage.views
-import frontstage.error_handlers
 
 from flask import Flask
 from structlog import wrap_logger
@@ -28,6 +26,5 @@ if app.config['DEBUG']:
 logger_initial_config(service_name='ras-frontstage', log_level=log_level)
 logger = wrap_logger(logging.getLogger(__name__))
 
-
-
-
+import frontstage.views
+import frontstage.error_handlers

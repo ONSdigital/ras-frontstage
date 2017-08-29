@@ -54,7 +54,7 @@ def surveys_history(session):
     data_array = build_survey_data(session, status_filter)
 
     # Render the template
-    return render_template('surveys/surveys-history.html',  _theme='default', data_array=data_array)
+    return render_template('surveys/surveys-history.html',  _theme='default', data_array=data_array, history=True)
 
 
 def get_cases_from_party(party_id):

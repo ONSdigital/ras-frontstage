@@ -76,22 +76,20 @@ def login():
 
         url = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], username)
         req = requests.get(url, verify=False)
-        if req.status_code != 200:
+        if req.status_code == 404:
             logger.error('Email not found in party service', email=username)
+            return render_template('sign-in/sign-in.html', _theme='default',
+                                   form=form, data={"error": {"type": "failed"}})
+        elif req.status_code != 200:
+            logger.error('Error retrieving respondent from party service', email=username)
             raise ExternalServiceError(req)
-
-        ##### THIS EXCEPTION CAN NEVER BE HIT??? #####
-        try:
-            party_id = req.json().get('id')
-        except Exception as e:
-            logger.error('error trying to get username from party service', exception=str(e))
-            return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+        party_id = req.json().get('id')
 
         # Take our raw token and add a UTC timestamp to the expires_at attribute
         data_dict_for_jwt_token = timestamp_token(oauth2_token, username, party_id)
-
         encoded_jwt_token = encode(data_dict_for_jwt_token)
-        response = make_response(redirect(url_for('surveys_bp.logged_in', _external=True, _scheme=getenv('SCHEME', 'http'))))
+        response = make_response(redirect(url_for('surveys_bp.logged_in', _external=True,
+                                                  _scheme=getenv('SCHEME', 'http'))))
         response.set_cookie('authorization', value=encoded_jwt_token)
         return response
 

@@ -7,11 +7,11 @@
 {% block main %}
 
 <div>
-    {{ if "history" in referer_header }}
+    {% if 'history' in referer_header %}
         <a href="{{ url_for('surveys_bp.surveys_history') }}">Back</a>
-    {{ else }}
+    {% else %}
         <a href="{{ url_for('surveys_bp.logged_in') }}">Back</a>
-    {{ endif }}
+    {% endif %}
 </div>
 
 <br/>

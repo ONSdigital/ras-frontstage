@@ -72,6 +72,9 @@ class TestSurveys(unittest.TestCase):
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
         self.cases_data = cases_data
         self.survey_file = dict(file=(io.BytesIO(b'my file contents'), "testfile.xlsx"))
+        self.headers = {
+            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"  # NOQA
+            }
 
     @requests_mock.mock()
     def test_get_surveys_todo(self, mock_object):
@@ -117,8 +120,9 @@ class TestSurveys(unittest.TestCase):
     def test_view_access_surveys(self, mock_object):
         mock_object.get(url_get_case, status_code=200, json=cases_data)
         mock_object.get(url_get_collection_instrument, status_code=200, json=collection_instrument_data)
+        self.headers['referer'] = '/surveys/access_survey'
 
-        response = self.app.post('/surveys/access_survey', follow_redirects=True, data=access_survey_form)
+        response = self.app.post('/surveys/access_survey', follow_redirects=True, data=access_survey_form, headers=self.headers)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Bolts and Ratchets Ltd'.encode() in response.data)
@@ -127,8 +131,9 @@ class TestSurveys(unittest.TestCase):
     @requests_mock.mock()
     def test_view_access_surveys_case_fail(self, mock_object):
         mock_object.get(url_get_case, status_code=500, json=cases_data)
+        self.headers['referer'] = '/surveys/access_survey'
 
-        response = self.app.post('/surveys/access_survey', follow_redirects=True, data=access_survey_form)
+        response = self.app.post('/surveys/access_survey', follow_redirects=True, data=access_survey_form, headers=self.headers)
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
@@ -137,8 +142,9 @@ class TestSurveys(unittest.TestCase):
     def test_view_access_surveys_ci_fail(self, mock_object):
         mock_object.get(url_get_case, status_code=200, json=cases_data)
         mock_object.get(url_get_collection_instrument, status_code=500)
+        self.headers['referer'] = '/surveys/access_survey'
 
-        response = self.app.post('/surveys/access_survey', follow_redirects=True, data=access_survey_form)
+        response = self.app.post('/surveys/access_survey', follow_redirects=True, data=access_survey_form, headers=self.headers)
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
@@ -148,8 +154,9 @@ class TestSurveys(unittest.TestCase):
         self.cases_data[0]['collectionInstrumentId'] = 'somethingelse'
         mock_object.get(url_get_case, status_code=200, json=self.cases_data)
         mock_object.get(url_get_collection_instrument, status_code=200, json=collection_instrument_data)
+        self.headers['referer'] = '/surveys/access_survey'
 
-        response = self.app.post('/surveys/access_survey', follow_redirects=True, data=access_survey_form)
+        response = self.app.post('/surveys/access_survey', follow_redirects=True, data=access_survey_form, headers=self.headers)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Oops!'.encode() in response.data)

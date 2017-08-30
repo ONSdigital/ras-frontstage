@@ -309,13 +309,13 @@ def messages_get(session, label="INBOX"):
 
     labels = app.config['LABELS_GET_API_URL']
 
-    totals = requests.get(labels, headers=headers)
+    unread_label_data = requests.get(labels, headers=headers)
 
-    total = json.loads(totals.text)
+    unread_msg_total = json.loads(unread_label_data.text)
 
     logger.info('Retrieved messages successfully')
     return render_template('secure-messages/secure-messages.html', _theme='default', messages=response_data['messages'],
-                           links=response_data['_links'], label=label, total=total['total'])
+                           links=response_data['_links'], label=label, total=unread_msg_total['total'])
 
 
 @secure_message_bp.route('/draft/<draft_id>', methods=['GET'])

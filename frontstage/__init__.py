@@ -19,12 +19,9 @@ app.url_map.strict_slashes = False
 app.jinja_env.filters['case_status_filter'] = case_status_filter
 app.jinja_env.filters['file_size_filter'] = file_size_filter
 
-log_level = None
-if app.config['DEBUG']:
-    log_level = 'DEBUG'
-
+log_level = 'DEBUG' if app.config['DEBUG'] else None
 logger_initial_config(service_name='ras-frontstage', log_level=log_level)
 logger = wrap_logger(logging.getLogger(__name__))
 
-import frontstage.views
-import frontstage.error_handlers
+import frontstage.views  # NOQA
+import frontstage.error_handlers  # NOQA

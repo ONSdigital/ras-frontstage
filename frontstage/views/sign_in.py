@@ -12,7 +12,6 @@ from frontstage.exceptions.exceptions import ExternalServiceError
 from frontstage.jwt import encode, timestamp_token
 from frontstage.models import LoginForm
 
-
 logger = wrap_logger(logging.getLogger(__name__))
 
 sign_in_bp = Blueprint('sign_in_bp', __name__, static_folder='static', template_folder='frontstage/templates/sign-in')
@@ -46,7 +45,7 @@ def login():
             }
 
             oauth2_response = requests.post(url=token_url, data=data, headers=headers, auth=(app.config['RAS_FRONTSTAGE_CLIENT_ID'],
-                                                                                              app.config['RAS_FRONTSTAGE_CLIENT_SECRET']))
+                                                                                             app.config['RAS_FRONTSTAGE_CLIENT_SECRET']))
             # Check to see that this user has not attempted to login too many times or that they have not forgot to
             # click on the activate account URL in their email by checking the error message back from the OAuth2 server
             if oauth2_response.status_code == 401:
@@ -103,7 +102,7 @@ def login():
 
     return render_template('sign-in/sign-in.html', _theme='default', form=form, data=template_data)
 
-  
+
 @sign_in_bp.route('/logout')
 def logout():
     response = make_response(redirect(url_for('sign_in_bp.login')))

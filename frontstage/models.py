@@ -140,15 +140,6 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', [InputRequired("Password is required")])
 
 
-class EnrolmentCodeForm(FlaskForm):
-    """
-    This is our Register form and part 1 of registration. It's used for the user to pass the 'Activation Code'. The
-    activation code will be sent to the party service, in turn get resolved in the 'case service'. If successful we can
-    progress with registration. The 'Activation Code' is a string in our case.
-    """
-    enrolment_code = StringField('Enrolment Code', [InputRequired()])
-
-
 class ForgotPasswordForm(FlaskForm):
     """
     Forgot Password form.
@@ -158,6 +149,7 @@ class ForgotPasswordForm(FlaskForm):
                                             Email(message="Your email should be of the form 'myname@email.com' "),
                                             Length(max=254,
                                                    message='Your email must be less than 254 characters')])
+
 
 class ResetPasswordForm(FlaskForm):
     """

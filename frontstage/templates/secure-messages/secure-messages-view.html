@@ -6,9 +6,9 @@
 
 <div class="secure-message-view-component">
     {% if message['subject'].startswith('Re: ') %}
-        <h1 class="saturn">{{ message['subject'][4:] }}</h1>
+        <h1 class="saturn">Subject: {{ message['subject'][4:] }}</h1>
     {% else %}
-        <h1 class="saturn">{{ message['subject'] }}</h1>
+        <h1 class="saturn">Subject: {{ message['subject'] }}</h1>
     {% endif %}
     <div class="grid">
         <dl>
@@ -31,24 +31,14 @@
         {{ message['body'] }}
     </p>
     <form action="{{ url_for('secure_message_bp.reply_message') }}" method="post">
-        <fieldset>
-            <label>Subject</label>
+
             {% if message['subject'].startswith('Re: ') %}
-                <textarea readonly
-                    id="secure-message-subject-thread"
-                    class="secure-message-form__subject input input--text"
-                    type="text"
-                    rows="1"
-                    name="secure-message-subject">{{ message['subject'] }} </textarea>
+                {% set subject = message['subject'] %}
             {% else %}
-                <textarea readonly
-                    id="secure-message-subject"
-                    class="secure-message-form__subject input input--text"
-                    type="text"
-                    rows="1"
-                    name="secure-message-subject">Re: {{ message['subject'] }} </textarea>
+                {% set subject = "Re: " + message['subject'] %}
             {% endif %}
-        </fieldset>
+                <input name="secure-message-subject" type="hidden" id="secure-message-subject" value="{{ subject }}">
+
 
         <fieldset>
             <label class="venus" for="secure-message-body">Reply</label>

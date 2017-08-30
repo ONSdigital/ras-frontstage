@@ -322,10 +322,7 @@ def register_activate_account(token):
         party_id = json_response.get('id')
         if party_id:
             logger.warning('Expired token', token=token, party_id=party_id)
-            return redirect(url_for('register_bp.register_resend_email',
-                                    party_id=party_id,
-                                    _external=True,
-                                    _scheme=getenv('SCHEME', 'http')))
+            return render_template('register/register.link-expired.html', _theme='default', party_id=party_id)
         else:
             logger.error('No party_id found', token=token)
             return redirect(url_for('error_bp.default_error_page'))
@@ -350,14 +347,18 @@ def register_activate_account(token):
         return redirect(url_for('error_bp.default_error_page'))
 
 
-@register_bp.route('/create-account/resend-email', methods=['GET'])
-def register_resend_email():
-    user_id = request.args.get('party_id', None)
-    return render_template('register/register.link-expired.html', _theme='default', party_id=user_id)
-
-
 @register_bp.route('/create-account/email-resent', methods=['GET'])
 def register_email_resent():
-    # TODO Call the service that will request a new email to be sent out
-
-    return render_template('register/register.email-resent.html', _theme='default')
+    # Resend email verification link
+    party_id = request.args.get('party_id')
+    logger.debug('Attempting to re-send email verification link', party_id=party_id)
+    url = app.config['RAS_PARTY_RESEND_VERIFICATION'].format(app.config['RAS_PARTY_SERVICE'], party_id)
+    response = requests.get(url)
+    if response.status_code == 200:
+        logger.info("Successfully re-sent email verification link", party_id=party_id)
+        return render_template('register/register.email-resent.html', _theme='default', party_id=party_id)
+    elif response.status_code == 404:
+        logger.warning("Party not found to resend email verification link to", party_id=party_id)
+        return redirect(url_for('error_bp.default_error_page'))
+    else:
+        raise ExternalServiceError(response)

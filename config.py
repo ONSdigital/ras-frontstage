@@ -107,6 +107,7 @@ class Config(object):
     DRAFT_SAVE_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'draft/save'
     DRAFT_GET_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'draft/{}'
     DRAFT_PUT_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'draft/{}/modify'
+    LABELS_GET_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'labels?name=unread'
 
 
 class ProductionConfig(Config):

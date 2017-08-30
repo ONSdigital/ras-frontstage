@@ -20,6 +20,7 @@ _categories = None
 
 logger = wrap_logger(logging.getLogger(__name__))
 
+
 def post_event(case_id, description=None, category=None, party_id=None, created_by=None, payload=None):
     """
     Post an event to the case service ...

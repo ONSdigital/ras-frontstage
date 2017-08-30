@@ -3,9 +3,7 @@ import unittest
 import requests_mock
 
 from frontstage import app
-from frontstage.exceptions.exceptions import ExternalServiceError
 from frontstage.models import RespondentStatus
-
 
 token = 'TOKEN_ABC'
 user_id = 'USER_12345'

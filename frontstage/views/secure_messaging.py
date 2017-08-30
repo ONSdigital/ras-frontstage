@@ -337,7 +337,7 @@ def draft_get(session, draft_id):
     logger.info('Retrieved draft successfully')
 
     # Check if draft is part of an ongoing thread
-    thread_id = draft['thread_id']
+    thread_id = draft.get('thread_id')
     if thread_id != draft['msg_id']:
         logger.debug('Attempting to retrieve thread', thread_id=thread_id)
         url = app.config['THREAD_GET_API_URL'].format(thread_id)
@@ -346,11 +346,12 @@ def draft_get(session, draft_id):
             logger.error('Failed to retrieve thread', thread_id)
             raise ExternalServiceError(response)
         thread = json.loads(response.text)
+        message = thread[0]
     else:
-        thread = None
+        message = None
 
     return render_template('secure-messages/secure-messages-draft.html', _theme='default',
-                           draft=draft, message=thread[0])
+                           draft=draft, message=message)
 
 
 @secure_message_bp.route('/sent/<sent_id>', methods=['GET'])

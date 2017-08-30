@@ -19,7 +19,7 @@ def build_survey_data(session, status_filter):
     party_id = session.get('party_id', 'no-party-id')
     logger.debug('Retrieving survey data', party_id=party_id)
     url = app.config['RAS_AGGREGATOR_TODO'].format(app.config['RAS_API_GATEWAY_SERVICE'], party_id)
-    req = requests.get(url, params=status_filter, verify=False)
+    req = requests.get(url, auth=app.config['BASIC_AUTH'], params=status_filter, verify=False)
     if req.status_code != 200:
         logger.error('Failed to retrieve survey')
         ExternalServiceError(req)
@@ -88,7 +88,7 @@ def access_survey(session):
         #   - we can do this by calling "get cases by party" and ensuring the instrument_id is in the result set
         #
         url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
-        req = requests.get(url, verify=False)
+        req = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
         if req.status_code != 200:
             logger.error('Failed to retrieve case', party_id=party_id)
             raise ExternalServiceError(req)
@@ -111,7 +111,7 @@ def access_survey(session):
 
         url = app.config['RAS_CI_GET'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], collection_instrument_id)
         logger.info('Retrieving collection instrument', url=url)
-        req = requests.get(url, verify=False)
+        req = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
 
         if req.status_code != 200:
             raise ExternalServiceError(req)
@@ -137,7 +137,7 @@ def access_survey(session):
         #   - we can do this by calling "get cases by party" and ensuring the instrument_id is in the result set
         #
         url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
-        req = requests.get(url, verify=False)
+        req = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
         if req.status_code != 200:
             logger.error('Failed to retrieve case', party_id=party_id)
             raise ExternalServiceError(req)
@@ -159,7 +159,7 @@ def access_survey(session):
             return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
 
         url = app.config['RAS_CI_DOWNLOAD'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], collection_instrument_id)
-        response = requests.get(url, verify=False)
+        response = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
 
         category = 'COLLECTION_INSTRUMENT_DOWNLOADED' if response.status_code == 200 else 'COLLECTION_INSTRUMENT_ERROR'
         code, msg = post_event(case_id,
@@ -202,7 +202,7 @@ def upload_survey(session):
     #   - we can do this by calling "get cases by party" and ensuring the case_id is in the result set
     #
     url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
-    req = requests.get(url, verify=False)
+    req = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
     if req.status_code != 200:
         logger.error('Failed to retrieve case', party_id=party_id)
         raise ExternalServiceError(req)
@@ -235,7 +235,7 @@ def upload_survey(session):
     # Upload the survey
     url = app.config['RAS_CI_UPLOAD'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], case_id)
     logger.info('Attempting to upload survey', url=url, case_id=case_id, party_id=party_id)
-    result = requests.post(url, headers, files=upload_file, verify=False)
+    result = requests.post(url, auth=app.config['BASIC_AUTH'], headers=headers, files=upload_file, verify=False)
     logger.debug('Upload survey response', result=result.status_code, reason=result.reason, text=result.text)
 
     category = 'SUCCESSFUL_RESPONSE_UPLOAD' if result.status_code == 200 else 'UNSUCCESSFUL_RESPONSE_UPLOAD'

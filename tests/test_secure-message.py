@@ -24,14 +24,15 @@ url_case_get_by_party = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM
                                                                   "db036fd7-ce17-40c2-a8fc-932e7c228397")
 url_ru_id_get_by_party = app.config['RAS_PARTY_GET_BY_RESPONDENT'].format(app.config['RAS_PARTY_SERVICE'],
                                                                           "db036fd7-ce17-40c2-a8fc-932e7c228397")
-url_sm_create_message = 'http://localhost:5050/message/send'
-url_sm_save_draft = 'http://localhost:5050/draft/save'
-url_sm_modify_draft = 'http://localhost:5050/draft/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb/modify'
-url_sm_modify_message = 'http://localhost:5050/message/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb/modify'
-url_sm_get_draft = 'http://localhost:5050/draft/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
-url_sm_get_messages = 'http://localhost:5050/messages?limit=1000'
-url_sm_get_single_draft = 'http://localhost:5050/draft/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
-url_sm_get_single_message = 'http://localhost:5050/message/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
+
+url_sm_create_message = app.config['CREATE_MESSAGE_API_URL']
+url_sm_save_draft = app.config['DRAFT_SAVE_API_URL']
+url_sm_modify_draft = app.config['DRAFT_PUT_API_URL'].format('7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb')
+url_sm_modify_message = app.config['MESSAGE_MODIFY_URL'].format('7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb')
+url_sm_get_single_draft = app.config['DRAFT_GET_API_URL'].format('7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb')
+url_sm_get_messages = app.config['MESSAGES_API_URL']
+url_sm_get_single_message = app.config['MESSAGE_GET_URL'].format('7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb')
+url_sm_get_labels = app.config['LABELS_GET_API_URL']
 
 encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoX3Rva2VuIjoiNmY5NjM0ZGEtYTI3ZS00ZDk3LWJhZjktNjN" \
                     "jOGRjY2IyN2M2IiwiYWNjZXNzX3Rva2VuIjoiMjUwMDM4YzUtM2QxOS00OGVkLThlZWMtODFmNTQyMDRjNDE1Iiwic2NvcGU" \
@@ -159,7 +160,7 @@ class TestSecureMessage(unittest.TestCase):
         mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
         mock_object.get(url_ru_id_get_by_party, status_code=200, json=party_data)
         mock_object.post(url_sm_save_draft, status_code=201, json=self.send_response)
-        mock_object.get(url_sm_get_draft, status_code=200, json=example_message_data)
+        mock_object.get(url_sm_get_single_draft, status_code=200, json=example_message_data)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
         self.message_form['submit'] = 'Save draft'
 
@@ -199,7 +200,7 @@ class TestSecureMessage(unittest.TestCase):
         mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
         mock_object.get(url_ru_id_get_by_party, status_code=200, json=party_data)
         mock_object.put(url_sm_modify_draft, status_code=200, json=self.send_response)
-        mock_object.get(url_sm_get_draft, status_code=200, json=example_message_data)
+        mock_object.get(url_sm_get_single_draft, status_code=200, json=example_message_data)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
         self.message_form['submit'] = 'Save draft'
         self.message_form['msg_id'] = '7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
@@ -321,7 +322,7 @@ class TestSecureMessage(unittest.TestCase):
         mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
         mock_object.get(url_ru_id_get_by_party, status_code=200, json=party_data)
         mock_object.post(url_sm_save_draft, status_code=201, json=self.send_response)
-        mock_object.get(url_sm_get_draft, status_code=200, json=example_message_data)
+        mock_object.get(url_sm_get_single_draft, status_code=200, json=example_message_data)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
         self.message_form['submit'] = 'Save draft'
 
@@ -361,7 +362,7 @@ class TestSecureMessage(unittest.TestCase):
         mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
         mock_object.get(url_ru_id_get_by_party, status_code=200, json=party_data)
         mock_object.put(url_sm_modify_draft, status_code=200, json=self.send_response)
-        mock_object.get(url_sm_get_draft, status_code=200, json=example_message_data)
+        mock_object.get(url_sm_get_single_draft, status_code=200, json=example_message_data)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
         self.message_form['submit'] = 'Save draft'
         self.message_form['msg_id'] = '7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
@@ -402,6 +403,7 @@ class TestSecureMessage(unittest.TestCase):
     @requests_mock.mock()
     def test_get_messages_success(self, mock_object):
         mock_object.get(url_sm_get_messages, status_code=200, json=messages_get_data)
+        mock_object.get(url_sm_get_labels, status_code=200, json={'name': '', 'total': ''})
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
 
         response = self.app.get("secure-message/messages/", data=self.message_form, follow_redirects=True)

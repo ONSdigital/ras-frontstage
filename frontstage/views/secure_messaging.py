@@ -22,7 +22,7 @@ secure_message_bp = Blueprint('secure_message_bp', __name__, static_folder='stat
 def get_party_ru_id(party_id):
     url = app.config['RAS_PARTY_GET_BY_RESPONDENT'].format(app.config['RAS_PARTY_SERVICE'], party_id)
     logger.debug('Retrieving ru_id', party_id=party_id)
-    party_response = requests.get(url)
+    party_response = requests.get(url, auth=app.config['BASIC_AUTH'])
     if party_response.status_code == 404:
         logger.error('No respondent found in party service', party_id=party_id)
         return None
@@ -42,7 +42,7 @@ def get_party_ru_id(party_id):
 def get_collection_case(party_id):
     url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
     logger.debug('Retrieving collection case id', party_id=party_id)
-    collection_response = requests.get(url)
+    collection_response = requests.get(url, auth=app.config['BASIC_AUTH'])
     if collection_response.status_code == 204:
         logger.error('No case found', party_id=party_id)
         return None
@@ -56,7 +56,7 @@ def get_collection_case(party_id):
 def get_survey_id(party_id):
     url = app.config['RAS_PARTY_GET_BY_RESPONDENT'].format(app.config['RAS_PARTY_SERVICE'], party_id)
     logger.debug('Retrieving survey id', party_id=party_id)
-    survey_response = requests.get(url)
+    survey_response = requests.get(url, auth=app.config['BASIC_AUTH'])
     if survey_response is None:
         logger.error('No respondent found in party service', party_id=party_id)
         return None
@@ -305,14 +305,19 @@ def messages_get(session, label="INBOX"):
         raise ExternalServiceError(resp)
 
     response_data = json.loads(resp.text)
-    total_msgs = 0
 
-    for x in range(0, len(response_data['messages'])):
-        if "UNREAD" in response_data['messages'][x]["labels"]:
-            total_msgs += 1
+    labels = app.config['LABELS_GET_API_URL']
+
+    unread_label_data = requests.get(labels, headers=headers)
+    if unread_label_data.status_code != 200:
+        logger.error('Failed to retrieve unread label data')
+        unread_msg_total = {'total': '0'}
+    else:
+        unread_msg_total = json.loads(unread_label_data.text)
+
     logger.info('Retrieved messages successfully')
     return render_template('secure-messages/secure-messages.html', _theme='default', messages=response_data['messages'],
-                           links=response_data['_links'], label=label, total=total_msgs)
+                           links=response_data['_links'], label=label, total=unread_msg_total['total'])
 
 
 @secure_message_bp.route('/draft/<draft_id>', methods=['GET'])
@@ -366,7 +371,7 @@ def message_get(session, msg_id):
     loggerb.debug('Attempting to remove unread label')
     data = {"label": 'UNREAD', "action": 'remove'}
     url = app.config['MESSAGE_MODIFY_URL'].format(msg_id)
-    response = requests.put(url, data=json.dumps(data), headers=headers)  # noqa: F841
+    response = requests.put(url, data=json.dumps(data), headers=headers)
     if response.status_code != 200:
         loggerb.error("Failed to remove unread label")
         raise ExternalServiceError(response)

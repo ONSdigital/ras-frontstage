@@ -14,6 +14,9 @@ class Config(object):
     CSRF_ENABLED = False
     WTF_CSRF_ENABLED = False
     SECRET_KEY = 'this-really-needs-to-be-changed'
+    SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'dummy_user')
+    SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'dummy_password')
+    BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
 
     VALIDATE_JWT = os.environ.get('VALIDATE_JWT', True)
     GOOGLE_ANALYTICS = os.getenv('GOOGLE_ANALYTICS', None)
@@ -104,6 +107,7 @@ class Config(object):
     DRAFT_SAVE_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'draft/save'
     DRAFT_GET_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'draft/{}'
     DRAFT_PUT_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'draft/{}/modify'
+    LABELS_GET_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'labels?name=unread'
 
 
 class ProductionConfig(Config):

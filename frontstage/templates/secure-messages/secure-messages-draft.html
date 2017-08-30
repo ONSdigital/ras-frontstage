@@ -17,16 +17,16 @@ Send secure message
             <div class="system-feedback"> 
                 <ul class="system-feedback__list"> 
                     <li class="system-feedback__list-item system-feedback__list-item--success"> 
-                            <i class="fa fa-check-circle system-feedback__icon" aria-hidden="true" id="inbox-link"> </i>
-                            Draft saved.
-                            <a href="{{ url_for('secure_message_bp.messages_get') }}">View your inbox</a> </li> 
+                        <i class="fa fa-check-circle system-feedback__icon" aria-hidden="true" id="inbox-link"> </i>
+                        Draft saved.
+                        <a href="{{ url_for('secure_message_bp.messages_get') }}">View your inbox</a> 
+                    </li> 
                 </ul> 
             </div>
             {% endif %}
 
             {% if message %}
             <h1 class="saturn">Subject: {{ message['subject'] }}</h1>
-
             <div class="grid">
                 <dl>
                     <dt class="grid__col col-2@s">From:</dt>
@@ -36,17 +36,13 @@ Send secure message
                     {% else %}
                         {{ message['@msg_from']['email'] }}
                     {% endif %}
-            </dd>
-            <dt class="grid__col col-2@s">Sent:</dt>
-            <dd class="grid__col col-10@s">{{ message['sent_date'][:19] }}</dd>
+                    </dd>
+                    <dt class="grid__col col-2@s">Sent:</dt>
+                    <dd class="grid__col col-10@s">{{ message['sent_date'][:19] }}</dd>
                 </dl>
             </div>
-
             <br />
-
-            <p>
-                {{ message['body'] }}
-            </p>
+            <p> {{ message['body'] }} </p>
             {% endif %}
 
             <h1 class="saturn">Edit a draft message</h1>
@@ -66,15 +62,7 @@ Send secure message
                         {% endif %}
 
                         {% if draft['msg_id'] == draft['thread_id'] %}
-                        <fieldset>
-                            <label for="secure-message-subject">Subject</label>
-                            <input
-                                id="secure-message-subject"
-                                class="secure-message-form__subject input input--text"
-                                type="text"
-                                name="secure-message-subject"
-                                value="{{ draft['subject'] }}"/>
-                        </fieldset>
+                            <input name="secure-message-subject" type="hidden" id="secure-message-subject" value="{{ subject }}">
                         {% else %}
                             <fieldset>
                             <label for="secure-message-subject">Subject</label>

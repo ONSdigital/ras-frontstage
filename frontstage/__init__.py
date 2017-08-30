@@ -23,5 +23,5 @@ log_level = 'DEBUG' if app.config['DEBUG'] else None
 logger_initial_config(service_name='ras-frontstage', log_level=log_level)
 logger = wrap_logger(logging.getLogger(__name__))
 
-import frontstage.views  # NOQA
-import frontstage.error_handlers  # NOQA
+import frontstage.views  # NOQA  # pylint: disable=wrong-import-position
+import frontstage.error_handlers  # NOQA  # pylint: disable=wrong-import-position

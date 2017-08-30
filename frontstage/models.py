@@ -2,9 +2,9 @@
 This module contains the data model for the application
 """
 import logging
-
-import phonenumbers
 import enum
+import phonenumbers
+
 from flask_wtf import FlaskForm
 from phonenumbers.phonenumberutil import NumberParseException
 from structlog import wrap_logger
@@ -110,26 +110,26 @@ class RegistrationForm(FlaskForm):
                                default=None)
     enrolment_code = HiddenField('Enrolment Code')
 
+    @staticmethod
     def validate_phone_number(form, field):
         try:
             logger.debug('Checking this is a valid GB phone number')
             input_number = phonenumbers.parse(field.data, "GB")  # Tell the parser we are looking for a GB number
 
-            if not (phonenumbers.is_possible_number(input_number)):
+            if not phonenumbers.is_possible_number(input_number):
                 raise ValidationError('This should be a valid phone number between 9 and 15 digits')
 
-            if not (phonenumbers.is_valid_number(input_number)):
+            if not phonenumbers.is_valid_number(input_number):
                 raise ValidationError('Please use a valid UK number e.g. 01632 496 0018.')
         except NumberParseException:
             logger.debug('There is a number parse exception in the phonenumber field')
             raise ValidationError('This should be a valid UK number e.g. 01632 496 0018. ')
 
+    @staticmethod
     def validate_password(form, field):
         password = field.data
-        if password.isalnum() or \
-            not any(char.isupper() for char in password) or \
-                not any(char.isdigit() for char in password):
-                    raise ValidationError(app.config['PASSWORD_CRITERIA_ERROR_TEXT'])
+        if password.isalnum() or not any(char.isupper() for char in password) or not any(char.isdigit() for char in password):
+            raise ValidationError(app.config['PASSWORD_CRITERIA_ERROR_TEXT'])
 
 
 class LoginForm(FlaskForm):

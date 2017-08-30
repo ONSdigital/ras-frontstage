@@ -310,8 +310,11 @@ def messages_get(session, label="INBOX"):
     labels = app.config['LABELS_GET_API_URL']
 
     unread_label_data = requests.get(labels, headers=headers)
-
-    unread_msg_total = json.loads(unread_label_data.text)
+    if unread_label_data.status_code != 200:
+        logger.error('Failed to retrieve unread label data')
+        unread_msg_total = {'total': '0'}
+    else:
+        unread_msg_total = json.loads(unread_label_data.text)
 
     logger.info('Retrieved messages successfully')
     return render_template('secure-messages/secure-messages.html', _theme='default', messages=response_data['messages'],

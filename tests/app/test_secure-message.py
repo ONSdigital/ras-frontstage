@@ -422,6 +422,17 @@ class TestSecureMessage(unittest.TestCase):
         self.assertTrue(bytes("500", encoding='UTF-8') in response.data)
 
     @requests_mock.mock()
+    def test_get_messages_label_fail(self, mock_object):
+        mock_object.get(url_sm_get_messages, status_code=200, json=messages_get_data)
+        mock_object.get(url_sm_get_labels, status_code=500, json={'name': '', 'total': ''})
+        self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
+
+        response = self.app.get("secure-message/messages/", data=self.message_form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(bytes("aaaabbbbaaaa", encoding='UTF-8') in response.data)
+
+    @requests_mock.mock()
     def test_get_single_draft_success(self, mock_object):
         mock_object.get(url_sm_get_single_draft, status_code=200, json=example_message_data)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)

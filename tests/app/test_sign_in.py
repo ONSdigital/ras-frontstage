@@ -61,6 +61,61 @@ class TestSignIn(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue('/surveys/'.encode() in response.data)
 
+    @requests_mock.mock()
+    def test_sign_in_unauthorised_oauth_credentials(self, mock_object):
+        self.sign_in_form['username'] = 'testuser@email.com'
+        self.sign_in_form['password'] = 'password'
+        mock_object.post(url_oauth_token, status_code=401, json={"detail": "Unauthorized user credentials"})
+
+        response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Incorrect email or password'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_sign_in_locked_account(self, mock_object):
+        self.sign_in_form['username'] = 'testuser@email.com'
+        self.sign_in_form['password'] = 'password'
+        mock_object.post(url_oauth_token, status_code=401, json={"detail": "User account locked"})
+
+        response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Trouble signing in?'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_sign_in_unverified_account(self, mock_object):
+        self.sign_in_form['username'] = 'testuser@email.com'
+        self.sign_in_form['password'] = 'password'
+        mock_object.post(url_oauth_token, status_code=401, json={"detail": "User account not verified"})
+
+        response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Please follow the link in the verification email'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_sign_in_unknown_response(self, mock_object):
+        self.sign_in_form['username'] = 'testuser@email.com'
+        self.sign_in_form['password'] = 'password'
+        mock_object.post(url_oauth_token, status_code=401, json={"detail": "wat"})
+
+        response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Incorrect email or password'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_sign_in_oauth_fail(self, mock_object):
+        self.sign_in_form['username'] = 'testuser@email.com'
+        self.sign_in_form['password'] = 'password'
+        mock_object.post(url_oauth_token, status_code=500)
+
+        response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
     def test_sign_in_no_username(self):
         del self.sign_in_form['username']
 
@@ -87,10 +142,9 @@ class TestSignIn(unittest.TestCase):
         self.assertTrue('Password is required'.encode() in response.data)
 
     @requests_mock.mock()
-    def test_sign_in_unrecognised_user_oauth(self, mock_object):
-        self.sign_in_form['username'] = 'testuser@email.com'
-        self.sign_in_form['password'] = 'password'
-        mock_object.post(url_oauth_token, status_code=401, text='{"detail":"Unauthorized user credentials!!!"}')
+    def test_sign_in_unrecognised_user_party(self, mock_object):
+        mock_object.post(url_oauth_token, status_code=201, json=oauth_token)
+        mock_object.get(url_party_by_email, status_code=404, json=my_party_data)
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
@@ -98,9 +152,9 @@ class TestSignIn(unittest.TestCase):
         self.assertTrue('Incorrect email or password'.encode() in response.data)
 
     @requests_mock.mock()
-    def test_sign_in_unrecognised_user_party(self, mock_object):
+    def test_sign_in_party_fail(self, mock_object):
         mock_object.post(url_oauth_token, status_code=201, json=oauth_token)
-        mock_object.get(url_party_by_email, status_code=404, json=my_party_data)
+        mock_object.get(url_party_by_email, status_code=500, json=my_party_data)
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 

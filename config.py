@@ -53,6 +53,7 @@ class Config(object):
     dbname = "ras_frontstage_backup"
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI', 'postgresql://ras_frontstage_backup:password@localhost:5431/postgres')
     VALIDATE_JWT = os.environ.get('VALIDATE_JWT', True)
+    SELENIUM_TEST_URL = os.environ.get('SELENIUM_TEST_URL', 'http://localhost:8080')
     GOOGLE_ANALYTICS = os.getenv('GOOGLE_ANALYTICS', None)
 
     ONS_OAUTH_PROTOCOL = os.environ.get('ONS_OAUTH_PROTOCOL', 'http://')
@@ -157,6 +158,7 @@ class Config(object):
     RM_CASE_GET_BY_PARTY = '{}cases/partyid/{}'
     RM_CASE_GET_BY_IAC = '{}cases/iac/{}'
     RAS_PARTY_GET_BY_EMAIL = '{}party-api/v1/respondents/email/{}'
+    RAS_PARTY_RESEND_VERIFICATION = '{}party-api/v1/resend-verification-email/{}'
 
     MESSAGE_LIMIT = os.getenv('MESSAGE_LIMIT', 1000)
     CREATE_MESSAGE_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'message/send'
@@ -245,10 +247,6 @@ class DevelopmentConfig(Config):
     API_GATEWAY_COLLECTION_INSTRUMENT_URL = os.environ.get('API_GATEWAY_COLLECTION_INSTRUMENT_URL', 'http://localhost:8082/collection-instrument-api/1.0.2/')
     API_GATEWAY_AGGREGATED_SURVEYS_URL = os.environ.get('API_GATEWAY_AGGREGATED_SURVEYS_URL', 'http://localhost:8083/api/1.0.0/surveys/')
     API_GATEWAY_PARTY_URL = os.environ.get('API_GATEWAY_PARTY_URL', 'http://localhost:8081/party-api/v1/')
-
-
-
-
 
 
 class TestingConfig(Config):

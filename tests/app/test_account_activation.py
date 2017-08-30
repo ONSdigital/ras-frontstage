@@ -9,9 +9,11 @@ from frontstage.models import RespondentStatus
 
 token = 'TOKEN_ABC'
 user_id = 'USER_12345'
+party_id = "db036fd7-ce17-40c2-a8fc-932e7c228397"
 
 # Build the mock URL and that is used to validate the email token
 url_email_verification = app.config['RAS_PARTY_VERIFY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], token)
+url_resend_verification = app.config['RAS_PARTY_RESEND_VERIFICATION'].format(app.config['RAS_PARTY_SERVICE'], party_id)
 
 
 @requests_mock.mock()
@@ -87,25 +89,38 @@ class TestAccountActivation(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Oops!'.encode() in response.data)
 
-    # ============== YOUR LINK HAS EXPIRED PAGE ===============
-
-    # Check the content of the 'Your link has expired' page
-    def test_link_expired_page(self, mock_object):
-        response = self.app.get('/register/create-account/resend-email?user_id=' + user_id, headers=self.headers, follow_redirects=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('Expired'.encode() in response.data)
-
     # ==============EMAIL RE-SENT PAGE ===============
 
     # Check the content of the 'We've re-sent your email' page
-    def test_email_resent_page(self, mock_object):
-        response = self.app.get('/register/create-account/email-resent?user_id=' + user_id, headers=self.headers, follow_redirects=True)
+    def test_email_resent(self, mock_object):
+        mock_object.get(url_resend_verification, status_code=200)
 
-        # TODO check that the email was actually re-sent once the backend functionality has been developed
+        response = self.app.get('/register/create-account/email-resent?party_id=' + party_id,
+                                headers=self.headers,
+                                follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('re-sent'.encode() in response.data)
+
+    def test_email_resent_404(self, mock_object):
+        mock_object.get(url_resend_verification, status_code=404)
+
+        response = self.app.get('/register/create-account/email-resent?party_id=' + party_id,
+                                headers=self.headers,
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Oops!'.encode() in response.data)
+
+    def test_email_resent_500(self, mock_object):
+        mock_object.get(url_resend_verification, status_code=500)
+
+        response = self.app.get('/register/create-account/email-resent?party_id=' + party_id,
+                                headers=self.headers,
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
 
     # ============== SIGN IN PAGE WITH 'ACCOUNT ACTIVATED' MESSAGE ===============
 

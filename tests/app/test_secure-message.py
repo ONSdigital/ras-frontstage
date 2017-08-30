@@ -191,7 +191,7 @@ class TestSecureMessage(unittest.TestCase):
 
         response = self.app.post("secure-message/create-message", data=self.message_form, follow_redirects=True)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 500)
         self.assertTrue(bytes("errors", encoding='UTF-8'))
 
     @requests_mock.mock()

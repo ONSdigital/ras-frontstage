@@ -2,7 +2,7 @@ import json
 import logging
 from os import getenv
 
-from flask import Blueprint, render_template, request, flash, redirect, url_for, abort
+from flask import Blueprint, render_template, request, redirect, url_for, abort
 from jose import JWTError
 from oauthlib.oauth2 import BackendApplicationClient, MissingTokenError
 import requests

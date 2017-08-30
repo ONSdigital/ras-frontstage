@@ -1,5 +1,4 @@
 import logging
-import os
 
 from flask import Blueprint, json, redirect, render_template, request, session, url_for
 from frontstage.common.authorisation import jwt_authorization
@@ -254,7 +253,7 @@ def reply_message(session):
             if get_draft.status_code != 200:
                 logger.error('Failed to retrieve saved draft')
                 raise ExternalServiceError(get_draft)
-                
+
             get_json = json.loads(get_draft.content)
             loggerb.debug('Retrieved saved draft')
             return render_template('secure-messages/secure-messages-draft.html', _theme='default', draft=get_json)

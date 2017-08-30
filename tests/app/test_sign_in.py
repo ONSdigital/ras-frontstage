@@ -169,4 +169,3 @@ class TestSignIn(unittest.TestCase):
         self.assertTrue('Sign in'.encode() in response.data)
         self.assertTrue('Have an enrolment code?'.encode() in response.data)
         self.assertFalse('Sign out'.encode() in response.data)
-

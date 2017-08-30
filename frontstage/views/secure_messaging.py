@@ -305,14 +305,19 @@ def messages_get(session, label="INBOX"):
         raise ExternalServiceError(resp)
 
     response_data = json.loads(resp.text)
-    total_msgs = 0
 
-    for x in range(0, len(response_data['messages'])):
-        if "UNREAD" in response_data['messages'][x]["labels"]:
-            total_msgs += 1
+    labels = app.config['LABELS_GET_API_URL']
+
+    unread_label_data = requests.get(labels, headers=headers)
+    if unread_label_data.status_code != 200:
+        logger.error('Failed to retrieve unread label data')
+        unread_msg_total = {'total': '0'}
+    else:
+        unread_msg_total = json.loads(unread_label_data.text)
+
     logger.info('Retrieved messages successfully')
     return render_template('secure-messages/secure-messages.html', _theme='default', messages=response_data['messages'],
-                           links=response_data['_links'], label=label, total=total_msgs)
+                           links=response_data['_links'], label=label, total=unread_msg_total['total'])
 
 
 @secure_message_bp.route('/draft/<draft_id>', methods=['GET'])

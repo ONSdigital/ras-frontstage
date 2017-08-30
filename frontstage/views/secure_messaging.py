@@ -192,7 +192,7 @@ def reply_message(session):
                 'msg_from': session['party_id'],
                 'subject': request.form['secure-message-subject'],
                 'body': request.form['secure-message-body'],
-                'thread_id': '',
+                'thread_id': request.form['secure-message-thread-id'],
                 'collection_case': collection_case,
                 'ru_id': ru_id,
                 'survey': survey_name}

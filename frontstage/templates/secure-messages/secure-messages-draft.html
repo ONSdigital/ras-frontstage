@@ -39,6 +39,7 @@ Send secure message
                             <p class="error-message">{{ errors['subject'][0] }}</p>
                         {% endif %}
 
+                        {% if message['msg_id'] == message['thread_id'] %}
                         <fieldset>
                             <label for="secure-message-subject">Subject</label>
                             <input
@@ -48,6 +49,8 @@ Send secure message
                                 name="secure-message-subject"
                                 value="{{ draft['subject'] }}"/>
                         </fieldset>
+                        {% else %}
+                            
 
                         {% if "subject" in errors %}
                         </div>

@@ -23,6 +23,32 @@ Send secure message
                 </ul> 
             </div>
             {% endif %}
+
+            {% if message %}
+            <h1 class="saturn">Subject: {{ message['subject'] }}</h1>
+
+            <div class="grid">
+                <dl>
+                    <dt class="grid__col col-2@s">From:</dt>
+                    <dd class="grid__col col-10@s">
+                    {% if message['@msg_from']['id'] == 'BRES' %}
+                        {{ message['@msg_from']['id'] }}
+                    {% else %}
+                        {{ message['@msg_from']['email'] }}
+                    {% endif %}
+            </dd>
+            <dt class="grid__col col-2@s">Sent:</dt>
+            <dd class="grid__col col-10@s">{{ message['sent_date'][:19] }}</dd>
+                </dl>
+            </div>
+
+            <br />
+
+            <p>
+                {{ message['body'] }}
+            </p>
+            {% endif %}
+
             <h1 class="saturn">Edit a draft message</h1>
             <div class="secure-message-form">
                 <form action="{{ url_for('secure_message_bp.create_message') }}" method="post">
@@ -39,7 +65,7 @@ Send secure message
                             <p class="error-message">{{ errors['subject'][0] }}</p>
                         {% endif %}
 
-                        {% if message['msg_id'] == message['thread_id'] %}
+                        {% if draft['msg_id'] == draft['thread_id'] %}
                         <fieldset>
                             <label for="secure-message-subject">Subject</label>
                             <input
@@ -50,7 +76,16 @@ Send secure message
                                 value="{{ draft['subject'] }}"/>
                         </fieldset>
                         {% else %}
-                            
+                            <fieldset>
+                            <label for="secure-message-subject">Subject</label>
+                            <input readonly
+                                id="secure-message-subject"
+                                class="secure-message-form__subject input input--text"
+                                type="text"
+                                name="secure-message-subject"
+                                value="{{ draft['subject'] }}"/>
+                        </fieldset>
+                        {% endif %}
 
                         {% if "subject" in errors %}
                         </div>

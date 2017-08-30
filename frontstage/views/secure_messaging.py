@@ -337,7 +337,15 @@ def draft_get(session, draft_id):
 
     draft = json.loads(get_draft.text)
     logger.info('Retrieved draft successfully')
-    return render_template('secure-messages/secure-messages-draft.html', _theme='default', draft=draft)
+
+    if draft['thread_id'] != draft['msg_id']:
+        url_msg_get = app.config['THREAD_GET_API_URL'].format(draft['thread_id'])
+        response = requests.get(url_msg_get, headers=headers)
+        message = json.loads(response.text)
+    else:
+        message = None
+
+    return render_template('secure-messages/secure-messages-draft.html', _theme='default', draft=draft, message=message)
 
 
 @secure_message_bp.route('/sent/<sent_id>', methods=['GET'])

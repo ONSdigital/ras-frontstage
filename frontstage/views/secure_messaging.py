@@ -22,7 +22,7 @@ secure_message_bp = Blueprint('secure_message_bp', __name__, static_folder='stat
 def get_party_ru_id(party_id):
     url = app.config['RAS_PARTY_GET_BY_RESPONDENT'].format(app.config['RAS_PARTY_SERVICE'], party_id)
     logger.debug('Retrieving ru_id', party_id=party_id)
-    party_response = requests.get(url)
+    party_response = requests.get(url, auth=app.config['BASIC_AUTH'])
     if party_response.status_code == 404:
         logger.error('No respondent found in party service', party_id=party_id)
         return None
@@ -42,7 +42,7 @@ def get_party_ru_id(party_id):
 def get_collection_case(party_id):
     url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
     logger.debug('Retrieving collection case id', party_id=party_id)
-    collection_response = requests.get(url)
+    collection_response = requests.get(url, auth=app.config['BASIC_AUTH'])
     if collection_response.status_code == 204:
         logger.error('No case found', party_id=party_id)
         return None
@@ -56,7 +56,7 @@ def get_collection_case(party_id):
 def get_survey_id(party_id):
     url = app.config['RAS_PARTY_GET_BY_RESPONDENT'].format(app.config['RAS_PARTY_SERVICE'], party_id)
     logger.debug('Retrieving survey id', party_id=party_id)
-    survey_response = requests.get(url)
+    survey_response = requests.get(url, auth=app.config['BASIC_AUTH'])
     if survey_response is None:
         logger.error('No respondent found in party service', party_id=party_id)
         return None
@@ -118,7 +118,7 @@ def create_message(session):
                 loggerb.info('Attempting to modify draft')
                 url = app.config['DRAFT_PUT_API_URL'].format(request.form['msg_id'])
 
-                response = requests.put(url, data=json.dumps(data), headers=headers)
+                response = requests.put(url, auth=app.config['BASIC_AUTH'], data=json.dumps(data), headers=headers)
 
                 if response.status_code == 400:
                     loggerb.warning("Bad request to secure message service")
@@ -134,7 +134,7 @@ def create_message(session):
                 loggerb.info("Attempting to save draft")
                 url = app.config['DRAFT_SAVE_API_URL']
 
-                response = requests.post(url, data=json.dumps(data), headers=headers)
+                response = requests.post(url, auth=app.config['BASIC_AUTH'], data=json.dumps(data), headers=headers)
 
                 if response.status_code == 400:
                     loggerb.warning("Bad request to secure message service")
@@ -154,7 +154,7 @@ def create_message(session):
             loggerb.debug('Retrieving saved draft')
 
             url = app.config['DRAFT_GET_API_URL'].format(response_data['msg_id'])
-            get_draft = requests.get(url, headers=headers)
+            get_draft = requests.get(url, auth=app.config['BASIC_AUTH'], headers=headers)
 
             if get_draft.status_code != 200:
                 loggerb.error('Failed to retrieve saved draft')
@@ -213,7 +213,7 @@ def reply_message(session):
                 data['msg_id'] = request.form['msg_id']
                 url = app.config['DRAFT_PUT_API_URL'].format(request.form['msg_id'])
 
-                response = requests.put(url, data=json.dumps(data), headers=headers)
+                response = requests.put(url, auth=app.config['BASIC_AUTH'], data=json.dumps(data), headers=headers)
 
                 if response.status_code == 400:
                     logger.warning("Bad request to secure message service")
@@ -228,7 +228,7 @@ def reply_message(session):
             else:
                 loggerb.info("Attempting to save draft")
                 url = app.config['DRAFT_SAVE_API_URL']
-                response = requests.post(url, data=json.dumps(data), headers=headers)
+                response = requests.post(url, auth=app.config['BASIC_AUTH'], data=json.dumps(data), headers=headers)
 
                 if response.status_code == 400:
                     loggerb.warning("Bad request to secure message service")
@@ -248,7 +248,7 @@ def reply_message(session):
             loggerb = loggerb.bind(message_id=response_data['msg_id'])
 
             url = app.config['DRAFT_GET_API_URL'].format(response_data['msg_id'])
-            get_draft = requests.get(url, headers=headers)
+            get_draft = requests.get(url, auth=app.config['BASIC_AUTH'], headers=headers)
 
             if get_draft.status_code != 200:
                 logger.error('Failed to retrieve saved draft')
@@ -266,7 +266,7 @@ def message_check_response(data, logger):
     logger.info("Attempting to send message")
     url = app.config['CREATE_MESSAGE_API_URL']
 
-    response = requests.post(url, data=json.dumps(data), headers=headers)
+    response = requests.post(url, auth=app.config['BASIC_AUTH'], data=json.dumps(data), headers=headers)
 
     if response.status_code == 400:
         logger.warning("Bad request to secure message service")
@@ -299,7 +299,7 @@ def messages_get(session, label="INBOX"):
     if label is not None:
         url = url + "&label=" + label
 
-    resp = requests.get(url, headers=headers)
+    resp = requests.get(url, auth=app.config['BASIC_AUTH'], headers=headers)
     if resp.status_code != 200:
         logger.error('Error retrieving user messages', label=label)
         raise ExternalServiceError(resp)
@@ -325,7 +325,7 @@ def draft_get(session, draft_id):
 
     url = app.config['DRAFT_GET_API_URL'].format(draft_id)
 
-    get_draft = requests.get(url, headers=headers)
+    get_draft = requests.get(url, auth=app.config['BASIC_AUTH'], headers=headers)
     if get_draft.status_code != 200:
         logger.error('Failed to retrieve draft')
         raise ExternalServiceError(get_draft)
@@ -346,7 +346,7 @@ def sent_get(session, sent_id):
     url = app.config['MESSAGE_GET_URL'].format(sent_id)
     loggerb.debug('Retrieving message')
 
-    get_sent = requests.get(url, headers=headers)
+    get_sent = requests.get(url, auth=app.config['BASIC_AUTH'], headers=headers)
     if get_sent.status_code != 200:
         loggerb.error('Failed to retrieve message')
         raise ExternalServiceError(get_sent)
@@ -366,7 +366,7 @@ def message_get(session, msg_id):
     loggerb.debug('Attempting to remove unread label')
     data = {"label": 'UNREAD', "action": 'remove'}
     url = app.config['MESSAGE_MODIFY_URL'].format(msg_id)
-    response = requests.put(url, data=json.dumps(data), headers=headers)  # noqa: F841
+    response = requests.put(url, auth=app.config['BASIC_AUTH'], data=json.dumps(data), headers=headers)
     if response.status_code != 200:
         loggerb.error("Failed to remove unread label")
         raise ExternalServiceError(response)

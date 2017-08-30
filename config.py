@@ -158,6 +158,7 @@ class Config(object):
     RM_CASE_GET_BY_PARTY = '{}cases/partyid/{}'
     RM_CASE_GET_BY_IAC = '{}cases/iac/{}'
     RAS_PARTY_GET_BY_EMAIL = '{}party-api/v1/respondents/email/{}'
+    RAS_PARTY_RESEND_VERIFICATION = '{}party-api/v1/resend-verification-email/{}'
 
     MESSAGE_LIMIT = os.getenv('MESSAGE_LIMIT', 1000)
     CREATE_MESSAGE_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'message/send'

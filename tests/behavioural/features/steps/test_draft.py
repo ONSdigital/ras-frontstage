@@ -11,7 +11,47 @@ def step_impl_create_draft(context):
     context.browser.find_by_id('draft').click()
 
 
+@given('there is a draft with no subject')
+def step_impl_create_draft(context):
+    context.browser.visit('/secure-message/create-message')
+    context.browser.find_by_id('secure-message-body').send_keys('Test Body')
+    context.browser.find_by_id('draft').click()
+
+
+@given('there is a draft with no body')
+def step_impl_create_draft(context):
+    context.browser.visit('/secure-message/create-message')
+    context.browser.find_by_id('secure-message-subject').send_keys('Test Subject No Body')
+    context.browser.find_by_id('draft').click()
+
+
+@given('there is a draft with empty fields')
+def step_impl_create_draft(context):
+    context.browser.visit('/secure-message/create-message')
+    context.browser.find_by_id('draft').click()
+
+
 @when('I open a draft')
+def step_impl_go_to_draft_message(context):
+    context.browser.visit('/secure-message/messages/DRAFT')
+    context.browser.find_by_link_text('Test Subject').click()
+
+
+@when('I open a draft with no body')
+def step_impl_go_to_draft_message(context):
+    context.browser.visit('/secure-message/messages/DRAFT')
+    context.browser.find_by_link_text('Test Subject No Body').click()
+
+
+# TODO Change this test to be able to find <msg-id>
+@when('I open a draft with no subject')
+def step_impl_go_to_draft_message(context):
+    context.browser.visit('/secure-message/messages/DRAFT')
+    context.browser.find_by_link_text('Test Subject').click()
+
+
+# TODO Change this test to be able to find <msg-id>
+@when('I open a draft with empty fields')
 def step_impl_go_to_draft_message(context):
     context.browser.visit('/secure-message/messages/DRAFT')
     context.browser.find_by_link_text('Test Subject').click()

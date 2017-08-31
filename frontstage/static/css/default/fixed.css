@@ -4420,8 +4420,8 @@ input[type=file]::-webkit-file-upload-button:hover {
   margin-top: 2rem;
   padding-top: 32px;
   padding-top: 2rem;
-  padding-bottom: 80px;
-  padding-bottom: 5rem;
+  padding-bottom: 64px;
+  padding-bottom: 4rem;
   color: #ffffff;
   background-color: #666666;
 }
@@ -4440,8 +4440,8 @@ input[type=file]::-webkit-file-upload-button:hover {
 }
 
 .footer .footer__license {
-  margin-top: 16px;
-  margin-top: 1rem;
+  margin-top: 32px;
+  margin-top: 2rem;
 }
 
 /*# sourceMappingURL=fixed.css.map */

@@ -22,7 +22,7 @@ def step_impl_open_create_message_page(context):
 
 
 @when('I am on the create message page')
-def step_impl_open_create_message_page(context):
+def step_impl_visit_create_message_page(context):
     context.browser.visit('/secure-message/create-message/')
 
 
@@ -77,4 +77,3 @@ def step_impl_see_message_from_bres(context):
 def step_impl_reply_to_bres_message(context):
     context.browser.find_by_id('secure-message-body').send_keys('I am replying to BRES')
     context.browser.find_by_id('submit-btn').click()
-

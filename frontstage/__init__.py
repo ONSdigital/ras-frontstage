@@ -19,6 +19,12 @@ app.url_map.strict_slashes = False
 app.jinja_env.filters['case_status_filter'] = case_status_filter
 app.jinja_env.filters['file_size_filter'] = file_size_filter
 
+
+@app.after_request
+def apply_caching(response):
+    response.headers["X-Frame-Options"] = "DENY"
+    return response
+
 log_level = 'DEBUG' if app.config['DEBUG'] else None
 logger_initial_config(service_name='ras-frontstage', log_level=log_level)
 logger = wrap_logger(logging.getLogger(__name__))

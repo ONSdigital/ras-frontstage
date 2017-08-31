@@ -224,10 +224,9 @@ def upload_survey(session):
     upload_file = {'file': (upload_filename, upload_file.stream, upload_file.mimetype, {'Expires': 0})}
 
     # Upload the survey
-    logger.info('Attempting to upload survey', url=url, case_id=case_id, party_id=party_id)
+    logger.info('Attempting to upload survey', case_id=case_id, party_id=party_id)
     url = app.config['RAS_CI_UPLOAD'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], case_id)
-    result = requests.post(url, auth=app.config['BASIC_AUTH'], headers=headers, files=upload_file, verify=False)
-
+    result = requests.post(url, auth=app.config['BASIC_AUTH'], files=upload_file, verify=False)
     logger.debug('Upload survey response', result=result.status_code, reason=result.reason, text=result.text)
 
     category = 'SUCCESSFUL_RESPONSE_UPLOAD' if result.status_code == 200 else 'UNSUCCESSFUL_RESPONSE_UPLOAD'

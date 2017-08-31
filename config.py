@@ -1,60 +1,26 @@
-"""
-This module hosts the config setup for our project
-"""
-
 import os
-
-# ENV VARIABLES BELOW, SET THESE ON YOUR TERMINAL
-# export APP_SETTINGS=config.Config
-# export FLASK_APP=application.py
-# export OAUTHLIB_INSECURE_TRANSPORT=1
-
-# Environment variables for running locally using the server.js Node server in ras-backstage-ui)
-# To use these stubs:
-#   git clone ras-backstage-ui
-#   npm install
-#   node server.js to run the app on localhost:8050
-#
-# And set these environment variables on the ras-frontstage terminal:
-# export API_GATEWAY_CASE_URL=http://localhost:8050/api/cases/
-# export API_GATEWAY_COLLECTION_INSTRUMENT_URL=http://localhost:8050/api/collection-instruments/
-# export API_GATEWAY_SURVEYS_URL=http://localhost:8050/api/surveys/
-# export API_GATEWAY_AGGREGATED_SURVEYS_URL=http://localhost:8050/api/my-surveys/
-# export API_GATEWAY_PARTY_URL=http://localhost:8050/api/party-api/
-# export API_GATEWAY_IAC_URL=http://localhost:8050/api/iacs/
-
-# export ONS_OAUTH_SERVER=ras-django-int.apps.devtest.onsclofo.uk
-# export ONS_OAUTH_SERVER=ras-django-ci.apps.devtest.onsclofo.uk
-# Log is as testuser@email.com , password
-# OR
-# Log in using your account on:
-# export ONS_OAUTH_SERVER=ons-oauth2.cfapps.io
-
-
-# Default values
-if "APP_SETTINGS" not in os.environ:
-    os.environ["APP_SETTINGS"] = "config.Config"
 
 
 class Config(object):
-    """
-    Base config class
-    """
-    NAME = os.getenv('NAME', 'ras-frontstage')
-    VERSION = os.getenv('VERSION', '0.2.0')
-
-    RAS_FS_CRYPTO_KEY = 'ONS_DUMMY_KEY'
     DEBUG = False
     TESTING = False
+    NAME = os.getenv('NAME', 'ras-frontstage')
+    VERSION = os.getenv('VERSION', '0.2.0')
+    dbname = "ras_frontstage_backup"
+    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI',
+                                             'postgresql://ras_frontstage_backup:password@localhost:5431/postgres')
+
+    RAS_FS_CRYPTO_KEY = 'ONS_DUMMY_KEY'
     CSRF_ENABLED = False
-    # WTF_CSRF_CHECK_DEFAULT = False
     WTF_CSRF_ENABLED = False
     SECRET_KEY = 'this-really-needs-to-be-changed'
-    dbname = "ras_frontstage_backup"
-    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI', 'postgresql://ras_frontstage_backup:password@localhost:5431/postgres')
+    SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'dummy_user')
+    SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'dummy_password')
+    BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
+
     VALIDATE_JWT = os.environ.get('VALIDATE_JWT', True)
-    SELENIUM_TEST_URL = os.environ.get('SELENIUM_TEST_URL', 'http://localhost:8080')
     GOOGLE_ANALYTICS = os.getenv('GOOGLE_ANALYTICS', None)
+    SELENIUM_TEST_URL = os.environ.get('SELENIUM_TEST_URL', 'http://localhost:8080')
 
     ONS_OAUTH_PROTOCOL = os.environ.get('ONS_OAUTH_PROTOCOL', 'http://')
     ONS_OAUTH_SERVER = os.environ.get('ONS_OAUTH_SERVER', 'ons-oauth2.cfapps.io')
@@ -63,42 +29,20 @@ class Config(object):
     ONS_AUTHORIZATION_ENDPOINT = os.environ.get('ONS_AUTHORIZATION_ENDPOINT', '/web/authorize/')
     ONS_TOKEN_ENDPOINT = os.environ.get('ONS_TOKEN_ENDPOINT', '/api/v1/tokens/')
     ONS_ADMIN_ENDPOINT = os.environ.get('ONS_ADMIN_ENDPOINT', '/api/account/create')
-    
-    # Cloud Foundry config
 
-    # TODO - Define default CF endpoints
-    API_GATEWAY_CASE_URL = os.environ.get('API_GATEWAY_CASE_URL',
-                                          'http://localhost:8050/api/cases/')
-
-    # TODO - Define default CF endpoints
-    API_GATEWAY_COLLECTION_EXERCISE_URL = os.environ.get('API_GATEWAY_COLLECTION_EXERCISE_URL',
-                                                         'http://localhost:8050/api/collectionexercises/')
-
-    API_GATEWAY_COLLECTION_INSTRUMENT_URL = os.environ.get('API_GATEWAY_COLLECTION_INSTRUMENT_URL',
-                                                           'http://ras-api-gateway-int.apps.devtest.onsclofo.uk:80/collection-instrument-api/1.0.2/')
-    API_GATEWAY_SURVEYS_URL = os.environ.get('API_GATEWAY_SURVEYS_URL',
-                                             'http://ras-api-gateway-int.apps.devtest.onsclofo.uk:80/surveys/')
-    API_GATEWAY_AGGREGATED_SURVEYS_URL = os.environ.get('API_GATEWAY_AGGREGATED_SURVEYS_URL',
-                                                        'http://ras-api-gateway-int.apps.devtest.onsclofo.uk/api/1.0.0/surveys/')
-    API_GATEWAY_PARTY_URL = os.environ.get('API_GATEWAY_PARTY_URL',
-                                           'http://ras-api-gateway-int.apps.devtest.onsclofo.uk/party-api/v1/')
-    API_GATEWAY_IAC_URL = os.environ.get('API_GATEWAY_IAC_URL',
-                                         'http://ras-api-gateway-int.apps.devtest.onsclofo.uk/api/1.0.0/iacs/')
-    
     PASSWORD_MATCH_ERROR_TEXT = 'Your passwords do not match'
     PASSWORD_CRITERIA_ERROR_TEXT = 'Your password doesn\'t meet the requirements'
     PASSWORD_MIN_LENGTH = 8
     PASSWORD_MAX_LENGTH = 160
 
-    #
-    #   These settings are to support the new post_event routine which has been ported
-    #   into ras-frontstage from ras-common. The style of environment variable over-ride
-    #   has been taken from JB's new common code implementation.
-    #
+    # Configurations for external services
     RM_CASE_SERVICE_HOST = os.getenv('RM_CASE_SERVICE_HOST', 'localhost')
     RM_CASE_SERVICE_PORT = os.getenv('RM_CASE_SERVICE_PORT', 8171)
     RM_CASE_SERVICE_PROTOCOL = os.getenv('RM_CASE_SERVICE_PROTOCOL', 'http')
     RM_CASE_SERVICE = '{}://{}:{}/'.format(RM_CASE_SERVICE_PROTOCOL, RM_CASE_SERVICE_HOST, RM_CASE_SERVICE_PORT)
+    RM_CASE_GET = '{}cases/{}'
+    RM_CASE_GET_BY_PARTY = '{}cases/partyid/{}'
+    RM_CASE_GET_BY_IAC = '{}cases/iac/{}'
 
     RAS_COLLECTION_INSTRUMENT_SERVICE_HOST = os.getenv('RAS_COLLECTION_INSTRUMENT_SERVICE_HOST', 'localhost')
     RAS_COLLECTION_INSTRUMENT_SERVICE_PORT = os.getenv('RAS_COLLECTION_INSTRUMENT_SERVICE_PORT', 8002)
@@ -106,6 +50,9 @@ class Config(object):
     RAS_COLLECTION_INSTRUMENT_SERVICE = '{}://{}:{}/'.format(RAS_COLLECTION_INSTRUMENT_SERVICE_PROTOCOL,
                                                              RAS_COLLECTION_INSTRUMENT_SERVICE_HOST,
                                                              RAS_COLLECTION_INSTRUMENT_SERVICE_PORT)
+    RAS_CI_UPLOAD = '{}collection-instrument-api/1.0.2/survey_responses/{}'
+    RAS_CI_GET = '{}collection-instrument-api/1.0.2/collectioninstrument/id/{}'
+    RAS_CI_DOWNLOAD = '{}collection-instrument-api/1.0.2/download/{}'
 
     RAS_API_GATEWAY_SERVICE_HOST = os.getenv('RAS_API_GATEWAY_SERVICE_HOST', 'localhost')
     RAS_API_GATEWAY_SERVICE_PORT = os.getenv('RAS_API_GATEWAY_SERVICE_PORT', 8080)
@@ -113,16 +60,24 @@ class Config(object):
     RAS_API_GATEWAY_SERVICE = '{}://{}:{}/'.format(RAS_API_GATEWAY_SERVICE_PROTOCOL,
                                                    RAS_API_GATEWAY_SERVICE_HOST,
                                                    RAS_API_GATEWAY_SERVICE_PORT)
+    RAS_AGGREGATOR_TODO = '{}api/1.0.0/surveys/todo/{}'
 
     RM_IAC_SERVICE_HOST = os.getenv('RM_IAC_SERVICE_HOST', 'localhost')
     RM_IAC_SERVICE_PORT = os.getenv('RM_IAC_SERVICE_PORT', 8121)
     RM_IAC_SERVICE_PROTOCOL = os.getenv('RM_IAC_SERVICE_PROTOCOL', 'http')
     RM_IAC_SERVICE = '{}://{}:{}/'.format(RM_IAC_SERVICE_PROTOCOL, RM_IAC_SERVICE_HOST, RM_IAC_SERVICE_PORT)
+    RM_IAC_GET = '{}iacs/{}'
 
     RAS_PARTY_SERVICE_HOST = os.getenv('RAS_PARTY_SERVICE_HOST', 'localhost')
     RAS_PARTY_SERVICE_PORT = os.getenv('RAS_PARTY_SERVICE_PORT', 8081)
     RAS_PARTY_SERVICE_PROTOCOL = os.getenv('RAS_PARTY_SERVICE_PROTOCOL', 'http')
     RAS_PARTY_SERVICE = '{}://{}:{}/'.format(RAS_PARTY_SERVICE_PROTOCOL, RAS_PARTY_SERVICE_HOST, RAS_PARTY_SERVICE_PORT)
+    RAS_PARTY_GET_BY_BUSINESS = '{}party-api/v1/businesses/id/{}'
+    RAS_PARTY_GET_BY_RESPONDENT = '{}party-api/v1/respondents/id/{}'
+    RAS_PARTY_POST_RESPONDENTS = '{}party-api/v1/respondents'
+    RAS_PARTY_VERIFY_EMAIL = '{}party-api/v1/emailverification/{}'
+    RAS_PARTY_GET_BY_EMAIL = '{}party-api/v1/respondents/email/{}'
+    RAS_PARTY_RESEND_VERIFICATION = '{}party-api/v1/resend-verification-email/{}'
 
     RM_COLLECTION_EXERCISE_SERVICE_HOST = os.getenv('RM_COLLECTION_EXERCISE_SERVICE_HOST', 'localhost')
     RM_COLLECTION_EXERCISE_SERVICE_PORT = os.getenv('RM_COLLECTION_EXERCISE_SERVICE_PORT', 8145)
@@ -130,11 +85,13 @@ class Config(object):
     RM_COLLECTION_EXERCISE_SERVICE = '{}://{}:{}/'.format(RM_COLLECTION_EXERCISE_SERVICE_PROTOCOL,
                                                           RM_COLLECTION_EXERCISE_SERVICE_HOST,
                                                           RM_COLLECTION_EXERCISE_SERVICE_PORT)
+    RM_COLLECTION_EXERCISES_GET = '{}collectionexercises/{}'
 
     RM_SURVEY_SERVICE_HOST = os.getenv('RM_SURVEY_SERVICE_HOST', 'localhost')
     RM_SURVEY_SERVICE_PORT = os.getenv('RM_SURVEY_SERVICE_PORT', 8080)
     RM_SURVEY_SERVICE_PROTOCOL = os.getenv('RM_SURVEY_SERVICE_PROTOCOL', 'http')
     RM_SURVEY_SERVICE = '{}://{}:{}/'.format(RM_SURVEY_SERVICE_PROTOCOL, RM_SURVEY_SERVICE_HOST, RM_SURVEY_SERVICE_PORT)
+    RM_SURVEY_GET = '{}surveys/{}'
 
     RAS_SECURE_MESSAGE_SERVICE_HOST = os.getenv('RAS_SECURE_MESSAGE_SERVICE_HOST', 'localhost')
     RAS_SECURE_MESSAGE_SERVICE_PORT = os.getenv('RAS_SECURE_MESSAGE_SERVICE_PORT', 5050)
@@ -142,24 +99,6 @@ class Config(object):
     RAS_SECURE_MESSAGE_SERVICE = '{}://{}:{}/'.format(RAS_SECURE_MESSAGE_SERVICE_PROTOCOL,
                                                       RAS_SECURE_MESSAGE_SERVICE_HOST,
                                                       RAS_SECURE_MESSAGE_SERVICE_PORT)
-
-    RAS_AGGREGATOR_TODO = '{}api/1.0.0/surveys/todo/{}'
-    RAS_CI_UPLOAD = '{}collection-instrument-api/1.0.2/survey_responses/{}'
-    RAS_CI_GET = '{}collection-instrument-api/1.0.2/collectioninstrument/id/{}'
-    RAS_CI_DOWNLOAD = '{}collection-instrument-api/1.0.2/download/{}'
-    RM_CASE_GET = '{}cases/{}'
-    RAS_PARTY_GET_BY_BUSINESS = '{}party-api/v1/businesses/id/{}'
-    RAS_PARTY_GET_BY_RESPONDENT = '{}party-api/v1/respondents/id/{}'
-    RM_COLLECTION_EXERCISES_GET = '{}collectionexercises/{}'
-    RM_SURVEY_GET = '{}surveys/{}'
-    RAS_PARTY_POST_RESPONDENTS = '{}party-api/v1/respondents'
-    RAS_PARTY_VERIFY_EMAIL = '{}party-api/v1/emailverification/{}'
-    RM_IAC_GET = '{}iacs/{}'
-    RM_CASE_GET_BY_PARTY = '{}cases/partyid/{}'
-    RM_CASE_GET_BY_IAC = '{}cases/iac/{}'
-    RAS_PARTY_GET_BY_EMAIL = '{}party-api/v1/respondents/email/{}'
-    RAS_PARTY_RESEND_VERIFICATION = '{}party-api/v1/resend-verification-email/{}'
-
     MESSAGE_LIMIT = os.getenv('MESSAGE_LIMIT', 1000)
     CREATE_MESSAGE_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'message/send'
     MESSAGES_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'messages?limit={}'.format(MESSAGE_LIMIT)
@@ -168,108 +107,26 @@ class Config(object):
     DRAFT_SAVE_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'draft/save'
     DRAFT_GET_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'draft/{}'
     DRAFT_PUT_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'draft/{}/modify'
+    LABELS_GET_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'labels?name=unread'
 
 
 class ProductionConfig(Config):
-    """
-    Production config class
-    """
     DEBUG = False
 
 
 class StagingConfig(Config):
-    """
-    Staging config class
-    """
     DEVELOPMENT = True
     DEBUG = True
 
 
 class DevelopmentConfig(Config):
-    """
-    Development config class
-    """
     DEVELOPMENT = True
     DEBUG = True
     TEMPLATES_AUTO_RELOAD = True
-    # Settings for communicating with the OAuth2 server - this assumes you want to talk to a server on localhost
-    OAUTHLIB_INSECURE_TRANSPORT = os.environ.get('OAUTHLIB_INSECURE_TRANSPORT', 1)
-    ONS_OAUTH_PROTOCOL = os.environ.get('ONS_OAUTH_PROTOCOL', 'http://')
-    ONS_OAUTH_SERVER = os.environ.get('ONS_OAUTH_SERVER', 'localhost:8008')
-    ONS_AUTHORIZATION_ENDPOINT = os.environ.get('ONS_AUTHORIZATION_ENDPOINT', '/web/authorize/')
-    ONS_TOKEN_ENDPOINT = os.environ.get('ONS_TOKEN_ENDPOINT', '/api/v1/tokens/')
-    ONS_ADMIN_ENDPOINT = os.environ.get('ONS_ADMIN_ENDPOINT', '/api/account/create')
-    RAS_FRONTSTAGE_CLIENT_ID = os.environ.get('RAS_FRONTSTAGE_CLIENT_ID', 'ons@ons.gov')
-    RAS_FRONTSTAGE_CLIENT_SECRET = os.environ.get('RAS_FRONTSTAGE_CLIENT_SECRET', 'password')
-
-    # Settings for the case service built in Titchfield - this assumes you want to talk to a server on localhost
-    RM_CASE_SERVICE_HOST = os.environ.get('RM_CASE_SERVICE_HOST', 'localhost')
-    RM_CASE_SERVICE_PORT = os.environ.get('RM_CASE_SERVICE_PORT', '8171')
-    RM_CASE_SERVICE_PROTOCOL = os.environ.get('RM_CASE_SERVICE_PROTOCOL', 'http')
-
-    # Settings for the collection instrument service - this assumes you want to talk to a server on localhost
-    RAS_COLLECTION_INSTRUMENT_SERVICE_HOST = os.environ.get('RAS_COLLECTION_INSTRUMENT_SERVICE_HOST', 'localhost')
-    RAS_COLLECTION_INSTRUMENT_SERVICE_PORT = os.environ.get('RAS_COLLECTION_INSTRUMENT_SERVICE_PORT', '8082')
-    RAS_COLLECTION_INSTRUMENT_SERVICE_PROTOCOL= os.environ.get('RAS_COLLECTION_INSTRUMENT_SERVICE_PROTOCOL', 'http')
-
-    # Settings for the Internet Access Code service built in Titchfield - this assumes you want to talk to a server on localhost
-    RM_IAC_SERVICE_HOST = os.environ.get('RM_IAC_SERVICE_HOST', 'localhost')
-    RM_IAC_SERVICE_PORT = os.environ.get('RM_IAC_SERVICE_PORT', '8121')
-    RM_IAC_SERVICE_PROTOCOL = os.environ.get('RM_IAC_SERVICE_PROTOCOL', 'http')
-
-    # Settings for the Party Service - this assumes you want to talk to a server on localhost
-    RAS_PARTY_SERVICE_HOST = os.environ.get('RAS_PARTY_SERVICE_HOST', 'localhost')
-    RAS_PARTY_SERVICE_PORT = os.environ.get('RAS_PARTY_SERVICE_PORT', '8001')
-    RAS_PARTY_SERVICE_PROTOCOL = os.environ.get('RAS_PARTY_SERVICE_PROTOCOL', 'http')
-
-    # Settings for the Collection Exercise service built in Titchfield - this assumes you want to talk to a server on localhost
-    RM_COLLECTION_EXERCISE_SERVICE_HOST = os.environ.get('RM_COLLECTION_EXERCISE_SERVICE_HOST', 'localhost')
-    RM_COLLECTION_EXERCISE_SERVICE_PORT = os.environ.get('RM_COLLECTION_EXERCISE_SERVICE_PORT', '8145')
-    RM_COLLECTION_EXERCISE_SERVICE_PROTOCOL = os.environ.get('RM_COLLECTION_EXERCISE_SERVICE_PROTOCOL', 'http')
-
-    # Settings for the Survey Service built in Titchfield - this assumes you want to talk to a server on localhost
-    RM_SURVEY_SERVICE_HOST = os.environ.get('RM_SURVEY_SERVICE_HOST', 'localhost')
-    RM_SURVEY_SERVICE_PORT = os.environ.get('RM_SURVEY_SERVICE_PORT', '8080')
-    RM_SURVEY_SERVICE_PROTOCOL = os.environ.get('RM_SURVEY_SERVICE_PROTOCOL', 'http')
-
-    # Settings for the API Gateway. This node is an aggregations point for front end services to use - in this instance angular
-    RAS_API_GATEWAY_SERVICE_HOST = os.environ.get('RAS_API_GATEWAY_SERVICE_HOST', 'localhost')
-    RAS_API_GATEWAY_SERVICE_PORT = os.environ.get('RAS_API_GATEWAY_SERVICE_PORT', '8082')
-    RAS_API_GATEWAY_SERVICE_PROTOCOL = os.environ.get('RAS_API_GATEWAY_SERVICE_PROTOCOL', 'http')
-    RAS_API_GATEWAY_SERVICE = '{}://{}:{}/'.format(RAS_API_GATEWAY_SERVICE_PROTOCOL, RAS_API_GATEWAY_SERVICE_HOST, RAS_API_GATEWAY_SERVICE_PORT)
-
-
-
-    API_GATEWAY_CASE_URL = os.environ.get('API_GATEWAY_CASE_URL', 'http://localhost:8171/cases/')
-    API_GATEWAY_COLLECTION_EXERCISE_URL = os.environ.get('API_GATEWAY_COLLECTION_EXERCISE_URL', 'http://localhost:8145/collectionexercises/')
-    API_GATEWAY_SURVEYS_URL = os.environ.get('API_GATEWAY_SURVEYS_URL', 'http://localhost:8080/surveys/')
-    API_GATEWAY_IAC_URL = os.environ.get('API_GATEWAY_IAC_URL', 'http://localhost:8121/iacs/')
-    API_GATEWAY_COLLECTION_INSTRUMENT_URL = os.environ.get('API_GATEWAY_COLLECTION_INSTRUMENT_URL', 'http://localhost:8082/collection-instrument-api/1.0.2/')
-    API_GATEWAY_AGGREGATED_SURVEYS_URL = os.environ.get('API_GATEWAY_AGGREGATED_SURVEYS_URL', 'http://localhost:8083/api/1.0.0/surveys/')
-    API_GATEWAY_PARTY_URL = os.environ.get('API_GATEWAY_PARTY_URL', 'http://localhost:8081/party-api/v1/')
 
 
 class TestingConfig(Config):
-    """
-    Testing config class
-    """
     TESTING = True
     DEBUG = True
     TEMPLATES_AUTO_RELOAD = True
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-
-    # # Local version for OAuth2 server:
-    # ONS_OAUTH_PROTOCOL = os.environ.get('ONS_OAUTH_PROTOCOL', 'http://')
-    # ONS_OAUTH_SERVER = os.environ.get('ONS_OAUTH_SERVER', 'localhost:8000')
-    # ONS_AUTHORIZATION_ENDPOINT = os.environ.get('ONS_AUTHORIZATION_ENDPOINT', '/web/authorize/')
-    # ONS_TOKEN_ENDPOINT = os.environ.get('ONS_TOKEN_ENDPOINT', '/api/v1/tokens/')
-    # ONS_ADMIN_ENDPOINT = os.environ.get('ONS_ADMIN_ENDPOINT', '/api/account/create')
-    #
-    # API_GATEWAY_PARTY_URL = os.environ.get('API_GATEWAY_PARTY_URL',
-    #                                        'http://localhost:5201/party-api/v1/')
-    #
-    # # Local version of Collection Instrument Service:
-    # COLLECTION_INSTRUMENT_URL = os.environ.get('COLLECTION_INSTRUMENT_URL', 'https://api-dev.apps.mvp.onsclofo.uk:443/collection-instrument-api/1.0.2/')
-    #
-    # # Local verions of Survey serivce:
-    # SURVEYS_URL = os.environ.get('SURVEYS_URL', 'https://api-dev.apps.mvp.onsclofo.uk/api/1.0.0/surveys/')

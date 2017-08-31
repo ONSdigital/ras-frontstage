@@ -363,23 +363,6 @@ class TestRegistration(unittest.TestCase):
         self.assertTrue('Almost done'.encode() in response.data)
 
     @requests_mock.mock()
-    def test_create_account_success(self, mock_object):
-        """Test create account phone no. too big returns length guidance"""
-        mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)
-        mock_object.post(url_oauth_token, status_code=201, json=oauth_token)
-        mock_object.post(url_create_party, status_code=200)
-        self.headers['referer'] = 'register/create-account/enter-account-details'
-
-        response = self.app.post('register/create-account/enter-account-details',
-                                 query_string=params,
-                                 data=self.test_user,
-                                 headers=self.headers,
-                                 follow_redirects=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('Almost done'.encode() in response.data)
-
-    @requests_mock.mock()
     def test_create_account_duplicate_email(self, mock_object):
         """Test create account phone no. too big returns length guidance"""
         mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)

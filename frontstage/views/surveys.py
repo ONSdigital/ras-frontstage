@@ -19,7 +19,7 @@ def build_survey_data(session, status_filter):
     party_id = session.get('party_id', 'no-party-id')
     logger.debug('Retrieving survey data', party_id=party_id)
     url = app.config['RAS_AGGREGATOR_TODO'].format(app.config['RAS_API_GATEWAY_SERVICE'], party_id)
-    req = requests.get(url, params=status_filter, verify=False)
+    req = requests.get(url, auth=app.config['BASIC_AUTH'], params=status_filter, verify=False)
     if req.status_code != 200:
         logger.error('Failed to retrieve survey')
         ExternalServiceError(req)
@@ -60,7 +60,7 @@ def surveys_history(session):
 def get_cases_from_party(party_id):
     # Get cases for given party_id
     url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
-    req = requests.get(url, verify=False)
+    req = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
     if req.status_code != 200:
         logger.error('Failed to retrieve case', party_id=party_id)
         raise ExternalServiceError(req)
@@ -135,7 +135,8 @@ def access_survey(session):
                     party_id=party_id,
                     collection_instrument_id=collection_instrument_id)
         url = app.config['RAS_CI_GET'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], collection_instrument_id)
-        req = requests.get(url, verify=False)
+        logger.info('Retrieving collection instrument', collection_instrument_id=collection_instrument_id)
+        req = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
         if req.status_code != 200:
             logger.error('Failed to retrieve collection instrument',
                          collection_instrument_id=collection_instrument_id,
@@ -157,6 +158,7 @@ def access_survey(session):
                     case_id=case_id)
 
         valid = access_surveys_permissions(collection_instrument_id, party_id)
+
         if not valid:
             logger.warning('Party does not have permission to access collection instrument',
                            party_id=party_id,
@@ -168,7 +170,7 @@ def access_survey(session):
                     collection_instrument_id=collection_instrument_id)
         url = app.config['RAS_CI_DOWNLOAD'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'],
                                                    collection_instrument_id)
-        response = requests.get(url, verify=False)
+        response = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
 
         category = 'COLLECTION_INSTRUMENT_DOWNLOADED' if response.status_code == 200 else 'COLLECTION_INSTRUMENT_ERROR'
         code, msg = post_event(case_id,
@@ -222,9 +224,10 @@ def upload_survey(session):
     upload_file = {'file': (upload_filename, upload_file.stream, upload_file.mimetype, {'Expires': 0})}
 
     # Upload the survey
-    url = app.config['RAS_CI_UPLOAD'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], case_id)
     logger.info('Attempting to upload survey', url=url, case_id=case_id, party_id=party_id)
-    result = requests.post(url, files=upload_file, verify=False)
+    url = app.config['RAS_CI_UPLOAD'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], case_id)
+    result = requests.post(url, auth=app.config['BASIC_AUTH'], headers=headers, files=upload_file, verify=False)
+
     logger.debug('Upload survey response', result=result.status_code, reason=result.reason, text=result.text)
 
     category = 'SUCCESSFUL_RESPONSE_UPLOAD' if result.status_code == 200 else 'UNSUCCESSFUL_RESPONSE_UPLOAD'

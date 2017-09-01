@@ -32,12 +32,14 @@
     </p>
     <form action="{{ url_for('secure_message_bp.reply_message') }}" method="post">
 
-            {% if message['subject'].startswith('Re: ') %}
-                {% set subject = message['subject'] %}
-            {% else %}
-                {% set subject = "Re: " + message['subject'] %}
-            {% endif %}
-                <input name="secure-message-subject" type="hidden" id="secure-message-subject" value="{{ subject }}">
+        {% if message['subject'].startswith('Re: ') %}
+            {% set subject = message['subject'] %}
+        {% else %}
+            {% set subject = "Re: " + message['subject'] %}
+        {% endif %}
+
+        <input name="secure-message-subject" type="hidden" id="secure-message-subject" value="{{ subject }}">
+        <input name="secure-message-thread-id" type="hidden" id="secure-message-thread-id" value="{{ message['thread_id'] }}">
 
 
         <fieldset>

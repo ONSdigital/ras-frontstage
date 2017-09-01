@@ -110,7 +110,7 @@ def step_impl_open_internal_message(context):
 
 @then('I should see a reply message')
 def step_impl_see_message_from_bres(context):
-    assert is_element_present_by_id(context, 'secure-message-subject')  # TODO find some values inside textfield
+    assert is_element_present_by_id(context, 'secure-message-subject')
     assert is_element_present_by_id(context, 'secure-message-body')
 
 

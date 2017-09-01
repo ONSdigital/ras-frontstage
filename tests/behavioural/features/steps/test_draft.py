@@ -45,18 +45,16 @@ def step_impl_go_to_draft_message(context):
     context.browser.find_by_link_text('Test Subject No Body').click()
 
 
-# TODO Change this test to be able to find <msg-id>
 @when('I open a draft with no subject')
 def step_impl_go_to_draft_message(context):
     context.browser.visit('/secure-message/messages/DRAFT')
-    context.browser.find_by_link_text('Test Subject').click()
+    context.browser.find_by_link_text('Read full message').click()
 
 
-# TODO Change this test to be able to find <msg-id>
 @when('I open a draft with empty fields')
 def step_impl_go_to_draft_message(context):
     context.browser.visit('/secure-message/messages/DRAFT')
-    context.browser.find_by_link_text('Test Subject').click()
+    context.browser.find_by_link_text('Read full message').click()
 
 
 @then('the draft contains some text')

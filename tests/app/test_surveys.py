@@ -73,7 +73,7 @@ class TestSurveys(unittest.TestCase):
         self.cases_data = cases_data
         self.survey_file = dict(file=(io.BytesIO(b'my file contents'), "testfile.xlsx"))
         self.headers = {
-            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"  # NOQA
+            "Authorization": encoded_jwt_token  # NOQA
             }
 
     @requests_mock.mock()

@@ -192,7 +192,7 @@ def reply_message(session):
                 'msg_from': session['party_id'],
                 'subject': request.form['secure-message-subject'],
                 'body': request.form['secure-message-body'],
-                'thread_id': '',
+                'thread_id': request.form['secure-message-thread-id'],
                 'collection_case': collection_case,
                 'ru_id': ru_id,
                 'survey': survey_name}
@@ -242,21 +242,9 @@ def reply_message(session):
                     raise ExternalServiceError(response)
 
             response_data = json.loads(response.text)
+            loggerb.debug('Successfully saved draft', message_id=response_data['msg_id'])
 
-            loggerb.debug('Successfully saved draft')
-            loggerb.debug('Retrieving saved draft')
-            loggerb = loggerb.bind(message_id=response_data['msg_id'])
-
-            url = app.config['DRAFT_GET_API_URL'].format(response_data['msg_id'])
-            get_draft = requests.get(url, headers=headers)
-
-            if get_draft.status_code != 200:
-                logger.error('Failed to retrieve saved draft')
-                raise ExternalServiceError(get_draft)
-
-            get_json = json.loads(get_draft.content)
-            loggerb.debug('Retrieved saved draft')
-            return render_template('secure-messages/secure-messages-draft.html', _theme='default', draft=get_json)
+            return draft_get(response_data['msg_id'])
 
     return render_template('secure-messages/secure-messages-create.html', _theme='default', draft={})
 
@@ -326,18 +314,35 @@ def draft_get(session, draft_id):
     """Get draft message"""
     party_id = session['party_id']
     loggerb = logger.bind(message_id=draft_id, party_id=party_id)
+
     loggerb.debug('Retrieving draft')
-
     url = app.config['DRAFT_GET_API_URL'].format(draft_id)
-
     get_draft = requests.get(url, headers=headers)
     if get_draft.status_code != 200:
         logger.error('Failed to retrieve draft')
         raise ExternalServiceError(get_draft)
-
     draft = json.loads(get_draft.text)
     logger.info('Retrieved draft successfully')
-    return render_template('secure-messages/secure-messages-draft.html', _theme='default', draft=draft)
+
+    # Check if draft is part of an ongoing thread
+    thread_id = draft.get('thread_id')
+    if thread_id != draft['msg_id']:
+        logger.debug('Attempting to retrieve thread', thread_id=thread_id)
+        url = app.config['THREAD_GET_API_URL'].format(thread_id)
+        response = requests.get(url, headers=headers)
+        if response.status_code != 200:
+            logger.error('Failed to retrieve thread', thread_id=thread_id)
+            raise ExternalServiceError(response)
+        thread = json.loads(response.text)
+        for message in thread['messages']:
+            if message.get('sent_date'):
+                reply_message = message
+                break
+    else:
+        reply_message = None
+
+    return render_template('secure-messages/secure-messages-draft.html', _theme='default',
+                           draft=draft, message=reply_message)
 
 
 @secure_message_bp.route('/sent/<sent_id>', methods=['GET'])

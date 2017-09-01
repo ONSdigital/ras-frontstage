@@ -148,6 +148,16 @@ class TestSignIn(unittest.TestCase):
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Incorrect email or password'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_sign_in_party_fail(self, mock_object):
+        mock_object.post(url_oauth_token, status_code=201, json=oauth_token)
+        mock_object.get(url_party_by_email, status_code=500, json=my_party_data)
+
+        response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
+
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
 
@@ -159,4 +169,3 @@ class TestSignIn(unittest.TestCase):
         self.assertTrue('Sign in'.encode() in response.data)
         self.assertTrue('Have an enrolment code?'.encode() in response.data)
         self.assertFalse('Sign out'.encode() in response.data)
-

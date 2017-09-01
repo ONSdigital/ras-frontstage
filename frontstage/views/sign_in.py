@@ -1,17 +1,15 @@
+import json
 import logging
 from os import getenv
 
 from flask import Blueprint, make_response, render_template, request, redirect, url_for
-from oauthlib.oauth2 import LegacyApplicationClient, MissingTokenError
 import requests
-from requests_oauthlib import OAuth2Session
 from structlog import wrap_logger
-import json
+
 from frontstage import app
 from frontstage.exceptions.exceptions import ExternalServiceError
 from frontstage.jwt import encode, timestamp_token
 from frontstage.models import LoginForm
-
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -45,8 +43,9 @@ def login():
                 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
             }
 
-            oauth2_response = requests.post(url=token_url, data=data, headers=headers, auth=(app.config['RAS_FRONTSTAGE_CLIENT_ID'],
-                                                                                              app.config['RAS_FRONTSTAGE_CLIENT_SECRET']))
+            oauth2_response = requests.post(url=token_url, data=data,
+                                            headers=headers, auth=(app.config['RAS_FRONTSTAGE_CLIENT_ID'],
+                                                                   app.config['RAS_FRONTSTAGE_CLIENT_SECRET']))
             # Check to see that this user has not attempted to login too many times or that they have not forgot to
             # click on the activate account URL in their email by checking the error message back from the OAuth2 server
             if oauth2_response.status_code == 401:
@@ -75,23 +74,21 @@ def login():
         oauth2_token = json.loads(oauth2_response.text)
 
         url = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], username)
-        req = requests.get(url, verify=False)
-        if req.status_code != 200:
+        req = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
+        if req.status_code == 404:
             logger.error('Email not found in party service', email=username)
+            return render_template('sign-in/sign-in.html', _theme='default',
+                                   form=form, data={"error": {"type": "failed"}})
+        elif req.status_code != 200:
+            logger.error('Error retrieving respondent from party service', email=username)
             raise ExternalServiceError(req)
-
-        ##### THIS EXCEPTION CAN NEVER BE HIT??? #####
-        try:
-            party_id = req.json().get('id')
-        except Exception as e:
-            logger.error('error trying to get username from party service', exception=str(e))
-            return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+        party_id = req.json().get('id')
 
         # Take our raw token and add a UTC timestamp to the expires_at attribute
         data_dict_for_jwt_token = timestamp_token(oauth2_token, username, party_id)
-
         encoded_jwt_token = encode(data_dict_for_jwt_token)
-        response = make_response(redirect(url_for('surveys_bp.logged_in', _external=True, _scheme=getenv('SCHEME', 'http'))))
+        response = make_response(redirect(url_for('surveys_bp.logged_in', _external=True,
+                                                  _scheme=getenv('SCHEME', 'http'))))
         response.set_cookie('authorization', value=encoded_jwt_token)
         return response
 
@@ -105,7 +102,7 @@ def login():
 
     return render_template('sign-in/sign-in.html', _theme='default', form=form, data=template_data)
 
-  
+
 @sign_in_bp.route('/logout')
 def logout():
     response = make_response(redirect(url_for('sign_in_bp.login')))

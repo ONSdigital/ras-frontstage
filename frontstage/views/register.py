@@ -2,7 +2,7 @@ import json
 import logging
 from os import getenv
 
-from flask import Blueprint, render_template, request, flash, redirect, url_for, abort
+from flask import Blueprint, render_template, request, redirect, url_for, abort
 from jose import JWTError
 from oauthlib.oauth2 import BackendApplicationClient, MissingTokenError
 import requests
@@ -34,7 +34,7 @@ def validate_enrolment_code(enrolment_code):
     url = app.config['RM_IAC_GET'].format(app.config['RM_IAC_SERVICE'], enrolment_code)
     logger.debug('Enrolment code validation attempt', url=url, enrolment_code=enrolment_code)
 
-    result = requests.get(url, verify=False)
+    result = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
     logger.debug('IAC service response', status_code=result.status_code, reason=result.reason, text=result.text)
 
     if result.status_code == 200:
@@ -78,7 +78,7 @@ def register():
         if case_id:
 
             url = app.config['RM_CASE_GET_BY_IAC'].format(app.config['RM_CASE_SERVICE'], enrolment_code)
-            case = requests.get(url, verify=False)
+            case = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
 
             if case.status_code == 200:
                 case = json.loads(case.text)
@@ -131,7 +131,7 @@ def register_confirm_organisation_survey():
     # Look up the case by case_id
     url = app.config['RM_CASE_GET'].format(app.config['RM_CASE_SERVICE'], case_id)
     logger.debug('Get case', url=url)
-    case = requests.get(url, verify=False)
+    case = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
     logger.debug('Case service response', status_code=case.status_code, reason=case.reason, text=case.text)
 
     if case.status_code == 200:
@@ -144,7 +144,7 @@ def register_confirm_organisation_survey():
     # Look up the organisation by party_id
     url = app.config['RAS_PARTY_GET_BY_BUSINESS'].format(app.config['RAS_PARTY_SERVICE'], business_party_id)
     logger.debug('Get organisation', url=url)
-    party = requests.get(url, verify=False)
+    party = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
     logger.debug('Party service response', status_code=party.status_code, reason=party.reason, text=party.text)
 
     if party.status_code == 200:
@@ -156,7 +156,7 @@ def register_confirm_organisation_survey():
     # Look up the collection exercise by collection_exercise_id
     url = app.config['RM_COLLECTION_EXERCISES_GET'].format(app.config['RM_COLLECTION_EXERCISE_SERVICE'], collection_exercise_id)
     logger.debug('Get collection exercise', url=url)
-    collection_exercise = requests.get(url, verify=False)
+    collection_exercise = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
     logger.debug('collection exercise service response',
                  status_code=collection_exercise.status_code,
                  reason=collection_exercise.reason,
@@ -171,7 +171,7 @@ def register_confirm_organisation_survey():
     # Look up the survey by survey_id
     url = app.config['RM_SURVEY_GET'].format(app.config['RM_SURVEY_SERVICE'], survey_id)
     logger.debug('Get survey', url=url)
-    survey = requests.get(url, verify=False)
+    survey = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
     logger.debug('Survey response', status_code=survey.status_code, reason=survey.reason, text=survey.text)
 
     if survey.status_code == 200:
@@ -283,7 +283,8 @@ def register_enter_your_details():
 
         party_service_url = app.config['RAS_PARTY_POST_RESPONDENTS'].format(app.config['RAS_PARTY_SERVICE'])
         logger.debug('Attempting account creation', url=party_service_url)
-        result = requests.post(party_service_url, headers=headers, data=json.dumps(registration_data))
+        result = requests.post(party_service_url, headers=headers,
+                               auth=app.config['BASIC_AUTH'], data=json.dumps(registration_data))
         logger.debug('Party service response', status_code=result.status_code, reason=result.reason, text=result.text)
 
         if result.status_code == 400:
@@ -314,7 +315,7 @@ def register_activate_account(token):
     # Call the Party service to try to activate the account corresponding to the token that was supplied
     url = app.config['RAS_PARTY_VERIFY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], token)
     logger.info('Attempting to verify email', url=url)
-    result = requests.put(url)
+    result = requests.put(url, auth=app.config['BASIC_AUTH'])
 
     if result.status_code == 409:
         # Token is expired
@@ -322,10 +323,7 @@ def register_activate_account(token):
         party_id = json_response.get('id')
         if party_id:
             logger.warning('Expired token', token=token, party_id=party_id)
-            return redirect(url_for('register_bp.register_resend_email',
-                                    party_id=party_id,
-                                    _external=True,
-                                    _scheme=getenv('SCHEME', 'http')))
+            return render_template('register/register.link-expired.html', _theme='default', party_id=party_id)
         else:
             logger.error('No party_id found', token=token)
             return redirect(url_for('error_bp.default_error_page'))
@@ -350,14 +348,18 @@ def register_activate_account(token):
         return redirect(url_for('error_bp.default_error_page'))
 
 
-@register_bp.route('/create-account/resend-email', methods=['GET'])
-def register_resend_email():
-    user_id = request.args.get('party_id', None)
-    return render_template('register/register.link-expired.html', _theme='default', party_id=user_id)
-
-
 @register_bp.route('/create-account/email-resent', methods=['GET'])
 def register_email_resent():
-    # TODO Call the service that will request a new email to be sent out
-
-    return render_template('register/register.email-resent.html', _theme='default')
+    # Resend email verification link
+    party_id = request.args.get('party_id')
+    logger.debug('Attempting to re-send email verification link', party_id=party_id)
+    url = app.config['RAS_PARTY_RESEND_VERIFICATION'].format(app.config['RAS_PARTY_SERVICE'], party_id)
+    response = requests.get(url, auth=app.config['BASIC_AUTH'])
+    if response.status_code == 200:
+        logger.info("Successfully re-sent email verification link", party_id=party_id)
+        return render_template('register/register.email-resent.html', _theme='default', party_id=party_id)
+    elif response.status_code == 404:
+        logger.warning("Party not found to resend email verification link to", party_id=party_id)
+        return redirect(url_for('error_bp.default_error_page'))
+    else:
+        raise ExternalServiceError(response)

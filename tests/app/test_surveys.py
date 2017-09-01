@@ -197,13 +197,13 @@ class TestSurveys(unittest.TestCase):
                                 follow_redirects=True,
                                 data=access_survey_form)
 
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue('Something went wrong'.encode() in response.data)
 
     @requests_mock.mock()
     def test_download_survey_categories_fail(self, mock_object):
         mock_object.get(url_get_case, status_code=200, json=cases_data)
-        mock_object.get(url_ci_download, status_code=500)
+        mock_object.get(url_ci_download, status_code=200)
         mock_object.get(url_case_categories, status_code=500)
         mock_object.post(url_case_post, status_code=201)
 
@@ -211,13 +211,13 @@ class TestSurveys(unittest.TestCase):
                                 follow_redirects=True,
                                 data=access_survey_form)
 
-        self.assertEqual(response.status_code, 500)
-        self.assertTrue('Something went wrong'.encode() in response.data)
+        # We don't want to stop the users journey when we fail to post case events?
+        self.assertEqual(response.status_code, 200)
 
     @requests_mock.mock()
     def test_download_survey_case_post_fail(self, mock_object):
         mock_object.get(url_get_case, status_code=200, json=cases_data)
-        mock_object.get(url_ci_download, status_code=500)
+        mock_object.get(url_ci_download, status_code=200)
         mock_object.get(url_case_categories, status_code=200, json=categories_data)
         mock_object.post(url_case_post, status_code=500)
 
@@ -225,8 +225,8 @@ class TestSurveys(unittest.TestCase):
                                 follow_redirects=True,
                                 data=access_survey_form)
 
-        self.assertEqual(response.status_code, 500)
-        self.assertTrue('Something went wrong'.encode() in response.data)
+        # We don't want to stop the users journey when we fail to post case events?
+        self.assertEqual(response.status_code, 200)
 
     @requests_mock.mock()
     def test_upload_survey(self, mock_object):

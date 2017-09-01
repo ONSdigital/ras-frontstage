@@ -1,6 +1,6 @@
 export const commonPath = './common/assets';
-export const appPath = './app';
-export const distPath = './app/static';
+export const appPath = './frontstage';
+export const distPath = './frontstage/static';
 
 export const paths = {
 	common: commonPath,

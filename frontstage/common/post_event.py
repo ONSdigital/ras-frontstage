@@ -20,6 +20,7 @@ _categories = None
 
 logger = wrap_logger(logging.getLogger(__name__))
 
+
 def post_event(case_id, description=None, category=None, party_id=None, created_by=None, payload=None):
     """
     Post an event to the case service ...
@@ -46,7 +47,7 @@ def post_event(case_id, description=None, category=None, party_id=None, created_
     global _categories
     if not _categories:
         logger.debug('Caching event category list')
-        resp = requests.get('{}categories'.format(app.config['RM_CASE_SERVICE']))
+        resp = requests.get('{}categories'.format(app.config['RM_CASE_SERVICE']), auth=app.config['BASIC_AUTH'])
         if resp.status_code != 200:
             return 404, {'code': 404, 'text': 'error loading categories'}
         _categories = {}
@@ -80,8 +81,7 @@ def post_event(case_id, description=None, category=None, party_id=None, created_
     logger.info('Posting case event', case_id=case_id, category=category, party_id=party_id)
     headers = {'Content-Type': 'application/json'}
     resp = requests.post('{}cases/{}/events'.format(app.config['RM_CASE_SERVICE'], case_id),
-                         data=dumps(message),
-                         headers=headers)
+                         auth=app.config['BASIC_AUTH'], data=dumps(message), headers=headers)
 
     if resp.status_code != 201:
         logger.error('Failed to post to case service', status_code=resp.status_code, text=str(resp.text))

@@ -26,20 +26,16 @@ def logger_initial_config(service_name=None,
     except ValueError:
         indent = None
 
-    def add_service(logger, method_name, event_dict):
+    def add_service(logger, method_name, event_dict):  # pylint: disable=unused-argument
         """
         Add the service name to the event dict.
         """
         event_dict['service'] = service_name
         return event_dict
 
-    logging.basicConfig(level=log_level,
-                        format=logger_format)
-    configure(processors=[add_log_level,
-              filter_by_level,
-              add_service,
-              TimeStamper(fmt=logger_date_format, utc=True, key="created_at"),
-              JSONRenderer(indent=indent)])
+    logging.basicConfig(level=log_level, format=logger_format)
+    configure(processors=[add_log_level, filter_by_level, add_service,
+                          TimeStamper(fmt=logger_date_format, utc=True, key="created_at"), JSONRenderer(indent=indent)])
     oauth_log = logging.getLogger("requests_oauthlib")
     oauth_log.addHandler(logging.NullHandler())
     oauth_log.propagate = False

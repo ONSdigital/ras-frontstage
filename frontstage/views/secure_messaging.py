@@ -334,12 +334,15 @@ def draft_get(session, draft_id):
             logger.error('Failed to retrieve thread', thread_id=thread_id)
             raise ExternalServiceError(response)
         thread = json.loads(response.text)
-        message = thread[0]
+        for message in thread['messages']:
+            if message.get('sent_date'):
+                reply_message = message
+                break
     else:
-        message = None
+        reply_message = None
 
     return render_template('secure-messages/secure-messages-draft.html', _theme='default',
-                           draft=draft, message=message)
+                           draft=draft, message=reply_message)
 
 
 @secure_message_bp.route('/sent/<sent_id>', methods=['GET'])

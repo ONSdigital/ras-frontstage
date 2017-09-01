@@ -25,6 +25,7 @@ Send secure message
             </div>
             {% endif %}
 
+
             {% if message %}
             <h1 class="saturn">Subject: {{ message['subject'] }}</h1>
             <div class="grid">
@@ -49,24 +50,22 @@ Send secure message
             <div class="secure-message-form">
                 <form action="{{ url_for('secure_message_bp.create_message') }}" method="post">
                     <p>To: ONS Business Surveys team</p>
-
                     <input
                             id="msg_id"
                             type ="hidden"
                             name="msg_id"
                             value="{{draft['msg_id']}}">
-
                         {% if "subject" in errors %}
                         <div class="panel panel--simple panel--error panel--spacious">
                             <p class="error-message">{{ errors['subject'][0] }}</p>
                         {% endif %}
 
-                        {% if draft['msg_id'] == draft['thread_id'] %}
-                            <input name="secure-message-subject" type="hidden" id="secure-message-subject" value="{{ subject }}">
+                        {% if message %}
+                            <input name="secure-message-subject" type="hidden" id="secure-message-subject" value="{{ draft['subject'] }}">
                         {% else %}
                             <fieldset>
                             <label for="secure-message-subject">Subject</label>
-                            <input readonly
+                            <input
                                 id="secure-message-subject"
                                 class="secure-message-form__subject input input--text"
                                 type="text"
@@ -78,8 +77,6 @@ Send secure message
                         {% if "subject" in errors %}
                         </div>
                         {% endif %}
-
-                        <br />
 
                         {% if "body" in errors %}
                         <div class="panel panel--simple panel--error panel--spacious">

@@ -38,8 +38,8 @@ def step_impl_add_text_to_subject_and_body(context):
 
 @when('I have a message with non alpha characters')
 def step_impl_add_non_alpha_text_to_subject_and_body(context):
-    context.browser.find_by_id('secure-message-subject').send_keys('[]!@£$%^&*()')
-    context.browser.find_by_id('secure-message-body').send_keys('"?><:|}{+_±')
+    context.browser.find_by_id('secure-message-subject').send_keys('[]!@%^&*()')
+    context.browser.find_by_id('secure-message-body').send_keys('"?><:}{+_')
 
 
 @when('I have a message with empty fields')

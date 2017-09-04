@@ -7,7 +7,6 @@ Feature: Open the surveys page
     When I go to the history tab
     Then I should see the Access survey button
 
-
   Scenario: User opens the history tab
     Given I am already logged in
     When I am on the history page

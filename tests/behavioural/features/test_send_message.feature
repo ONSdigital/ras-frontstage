@@ -13,7 +13,36 @@ Feature: Test send message
     Given I am already logged in
     When I am on the create message page
     When I have a message to send
+    When I send a message
     Then The confirmation sent page opens
+
+  Scenario: User sends a message with non alpha characters
+    Given I am already logged in
+    When I am on the create message page
+    When I have a message with non alpha characters
+    When I send a message
+    Then The confirmation sent page opens
+
+  Scenario: User sends a message with empty subject and body
+    Given I am already logged in
+    When I am on the create message page
+    When I have a message with empty fields
+    When I send a message
+    Then I should receive a subject and body error
+
+  Scenario: User sends a message with subject too long
+    Given I am already logged in
+    When I am on the create message page
+    When I have a message with subject too long
+    When I send a message
+    Then the confirmation sent page opens
+
+  Scenario: User sends a message with body too long
+    Given I am already logged in
+    When I am on the create message page
+    When I have a message with body too long
+    When I send a message
+    Then I should receive a body too long error
 
   Scenario: User receives a message from BRES
     Given I am already logged in

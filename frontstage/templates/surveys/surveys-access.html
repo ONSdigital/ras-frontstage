@@ -7,7 +7,11 @@
 {% block main %}
 
 <div>
-    <a href="{{ url_for('surveys_bp.surveys_history') }}">Back</a>
+    {% if 'history' in referer_header %}
+        <a href="{{ url_for('surveys_bp.surveys_history') }}">Back</a>
+    {% else %}
+        <a href="{{ url_for('surveys_bp.logged_in') }}">Back</a>
+    {% endif %}
 </div>
 
 <br/>
@@ -30,7 +34,7 @@
         <span class="download__text">Download spreadsheet&nbsp;&nbsp;&nbsp;</span>
         <span class="download__text"><i class="fa fa-download fa-lg" aria-hidden="true"></i></span>
     </div>
-    <div class="download__text pluto">({{ ci_data.len | file_size_filter }} KB)</div>
+    <div class="download__text pluto">({{ ci_data.len | file_size_filter }} kb XLS)</div>
 </a>
 
 <br/>

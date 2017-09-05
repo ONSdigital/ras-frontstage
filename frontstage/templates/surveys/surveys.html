@@ -71,7 +71,7 @@
                 <input type="hidden" name="submit_by" value="{{ data.collectionExerciseData.scheduledReturnFormatted }}">
 
                 <button id="ACCESS_SURVEY_BUTTON_{{loop.index}}" class="btn action-button btn--primary"
-                        type="submit">Access survey
+                        type="submit">Access <span class="u-vh">{{ data.surveyData.longName|replace("Survey", " ") }}</span> survey
                 </button>
             </form>
         </div>

@@ -9,6 +9,7 @@ class Config(object):
 
     CSRF_ENABLED = False
     WTF_CSRF_ENABLED = False
+    SECRET_KEY = os.getenv('SECRET_KEY', 'the-secret-key')
     RAS_FS_CRYPTO_KEY = os.getenv('RAS_FS_CRYPTO_KEY', 'ONS_DUMMY_KEY')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'dummy_user')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'dummy_password')
@@ -92,10 +93,10 @@ class Config(object):
                                                       RAS_SECURE_MESSAGE_SERVICE_HOST,
                                                       RAS_SECURE_MESSAGE_SERVICE_PORT)
 
-    ONS_OAUTH_HOST = os.environ.get('ONS_OAUTH_HOST', 'ons-oauth2.cfapps.io')
-    ONS_OAUTH_PORT = os.getenv('ONS_OAUTH_PORT', 80)
-    ONS_OAUTH_PROTOCOL = os.environ.get('ONS_OAUTH_PROTOCOL', 'http')
-    ONS_OAUTH_SERVICE = '{}://{}:{}/'.format(ONS_OAUTH_PROTOCOL, ONS_OAUTH_HOST, ONS_OAUTH_PORT)
+    ONS_OAUTH_SERVICE_HOST = os.environ.get('ONS_OAUTH_HOST', 'ons-oauth2.cfapps.io')
+    ONS_OAUTH_SERVICE_PORT = os.getenv('ONS_OAUTH_PORT', 80)
+    ONS_OAUTH_SERVICE_PROTOCOL = os.environ.get('ONS_OAUTH_PROTOCOL', 'http')
+    ONS_OAUTH_SERVICE = '{}://{}:{}/'.format(ONS_OAUTH_SERVICE_PROTOCOL, ONS_OAUTH_SERVICE_HOST, ONS_OAUTH_SERVICE_PORT)
     ONS_TOKEN = '{}api/v1/tokens/'.format(ONS_OAUTH_SERVICE)
 
     MESSAGE_LIMIT = os.getenv('MESSAGE_LIMIT', 1000)

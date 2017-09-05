@@ -71,15 +71,17 @@ Environment variables available for configuration are listed below:
 | Environment Variable            | Description                                        | Default
 |---------------------------------|----------------------------------------------------|-------------------------------
 | NAME                            | Name of application                                | 'ras-frontstage'
-| VERSION                         | Version number of application                      | '0.2.0' (Updates as application updates)
+| VERSION                         | Version number of application                      | '0.2.0' (manually update as application updates)
+| APP_SETTINGS                    | Which config to use                                | 'Config' (use DevelopmentConfig) for developers
+| SECRET_KEY                      | Secret key used by flask                           | 'the-secret-key'
 | SECURITY_USER_NAME              | Username for basic auth                            | 'dummy_user'
 | SECURITY_USER_PASSWORD          | Password for basic auth                            | 'dummy_password'
 | JWT_ALGORITHM                   | Algotithm used to code JWT                         | 'HS256'
 | JWT_SECRET                      | SECRET used to code JWT                            | 'vrwgLNWEffe45thh545yuby'
 | VALIDATE_JWT                    | Boolean for turning on/off JWT validation (True=on)| True 
 | GOOGLE_ANALYTICS                | Code for google analytics                          | None
-| RAS_FRONTSTAGE_CLIENT_ID        | Client id for oauth service                        |'ons@ons.gov'
-| RAS_FRONTSTAGE_CLIENT_SECRET    | Secret for oauth service                           |'password'
+| RAS_FRONTSTAGE_CLIENT_ID        | Client id for oauth service                        | 'ons@ons.gov'
+| RAS_FRONTSTAGE_CLIENT_SECRET    | Secret for oauth service                           | 'password'
 
 For each external application which frontstage communicates with there are 3 environment variables e.g. for the RM case service:
 
@@ -100,3 +102,4 @@ The services these variables exist for are listed below with the beginnings of t
 | API gateway service             | RAS_API_GATEWAY_SERVICE
 | Party service                   | RAS_PARTY_SERVICE
 | Secure message service          | RAS_SECURE_MESSAGE_SERVICE
+| Oauth service                   | ONS_OAUTH_SERVICE

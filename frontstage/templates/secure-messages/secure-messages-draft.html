@@ -49,6 +49,7 @@ Send secure message
             <h1 class="saturn">Edit a draft message</h1>
             <div class="secure-message-form">
                 <form action="{{ url_for('secure_message_bp.create_message') }}" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <p>To: ONS Business Surveys team</p>
                     <input
                             id="msg_id"

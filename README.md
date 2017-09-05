@@ -63,3 +63,42 @@ View DEBUG logs
 ```
 export RAS_FRONTSTAGE_LOGGING_LEVEL=DEBUG
 ```
+
+## Configuration
+
+Environment variables available for configuration are listed below:
+
+| Environment Variable            | Description                   | Default
+|---------------------------------|-------------------------------|-------------------------------
+| NAME                            | Name of application           | 'ras-frontstage'
+| VERSION                         | Version number of application | '0.2.0' (Updates as application updates)
+| SECURITY_USER_NAME              | Username for basic auth       | 'dummy_user'
+| SECURITY_USER_PASSWORD          | Password for basic auth       | 'dummy_password'
+| JWT_ALGORITHM                   | Algotithm used to code JWT    | 'HS256'
+| JWT_SECRET                      | SECRET used to code JWT       | 'vrwgLNWEffe45thh545yuby'
+| VALIDATE_JWT                    | Boolean for turning on/off    | True
+|                                 | JWT validation (True=on)      | 
+| GOOGLE_ANALYTICS                | Code for google analytics     | None
+| RAS_FRONTSTAGE_CLIENT_ID        | Client id for oauth service   | 'ons@ons.gov'
+| RAS_FRONTSTAGE_CLIENT_SECRET    | Secret for oauth service      | 'password'
+
+For each external application which frontstage communicates with there are 3 environment variables e.g. for the RM case service:
+
+| RM_CASE_SERVICE_HOST            | Host address for RM case service  | 'http'
+| RM_CASE_SERVICE_PORT            | Port for RM case service          | 'password'
+| RM_CASE_SERVICE_PROTOCOL        | Protocol used for RM case service | 'password'
+
+The services these variables exist for are listed below with the beginnings of their variables and their github links:
+
+| Service                         | Start of variables
+|---------------------------------|-----------------------------
+| Case service                    | RM_CASE_SERVICE
+| IAC service                     | RM_IAC_SERVICE
+| Collection exercise service     | RM_COLLECTION_EXERCISE    
+| Survey service                  | RM_SURVEY_SERVICE
+| API gateway service             | RAS_API_GATEWAY_SERVICE
+| Party service                   | RAS_PARTY_SERVICE
+| Secure message service          | RAS_SECURE_MESSAGE_SERVICE
+
+The Oauth server is configured slightly differently (This will probably change) these variables are:
+

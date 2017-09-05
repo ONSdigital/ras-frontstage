@@ -131,5 +131,3 @@ class TestingConfig(Config):
     TEMPLATES_AUTO_RELOAD = True
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     SECRET_KEY = 'ONS_DUMMY_KEY'
-
-

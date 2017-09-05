@@ -76,7 +76,7 @@ url_get_coll = app.config['RM_COLLECTION_EXERCISES_GET'].format(app.config['RM_C
                                                                 collection_exercise_id)
 survey_id = coll_json['surveyId']
 url_get_survey = app.config['RM_SURVEY_GET'].format(app.config['RM_SURVEY_SERVICE'], survey_id)
-url_oauth_token = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_TOKEN_ENDPOINT']
+url_oauth_token = app.config['ONS_TOKEN']
 url_create_party = app.config['RAS_PARTY_POST_RESPONDENTS'].format(app.config['RAS_PARTY_SERVICE'])
 
 

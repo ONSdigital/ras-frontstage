@@ -7,6 +7,9 @@ python: '3.5'
 
 cache:
   - pip
+
+env:
+  - APP_SETTINGS=TestingConfig
 install:
   - pip install -r requirements.txt
   - pip install -r requirements-test.txt

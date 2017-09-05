@@ -27,7 +27,7 @@ encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoX3Rva2VuIj
                     "8kugpDi3_GSDnxWh5rz2e5GQuBx7kmLM"
 
 url_party_by_email = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], "testuser@email.com")
-url_oauth_token = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_TOKEN_ENDPOINT']
+url_oauth_token = app.config['ONS_TOKEN']
 
 
 class TestSignIn(unittest.TestCase):

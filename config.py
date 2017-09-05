@@ -6,31 +6,21 @@ class Config(object):
     TESTING = False
     NAME = os.getenv('NAME', 'ras-frontstage')
     VERSION = os.getenv('VERSION', '0.2.0')
-    dbname = "ras_frontstage_backup"
-    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI',
-                                             'postgresql://ras_frontstage_backup:password@localhost:5431/postgres')
 
-    RAS_FS_CRYPTO_KEY = 'ONS_DUMMY_KEY'
     CSRF_ENABLED = False
     WTF_CSRF_ENABLED = False
-    SECRET_KEY = 'this-really-needs-to-be-changed'
+    SECRET_KEY = os.getenv('SECRET_KEY', 'ONS_DUMMY_KEY')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'dummy_user')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'dummy_password')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
     JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
     JWT_SECRET = os.getenv('JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
+    RAS_FRONTSTAGE_CLIENT_ID = os.environ.get('RAS_FRONTSTAGE_CLIENT_ID', 'ons@ons.gov')
+    RAS_FRONTSTAGE_CLIENT_SECRET = os.environ.get('RAS_FRONTSTAGE_CLIENT_SECRET', 'password')
 
     VALIDATE_JWT = os.environ.get('VALIDATE_JWT', True)
     GOOGLE_ANALYTICS = os.getenv('GOOGLE_ANALYTICS', None)
     SELENIUM_TEST_URL = os.environ.get('SELENIUM_TEST_URL', 'http://localhost:8080')
-
-    ONS_OAUTH_PROTOCOL = os.environ.get('ONS_OAUTH_PROTOCOL', 'http://')
-    ONS_OAUTH_SERVER = os.environ.get('ONS_OAUTH_SERVER', 'ons-oauth2.cfapps.io')
-    RAS_FRONTSTAGE_CLIENT_ID = os.environ.get('RAS_FRONTSTAGE_CLIENT_ID', 'ons@ons.gov')
-    RAS_FRONTSTAGE_CLIENT_SECRET = os.environ.get('RAS_FRONTSTAGE_CLIENT_SECRET', 'password')
-    ONS_AUTHORIZATION_ENDPOINT = os.environ.get('ONS_AUTHORIZATION_ENDPOINT', '/web/authorize/')
-    ONS_TOKEN_ENDPOINT = os.environ.get('ONS_TOKEN_ENDPOINT', '/api/v1/tokens/')
-    ONS_ADMIN_ENDPOINT = os.environ.get('ONS_ADMIN_ENDPOINT', '/api/account/create')
 
     PASSWORD_MATCH_ERROR_TEXT = 'Your passwords do not match'
     PASSWORD_CRITERIA_ERROR_TEXT = 'Your password doesn\'t meet the requirements'
@@ -101,6 +91,13 @@ class Config(object):
     RAS_SECURE_MESSAGE_SERVICE = '{}://{}:{}/'.format(RAS_SECURE_MESSAGE_SERVICE_PROTOCOL,
                                                       RAS_SECURE_MESSAGE_SERVICE_HOST,
                                                       RAS_SECURE_MESSAGE_SERVICE_PORT)
+
+    ONS_OAUTH_SERVICE_HOST = os.environ.get('ONS_OAUTH_HOST', 'ons-oauth2.cfapps.io')
+    ONS_OAUTH_SERVICE_PORT = os.getenv('ONS_OAUTH_PORT', 80)
+    ONS_OAUTH_SERVICE_PROTOCOL = os.environ.get('ONS_OAUTH_PROTOCOL', 'http')
+    ONS_OAUTH_SERVICE = '{}://{}:{}/'.format(ONS_OAUTH_SERVICE_PROTOCOL, ONS_OAUTH_SERVICE_HOST, ONS_OAUTH_SERVICE_PORT)
+    ONS_TOKEN = '{}api/v1/tokens/'.format(ONS_OAUTH_SERVICE)
+
     MESSAGE_LIMIT = os.getenv('MESSAGE_LIMIT', 1000)
     CREATE_MESSAGE_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'message/send'
     MESSAGES_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'messages?limit={}'.format(MESSAGE_LIMIT)

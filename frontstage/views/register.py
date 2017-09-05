@@ -235,7 +235,7 @@ def register_enter_your_details():
         # passes our 'client' to the session management object
         # this deals with the transactions between the OAuth2 server
         oauth = OAuth2Session(client=client)
-        token_url = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_TOKEN_ENDPOINT']
+        token_url = app.config['ONS_TOKEN']
         logger.debug('Fetching oauth token', url=token_url)
 
         try:

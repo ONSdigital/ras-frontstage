@@ -2,7 +2,7 @@
 
 {% extends "layouts/_onecol.html" %}
 
-{% block page_title %}My surveys - ONS Business Surveys{% endblock %}
+{% block page_title %}Completed surveys - ONS Business Surveys{% endblock %}
 
 {% block main %}
 
@@ -20,6 +20,8 @@
            class="btn btn--secondary btn--border navigation-tabs__tab">Messages</a>
     </li>
 </ul>
+
+<h1 class="u-vh">Completed surveys</h1>
 
 {% set emptySurveyListLabel = 'No items to show' %}
 {% include "surveys/surveys.html" %}

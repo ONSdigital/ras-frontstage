@@ -1,7 +1,7 @@
 
 {% extends "secure-messages/messages.html" %}
 
-{% block page_title %}Messages{% endblock %}
+{% block page_title %}Messages - ONS Business Surveys{% endblock %}
 
 
 {% block messages %}
@@ -116,14 +116,22 @@
         <p>{{ message['body']|truncate(100) }}</p>
 
         {% if 'DRAFT' in message['labels'] %}
-            <a href="{{ url_for('secure_message_bp.draft_get', draft_id=message['msg_id']) }}">Read full message</a>
+            <a href="{{ url_for('secure_message_bp.draft_get', draft_id=message['msg_id']) }}">
+                Read full message with subject: <span class="u-vh">{{ message['subject'] }}</span>
+            </a>
         {% elif 'SENT' in message['labels'] %}
-            <a href="{{ url_for('secure_message_bp.sent_get', sent_id=message['msg_id']) }}">Read full message</a>
+            <a href="{{ url_for('secure_message_bp.sent_get', sent_id=message['msg_id']) }}">
+                Read full message with subject: <span class="u-vh">{{ message['subject'] }}</span>
+            </a>
         {% elif 'INBOX' in message['labels'] %}
             {% if 'UNREAD' in message['labels'] %}
-            <b><a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">Read full message</a></b>
+            <b><a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">
+                Read full message with subject: <span class="u-vh">{{ message['subject'] }}</span>
+            </a></b>
             {% else %}
-            <a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">Read full message</a>
+            <a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">
+                Read full message with subject: <span class="u-vh">{{ message['subject'] }}</span>
+            </a>
             {% endif %}
         {% endif %}
 

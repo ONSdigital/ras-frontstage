@@ -373,14 +373,6 @@ def message_get(session, msg_id):
     party_id = session['party_id']
     loggerb = logger.bind(message_id=msg_id, party_id=party_id)
 
-    loggerb.debug('Attempting to remove unread label')
-    data = {"label": 'UNREAD', "action": 'remove'}
-    url = app.config['MESSAGE_MODIFY_URL'].format(msg_id)
-    response = requests.put(url, data=json.dumps(data), headers=headers)
-    if response.status_code != 200:
-        loggerb.error("Failed to remove unread label")
-        raise ExternalServiceError(response)
-
     loggerb.debug('Retrieving message')
     url = app.config['MESSAGE_GET_URL'].format(msg_id)
     get_message = requests.get(url, headers=headers)
@@ -389,4 +381,12 @@ def message_get(session, msg_id):
         raise ExternalServiceError(get_message)
     message = json.loads(get_message.text)
     loggerb.debug('Retrieved message successfully')
+
+    loggerb.debug('Attempting to remove unread label')
+    data = {"label": 'UNREAD', "action": 'remove'}
+    url = app.config['MESSAGE_MODIFY_URL'].format(msg_id)
+    response = requests.put(url, data=json.dumps(data), headers=headers)
+    if response.status_code != 200:
+        loggerb.error("Failed to remove unread label")
+
     return render_template('secure-messages/secure-messages-view.html', _theme='default', message=message)

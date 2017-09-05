@@ -500,10 +500,12 @@ class TestSecureMessage(unittest.TestCase):
 
     @requests_mock.mock()
     def test_get_single_message_modify_failure(self, mock_object):
-        mock_object.put(url_sm_modify_message, status_code=500, json=example_message_data)
+        mock_object.get(url_sm_get_single_message, status_code=200, json=example_message_data)
+        mock_object.put(url_sm_modify_message, status_code=500)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
 
-        response = self.app.get("secure-message/message/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb", data=self.message_form)
+        response = self.app.get("secure-message/message/7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb",
+                                data=self.message_form, follow_redirects=True)
 
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue(bytes("errors", encoding='UTF-8') in response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(bytes("Reply", encoding='UTF-8') in response.data)

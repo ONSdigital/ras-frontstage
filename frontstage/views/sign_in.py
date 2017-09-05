@@ -30,7 +30,8 @@ def login():
         # TODO Consider moving this to a helper function.
         # Lets get a token from the OAuth2 server
         try:
-            token_url = app.config['ONS_OAUTH_PROTOCOL'] + app.config['ONS_OAUTH_SERVER'] + app.config['ONS_TOKEN_ENDPOINT']
+            token_url = app.config['ONS_TOKEN']
+
             data = {
                 'grant_type': 'password',
                 'client_id': app.config['RAS_FRONTSTAGE_CLIENT_ID'],

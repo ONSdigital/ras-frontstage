@@ -16,7 +16,7 @@ class Cryptographer:
 
         :param key: The encryption key to use when encrypting the data
         """
-        key = app.config['RAS_FS_CRYPTO_KEY']
+        key = app.config['SECRET_KEY']
         self._key = sha256(key.encode('utf-8')).digest()
 
     def encrypt(self, raw_text):

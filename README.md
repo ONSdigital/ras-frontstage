@@ -76,7 +76,7 @@ Environment variables available for configuration are listed below:
 | SECURITY_USER_PASSWORD          | Password for basic auth       | 'dummy_password'
 | JWT_ALGORITHM                   | Algotithm used to code JWT    | 'HS256'
 | JWT_SECRET                      | SECRET used to code JWT       | 'vrwgLNWEffe45thh545yuby'
-| VALIDATE_JWT                    | Boolean for turning on/off    | True
+| VALIDATE_JWT                    | Boolean for turning on/off JWT validation (True=on)   | True
 |                                 | JWT validation (True=on)      | 
 | GOOGLE_ANALYTICS                | Code for google analytics     | None
 | RAS_FRONTSTAGE_CLIENT_ID        | Client id for oauth service   | 'ons@ons.gov'
@@ -84,9 +84,11 @@ Environment variables available for configuration are listed below:
 
 For each external application which frontstage communicates with there are 3 environment variables e.g. for the RM case service:
 
+| Environment Variable            | Description                       | Default
+|---------------------------------|-----------------------------------|-------------------------------
 | RM_CASE_SERVICE_HOST            | Host address for RM case service  | 'http'
-| RM_CASE_SERVICE_PORT            | Port for RM case service          | 'password'
-| RM_CASE_SERVICE_PROTOCOL        | Protocol used for RM case service | 'password'
+| RM_CASE_SERVICE_PORT            | Port for RM case service          | 'localhost'
+| RM_CASE_SERVICE_PROTOCOL        | Protocol used for RM case service | '8171'
 
 The services these variables exist for are listed below with the beginnings of their variables and their github links:
 

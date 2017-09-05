@@ -73,7 +73,7 @@ Environment variables available for configuration are listed below:
 | NAME                            | Name of application                                | 'ras-frontstage'
 | VERSION                         | Version number of application                      | '0.2.0' (manually update as application updates)
 | APP_SETTINGS                    | Which config to use                                | 'Config' (use DevelopmentConfig) for developers
-| SECRET_KEY                      | Secret key used by flask                           | 'the-secret-key'
+| SECRET_KEY                      | Secret key used by flask                           | 'ONS_DUMMY_KEY'
 | SECURITY_USER_NAME              | Username for basic auth                            | 'dummy_user'
 | SECURITY_USER_PASSWORD          | Password for basic auth                            | 'dummy_password'
 | JWT_ALGORITHM                   | Algotithm used to code JWT                         | 'HS256'

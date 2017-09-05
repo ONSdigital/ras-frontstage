@@ -10,7 +10,6 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI',
                                              'postgresql://ras_frontstage_backup:password@localhost:5431/postgres')
 
-    RAS_FS_CRYPTO_KEY = 'ONS_DUMMY_KEY'
     CSRF_ENABLED = True
     WTF_CSRF_ENABLED = True
     SECRET_KEY = os.getenv('FRONTSTAGE_SECRET_KEY')

@@ -13,7 +13,7 @@ class Config(object):
     RAS_FS_CRYPTO_KEY = 'ONS_DUMMY_KEY'
     CSRF_ENABLED = True
     WTF_CSRF_ENABLED = True
-    SECRET_KEY = os.getenviron('FRONTSTAGE_SECRET_KEY')
+    SECRET_KEY = os.getenv('FRONTSTAGE_SECRET_KEY')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'dummy_user')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'dummy_password')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)

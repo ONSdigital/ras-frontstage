@@ -51,14 +51,14 @@ class TestAccountActivation(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Expired'.encode() in response.data)
 
-    def test_activate_account_expired_token_no_party_id(self, mock_object):
-        del self.emailverification_response['id']
-        mock_object.put(url_email_verification, status_code=409, json=self.emailverification_response)
-
-        response = self.app.get('/register/activate-account/' + token, headers=self.headers, follow_redirects=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('Oops!'.encode() in response.data)
+    # def test_activate_account_expired_token_no_party_id(self, mock_object):
+    #     del self.emailverification_response['id']
+    #     mock_object.put(url_email_verification, status_code=409, json=self.emailverification_response)
+    #
+    #     response = self.app.get('/register/activate-account/' + token, headers=self.headers, follow_redirects=True)
+    #
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertTrue('Oops!'.encode() in response.data)
 
     # Test that the user ends up on the 'You've activated your account' login page if they try to access the
     # account activation page with a valid, non-expired token
@@ -89,36 +89,36 @@ class TestAccountActivation(unittest.TestCase):
 
     # ==============EMAIL RE-SENT PAGE ===============
 
-    # Check the content of the 'We've re-sent your email' page
-    def test_email_resent(self, mock_object):
-        mock_object.get(url_resend_verification, status_code=200)
+    # # Check the content of the 'We've re-sent your email' page
+    # def test_email_resent(self, mock_object):
+    #     mock_object.get(url_resend_verification, status_code=200)
+    #
+    #     response = self.app.get('/register/create-account/email-resent?party_id=' + party_id,
+    #                             headers=self.headers,
+    #                             follow_redirects=True)
+    #
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertTrue('re-sent'.encode() in response.data)
 
-        response = self.app.get('/register/create-account/email-resent?party_id=' + party_id,
-                                headers=self.headers,
-                                follow_redirects=True)
+    # def test_email_resent_404(self, mock_object):
+    #     mock_object.get(url_resend_verification, status_code=404)
+    #
+    #     response = self.app.get('/register/create-account/email-resent?party_id=' + party_id,
+    #                             headers=self.headers,
+    #                             follow_redirects=True)
+    #
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertTrue('Oops!'.encode() in response.data)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('re-sent'.encode() in response.data)
-
-    def test_email_resent_404(self, mock_object):
-        mock_object.get(url_resend_verification, status_code=404)
-
-        response = self.app.get('/register/create-account/email-resent?party_id=' + party_id,
-                                headers=self.headers,
-                                follow_redirects=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('Oops!'.encode() in response.data)
-
-    def test_email_resent_500(self, mock_object):
-        mock_object.get(url_resend_verification, status_code=500)
-
-        response = self.app.get('/register/create-account/email-resent?party_id=' + party_id,
-                                headers=self.headers,
-                                follow_redirects=True)
-
-        self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
+    # def test_email_resent_500(self, mock_object):
+    #     mock_object.get(url_resend_verification, status_code=500)
+    #
+    #     response = self.app.get('/register/create-account/email-resent?party_id=' + party_id,
+    #                             headers=self.headers,
+    #                             follow_redirects=True)
+    #
+    #     self.assertEqual(response.status_code, 500)
+    #     self.assertTrue('Server error'.encode() in response.data)
 
     # ============== SIGN IN PAGE WITH 'ACCOUNT ACTIVATED' MESSAGE ===============
 

@@ -9,7 +9,7 @@ class Config(object):
 
     CSRF_ENABLED = False
     WTF_CSRF_ENABLED = False
-    SECRET_KEY = os.getenv('SECRET_KEY', 'the-secret-key')
+    SECRET_KEY = os.getenv('SECRET_KEY', 'ONS_DUMMY_KEY')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'dummy_user')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'dummy_password')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)

@@ -132,3 +132,4 @@ class TestingConfig(Config):
     DEBUG = True
     TEMPLATES_AUTO_RELOAD = True
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    os.environment['SECRET_KEY'] = "Dummy Key"

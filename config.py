@@ -7,9 +7,8 @@ class Config(object):
     NAME = os.getenv('NAME', 'ras-frontstage')
     VERSION = os.getenv('VERSION', '0.2.0')
 
-    CSRF_ENABLED = False
-    WTF_CSRF_ENABLED = False
-    SECRET_KEY = os.getenv('SECRET_KEY', 'ONS_DUMMY_KEY')
+    WTF_CSRF_ENABLED = True
+    SECRET_KEY = os.getenv('SECRET_KEY')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'dummy_user')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'dummy_password')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
@@ -17,7 +16,6 @@ class Config(object):
     JWT_SECRET = os.getenv('JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
     RAS_FRONTSTAGE_CLIENT_ID = os.environ.get('RAS_FRONTSTAGE_CLIENT_ID', 'ons@ons.gov')
     RAS_FRONTSTAGE_CLIENT_SECRET = os.environ.get('RAS_FRONTSTAGE_CLIENT_SECRET', 'password')
-
     VALIDATE_JWT = os.environ.get('VALIDATE_JWT', True)
     GOOGLE_ANALYTICS = os.getenv('GOOGLE_ANALYTICS', None)
     SELENIUM_TEST_URL = os.environ.get('SELENIUM_TEST_URL', 'http://localhost:8080')
@@ -123,10 +121,13 @@ class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
     TEMPLATES_AUTO_RELOAD = True
+    SECRET_KEY = 'ONS_DUMMY_KEY'
 
 
 class TestingConfig(Config):
     TESTING = True
     DEBUG = True
+    WTF_CSRF_ENABLED = False
     TEMPLATES_AUTO_RELOAD = True
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    SECRET_KEY = 'ONS_DUMMY_KEY'

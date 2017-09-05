@@ -2,6 +2,7 @@ import logging
 import os
 
 from flask import Flask
+from flask_wtf.csrf import CSRFProtect
 from structlog import wrap_logger
 
 from frontstage.filters.case_status_filter import case_status_filter
@@ -15,6 +16,8 @@ app_config = 'config.{}'.format(os.environ.get('APP_SETTINGS', 'Config'))
 app.config.from_object(app_config)
 
 app.url_map.strict_slashes = False
+
+csrf = CSRFProtect(app)
 
 app.jinja_env.filters['case_status_filter'] = case_status_filter
 app.jinja_env.filters['file_size_filter'] = file_size_filter

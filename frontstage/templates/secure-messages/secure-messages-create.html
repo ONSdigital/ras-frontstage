@@ -17,6 +17,7 @@ Send secure message
 
             <div class="secure-message-form">
                 <form method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <p>To: ONS Business Surveys team</p>
 
                     {% if "subject" in errors %}

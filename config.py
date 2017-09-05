@@ -11,9 +11,9 @@ class Config(object):
                                              'postgresql://ras_frontstage_backup:password@localhost:5431/postgres')
 
     RAS_FS_CRYPTO_KEY = 'ONS_DUMMY_KEY'
-    CSRF_ENABLED = False
-    WTF_CSRF_ENABLED = False
-    SECRET_KEY = 'this-really-needs-to-be-changed'
+    CSRF_ENABLED = True
+    WTF_CSRF_ENABLED = True
+    SECRET_KEY = os.getenviron('FRONTSTAGE_SECRET_KEY')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'dummy_user')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'dummy_password')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
@@ -126,6 +126,7 @@ class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
     TEMPLATES_AUTO_RELOAD = True
+    SECRET_KEY = "Dummy Key"
 
 
 class TestingConfig(Config):

@@ -31,6 +31,7 @@
         {{ message['body'] }}
     </p>
     <form action="{{ url_for('secure_message_bp.reply_message') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
         {% if message['subject'].startswith('Re: ') %}
             {% set subject = message['subject'] %}

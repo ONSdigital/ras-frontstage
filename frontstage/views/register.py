@@ -319,20 +319,32 @@ def register_activate_account(token):
 
     if result.status_code == 409:
         # Token is expired
-        json_response = json.loads(result.text)
-        party_id = json_response.get('id')
-        if party_id:
-            logger.warning('Expired token', token=token, party_id=party_id)
-            return render_template('register/register.link-expired.html', _theme='default', party_id=party_id)
-        else:
-            logger.error('No party_id found', token=token)
-            return redirect(url_for('error_bp.default_error_page'))
+        logger.warning('Expired token', token=token)
+        return render_template('register/register.link-expired.html', _theme='default')
     elif result.status_code == 404:
         # Token not recognised
         logger.warning("Unrecognised email verification token", token=token)
         return redirect(url_for('error_bp.not_found_error_page'))
     elif result.status_code != 200:
         raise ExternalServiceError(result)
+
+    # THE BELOW CODE WILL REDIRECT TO A RESEND EMAIL PAGE IF TOKEN IS EXPIRED (REQUIRES CHANGES IN PARTY SERVICE
+    # if result.status_code == 409:
+    #     # Token is expired
+    #     json_response = json.loads(result.text)
+    #     party_id = json_response.get('id')
+    #     if party_id:
+    #         logger.warning('Expired token', token=token, party_id=party_id)
+    #         return render_template('register/register.link-expired.html', _theme='default', party_id=party_id)
+    #     else:
+    #         logger.error('No party_id found', token=token)
+    #         return redirect(url_for('error_bp.default_error_page'))
+    # elif result.status_code == 404:
+    #     # Token not recognised
+    #     logger.warning("Unrecognised email verification token", token=token)
+    #     return redirect(url_for('error_bp.not_found_error_page'))
+    # elif result.status_code != 200:
+    #     raise ExternalServiceError(result)
 
     json_response = json.loads(result.text)
 
@@ -348,18 +360,19 @@ def register_activate_account(token):
         return redirect(url_for('error_bp.default_error_page'))
 
 
-@register_bp.route('/create-account/email-resent', methods=['GET'])
-def register_email_resent():
-    # Resend email verification link
-    party_id = request.args.get('party_id')
-    logger.debug('Attempting to re-send email verification link', party_id=party_id)
-    url = app.config['RAS_PARTY_RESEND_VERIFICATION'].format(app.config['RAS_PARTY_SERVICE'], party_id)
-    response = requests.get(url, auth=app.config['BASIC_AUTH'])
-    if response.status_code == 200:
-        logger.info("Successfully re-sent email verification link", party_id=party_id)
-        return render_template('register/register.email-resent.html', _theme='default', party_id=party_id)
-    elif response.status_code == 404:
-        logger.warning("Party not found to resend email verification link to", party_id=party_id)
-        return redirect(url_for('error_bp.default_error_page'))
-    else:
-        raise ExternalServiceError(response)
+# WAITING FOR PARTY SERVICE CHANGES TO IMPLEMENT
+# @register_bp.route('/create-account/email-resent', methods=['GET'])
+# def register_email_resent():
+#     # Resend email verification link
+#     party_id = request.args.get('party_id')
+#     logger.debug('Attempting to re-send email verification link', party_id=party_id)
+#     url = app.config['RAS_PARTY_RESEND_VERIFICATION'].format(app.config['RAS_PARTY_SERVICE'], party_id)
+#     response = requests.get(url, auth=app.config['BASIC_AUTH'])
+#     if response.status_code == 200:
+#         logger.info("Successfully re-sent email verification link", party_id=party_id)
+#         return render_template('register/register.email-resent.html', _theme='default', party_id=party_id)
+#     elif response.status_code == 404:
+#         logger.warning("Party not found to resend email verification link to", party_id=party_id)
+#         return redirect(url_for('error_bp.default_error_page'))
+#     else:
+#         raise ExternalServiceError(response)

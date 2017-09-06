@@ -6201,6 +6201,34 @@ input:checked ~ .label {
   color: #0f8243;
 }
 
+.table.table--dense {
+  font-size: 81.25%;
+}
+
+.table .table__cell {
+  padding: 9px 0 9px 18px;
+  padding: 0.5rem 0 0.5rem 1rem;
+  font-size: 12pt;
+  text-align: left;
+  vertical-align: top;
+}
+
+.table .table__row {
+  border-bottom: 1px solid #ccc;
+}
+
+.table .table__header-cell {
+  padding: 9px 0 4.5px 18px;
+  padding: 0.5rem 0 0.25rem 1rem;
+  font-size: 12pt;
+  text-align: left;
+  border-bottom: 2px solid #666;
+}
+
+.table .table__header-cell.table__header-cell--align {
+  text-align: left;
+}
+
 /**
  * Override normalize styles
  */
@@ -6559,6 +6587,10 @@ input[type=file]::-webkit-file-upload-button:hover {
   margin-bottom: -1px;
   padding-bottom: 1px;
   background-color: #fff;
+}
+
+.nowrap {
+  white-space: nowrap;
 }
 
 /**
@@ -6951,6 +6983,10 @@ input[type=file]::-webkit-file-upload-button:hover {
   margin-bottom: -1px;
   padding-bottom: 1px;
   background-color: #fff;
+}
+
+.nowrap {
+  white-space: nowrap;
 }
 
 /*# sourceMappingURL=responsive.css.map */

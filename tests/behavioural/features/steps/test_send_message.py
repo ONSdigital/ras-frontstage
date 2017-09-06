@@ -2,7 +2,6 @@ import requests
 from behave import given, when, then
 from flask import json
 
-from frontstage.views.secure_messaging import headers
 from tests.behavioural.features.steps.common import is_element_present_by_id
 
 
@@ -82,9 +81,11 @@ def step_impl_open_confirmation_page(context):
 def step_impl_received_message_from_bres(context):
     url = 'http://localhost:5050/message/send'
     # This authorization needs to be valid for the user or the test will not work
-    headers['Authorization'] = 'eyJ0eXAiOiJqd3QiLCJhbGciOiJIUzI1NiJ9.eyJwYXJ0eV9pZCI6IkJSRVMiLCJy' \
-                               'b2xlIjoiaW50ZXJuYWwifQ.y_B0MsBwFbwUBadYvtn5ZppWRrw4Z-3JW9_ZXDprLug'
-    headers['Content-Type'] = 'application/json'
+    headers = {
+        'Authorization': 'eyJ0eXAiOiJqd3QiLCJhbGciOiJIUzI1NiJ9.eyJwYXJ0eV9pZCI6IkJSRVMiLCJy' \
+                         'b2xlIjoiaW50ZXJuYWwifQ.y_B0MsBwFbwUBadYvtn5ZppWRrw4Z-3JW9_ZXDprLug',
+        'Content-Type': 'application/json'
+    }
     message = {
         "msg_to": ["0ab69a7c-21ce-40e5-a451-49eeb84ceeda"],
         "msg_from": "BRES",

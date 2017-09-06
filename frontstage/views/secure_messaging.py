@@ -11,8 +11,6 @@ from frontstage.exceptions.exceptions import ExternalServiceError
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-headers = {"Content-Type": "application/json"}
-
 modify_data = {'action': '',
                'label': ''}
 
@@ -79,6 +77,7 @@ def create_message(session):
     """Handles sending of new message"""
     if request.method == 'POST':
         party_id = session['party_id']
+        headers = {"Authorization": request.cookies['authorization']}
         loggerb = logger.bind(party_id=party_id)
 
         collection_case = get_collection_case(party_id)
@@ -113,12 +112,10 @@ def create_message(session):
 
         if request.form['submit'] == 'Save draft':
             if "msg_id" in request.form and len(request.form['msg_id']) != 0:
-                headers['Authorization'] = request.cookies['authorization']
-
                 loggerb.info('Attempting to modify draft')
                 url = app.config['DRAFT_PUT_API_URL'].format(request.form['msg_id'])
 
-                response = requests.put(url, data=json.dumps(data), headers=headers)
+                response = requests.put(url, json=data, headers=headers)
 
                 if response.status_code == 400:
                     loggerb.warning("Bad request to secure message service")
@@ -134,7 +131,7 @@ def create_message(session):
                 loggerb.info("Attempting to save draft")
                 url = app.config['DRAFT_SAVE_API_URL']
 
-                response = requests.post(url, data=json.dumps(data), headers=headers)
+                response = requests.post(url, json=data, headers=headers)
 
                 if response.status_code == 400:
                     loggerb.warning("Bad request to secure message service")
@@ -176,6 +173,7 @@ def reply_message(session):
 
     if request.method == 'POST':
         party_id = session['party_id']
+        headers = {"Authorization": request.cookies['authorization']}
         loggerb = logger.bind(party_id=party_id)
 
         collection_case = get_collection_case(party_id)
@@ -213,7 +211,7 @@ def reply_message(session):
                 data['msg_id'] = request.form['msg_id']
                 url = app.config['DRAFT_PUT_API_URL'].format(request.form['msg_id'])
 
-                response = requests.put(url, data=json.dumps(data), headers=headers)
+                response = requests.put(url, json=data, headers=headers)
 
                 if response.status_code == 400:
                     logger.warning("Bad request to secure message service")
@@ -228,7 +226,7 @@ def reply_message(session):
             else:
                 loggerb.info("Attempting to save draft")
                 url = app.config['DRAFT_SAVE_API_URL']
-                response = requests.post(url, data=json.dumps(data), headers=headers)
+                response = requests.post(url, json=data, headers=headers)
 
                 if response.status_code == 400:
                     loggerb.warning("Bad request to secure message service")
@@ -250,11 +248,11 @@ def reply_message(session):
 
 
 def message_check_response(data, logger):
-    headers['Authorization'] = request.cookies['authorization']
+    headers = {"Authorization": request.cookies['authorization']}
     logger.info("Attempting to send message")
     url = app.config['CREATE_MESSAGE_API_URL']
 
-    response = requests.post(url, data=json.dumps(data), headers=headers)
+    response = requests.post(url, json=data, headers=headers)
 
     if response.status_code == 400:
         logger.warning("Bad request to secure message service")
@@ -278,9 +276,8 @@ def message_check_response(data, logger):
 def messages_get(session, label="INBOX"):
     """Gets users messages"""
     party_id = session['party_id']
+    headers = {"Authorization": request.cookies['authorization']}
     loggerb = logger.bind(party_id=party_id)
-    headers['Authorization'] = request.cookies['authorization']
-    headers['Content-Type'] = 'application/json'
     loggerb.info('Attempting to retrieve messages', label=label)
 
     url = app.config['MESSAGES_API_URL']
@@ -313,6 +310,7 @@ def messages_get(session, label="INBOX"):
 def draft_get(session, draft_id):
     """Get draft message"""
     party_id = session['party_id']
+    headers = {"Authorization": request.cookies['authorization']}
     loggerb = logger.bind(message_id=draft_id, party_id=party_id)
 
     loggerb.debug('Retrieving draft')
@@ -349,9 +347,9 @@ def draft_get(session, draft_id):
 @jwt_authorization(request)
 def sent_get(session, sent_id):
     """Get sent message"""
-
     party_id = session['party_id']
     loggerb = logger.bind(message_id=sent_id, party_id=party_id)
+    headers = {"Authorization": request.cookies['authorization']}
 
     url = app.config['MESSAGE_GET_URL'].format(sent_id)
     loggerb.debug('Retrieving message')
@@ -372,14 +370,7 @@ def message_get(session, msg_id):
     """Get message"""
     party_id = session['party_id']
     loggerb = logger.bind(message_id=msg_id, party_id=party_id)
-
-    loggerb.debug('Attempting to remove unread label')
-    data = {"label": 'UNREAD', "action": 'remove'}
-    url = app.config['MESSAGE_MODIFY_URL'].format(msg_id)
-    response = requests.put(url, data=json.dumps(data), headers=headers)
-    if response.status_code != 200:
-        loggerb.error("Failed to remove unread label")
-        raise ExternalServiceError(response)
+    headers = {"Authorization": request.cookies['authorization']}
 
     loggerb.debug('Retrieving message')
     url = app.config['MESSAGE_GET_URL'].format(msg_id)
@@ -389,4 +380,12 @@ def message_get(session, msg_id):
         raise ExternalServiceError(get_message)
     message = json.loads(get_message.text)
     loggerb.debug('Retrieved message successfully')
+
+    loggerb.debug('Attempting to remove unread label')
+    data = {"label": 'UNREAD', "action": 'remove'}
+    url = app.config['MESSAGE_MODIFY_URL'].format(msg_id)
+    response = requests.put(url, json=data, headers=headers)
+    if response.status_code != 200:
+        loggerb.error("Failed to remove unread label")
+
     return render_template('secure-messages/secure-messages-view.html', _theme='default', message=message)

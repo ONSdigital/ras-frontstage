@@ -16,7 +16,7 @@ def logger_initial_config(service_name=None,
     if not log_level:
         log_level = os.getenv('SMS_LOG_LEVEL', 'INFO')
     if not logger_format:
-        logger_format = "%(message)s , 'file'='%(name)s', 'line_number'=%(lineno)s"
+        logger_format = "%(message)s"
     if not service_name:
         service_name = os.getenv('NAME', 'ras-frontstage')
     try:

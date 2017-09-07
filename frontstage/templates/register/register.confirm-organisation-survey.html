@@ -10,6 +10,7 @@
         action="{{ url_for('register_bp.register_confirm_organisation_survey') }}"
         class="form"
         role="form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
     <h1 class="saturn">Confirm organisation and survey details</h1>
 

@@ -16,6 +16,11 @@ logger = wrap_logger(logging.getLogger(__name__))
 sign_in_bp = Blueprint('sign_in_bp', __name__, static_folder='static', template_folder='frontstage/templates/sign-in')
 
 
+@app.route('/', methods=['GET'])
+def home():
+    return redirect(url_for('sign_in_bp.login', _external=True, _scheme=getenv('SCHEME', 'http')))
+
+
 # ===== Sign in using OAuth2 =====
 @sign_in_bp.route('/', methods=['GET', 'POST'])
 def login():

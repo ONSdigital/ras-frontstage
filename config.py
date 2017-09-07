@@ -7,7 +7,7 @@ class Config(object):
     NAME = os.getenv('NAME', 'ras-frontstage')
     VERSION = os.getenv('VERSION', '0.2.0')
 
-    WTF_CSRF_ENABLED = True
+    WTF_CSRF_ENABLED = os.getenv('WTF_CSRF_ENABLED', True)
     SECRET_KEY = os.getenv('SECRET_KEY')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'dummy_user')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'dummy_password')

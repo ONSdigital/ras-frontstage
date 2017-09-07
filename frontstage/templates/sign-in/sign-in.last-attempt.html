@@ -6,6 +6,7 @@
 {% block main %}
 
     <form method="get" class="form" action="/sign-in/account-locked">
+        {{ form.csrf_token }}
 
         <h1 class="saturn">Accessing your account</h1>
         <p>If you're unsure of your sign in details, you may want to <a href="/passwords/forgot-password">reset your password.</a></p>

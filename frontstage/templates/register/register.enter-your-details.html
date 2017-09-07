@@ -32,6 +32,7 @@
             action="{{ url_for('register_bp.register_enter_your_details') }}"
             class="form"
             role="form">
+            {{ form.csrf_token }}
 
         <h1 class="saturn">Enter your account details</h1>
         {{ form.enrolment_code }}

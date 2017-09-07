@@ -37,6 +37,7 @@
           class="form"
           action="{{ url_for('sign_in_bp.login') }}"
           role="form">
+        {{ form.csrf_token }}
 
         {% if data['account_activated'] %}
         <h1 class="saturn">You've activated your account</h1>

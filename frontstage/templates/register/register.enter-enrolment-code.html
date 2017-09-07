@@ -26,6 +26,7 @@
             action="{{ url_for('register_bp.register') }}"
             class="form"
             role="form">
+        {{ form.csrf_token }}
 
         <h1 class="saturn">Create an account</h1>
 
@@ -52,7 +53,6 @@
 
     </form>
 
-    <p>Already have an account? <a href="/sign-in">sign in here</a></p>
 </section>
 
 

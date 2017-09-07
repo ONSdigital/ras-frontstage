@@ -10,6 +10,7 @@
         action="{{ url_for('register_bp.register_confirm_organisation_survey') }}"
         class="form"
         role="form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
     <h1 class="saturn">Confirm organisation and survey details</h1>
 
@@ -28,13 +29,7 @@
 
     <button class="btn btn--primary venus" type="submit" id="CONFIRM_AND_CONTINUE_BUTTON">Confirm</button>
 
-    <p>If the organisation or survey details aren't what you were expecting.<br />
-        Please contact us on <a href="tel:+4403001234931">0300 1234 931</a></p>
-
-    <br />
-
-    <h2 class="neptune">Already have an account?</h2>
-    <p>You can still use this enrolment code after you <a href="/sign-in">sign in</a>.</p>
+    <p>If the organisation or survey details aren't what you were expecting, please contact us on <a href="tel:+4403001234931">0300 1234 931</a></p>
 
 </form>
 {% endblock main %}

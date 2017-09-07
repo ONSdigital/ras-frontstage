@@ -4,6 +4,7 @@
         class="form"
         role="form"
         enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
     <div>
         <input class="input input--text" id="selected-file" name="file" type="file" required

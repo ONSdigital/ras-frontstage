@@ -60,6 +60,7 @@
                     action="{{ url_for('surveys_bp.access_survey') }}"
                     class="form"
                     role="form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <input type="hidden" name="case_id" value="{{ data.case.id }}">
                 <input type="hidden" name="collection_instrument_id" value="{{ data.case.collectionInstrumentId }}">
                 <input type="hidden" name="business" value="{{ data.businessData.name }}">

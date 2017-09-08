@@ -7,6 +7,8 @@ from structlog import wrap_logger
 logger = wrap_logger(logging.getLogger(__name__))
 
 
+# To choose which config to use when running frontstage set environment variable APP_SETTINGS to the name of the
+# config object e.g. for the dev config set APP_SETTINGS=DevelopmentConfig
 class Config(object):
     DEBUG = False
     TESTING = False
@@ -129,13 +131,13 @@ class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
     TEMPLATES_AUTO_RELOAD = True
-    SECRET_KEY = 'ONS_DUMMY_KEY'
-    JWT_SECRET = 'vrwgLNWEffe45thh545yuby'
-    SECURITY_USER_NAME = 'dummy_user'
-    SECURITY_USER_PASSWORD = 'dummy_password'
+    SECRET_KEY = os.getenv('SECRET_KEY', 'ONS_DUMMY_KEY')
+    JWT_SECRET = os.getenv('JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
+    SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'dummy_user')
+    SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'dummy_password')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
-    RAS_FRONTSTAGE_CLIENT_ID = 'ons@ons.gov'
-    RAS_FRONTSTAGE_CLIENT_SECRET = 'password'
+    RAS_FRONTSTAGE_CLIENT_ID = os.getenv('RAS_FRONTSTAGE_CLIENT_ID', 'ons@ons.gov')
+    RAS_FRONTSTAGE_CLIENT_SECRET = os.getenv('RAS_FRONTSTAGE_CLIENT_SECRET', 'password')
 
 
 class TestingConfig(DevelopmentConfig):

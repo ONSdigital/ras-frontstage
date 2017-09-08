@@ -1,4 +1,10 @@
+import logging
 import os
+
+from structlog import wrap_logger
+
+
+logger = wrap_logger(logging.getLogger(__name__))
 
 
 class Config(object):
@@ -19,6 +25,8 @@ class Config(object):
     VALIDATE_JWT = os.environ.get('VALIDATE_JWT', True)
     GOOGLE_ANALYTICS = os.getenv('GOOGLE_ANALYTICS', None)
     SELENIUM_TEST_URL = os.environ.get('SELENIUM_TEST_URL', 'http://localhost:8080')
+    NON_DEFAULT_VARIABLES = ['SECRET_KEY', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD', 'JWT_SECRET',
+                             'RAS_FRONTSTAGE_CLIENT_ID', 'RAS_FRONTSTAGE_CLIENT_SECRET']
 
     PASSWORD_MATCH_ERROR_TEXT = 'Your passwords do not match'
     PASSWORD_CRITERIA_ERROR_TEXT = 'Your password doesn\'t meet the requirements'

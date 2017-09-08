@@ -2,7 +2,7 @@
 {% extends "layouts/_twocol.html" %}
 {% set errorType = data['error']['type'] %}
 
-{% block page_title %}Error page{% endblock %}
+{% block page_title %}Error - Please sign in - ONS Business Surveys{% endblock %}
 
 {% block main %}
         <h1 class="saturn">Oops! Something went wrong...</h1>
@@ -10,7 +10,7 @@
         <div class="panel panel--simple panel--error">
 
             <p>You have been signed out.</p>
-            <p><a id="please-login" href="{{ url_for('sign_in_bp.login') }}">Please Login.</a></p>
+            <p><a id="please-login" href="{{ url_for('sign_in_bp.login') }}">Please sign in</a></p>
 
         </div>
 {% endblock main %}

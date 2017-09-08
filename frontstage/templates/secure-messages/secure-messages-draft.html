@@ -3,7 +3,7 @@
 {% set errors = errors %}
 
 {% block page_title %}
-Send secure message
+Edit draft message - ONS Business Surveys
 {% endblock %}
 
 {% block messages %}
@@ -18,7 +18,7 @@ Send secure message
                 <ul class="system-feedback__list"> 
                     <li class="system-feedback__list-item system-feedback__list-item--success"> 
                         <i class="fa fa-check-circle system-feedback__icon" aria-hidden="true" id="inbox-link"> </i>
-                        Draft saved.
+                        Draft saved
                         <a href="{{ url_for('secure_message_bp.messages_get') }}">View your inbox</a> 
                     </li> 
                 </ul> 
@@ -46,7 +46,7 @@ Send secure message
             <p> {{ message['body'] }} </p>
             {% endif %}
 
-            <h1 class="saturn">Edit a draft message</h1>
+            <h1 class="saturn">Edit draft message</h1>
             <div class="secure-message-form">
                 <form action="{{ url_for('secure_message_bp.create_message') }}" method="post">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>

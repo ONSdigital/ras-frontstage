@@ -338,7 +338,7 @@ class TestSecureMessage(unittest.TestCase):
         response = self.app.post("secure-message/reply-message", data=self.message_form)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes("Edit a draft message", encoding='UTF-8') in response.data)
+        self.assertTrue(bytes("Edit draft message", encoding='UTF-8') in response.data)
 
     @requests_mock.mock()
     def test_reply_message_post_draft_new_400(self, mock_object):
@@ -450,7 +450,7 @@ class TestSecureMessage(unittest.TestCase):
                                 data=self.message_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes("Edit a draft message", encoding='UTF-8') in response.data)
+        self.assertTrue(bytes("Edit draft message", encoding='UTF-8') in response.data)
 
     @requests_mock.mock()
     def test_get_single_thread_draft_success(self, mock_object):

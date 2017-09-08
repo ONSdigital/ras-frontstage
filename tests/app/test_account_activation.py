@@ -49,7 +49,7 @@ class TestAccountActivation(unittest.TestCase):
         response = self.app.get('/register/activate-account/' + token, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Expired'.encode() in response.data)
+        self.assertTrue('Link expired '.encode() in response.data)
 
     # def test_activate_account_expired_token_no_party_id(self, mock_object):
     #     del self.emailverification_response['id']

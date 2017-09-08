@@ -2,15 +2,16 @@
 {% extends "layouts/_twocol.html" %}
 {% set errorType = data['error']['type'] %}
 
-{% block page_title %}Error page{% endblock %}
+{% block page_title %}Server error (Error 500) - ONS Business Surveys{% endblock %}
 
 {% block main %}
-        <h1 class="saturn">500 Server error</h1>
+        <h1 class="saturn">Error 500 - Server error</h1>
 
         <div class="panel panel--simple panel--error">
 
-            <p>Something went wrong on our end</p>
-            <p><a id="please-login" href="{{ url_for('surveys_bp.logged_in') }}">Return to your todo page</a></p>
+            <p>Something has gone wrong with the website.</p>
+            <p>You may want to visit the <a href="/">homepage</a></p>
+            <p>If you still encounter problems please <a href="/contact-us">contact us</a>. We apologise for any inconvenience this may have caused.</p>
 
         </div>
 {% endblock main %}

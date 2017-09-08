@@ -15,6 +15,13 @@ app = Flask(__name__)
 app_config = 'config.{}'.format(os.environ.get('APP_SETTINGS', 'Config'))
 app.config.from_object(app_config)
 
+logger = wrap_logger(logging.getLogger(__name__))
+
+logger.error('{} used'.format(str(app_config)))
+for var in app.config['NON_DEFAULT_VARIABLES']:
+    if not app.config[var]:
+        logger.error('No {} set'.format(var))
+
 app.url_map.strict_slashes = False
 
 csrf = CSRFProtect(app)

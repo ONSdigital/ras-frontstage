@@ -30,6 +30,3 @@ class TestApplication(unittest.TestCase):
         my_encoded_dictionary = encode(data_dict_for_jwt_token)
         my_decoded_dictionary = decode(my_encoded_dictionary)
         self.assertEqual(my_decoded_dictionary, data_dict_for_jwt_token)
-
-    def test_decode_jwt(self):
-        self.assertEqual(decode(encoded_token), data_dict_for_jwt_token)

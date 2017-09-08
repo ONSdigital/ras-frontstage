@@ -125,7 +125,7 @@ class TestSecureMessage(unittest.TestCase):
         response = self.app.get("secure-message/create-message", follow_redirects=True)
 
         self.assertEqual(response.status_code, 403)
-        self.assertTrue(bytes("not logged in", encoding='UTF-8') in response.data)
+        self.assertTrue(bytes("Error - not signed in", encoding='UTF-8') in response.data)
 
     @requests_mock.mock()
     def test_create_message_post_success(self, mock_object):
@@ -261,7 +261,7 @@ class TestSecureMessage(unittest.TestCase):
         response = self.app.get("secure-message/reply-message", follow_redirects=True)
 
         self.assertEqual(response.status_code, 403)
-        self.assertTrue(bytes("not logged in", encoding='UTF-8') in response.data)
+        self.assertTrue(bytes("Error - not signed in", encoding='UTF-8') in response.data)
 
     @requests_mock.mock()
     def test_reply_message_post_new_success(self, mock_object):

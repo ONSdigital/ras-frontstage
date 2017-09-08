@@ -1,10 +1,4 @@
-import logging
 import os
-
-from structlog import wrap_logger
-
-
-logger = wrap_logger(logging.getLogger(__name__))
 
 
 # To choose which config to use when running frontstage set environment variable APP_SETTINGS to the name of the
@@ -20,7 +14,7 @@ class Config(object):
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
-    JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
+    JWT_ALGORITHM = os.getenv('JWT_ALGORITHM')
     JWT_SECRET = os.getenv('JWT_SECRET')
     RAS_FRONTSTAGE_CLIENT_ID = os.environ.get('RAS_FRONTSTAGE_CLIENT_ID')
     RAS_FRONTSTAGE_CLIENT_SECRET = os.environ.get('RAS_FRONTSTAGE_CLIENT_SECRET')
@@ -28,7 +22,7 @@ class Config(object):
     GOOGLE_ANALYTICS = os.getenv('GOOGLE_ANALYTICS', None)
     SELENIUM_TEST_URL = os.environ.get('SELENIUM_TEST_URL', 'http://localhost:8080')
     NON_DEFAULT_VARIABLES = ['SECRET_KEY', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD', 'JWT_SECRET',
-                             'RAS_FRONTSTAGE_CLIENT_ID', 'RAS_FRONTSTAGE_CLIENT_SECRET']
+                             'JWT_ALGORITHM', 'RAS_FRONTSTAGE_CLIENT_ID', 'RAS_FRONTSTAGE_CLIENT_SECRET']
 
     PASSWORD_MATCH_ERROR_TEXT = 'Your passwords do not match'
     PASSWORD_CRITERIA_ERROR_TEXT = 'Your password doesn\'t meet the requirements'
@@ -131,13 +125,13 @@ class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
     TEMPLATES_AUTO_RELOAD = True
-    SECRET_KEY = os.getenv('SECRET_KEY', 'ONS_DUMMY_KEY')
-    JWT_SECRET = os.getenv('JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
-    SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'dummy_user')
-    SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'dummy_password')
+    SECRET_KEY = os.getenv('SECRET_KEY', 'ONS_DEV_KEY')
+    JWT_SECRET = os.getenv('JWT_SECRET', 'devsecret')
+    SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'dev_user')
+    SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'dev_password')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
-    RAS_FRONTSTAGE_CLIENT_ID = os.getenv('RAS_FRONTSTAGE_CLIENT_ID', 'ons@ons.gov')
-    RAS_FRONTSTAGE_CLIENT_SECRET = os.getenv('RAS_FRONTSTAGE_CLIENT_SECRET', 'password')
+    RAS_FRONTSTAGE_CLIENT_ID = os.getenv('RAS_FRONTSTAGE_CLIENT_ID', 'dev@dev.dev')
+    RAS_FRONTSTAGE_CLIENT_SECRET = os.getenv('RAS_FRONTSTAGE_CLIENT_SECRET', 'devpassword')
 
 
 class TestingConfig(DevelopmentConfig):

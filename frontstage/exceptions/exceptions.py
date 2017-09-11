@@ -18,10 +18,6 @@ class MissingEnvironmentVariable(Exception):
         self.log_missing_env_variables()
 
     def log_missing_env_variables(self):
-        missing_env_variables = []
-        for var in self.app.config['NON_DEFAULT_VARIABLES']:
-            if not self.app.config[var]:
-                missing_env_variables.append(var)
-
+        missing_env_variables = [var for var in self.app.config['NON_DEFAULT_VARIABLES'] if not self.app.config[var]]
         self.logger.error('Missing environment variables', variables=missing_env_variables)
         sys.exit("Application failed to start")

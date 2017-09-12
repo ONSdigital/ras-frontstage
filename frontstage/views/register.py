@@ -70,7 +70,7 @@ def register():
 
     if request.method == 'POST' and form.validate():
 
-        enrolment_code = request.form.get('enrolment_code')
+        enrolment_code = request.form.get('enrolment_code').lower()
         logger.debug('Enrolment code submitted', enrolment_code=enrolment_code)
 
         case_id = validate_enrolment_code(enrolment_code)

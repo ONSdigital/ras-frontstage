@@ -163,6 +163,12 @@ class ResetPasswordForm(FlaskForm):
                                                 message=app.config['PASSWORD_CRITERIA_ERROR_TEXT'])])
     password_confirm = PasswordField('Re-type new password')
 
+    @staticmethod
+    def validate_password(form, field):
+        password = field.data
+        if password.isalnum() or not any(char.isupper() for char in password) or not any(char.isdigit() for char in password):
+            raise ValidationError(app.config['PASSWORD_CRITERIA_ERROR_TEXT'])
+
 
 class RespondentStatus(enum.IntEnum):
     CREATED = 0

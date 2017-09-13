@@ -2,8 +2,11 @@ import logging
 from os import getenv
 
 from flask import Blueprint, render_template, request, redirect, url_for
+import requests
 from structlog import wrap_logger
 
+from frontstage import app
+from frontstage.exceptions.exceptions import ExternalServiceError
 from frontstage.models import ForgotPasswordForm, ResetPasswordForm
 
 
@@ -15,26 +18,29 @@ passwords_bp = Blueprint('passwords_bp', __name__, static_folder='static', templ
 # ===== Forgot password =====
 @passwords_bp.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
-
     form = ForgotPasswordForm(request.form)
 
     if request.method == 'POST' and form.validate():
-
         email_address = request.form.get('email_address')
+        post_data = {"email_address": email_address}
 
-        # TODO do some kind of back end processing to validate the email address, error handling, logging
-        # print('Email address=' + email_address)
-
-        return redirect(url_for('passwords_bp.forgot_password_check_email',
-                                _external=True,
-                                _scheme=getenv('SCHEME', 'http')))
+        url = app.config['RAS_PARTY_RESET_PASSWORD_REQUEST'].format(app.config['RAS_PARTY_SERVICE'])
+        response = requests.post(url, auth=app.config['BASIC_AUTH'], data=post_data, verify=False)
+        if response.status_code == 404:
+            logger.warning('Email address is not registered')
+            template_data = {"error": {"type": {"Email address ia not registered"}}}
+            return render_template('passwords/forgot-password.html', _theme='default', form=form, data=template_data)
+        if response.status_code != 200:
+            logger.error('Failed to send password change request email')
+            raise ExternalServiceError(response)
+        logger.debug('Successfully sent password change request email')
+        return redirect(url_for('passwords_bp.forgot_password_check_email'))
 
     template_data = {
         "error": {
             "type": form.errors
         }
     }
-
     return render_template('passwords/forgot-password.html', _theme='default', form=form, data=template_data)
 
 
@@ -46,20 +52,33 @@ def forgot_password_check_email():
 # ===== Reset password =====
 @passwords_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
-
     form = ResetPasswordForm(request.form)
-
-    # TODO validate the token
+    url = app.config['RAS_PARTY_VERIFY_PASSWORD_TOKEN'].format(app.config['RAS_PARTY_SERVICE'], token)
+    response = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
+    if response.status_code != 409:
+        logger.warning('Token expired', token=token)
+        raise ExternalServiceError(response)
+        # return render_template('what-goes-here?')
+    elif response.status_code == 404:
+        logger.warning('Invalid token sent to party service', token=token)
+        return redirect(url_for('error_bp.not_found_error_page'))
+    elif response.status_code != 200:
+        logger.error('Party service failed to verify token')
+        raise ExternalServiceError(response)
 
     if request.method == 'POST' and form.validate():
         password = request.form.get('password')
-        password_confirm = request.form.get('password_confirm')
+        put_data = {
+            "new_password": password
+        }
 
-        print('password=' + password)
-        print('password_confirm=' + password_confirm)
+        url = app.config['RAS_PARTY_CHANGE_PASSWORD'].format(app.config['RAS_PARTY_SERVICE'], token)
+        response = requests.put(url, auth=app.config['BASIC_AUTH'], data=put_data, verify=False)
 
-        # TODO do some kind of back end processing to change the password, error handling, logging
-
+        if response.status_code != 200:
+            logger.error('Failed to change user password', token=token)
+            raise ExternalServiceError(response)
+        logger.info('Successfully change user password', token=token)
         return redirect(url_for('passwords_bp.reset_password_confirmation'))
 
     template_data = {

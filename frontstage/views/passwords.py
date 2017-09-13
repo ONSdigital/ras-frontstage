@@ -25,7 +25,7 @@ def forgot_password():
         post_data = {"email_address": email_address}
 
         url = app.config['RAS_PARTY_RESET_PASSWORD_REQUEST'].format(app.config['RAS_PARTY_SERVICE'])
-        response = requests.post(url, auth=app.config['BASIC_AUTH'], data=post_data, verify=False)
+        response = requests.post(url, auth=app.config['BASIC_AUTH'], json=post_data, verify=False)
         if response.status_code == 404:
             logger.warning('Email address is not registered')
             template_data = {"error": {"type": {"Email address ia not registered"}}}
@@ -72,7 +72,7 @@ def reset_password(token):
         }
 
         url = app.config['RAS_PARTY_CHANGE_PASSWORD'].format(app.config['RAS_PARTY_SERVICE'], token)
-        response = requests.put(url, auth=app.config['BASIC_AUTH'], data=put_data, verify=False)
+        response = requests.put(url, auth=app.config['BASIC_AUTH'], json=put_data, verify=False)
 
         if response.status_code != 200:
             logger.error('Failed to change user password', token=token)

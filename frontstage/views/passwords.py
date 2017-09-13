@@ -55,10 +55,9 @@ def reset_password(token):
     form = ResetPasswordForm(request.form)
     url = app.config['RAS_PARTY_VERIFY_PASSWORD_TOKEN'].format(app.config['RAS_PARTY_SERVICE'], token)
     response = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
-    if response.status_code != 409:
+    if response.status_code == 409:
         logger.warning('Token expired', token=token)
-        raise ExternalServiceError(response)
-        # return render_template('what-goes-here?')
+        return render_template('passwords/password-expired.html', _theme='default')
     elif response.status_code == 404:
         logger.warning('Invalid token sent to party service', token=token)
         return redirect(url_for('error_bp.not_found_error_page'))

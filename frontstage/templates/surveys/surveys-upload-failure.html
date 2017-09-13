@@ -11,17 +11,17 @@
 
         <div class="panel panel--error u-mb-s" data-qa="error">
             <div class="panel__header">
-                <h1 class="panel__title venus">Something went wrong</h1>
+                 {% if ".xlsx format" in error_info.text %}
+                    <h1 class="panel__title venus">Error uploading - incorrect file type</h1>
+                 {% elif "50 characters" in error_info.text %}
+                    <h1 class="panel__title venus">Error uploading - file name too long</h1>
+                 {% elif "20MB" in error_info.text %}
+                    <h1 class="panel__title venus">Error uploading - file size too large</h1>
+                 {% endif %}
             </div>
             <div class="panel__body" data-qa="error-body">
 
-                <ul class="error-message">
-                    <li>{{ error_info.text }}</li>
-                </ul>
-
-                <p class="error-message">
-                    Please try uploading your spreadsheet again
-                </p>
+                <p class="error-message">{{ error_info.text }}</p>
 
                 <div class="upload--response">
 

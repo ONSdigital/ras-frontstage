@@ -1,20 +1,13 @@
 {% import 'partials/section.html' as section %}
 {% extends "layouts/_twocol.html" %}
 
-{% block page_title %}Account disabled - ONS Business Surveys{% endblock %}
+{% block page_title %}Trouble signing in? - ONS Business Surveys{% endblock %}
 
 {% block main %}
     <h1 class="saturn">Trouble signing in?</h1>
 
     <p>You've tried to sign in a few times with the wrong details.</p>
 
-    <p>If the email address you entered is for a registered account:</p>
-
-    <ul>
-        <li>we’ve disabled the account for security reasons</li>
-        <li>don’t worry, we’ve sent an email explaining how to sign in</li>
-    </ul>
-
-    {% include "register/register.help-with-email.html" %}
+    <p class="u-mb-l">To access your account please call us on 0300 1234 932 or email <a href="mailto:surveys@ons.gov.uk">surveys@ons.gov.uk</a></p>
 
 {% endblock main %}

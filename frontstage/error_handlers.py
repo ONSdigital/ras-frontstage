@@ -1,14 +1,13 @@
 import logging
 from os import getenv
 
-from flask import redirect, url_for
-from flask import render_template
-from flask import request
+from flask import redirect, url_for, render_template, request
 from requests.exceptions import ConnectionError
 from structlog import wrap_logger
 from werkzeug.exceptions import RequestEntityTooLarge
 
 from frontstage import app
+from frontstage.common.authorisation import jwt_authorization
 from frontstage.exceptions.exceptions import ExternalServiceError, JWTValidationError
 
 
@@ -53,9 +52,11 @@ def connection_error_jwt_validation(error):  # pylint: disable=unused-argument
 
 
 @app.errorhandler(RequestEntityTooLarge)
-def request_entity_too_large_error(error):
+@jwt_authorization(request)
+def request_entity_too_large_error(session, error):
+    party_id = session.get('party_id', 'no-party-id')
     case_id = request.args.get('case_id', None)
-    logger.error('Upload failed', status_code=413, case_id=case_id)
+    logger.error('Upload failed', status_code=413, party_id=party_id, case_id=case_id)
     error_info = {'status code': 413, 'text': 'The spreadsheet must be smaller than 20MB in size.'}
     return render_template('surveys/surveys-upload-failure.html', _theme='default', error_info=error_info,
                            case_id=case_id)

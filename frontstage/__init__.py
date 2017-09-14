@@ -15,6 +15,7 @@ app = Flask(__name__)
 
 app_config = 'config.{}'.format(os.environ.get('APP_SETTINGS', 'Config'))
 app.config.from_object(app_config)
+app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024
 
 log_level = 'DEBUG' if app.config['DEBUG'] else None
 logger_initial_config(service_name='ras-frontstage', log_level=log_level)

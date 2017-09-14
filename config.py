@@ -90,9 +90,7 @@ class Config(object):
     RAS_SECURE_MESSAGE_SERVICE_HOST = os.getenv('RAS_SECURE_MESSAGE_SERVICE_HOST', 'localhost')
     RAS_SECURE_MESSAGE_SERVICE_PORT = os.getenv('RAS_SECURE_MESSAGE_SERVICE_PORT', 5050)
     RAS_SECURE_MESSAGE_SERVICE_PROTOCOL = os.getenv('RAS_SECURE_MESSAGE_SERVICE_PROTOCOL', 'http')
-    RAS_SECURE_MESSAGE_SERVICE = '{}://{}:{}/'.format(RAS_SECURE_MESSAGE_SERVICE_PROTOCOL,
-                                                      RAS_SECURE_MESSAGE_SERVICE_HOST,
-                                                      RAS_SECURE_MESSAGE_SERVICE_PORT)
+    RAS_SECURE_MESSAGE_SERVICE = 'http://ras-secure-messaging-sit.apps.devtest.onsclofo.uk/'
 
     ONS_OAUTH_SERVICE_HOST = os.environ.get('ONS_OAUTH_HOST', 'ons-oauth2.cfapps.io')
     ONS_OAUTH_SERVICE_PORT = os.getenv('ONS_OAUTH_PORT', 80)

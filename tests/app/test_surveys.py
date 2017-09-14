@@ -62,6 +62,8 @@ url_case_post = '{}cases/{}/events'.format(app.config['RM_CASE_SERVICE'], case_i
 url_case_categories = '{}categories'.format(app.config['RM_CASE_SERVICE'])
 url_survey_upload = app.config['RAS_CI_UPLOAD'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], case_id)
 
+FILE_EXTENSION_ERROR = 'The spreadsheet must be in .xls ot .xlsx format'
+FILE_NAME_LENGTH_ERROR = 'The file name of your spreadsheet must be less than 50 characters long'
 
 class TestSurveys(unittest.TestCase):
     """Test case for application endpoints and functionality"""
@@ -269,6 +271,36 @@ class TestSurveys(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Something went wrong'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_upload_survey_upload_file_name_too_long(self, mock_object):
+        mock_object.get(url_get_case, status_code=200, json=cases_data)
+        mock_object.post(url_survey_upload, status_code=400, text=FILE_NAME_LENGTH_ERROR)
+        mock_object.get(url_case_categories, status_code=200, json=categories_data)
+        mock_object.post(url_case_post, status_code=201)
+
+        response = self.app.post('/surveys/upload_survey?party_id={}&case_id={}'.format(party_id, case_id),
+                                 content_type='multipart/form-data',
+                                 follow_redirects=True,
+                                 data=self.survey_file)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(FILE_NAME_LENGTH_ERROR.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_upload_survey_upload_file_extension_incorrect(self, mock_object):
+        mock_object.get(url_get_case, status_code=200, json=cases_data)
+        mock_object.post(url_survey_upload, status_code=400, text=FILE_EXTENSION_ERROR)
+        mock_object.get(url_case_categories, status_code=200, json=categories_data)
+        mock_object.post(url_case_post, status_code=201)
+
+        response = self.app.post('/surveys/upload_survey?party_id={}&case_id={}'.format(party_id, case_id),
+                                 content_type='multipart/form-data',
+                                 follow_redirects=True,
+                                 data=self.survey_file)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(FILE_EXTENSION_ERROR.encode() in response.data)
 
     @requests_mock.mock()
     def test_upload_survey_categories_fail(self, mock_object):

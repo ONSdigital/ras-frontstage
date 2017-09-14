@@ -28,7 +28,7 @@ def forgot_password():
         response = requests.post(url, auth=app.config['BASIC_AUTH'], json=post_data, verify=False)
         if response.status_code == 404:
             logger.warning('Email address is not registered')
-            template_data = {"error": {"type": {"Email address ia not registered"}}}
+            template_data = {"error": {"type": {"Email address is not registered"}}}
             return render_template('passwords/forgot-password.html', _theme='default', form=form, data=template_data)
         if response.status_code != 200:
             logger.error('Failed to send password change request email')

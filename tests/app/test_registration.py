@@ -349,7 +349,6 @@ class TestRegistration(unittest.TestCase):
     def test_create_account_success(self, mock_object):
         """Test create account phone no. too big returns length guidance"""
         mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)
-        mock_object.post(url_oauth_token, status_code=201, json=oauth_token)
         mock_object.post(url_create_party, status_code=200)
         self.headers['referer'] = 'register/create-account/enter-account-details'
 
@@ -366,7 +365,6 @@ class TestRegistration(unittest.TestCase):
     def test_create_account_duplicate_email(self, mock_object):
         """Test create account phone no. too big returns length guidance"""
         mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)
-        mock_object.post(url_oauth_token, status_code=201, json=oauth_token)
         mock_object.post(url_create_party, status_code=400)
         self.headers['referer'] = 'register/create-account/enter-account-details'
 
@@ -383,7 +381,6 @@ class TestRegistration(unittest.TestCase):
     def test_create_account_oauth_fail(self, mock_object):
         """Test create account phone no. too big returns length guidance"""
         mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)
-        mock_object.post(url_oauth_token, status_code=401, json=oauth_token)
         mock_object.post(url_create_party, status_code=500)
         self.headers['referer'] = 'register/create-account/enter-account-details'
 

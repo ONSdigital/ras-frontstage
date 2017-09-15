@@ -1,8 +1,10 @@
 import logging
+from os import getenv
 
-from flask import Blueprint, render_template, request
 import requests
+from flask import Blueprint, render_template, request, url_for
 from structlog import wrap_logger
+from werkzeug.utils import redirect
 
 from frontstage import app
 from frontstage.common.post_event import post_event
@@ -165,7 +167,7 @@ def access_survey(session):
             logger.warning('Party does not have permission to access collection instrument',
                            party_id=party_id,
                            collection_instrument_id=collection_instrument_id)
-            return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+            return render_template("errors/error.html", _theme='default', data={"error": {"type": "failed"}})
 
         logger.info('Attempting to download collection instrument',
                     party_id=party_id,
@@ -213,6 +215,15 @@ def upload_survey(session):
     case_id = request.args.get('case_id', None)
     logger.info('Attempting to upload survey', party_id=party_id, case_id=case_id)
 
+    if request.content_length > app.config['MAX_UPLOAD_LENGTH']:
+        error_info = "size"
+
+        return redirect(url_for('surveys_bp.upload_failed',
+                                _external=True,
+                                _scheme=getenv('SCHEME', 'http'),
+                                case_id=case_id,
+                                error_info=error_info))
+
     valid = upload_surveys_permissions(case_id, party_id)
     if not valid:
         logger.warning('Party does not have permission to upload survey',
@@ -249,6 +260,47 @@ def upload_survey(session):
         logger.info('Upload successful', party_id=party_id, case_id=case_id)
         return render_template('surveys/surveys-upload-success.html', _theme='default', upload_filename=upload_filename)
     else:
-        logger.error('Upload failed', status_code=result.status_code, party_id=party_id, case_id=case_id)
-        error_info = {'status code': result.status_code, 'text': result.text}
-        return render_template('surveys/surveys-upload-failure.html', _theme='default', error_info=error_info, case_id=case_id)
+        if ".xlsx format" in result.text:
+            error_info = "type"
+        elif "50 characters" in result.text:
+            error_info = "charLimit"
+        else:
+            logger.error('Unexpected error message returned from collection instrument',
+                         status_code=result.status_code,
+                         party_id=party_id,
+                         case_id=case_id)
+            error_info = "unexpected"
+
+        return redirect(url_for('surveys_bp.upload_failed',
+                                _external=True,
+                                _scheme=getenv('SCHEME', 'http'),
+                                case_id=case_id,
+                                error_info=error_info))
+
+
+@surveys_bp.route('/upload_failed', methods=['GET'])
+@jwt_authorization(request)
+def upload_failed(session):
+    """Logged in page for users only."""
+    party_id = session.get('party_id', 'no-party-id')
+    case_id = request.args.get('case_id', None)
+    error_info = request.args.get('error_info', None)
+    logger.error('Upload failed', party_id=party_id, case_id=case_id)
+
+    if error_info == "type":
+        error_info = {'header': "Error uploading - incorrect file type",
+                      'body': 'The spreadsheet must be in .xls or .xlsx format'}
+    elif error_info == "charLimit":
+        error_info = {'header': "Error uploading - file name too long",
+                      'body': 'The file name of your spreadsheet must be less than 50 characters long'}
+    elif error_info == "size":
+        error_info = {'header': "Error uploading - file size too large",
+                      'body': 'The spreadsheet must be smaller than 20MB in size'}
+    else:
+        error_info = {'header': "Something went wrong",
+                      'body': 'Please try uploading your spreadsheet again'}
+
+    return render_template('surveys/surveys-upload-failure.html',
+                           _theme='default',
+                           error_info=error_info,
+                           case_id=case_id)

@@ -167,7 +167,7 @@ def access_survey(session):
             logger.warning('Party does not have permission to access collection instrument',
                            party_id=party_id,
                            collection_instrument_id=collection_instrument_id)
-            return render_template("error.html", _theme='default', data={"error": {"type": "failed"}})
+            return render_template("errors/error.html", _theme='default', data={"error": {"type": "failed"}})
 
         logger.info('Attempting to download collection instrument',
                     party_id=party_id,
@@ -214,6 +214,15 @@ def upload_survey(session):
     party_id = session.get('party_id', 'no-party-id')
     case_id = request.args.get('case_id', None)
     logger.info('Attempting to upload survey', party_id=party_id, case_id=case_id)
+
+    if request.content_length > app.config['MAX_UPLOAD_LENGTH']:
+        error_info = "size"
+
+        return redirect(url_for('surveys_bp.upload_failed',
+                                _external=True,
+                                _scheme=getenv('SCHEME', 'http'),
+                                case_id=case_id,
+                                error_info=error_info))
 
     valid = upload_surveys_permissions(case_id, party_id)
     if not valid:

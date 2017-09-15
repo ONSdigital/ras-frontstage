@@ -48,16 +48,3 @@ def connection_error_jwt_validation(error):  # pylint: disable=unused-argument
     return redirect(url_for('error_bp.not_logged_in_error_page',
                             _external=True,
                             _scheme=getenv('SCHEME', 'http')))
-
-
-@app.errorhandler(RequestEntityTooLarge)
-def request_entity_too_large_error(error):
-    case_id = request.args.get('case_id', None)
-    logger.error('Request Entity too large')
-    error_info = 'size'
-
-    return redirect(url_for('surveys_bp.upload_failed',
-                            _external=True,
-                            _scheme=getenv('SCHEME', 'http'),
-                            case_id=case_id,
-                            error_info=error_info))

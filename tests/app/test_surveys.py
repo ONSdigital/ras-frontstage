@@ -304,6 +304,24 @@ class TestSurveys(unittest.TestCase):
         self.assertTrue(FILE_EXTENSION_ERROR.encode() in response.data)
 
     @requests_mock.mock()
+    def test_upload_survey_exceeded_upload_size(self, mock_object):
+        mock_object.get(url_get_case, status_code=200, json=cases_data)
+        mock_object.post(url_survey_upload, status_code=200)
+        mock_object.get(url_case_categories, status_code=200, json=categories_data)
+        mock_object.post(url_case_post, status_code=201)
+
+        file_data = 'a' * 21 * 1024 * 1024
+        over_size_file = dict(file=(io.BytesIO(file_data.encode()), "testfile.xlsx"))
+
+        response = self.app.post('/surveys/upload_survey?party_id={}&case_id={}'.format(party_id, case_id),
+                                 content_type='multipart/form-data',
+                                 follow_redirects=True,
+                                 data=over_size_file)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(FILE_SIZE_ERROR.encode() in response.data)
+
+    @requests_mock.mock()
     def test_upload_survey_categories_fail(self, mock_object):
         mock_object.get(url_get_case, status_code=200, json=cases_data)
         mock_object.post(url_survey_upload, status_code=200)

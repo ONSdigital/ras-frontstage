@@ -376,19 +376,3 @@ class TestRegistration(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('This email has already been used'.encode() in response.data)
-
-    @requests_mock.mock()
-    def test_create_account_oauth_fail(self, mock_object):
-        """Test create account phone no. too big returns length guidance"""
-        mock_object.get(url_validate_iac, status_code=200, json=self.iac_response)
-        mock_object.post(url_create_party, status_code=500)
-        self.headers['referer'] = 'register/create-account/enter-account-details'
-
-        response = self.app.post('register/create-account/enter-account-details',
-                                 query_string=params,
-                                 data=self.test_user,
-                                 headers=self.headers,
-                                 follow_redirects=True)
-
-        self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)

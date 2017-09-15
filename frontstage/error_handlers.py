@@ -7,7 +7,6 @@ from structlog import wrap_logger
 from werkzeug.exceptions import RequestEntityTooLarge
 
 from frontstage import app
-from frontstage.common.authorisation import jwt_authorization
 from frontstage.exceptions.exceptions import ExternalServiceError, JWTValidationError
 
 
@@ -52,11 +51,13 @@ def connection_error_jwt_validation(error):  # pylint: disable=unused-argument
 
 
 @app.errorhandler(RequestEntityTooLarge)
-@jwt_authorization(request)
-def request_entity_too_large_error(session, error):
-    party_id = session.get('party_id', 'no-party-id')
+def request_entity_too_large_error(error):
     case_id = request.args.get('case_id', None)
-    logger.error('Upload failed', status_code=413, party_id=party_id, case_id=case_id)
-    error_info = {'status code': 413, 'text': 'The spreadsheet must be smaller than 20MB in size.'}
-    return render_template('surveys/surveys-upload-failure.html', _theme='default', error_info=error_info,
-                           case_id=case_id)
+    logger.error('Request Entity too large')
+    error_info = 'size'
+
+    return redirect(url_for('surveys_bp.upload_failed',
+                            _external=True,
+                            _scheme=getenv('SCHEME', 'http'),
+                            case_id=case_id,
+                            error_info=error_info))

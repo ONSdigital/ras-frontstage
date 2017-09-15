@@ -4416,7 +4416,7 @@ input:checked ~ .field__other {
 
 @media only screen and (min-width: 500px) {
   .input {
-    width: 20rem;
+    width: 19.5rem;
   }
 }
 
@@ -6604,7 +6604,7 @@ input[type=file]::-webkit-file-upload-button:hover {
   padding-bottom: 72px;
   padding-bottom: 4rem;
   color: #ffffff;
-  background-color: #666666;
+  background-color: #595959;
 }
 
 .footer a {

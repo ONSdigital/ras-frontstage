@@ -62,8 +62,9 @@ url_case_post = '{}cases/{}/events'.format(app.config['RM_CASE_SERVICE'], case_i
 url_case_categories = '{}categories'.format(app.config['RM_CASE_SERVICE'])
 url_survey_upload = app.config['RAS_CI_UPLOAD'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], case_id)
 
-FILE_EXTENSION_ERROR = 'The spreadsheet must be in .xls ot .xlsx format'
+FILE_EXTENSION_ERROR = 'The spreadsheet must be in .xls or .xlsx format'
 FILE_NAME_LENGTH_ERROR = 'The file name of your spreadsheet must be less than 50 characters long'
+FILE_SIZE_ERROR = 'The spreadsheet must be smaller than 20MB in size'
 
 class TestSurveys(unittest.TestCase):
     """Test case for application endpoints and functionality"""
@@ -331,3 +332,35 @@ class TestSurveys(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('File uploaded successfully'.encode() in response.data)
+
+    def test_upload_failed_upload_file_extension_incorrect(self):
+
+        response = self.app.get('/surveys/upload_failed?error_info={}&case_id={}'.format('type', case_id),
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(FILE_EXTENSION_ERROR.encode() in response.data)
+
+    def test_upload_failed_upload_file_name_too_long(self):
+
+        response = self.app.get('/surveys/upload_failed?error_info={}&case_id={}'.format('charLimit', case_id),
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(FILE_NAME_LENGTH_ERROR.encode() in response.data)
+
+    def test_upload_failed_upload_file_size_too_large(self):
+
+        response = self.app.get('/surveys/upload_failed?error_info={}&case_id={}'.format('size', case_id),
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(FILE_SIZE_ERROR.encode() in response.data)
+
+    def test_upload_failed_unexpected_error(self):
+
+        response = self.app.get('/surveys/upload_failed?case_id={}'.format(case_id),
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(b'Please try uploading your spreadsheet again' in response.data)

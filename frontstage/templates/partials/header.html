@@ -1,3 +1,51 @@
+
+<div class="helpinfo">
+  <div class="header__help is-closed js-help-body">
+    <div class="header__container container">
+      <div class="header__title">Help –</div>
+      <ul class="header__nav nav nav--horizontal">
+        <li class="nav__item">
+          <span class="mars" role="presentation">Call </span> <a class="venus nav__link" href="tel:03001234931"><span class="u-vh">For help call </span>0300 1234 931</a>
+        </li>
+        <li class="nav__item">
+          <span class="mars" role="presentation">Email </span> <a class="venus nav__link external" href="mailto:surveys@ons.gov.uk" rel="ext">surveys@ons.gov.uk</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+ready(function () {
+  var btn = document.querySelector('.js-help-btn');
+  var help = document.querySelector('.js-help-body');
+  var classClosed = 'is-closed';
+
+  var openedByClick = false;
+
+  if (help === null || btn === null) {
+    return false;
+  }
+
+  help.addEventListener('focus', function (e) {
+    help.classList.remove(classClosed);
+  }, true);
+
+  help.addEventListener('blur', function (e) {
+    if (!openedByClick) {
+      help.classList.add(classClosed);
+    }
+  }, true);
+
+  btn.classList.remove('u-hidden');
+  btn.addEventListener('click', function (e) {
+    e.preventDefault();
+    openedByClick = !openedByClick;
+    help.classList.toggle(classClosed);
+  });
+});
+</script>
+
 <div class="container">
 
   <header class="header">
@@ -12,23 +60,6 @@
     ga('send', 'pageview');
     </script>
     {% endif %}
-
-
-    <div class="header__help is-closed js-help-body">
-      <div class="header__container container">
-        <div class="header__title">Help –</div>
-        <ul class="header__nav nav nav--horizontal">
-          <li class="nav__item">
-            <span class="mars" role="presentation">Call </span> <a class="venus nav__link" href="tel:03001234931"><span class="u-vh">For help call </span>0300 1234 931</a>
-          </li>
-          <li class="nav__item">
-            <span class="mars" role="presentation">Email </span> <a class="venus nav__link external" href="mailto:surveys@ons.gov.uk" rel="ext">surveys@ons.gov.uk</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-
 
     <div class="logo header__logo">
       <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Office for National Statistics"

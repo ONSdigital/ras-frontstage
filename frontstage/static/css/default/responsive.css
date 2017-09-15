@@ -4416,7 +4416,7 @@ input:checked ~ .field__other {
 
 @media only screen and (min-width: 500px) {
   .input {
-    width: 20rem;
+    width: 19.5rem;
   }
 }
 
@@ -6623,6 +6623,209 @@ input[type=file]::-webkit-file-upload-button:hover {
 .footer .footer__license {
   margin-top: 36px;
   margin-top: 2rem;
+}
+
+/* copied from Help and Support on Census and changed for SDC */
+.header__container {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  position: relative;
+  padding: 9px 0;
+  padding: 0.5rem 0;
+  width: 100%;
+}
+
+.nav {
+  padding: 0;
+}
+
+.nav--horizontal {
+  font-size: 0;
+  margin: 0;
+}
+
+.nav--horizontal .nav__item {
+  font-size: 18px;
+  font-size: 18px;
+  font-size: 1rem;
+  display: inline-block;
+  margin: 0 0 0 9px;
+  margin: 0 0 0 9px;
+  margin: 0 0 0 0.5rem;
+  padding: 0 9px 0 0;
+  padding: 0 9px 0 0;
+  padding: 0 0.5rem 0 0;
+  position: relative;
+  text-align: center;
+  *display: inline;
+  *zoom: 1;
+  *display: inline;
+  *zoom: 1;
+}
+
+.nav--horizontal .nav__item:not(:last-child):after {
+  content: "";
+  position: absolute;
+  height: 1em;
+  width: 1px;
+  background-color: #999;
+  right: -1px;
+  bottom: 0;
+  top: 0;
+  margin: auto;
+}
+
+.nav--horizontal .nav__item:first-child {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.nav--horizontal .nav__item:last-child {
+  margin-right: 0;
+  padding-right: 0;
+  border: none;
+}
+
+.nav--horizontal .nav__link {
+  display: inline-block;
+  text-decoration: none;
+  margin: 0;
+  text-align: center;
+  *display: inline;
+  *zoom: 1;
+  *display: inline;
+  *zoom: 1;
+}
+
+@media only screen and (min-width: 740px) {
+  .header__help .header__container {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+}
+
+.header__btn {
+  text-align: right;
+  line-height: 1;
+  color: white;
+  margin: 0 0 0 36px;
+  margin: 0 0 0 36px;
+  margin: 0 0 0 2rem;
+  width: auto;
+}
+
+@media only screen and (min-width: 300px) and (max-width: 500px) {
+  .header__btn {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.5rem !important;
+  }
+}
+
+.header__help {
+  padding: 0;
+  color: #fff;
+  background: #033e58;
+  overflow: hidden;
+  -webkit-transition: max-height 300ms ease-in;
+  transition: max-height 300ms ease-in;
+  height: auto;
+}
+
+.has-js .header__help {
+  max-height: 720px;
+  max-height: 720px;
+  max-height: 40rem;
+}
+
+.has-js .header__help.is-closed {
+  max-height: 0;
+  -webkit-transition: max-height 200ms ease-out;
+  transition: max-height 200ms ease-out;
+}
+
+@media only screen and (min-width: 300px) and (max-width: 500px) {
+  .header__help .mars,
+  .header__help .venus {
+    font-size: 0.8rem;
+  }
+}
+
+.header__help a {
+  color: white;
+  text-decoration: underline;
+}
+
+.header__help a:hover {
+  color: white;
+  text-decoration: none;
+}
+
+.header__help .header__container {
+  padding-top: 13.5px;
+  padding-top: 13.5px;
+  padding-top: 0.75rem;
+  padding-bottom: 13.5px;
+  padding-bottom: 13.5px;
+  padding-bottom: 0.75rem;
+}
+
+@media only screen and (min-width: 740px) {
+  .header__help .header__container {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+}
+
+.header__title {
+  display: none;
+}
+
+.header__nav {
+  margin-left: auto;
+  margin-right: 18px;
+}
+
+.header__logo {
+  width: auto;
+  margin-right: auto;
+}
+
+.btn--light.btn--border {
+  font-weight: 600;
+  background: transparent;
+  border: 2px solid #033e58;
+  color: #033e58;
+  padding: 9px 36px;
+  padding: 9px 36px;
+  padding: 0.5rem 2rem;
+}
+
+.btn--light.btn--border:hover, .btn--light.btn--border:focus {
+  background: #033e58;
+  color: #fff;
+}
+
+@media only screen and (max-width: 540px) {
+  .header__btn span {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 499px) {
+  .header__btn {
+    font-size: 6.4px;
+    font-size: 0.8rem;
+    padding: 2.4px 4px !important;
+    padding: 0.3rem 0.5rem !important;
+    margin: 0 0 0 8px;
+    margin: 0 0 0 1rem;
+  }
 }
 
 /**

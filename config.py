@@ -8,6 +8,7 @@ class Config(object):
     TESTING = False
     NAME = os.getenv('NAME', 'ras-frontstage')
     VERSION = os.getenv('VERSION', '0.2.0')
+    MAX_UPLOAD_LENGTH = os.getenv('MAX_UPLOAD_LENGTH',  20 * 1024 * 1024)
 
     WTF_CSRF_ENABLED = os.getenv('WTF_CSRF_ENABLED', True)
     SECRET_KEY = os.getenv('SECRET_KEY')

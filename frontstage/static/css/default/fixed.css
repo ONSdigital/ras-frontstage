@@ -2985,8 +2985,8 @@ input:checked ~ .field__other {
   width: 100%;
   -webkit-transition: border-color 200ms ease-in;
   transition: border-color 200ms ease-in;
-  width: 320px;
-  width: 20rem;
+  width: 312px;
+  width: 19.5rem;
 }
 
 .input:hover {
@@ -4509,7 +4509,7 @@ input[type=file]::-webkit-file-upload-button:hover {
   padding-bottom: 64px;
   padding-bottom: 4rem;
   color: #ffffff;
-  background-color: #666666;
+  background-color: #595959;
 }
 
 .footer a {

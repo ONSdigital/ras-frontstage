@@ -2,19 +2,15 @@ import json
 import logging
 from os import getenv
 
-from flask import Blueprint, render_template, request, redirect, url_for, abort
-from jose import JWTError
-from oauthlib.oauth2 import BackendApplicationClient, MissingTokenError
+from flask import Blueprint, render_template, request, redirect, url_for
 import requests
-from requests_oauthlib import OAuth2Session
 from structlog import wrap_logger
 
 from frontstage import app
-from frontstage.common.post_event import post_event
-from frontstage.jwt import encode
-from frontstage.models import RegistrationForm, EnrolmentCodeForm, RespondentStatus
-from frontstage.exceptions.exceptions import ExternalServiceError
 from frontstage.common.cryptographer import Cryptographer
+from frontstage.common.post_event import post_event
+from frontstage.exceptions.exceptions import ExternalServiceError
+from frontstage.models import RegistrationForm, EnrolmentCodeForm, RespondentStatus
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -183,8 +179,6 @@ def register_confirm_organisation_survey():
     if request.method == 'POST':
         return redirect(url_for('register_bp.register_enter_your_details',
                                 enrolment_code=encrypted_enrolment_code,
-                                organisation_name=organisation_name,
-                                survey_name=survey_name,
                                 _external=True,
                                 _scheme=getenv('SCHEME', 'http')))
     else:

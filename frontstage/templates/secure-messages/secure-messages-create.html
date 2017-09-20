@@ -16,6 +16,8 @@
             <div class="secure-message-form">
                 <form method="post">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input name="secure-message-thread-id" type="hidden" id="secure-message-thread-id" value="{{ draft['thread_id'] }}">
+
                     <p>To: ONS Business Surveys team</p>
 
                     {% if "subject" in errors %}

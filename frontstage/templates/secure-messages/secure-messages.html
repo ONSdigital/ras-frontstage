@@ -60,9 +60,9 @@
             <a href="{{ url_for('secure_message_bp.sent_get', sent_id=message['msg_id']) }}">{{ message['subject'] }}</a>
         {% elif 'INBOX' in message['labels'] %}
             {% if 'UNREAD' in message['labels'] %}
-                <b><a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">{{ message['subject'] }}</a></b>
+                <b><a href="{{ url_for('secure_message_bp.message_get', message_id=message['msg_id']) }}">{{ message['subject'] }}</a></b>
             {% else %}
-            <a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">{{ message['subject'] }}</a>
+            <a href="{{ url_for('secure_message_bp.message_get', message_id=message['msg_id']) }}">{{ message['subject'] }}</a>
             {% endif %}
         {% endif %}
 
@@ -125,11 +125,11 @@
             </a>
         {% elif 'INBOX' in message['labels'] %}
             {% if 'UNREAD' in message['labels'] %}
-            <b><a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">
+            <b><a href="{{ url_for('secure_message_bp.message_get', message_id=message['msg_id']) }}">
                 Read full message with subject: <span class="u-vh">{{ message['subject'] }}</span>
             </a></b>
             {% else %}
-            <a href="{{ url_for('secure_message_bp.message_get', msg_id=message['msg_id']) }}">
+            <a href="{{ url_for('secure_message_bp.message_get', message_id=message['msg_id']) }}">
                 Read full message with subject: <span class="u-vh">{{ message['subject'] }}</span>
             </a>
             {% endif %}

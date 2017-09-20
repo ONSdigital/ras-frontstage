@@ -4,61 +4,34 @@
 
 {% block messages %}
 
+{% set message_type = draft if draft %}
+
+{% include 'secure-messages/message-error-summary.html' %}
+
 <div class="secure-message-view-component">
-    {% if message['subject'].startswith('Re: ') %}
-        <h1 class="saturn">Subject: {{ message['subject'][4:] }}</h1>
-    {% else %}
-        <h1 class="saturn">Subject: {{ message['subject'] }}</h1>
-    {% endif %}
-    <div class="grid">
-        <dl>
-            <dt class="grid__col col-2@s">From:</dt>
-            <dd class="grid__col col-10@s">
-                {% if message['@msg_from']['id'] == 'BRES' %}
-                    {{ message['@msg_from']['id'] }}
-                {% else %}
-                    {{ message['@msg_from']['email'] }}
-                {% endif %}
-            </dd>
-            <dt class="grid__col col-2@s">Sent:</dt>
-            <dd class="grid__col col-10@s">{{ message['sent_date'][:19] }}</dd>
-        </dl>
+
+    {% if label == 'DRAFT' %}
+    {% if errors|length == 0 %}
+    <div class="system-feedback"> 
+        <ul class="system-feedback__list"> 
+            <li class="system-feedback__list-item system-feedback__list-item--success"> 
+                <i class="fa fa-check-circle system-feedback__icon" aria-hidden="true" id="inbox-link"> </i>
+                Draft saved
+                <a href="{{ url_for('secure_message_bp.messages_get') }}">View your inbox</a> 
+            </li> 
+        </ul> 
     </div>
+    {% endif %}
+    {% endif %}
 
-    <br />
+    {% if message %}
+        {% include 'secure-messages/thread-message.html' %}
+    {% endif %}
 
-    <p>
-        {{ message['body'] }}
-    </p>
-    <form action="{{ url_for('secure_message_bp.reply_message') }}" method="post">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-
-        {% if message['subject'].startswith('Re: ') %}
-            {% set subject = message['subject'] %}
-        {% else %}
-            {% set subject = "Re: " + message['subject'] %}
-        {% endif %}
-
-        <input name="secure-message-subject" type="hidden" id="secure-message-subject" value="{{ subject }}">
-        <input name="secure-message-thread-id" type="hidden" id="secure-message-thread-id" value="{{ message['thread_id'] }}">
-
-
-        <fieldset>
-            <label class="venus" for="secure-message-body">Reply</label>
-            <textarea
-                id="secure-message-body"
-                class="input input--textarea input--textarea-message"
-                rows="10"
-                name="secure-message-body"></textarea>
-        </fieldset>
-
-        <br />
-
-        <input class="btn btn--secondary" type="submit" name ="submit" value="Save draft" id="draft">
-        <input class="btn" type="submit" name="submit" value="Send" id="submit-btn">
-
-        <p><a href="{{ url_for('secure_message_bp.messages_get') }}">Cancel</a></p>
-    </form>
+    {% if label != 'SENT' %}
+        {% include 'secure-messages/message-form.html' %}
+    {% endif %}
+    <p><a href="{{ url_for('secure_message_bp.messages_get') }}">Cancel</a></p>
 </div>
 
 {% endblock messages %}

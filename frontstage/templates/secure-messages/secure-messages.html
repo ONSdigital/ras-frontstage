@@ -7,42 +7,23 @@
 {% block messages %}
 
 <ul class="navigation-tabs navigation-tabs--pills">
-    <li id="Inbox" class="{% if label == 'INBOX' %}
-                    {{ 'navigation-tabs__item navigation-tabs__item--primary navigation-tabs__item--active' }}
-                {% else %}
-                     {{ 'navigation-tabs__item navigation-tabs__item--primary' }}
-                {% endif %}">
+
+    <li id="Inbox"
+        class="navigation-tabs__item navigation-tabs__item--primary {% if label == 'INBOX' %}{{'navigation-tabs__item--active'}}{% endif %}">
         <a href="/secure-message/messages/INBOX"
-           class= "{% if label == 'INBOX' %}
-                    {{ 'navigation-tabs__tab navigation-tabs__tab--active' }}
-                 {% else %}
-                    {{ 'navigation-tabs__tab' }}
-                 {% endif %}">Inbox ({{total}})
-        </a>
+           class="navigation-tabs__tab {% if label == 'INBOX' %}{{'navigation-tabs__tab--active'}}{% endif %}">Inbox ({{total}})</a>
     </li>
-    <li id="Sent" class="{% if label == 'SENT' %}
-                    {{ 'navigation-tabs__item navigation-tabs__item--primary navigation-tabs__item--active' }}
-                {% else %}
-                     {{ 'navigation-tabs__item navigation-tabs__item--primary' }}
-                {% endif %}">
+
+    <li id="Sent"
+        class="navigation-tabs__item navigation-tabs__item--primary {% if label == 'SENT' %}{{'navigation-tabs__item--active'}}{% endif %}">
         <a href="/secure-message/messages/SENT"
-           class= "{% if label == 'SENT' %}
-                    {{ 'navigation-tabs__tab navigation-tabs__tab--active' }}
-                 {% else %}
-                    {{ 'navigation-tabs__tab' }}
-                 {% endif %}">Sent</a>
+           class="navigation-tabs__tab {% if label == 'SENT' %}{{'navigation-tabs__tab--active'}}{% endif %}">Sent</a>
     </li>
-    <li id="Draft" class="{% if label == 'DRAFT' %}
-                    {{ 'navigation-tabs__item navigation-tabs__item--primary navigation-tabs__item--active' }}
-                {% else %}
-                     {{ 'navigation-tabs__item navigation-tabs__item--primary' }}
-                {% endif %}">
+
+    <li id="Draft"
+        class="navigation-tabs__item navigation-tabs__item--primary {% if label == 'DRAFT' %}{{'navigation-tabs__item--active'}}{% endif %}">
         <a href="/secure-message/messages/DRAFT"
-           class= "{% if label == 'DRAFT' %}
-                    {{ 'navigation-tabs__tab navigation-tabs__tab--active' }}
-                 {% else %}
-                    {{ 'navigation-tabs__tab' }}
-                 {% endif %}">Draft</a>
+           class="navigation-tabs__tab {% if label == 'DRAFT' %}{{'navigation-tabs__tab--active'}}{% endif %}">Draft</a>
     </li>
 
     <li class="navigation-tabs__item navigation-tabs__item--secondary">
@@ -52,92 +33,91 @@
 </ul>
 
 <ul class="message-list">
-    {% for message in messages %}
+{% for message in messages %}
     <li id="message-list" class="message-list__item">
-        {% if 'DRAFT' in message['labels'] %}
-            <a href="{{ url_for('secure_message_bp.draft_get', draft_id=message['msg_id']) }}">{{ message['subject'] }}</a>
-        {% elif 'SENT' in message['labels'] %}
-            <a href="{{ url_for('secure_message_bp.sent_get', sent_id=message['msg_id']) }}">{{ message['subject'] }}</a>
-        {% elif 'INBOX' in message['labels'] %}
-            {% if 'UNREAD' in message['labels'] %}
-                <b><a href="{{ url_for('secure_message_bp.message_get', message_id=message['msg_id']) }}">{{ message['subject'] }}</a></b>
-            {% else %}
-            <a href="{{ url_for('secure_message_bp.message_get', message_id=message['msg_id']) }}">{{ message['subject'] }}</a>
-            {% endif %}
-        {% endif %}
+    {% if 'DRAFT' in message['labels'] %}
+        <a href="{{ url_for('secure_message_bp.message_get', label='DRAFT', message_id=message['msg_id']) }}">{{ message['subject'] }}</a>
+    {% elif 'SENT' in message['labels'] %}
+        <a href="{{ url_for('secure_message_bp.message_get', label='SENT', message_id=message['msg_id']) }}">{{ message['subject'] }}</a>
+    {% elif 'INBOX' in message['labels'] %}
+    {% if 'UNREAD' in message['labels'] %}
+        <b><a href="{{ url_for('secure_message_bp.message_get', label='INBOX', message_id=message['msg_id']) }}">{{ message['subject'] }}</a></b>
+    {% else %}
+        <a href="{{ url_for('secure_message_bp.message_get', label='INBOX', message_id=message['msg_id']) }}">{{ message['subject'] }}</a>
+    {% endif %}
+    {% endif %}
 
         <dl class="grid">
             <dt class="grid__col col-2@m">
-                {% if 'UNREAD' in message['labels'] %}
-                    <b>Sent:</b>
-                {% else %}
-                    Sent:
-                {% endif %}
+            {% if 'UNREAD' in message['labels'] %}
+                <b>Sent:</b>
+            {% else %}
+                Sent:
+            {% endif %}
             </dt>
+
             <dd class="grid__col col-9@m pull-1@m">
-                {% if 'INBOX' in message['labels'] %}
-                    {% if 'UNREAD' in message['labels'] %}
-                        <b>{{ message['sent_date'][:19] }}</b>
-                    {% else %}
-                        {{ message['sent_date'][:19] }}
-                    {% endif %}
-                {% elif 'SENT' in message['labels'] %}
-                    {{ message['sent_date'][:19] }}
-                {% elif 'DRAFT' in message['labels'] %}
-                    {{ message['modified_date'][:19] }}
-                {% endif %}
+            {% if 'INBOX' in message['labels'] %}
+            {% if 'UNREAD' in message['labels'] %}
+                <b>{{ message['sent_date'][:19] }}</b>
+            {% else %}
+                {{ message['sent_date'][:19] }}
+            {% endif %}
+            {% elif 'SENT' in message['labels'] %}
+                {{ message['sent_date'][:19] }}
+            {% elif 'DRAFT' in message['labels'] %}
+                {{ message['modified_date'][:19] }}
+            {% endif %}
             </dd>
+
             <dt class="grid__col col-2@m">
-                {% if 'INBOX' in message['labels'] %}
-                    {% if 'UNREAD' in message['labels'] %}
-                        <b>From:</b>
-                    {% else %}
-                        From:
-                    {% endif %}
-                {% else %}
-                    To:
-                {% endif %}
+            {% if 'INBOX' in message['labels'] %}
+            {% if 'UNREAD' in message['labels'] %}
+                <b>From:</b>
+            {% else %}
+                From:
+            {% endif %}
+            {% else %}
+                To:
+            {% endif %}
             </dt>
+
             <dd class="grid__col col-9@m pull-1@m">
-                {% if 'INBOX' in message['labels'] %}
-                    {% if 'UNREAD' in message['labels'] %}
-                        <b>{{ message['@msg_from']['firstName'] }} {{ message['@msg_from']['lastName'] }}</b>
-                    {% else %}
-                        {{ message['@msg_from']['firstName'] }} {{ message['@msg_from']['lastName'] }}
-                    {% endif %}
-                {% else %}
-                    <!-- Functionality here to be used when BRES has been added to the party service -->
-                    <!-- {{ message['@msg_to']['firstName'] }} {{ message['@msg_to']['lastName'] }} -->
-                    BRES
-                {% endif %}
+            {% if 'INBOX' in message['labels'] %}
+            {% if 'UNREAD' in message['labels'] %}
+                <b>{{ message['@msg_from']['firstName'] }} {{ message['@msg_from']['lastName'] }}</b>
+            {% else %}
+                {{ message['@msg_from']['firstName'] }} {{ message['@msg_from']['lastName'] }}
+            {% endif %}
+            {% else %}
+                <!-- Functionality here to be used when BRES has been added to the party service -->
+                <!-- {{ message['@msg_to']['firstName'] }} {{ message['@msg_to']['lastName'] }} -->
+                BRES
+            {% endif %}
             </dd>
         </dl>
 
         <p>{{ message['body']|truncate(100) }}</p>
 
-        {% if 'DRAFT' in message['labels'] %}
-            <a href="{{ url_for('secure_message_bp.draft_get', draft_id=message['msg_id']) }}">
-                Read full message with subject: <span class="u-vh">{{ message['subject'] }}</span>
-            </a>
-        {% elif 'SENT' in message['labels'] %}
-            <a href="{{ url_for('secure_message_bp.sent_get', sent_id=message['msg_id']) }}">
-                Read full message with subject: <span class="u-vh">{{ message['subject'] }}</span>
-            </a>
-        {% elif 'INBOX' in message['labels'] %}
-            {% if 'UNREAD' in message['labels'] %}
-            <b><a href="{{ url_for('secure_message_bp.message_get', message_id=message['msg_id']) }}">
-                Read full message with subject: <span class="u-vh">{{ message['subject'] }}</span>
-            </a></b>
-            {% else %}
-            <a href="{{ url_for('secure_message_bp.message_get', message_id=message['msg_id']) }}">
-                Read full message with subject: <span class="u-vh">{{ message['subject'] }}</span>
-            </a>
-            {% endif %}
-        {% endif %}
+    {% if 'DRAFT' in message['labels'] %}
+        <a href="{{ url_for('secure_message_bp.message_get', label='DRAFT', message_id=message['msg_id']) }}">
+    {% elif 'SENT' in message['labels'] %}
+        <a href="{{ url_for('secure_message_bp.message_get', label='SENT', message_id=message['msg_id']) }}">
+    {% elif 'INBOX' in message['labels'] %}
+    {% if 'UNREAD' in message['labels'] %}
+        <b>
+    {% endif %}
+        <a href="{{ url_for('secure_message_bp.message_get', label='INBOX', message_id=message['msg_id']) }}">
+    {% endif %}
+            <span class="u-vh">Read full message with subject: </span>{{ message['subject'] }}
+    {% if 'UNREAD' in message['labels'] %}
+        </b>
+    {% endif %}
+        </a>
 
     </li>
-    {% else %}
-       <li>You have no messages</li>
-    {% endfor %}
+{% else %}
+    <li>You have no messages</li>
+{% endfor %}
 </ul>
 {% endblock messages %}

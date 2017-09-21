@@ -1,24 +1,27 @@
 {% if message %}
-{% set to_from = 'To' if label == 'SENT' else 'From' %}
-<div>
+    <div>
     {% if message['subject'].startswith('Re: ') %}
         <h1 class="saturn">Subject: {{ message['subject'][4:] }}</h1>
     {% else %}
         <h1 class="saturn">Subject: {{ message['subject'] }}</h1>
     {% endif %}
-    <div class="grid">
-        <dl>
-            <dt class="grid__col col-2@s">
-                {{to_from}}:
-            </dt>
-            <dd class="grid__col col-10@s">ONS Business Surveys team</dd>
-            <dt class="grid__col col-2@s">Sent:</dt>
-            <dd class="grid__col col-10@s">{{ message['sent_date'][:19] }}</dd>
-        </dl>
+
+        <div class="grid">
+            <dl>
+                <dt class="grid__col col-2@s">
+                {% if label == 'SENT' %}
+                    To:
+                {% else %}
+                    From:
+                {% endif %}
+                </dt>
+                <dd class="grid__col col-10@s">ONS Business Surveys team</dd>
+                <dt class="grid__col col-2@s">Sent:</dt>
+                <dd class="grid__col col-10@s">{{ message['sent_date'][:19] }}</dd>
+            </dl>
+        </div>
+
+        <br />
+        <p>{{ message['body'] }}</p>
     </div>
-    <br />
-    <p>
-        {{ message['body'] }}
-    </p>
-</div>
 {% endif %}

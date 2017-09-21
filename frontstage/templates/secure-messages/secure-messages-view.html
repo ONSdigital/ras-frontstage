@@ -4,14 +4,11 @@
 
 {% block messages %}
 
-{% set message_type = draft if draft %}
-
 {% include 'secure-messages/message-error-summary.html' %}
 
 <div class="secure-message-view-component">
 
-    {% if label == 'DRAFT' %}
-    {% if errors|length == 0 %}
+{% if label == 'DRAFT' and errors|length == 0%}
     <div class="system-feedback"> 
         <ul class="system-feedback__list"> 
             <li class="system-feedback__list-item system-feedback__list-item--success"> 
@@ -21,17 +18,18 @@
             </li> 
         </ul> 
     </div>
-    {% endif %}
-    {% endif %}
+{% endif %}
 
-    {% if message %}
-        {% include 'secure-messages/thread-message.html' %}
-    {% endif %}
+{% if message %}
+    {% include 'secure-messages/thread-message.html' %}
+{% endif %}
 
-    {% if label != 'SENT' %}
-        {% include 'secure-messages/message-form.html' %}
-    {% endif %}
+{% if label != 'SENT' %}
+    {% include 'secure-messages/message-form.html' %}
+{% endif %}
+
     <p><a href="{{ url_for('secure_message_bp.messages_get') }}">Cancel</a></p>
+
 </div>
 
 {% endblock messages %}

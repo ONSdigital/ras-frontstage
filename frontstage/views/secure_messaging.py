@@ -55,7 +55,6 @@ def create_message(session):
             return send_message(data, loggerb)
 
         elif request.form['submit'] == 'Save draft':
-            loggerb.info("Attempting to save draft")
             return save_draft(data, loggerb)
 
     return render_template('secure-messages/secure-messages-view.html', _theme='default', message={})
@@ -117,6 +116,7 @@ def get_party_ru_id(party_id):
     associations = party_response_json.get('associations')
     if associations:
         ru_id = associations[0].get('partyId')
+        logger.debug('Successfully received ru_id', ru_id=ru_id)
     else:
         logger.error('Respondent has no associations', party_id=party_id)
         ru_id = None
@@ -125,15 +125,16 @@ def get_party_ru_id(party_id):
 
 def get_collection_case(party_id):
     url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
-    logger.debug('Retrieving collection case id', party_id=party_id)
+    logger.debug('Retrieving collection case id')
     collection_response = requests.get(url, auth=app.config['BASIC_AUTH'])
     if collection_response.status_code == 204:
-        logger.error('No case found', party_id=party_id)
+        logger.error('No case found')
         return None
     elif collection_response.status_code != 200:
-        logger.error('Failed to retrieve collection case id', party_id=party_id)
+        logger.error('Failed to retrieve collection case id')
         raise ExternalServiceError(collection_response)
     collection_response_json = collection_response.json()
+    logger.debug('Successfully received collection case', case_id=case_id)
     return collection_response_json[0].get('id')
 
 
@@ -154,6 +155,7 @@ def get_survey_id(party_id):
     else:
         logger.error('Respondent has no associations', party_id=party_id)
         survey_name = None
+    logger.debug('Successfully received survey_id', survey_id=survey_id)
     return survey_name
 
 
@@ -213,11 +215,15 @@ def get_thread_message(thread_id, logger, party_id):
         logger.error('Failed to retrieve thread', thread_id=thread_id)
         raise ExternalServiceError(response)
 
+    # Search through the messages in the thread and set message to the last message the user received
     thread = json.loads(response.text)
     for thread_message in thread['messages']:
         if thread_message['@msg_from']['id'] != party_id:
             message = thread_message
             break
+    else:
+        message = None
+        logger.error('No message found in thread not belonging to the user')
 
     logger.debug('Retrieved message from thread successfully', thread_id=thread_id)
     return message

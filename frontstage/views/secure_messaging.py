@@ -74,9 +74,11 @@ def message_get(session, label, message_id):
         draft = message
         thread_id = draft.get('thread_id')
         if thread_id != draft['msg_id']:
-            message = get_thread_message(thread_id, loggerb)
+            message = get_thread_message(thread_id, loggerb, party_id)
         else:
             message = None
+    else:
+        draft = {}
 
     if label == 'INBOX':
         remove_unread_label(message_id, loggerb)
@@ -84,6 +86,7 @@ def message_get(session, label, message_id):
     return render_template('secure-messages/secure-messages-view.html',
                            _theme='default',
                            message=message,
+                           draft=draft,
                            label=label)
 
 
@@ -200,7 +203,7 @@ def get_message(message_id, label, logger):
     return message
 
 
-def get_thread_message(thread_id, logger):
+def get_thread_message(thread_id, logger, party_id):
     headers = {"Authorization": request.cookies['authorization']}
     logger.debug('Attempting to retrieve message from thread', thread_id=thread_id)
     url = app.config['THREAD_GET_API_URL'].format(thread_id)
@@ -211,7 +214,11 @@ def get_thread_message(thread_id, logger):
         raise ExternalServiceError(response)
 
     thread = json.loads(response.text)
-    message = thread['messages'][0]
+    for thread_message in thread['messages']:
+        if thread_message['@msg_from']['id'] != party_id:
+            message = thread_message
+            break
+
     logger.debug('Retrieved message from thread successfully', thread_id=thread_id)
     return message
 

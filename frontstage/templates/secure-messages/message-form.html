@@ -2,7 +2,7 @@
 {% set draft = {} if not draft else draft %}
 
 {% if label == 'DRAFT' %}<h1 class="saturn">Edit draft message</h1>{% endif %}
-{% if not message and not draft %}<h1 class="saturn">Create message</h1>{% endif %}
+{% if not message and label != 'DRAFT' %}<h1 class="saturn">Create message</h1>{% endif %}
 
 <form action="{{ url_for('secure_message_bp.create_message') }}" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>

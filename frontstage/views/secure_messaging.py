@@ -143,7 +143,7 @@ def get_survey_id(party_id):
     url = app.config['RAS_PARTY_GET_BY_RESPONDENT'].format(app.config['RAS_PARTY_SERVICE'], party_id)
     logger.debug('Retrieving survey id', party_id=party_id)
     survey_response = requests.get(url, auth=app.config['BASIC_AUTH'])
-    if survey_response is None:
+    if survey_response == 404:
         logger.error('No respondent found in party service', party_id=party_id)
         return None
     elif survey_response.status_code != 200:
@@ -233,8 +233,15 @@ def get_thread_message(thread_id, logger, party_id):
 def process_form_errors(response, data, logger):
     logger.warning("Bad request to secure message service")
     errors = json.loads(response.content)
+
+    if data.get('thread_id'):
+        message = get_thread_message(data['thread_id'], logger, data['msg_from'])
+    else:
+        message = {}
+
     return render_template('secure-messages/secure-messages-view.html',
                            _theme='default',
+                           message=message,
                            draft=data,
                            errors=errors)
 

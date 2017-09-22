@@ -145,8 +145,10 @@ class TestSecureMessage(unittest.TestCase):
         mock_object.get(url_ru_id_get_by_party, status_code=200, json=party_data)
         mock_object.post(url_sm_create_message, status_code=400, json=self.send_error_response)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
+        message_form = self.message_form
+        message_form['secure-message-thread-id'] = ''
 
-        response = self.app.post("secure-message/create-message", data=self.message_form, follow_redirects=True)
+        response = self.app.post("secure-message/create-message", data=message_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(bytes("must be corrected", encoding='UTF-8') in response.data)
@@ -184,6 +186,7 @@ class TestSecureMessage(unittest.TestCase):
         mock_object.post(url_sm_save_draft, status_code=400, json=self.send_error_response)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
         self.message_form['submit'] = 'Save draft'
+        self.message_form['secure-message-thread-id'] = ''
 
         response = self.app.post("secure-message/create-message", data=self.message_form, follow_redirects=True)
 
@@ -226,6 +229,7 @@ class TestSecureMessage(unittest.TestCase):
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
         self.message_form['submit'] = 'Save draft'
         self.message_form['msg_id'] = '7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb'
+        self.message_form['secure-message-thread-id'] = ''
 
         response = self.app.post("secure-message/create-message", data=self.message_form, follow_redirects=True)
 

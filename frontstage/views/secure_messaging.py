@@ -22,17 +22,17 @@ def get_party_ru_id(party_id):
     logger.debug('Retrieving ru_id', party_id=party_id)
     party_response = requests.get(url, auth=app.config['BASIC_AUTH'])
     if party_response.status_code == 404:
-        logger.info('No respondent found in party service', party_id=party_id)
+        logger.error('No respondent found in party service', party_id=party_id)
         return None
     elif party_response.status_code != 200:
-        logger.warning('Failed to retrieve ru_id', party_id=party_id)
+        logger.error('Failed to retrieve ru_id')
         raise ExternalServiceError(party_response)
     party_response_json = party_response.json()
     associations = party_response_json.get('associations')
     if associations:
         ru_id = associations[0].get('partyId')
     else:
-        logger.warning('Respondent has no associations', party_id=party_id)
+        logger.error('Respondent has no associations', party_id=party_id)
         ru_id = None
     return ru_id
 
@@ -42,7 +42,7 @@ def get_collection_case(party_id):
     logger.debug('Retrieving collection case id', party_id=party_id)
     collection_response = requests.get(url, auth=app.config['BASIC_AUTH'])
     if collection_response.status_code == 204:
-        logger.info('No case found', party_id=party_id)
+        logger.error('No case found', party_id=party_id)
         return None
     elif collection_response.status_code != 200:
         logger.error('Failed to retrieve collection case id', party_id=party_id)

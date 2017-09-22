@@ -62,7 +62,7 @@ def reset_password(token):
         logger.warning('Invalid token sent to party service', token=token)
         return redirect(url_for('error_bp.not_found_error_page'))
     elif response.status_code != 200:
-        logger.warning('Party service failed to verify token')
+        logger.error('Party service failed to verify token')
         raise ExternalServiceError(response)
 
     if request.method == 'POST' and form.validate():

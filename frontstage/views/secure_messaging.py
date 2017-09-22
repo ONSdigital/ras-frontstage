@@ -134,8 +134,9 @@ def get_collection_case(party_id):
         logger.error('Failed to retrieve collection case id')
         raise ExternalServiceError(collection_response)
     collection_response_json = collection_response.json()
+    case_id = collection_response_json[0].get('id')
     logger.debug('Successfully received collection case', case_id=case_id)
-    return collection_response_json[0].get('id')
+    return case_id
 
 
 def get_survey_id(party_id):
@@ -155,7 +156,7 @@ def get_survey_id(party_id):
     else:
         logger.error('Respondent has no associations', party_id=party_id)
         survey_name = None
-    logger.debug('Successfully received survey_id', survey_id=survey_id)
+    logger.debug('Successfully received survey name', survey_id=survey_name, party_id=party_id)
     return survey_name
 
 

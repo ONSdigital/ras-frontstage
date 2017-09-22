@@ -10,7 +10,7 @@ def step_impl_go_to_sign_in_page(context):
 
 @when('I enter my credentials')
 def step_impl_enter_credentials(context):
-    context.browser.find_by_id('username').send_keys('madpenguinxxx@linux.co.uk')
+    context.browser.find_by_id('username').send_keys('tejas.patel@ons.gov.uk')
     context.browser.find_by_id('password').send_keys('Gizmo007!')
 
 

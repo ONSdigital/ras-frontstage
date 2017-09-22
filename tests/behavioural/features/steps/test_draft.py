@@ -48,13 +48,13 @@ def step_impl_go_to_draft_message(context):
 @when('I open a draft with no subject')
 def step_impl_go_to_draft_message(context):
     context.browser.visit('/secure-message/messages/DRAFT')
-    context.browser.find_by_link_text('Read full message').click()
+    context.browser.find_by_link_text('Read full message with subject:').click()
 
 
 @when('I open a draft with empty fields')
 def step_impl_go_to_draft_message(context):
     context.browser.visit('/secure-message/messages/DRAFT')
-    context.browser.find_by_link_text('Read full message').click()
+    context.browser.find_by_link_text('Read full message with subject:').click()
 
 
 @then('the draft contains some text')

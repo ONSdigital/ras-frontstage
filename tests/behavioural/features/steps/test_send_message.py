@@ -82,12 +82,13 @@ def step_impl_received_message_from_bres(context):
     url = 'http://localhost:5050/message/send'
     # This authorization needs to be valid for the user or the test will not work
     headers = {
-        'Authorization': 'eyJ0eXAiOiJqd3QiLCJhbGciOiJIUzI1NiJ9.eyJwYXJ0eV9pZCI6IkJSRVMiLCJy' \
-                         'b2xlIjoiaW50ZXJuYWwifQ.y_B0MsBwFbwUBadYvtn5ZppWRrw4Z-3JW9_ZXDprLug',
+        'Authorization': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoX3Rva2VuIjoiNGE3NThlZTUtNDQ2My00ZWZjLTk4MGItOTcyYjcxMjIyN2U5IiwiYW' \
+        'NjZXNzX3Rva2VuIjoiNWZhNmZkYTgtYzQ1Zi00YTE5LWEzZDYtNGMzYWUzMTI0NjMxIiwiZXhwaXJlc19hdCI6MTUwNjA3NjY1OC40ODk1OTYsInJvb' \
+        'GUiOiJpbnRlcm5hbCIsInBhcnR5X2lkIjoiQlJFUyJ9.gBqxH_HgK7TRUxBtpgiI97QsHBPhfzbNdHyC8Nm8caw',
         'Content-Type': 'application/json'
     }
     message = {
-        "msg_to": ["0ab69a7c-21ce-40e5-a451-49eeb84ceeda"],
+        "msg_to": ["a0e833fe-8a2d-4293-903b-4b826732e079"],
         "msg_from": "BRES",
         "subject": "Test internal message",
         "body": "Test internal message",
@@ -96,8 +97,9 @@ def step_impl_received_message_from_bres(context):
         "collection_case": "ACollectionCase",
         "survey": "BRES"
     }
-    requests.post(url, data=json.dumps(message), headers=headers)
-
+    # requests.post(url, data=json.dumps(message), headers=headers)
+    response = requests.post(url, data=json.dumps(message), headers=headers)
+    print(response)
 
 @when('I go to the inbox tab')
 def step_impl_go_to_inbox_tab(context):

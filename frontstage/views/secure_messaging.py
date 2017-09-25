@@ -107,7 +107,7 @@ def get_party_ru_id(party_id):
     logger.debug('Retrieving ru_id', party_id=party_id)
     party_response = requests.get(url, auth=app.config['BASIC_AUTH'])
     if party_response.status_code == 404:
-        logger.error('No respondent found in party service', party_id=party_id)
+        logger.warning('No respondent found in party service', party_id=party_id)
         return None
     elif party_response.status_code != 200:
         logger.error('Failed to retrieve ru_id')
@@ -128,7 +128,7 @@ def get_collection_case(party_id):
     logger.debug('Retrieving collection case id')
     collection_response = requests.get(url, auth=app.config['BASIC_AUTH'])
     if collection_response.status_code == 204:
-        logger.error('No case found')
+        logger.warning('No case found')
         return None
     elif collection_response.status_code != 200:
         logger.error('Failed to retrieve collection case id')
@@ -144,7 +144,7 @@ def get_survey_id(party_id):
     logger.debug('Retrieving survey id', party_id=party_id)
     survey_response = requests.get(url, auth=app.config['BASIC_AUTH'])
     if survey_response == 404:
-        logger.error('No respondent found in party service', party_id=party_id)
+        logger.warning('No respondent found in party service', party_id=party_id)
         return None
     elif survey_response.status_code != 200:
         logger.error('Failed to retrieve survey id', party_id=party_id)

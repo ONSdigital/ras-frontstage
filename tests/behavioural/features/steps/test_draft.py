@@ -1,7 +1,4 @@
-from email import message
-
 from behave import given, when, then
-
 from tests.behavioural.features.steps.common import is_element_present_by_id
 
 

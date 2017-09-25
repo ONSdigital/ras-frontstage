@@ -1,7 +1,6 @@
 import os
 
 from selenium import webdriver
-
 from frontstage import app
 
 

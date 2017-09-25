@@ -20,13 +20,18 @@
     </div>
 {% endif %}
 
-{% if message %}
-    {% include 'secure-messages/thread-message.html' %}
-{% endif %}
+    {% if message %}
+        {% include 'secure-messages/thread-message.html' %}
+    {% endif %}
 
-{% if label != 'SENT' %}
-    {% include 'secure-messages/message-form.html' %}
-{% endif %}
+    <div class="grid grid--reverse">
+        <div class="grid__col col-4@m"></div>
+        <div class="grid__col col-7@m pull-1@m">
+        {% if label != 'SENT' %}
+            {% include 'secure-messages/message-form.html' %}
+        {% endif %}
+        </div>
+    </div>
 
     <p><a href="{{ url_for('secure_message_bp.messages_get') }}">Cancel</a></p>
 

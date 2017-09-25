@@ -3,18 +3,18 @@ from behave import when, then
 from tests.behavioural.features.steps.common import is_element_present_by_id
 
 
-@when('I go to the history tab')
-def step_impl_open_history_tab(context):
+@when('I go to the todo tab')
+def step_impl_open_todo_tab(context):
     context.browser.find_by_id('SURVEY_TODO_TAB').click()
 
 
 @then('I should see the Access survey button')
-def step_impl_find_button_in_history_tab(context):
+def step_impl_find_button_in_todo_tab(context):
     assert is_element_present_by_id(context, 'ACCESS_SURVEY_BUTTON_1')
 
 
-@when('I am on the history page')
-def step_impl_open_history_page(context):
+@when('I am on the todo page')
+def step_impl_open_todo_page(context):
     context.browser.visit('/surveys/')
 
 

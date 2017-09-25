@@ -8,16 +8,16 @@
 
         <div class="grid">
             <dl>
-                <dt class="grid__col col-2@s">
+                <dt class="grid__col col-1@s">
                 {% if label == 'SENT' %}
                     To:
                 {% else %}
                     From:
                 {% endif %}
                 </dt>
-                <dd class="grid__col col-10@s">ONS Business Surveys team</dd>
-                <dt class="grid__col col-2@s">Sent:</dt>
-                <dd class="grid__col col-10@s">{{ message['sent_date'][:19] }}</dd>
+                <dd class="grid__col col-11@s">ONS Business Surveys team</dd>
+                <dt class="grid__col col-1@s">Sent:</dt>
+                <dd class="grid__col col-11@s">{{ message['sent_date'][:19] }}</dd>
             </dl>
         </div>
 

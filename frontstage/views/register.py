@@ -46,7 +46,7 @@ def validate_enrolment_code(enrolment_code):
             logger.info('Inactive enrolment code used', case_id=case_id)
 
     elif result.status_code == 404:
-        logger.error('Enrolment code not found', enrolment_code=enrolment_code)
+        logger.info('Enrolment code not found', enrolment_code=enrolment_code)
     elif result.status_code != 200:
         raise ExternalServiceError(result)
 
@@ -78,7 +78,7 @@ def register():
 
             if case.status_code == 200:
                 case = json.loads(case.text)
-                business_party_id = case['partyId']
+                business_party_id = case.get('partyId')
             elif case.status_code != 200:
                 raise ExternalServiceError(case)
 
@@ -117,7 +117,7 @@ def register_confirm_organisation_survey():
     if encrypted_enrolment_code:
         decrypted_enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
     else:
-        logger.error('Enrolment code not specified')
+        logger.info('Enrolment code not specified')
         return redirect(url_for('error_bp.default_error_page'))
 
     case_id = validate_enrolment_code(decrypted_enrolment_code)
@@ -202,7 +202,7 @@ def register_enter_your_details():
     if encrypted_enrolment_code:
         decrypted_enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
     else:
-        logger.error('Enrolment code not specified')
+        logger.info('Enrolment code not specified')
         return redirect(url_for('error_bp.default_error_page'))
 
     case_id = validate_enrolment_code(decrypted_enrolment_code)

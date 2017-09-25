@@ -82,7 +82,7 @@ def login():
         url = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], username)
         req = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
         if req.status_code == 404:
-            logger.error('Email not found in party service', email=username)
+            logger.warning('Email not found in party service', email=username)
             return render_template('sign-in/sign-in.html', _theme='default',
                                    form=form, data={"error": {"type": "failed"}})
         elif req.status_code != 200:

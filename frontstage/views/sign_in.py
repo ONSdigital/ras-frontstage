@@ -3,13 +3,13 @@ import logging
 from os import getenv
 
 from flask import Blueprint, make_response, render_template, request, redirect, url_for
-from itsdangerous import URLSafeTimedSerializer
 import requests
 from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.exceptions.exceptions import ExternalServiceError
 from frontstage.jwt import encode, timestamp_token
+from frontstage.common.encoder import Encoder
 from frontstage.models import LoginForm
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -80,7 +80,8 @@ def login():
             raise ExternalServiceError(e)
         oauth2_token = json.loads(oauth2_response.text)
 
-        encoded_email = party_encode(username)
+        PartyEncoder = Encoder
+        encoded_email = PartyEncoder.party_encode(username)
         url = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], encoded_email)
         req = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
         if req.status_code == 404:
@@ -116,10 +117,3 @@ def logout():
     response = make_response(redirect(url_for('sign_in_bp.login')))
     response.set_cookie('authorization', value='', expires=0)
     return response
-
-
-def party_encode(email):
-    secret_key = app.config["SECRET_KEY"]
-    email_token_salt = app.config["EMAIL_TOKEN_SALT"]
-    timed_serializer = URLSafeTimedSerializer(secret_key)
-    return timed_serializer.dumps(email, salt=email_token_salt)

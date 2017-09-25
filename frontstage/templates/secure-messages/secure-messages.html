@@ -109,7 +109,7 @@
     {% endif %}
         <a href="{{ url_for('secure_message_bp.message_get', label='INBOX', message_id=message['msg_id']) }}">
     {% endif %}
-            <span class="u-vh">Read full message with subject: </span>{{ message['subject'] }}
+            Read full message<span class="u-vh"> with subject: {{ message['subject'] }}</span>
     {% if 'UNREAD' in message['labels'] %}
         </b>
     {% endif %}

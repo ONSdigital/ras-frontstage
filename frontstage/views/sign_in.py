@@ -76,12 +76,12 @@ def login():
                 raise ExternalServiceError(oauth2_response)
             logger.debug('Access Token Granted')
         except requests.ConnectionError as e:
-            logger.warning('Connection error between the server and the OAuth2 service of: {}'.format(exception=str(e)))
+            logger.warning('Connection error between the server and the OAuth2', exception=str(e))
             raise ExternalServiceError(e)
         oauth2_token = json.loads(oauth2_response.text)
 
-        PartyEncoder = Encoder
-        encoded_email = PartyEncoder.party_encode(username)
+        party_encoder = Encoder()
+        encoded_email = party_encoder.party_encode(username)
         url = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], encoded_email)
         req = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
         if req.status_code == 404:

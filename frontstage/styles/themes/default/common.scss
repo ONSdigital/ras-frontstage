@@ -226,6 +226,10 @@ $static: "/static/assets";
   max-height: 40rem;
 }
 
+.has-js .header__help.is-closed--init {
+  max-height: 0;
+}
+
 .has-js .header__help.is-closed {
   max-height: 0;
   -webkit-transition: max-height 200ms ease-out;

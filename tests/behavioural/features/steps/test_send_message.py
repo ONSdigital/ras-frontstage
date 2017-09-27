@@ -2,10 +2,7 @@ import requests
 
 from behave import given, when, then
 from flask import json
-from tests.behavioural.features.steps.common import is_element_present_by_id, maxtext10000
-
-
-maxtext100 = 'lA4qe9NwQ5jO90Kkx30xf7Qjwcl8argK5IyJKutxUv6RlraTzwPSb2ka4XJ7TOJMCZyGgk0fCx8lLnOOQC3uJTBtfCiatbwvGNaZV'
+from tests.behavioural.features.steps.common import is_element_present_by_id, maxtext10000, maxtext100
 
 
 @given('I go to the secure-message page')
@@ -20,7 +17,7 @@ def step_impl_click_create_message(context):
 
 @then('The create message page will open')
 def step_impl_open_create_message_page(context):
-    assert is_element_present_by_id(context, 'send-message')
+    assert is_element_present_by_id(context, 'submit-btn')
 
 
 @given('I am on the create message page')
@@ -66,9 +63,15 @@ def step_impl_add_text_to_body_too_long(context):
     context.browser.find_by_id('secure-message-body').send_keys(maxtext10000)
 
 
+@given('I have a message with subject and body too long')
+def step_impl_add_text_to_body_too_long(context):
+    context.browser.find_by_id('secure-message-subject').send_keys(maxtext100)
+    context.browser.find_by_id('secure-message-body').send_keys(maxtext10000)
+
+
 @when('I send a message')
 def step_impl_send_a_message(context):
-    context.browser.find_by_id('send-message').click()
+    context.browser.find_by_id('submit-btn').click()
 
 
 @then('The confirmation sent page opens')

@@ -99,21 +99,23 @@
 
         <p>{{ message['body']|truncate(100) }}</p>
 
+
     {% if 'DRAFT' in message['labels'] %}
-        <a href="{{ url_for('secure_message_bp.message_get', label='DRAFT', message_id=message['msg_id']) }}">
+        <a id="read-message-link-{{loop.index}}" href="{{ url_for('secure_message_bp.message_get', label='DRAFT', message_id=message['msg_id']) }}">
     {% elif 'SENT' in message['labels'] %}
-        <a href="{{ url_for('secure_message_bp.message_get', label='SENT', message_id=message['msg_id']) }}">
+        <a id="read-message-link-{{loop.index}}" href="{{ url_for('secure_message_bp.message_get', label='SENT', message_id=message['msg_id']) }}">
     {% elif 'INBOX' in message['labels'] %}
     {% if 'UNREAD' in message['labels'] %}
         <b>
     {% endif %}
-        <a href="{{ url_for('secure_message_bp.message_get', label='INBOX', message_id=message['msg_id']) }}">
+        <a id="read-message-link-{{loop.index}}" href="{{ url_for('secure_message_bp.message_get', label='INBOX', message_id=message['msg_id']) }}">
     {% endif %}
             Read full message<span class="u-vh"> with subject: {{ message['subject'] }}</span>
     {% if 'UNREAD' in message['labels'] %}
         </b>
     {% endif %}
         </a>
+
 
     </li>
 {% else %}

@@ -38,6 +38,12 @@ Feature: Test send message
     When I send a message
     Then I should receive a body too long error
 
+  Scenario: User sends a message with subject and body too long
+    Given I am on the create message page
+    And I have a message with subject and body too long
+    When I send a message
+    Then I should receive subject and body too long errors
+
   Scenario: User receives a message from BRES
     Given I have received a message from BRES
     And I go to the inbox tab

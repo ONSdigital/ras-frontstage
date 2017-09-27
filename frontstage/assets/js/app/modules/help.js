@@ -28,7 +28,7 @@ domready(() => {
 
   btn.addEventListener('click', e => {
     e.preventDefault();
-    openedByClick = !openedByClick
+    openedByClick = !openedByClick;
     help.classList.toggle(classClosed);
   });
 });

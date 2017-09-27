@@ -24,7 +24,19 @@ Feature: Test send message
     Given I am on the create message page
     And I have a message with empty fields
     When I send a message
-    Then I should receive a subject and body error
+    Then I should receive subject and body empty errors
+
+  Scenario: User sends a message with empty subject
+    Given I am on the create message page
+    And I have a message with an empty subject
+    When I send a message
+    Then I should receive a subject empty error
+
+  Scenario: User sends a message with empty body
+    Given I am on the create message page
+    And I have a message with an empty body
+    When I send a message
+    Then I should receive a body empty error
 
   Scenario: User sends a message with subject too long
     Given I am on the create message page

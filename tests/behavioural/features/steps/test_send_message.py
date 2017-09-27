@@ -2,7 +2,8 @@ import requests
 
 from behave import given, when, then
 from flask import json
-from tests.behavioural.features.steps.common import is_element_present_by_id, maxtext10000, maxtext100
+from tests.behavioural.features.steps.common import is_element_present_by_id, step_impl_body_too_long, step_impl_subject_too_long, \
+    step_impl_subject_empty, step_impl_body_empty
 
 
 @given('I go to the secure-message page')
@@ -39,13 +40,25 @@ def step_impl_add_non_alpha_text_to_subject_and_body(context):
 
 @given('I have a message with empty fields')
 def step_impl_empty_subject_and_body(context):
-    context.browser.find_by_id('secure-message-subject').send_keys('')
-    context.browser.find_by_id('secure-message-body').send_keys('')
+    step_impl_subject_empty(context)
+    step_impl_body_empty(context)
+
+
+@given('I have a message with an empty subject')
+def step_impl_create_msg_with_empty_subject(context):
+    step_impl_subject_empty(context)
+    context.browser.find_by_id('secure-message-body').send_keys('Subject empty')
+
+
+@given('I have a message with an empty body')
+def step_impl_create_msg_empty_body(context):
+    context.browser.find_by_id('secure-message-subject').send_keys('Test body empty')
+    step_impl_body_empty(context)
 
 
 @given('I have a message with subject too long')
 def step_impl_add_text_to_subject_too_long(context):
-    context.browser.find_by_id('secure-message-subject').send_keys(maxtext100)
+    step_impl_subject_too_long(context)
     context.browser.find_by_id('secure-message-body').send_keys('Test')
 
 
@@ -60,13 +73,13 @@ def step_impl_subject_too_long_send(context):
 @given('I have a message with body too long')
 def step_impl_add_text_to_body_too_long(context):
     context.browser.find_by_id('secure-message-subject').send_keys('Test')
-    context.browser.find_by_id('secure-message-body').send_keys(maxtext10000)
+    step_impl_body_too_long(context)
 
 
 @given('I have a message with subject and body too long')
 def step_impl_add_text_to_body_too_long(context):
-    context.browser.find_by_id('secure-message-subject').send_keys(maxtext100)
-    context.browser.find_by_id('secure-message-body').send_keys(maxtext10000)
+    step_impl_subject_too_long(context)
+    step_impl_body_too_long(context)
 
 
 @when('I send a message')
@@ -99,9 +112,7 @@ def step_impl_received_message_from_bres(context):
         "collection_case": "ACollectionCase",
         "survey": "BRES"
     }
-    # requests.post(url, data=json.dumps(message), headers=headers)
-    response = requests.post(url, data=json.dumps(message), headers=headers)
-    print(response)
+    requests.post(url, data=json.dumps(message), headers=headers)
 
 
 @then('I should see a reply message')
@@ -119,14 +130,3 @@ def step_impl_reply_to_bres_message(context):
 @then('The draft saved text should appear')
 def step_impl_draft_saved_text_appears(context):
     assert is_element_present_by_id(context, 'message-sent')
-
-
-@then('I should receive a subject and body error')
-def step_impl_subject_and_body_error(context):
-    context.browser.find_by_link_text('Please enter a subject')
-    context.browser.find_by_link_text('Please enter a message')
-
-
-@then('I should receive a body too long error')
-def step_impl_subject_and_body_error(context):
-    context.browser.find_by_link_text('Body field length must not be greater than 10000')

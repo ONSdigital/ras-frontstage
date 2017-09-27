@@ -39,8 +39,10 @@
       Help
     </button>
 
+    <a class="u-ml-s nowrap" href="{{ url_for('sign_in_bp.logout') }}">Sign out</a>
+
     {% if 'authorization' in request.cookies %}
-    <a class="u-ml-s" href="{{ url_for('sign_in_bp.logout') }}">Sign out</a>
+    <a class="u-ml-s nowrap" href="{{ url_for('sign_in_bp.logout') }}">Sign out</a>
     {% endif %}
   </header>
 </div>

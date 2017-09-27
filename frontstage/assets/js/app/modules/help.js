@@ -1,9 +1,9 @@
-import domready from './domready'
-
+import domready from '../../../../../common/assets/js/app/modules/domready';
 
 domready(() => {
   const btn = document.querySelector('.js-help-btn');
   const help = document.querySelector('.js-help-body');
+  const classClosedInit = 'is-closed--init';
   const classClosed = 'is-closed';
 
   let openedByClick = false;
@@ -12,6 +12,9 @@ domready(() => {
     return false;
   }
 
+  help.classList.add(classClosedInit);
+  help.classList.add(classClosed);
+  btn.classList.remove('u-vh');
 
   help.addEventListener('focus', e => {
     help.classList.remove(classClosed);
@@ -28,4 +31,4 @@ domready(() => {
     openedByClick = !openedByClick;
     help.classList.toggle(classClosed);
   });
-})
+});

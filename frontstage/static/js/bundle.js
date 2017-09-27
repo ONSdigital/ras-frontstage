@@ -8504,8 +8504,9 @@ ready(function () {
     return false;
   }
 
+  help.classList.add(classClosedInit);
   help.classList.add(classClosed);
-  btn.classList.remove('u-hidden');
+  btn.classList.remove('u-vh');
 
   help.addEventListener('focus', function (e) {
     help.classList.remove(classClosed);
@@ -8517,7 +8518,7 @@ ready(function () {
     }
   }, true);
 
-  btn.classList.remove('u-hidden');
+  btn.classList.remove('u-vh');
   btn.addEventListener('click', function (e) {
     e.preventDefault();
     openedByClick = !openedByClick;

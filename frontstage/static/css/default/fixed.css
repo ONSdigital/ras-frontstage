@@ -4637,8 +4637,6 @@ input[type=file]::-webkit-file-upload-button:hover {
   color: #fff;
   background: #033e58;
   overflow: hidden;
-  -webkit-transition: max-height 300ms ease-in;
-  transition: max-height 300ms ease-in;
   height: auto;
 }
 
@@ -4650,6 +4648,8 @@ input[type=file]::-webkit-file-upload-button:hover {
 
 .has-js .header__help.is-closed--init {
   max-height: 0;
+  -webkit-transition: max-height 300ms ease-in;
+  transition: max-height 300ms ease-in;
 }
 
 .has-js .header__help.is-closed {

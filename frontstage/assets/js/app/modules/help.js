@@ -12,8 +12,9 @@ domready(() => {
     return false;
   }
 
+  help.classList.add(classClosedInit);
   help.classList.add(classClosed);
-  btn.classList.remove('u-hidden');
+  btn.classList.remove('u-vh');
 
   help.addEventListener('focus', e => {
     help.classList.remove(classClosed);
@@ -25,7 +26,7 @@ domready(() => {
     }
   }, true);
 
-  btn.classList.remove('u-hidden');
+  btn.classList.remove('u-vh');
   btn.addEventListener('click', e => {
     e.preventDefault();
     openedByClick = !openedByClick

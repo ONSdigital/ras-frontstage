@@ -35,12 +35,14 @@
              class="logo__img"/>
     </div>
 
-    <button aria-controls="helpinfo" class="header__btn btn btn--light btn--border js-help-btn">
+    <button aria-controls="helpinfo" class="header__btn btn btn--light btn--border js-help-btn u-vh">
       Help
     </button>
 
+    <a class="u-ml-s" href="{{ url_for('sign_in_bp.logout') }}">Sign out</a>
+
     {% if 'authorization' in request.cookies %}
-    <a href="{{ url_for('sign_in_bp.logout') }}">Sign out</a>
+    <a class="u-ml-s" href="{{ url_for('sign_in_bp.logout') }}">Sign out</a>
     {% endif %}
   </header>
 </div>

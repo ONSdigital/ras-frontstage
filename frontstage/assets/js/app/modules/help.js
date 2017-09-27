@@ -26,7 +26,6 @@ domready(() => {
     }
   }, true);
 
-  btn.classList.remove('u-vh');
   btn.addEventListener('click', e => {
     e.preventDefault();
     openedByClick = !openedByClick

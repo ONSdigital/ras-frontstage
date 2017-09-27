@@ -2,19 +2,15 @@ import json
 import logging
 from os import getenv
 
-from flask import Blueprint, render_template, request, redirect, url_for, abort
-from jose import JWTError
-from oauthlib.oauth2 import BackendApplicationClient, MissingTokenError
+from flask import Blueprint, render_template, request, redirect, url_for
 import requests
-from requests_oauthlib import OAuth2Session
 from structlog import wrap_logger
 
 from frontstage import app
-from frontstage.common.post_event import post_event
-from frontstage.jwt import encode
-from frontstage.models import RegistrationForm, EnrolmentCodeForm, RespondentStatus
-from frontstage.exceptions.exceptions import ExternalServiceError
 from frontstage.common.cryptographer import Cryptographer
+from frontstage.common.post_event import post_event
+from frontstage.exceptions.exceptions import ExternalServiceError
+from frontstage.models import RegistrationForm, EnrolmentCodeForm, RespondentStatus
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -50,7 +46,7 @@ def validate_enrolment_code(enrolment_code):
             logger.info('Inactive enrolment code used', case_id=case_id)
 
     elif result.status_code == 404:
-        logger.error('Enrolment code not found', enrolment_code=enrolment_code)
+        logger.info('Enrolment code not found', enrolment_code=enrolment_code)
     elif result.status_code != 200:
         raise ExternalServiceError(result)
 
@@ -82,7 +78,7 @@ def register():
 
             if case.status_code == 200:
                 case = json.loads(case.text)
-                business_party_id = case['partyId']
+                business_party_id = case.get('partyId')
             elif case.status_code != 200:
                 raise ExternalServiceError(case)
 
@@ -121,7 +117,7 @@ def register_confirm_organisation_survey():
     if encrypted_enrolment_code:
         decrypted_enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
     else:
-        logger.error('Enrolment code not specified')
+        logger.info('Enrolment code not specified')
         return redirect(url_for('error_bp.default_error_page'))
 
     case_id = validate_enrolment_code(decrypted_enrolment_code)
@@ -183,8 +179,6 @@ def register_confirm_organisation_survey():
     if request.method == 'POST':
         return redirect(url_for('register_bp.register_enter_your_details',
                                 enrolment_code=encrypted_enrolment_code,
-                                organisation_name=organisation_name,
-                                survey_name=survey_name,
                                 _external=True,
                                 _scheme=getenv('SCHEME', 'http')))
     else:
@@ -208,7 +202,7 @@ def register_enter_your_details():
     if encrypted_enrolment_code:
         decrypted_enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
     else:
-        logger.error('Enrolment code not specified')
+        logger.info('Enrolment code not specified')
         return redirect(url_for('error_bp.default_error_page'))
 
     case_id = validate_enrolment_code(decrypted_enrolment_code)
@@ -226,49 +220,6 @@ def register_enter_your_details():
         email_address = request.form.get('email_address')
         password = request.form.get('password')
         phone_number = request.form.get('phone_number')
-
-        client = BackendApplicationClient(client_id=app.config['RAS_FRONTSTAGE_CLIENT_ID'])
-
-        # Populates the request body with username and password from the user
-        client.prepare_request_body(scope=['ps.write', ])
-
-        # passes our 'client' to the session management object
-        # this deals with the transactions between the OAuth2 server
-        oauth = OAuth2Session(client=client)
-        token_url = app.config['ONS_TOKEN']
-        logger.debug('Fetching oauth token', url=token_url)
-
-        try:
-            token = oauth.fetch_token(token_url=token_url, client_id=app.config['RAS_FRONTSTAGE_CLIENT_ID'],
-                                      client_secret=app.config['RAS_FRONTSTAGE_CLIENT_SECRET'])
-            logger.debug('Access token granted')
-
-            # TODO Check that this token has not expired. This should never happen, as we just got this token to
-            # register the user
-
-            data_dict_for_jwt_token = {
-                "refresh_token": token['refresh_token'],
-                "access_token": token['access_token'],
-                "scope": token['scope'],
-                "expires_at": token['expires_at'],
-                "username": email_address
-            }
-
-            # We need to take our token from teh OAuth2 server and encode in a JWT token and send in the authorization
-            # header to the party service microservice
-            encoded_jwt_token = encode(data_dict_for_jwt_token)
-
-        except JWTError:
-            # TODO Provide proper logging
-            logger.warning('JWT scope could not be validated')
-            return abort(500, '{"event" : "There was a problem with the Authentication service please contact a member of the ONS staff"}')
-
-        except MissingTokenError as e:
-            logger.warning('Missing token error', exception=str(e))
-            return abort(500, '{"event" : "There was a problem with the Authentication service please contact a member of the ONS staff"}')
-
-        # Step 2
-        # Register with the party service
         registration_data = {
             'emailAddress': email_address,
             'firstName': first_name,
@@ -279,12 +230,9 @@ def register_enter_your_details():
             'status': 'CREATED'
         }
 
-        headers = {'authorization': encoded_jwt_token, 'content-type': 'application/json'}
-
         party_service_url = app.config['RAS_PARTY_POST_RESPONDENTS'].format(app.config['RAS_PARTY_SERVICE'])
         logger.debug('Attempting account creation', url=party_service_url)
-        result = requests.post(party_service_url, headers=headers,
-                               auth=app.config['BASIC_AUTH'], data=json.dumps(registration_data))
+        result = requests.post(party_service_url, auth=app.config['BASIC_AUTH'], json=registration_data)
         logger.debug('Party service response', status_code=result.status_code, reason=result.reason, text=result.text)
 
         if result.status_code == 400:
@@ -297,10 +245,10 @@ def register_enter_your_details():
             raise ExternalServiceError(result)
         else:
             return render_template('register/register.almost-done.html', _theme='default', email=email_address)
-        # TODO We need to add an exception timeout catch and handle this type of error
+
     else:
         if form.errors:
-            logger.warning('Form submitted with errors', errors=str(form.errors))
+            logger.debug('Form submitted with errors', errors=str(form.errors))
         return render_template('register/register.enter-your-details.html', _theme='default', form=form, errors=form.errors)
 
 

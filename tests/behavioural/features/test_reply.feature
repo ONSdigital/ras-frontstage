@@ -17,7 +17,7 @@ Feature: Test the replies
     Then I send an empty reply
     And I should receive an empty reply error
 
-  Scenario: User sends reply to long
+  Scenario: User sends reply too long
     Given I have received a message from BRES
     And I go to the inbox tab
     When I open the internal message

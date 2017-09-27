@@ -13,12 +13,12 @@ def step_impl_subject_and_body_error(context):
     context.browser.find_by_link_text('Please enter a message')
 
 
-@then('I send an empty reply')
+@then('I send a reply that\'s too long')
 def step_impl_reply_to_bres_message(context):
     context.browser.find_by_id('secure-message-body').send_keys(maxtext10000)
     context.browser.find_by_id('submit-btn').click()
 
 
-@then('I should receive an empty reply error')
+@then('I should receive a reply too long error')
 def step_impl_subject_and_body_error(context):
-    context.browser.find_by_link_text('Please enter a message')
+    context.browser.find_by_link_text('Body field length must not be greater than 10000')

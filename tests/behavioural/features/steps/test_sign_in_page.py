@@ -24,9 +24,21 @@ def step_impl_signed_out(context):
     assert is_element_present_by_id(context, 'SIGN_IN_BUTTON')
 
 
-@given('I enter the incorrect credentials')
+@given('I enter the incorrect password')
 def step_impl_incorrect_credentials(context):
     context.browser.find_by_id('username').send_keys('tejas.patel@ons.gov.uk')
+    context.browser.find_by_id('password').send_keys('Gizmo7')
+
+
+@given('I enter the incorrect email')
+def step_impl_incorrect_credentials(context):
+    context.browser.find_by_id('username').send_keys('tas.patel@ons.gov.uk')
+    context.browser.find_by_id('password').send_keys('Gizmo007!')
+
+
+@given('I enter the incorrect email and password')
+def step_impl_incorrect_credentials(context):
+    context.browser.find_by_id('username').send_keys('tas.patel@ons.gov.uk')
     context.browser.find_by_id('password').send_keys('Gizmo7')
 
 

@@ -55,11 +55,3 @@ Feature: Test send message
     And I have a message with subject and body too long
     When I send a message
     Then I should receive subject and body too long errors
-
-  Scenario: User receives a message from BRES
-    Given I have received a message from BRES
-    And I go to the inbox tab
-    When I open the internal message
-    Then I should see a reply message
-
-

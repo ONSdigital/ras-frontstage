@@ -48,7 +48,17 @@ def step_impl_go_to_draft_message(context):
     context.browser.find_by_id('read-message-link-1').click()
 
 
+@when('I save a message')
+def step_impl_send_a_message(context):
+    context.browser.find_by_id('draft').click()
+
+
 @then('the draft contains some text')
 def step_impl_draft_page(context):
     assert is_element_present_by_id(context, 'secure-message-subject')
     assert is_element_present_by_id(context, 'secure-message-body')
+
+
+@then('The confirmation save page opens')
+def step_impl_open_confirmation_page(context):
+    assert is_element_present_by_id(context, 'inbox-link')

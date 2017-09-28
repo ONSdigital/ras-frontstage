@@ -23,3 +23,9 @@ Feature: Test the replies
     When I open the internal message
     Then I send a reply that's too long
     And I should receive a reply too long error
+
+  Scenario: User receives a message from BRES
+    Given I have received a message from BRES
+    And I go to the inbox tab
+    When I open the internal message
+    Then I should see a reply message

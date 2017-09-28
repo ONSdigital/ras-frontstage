@@ -42,6 +42,11 @@ def step_impl_go_to_sign_in_page(context):
     step_impl_click_sign_in(context)
 
 
+@given('I am on the create message page')
+def step_impl_visit_create_message_page(context):
+    context.browser.visit('/secure-message/create-message/')
+
+
 @given('I go to the inbox tab')
 def step_impl_go_to_inbox_tab(context):
     context.browser.visit('/secure-message/messages/INBOX')
@@ -55,6 +60,12 @@ def step_impl_open_internal_message(context):
 @then('I should receive a subject empty error')
 def step_impl_subject_empty_error(context):
     context.browser.find_by_link_text('Please enter a subject')
+
+
+@given('I have a message with subject too long')
+def step_impl_add_text_to_subject_too_long(context):
+    step_impl_subject_too_long(context)
+    context.browser.find_by_id('secure-message-body').send_keys('Test')
 
 
 @then('I should receive a body empty error')

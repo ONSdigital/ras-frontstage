@@ -27,3 +27,9 @@ Feature: Test the drafts
     Given there is a draft with empty fields
     When I open a draft with the read message link
     Then the draft contains some text
+
+  Scenario: User saves a message with subject too long
+    Given I am on the create message page
+    And I have a message with subject too long
+    When I save a message
+    Then the confirmation save page opens

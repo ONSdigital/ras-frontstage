@@ -36,7 +36,7 @@ class Config(object):
     RM_CASE_SERVICE_PROTOCOL = os.getenv('RM_CASE_SERVICE_PROTOCOL', 'http')
     RM_CASE_SERVICE = '{}://{}:{}/'.format(RM_CASE_SERVICE_PROTOCOL, RM_CASE_SERVICE_HOST, RM_CASE_SERVICE_PORT)
     RM_CASE_GET = '{}cases/{}'
-    RM_CASE_GET_BY_PARTY = '{}cases/partyid/{}'
+    RM_CASE_GET_BY_PARTY = '{}cases/partyid/{}?{}'
     RM_CASE_GET_BY_IAC = '{}cases/iac/{}'
 
     RAS_COLLECTION_INSTRUMENT_SERVICE_HOST = os.getenv('RAS_COLLECTION_INSTRUMENT_SERVICE_HOST', 'localhost')
@@ -48,6 +48,7 @@ class Config(object):
     RAS_CI_UPLOAD = '{}collection-instrument-api/1.0.2/survey_responses/{}'
     RAS_CI_GET = '{}collection-instrument-api/1.0.2/collectioninstrument/id/{}'
     RAS_CI_DOWNLOAD = '{}collection-instrument-api/1.0.2/download/{}'
+    RAS_CI_SIZE = '{}collection-instrument-api/1.0.2/instrument_size/{}'
 
     RAS_API_GATEWAY_SERVICE_HOST = os.getenv('RAS_API_GATEWAY_SERVICE_HOST', 'localhost')
     RAS_API_GATEWAY_SERVICE_PORT = os.getenv('RAS_API_GATEWAY_SERVICE_PORT', 8080)

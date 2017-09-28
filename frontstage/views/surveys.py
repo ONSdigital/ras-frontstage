@@ -1,8 +1,9 @@
 import logging
 from os import getenv
 
+import arrow
+from flask import Blueprint, jsonify, render_template, request, url_for
 import requests
-from flask import Blueprint, render_template, request, url_for
 from structlog import wrap_logger
 from werkzeug.utils import redirect
 
@@ -17,86 +18,12 @@ logger = wrap_logger(logging.getLogger(__name__))
 surveys_bp = Blueprint('surveys_bp', __name__, static_folder='static', template_folder='templates/surveys')
 
 
-def build_survey_data(session, status_filter):
-    party_id = session.get('party_id', 'no-party-id')
-    logger.debug('Retrieving survey data', party_id=party_id)
-    url = app.config['RAS_AGGREGATOR_TODO'].format(app.config['RAS_API_GATEWAY_SERVICE'], party_id)
-    req = requests.get(url, auth=app.config['BASIC_AUTH'], params=status_filter, verify=False)
-    if req.status_code != 200:
-        logger.error('Failed to retrieve survey')
-        raise ExternalServiceError(req)
-    return req.json()
-
-
-def get_case(case_id):
-    url = app.config['RM_CASE_GET'].format(app.config['RM_CASE_SERVICE'], case_id)
-    response = requests.get(url, auth=app.config['BASIC_AUTH'])
-    if response.status_code != 200:
-        logger.error('Failed to retrieve case')
-        raise ExternalServiceError(response)
-    case = response.json()
-    return case
-
-
-def get_collection_exercise(collection_exercise_id):
-    url = app.config['RM_COLLECTION_EXERCISES_GET'].format(app.config['RM_COLLECTION_EXERCISE_SERVICE'], collection_exercise_id)
-    response = requests.get(url, auth=app.config['BASIC_AUTH'])
-    if response.status_code != 200:
-        logger.error('Failed to retrieve collection exercise')
-        raise ExternalServiceError(response)
-    collection_exercise = response.json()
-    return collection_exercise
-
-
-def get_business_party(business_party_id):
-    url = app.config['RAS_PARTY_GET_BY_BUSINESS'].format(app.config['RAS_PARTY_SERVICE'], business_party_id)
-    response = requests.get(url, auth=app.config['BASIC_AUTH'])
-    if response.status_code != 200:
-        logger.error('Failed to retrieve business party')
-        raise ExternalServiceError(response)
-    business_party = response.json()
-    return business_party
-
-
-def get_survey(survey_id):
-    url = app.config['RM_SURVEY_GET'].format(app.config['RM_SURVEY_SERVICE'], survey_id)
-    response = requests.get(url, auth=app.config['BASIC_AUTH'])
-    if response.status_code != 200:
-        logger.error('Failed to retrieve survey')
-        raise ExternalServiceError(response)
-    survey = response.json()
-    return survey
-
-
-def build_single_survey_data(case_id):
-    case = get_case(case_id)
-    collection_exercise_id = case["caseGroup"]["collectionExerciseId"]
-    collection_exercise = get_collection_exercise(collection_exercise_id)
-    business_party_id = case['caseGroup']['partyId']
-    business_party = get_business_party(business_party_id)
-    survey_id = collection_exercise['surveyId']
-    survey = get_survey(survey_id)
-    survey_data = {
-        "case": case,
-        "collection_exercise": collection_exercise,
-        "business_party": business_party,
-        "survey": survey
-    }
-    return survey_data
-
-
 # ===== Surveys To Do =====
 @surveys_bp.route('/', methods=['GET'])
 @jwt_authorization(request)
 def logged_in(session):
-    """Logged in page for users only."""
-
-    # Filters the data array to remove surveys that shouldn't appear on the To Do page
     status_filter = {'status_filter': '["not started", "in progress"]'}
-
-    # Get the survey data (To Do survey type)
     data_array = build_survey_data(session, status_filter)
-
     return render_template('surveys/surveys-todo.html', _theme='default', data_array=data_array)
 
 
@@ -104,163 +31,240 @@ def logged_in(session):
 @surveys_bp.route('/history', methods=['GET'])
 @jwt_authorization(request)
 def surveys_history(session):
-    """Logged in page for users only."""
-
-    # Filters the data array to remove surveys that shouldn't appear on the History page
-    status_filter = {'status_filter': '["complete"]'}
-
-    # Get the survey data (History survey type)
+    status_filter = ["complete"]
     data_array = build_survey_data(session, status_filter)
-
-    # Render the template
     return render_template('surveys/surveys-history.html',  _theme='default', data_array=data_array, history=True)
 
 
+def get_case(case_id, logger=None):
+    logger.debug('Attempting to retrieve case', case_id=case_id)
+    url = app.config['RM_CASE_GET'].format(app.config['RM_CASE_SERVICE'], case_id)
+    response = requests.get(url, auth=app.config['BASIC_AUTH'])
+    if response.status_code != 200:
+        logger.error('Failed to retrieve case', case_id=case_id)
+        raise ExternalServiceError(response)
+    case = response.json()
+    logger.debug('Successfully retrieved case', case_id=case_id)
+    return case
+
+
+def get_collection_exercise(collection_exercise_id, logger=None):
+    logger.debug('Attempting to retrieve collection exercise', collection_exercise_id=collection_exercise_id)
+    url = app.config['RM_COLLECTION_EXERCISES_GET'].format(app.config['RM_COLLECTION_EXERCISE_SERVICE'], collection_exercise_id)
+    response = requests.get(url, auth=app.config['BASIC_AUTH'])
+    if response.status_code != 200:
+        logger.error('Failed to retrieve collection exercise', collection_exercise_id=collection_exercise_id)
+        raise ExternalServiceError(response)
+    collection_exercise = response.json()
+    logger.debug('Successfully retrieved collection exercise', collection_exercise_id=collection_exercise_id)
+    return collection_exercise
+
+
+def format_dates(collection_exercise):
+    input_date_format = 'YYYY-MM-DDThh:mm:ss'
+    output_date_format = 'D MMM YYYY'
+    for key in ['periodStartDateTime', 'periodEndDateTime', 'scheduledReturnDateTime']:
+        collection_exercise[key] = collection_exercise[key].replace('Z', '')
+        collection_exercise[key + 'Formatted'] = arrow.get(collection_exercise[key], input_date_format).format(output_date_format)
+    return collection_exercise
+
+
+def get_business_party(business_party_id, logger=None):
+    logger.debug('Attempting to retrieve business_party', business_party_id=business_party_id)
+    url = app.config['RAS_PARTY_GET_BY_BUSINESS'].format(app.config['RAS_PARTY_SERVICE'], business_party_id)
+    response = requests.get(url, auth=app.config['BASIC_AUTH'])
+    if response.status_code != 200:
+        logger.error('Failed to retrieve business party', business_party_id=business_party_id)
+        raise ExternalServiceError(response)
+    business_party = response.json()
+    logger.debug('Successfully retrieved business party', business_party_id=business_party_id)
+    return business_party
+
+
+def get_survey(survey_id, logger=None):
+    logger.debug('Attempting to retrieve survey', survey_id=survey_id)
+    url = app.config['RM_SURVEY_GET'].format(app.config['RM_SURVEY_SERVICE'], survey_id)
+    response = requests.get(url, auth=app.config['BASIC_AUTH'])
+    if response.status_code != 200:
+        logger.error('Failed to retrieve survey', survey_id=survey_id)
+        raise ExternalServiceError(response)
+    survey = response.json()
+    logger.debug('Successfully retrieved survey', survey_id=survey_id)
+    return survey
+
+
+# def build_survey_data(session, status_filter):
+#     party_id = session.get('party_id', 'no-party-id')
+#     logger.debug('Retrieving survey data', party_id=party_id)
+#     url = app.config['RAS_AGGREGATOR_TODO'].format(app.config['RAS_API_GATEWAY_SERVICE'], party_id)
+#     req = requests.get(url, auth=app.config['BASIC_AUTH'], params=status_filter, verify=False)
+#     if req.status_code != 200:
+#         logger.error('Failed to retrieve survey')
+#         raise ExternalServiceError(req)
+#     return req.json()
+
+
+def calculate_case_status(case):
+    case_events = case.get('caseEvents')
+    status = None
+    if case_events:
+        for event in case_events:
+            if event['category'] == 'SUCCESSFUL_RESPONSE_UPLOAD':
+                status = 'Complete'
+                break
+            if event['category'] == 'COLLECTION_INSTRUMENT_DOWNLOADED':
+                status = 'In Progress'
+    return status if status else 'Not Started'
+
+
+def build_survey_data(session, status_filter):
+    party_id = session.get('party_id', 'no-party-id')
+    cases = get_cases_from_party(party_id)
+    filtered_cases = [case for case in cases if calculate_case_status(case).lower() in status_filter]
+    survey_data = [build_single_survey_data(case, status_filter[0], logger) for case in filtered_cases]
+    return {'rows': survey_data}
+
+
 def get_cases_from_party(party_id):
-    # Get cases for given party_id
-    url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
+    logger.debug('Attempting to retrieve cases for party', party_id=party_id)
+    url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id, 'caseevents=true')
     req = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
     if req.status_code != 200:
-        logger.error('Failed to retrieve case', party_id=party_id)
+        logger.error('Failed to retrieve cases', party_id=party_id)
         raise ExternalServiceError(req)
     logger.debug('Successfully read cases for party', party_id=party_id)
     return req.json()
 
 
-def access_surveys_permissions(collection_instrument_id, party_id):
+def build_single_survey_data(case, status_filter, logger=None):
+    case_id = case['id']
+    logger.debug('Attempting to build survey data', case_id=case_id)
+    collection_exercise_id = case["caseGroup"]["collectionExerciseId"]
+    collection_exercise = get_collection_exercise(collection_exercise_id, logger)
+    business_party_id = case['caseGroup']['partyId']
+    business_party = get_business_party(business_party_id, logger)
+    survey_id = collection_exercise['surveyId']
+    survey = get_survey(survey_id, logger)
+    survey_data = {
+        "case": case,
+        "collection_exercise": collection_exercise,
+        "business_party": business_party,
+        "survey": survey,
+        'status': status_filter
+    }
+    logger.debug('Successfully built survey data', case_id=case_id)
+    return survey_data
+
+
+def access_surveys_permissions(party_id, case_party_id, logger=None):
     logger.info('Collection instrument access requested',
-                collection_instrument=collection_instrument_id,
-                party_id=party_id)
-
-    cases = get_cases_from_party(party_id)
-    # Check if any case has matching collection instrument
-    for case in cases:
-        if case.get('collectionInstrumentId') == collection_instrument_id:
-            logger.debug('Party has permission to access collection instrument',
-                         party_id=party_id,
-                         collection_instrument_id=collection_instrument_id)
-            return True
-    logger.warning('Party does not have permission to access collection_instrument',
-                   party_id=party_id,
-                   collection_instrument_id=collection_instrument_id)
-    return False
-
-
-def upload_surveys_permissions(case_id, party_id):
-    logger.info('Collection instrument access requested',
-                case=case_id,
-                party_id=party_id)
-
-    cases = get_cases_from_party(party_id)
-    # Check if any case has matching id
-    for case in cases:
-        if case.get('id') == case_id:
-            logger.debug('Party has permission to upload survey',
-                         party_id=party_id,
-                         collection_instrument_id=case_id)
-            return True
-    logger.warning('Party does not have permission to upload survey',
-                   party_id=party_id,
-                   case_id=case_id)
-    return False
-
-
-@surveys_bp.route('/access_survey', methods=['POST'])
-@jwt_authorization(request)
-def access_survey(session):
-    """Logged in page for users only."""
-    party_id = session.get('party_id', 'no-party-id')
-    case_id = request.form.get('case_id', None)
-    collection_instrument_id = request.form.get('collection_instrument_id', None)
-    survey = request.form.get('survey', None)
-    survey_abbr = request.form.get('survey_abbr', None)
-    business = request.form.get('business', None)
-    period_start = request.form.get('period_start', None)
-    period_end = request.form.get('period_end', None)
-    submit_by = request.form.get('submit_by', None)
-    referer_header = request.headers['referer']
-
-    survey_data = build_single_survey_data(case_id)
-
-    logger.info('Attempting to access survey information',
                 party_id=party_id,
-                collection_instrument_id=collection_instrument_id,
-                case_id=case_id)
-
-    valid = access_surveys_permissions(collection_instrument_id, party_id)
-    if not valid:
-        return render_template("errors/error.html", _theme='default', data={"error": {"type": "failed"}})
-
-    logger.info('Retrieving collection instrument',
-                party_id=party_id,
-                collection_instrument_id=collection_instrument_id)
-    url = app.config['RAS_CI_GET'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], collection_instrument_id)
-    logger.info('Retrieving collection instrument', collection_instrument_id=collection_instrument_id)
-    req = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
-    if req.status_code != 200:
-        logger.error('Failed to retrieve collection instrument',
-                     collection_instrument_id=collection_instrument_id,
-                     party_id=party_id)
-        raise ExternalServiceError(req)
-    ci_data = req.json()
-
-    return render_template('surveys/surveys-access.html', _theme='default', case_id=case_id, ci_data=ci_data,
-                           survey=survey, survey_abbr=survey_abbr, business=business, period_start=period_start,
-                           period_end=period_end, submit_by=submit_by, referer_header=referer_header)
-
-
-@surveys_bp.route('/download_survey', methods=['GET'])
-@jwt_authorization(request)
-def download_survey(session):
-    # GET request here downloads the xlsx file
-    party_id = session.get('party_id', 'no-party-id')
-    collection_instrument_id = request.args.get('cid')
-    case_id = request.args.get('case_id')
-    logger.info('Attempting to download collection instrument',
-                party_id=party_id,
-                collection_instrument_id=collection_instrument_id,
-                case_id=case_id)
-
-    valid = access_surveys_permissions(collection_instrument_id, party_id)
-    if not valid:
+                case_party_id=case_party_id)
+    if party_id != case_party_id:
         logger.warning('Party does not have permission to access collection instrument',
                        party_id=party_id,
-                       collection_instrument_id=collection_instrument_id)
+                       case_party_id=case_party_id)
+        return False
+    else:
+        logger.debug('Party has permission to access collection instrument',
+                     party_id=party_id,
+                     case_party_id=case_party_id)
+        return True
+
+
+def get_collection_instrument_size(collection_instrument_id, logger=None):
+    logger.debug('Attempting to retrieve collection instrument size', collection_instrument_id=collection_instrument_id)
+    url = app.config['RAS_CI_SIZE'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'], collection_instrument_id)
+    response = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
+    if response.status_code != 200:
+        logger.error('Failed to retrieve collection instrument size', collection_instrument_id=collection_instrument_id)
+        raise ExternalServiceError(response)
+    collection_instrument_size = response.json().get('size')
+    logger.debug('Successfully retrieved collection instrument size', collection_instrument_id=collection_instrument_id)
+    return collection_instrument_size
+
+
+@surveys_bp.route('/access_survey', methods=['GET'])
+@jwt_authorization(request)
+def access_survey(session):
+    party_id = session.get('party_id', 'no-party-id')
+    case_id = request.args.get('case_id', None)
+    loggerb = logger.bind(party_id=party_id, case_id=case_id)
+    referer_header = request.headers['referer']
+
+    # Retrieving and parsing data for given case
+    survey_data = build_single_survey_data(case_id, loggerb)
+    survey_info = survey_data.get('survey')
+    collection_exercise_info = survey_data.get('collection_exercise')
+
+    collection_exercise_info = format_dates(collection_exercise_info)
+
+    business_info = survey_data.get('business_party')
+    collection_instrument_id = survey_data.get('case').get('collectionInstrumentId')
+    case_party_id = survey_data.get('case').get('partyId')
+
+    # Confirming current user has permission to access case data
+    valid = access_surveys_permissions(party_id, case_party_id, loggerb)
+    if not valid:
         return render_template("errors/error.html", _theme='default', data={"error": {"type": "failed"}})
 
-    logger.info('Attempting to download collection instrument',
-                party_id=party_id,
-                collection_instrument_id=collection_instrument_id)
+    collection_instrument_size = get_collection_instrument_size(collection_instrument_id, loggerb)
+
+    return render_template('surveys/surveys-access.html', _theme='default',
+                           case_id=case_id,
+                           collection_instrument_id=collection_instrument_id,
+                           collection_instrument_size=collection_instrument_size,
+                           survey_info=survey_info,
+                           collection_exercise_info=collection_exercise_info,
+                           business_info=business_info, referer_header=referer_header)
+
+
+def download_collection_instrument(collection_instrument_id, logger):
+    logger.info('Attempting to download collection instrument', collection_instrument_id=collection_instrument_id)
     url = app.config['RAS_CI_DOWNLOAD'].format(app.config['RAS_COLLECTION_INSTRUMENT_SERVICE'],
                                                collection_instrument_id)
     response = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
+    return response.content, response.status_code, response.headers.items()
 
-    category = 'COLLECTION_INSTRUMENT_DOWNLOADED' if response.status_code == 200 else 'COLLECTION_INSTRUMENT_ERROR'
+
+def post_download_collection_instrument_case_event(case_id, party_id, collection_instrument_id, status_code):
+    category = 'COLLECTION_INSTRUMENT_DOWNLOADED' if status_code == 200 else 'COLLECTION_INSTRUMENT_ERROR'
     code, msg = post_event(case_id,
                            category=category,
                            created_by='FRONTSTAGE',
                            party_id=party_id,
                            description='Instrument {} downloaded by {} for case {}'.format(collection_instrument_id, party_id, case_id))
-    if code != 201:
-        # Should we error out if the case post fails or let the user continue?
-        logger.error('Failed to post case event',
+    if code == 201:
+        logger.debug('Successfully posted case',
                      error=msg,
                      status_code=code,
                      case_id=case_id,
                      category=category,
                      party_id=party_id)
 
-    if response.status_code == 200:
-        logger.info('Successfully downloaded collection instrument',
-                    party_id=party_id,
-                    collection_instrument_id=collection_instrument_id,
-                    case_id=case_id)
-        return response.content, response.status_code, response.headers.items()
+
+@surveys_bp.route('/download_survey', methods=['GET'])
+@jwt_authorization(request)
+def download_survey(session):
+    party_id = session.get('party_id', 'no-party-id')
+    collection_instrument_id = request.args.get('cid')
+    case_id = request.args.get('case_id')
+    loggerb = logger.bind(party_id=party_id, collection_instrument_id=collection_instrument_id, case_id=case_id)
+    case = get_case(case_id, loggerb)
+    case_party_id = case.get('partyId')
+
+    valid = access_surveys_permissions(party_id, case_party_id, loggerb)
+    if not valid:
+        return render_template("errors/error.html", _theme='default', data={"error": {"type": "failed"}})
+
+    collection_instrument, status_code, headers = download_collection_instrument(collection_instrument_id)
+    post_download_collection_instrument_case_event(case_id, party_id, collection_instrument_id, status_code)
+
+    if status_code == 200:
+        logger.info('Successfully downloaded collection instrument', collection_instrument_id=collection_instrument_id)
+        return collection_instrument, status_code, headers
     else:
-        logger.error('Failed to download collection instrument',
-                     collection_instrument_id=collection_instrument_id,
-                     party_id=party_id,
-                     status_code=response.status_code)
+        logger.error('Failed to download collection instrument', status_code=status_code)
         return render_template('surveys/surveys-download-failure.html',
                                _theme='default',
                                error_info=request.args.get('error_info', None))
@@ -335,6 +339,25 @@ def upload_survey(session):
                                 _scheme=getenv('SCHEME', 'http'),
                                 case_id=case_id,
                                 error_info=error_info))
+
+
+def upload_surveys_permissions(case_id, party_id):
+    logger.info('Collection instrument access requested',
+                case=case_id,
+                party_id=party_id)
+
+    cases = get_cases_from_party(party_id)
+    # Check if any case has matching id
+    for case in cases:
+        if case.get('id') == case_id:
+            logger.debug('Party has permission to upload survey',
+                         party_id=party_id,
+                         collection_instrument_id=case_id)
+            return True
+    logger.warning('Party does not have permission to upload survey',
+                   party_id=party_id,
+                   case_id=case_id)
+    return False
 
 
 @surveys_bp.route('/upload_failed', methods=['GET'])

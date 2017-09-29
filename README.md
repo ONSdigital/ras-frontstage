@@ -1,6 +1,6 @@
 # ras-frontstage
 [![Build Status](https://travis-ci.org/ONSdigital/ras-frontstage.svg?branch=master)](https://travis-ci.org/ONSdigital/ras-frontstage) 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/94d065784ec14ed4aba8aeb4f36ce10a)](https://www.codacy.com/app/ONSDigital/ras-frontstage)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2423b87056d448a1a534fc90d8130e80)](https://www.codacy.com/app/ONSDigital/ras-frontstage)
 [![codecov](https://codecov.io/gh/ONSdigital/ras-frontstage/branch/master/graph/badge.svg)](https://codecov.io/gh/ONSdigital/ras-frontstage)
 
 User interface for Respondent Account Services

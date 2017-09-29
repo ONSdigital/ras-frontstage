@@ -1,27 +1,35 @@
-Feature: Test The drafts
+Feature: Test the drafts
 
-
+  Background: User logged in
+    Given I am already logged in
 
   Scenario: User opens up a draft
-    Given I am already logged in
-    And there is a draft
+    Given there is a draft
+    When I open a draft with the read message link
+    Then the draft contains some text
+
+  Scenario: User opens up a draft using subject link
+    Given there is a draft
     When I open a draft
     Then the draft contains some text
 
   Scenario: User opens up a draft with no subject
-    Given I am already logged in
-    And there is a draft with no subject
-    When I open a draft with no subject
+    Given there is a draft with no subject
+    When I open a draft with the read message link
     Then the draft contains some text
 
   Scenario: User opens up a draft with no body
-    Given I am already logged in
-    And there is a draft with no body
+    Given there is a draft with no body
     When I open a draft with no body
     Then the draft contains some text
 
   Scenario: User opens up a draft with empty fields
-    Given I am already logged in
-    And there is a draft with empty fields
-    When I open a draft with empty fields
+    Given there is a draft with empty fields
+    When I open a draft with the read message link
     Then the draft contains some text
+
+  Scenario: User saves a message with subject too long
+    Given I am on the create message page
+    And I have a message with subject too long
+    When I save a message
+    Then the confirmation save page opens

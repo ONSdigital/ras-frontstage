@@ -27,7 +27,7 @@ with open('tests/test_data/thread.json') as json_data:
     thread_data = json.load(json_data)
 
 url_case_get_by_party = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'],
-                                                                  "db036fd7-ce17-40c2-a8fc-932e7c228397")
+                                                                  "db036fd7-ce17-40c2-a8fc-932e7c228397", "")
 url_ru_id_get_by_party = app.config['RAS_PARTY_GET_BY_RESPONDENT'].format(app.config['RAS_PARTY_SERVICE'],
                                                                           "db036fd7-ce17-40c2-a8fc-932e7c228397")
 

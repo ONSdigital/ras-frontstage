@@ -50,14 +50,6 @@ class Config(object):
     RAS_CI_DOWNLOAD = '{}collection-instrument-api/1.0.2/download/{}'
     RAS_CI_SIZE = '{}collection-instrument-api/1.0.2/instrument_size/{}'
 
-    RAS_API_GATEWAY_SERVICE_HOST = os.getenv('RAS_API_GATEWAY_SERVICE_HOST', 'localhost')
-    RAS_API_GATEWAY_SERVICE_PORT = os.getenv('RAS_API_GATEWAY_SERVICE_PORT', 8080)
-    RAS_API_GATEWAY_SERVICE_PROTOCOL = os.getenv('RAS_API_GATEWAY_SERVICE_PROTOCOL', 'http')
-    RAS_API_GATEWAY_SERVICE = '{}://{}:{}/'.format(RAS_API_GATEWAY_SERVICE_PROTOCOL,
-                                                   RAS_API_GATEWAY_SERVICE_HOST,
-                                                   RAS_API_GATEWAY_SERVICE_PORT)
-    RAS_AGGREGATOR_TODO = '{}api/1.0.0/surveys/todo/{}'
-
     RM_IAC_SERVICE_HOST = os.getenv('RM_IAC_SERVICE_HOST', 'localhost')
     RM_IAC_SERVICE_PORT = os.getenv('RM_IAC_SERVICE_PORT', 8121)
     RM_IAC_SERVICE_PROTOCOL = os.getenv('RM_IAC_SERVICE_PROTOCOL', 'http')

@@ -124,7 +124,7 @@ def get_party_ru_id(party_id):
 
 
 def get_collection_case(party_id):
-    url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id)
+    url = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'], party_id, "")
     logger.debug('Retrieving collection case id')
     collection_response = requests.get(url, auth=app.config['BASIC_AUTH'])
     if collection_response.status_code == 204:

@@ -11,6 +11,9 @@ from frontstage.views.secure_messaging import get_collection_case, get_party_ru_
 with open('tests/test_data/cases.json') as json_data:
     cases_data = json.load(json_data)
 
+with open("tests/test_data/cases_todo.json") as json_data:
+    case_todo_data = json.load(json_data)
+
 with open('tests/test_data/my_party.json') as json_data:
     party_data = json.load(json_data)
 
@@ -27,7 +30,7 @@ with open('tests/test_data/thread.json') as json_data:
     thread_data = json.load(json_data)
 
 url_case_get_by_party = app.config['RM_CASE_GET_BY_PARTY'].format(app.config['RM_CASE_SERVICE'],
-                                                                  "db036fd7-ce17-40c2-a8fc-932e7c228397")
+                                                                  "db036fd7-ce17-40c2-a8fc-932e7c228397", "")
 url_ru_id_get_by_party = app.config['RAS_PARTY_GET_BY_RESPONDENT'].format(app.config['RAS_PARTY_SERVICE'],
                                                                           "db036fd7-ce17-40c2-a8fc-932e7c228397")
 
@@ -68,7 +71,7 @@ class TestSecureMessage(unittest.TestCase):
 
     @requests_mock.mock()
     def test_get_collection_case_success(self, mock_object):
-        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.get(url_case_get_by_party, status_code=200, json=case_todo_data)
 
         collection_case_id = get_collection_case("db036fd7-ce17-40c2-a8fc-932e7c228397")
 
@@ -113,7 +116,7 @@ class TestSecureMessage(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_message_get(self, mock_object):
-        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.get(url_case_get_by_party, status_code=200, json=case_todo_data)
         mock_object.get(url_ru_id_get_by_party, status_code=200, json=party_data)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
 
@@ -129,7 +132,7 @@ class TestSecureMessage(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_message_post_success(self, mock_object):
-        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.get(url_case_get_by_party, status_code=200, json=case_todo_data)
         mock_object.get(url_ru_id_get_by_party, status_code=200, json=party_data)
         mock_object.post(url_sm_create_message, status_code=201, json=self.send_response)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
@@ -141,7 +144,7 @@ class TestSecureMessage(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_message_post_400(self, mock_object):
-        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.get(url_case_get_by_party, status_code=200, json=case_todo_data)
         mock_object.get(url_ru_id_get_by_party, status_code=200, json=party_data)
         mock_object.post(url_sm_create_message, status_code=400, json=self.send_error_response)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
@@ -155,7 +158,7 @@ class TestSecureMessage(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_message_post_500(self, mock_object):
-        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.get(url_case_get_by_party, status_code=200, json=case_todo_data)
         mock_object.get(url_ru_id_get_by_party, status_code=200, json=party_data)
         mock_object.post(url_sm_create_message, status_code=500)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
@@ -167,7 +170,7 @@ class TestSecureMessage(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_message_post_draft_new_success(self, mock_object):
-        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.get(url_case_get_by_party, status_code=200, json=case_todo_data)
         mock_object.get(url_ru_id_get_by_party, status_code=200, json=party_data)
         mock_object.post(url_sm_save_draft, status_code=201, json=self.send_response)
         mock_object.get(url_sm_get_single_draft, status_code=200, json=example_message_data)
@@ -181,7 +184,7 @@ class TestSecureMessage(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_message_post_draft_new_400(self, mock_object):
-        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.get(url_case_get_by_party, status_code=200, json=case_todo_data)
         mock_object.get(url_ru_id_get_by_party, status_code=200, json=party_data)
         mock_object.post(url_sm_save_draft, status_code=400, json=self.send_error_response)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
@@ -195,7 +198,7 @@ class TestSecureMessage(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_message_post_draft_new_500(self, mock_object):
-        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.get(url_case_get_by_party, status_code=200, json=case_todo_data)
         mock_object.get(url_ru_id_get_by_party, status_code=200, json=party_data)
         mock_object.post(url_sm_save_draft, status_code=500)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
@@ -208,7 +211,7 @@ class TestSecureMessage(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_message_post_draft_old_success(self, mock_object):
-        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.get(url_case_get_by_party, status_code=200, json=case_todo_data)
         mock_object.get(url_ru_id_get_by_party, status_code=200, json=party_data)
         mock_object.put(url_sm_modify_draft, status_code=200, json=self.send_response)
         mock_object.get(url_sm_get_single_draft, status_code=200, json=example_message_data)
@@ -223,7 +226,7 @@ class TestSecureMessage(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_message_post_draft_old_400(self, mock_object):
-        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.get(url_case_get_by_party, status_code=200, json=case_todo_data)
         mock_object.get(url_ru_id_get_by_party, status_code=200, json=party_data)
         mock_object.put(url_sm_modify_draft, status_code=400, json=self.send_error_response)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
@@ -238,7 +241,7 @@ class TestSecureMessage(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_message_post_draft_new_500_with_msg_id(self, mock_object):
-        mock_object.get(url_case_get_by_party, status_code=200, json=cases_data)
+        mock_object.get(url_case_get_by_party, status_code=200, json=case_todo_data)
         mock_object.get(url_ru_id_get_by_party, status_code=200, json=party_data)
         mock_object.put(url_sm_modify_draft, status_code=500)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)

@@ -99,7 +99,6 @@ The services these variables exist for are listed below with the beginnings of t
 | IAC service                     | RM_IAC_SERVICE              | https://github.com/ONSdigital/iac-service
 | Collection exercise service     | RM_COLLECTION_EXERCISE      | https://github.com/ONSdigital/rm-collection-exercise-service
 | Survey service                  | RM_SURVEY_SERVICE           | https://github.com/ONSdigital/rm-survey-service
-| API gateway service             | RAS_API_GATEWAY_SERVICE     | https://github.com/ONSdigital/ras-api-gateway
 | Party service                   | RAS_PARTY_SERVICE           | https://github.com/ONSdigital/ras-party
 | Secure message service          | RAS_SECURE_MESSAGE_SERVICE  | https://github.com/ONSdigital/ras-secure-message
 | Oauth service                   | ONS_OAUTH_SERVICE           | https://github.com/ONSdigital/django-oauth2-test

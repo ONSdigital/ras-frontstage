@@ -22,7 +22,7 @@ surveys_bp = Blueprint('surveys_bp', __name__, static_folder='static', template_
 @surveys_bp.route('/', methods=['GET'])
 @jwt_authorization(request)
 def logged_in(session):
-    status_filter = ["not started", "in progress"]
+    status_filter = ["not started", "downloaded"]
     data_array = build_surveys_data(session, status_filter)
     return render_template('surveys/surveys-todo.html', _theme='default', data_array=data_array)
 
@@ -199,7 +199,7 @@ def build_surveys_data(session, status_filter):
     party_id = session.get('party_id', 'no-party-id')
     cases = get_cases_from_party(party_id)
     filtered_cases = [case for case in cases if calculate_case_status(case).lower() in status_filter]
-    surveys_data = [build_single_survey_data(case=case, status_filter=status_filter[0], logger=logger) for case in filtered_cases]
+    surveys_data = [build_single_survey_data(case=case, status_filter=calculate_case_status(case), logger=logger) for case in filtered_cases]
     return {'rows': surveys_data}
 
 
@@ -293,7 +293,7 @@ def calculate_case_status(case):
                 status = 'Complete'
                 break
             if event['category'] == 'COLLECTION_INSTRUMENT_DOWNLOADED':
-                status = 'In Progress'
+                status = 'Downloaded'
     return status if status else 'Not Started'
 
 

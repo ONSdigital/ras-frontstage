@@ -163,9 +163,9 @@ def get_survey_id(party_id):
 def get_messages(label, logger):
     headers = {"Authorization": request.cookies['authorization']}
     logger.debug('Attempting to retrieve messages')
-    url = app.config['MESSAGES_API_URL']
+    url = app.config['GET_MESSAGES_URL']
     if label is not None:
-        url = url + "&label=" + label
+        url = url + "?label=" + label
     response = requests.get(url, headers=headers)
 
     if response.status_code != 200:
@@ -178,7 +178,7 @@ def get_messages(label, logger):
 def get_unread_message_total(logger):
     headers = {"Authorization": request.cookies['authorization']}
     logger.debug('Attempting to get the unread message total')
-    url = app.config['LABELS_GET_API_URL']
+    url = app.config['UNREAD_MESSAGES_TOTAL_URL']
     unread_label_data = requests.get(url, headers=headers)
 
     if unread_label_data.status_code != 200:

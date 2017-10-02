@@ -1,9 +1,11 @@
 import json
 import unittest
+from unittest import mock
 
 import requests_mock
 
 from frontstage import app
+import frontstage
 
 
 with open('tests/test_data/my_party.json') as json_data:
@@ -26,7 +28,7 @@ encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoX3Rva2VuIj
                     "icmVzcG9uZGVudCIsInBhcnR5X2lkIjoiZGIwMzZmZDctY2UxNy00MGMyLWE4ZmMtOTMyZTdjMjI4Mzk3In0.hh9sFpiPA-O" \
                     "8kugpDi3_GSDnxWh5rz2e5GQuBx7kmLM"
 
-url_party_by_email = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], "testuser@email.com")
+url_party_by_email = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], "email_token")
 url_oauth_token = app.config['ONS_TOKEN']
 
 
@@ -51,11 +53,11 @@ class TestSignIn(unittest.TestCase):
         self.assertTrue('Sign in'.encode() in response.data)
         self.assertTrue('You\'ve activated your account'.encode() in response.data)
 
+    @mock.patch('frontstage.views.sign_in.Encoder.party_encode', return_value='email_token')
     @requests_mock.mock()
-    def test_sign_in(self, mock_object):
+    def test_sign_in(self, mock_encoder, mock_object):
         mock_object.post(url_oauth_token, status_code=201, json=oauth_token)
         mock_object.get(url_party_by_email, status_code=200, json=my_party_data)
-
         response = self.app.post('/sign-in/', data=self.sign_in_form)
 
         self.assertEqual(response.status_code, 302)
@@ -141,8 +143,9 @@ class TestSignIn(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Password is required'.encode() in response.data)
 
+    @mock.patch('frontstage.views.sign_in.Encoder.party_encode', return_value='email_token')
     @requests_mock.mock()
-    def test_sign_in_unrecognised_user_party(self, mock_object):
+    def test_sign_in_unrecognised_user_party(self, mock_encoder, mock_object):
         mock_object.post(url_oauth_token, status_code=201, json=oauth_token)
         mock_object.get(url_party_by_email, status_code=404, json=my_party_data)
 
@@ -151,8 +154,9 @@ class TestSignIn(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Incorrect email or password'.encode() in response.data)
 
+    @mock.patch('frontstage.views.sign_in.Encoder.party_encode', return_value='email_token')
     @requests_mock.mock()
-    def test_sign_in_party_fail(self, mock_object):
+    def test_sign_in_party_fail(self, mock_encoder, mock_object):
         mock_object.post(url_oauth_token, status_code=201, json=oauth_token)
         mock_object.get(url_party_by_email, status_code=500, json=my_party_data)
 

@@ -19,11 +19,12 @@ class Config(object):
     JWT_SECRET = os.getenv('JWT_SECRET')
     RAS_FRONTSTAGE_CLIENT_ID = os.environ.get('RAS_FRONTSTAGE_CLIENT_ID')
     RAS_FRONTSTAGE_CLIENT_SECRET = os.environ.get('RAS_FRONTSTAGE_CLIENT_SECRET')
+    EMAIL_TOKEN_SALT = os.getenv('EMAIL_TOKEN_SALT')
     VALIDATE_JWT = os.environ.get('VALIDATE_JWT', True)
     GOOGLE_ANALYTICS = os.getenv('GOOGLE_ANALYTICS', None)
     SELENIUM_TEST_URL = os.environ.get('SELENIUM_TEST_URL', 'http://localhost:8080')
     NON_DEFAULT_VARIABLES = ['SECRET_KEY', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD', 'JWT_SECRET',
-                             'RAS_FRONTSTAGE_CLIENT_ID', 'RAS_FRONTSTAGE_CLIENT_SECRET']
+                             'RAS_FRONTSTAGE_CLIENT_ID', 'RAS_FRONTSTAGE_CLIENT_SECRET', 'EMAIL_TOKEN_SALT']
 
     PASSWORD_MATCH_ERROR_TEXT = 'Your passwords do not match'
     PASSWORD_CRITERIA_ERROR_TEXT = 'Your password doesn\'t meet the requirements'
@@ -130,6 +131,7 @@ class DevelopmentConfig(Config):
     DEBUG = True
     TEMPLATES_AUTO_RELOAD = True
     SECRET_KEY = os.getenv('SECRET_KEY', 'ONS_DUMMY_KEY')
+    EMAIL_TOKEN_SALT = os.getenv('EMAIL_TOKEN_SALT', 'aardvark')
     JWT_SECRET = os.getenv('JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'test_user')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'test_password')

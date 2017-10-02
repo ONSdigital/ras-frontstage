@@ -1,11 +1,15 @@
-from selenium import webdriver
+import os
 
+from selenium import webdriver
 from frontstage import app
 
 
 class Browser(object):
     base_url = app.config['SELENIUM_TEST_URL']
-    driver = webdriver.Chrome()
+    # Windows machines
+    # driver = webdriver.Chrome()
+    # Linux machines
+    driver = webdriver.Chrome(os.path.join(os.getcwd(), 'chromedriver'))
     driver.implicitly_wait(10)
 
     def close(self):

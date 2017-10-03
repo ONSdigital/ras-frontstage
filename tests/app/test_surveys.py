@@ -11,6 +11,8 @@ with open("tests/test_data/cases.json") as json_data:
     cases_data = json.load(json_data)
 with open("tests/test_data/cases_todo.json") as json_data:
     case_todo_data = json.load(json_data)
+with open("tests/test_data/cases_todo_downloaded.json") as json_data:
+    case_todo_downloaded_data = json.load(json_data)
 with open("tests/test_data/cases_history.json") as json_data:
     case_history_data = json.load(json_data)
 with open("tests/test_data/collection_exercise.json") as json_data:
@@ -91,7 +93,7 @@ class TestSurveys(unittest.TestCase):
             }
 
     @requests_mock.mock()
-    def test_get_surveys_todo(self, mock_object):
+    def test_get_surveys_todo_not_started(self, mock_object):
         mock_object.get(url_get_case_by_party, status_code=200, json=case_todo_data)
         mock_object.get(url_get_collection_exercise, status_code=200, json=collection_exercise_data)
         mock_object.get(url_get_business_party, status_code=200, json=business_party_data)
@@ -101,6 +103,21 @@ class TestSurveys(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('To do'.encode() in response.data)
+        self.assertTrue('Not Started'.encode() in response.data)
+        self.assertTrue('Business Register and Employment Survey'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_get_surveys_todo_downloaded(self, mock_object):
+        mock_object.get(url_get_case_by_party, status_code=200, json=case_todo_downloaded_data)
+        mock_object.get(url_get_collection_exercise, status_code=200, json=collection_exercise_data)
+        mock_object.get(url_get_business_party, status_code=200, json=business_party_data)
+        mock_object.get(url_get_survey, status_code=200, json=survey_data)
+
+        response = self.app.get('/surveys/', follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('To do'.encode() in response.data)
+        self.assertTrue('Downloaded'.encode() in response.data)
         self.assertTrue('Business Register and Employment Survey'.encode() in response.data)
 
     @requests_mock.mock()
@@ -124,6 +141,7 @@ class TestSurveys(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('To do'.encode() in response.data)
+        self.assertTrue('Completed'.encode() in response.data)
         self.assertTrue('Business Register and Employment Survey'.encode() in response.data)
 
     @requests_mock.mock()

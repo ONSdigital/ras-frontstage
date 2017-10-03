@@ -1,5 +1,4 @@
-from behave import when, then
-
+from behave import when, then, given
 from tests.behavioural.features.steps.common import is_element_present_by_id
 
 
@@ -13,9 +12,9 @@ def step_impl_find_button_in_history_tab(context):
     assert is_element_present_by_id(context, 'ACCESS_SURVEY_BUTTON_1')
 
 
-@when('I am on the history page')
+@given('I am on the history page')
 def step_impl_open_history_page(context):
-    context.browser.visit('/surveys/history/')
+    context.browser.visit('/surveys/history')
 
 
 @when('I click the Access survey button')

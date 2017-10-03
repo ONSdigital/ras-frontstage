@@ -1,7 +1,4 @@
-from email import message
-
 from behave import given, when, then
-
 from tests.behavioural.features.steps.common import is_element_present_by_id
 
 
@@ -45,19 +42,23 @@ def step_impl_go_to_draft_message(context):
     context.browser.find_by_link_text('Test Subject No Body').click()
 
 
-@when('I open a draft with no subject')
+@when('I open a draft with the read message link')
 def step_impl_go_to_draft_message(context):
     context.browser.visit('/secure-message/messages/DRAFT')
-    context.browser.find_by_link_text('Read full message').click()
+    context.browser.find_by_id('read-message-link-1').click()
 
 
-@when('I open a draft with empty fields')
-def step_impl_go_to_draft_message(context):
-    context.browser.visit('/secure-message/messages/DRAFT')
-    context.browser.find_by_link_text('Read full message').click()
+@when('I save a message')
+def step_impl_send_a_message(context):
+    context.browser.find_by_id('draft').click()
 
 
 @then('the draft contains some text')
 def step_impl_draft_page(context):
     assert is_element_present_by_id(context, 'secure-message-subject')
     assert is_element_present_by_id(context, 'secure-message-body')
+
+
+@then('The confirmation save page opens')
+def step_impl_open_confirmation_page(context):
+    assert is_element_present_by_id(context, 'inbox-link')

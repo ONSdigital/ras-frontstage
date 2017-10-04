@@ -6658,13 +6658,6 @@ input[type=file]::-webkit-file-upload-button:hover {
   width: auto;
 }
 
-@media only screen and (min-width: 300px) and (max-width: 500px) {
-  .header__btn {
-    font-size: 0.8rem;
-    padding: 0.3rem 0.5rem !important;
-  }
-}
-
 .header__help {
   padding: 0;
   color: #fff;
@@ -6681,13 +6674,15 @@ input[type=file]::-webkit-file-upload-button:hover {
   max-height: 40rem;
 }
 
-.has-js .header__help.is-closed {
-  max-height: 0;
-  -webkit-transition: max-height 200ms ease-out;
-  transition: max-height 200ms ease-out;
+@media only screen and (min-width: 580px) {
+  .has-js .header__help.is-closed {
+    max-height: 0;
+    -webkit-transition: max-height 200ms ease-out;
+    transition: max-height 200ms ease-out;
+  }
 }
 
-@media only screen and (min-width: 300px) and (max-width: 500px) {
+@media only screen and (min-width: 300px) and (max-width: 540px) {
   .header__help .mars,
   .header__help .venus {
     font-size: 0.8rem;
@@ -6728,21 +6723,23 @@ input[type=file]::-webkit-file-upload-button:hover {
   color: #fff;
 }
 
-@media only screen and (max-width: 540px) {
-  .header__btn span {
+@media only screen and (max-width: 579px) {
+  .logo__img {
+    width: 180px;
+  }
+  .header__btn {
     display: none;
+  }
+  .header__sign-out {
+    position: fixed;
+    right: 1rem;
   }
 }
 
-@media only screen and (max-width: 499px) {
-  .header__btn {
-    font-size: 6.4px;
-    font-size: 0.8rem;
-    padding: 2.4px 4px !important;
-    padding: 0.3rem 0.5rem !important;
-    margin: 0 0 0 8px;
-    margin: 0 0 0 1rem;
-  }
+.header__sign-out {
+  display: inline-block;
+  *display: inline;
+  *zoom: 1;
 }
 
 /* Nav styles for header help */

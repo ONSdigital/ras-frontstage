@@ -156,6 +156,7 @@ def upload_survey(session):
         else:
             logger.error('Unexpected error message returned from collection instrument',
                          status_code=result.status_code,
+                         resp_text=result.text,
                          party_id=party_id,
                          case_id=case_id)
             error_info = "unexpected"
@@ -174,7 +175,6 @@ def upload_failed(session):
     party_id = session.get('party_id', 'no-party-id')
     case_id = request.args.get('case_id', None)
     error_info = request.args.get('error_info', None)
-    logger.error('Upload failed', party_id=party_id, case_id=case_id)
 
     if error_info == "type":
         error_info = {'header': "Error uploading - incorrect file type",
@@ -188,6 +188,8 @@ def upload_failed(session):
     else:
         error_info = {'header': "Something went wrong",
                       'body': 'Please try uploading your spreadsheet again'}
+
+    logger.error('Upload failed', error_info=error_info.get('header'), party_id=party_id, case_id=case_id)
 
     return render_template('surveys/surveys-upload-failure.html',
                            _theme='default',

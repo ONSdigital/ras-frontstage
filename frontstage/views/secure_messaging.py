@@ -7,6 +7,7 @@ from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.exceptions.exceptions import ExternalServiceError
+from frontstage.common.utilities import api_call
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -161,12 +162,11 @@ def get_survey_id(party_id):
 
 
 def get_messages(label, logger):
-    headers = {"Authorization": request.cookies['authorization']}
     logger.debug('Attempting to retrieve messages')
-    url = app.config['GET_MESSAGES_URL']
-    if label is not None:
-        url = url + "?label=" + label
-    response = requests.get(url, headers=headers)
+    headers = {"Authorization": request.cookies['authorization']}
+    endpoint = app.config['GET_MESSAGES_URL']
+    parameters = {"label": label} if label else {}
+    response = api_call('GET', endpoint, parameters=parameters, headers=headers)
 
     if response.status_code != 200:
         logger.error('Error retrieving user messages')
@@ -176,16 +176,16 @@ def get_messages(label, logger):
 
 
 def get_unread_message_total(logger):
-    headers = {"Authorization": request.cookies['authorization']}
     logger.debug('Attempting to get the unread message total')
-    url = app.config['UNREAD_MESSAGES_TOTAL_URL']
-    unread_label_data = requests.get(url, headers=headers)
+    headers = {"Authorization": request.cookies['authorization']}
+    endpoint = app.config['UNREAD_MESSAGES_TOTAL_URL']
+    response = api_call('GET', endpoint, headers=headers, fail=False)
 
-    if unread_label_data.status_code != 200:
+    if response.status_code != 200:
         logger.error('Failed to retrieve unread label data')
         return {'total': '0'}
     else:
-        return json.loads(unread_label_data.text)
+        return json.loads(response.text)
 
 
 def get_message(message_id, label, logger):

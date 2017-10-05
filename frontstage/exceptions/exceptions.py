@@ -7,6 +7,21 @@ class ExternalServiceError(Exception):
         self.status_code = response.status_code
 
 
+class FailedRequest(Exception):
+
+    def __init__(self, method, url, exception=None):
+        self.method = str(method)
+        self.url = url
+        self.exception = str(exception) if exception else None
+
+
+class InvalidRequestMethod(Exception):
+
+    def __init__(self, method, url):
+        self.method = str(method)
+        self.url = url
+
+
 class JWTValidationError(Exception):
     pass
 

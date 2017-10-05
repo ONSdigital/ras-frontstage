@@ -97,10 +97,10 @@ def messages_get(session, label="INBOX"):
     """Gets users messages"""
     party_id = session['party_id']
     loggerb = logger.bind(party_id=party_id, label=label)
-    messages = get_messages(label, loggerb)
-    unread_msg_total = get_unread_message_total(loggerb)
+    messages = get_messages_list(label, loggerb)
+    unread_msg_total = messages.get('total')
     return render_template('secure-messages/secure-messages.html', _theme='default', messages=messages['messages'],
-                           links=messages['_links'], label=label, total=unread_msg_total['total'])
+                           links=messages['_links'], label=label, total=unread_msg_total)
 
 
 def get_party_ru_id(party_id):
@@ -161,7 +161,7 @@ def get_survey_id(party_id):
     return survey_name
 
 
-def get_messages(label, logger):
+def get_messages_list(label, logger):
     logger.debug('Attempting to retrieve messages')
     headers = {"Authorization": request.cookies['authorization']}
     endpoint = app.config['GET_MESSAGES_URL']
@@ -171,19 +171,6 @@ def get_messages(label, logger):
     if response.status_code != 200:
         logger.error('Error retrieving user messages')
         raise ExternalServiceError(response)
-    else:
-        return json.loads(response.text)
-
-
-def get_unread_message_total(logger):
-    logger.debug('Attempting to get the unread message total')
-    headers = {"Authorization": request.cookies['authorization']}
-    endpoint = app.config['UNREAD_MESSAGES_TOTAL_URL']
-    response = api_call('GET', endpoint, headers=headers, fail=False)
-
-    if response.status_code != 200:
-        logger.error('Failed to retrieve unread label data')
-        return {'total': '0'}
     else:
         return json.loads(response.text)
 

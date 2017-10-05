@@ -22,7 +22,7 @@ surveys_bp = Blueprint('surveys_bp', __name__, static_folder='static', template_
 @surveys_bp.route('/', methods=['GET'])
 @jwt_authorization(request)
 def logged_in(session):
-    status_filter = ["not started", "in progress"]
+    status_filter = ["not started", "downloaded"]
     data_array = build_surveys_data(session, status_filter)
     return render_template('surveys/surveys-todo.html', _theme='default', data_array=data_array)
 
@@ -156,6 +156,7 @@ def upload_survey(session):
         else:
             logger.error('Unexpected error message returned from collection instrument',
                          status_code=result.status_code,
+                         resp_text=result.text,
                          party_id=party_id,
                          case_id=case_id)
             error_info = "unexpected"
@@ -174,7 +175,6 @@ def upload_failed(session):
     party_id = session.get('party_id', 'no-party-id')
     case_id = request.args.get('case_id', None)
     error_info = request.args.get('error_info', None)
-    logger.error('Upload failed', party_id=party_id, case_id=case_id)
 
     if error_info == "type":
         error_info = {'header': "Error uploading - incorrect file type",
@@ -189,6 +189,8 @@ def upload_failed(session):
         error_info = {'header': "Something went wrong",
                       'body': 'Please try uploading your spreadsheet again'}
 
+    logger.error('Upload failed', error_info=error_info.get('header'), party_id=party_id, case_id=case_id)
+
     return render_template('surveys/surveys-upload-failure.html',
                            _theme='default',
                            error_info=error_info,
@@ -199,7 +201,7 @@ def build_surveys_data(session, status_filter):
     party_id = session.get('party_id', 'no-party-id')
     cases = get_cases_from_party(party_id)
     filtered_cases = [case for case in cases if calculate_case_status(case).lower() in status_filter]
-    surveys_data = [build_single_survey_data(case=case, status_filter=status_filter[0], logger=logger) for case in filtered_cases]
+    surveys_data = [build_single_survey_data(case=case, status_filter=calculate_case_status(case), logger=logger) for case in filtered_cases]
     return {'rows': surveys_data}
 
 
@@ -293,7 +295,7 @@ def calculate_case_status(case):
                 status = 'Complete'
                 break
             if event['category'] == 'COLLECTION_INSTRUMENT_DOWNLOADED':
-                status = 'In Progress'
+                status = 'Downloaded'
     return status if status else 'Not Started'
 
 

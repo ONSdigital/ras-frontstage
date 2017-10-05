@@ -36,15 +36,13 @@
 {% for message in messages %}
     <li id="message-list" class="message-list__item">
     {% if 'DRAFT' in message['labels'] %}
-        <a href="{{ url_for('secure_message_bp.message_get', label='DRAFT', message_id=message['msg_id']) }}">{{ message['subject'] }}</a>
+        <a href="{{ url_for('secure_message_bp.message_get', label='DRAFT', message_id=message['msg_id']) }}">{{ message['subject'] | subject_filter }}</a>
     {% elif 'SENT' in message['labels'] %}
-        <a href="{{ url_for('secure_message_bp.message_get', label='SENT', message_id=message['msg_id']) }}">{{ message['subject'] }}</a>
-    {% elif 'INBOX' in message['labels'] %}
-    {% if 'UNREAD' in message['labels'] %}
-        <b><a href="{{ url_for('secure_message_bp.message_get', label='INBOX', message_id=message['msg_id']) }}">{{ message['subject'] }}</a></b>
+        <a href="{{ url_for('secure_message_bp.message_get', label='SENT', message_id=message['msg_id']) }}">{{ message['subject'] | subject_filter }}</a>
+    {% elif 'UNREAD' in message['labels'] %}
+        <b><a href="{{ url_for('secure_message_bp.message_get', label='UNREAD', message_id=message['msg_id']) }}">{{ message['subject'] | subject_filter }}</a></b>
     {% else %}
-        <a href="{{ url_for('secure_message_bp.message_get', label='INBOX', message_id=message['msg_id']) }}">{{ message['subject'] }}</a>
-    {% endif %}
+        <a href="{{ url_for('secure_message_bp.message_get', label='INBOX', message_id=message['msg_id']) }}">{{ message['subject'] | subject_filter }}</a>
     {% endif %}
 
         <dl class="grid">

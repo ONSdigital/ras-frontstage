@@ -4,6 +4,7 @@ domready(function () {
   var btn = document.querySelector('.js-help-btn');
   var help = document.querySelector('.js-help-body');
   var classClosed = 'is-closed';
+  var firstClosed = 'first-closed';
 
   var openedByClick = false;
 
@@ -11,8 +12,8 @@ domready(function () {
     return false;
   }
 
-  help.classList.add(classClosed);
   btn.classList.remove('u-vh');
+  help.classList.add(classClosed);
 
   help.addEventListener('focus', function (e) {
     help.classList.remove(classClosed);
@@ -27,6 +28,7 @@ domready(function () {
   btn.addEventListener('click', function (e) {
     e.preventDefault();
     openedByClick = !openedByClick;
+    help.classList.remove(firstClosed);
     help.classList.toggle(classClosed);
   });
 });

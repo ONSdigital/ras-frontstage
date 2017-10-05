@@ -4416,7 +4416,7 @@ input:checked ~ .field__other {
 
 @media only screen and (min-width: 500px) {
   .input {
-    width: 19.5rem;
+    width: 20rem;
   }
 }
 
@@ -6679,6 +6679,12 @@ input[type=file]::-webkit-file-upload-button:hover {
     max-height: 0;
     -webkit-transition: max-height 200ms ease-out;
     transition: max-height 200ms ease-out;
+  }
+}
+
+@media only screen and (min-width: 580px) {
+  .has-js .header__help.first-closed {
+    max-height: 0;
   }
 }
 

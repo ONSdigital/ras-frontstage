@@ -171,8 +171,10 @@ def get_messages_list(label, logger):
     if response.status_code != 200:
         logger.error('Error retrieving user messages')
         raise ExternalServiceError(response)
-    else:
-        return json.loads(response.text)
+
+    messages_list = json.loads(response.text)
+    logger.debug('Retrieved messages list successfully')
+    return messages_list
 
 
 def get_message(message_id, label, logger):

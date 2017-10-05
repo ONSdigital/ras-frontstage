@@ -80,7 +80,7 @@ def message_get(session, label, message_id):
     else:
         draft = {}
 
-    if label == 'INBOX':
+    if label == 'UNREAD':
         remove_unread_label(message_id, loggerb)
 
     return render_template('secure-messages/secure-messages-view.html',

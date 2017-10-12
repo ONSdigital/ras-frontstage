@@ -27,7 +27,6 @@
             <div class="panel panel--simple panel--error panel--spacious" id="subject-error">
                 <p class="error-message">{{ errors['subject'][0] }}</p>
         {% endif %}
-        <fieldset>
             <label class="venus" for="secure-message-subject">Subject</label>
             <input
                 id="secure-message-subject"
@@ -36,7 +35,6 @@
                 name="secure-message-subject"
                 maxlength="100"
                 value="{{ draft['subject'] }}" />
-        </fieldset>
         {% if "subject" in errors %}
             </div>
         {% endif %}
@@ -47,20 +45,18 @@
 
     {% if "body" in errors %}
         <div class="panel panel--simple panel--error panel--spacious" id="body-error">
-            <p class="error-message">{{ errors['body'][0] }}</p>
+          <p class="error-message">{{ errors['body'][0] }}</p>
     {% endif %}
-        <fieldset>
-            {% if message %}
-            <label class="venus" for="secure-message-body">Reply</label>
-            {% else %}
-            <label class="venus" for="secure-message-body">Message</label>
-            {% endif %}
-            <textarea
-                id="secure-message-body"
-                class="input input--textarea input--textarea-message"
-                rows="10"
-                name="secure-message-body">{{ draft['body'] }}</textarea>
-        </fieldset>
+          {% if message %}
+          <label class="venus" for="secure-message-body">Reply</label>
+          {% else %}
+          <label class="venus" for="secure-message-body">Message</label>
+          {% endif %}
+          <textarea
+            id="secure-message-body"
+            class="input input--textarea input--textarea-message"
+            rows="10"
+            name="secure-message-body">{{ draft['body'] }}</textarea>
     {% if "body" in errors %}
         </div>
     {% endif %}

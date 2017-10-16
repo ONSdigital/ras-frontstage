@@ -1,11 +1,12 @@
 import logging
 
-from flask import Blueprint, json, redirect, render_template, request, session, url_for
+from flask import Blueprint, json, redirect, render_template, request, url_for
 from frontstage.common.authorisation import jwt_authorization
 import requests
 from structlog import wrap_logger
 
 from frontstage import app
+from frontstage.common.session import SessionHandler
 from frontstage.exceptions.exceptions import ExternalServiceError
 
 
@@ -161,7 +162,7 @@ def get_survey_id(party_id):
 
 
 def get_messages(label, logger):
-    headers = {"Authorization": request.cookies['authorization']}
+    headers = create_headers()
     logger.debug('Attempting to retrieve messages')
     url = app.config['MESSAGES_API_URL']
     if label is not None:
@@ -176,7 +177,7 @@ def get_messages(label, logger):
 
 
 def get_unread_message_total(logger):
-    headers = {"Authorization": request.cookies['authorization']}
+    headers = create_headers()
     logger.debug('Attempting to get the unread message total')
     url = app.config['LABELS_GET_API_URL']
     unread_label_data = requests.get(url, headers=headers)
@@ -189,7 +190,7 @@ def get_unread_message_total(logger):
 
 
 def get_message(message_id, label, logger):
-    headers = {"Authorization": request.cookies['authorization']}
+    headers = create_headers()
     logger.debug('Attempting to retrieve message')
     if label == 'DRAFT':
         url = app.config['DRAFT_GET_API_URL'].format(message_id)
@@ -207,7 +208,7 @@ def get_message(message_id, label, logger):
 
 
 def get_thread_message(thread_id, logger, party_id):
-    headers = {"Authorization": request.cookies['authorization']}
+    headers = create_headers()
     logger.debug('Attempting to retrieve message from thread', thread_id=thread_id)
     url = app.config['THREAD_GET_API_URL'].format(thread_id)
     response = requests.get(url, headers=headers)
@@ -247,7 +248,7 @@ def process_form_errors(response, data, logger):
 
 
 def save_draft(data, logger):
-    headers = {"Authorization": request.cookies['authorization']}
+    headers = create_headers()
     logger.debug("Attempting to save draft")
     if data.get('msg_id'):
         url = app.config['DRAFT_PUT_API_URL'].format(data['msg_id'])
@@ -269,7 +270,7 @@ def save_draft(data, logger):
 
 
 def send_message(data, logger):
-    headers = {"Authorization": request.cookies['authorization']}
+    headers = create_headers()
     logger.debug("Attempting to send message")
     url = app.config['CREATE_MESSAGE_API_URL']
     response = requests.post(url, json=data, headers=headers)
@@ -287,7 +288,7 @@ def send_message(data, logger):
 
 
 def remove_unread_label(message_id, logger):
-    headers = {"Authorization": request.cookies['authorization']}
+    headers = create_headers()
     logger.debug('Attempting to remove unread label')
     data = {"label": 'UNREAD', "action": 'remove'}
     url = app.config['MESSAGE_MODIFY_URL'].format(message_id)
@@ -298,3 +299,9 @@ def remove_unread_label(message_id, logger):
         return False
     logger.debug("Removed unread label")
     return True
+
+
+def create_headers():
+    encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])
+    headers = {"Authorization": encoded_jwt}
+    return headers

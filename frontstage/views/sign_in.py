@@ -1,12 +1,14 @@
 import json
 import logging
 from os import getenv
+from uuid import uuid4
 
 from flask import Blueprint, make_response, render_template, request, redirect, url_for
 import requests
 from structlog import wrap_logger
 
-from frontstage import app
+from frontstage import app, redis
+from frontstage.common.session import SessionHandler
 from frontstage.exceptions.exceptions import ExternalServiceError
 from frontstage.jwt import encode, timestamp_token
 from frontstage.models import LoginForm
@@ -75,7 +77,7 @@ def login():
                 raise ExternalServiceError(oauth2_response)
             logger.debug('Access Token Granted')
         except requests.ConnectionError as e:
-            logger.warning('Connection error between the server and the OAuth2 service of: {}'.format(exception=str(e)))
+            logger.warning('Connection error between the server and the OAuth2 service of: {}'.format(str(e)))
             raise ExternalServiceError(e)
         oauth2_token = json.loads(oauth2_response.text)
 
@@ -95,7 +97,13 @@ def login():
         encoded_jwt_token = encode(data_dict_for_jwt_token)
         response = make_response(redirect(url_for('surveys_bp.logged_in', _external=True,
                                                   _scheme=getenv('SCHEME', 'http'))))
-        response.set_cookie('authorization', value=encoded_jwt_token)
+
+        session = SessionHandler()
+        logger.info('Creating session', party_id=party_id)
+        session.create_session(encoded_jwt_token)
+        response.set_cookie('authorization', value=session.session_key)
+        logger.info('Successfully created session', party_id=party_id)
+
         return response
 
     template_data = {

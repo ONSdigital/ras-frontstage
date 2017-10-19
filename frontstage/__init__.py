@@ -6,7 +6,6 @@ from flask_wtf.csrf import CSRFProtect
 import redis
 from structlog import wrap_logger
 
-from frontstage.cloud.cloud_foundry import ONSCloudFoundry
 from frontstage.exceptions.exceptions import MissingEnvironmentVariable
 from frontstage.filters.file_size_filter import file_size_filter
 from frontstage.filters.subject_filter import subject_filter
@@ -30,13 +29,6 @@ for var in app.config['NON_DEFAULT_VARIABLES']:
 app.url_map.strict_slashes = False
 
 csrf = CSRFProtect(app)
-
-cf = ONSCloudFoundry()
-
-if cf.detected:
-    logger.info('Cloudfoundry detected, setting service configurations')
-    app.config['REDIS_HOST'] = cf.redis.credentials['host']
-    app.config['REDIS_PORT'] = cf.redis.credentials['port']
 
 redis = redis.StrictRedis(host=app.config['REDIS_HOST'], port=app.config['REDIS_PORT'], db=app.config['REDIS_DB'])
 

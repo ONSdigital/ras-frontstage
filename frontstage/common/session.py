@@ -11,7 +11,7 @@ class SessionHandler(object):
 
     def create_session(self, encoded_jwt):
         self.encoded_jwt = encoded_jwt
-        self.session_key = 'session: {}'.format(self._create_key())
+        self.session_key = self._create_key()
         redis.setex(self.session_key, 3600, self.encoded_jwt)
 
     def update_session(self, session_key):

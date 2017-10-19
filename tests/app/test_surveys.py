@@ -1,6 +1,7 @@
 import io
 import json
 import unittest
+from unittest.mock import patch
 
 import requests_mock
 
@@ -85,12 +86,14 @@ class TestSurveys(unittest.TestCase):
     def setUp(self):
 
         self.app = app.test_client()
-        self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
+        self.app.set_cookie('localhost', 'authorization', 'session_key')
         self.cases_data = cases_data
         self.survey_file = dict(file=(io.BytesIO(b'my file contents'), "testfile.xlsx"))
         self.headers = {
             "Authorization": encoded_jwt_token
             }
+        self.patcher = patch('redis.StrictRedis.get', return_value=encoded_jwt_token)
+        self.patcher.start()
 
     @requests_mock.mock()
     def test_get_surveys_todo_not_started(self, mock_object):

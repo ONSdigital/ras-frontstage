@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest import mock
 
 from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
@@ -31,20 +31,22 @@ class TestJWTAuthorization(unittest.TestCase):
             pass
         test_function()
 
-    def test_jwt_authorization_success(self):
-        request = MagicMock(cookies={"authorization": valid_jwt_token})
+    @mock.patch('redis.StrictRedis.get')
+    def test_jwt_authorization_success(self, mock_redis_get):
+        request = mock.MagicMock(cookies={"authorization": 'session_key'})
+        mock_redis_get.return_value = valid_jwt_token
 
         # If this function runs without exceptions the test is considered passed
         self.decorator_test(request)
 
     def test_jwt_authorization_no_JWT(self):
-        request = MagicMock()
+        request = mock.MagicMock()
 
         with self.assertRaises(JWTValidationError):
             self.decorator_test(request)
 
     def test_jwt_authorization_expired_JWT(self):
-        request = MagicMock(cookies={"authorization": expired_jwt_token})
+        request = mock.MagicMock(cookies={"authorization": expired_jwt_token})
 
         with self.assertRaises(JWTValidationError):
             self.decorator_test(request)

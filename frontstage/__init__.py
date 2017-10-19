@@ -38,7 +38,7 @@ if cf.detected:
     app.config['REDIS_HOST'] = cf.redis.credentials['host']
     app.config['REDIS_PORT'] = cf.redis.credentials['port']
 
-redis = redis.StrictRedis(host=app.config['REDIS_HOST'], port=app.config['REDIS_PORT'], db=0)
+redis = redis.StrictRedis(host=app.config['REDIS_HOST'], port=app.config['REDIS_PORT'], db=app.config['REDIS_DB'])
 
 app.jinja_env.filters['file_size_filter'] = file_size_filter
 app.jinja_env.filters['subject_filter'] = subject_filter

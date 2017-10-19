@@ -95,6 +95,9 @@ class TestSurveys(unittest.TestCase):
         self.patcher = patch('redis.StrictRedis.get', return_value=encoded_jwt_token)
         self.patcher.start()
 
+    def tearDown(self):
+        self.patcher.stop()
+
     @requests_mock.mock()
     def test_get_surveys_todo_not_started(self, mock_object):
         mock_object.get(url_get_case_by_party, status_code=200, json=case_todo_data)

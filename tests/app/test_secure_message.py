@@ -73,6 +73,9 @@ class TestSecureMessage(unittest.TestCase):
         self.patcher.start()
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
 
+    def tearDown(self):
+        self.patcher.stop()
+
     @requests_mock.mock()
     def test_get_collection_case_success(self, mock_object):
         mock_object.get(url_case_get_by_party, status_code=200, json=case_todo_data)
@@ -128,12 +131,12 @@ class TestSecureMessage(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_create_message_get_not_logged_in(self):
-        self.patcher = patch('redis.StrictRedis.get')
-        self.patcher.start()
+        self.patcher_empty = patch('redis.StrictRedis.get')
+        self.patcher_empty.start()
         response = self.app.get("secure-message/create-message", follow_redirects=True)
-
         self.assertEqual(response.status_code, 403)
         self.assertTrue(bytes("Error - not signed in", encoding='UTF-8') in response.data)
+        self.patcher_empty.stop()
 
     @requests_mock.mock()
     def test_create_message_post_success(self, mock_object):

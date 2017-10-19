@@ -102,7 +102,7 @@ def login():
         logger.info('Creating session', party_id=party_id)
         session.create_session(encoded_jwt_token)
         response.set_cookie('authorization', value=session.session_key)
-        logger.info('Successfully created session', party_id=party_id)
+        # logger.info('Successfully created session', party_id=party_id, session_key=session.session_key)
 
         return response
 
@@ -119,6 +119,13 @@ def login():
 
 @sign_in_bp.route('/logout')
 def logout():
+    # Delete user session in redis
+    session_key = request.cookies.get('authorization')
+    session = SessionHandler()
+    session.delete_session(session_key)
+
+    # Delete session cookie
     response = make_response(redirect(url_for('sign_in_bp.login')))
     response.set_cookie('authorization', value='', expires=0)
+
     return response

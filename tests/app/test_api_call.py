@@ -8,7 +8,7 @@ from frontstage.common.api_call import api_call
 from frontstage.exceptions.exceptions import FailedRequest, InvalidRequestMethod
 
 
-class TestAccountActivation(unittest.TestCase):
+class TestApiCall(unittest.TestCase):
 
     def setUp(self):
         self.app = app.test_client()

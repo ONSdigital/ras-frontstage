@@ -12,8 +12,8 @@ class TestApiCall(unittest.TestCase):
 
     def setUp(self):
         self.app = app.test_client()
-        self.test_url = 'http://localhost:8082/test_endpoint'
-        self.test_url_with_params = 'http://localhost:8082/test_endpoint?param=param'
+        self.test_url = 'http://localhost:8083/test_endpoint'
+        self.test_url_with_params = 'http://localhost:8083/test_endpoint?param=param'
 
     @requests_mock.mock()
     def test_api_call_get_success(self, mock_request):

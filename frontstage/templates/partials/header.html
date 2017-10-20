@@ -1,25 +1,40 @@
+
+<div id="helpinfo" class="helpinfo">
+  <div class="header__help js-help-body first-closed">
+    <div class="header__container container">
+      <div class="header__title">Help –</div>
+      <ul class="header__nav nav nav--horizontal">
+        <li class="nav__item">
+          <span class="mars" role="presentation">Call </span> <a class="venus nav__link" href="tel:03001234931"><span class="u-vh">For help call </span>0300 1234 931</a>
+        </li>
+        <li class="nav__item">
+          <span class="mars" role="presentation">Email </span> <a class="venus nav__link external" href="mailto:surveys@ons.gov.uk" rel="ext">surveys@ons.gov.uk</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
 <div class="container">
-    <header class="header">
-        {% if config.GOOGLE_ANALYTICS %}
-        <script>
-        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-        ga('create', '{{ config.GOOGLE_ANALYTICS }}', 'auto');
-        ga('send', 'pageview');
-        </script>
-        {% endif %}
-        <div class="logo header__logo">
-            <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Office for National Statistics"
-                 class="logo__img"/>
-        </div>
+  <header class="header">
 
-        {% if 'authorization' in request.cookies %}
-        <a href="{{ url_for('sign_in_bp.logout') }}">Sign out</a>
-        {% endif %}
-    </header>
+    <div class="logo header__logo">
+      <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Office for National Statistics"
+             class="logo__img"/>
+    </div>
+
+    <button aria-controls="helpinfo" class="header__btn btn btn--light btn--border u-vh js-help-btn">
+      Help
+    </button>
+
+    {% if 'authorization' in request.cookies %}
+    <div class="sign-out header__sign-out">
+      <a class="u-ml-s nowrap" href="{{ url_for('sign_in_bp.logout') }}">Sign out</a>
+    </div>
+    
+    {% endif %}
+  </header>
 </div>
 <div class="bar " role="banner">
     <div class="bar__inner container">

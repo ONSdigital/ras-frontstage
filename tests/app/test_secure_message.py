@@ -39,7 +39,6 @@ url_sm_save_draft = app.config['DRAFT_SAVE_API_URL']
 url_sm_modify_draft = app.config['DRAFT_PUT_API_URL'].format('7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb')
 url_sm_modify_message = app.config['MESSAGE_MODIFY_URL'].format('7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb')
 url_sm_get_single_draft = app.config['DRAFT_GET_API_URL'].format('7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb')
-url_sm_get_messages = app.config['MESSAGES_API_URL']
 url_api_get_messages = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['GET_MESSAGES_URL']
 url_sm_get_single_message = app.config['MESSAGE_GET_URL'].format('7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb')
 url_sm_get_labels = app.config['LABELS_GET_API_URL']

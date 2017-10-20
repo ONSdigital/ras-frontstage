@@ -11,7 +11,7 @@ from frontstage.exceptions.exceptions import FailedRequest, InvalidRequestMethod
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def api_call(method, endpoint, parameters=None, json=None, headers=None, fail=True):
+def api_call(method, endpoint, parameters=None, json=None, headers=None):
     url = app.config['RAS_FRONTSTAGE_API_SERVICE'] + endpoint
     if parameters:
         url = '{}?'.format(url)

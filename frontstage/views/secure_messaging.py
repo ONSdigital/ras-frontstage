@@ -7,7 +7,7 @@ from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.exceptions.exceptions import ExternalServiceError
-from frontstage.common.utilities import api_call
+from frontstage.common.api_call import api_call
 
 
 logger = wrap_logger(logging.getLogger(__name__))

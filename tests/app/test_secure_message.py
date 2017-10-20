@@ -1,6 +1,6 @@
 import json
-
 import unittest
+
 import requests_mock
 
 from frontstage import app

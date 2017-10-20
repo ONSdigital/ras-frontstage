@@ -14,7 +14,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 def api_call(method, endpoint, parameters=None, json=None, headers=None, fail=True):
     url = app.config['RAS_FRONTSTAGE_API_SERVICE'] + endpoint
     if parameters:
-        url = url + '?'
+        url = '{}?'.format(url)
         for key, value in parameters.items():
             parameter_string = '{}={}&'.format(key, value)
             url = url + parameter_string
@@ -30,19 +30,10 @@ def api_call(method, endpoint, parameters=None, json=None, headers=None, fail=Tr
             raise InvalidRequestMethod(method, url)
     except ConnectTimeout as e:
         logger.error('Connection to remote server timed out', method=method, url=url, exception=str(e))
-        if fail:
-            raise FailedRequest(method, url, e)
-        else:
-            response = requests.models.Response
-            response.status_code = 500
-            return response
+        raise FailedRequest(method, url, e)
+
     except ConnectionError as e:
         logger.error('Failed to connect to external service', method=method, url=url, exception=str(e))
-        if fail:
-            raise FailedRequest(method, url, e)
-        else:
-            response = requests.models.Response
-            response.status_code = 500
-            return response
+        raise FailedRequest(method, url, e)
 
     return response

@@ -1,10 +1,9 @@
 import logging
 from os import getenv
 
-from flask import redirect, url_for, render_template, request
+from flask import redirect, url_for
 from requests.exceptions import ConnectionError
 from structlog import wrap_logger
-from werkzeug.exceptions import RequestEntityTooLarge
 
 from frontstage import app
 from frontstage.exceptions.exceptions import ExternalServiceError, JWTValidationError

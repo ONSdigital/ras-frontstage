@@ -1,6 +1,6 @@
 import json
-
 import unittest
+
 import requests_mock
 
 from frontstage import app
@@ -39,7 +39,7 @@ url_sm_save_draft = app.config['DRAFT_SAVE_API_URL']
 url_sm_modify_draft = app.config['DRAFT_PUT_API_URL'].format('7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb')
 url_sm_modify_message = app.config['MESSAGE_MODIFY_URL'].format('7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb')
 url_sm_get_single_draft = app.config['DRAFT_GET_API_URL'].format('7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb')
-url_sm_get_messages = app.config['MESSAGES_API_URL']
+url_api_get_messages = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['GET_MESSAGES_URL']
 url_sm_get_single_message = app.config['MESSAGE_GET_URL'].format('7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb')
 url_sm_get_labels = app.config['LABELS_GET_API_URL']
 url_sm_get_thread = app.config['THREAD_GET_API_URL'].format('7bc5d41b-0549-40b3-ba76-42f6d4cf3fde')
@@ -255,7 +255,7 @@ class TestSecureMessage(unittest.TestCase):
 
     @requests_mock.mock()
     def test_get_messages_success(self, mock_object):
-        mock_object.get(url_sm_get_messages, status_code=200, json=messages_get_data)
+        mock_object.get(url_api_get_messages, status_code=200, json=messages_get_data)
         mock_object.get(url_sm_get_labels, status_code=200, json={'name': '', 'total': ''})
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
 
@@ -266,24 +266,13 @@ class TestSecureMessage(unittest.TestCase):
 
     @requests_mock.mock()
     def test_get_messages_fail(self, mock_object):
-        mock_object.get(url_sm_get_messages, status_code=500)
+        mock_object.get(url_api_get_messages, status_code=500)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
 
         response = self.app.get("secure-message/messages/", data=self.message_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue(bytes("500", encoding='UTF-8') in response.data)
-
-    @requests_mock.mock()
-    def test_get_messages_label_fail(self, mock_object):
-        mock_object.get(url_sm_get_messages, status_code=200, json=messages_get_data)
-        mock_object.get(url_sm_get_labels, status_code=500, json={'name': '', 'total': ''})
-        self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
-
-        response = self.app.get("secure-message/messages/", data=self.message_form, follow_redirects=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(bytes("aaaabbbbaaaa", encoding='UTF-8') in response.data)
 
     @requests_mock.mock()
     def test_get_single_draft_success(self, mock_object):

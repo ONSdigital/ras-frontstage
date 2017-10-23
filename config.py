@@ -113,7 +113,6 @@ class Config(object):
                                                       RAS_FRONTSTAGE_API_HOST,
                                                       RAS_FRONTSTAGE_API_PORT)
     GET_MESSAGES_URL = 'messages_list'
-    UNREAD_MESSAGES_TOTAL_URL = 'unread_message_total'
 
 
 class ProductionConfig(Config):

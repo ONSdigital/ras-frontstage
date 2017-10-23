@@ -7,12 +7,12 @@ class ExternalServiceError(Exception):
         self.status_code = response.status_code
 
 
-class FailedRequest(Exception):
+class FrontstageAPIFailure(Exception):
 
-    def __init__(self, method, url, exception=None):
+    def __init__(self, method, url, exception):
         self.method = str(method)
         self.url = url
-        self.exception = str(exception) if exception else None
+        self.exception = str(exception)
 
 
 class InvalidRequestMethod(Exception):

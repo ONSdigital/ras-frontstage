@@ -5,7 +5,7 @@ from requests.exceptions import ConnectionError, ConnectTimeout
 from structlog import wrap_logger
 
 from frontstage import app
-from frontstage.exceptions.exceptions import FailedRequest, InvalidRequestMethod
+from frontstage.exceptions.exceptions import FrontstageAPIFailure, InvalidRequestMethod
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -29,11 +29,8 @@ def api_call(method, endpoint, parameters=None, json=None, headers=None):
             logger.error('Invalid request method', method=str(method), url=url)
             raise InvalidRequestMethod(method, url)
     except ConnectTimeout as e:
-        logger.error('Connection to remote server timed out', method=method, url=url, exception=str(e))
-        raise FailedRequest(method, url, e)
-
+        raise FrontstageAPIFailure(method, url, e)
     except ConnectionError as e:
-        logger.error('Failed to connect to external service', method=method, url=url, exception=str(e))
-        raise FailedRequest(method, url, e)
+        raise FrontstageAPIFailure(method, url, e)
 
     return response

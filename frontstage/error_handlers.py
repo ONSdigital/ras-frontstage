@@ -6,7 +6,7 @@ from requests.exceptions import ConnectionError
 from structlog import wrap_logger
 
 from frontstage import app
-from frontstage.exceptions.exceptions import ExternalServiceError, FrontstageAPIFailure, JWTValidationError
+from frontstage.exceptions.exceptions import ExternalServiceError, JWTValidationError
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -37,14 +37,6 @@ def connection_error(error):
 @app.errorhandler(ExternalServiceError)
 def connection_error_external_service(error):
     logger.error('Error in external service', status_code=error.status_code, url=error.url)
-    return redirect(url_for('error_bp.server_error_page',
-                            _external=True,
-                            _scheme=getenv('SCHEME', 'http')))
-
-
-@app.errorhandler(FrontstageAPIFailure)
-def connection_error_external_service(error):
-    logger.error('Failed to connect to Frontstage API', exception=error.exception, url=error.url)
     return redirect(url_for('error_bp.server_error_page',
                             _external=True,
                             _scheme=getenv('SCHEME', 'http')))

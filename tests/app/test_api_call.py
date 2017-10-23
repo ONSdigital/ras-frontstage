@@ -1,11 +1,10 @@
 import unittest
 
-from requests.exceptions import ConnectionError, ConnectTimeout
 import requests_mock
 
 from frontstage import app
 from frontstage.common.api_call import api_call
-from frontstage.exceptions.exceptions import FailedRequest, InvalidRequestMethod
+from frontstage.exceptions.exceptions import InvalidRequestMethod
 
 
 class TestApiCall(unittest.TestCase):
@@ -50,17 +49,3 @@ class TestApiCall(unittest.TestCase):
         response = api_call('GET', 'test_endpoint', {"param": "param"})
 
         self.assertEqual(response.status_code, 200)
-
-    @requests_mock.mock()
-    def test_api_call_connect_timeout(self, mock_request):
-        mock_request.get(self.test_url, exc=ConnectTimeout)
-
-        with self.assertRaises(FailedRequest):
-            api_call('GET', 'test_endpoint')
-
-    @requests_mock.mock()
-    def test_api_call_connection_error(self, mock_request):
-        mock_request.get(self.test_url, exc=ConnectionError)
-
-        with self.assertRaises(FailedRequest):
-            api_call('GET', 'test_endpoint')

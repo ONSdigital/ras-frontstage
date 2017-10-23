@@ -1,11 +1,10 @@
 import logging
 
 import requests
-from requests.exceptions import ConnectionError, ConnectTimeout
 from structlog import wrap_logger
 
 from frontstage import app
-from frontstage.exceptions.exceptions import FrontstageAPIFailure, InvalidRequestMethod
+from frontstage.exceptions.exceptions import InvalidRequestMethod
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -18,19 +17,15 @@ def api_call(method, endpoint, parameters=None, json=None, headers=None):
         for key, value in parameters.items():
             parameter_string = '{}={}&'.format(key, value)
             url = url + parameter_string
-    try:
-        if method == 'GET':
-            response = requests.get(url, headers=headers)
-        elif method == 'POST':
-            response = requests.post(url, headers=headers, json=json)
-        elif method == 'PUT':
-            response = requests.put(url, headers=headers, json=json)
-        else:
-            logger.error('Invalid request method', method=str(method), url=url)
-            raise InvalidRequestMethod(method, url)
-    except ConnectTimeout as e:
-        raise FrontstageAPIFailure(method, url, e)
-    except ConnectionError as e:
-        raise FrontstageAPIFailure(method, url, e)
+
+    if method == 'GET':
+        response = requests.get(url, headers=headers)
+    elif method == 'POST':
+        response = requests.post(url, headers=headers, json=json)
+    elif method == 'PUT':
+        response = requests.put(url, headers=headers, json=json)
+    else:
+        logger.error('Invalid request method', method=str(method), url=url)
+        raise InvalidRequestMethod(method, url)
 
     return response

@@ -5,7 +5,6 @@ import requests_mock
 
 from frontstage import app
 from frontstage.exceptions.exceptions import ExternalServiceError
-from frontstage.views.secure_messaging import get_collection_case, get_party_ru_id, get_survey_id
 
 
 with open('tests/test_data/cases.json') as json_data:

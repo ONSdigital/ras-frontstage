@@ -113,15 +113,8 @@ class Config(object):
                                                       RAS_FRONTSTAGE_API_HOST,
                                                       RAS_FRONTSTAGE_API_PORT)
     GET_MESSAGES_URL = 'messages_list'
-
-
-class ProductionConfig(Config):
-    DEBUG = False
-
-
-class StagingConfig(Config):
-    DEVELOPMENT = True
-    DEBUG = True
+    GET_MESSAGE_URL = 'message'
+    SEND_MESSAGE_URL = 'send_message'
 
 
 class DevelopmentConfig(Config):

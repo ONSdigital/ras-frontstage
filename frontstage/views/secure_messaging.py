@@ -50,13 +50,13 @@ def messages_get(session, label="INBOX"):
     """Gets users messages"""
     messages_list = get_messages_list(label)
     messages = messages_list['messages']
-    unread_msg_total = messages_list.get('unread_messages_total', {}).get('total')
+    unread_msg_total = messages_list.get('unread_messages_total')
     return render_template('secure-messages/secure-messages.html', _theme='default', messages=messages['messages'],
                            links=messages['_links'], label=label, total=unread_msg_total)
 
 
 def get_messages_list(label):
-    logger.debug('Attempting to retrieve messages')
+    logger.debug('Attempting to retrieve messages', label=label)
 
     # Form api request
     headers = {"Authorization": request.cookies['authorization']}
@@ -66,7 +66,7 @@ def get_messages_list(label):
 
     # Check for failure calling Frontstage API
     if response.status_code != 200:
-        logger.error('Error connecting to frontstage api')
+        logger.error('Error in frontstage api', status_code=response.status_code)
         raise ApiError('FA000')
 
     messages_list = json.loads(response.text)
@@ -74,17 +74,17 @@ def get_messages_list(label):
     # Handle Api Error codes
     error_code = messages_list.get('error', {}).get('code')
     if error_code == 'FA001':
-        logger.error('Failed to retrieve messages list')
+        logger.error('Failed to retrieve messages list', label=label)
         raise ApiError('FA001')
     elif error_code == 'FA002':
         logger.error('Could not retrieve unread message total')
 
-    logger.debug('Retrieved messages list successfully')
+    logger.debug('Retrieved messages list successfully', label=label)
     return messages_list
 
 
 def get_message(message_id, label, party_id):
-    logger.debug('Attempting to retrieve message')
+    logger.debug('Attempting to retrieve message', message_id=message_id, party_id=party_id)
 
     # Form api request
     headers = {"Authorization": request.cookies['authorization']}
@@ -94,7 +94,7 @@ def get_message(message_id, label, party_id):
 
     # Check for failure calling Frontstage API
     if response.status_code != 200:
-        logger.error('Failed to retrieve message')
+        logger.error('Failed to retrieve message', message_id=message_id, party_id=party_id)
         raise ExternalServiceError(response)
 
     message = json.loads(response.text)
@@ -102,15 +102,15 @@ def get_message(message_id, label, party_id):
     # Handle Api Error codes
     error_code = message.get('error', {}).get('code')
     if error_code and error_code != 'FA005':
-        logger.error('Failed to retrieve message')
+        logger.error('Failed to retrieve message', message_id=message_id, party_id=party_id)
         raise ApiError(error_code)
 
-    logger.debug('Retrieved message successfully')
+    logger.debug('Retrieved message successfully', message_id=message_id, party_id=party_id)
     return message
 
 
 def send_message(party_id, is_draft):
-    logger.debug('Attempting to retrieve message')
+    logger.debug('Attempting to send message', party_id=party_id)
 
     # Form api request
     headers = {"Authorization": request.cookies['authorization']}
@@ -135,7 +135,7 @@ def send_message(party_id, is_draft):
 
     # Handle Frontstage API Error codes
     if sent_message.get('error', {}).get('code') == 'FA006':
-        logger.debug('Form submitted with errors')
+        logger.debug('Form submitted with errors', party_id=party_id)
         message = sent_message.get('error', {}).get('data', {}).get('thread_message')
         errors = sent_message['error']['data']['form_errors']
         return render_template('secure-messages/secure-messages-view.html',
@@ -148,8 +148,8 @@ def send_message(party_id, is_draft):
 
     # If draft was saved render the saved draft
     if is_draft:
-        logger.info('Draft sent successfully', message_id=sent_message['msg_id'])
+        logger.info('Draft sent successfully', message_id=sent_message['msg_id'], party_id=party_id)
         return message_get('DRAFT', sent_message['msg_id'])
 
-    logger.info('Secure message sent successfully', message_id=sent_message['msg_id'])
+    logger.info('Secure message sent successfully', message_id=sent_message['msg_id'], party_id=party_id)
     return render_template('secure-messages/message-success-temp.html', _theme='default')

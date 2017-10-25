@@ -50,7 +50,7 @@ def messages_get(session, label="INBOX"):
     """Gets users messages"""
     messages_list = get_messages_list(label)
     messages = messages_list['messages']
-    unread_msg_total = messages_list.get('unread_messages_total').get('total')
+    unread_msg_total = messages_list.get('unread_messages_total', {}).get('total')
     return render_template('secure-messages/secure-messages.html', _theme='default', messages=messages['messages'],
                            links=messages['_links'], label=label, total=unread_msg_total)
 
@@ -67,7 +67,7 @@ def get_messages_list(label):
     # Check for failure calling Frontstage API
     if response.status_code != 200:
         logger.error('Error connecting to frontstage api')
-        raise ExternalServiceError(response)
+        raise ApiError('FA000')
 
     messages_list = json.loads(response.text)
 
@@ -121,6 +121,7 @@ def send_message(party_id, is_draft):
         'body': request.form['secure-message-body'],
         'thread_id': request.form['secure-message-thread-id']
     }
+    # If message has previously been saved as a draft add through the message id
     if "msg_id" in request.form:
         message_json["msg_id"] = request.form['msg_id']
     response = api_call('POST', endpoint, parameters={"is_draft": is_draft}, json=message_json, headers=headers)

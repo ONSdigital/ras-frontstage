@@ -50,7 +50,7 @@ def messages_get(session, label="INBOX"):
     """Gets users messages"""
     messages_list = get_messages_list(label)
     messages = messages_list['messages']
-    unread_msg_total = messages_list.get('unread_messages_total')
+    unread_msg_total = messages_list.get('unread_messages_total', 0)
     return render_template('secure-messages/secure-messages.html', _theme='default', messages=messages['messages'],
                            links=messages['_links'], label=label, total=unread_msg_total)
 

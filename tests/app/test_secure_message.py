@@ -22,10 +22,10 @@ encoded_jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoX3Rva2VuIjoiNmY5
                     "8kugpDi3_GSDnxWh5rz2e5GQuBx7kmLM"
 
 
-def create_api_error(error_code, data=None):
+def create_api_error(status_code, data=None):
     error_json = {
         "error": {
-            "code": error_code,
+            "status_code": status_code,
             "data": data
         }
     }
@@ -65,8 +65,8 @@ class TestSecureMessage(unittest.TestCase):
         self.assertTrue('Server error'.encode() in response.data)
 
     @requests_mock.mock()
-    def test_get_messages_api_error_FA001(self, mock_request):
-        mock_request.get(url_get_messages, json=create_api_error('FA001'))
+    def test_get_messages_api_error_bad_gateway(self, mock_request):
+        mock_request.get(url_get_messages, status_code=502)
 
         response = self.app.get("/secure-message/messages", headers=self.headers, follow_redirects=True)
 
@@ -75,7 +75,7 @@ class TestSecureMessage(unittest.TestCase):
 
     @requests_mock.mock()
     def test_get_messages_api_error_FA002(self, mock_request):
-        unread_total_fail_json = {**messages_get, **create_api_error('FA002')}
+        unread_total_fail_json = {**messages_get, **create_api_error(500)}
         del unread_total_fail_json['unread_messages_total']
         mock_request.get(url_get_messages, json=unread_total_fail_json)
 
@@ -112,10 +112,9 @@ class TestSecureMessage(unittest.TestCase):
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
 
-    # This test also covers error FA004
     @requests_mock.mock()
     def test_get_message_api_error_FA003(self, mock_request):
-        mock_request.get(url_get_message, json=create_api_error('FA003'))
+        mock_request.get(url_get_message, status_code=502)
 
         response = self.app.get("/secure-message/INBOX/29000d7b-dfd8-47fa-8e15-5650a985243b", headers=self.headers, follow_redirects=True)
 
@@ -170,8 +169,8 @@ class TestSecureMessage(unittest.TestCase):
         self.assertTrue('Server error'.encode() in response.data)
 
     @requests_mock.mock()
-    def test_create_message_post_success_api_error_FA007(self, mock_request):
-        mock_request.post(url_send_message, json=create_api_error('FA007'))
+    def test_create_message_post_bad_gateway(self, mock_request):
+        mock_request.post(url_send_message, status_code=502)
 
         response = self.app.post("/secure-message/create-message", data=self.message_form, headers=self.headers, follow_redirects=True)
 
@@ -182,7 +181,7 @@ class TestSecureMessage(unittest.TestCase):
     @requests_mock.mock()
     def test_create_message_post_success_api_error_FA006(self, mock_request):
         form_errors = {'form_errors': {'subject': ['Please enter a subject']}}
-        mock_request.post(url_send_message, json=create_api_error('FA006', form_errors))
+        mock_request.post(url_send_message, json=create_api_error(400, form_errors))
 
         response = self.app.post("/secure-message/create-message", data=self.message_form, headers=self.headers, follow_redirects=True)
 

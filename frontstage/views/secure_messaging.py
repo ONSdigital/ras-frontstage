@@ -64,12 +64,11 @@ def get_messages_list(label):
     parameters = {"label": label} if label else {}
     response = api_call('GET', endpoint, parameters=parameters, headers=headers)
 
-    messages_list = json.loads(response.text)
-
     if response.status_code != 200:
         logger.error('Failed to retrieve messages list', label=label)
         raise ApiError(response)
 
+    messages_list = json.loads(response.text)
     logger.debug('Retrieved messages list successfully', label=label)
     return messages_list
 
@@ -83,12 +82,11 @@ def get_message(message_id, label, party_id):
     parameters = {"message_id": message_id, "label": label, "party_id": party_id}
     response = api_call('GET', endpoint, parameters=parameters, headers=headers)
 
-    message = json.loads(response.text)
-
     if response.status_code != 200:
         logger.error('Failed to retrieve message', message_id=message_id, party_id=party_id)
         raise ApiError(response)
 
+    message = json.loads(response.text)
     logger.debug('Retrieved message successfully', message_id=message_id, party_id=party_id)
     return message
 

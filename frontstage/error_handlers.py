@@ -27,8 +27,8 @@ def connection_error_internal_server(error):  # pylint: disable=unused-argument
 
 
 @app.errorhandler(ApiError)
-def connection_error(error):
-    logger.error('Api failed to retrieve required data', error_code=error.error_code)
+def api_error(error):
+    logger.error('Api failed to retrieve required data', url=error.url, status_code=str(error.status_code))
     return redirect(url_for('error_bp.server_error_page',
                             _external=True,
                             _scheme=getenv('SCHEME', 'http')))

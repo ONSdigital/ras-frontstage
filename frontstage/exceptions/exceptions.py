@@ -3,8 +3,9 @@ import sys
 
 class ApiError(Exception):
 
-    def __init__(self, error_code):
-        self.error_code = error_code
+    def __init__(self, response):
+        self.url = response.url
+        self.status_code = response.status_code
 
 
 class ExternalServiceError(Exception):

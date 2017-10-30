@@ -5,7 +5,7 @@ from frontstage.common.authorisation import jwt_authorization
 from structlog import wrap_logger
 
 from frontstage import app
-from frontstage.exceptions.exceptions import ApiError, ExternalServiceError
+from frontstage.exceptions.exceptions import ApiError
 from frontstage.common.api_call import api_call
 
 
@@ -64,20 +64,11 @@ def get_messages_list(label):
     parameters = {"label": label} if label else {}
     response = api_call('GET', endpoint, parameters=parameters, headers=headers)
 
-    # Check for failure calling Frontstage API
-    if response.status_code != 200:
-        logger.error('Error in frontstage api', status_code=response.status_code)
-        raise ApiError('FA000')
-
     messages_list = json.loads(response.text)
 
-    # Handle Api Error codes
-    error_code = messages_list.get('error', {}).get('code')
-    if error_code == 'FA001':
+    if response.status_code != 200:
         logger.error('Failed to retrieve messages list', label=label)
-        raise ApiError('FA001')
-    elif error_code == 'FA002':
-        logger.error('Could not retrieve unread message total')
+        raise ApiError(response)
 
     logger.debug('Retrieved messages list successfully', label=label)
     return messages_list
@@ -92,18 +83,11 @@ def get_message(message_id, label, party_id):
     parameters = {"message_id": message_id, "label": label, "party_id": party_id}
     response = api_call('GET', endpoint, parameters=parameters, headers=headers)
 
-    # Check for failure calling Frontstage API
-    if response.status_code != 200:
-        logger.error('Failed to retrieve message', message_id=message_id, party_id=party_id)
-        raise ExternalServiceError(response)
-
     message = json.loads(response.text)
 
-    # Handle Api Error codes
-    error_code = message.get('error', {}).get('code')
-    if error_code and error_code != 'FA005':
+    if response.status_code != 200:
         logger.error('Failed to retrieve message', message_id=message_id, party_id=party_id)
-        raise ApiError(error_code)
+        raise ApiError(response)
 
     logger.debug('Retrieved message successfully', message_id=message_id, party_id=party_id)
     return message
@@ -126,15 +110,14 @@ def send_message(party_id, is_draft):
         message_json["msg_id"] = request.form['msg_id']
     response = api_call('POST', endpoint, parameters={"is_draft": is_draft}, json=message_json, headers=headers)
 
-    # Check for failure when calling Frontstage API
     if response.status_code != 200:
         logger.debug('Failed to send message')
-        raise ExternalServiceError(response)
+        raise ApiError(response)
 
     sent_message = json.loads(response.text)
 
-    # Handle Frontstage API Error codes
-    if sent_message.get('error', {}).get('code') == 'FA006':
+    # If form errors are returned render them
+    if sent_message.get('error'):
         logger.debug('Form submitted with errors', party_id=party_id)
         message = sent_message.get('error', {}).get('data', {}).get('thread_message')
         errors = sent_message['error']['data']['form_errors']
@@ -143,8 +126,6 @@ def send_message(party_id, is_draft):
                                message=message,
                                draft=message_json,
                                errors=errors)
-    elif sent_message.get('error'):
-        raise ApiError(error_code=sent_message['error']['code'])
 
     # If draft was saved render the saved draft
     if is_draft:

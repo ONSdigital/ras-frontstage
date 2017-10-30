@@ -101,9 +101,7 @@ class Config(object):
     ONS_OAUTH_SERVICE = '{}://{}:{}/'.format(ONS_OAUTH_SERVICE_PROTOCOL, ONS_OAUTH_SERVICE_HOST, ONS_OAUTH_SERVICE_PORT)
     ONS_TOKEN = '{}api/v1/tokens/'.format(ONS_OAUTH_SERVICE)
 
-    MESSAGE_LIMIT = os.getenv('MESSAGE_LIMIT', 1000)
     CREATE_MESSAGE_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'message/send'
-    MESSAGES_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'messages?limit={}'.format(MESSAGE_LIMIT)
     MESSAGE_GET_URL = RAS_SECURE_MESSAGE_SERVICE + 'message/{}'
     MESSAGE_MODIFY_URL = RAS_SECURE_MESSAGE_SERVICE + 'message/{}/modify'
     DRAFT_SAVE_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'draft/save'
@@ -111,6 +109,14 @@ class Config(object):
     DRAFT_PUT_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'draft/{}/modify'
     LABELS_GET_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'labels?name=unread'
     THREAD_GET_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'thread/{}'
+
+    RAS_FRONTSTAGE_API_HOST = os.getenv('RAS_FRONTSTAGE_API_HOST', 'localhost')
+    RAS_FRONTSTAGE_API_PORT = os.getenv('RAS_FRONTSTAGE_API_PORT', 8083)
+    RAS_FRONTSTAGE_API_PROTOCOL = os.getenv('RAS_FRONTSTAGE_API_PROTOCOL', 'http')
+    RAS_FRONTSTAGE_API_SERVICE = '{}://{}:{}/'.format(RAS_FRONTSTAGE_API_PROTOCOL,
+                                                      RAS_FRONTSTAGE_API_HOST,
+                                                      RAS_FRONTSTAGE_API_PORT)
+    GET_MESSAGES_URL = 'messages_list'
 
 
 class ProductionConfig(Config):

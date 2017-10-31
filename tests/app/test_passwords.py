@@ -1,7 +1,9 @@
 import requests_mock
 import unittest
 
+import requests
 from frontstage import app
+from frontstage.exceptions.exceptions import ExternalServiceError
 
 token = 'test_token'
 url_password_change_request = app.config['RAS_PARTY_RESET_PASSWORD_REQUEST'].format(app.config['RAS_PARTY_SERVICE'])
@@ -72,6 +74,15 @@ class TestPasswords(unittest.TestCase):
     @requests_mock.mock()
     def test_forgot_password_post_locked_email(self, mock_object):
         mock_object.post(url_oauth_token, status_code=401, text='{"detail": "User account locked"}')
+
+        response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
+
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue('Something went wrong'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_forgot_password_post_not_understood_401(self, mock_object):
+        mock_object.post(url_oauth_token, status_code=401, text='{"detail": "is not understood"}')
 
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
 

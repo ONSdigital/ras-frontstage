@@ -43,8 +43,9 @@
 <br/>
 
 <h2 class="neptune">Upload your spreadsheet</h2>
-
+{% if collection_exercise_info.scheduledReturnDateTimeFormatted %}
 <p>Please upload by <strong>{{ collection_exercise_info.scheduledReturnDateTimeFormatted }}</strong></p>
+{% endif %}
 
 <div class="guidance js-details upload-guidance"
      data-guidance-label="Guidance for uploading"

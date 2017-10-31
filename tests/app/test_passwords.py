@@ -7,6 +7,7 @@ token = 'test_token'
 url_password_change_request = app.config['RAS_PARTY_RESET_PASSWORD_REQUEST'].format(app.config['RAS_PARTY_SERVICE'])
 url_verify_token = app.config['RAS_PARTY_VERIFY_PASSWORD_TOKEN'].format(app.config['RAS_PARTY_SERVICE'], token)
 url_password_change = app.config['RAS_PARTY_CHANGE_PASSWORD'].format(app.config['RAS_PARTY_SERVICE'], token)
+url_oauth_token = app.config['ONS_TOKEN']
 
 
 class TestPasswords(unittest.TestCase):
@@ -25,6 +26,7 @@ class TestPasswords(unittest.TestCase):
 
     @requests_mock.mock()
     def test_forgot_password_post_success(self, mock_object):
+        mock_object.post(url_oauth_token, status_code=201)
         mock_object.post(url_password_change_request, status_code=200)
 
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
@@ -49,7 +51,17 @@ class TestPasswords(unittest.TestCase):
         self.assertTrue('Invalid email'.encode() in response.data)
 
     @requests_mock.mock()
-    def test_forgot_password_post_unrecognised_email(self, mock_object):
+    def test_forgot_password_post_unrecognised_email_oauth(self, mock_object):
+        mock_object.post(url_oauth_token, status_code=401, text='{"detail": "Unauthorized user credentials"}')
+
+        response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
+
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue('Invalid email'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_forgot_password_post_unrecognised_email_party(self, mock_object):
+        mock_object.post(url_oauth_token, status_code=201)
         mock_object.post(url_password_change_request, status_code=404)
 
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
@@ -58,8 +70,27 @@ class TestPasswords(unittest.TestCase):
         self.assertTrue('Invalid email'.encode() in response.data)
 
     @requests_mock.mock()
+    def test_forgot_password_post_locked_email(self, mock_object):
+        mock_object.post(url_oauth_token, status_code=401, text='{"detail": "User account locked"}')
+
+        response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
+
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue('Something went wrong'.encode() in response.data)
+
+    @requests_mock.mock()
     def test_forgot_password_post_party_fail(self, mock_object):
+        mock_object.post(url_oauth_token, status_code=201)
         mock_object.post(url_password_change_request, status_code=500)
+
+        response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
+
+        self.assertEquals(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_forgot_password_post_oauth_fail(self, mock_object):
+        mock_object.post(url_oauth_token, status_code=500)
 
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
 

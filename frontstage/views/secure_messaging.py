@@ -111,14 +111,13 @@ def send_message(party_id, is_draft):
     # If form errors are returned render them
     if response.status_code == 400:
         logger.debug('Form submitted with errors', party_id=party_id)
-        error_message = json.loads(response.text)
-        message = error_message.get('error', {}).get('data', {}).get('thread_message')
-        errors = error_message['error']['data']['form_errors']
+        error_message = json.loads(response.text).get('error', {}).get('data')
+
         return render_template('secure-messages/secure-messages-view.html',
                                _theme='default',
-                               message=message,
+                               message=error_message.get('thread_message'),
                                draft=message_json,
-                               errors=errors)
+                               errors=error_message.get('form_errors'))
 
     if response.status_code != 200:
         logger.debug('Failed to send message')

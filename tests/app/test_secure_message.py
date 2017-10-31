@@ -179,9 +179,9 @@ class TestSecureMessage(unittest.TestCase):
 
     # This error is for a bad request (form errors)
     @requests_mock.mock()
-    def test_create_message_post_success_api_error_FA006(self, mock_request):
+    def test_create_message_post_success_api_error(self, mock_request):
         form_errors = {'form_errors': {'subject': ['Please enter a subject']}}
-        mock_request.post(url_send_message, json=create_api_error(400, form_errors))
+        mock_request.post(url_send_message, status_code=400, json=create_api_error(400, form_errors))
 
         response = self.app.post("/secure-message/create-message", data=self.message_form, headers=self.headers, follow_redirects=True)
 

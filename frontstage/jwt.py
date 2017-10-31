@@ -8,7 +8,7 @@ from jose import jwt
 from frontstage import app
 
 
-def timestamp_token(token, username=None, party_id=None):
+def timestamp_token(token):
     """Time stamp the expires_in argument of the OAuth2 token. And replace with an expires_in UTC timestamp"""
 
     current_time = datetime.now()
@@ -18,7 +18,7 @@ def timestamp_token(token, username=None, party_id=None):
         "access_token": token['access_token'],
         "expires_at": expires_in.timestamp(),
         "role": "respondent",
-        "party_id": party_id
+        "party_id": token['party_id']
     }
 
     return data_dict_for_jwt_token
@@ -32,7 +32,3 @@ def encode(data):
 def decode(token):
     """Decode data in jwt token."""
     return jwt.decode(token, app.config['JWT_SECRET'], algorithms=[app.config['JWT_ALGORITHM']])
-
-
-data_dict_for_jwt_token = {"user_id": "c3c0c2cd-bd52-428f-8841-540b1b7dd619",
-                           "user_scopes": ['foo', 'bar', 'qux']}

@@ -107,6 +107,8 @@ class Config(object):
     GET_MESSAGE_URL = 'message'
     SEND_MESSAGE_URL = 'send_message'
 
+    SIGN_IN_URL = 'sign-in'
+
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True

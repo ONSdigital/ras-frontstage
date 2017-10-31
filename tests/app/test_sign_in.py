@@ -103,7 +103,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_sign_in_unauthorised_oauth_credentials(self, mock_object):
-        mock_object.post(url_oauth_token, status_code=502, json=self.oauth_error)
+        mock_object.post(url_oauth_token, status_code=401, json=self.oauth_error)
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
@@ -113,7 +113,7 @@ class TestSignIn(unittest.TestCase):
     @requests_mock.mock()
     def test_sign_in_locked_account(self, mock_object):
         self.oauth_error['error']['data']['detail'] = 'User account locked'
-        mock_object.post(url_oauth_token, status_code=502, json=self.oauth_error)
+        mock_object.post(url_oauth_token, status_code=401, json=self.oauth_error)
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
@@ -123,7 +123,7 @@ class TestSignIn(unittest.TestCase):
     @requests_mock.mock()
     def test_sign_in_unverified_account(self, mock_object):
         self.oauth_error['error']['data']['detail'] = 'User account not verified'
-        mock_object.post(url_oauth_token, status_code=502, json=self.oauth_error)
+        mock_object.post(url_oauth_token, status_code=401, json=self.oauth_error)
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
@@ -133,7 +133,7 @@ class TestSignIn(unittest.TestCase):
     @requests_mock.mock()
     def test_sign_in_unknown_response(self, mock_object):
         self.oauth_error['error']['data']['detail'] = 'wat'
-        mock_object.post(url_oauth_token, status_code=502, json=self.oauth_error)
+        mock_object.post(url_oauth_token, status_code=401, json=self.oauth_error)
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 

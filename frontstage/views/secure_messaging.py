@@ -108,23 +108,23 @@ def send_message(party_id, is_draft):
         message_json["msg_id"] = request.form['msg_id']
     response = api_call('POST', endpoint, parameters={"is_draft": is_draft}, json=message_json, headers=headers)
 
-    if response.status_code != 200:
-        logger.debug('Failed to send message')
-        raise ApiError(response)
-
-    sent_message = json.loads(response.text)
-
     # If form errors are returned render them
-    if sent_message.get('error'):
+    if response.status_code == 400:
         logger.debug('Form submitted with errors', party_id=party_id)
-        message = sent_message.get('error', {}).get('data', {}).get('thread_message')
-        errors = sent_message['error']['data']['form_errors']
+        error_message = json.loads(response.text)
+        message = error_message.get('error', {}).get('data', {}).get('thread_message')
+        errors = error_message['error']['data']['form_errors']
         return render_template('secure-messages/secure-messages-view.html',
                                _theme='default',
                                message=message,
                                draft=message_json,
                                errors=errors)
 
+    if response.status_code != 200:
+        logger.debug('Failed to send message')
+        raise ApiError(response)
+
+    sent_message = json.loads(response.text)
     # If draft was saved render the saved draft
     if is_draft:
         logger.info('Draft sent successfully', message_id=sent_message['msg_id'], party_id=party_id)

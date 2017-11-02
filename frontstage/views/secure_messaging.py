@@ -59,7 +59,7 @@ def get_messages_list(label):
     logger.debug('Attempting to retrieve messages', label=label)
 
     # Form api request
-    headers = {"Authorization": request.cookies['authorization']}
+    headers = {"jwt": request.cookies['authorization']}
     endpoint = app.config['GET_MESSAGES_URL']
     parameters = {"label": label} if label else {}
     response = api_call('GET', endpoint, parameters=parameters, headers=headers)
@@ -77,7 +77,7 @@ def get_message(message_id, label, party_id):
     logger.debug('Attempting to retrieve message', message_id=message_id, party_id=party_id)
 
     # Form api request
-    headers = {"Authorization": request.cookies['authorization']}
+    headers = {"jwt": request.cookies['authorization']}
     endpoint = app.config['GET_MESSAGE_URL']
     parameters = {"message_id": message_id, "label": label, "party_id": party_id}
     response = api_call('GET', endpoint, parameters=parameters, headers=headers)
@@ -95,7 +95,7 @@ def send_message(party_id, is_draft):
     logger.debug('Attempting to send message', party_id=party_id)
 
     # Form api request
-    headers = {"Authorization": request.cookies['authorization']}
+    headers = {"jwt": request.cookies['authorization']}
     endpoint = app.config['SEND_MESSAGE_URL']
     message_json = {
         'msg_from': party_id,

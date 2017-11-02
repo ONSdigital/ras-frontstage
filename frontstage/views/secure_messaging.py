@@ -112,6 +112,7 @@ def send_message(party_id, is_draft):
     if response.status_code == 400:
         logger.debug('Form submitted with errors', party_id=party_id)
         error_message = json.loads(response.text).get('error', {}).get('data')
+
         return render_template('secure-messages/secure-messages-view.html',
                                _theme='default',
                                message=error_message.get('thread_message'),

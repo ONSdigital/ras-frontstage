@@ -5,31 +5,27 @@
 
 {% block main %}
 
-<form
-        method="post"
-        action="{{ url_for('register_bp.register_confirm_organisation_survey') }}"
-        class="form"
-        role="form">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+<h1 class="saturn">Confirm organisation and survey details</h1>
 
-    <h1 class="saturn">Confirm organisation and survey details</h1>
+<div class="grid">
+    <div class="grid__col col-4@m">Enrolment code:</div>
+    <div class="grid__col col-8@m"><strong>{{ enrolment_code }}</strong></div>
+    <div class="grid__col col-4@m">Organisation:</div>
+    <div class="grid__col col-8@m"><strong>{{ organisation_name }}</strong></div>
+    <div class="grid__col col-4@m">Survey to complete:</div>
+    <div class="grid__col col-8@m"><strong>{{ survey_name }}</strong></div>
+</div>
 
-    <div class="grid">
-        <div class="grid__col col-4@m">Enrolment code:</div>
-        <div class="grid__col col-8@m"><strong>{{ enrolment_code }}</strong></div>
-        <div class="grid__col col-4@m">Organisation:</div>
-        <div class="grid__col col-8@m"><strong>{{ organisation_name }}</strong></div>
-        <div class="grid__col col-4@m">Survey to complete:</div>
-        <div class="grid__col col-8@m"><strong>{{ survey_name }}</strong></div>
-    </div>
+<br/>
 
-    <br/>
+<button class="btn btn--primary venus" type="submit" id="CONFIRM_AND_CONTINUE_BUTTON">
+    <a href="{{ url_for('register_bp.register_enter_your_details', encrypted_enrolment_code=encrypted_enrolment_code) }}">
+        Confirm
+    </a>
+</button>
 
-    <input type="hidden" id="enrolment_code" name="enrolment_code" value="{{ encrypted_enrolment_code }}">
+<p>If the organisation or survey details aren't what you were expecting, please contact us on <a class="nowrap" href="tel:+44-300-1234-931">0300 1234 931</a>
+    or send an email to <a href="mailto:surveys@ons.gov.uk">surveys@ons.gov.uk</a>
+</p>
 
-    <button class="btn btn--primary venus" type="submit" id="CONFIRM_AND_CONTINUE_BUTTON">Confirm</button>
-
-    <p>If the organisation or survey details aren't what you were expecting, please contact us on <a class="nowrap" href="tel:+44-300-1234-931">0300 1234 931</a> or send an email to <a href="mailto:surveys@ons.gov.uk">surveys@ons.gov.uk</a></p>
-
-</form>
 {% endblock main %}

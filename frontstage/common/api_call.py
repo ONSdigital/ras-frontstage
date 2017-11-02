@@ -18,6 +18,7 @@ def api_call(method, endpoint, parameters=None, json=None, headers=None):
             parameter_string = '{}={}&'.format(key, value)
             url = url + parameter_string
 
+    logger.debug('Calling frontstage api', method=method, url=url)
     if method == 'GET':
         response = requests.get(url, headers=headers, auth=app.config['BASIC_AUTH'])
     elif method == 'POST':
@@ -25,7 +26,8 @@ def api_call(method, endpoint, parameters=None, json=None, headers=None):
     elif method == 'PUT':
         response = requests.put(url, headers=headers, json=json, auth=app.config['BASIC_AUTH'])
     else:
-        logger.error('Invalid request method', method=str(method), url=url)
+        logger.error('Invalid request method', method=method, url=url)
         raise InvalidRequestMethod(method, url)
 
+    logger.debug('Frontstage-api response', method=method, url=url, status_code=response.status_code)
     return response

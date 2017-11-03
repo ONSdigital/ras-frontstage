@@ -61,6 +61,15 @@ class TestRegistration(unittest.TestCase):
         self.assertTrue('Create an account'.encode() in response.data)
 
     @requests_mock.mock()
+    def test_enter_enrolment_code_inactive_code(self, mock_object):
+        mock_object.post(url_validate_enrolment_initial, status_code=401, json={'active': False})
+
+        response = self.app.post('/register/create-account', data={'enrolment_code': 'test_enrolment'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Enrolment code not valid'.encode() in response.data)
+
+    @requests_mock.mock()
     def test_enter_enrolment_code_invalid_code(self, mock_object):
         mock_object.post(url_validate_enrolment_initial, status_code=404)
 

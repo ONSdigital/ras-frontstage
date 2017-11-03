@@ -34,6 +34,10 @@ def register():
             logger.info('Enrolment code not found')
             template_data = {"error": {"type": "failed"}}
             return render_template('register/register.enter-enrolment-code.html', _theme='default', form=form, data=template_data), 202
+        elif response.status_code == 401 and not json.loads(response.text).get('active'):
+            logger.info('Enrolment code not active')
+            template_data = {"error": {"type": "failed"}}
+            return render_template('register/register.enter-enrolment-code.html', _theme='default', form=form, data=template_data), 200
         elif response.status_code != 200:
             logger.error('Failed to submit enrolment code')
             raise ApiError(response)

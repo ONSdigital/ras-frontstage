@@ -2,13 +2,11 @@ import json
 import logging
 
 from flask import Blueprint, render_template, request, redirect, url_for
-import requests
 from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.common.api_call import api_call
 from frontstage.exceptions.exceptions import ApiError
-from frontstage.exceptions.exceptions import ExternalServiceError
 from frontstage.models import ForgotPasswordForm, ResetPasswordForm
 
 
@@ -72,9 +70,27 @@ def forgot_password_check_email():
 @passwords_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     form = ResetPasswordForm(request.form)
-    url = app.config['VERIFY_PASSWORD_TOKEN']
-    parameters = {"token": token}
-    response = api_call('GET', url, parameters=parameters)
+
+    if request.method == 'POST' and form.validate():
+        password = request.form.get('password')
+        put_data = {
+            "new_password": password,
+            "token": token
+        }
+
+        url = app.config['CHANGE_PASSWORD']
+        response = api_call('PUT', url, json=put_data)
+
+        if response.status_code == 200:
+            logger.info('Successfully change user password', token=token)
+            return redirect(url_for('passwords_bp.reset_password_confirmation'))
+        else:
+            logger.error('Failed to change user password', token=token)
+    else:
+        url = app.config['VERIFY_PASSWORD_TOKEN']
+        parameters = {"token": token}
+        response = api_call('GET', url, parameters=parameters)
+
     if response.status_code == 409:
         logger.warning('Token expired', token=token)
         return render_template('passwords/password-expired.html', _theme='default')
@@ -84,21 +100,6 @@ def reset_password(token):
     elif response.status_code != 200:
         logger.error('Party service failed to verify token')
         raise ApiError(response)
-
-    if request.method == 'POST' and form.validate():
-        password = request.form.get('password')
-        put_data = {
-            "new_password": password
-        }
-
-        url = app.config['RAS_PARTY_CHANGE_PASSWORD'].format(app.config['RAS_PARTY_SERVICE'], token)
-        response = requests.put(url, auth=app.config['BASIC_AUTH'], json=put_data, verify=False)
-
-        if response.status_code != 200:
-            logger.error('Failed to change user password', token=token)
-            raise ExternalServiceError(response)
-        logger.info('Successfully change user password', token=token)
-        return redirect(url_for('passwords_bp.reset_password_confirmation'))
 
     template_data = {
         "error": {

@@ -5,7 +5,7 @@ from frontstage import app
 
 token = 'test_token'
 url_verify_token = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['VERIFY_PASSWORD_TOKEN']
-url_password_change = app.config['RAS_PARTY_CHANGE_PASSWORD'].format(app.config['RAS_PARTY_SERVICE'], token)
+url_password_change = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['CHANGE_PASSWORD']
 url_request_password_change = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['REQUEST_PASSWORD_CHANGE']
 
 
@@ -184,7 +184,6 @@ class TestPasswords(unittest.TestCase):
 
     @requests_mock.mock()
     def test_reset_password_put_party_service_fail(self, mock_object):
-        mock_object.get(url_verify_token, status_code=200)
         mock_object.put(url_password_change, status_code=500)
         password_form = {"password": "Gizmo007!", "password_confirm": "Gizmo007!"}
 

@@ -66,7 +66,6 @@ class Config(object):
     RAS_PARTY_VERIFY_EMAIL = '{}party-api/v1/emailverification/{}'
     RAS_PARTY_GET_BY_EMAIL = '{}party-api/v1/respondents/email/{}'
     RAS_PARTY_RESEND_VERIFICATION = '{}party-api/v1/resend-verification-email/{}'
-    RAS_PARTY_VERIFY_PASSWORD_TOKEN = '{}party-api/v1/tokens/verify/{}'
     RAS_PARTY_CHANGE_PASSWORD = '{}party-api/v1/respondents/change_password/{}'
 
     RM_COLLECTION_EXERCISE_SERVICE_HOST = os.getenv('RM_COLLECTION_EXERCISE_SERVICE_HOST', 'localhost')
@@ -109,6 +108,7 @@ class Config(object):
     SIGN_IN_URL = 'sign-in'
 
     REQUEST_PASSWORD_CHANGE = 'request_password_change'
+    VERIFY_PASSWORD_TOKEN = 'verify_password_token'
 
 
 class DevelopmentConfig(Config):

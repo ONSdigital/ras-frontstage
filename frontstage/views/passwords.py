@@ -72,8 +72,9 @@ def forgot_password_check_email():
 @passwords_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     form = ResetPasswordForm(request.form)
-    url = app.config['RAS_PARTY_VERIFY_PASSWORD_TOKEN'].format(app.config['RAS_PARTY_SERVICE'], token)
-    response = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
+    url = app.config['VERIFY_PASSWORD_TOKEN']
+    parameters = {"token": token}
+    response = api_call('GET', url, parameters=parameters)
     if response.status_code == 409:
         logger.warning('Token expired', token=token)
         return render_template('passwords/password-expired.html', _theme='default')
@@ -82,7 +83,7 @@ def reset_password(token):
         return redirect(url_for('error_bp.not_found_error_page'))
     elif response.status_code != 200:
         logger.error('Party service failed to verify token')
-        raise ExternalServiceError(response)
+        raise ApiError(response)
 
     if request.method == 'POST' and form.validate():
         password = request.form.get('password')

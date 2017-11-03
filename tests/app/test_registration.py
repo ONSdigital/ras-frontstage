@@ -5,9 +5,8 @@ import requests_mock
 from frontstage import app
 
 
-url_validate_enrolment_initial = '{}{}?initial=True&'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'], app.config['VALIDATE_ENROLMENT'])
-url_confirm_organisation_survey = '{}{}'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'], app.config['CONFIRM_ORGANISATION_SURVEY'])
 url_validate_enrolment = '{}{}'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'], app.config['VALIDATE_ENROLMENT'])
+url_confirm_organisation_survey = '{}{}'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'], app.config['CONFIRM_ORGANISATION_SURVEY'])
 url_create_account = '{}{}'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'], app.config['CREATE_ACCOUNT'])
 url_activate_account = '{}{}?token=Test_token&'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'], app.config['VERIFY_EMAIL'])
 
@@ -46,7 +45,7 @@ class TestRegistration(unittest.TestCase):
 
     @requests_mock.mock()
     def test_enter_enrolment_code_success(self, mock_object):
-        mock_object.post(url_validate_enrolment_initial)
+        mock_object.post(url_validate_enrolment)
 
         response = self.app.post('/register/create-account', data={'enrolment_code': 'test_enrolment'})
 
@@ -62,7 +61,7 @@ class TestRegistration(unittest.TestCase):
 
     @requests_mock.mock()
     def test_enter_enrolment_code_inactive_code(self, mock_object):
-        mock_object.post(url_validate_enrolment_initial, status_code=401, json={'active': False})
+        mock_object.post(url_validate_enrolment, status_code=401, json={'active': False})
 
         response = self.app.post('/register/create-account', data={'enrolment_code': 'test_enrolment'})
 
@@ -71,7 +70,7 @@ class TestRegistration(unittest.TestCase):
 
     @requests_mock.mock()
     def test_enter_enrolment_code_invalid_code(self, mock_object):
-        mock_object.post(url_validate_enrolment_initial, status_code=404)
+        mock_object.post(url_validate_enrolment, status_code=404)
 
         response = self.app.post('/register/create-account', data={'enrolment_code': 'test_enrolment'})
 
@@ -80,7 +79,7 @@ class TestRegistration(unittest.TestCase):
 
     @requests_mock.mock()
     def test_enter_enrolment_code_fail(self, mock_object):
-        mock_object.post(url_validate_enrolment_initial, status_code=500)
+        mock_object.post(url_validate_enrolment, status_code=500)
 
         response = self.app.post('/register/create-account', data={'enrolment_code': 'test_enrolment'}, follow_redirects=True)
 

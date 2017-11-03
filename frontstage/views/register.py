@@ -26,8 +26,12 @@ def register():
     if request.method == 'POST' and form.validate():
         logger.info('Enrolment code submitted')
         enrolment_code = request.form.get('enrolment_code').lower()
-        params = {'initial': True}
-        response = api_call('POST', app.config['VALIDATE_ENROLMENT'], parameters=params, json={'enrolment_code': enrolment_code})
+        request_data = {
+            'enrolment_code': enrolment_code,
+            'initial': True
+        }
+
+        response = api_call('POST', app.config['VALIDATE_ENROLMENT'], json=request_data)
 
         # Handle API errors
         if response.status_code == 404:

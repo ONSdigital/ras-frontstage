@@ -138,8 +138,7 @@ def register_almost_done():
 @register_bp.route('/activate-account/<token>', methods=['GET'])
 def register_activate_account(token):
     logger.info('Attempting to verify email')
-    params = {'token': token}
-    response = api_call('PUT', app.config['VERIFY_EMAIL'], parameters=params)
+    response = api_call('PUT', app.config['VERIFY_EMAIL'], parameters={'token': token})
 
     # Handle api errors
     if response.status_code == 409:

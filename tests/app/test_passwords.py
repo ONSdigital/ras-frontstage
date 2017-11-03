@@ -1,15 +1,12 @@
 import requests_mock
 import unittest
 
-import requests
 from frontstage import app
-from frontstage.exceptions.exceptions import ExternalServiceError
 
 token = 'test_token'
-url_password_change_request = app.config['RAS_PARTY_RESET_PASSWORD_REQUEST'].format(app.config['RAS_PARTY_SERVICE'])
 url_verify_token = app.config['RAS_PARTY_VERIFY_PASSWORD_TOKEN'].format(app.config['RAS_PARTY_SERVICE'], token)
 url_password_change = app.config['RAS_PARTY_CHANGE_PASSWORD'].format(app.config['RAS_PARTY_SERVICE'], token)
-url_oauth_token = app.config['ONS_TOKEN']
+url_request_password_change = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['REQUEST_PASSWORD_CHANGE']
 
 
 class TestPasswords(unittest.TestCase):
@@ -23,17 +20,16 @@ class TestPasswords(unittest.TestCase):
     def test_forgot_password_get(self):
         response = self.app.get("passwords/forgot-password", follow_redirects=True)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue('reset your password'.encode() in response.data)
 
     @requests_mock.mock()
     def test_forgot_password_post_success(self, mock_object):
-        mock_object.post(url_oauth_token, status_code=201)
-        mock_object.post(url_password_change_request, status_code=200)
+        mock_object.post(url_request_password_change, status_code=200)
 
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue('Check your email'.encode() in response.data)
 
     def test_forgot_password_post_no_email(self):
@@ -41,7 +37,7 @@ class TestPasswords(unittest.TestCase):
 
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue('Invalid email'.encode() in response.data)
 
     def test_forgot_password_post_invalid_email(self):
@@ -49,69 +45,61 @@ class TestPasswords(unittest.TestCase):
 
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue('Invalid email'.encode() in response.data)
 
     @requests_mock.mock()
     def test_forgot_password_post_unrecognised_email_oauth(self, mock_object):
-        mock_object.post(url_oauth_token, status_code=401, text='{"detail": "Unauthorized user credentials"}')
+        mock_object.post(url_request_password_change, status_code=401,
+                         text='{"error":{"data": {"detail": "Unauthorized user credentials"}}}')
 
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue('Invalid email'.encode() in response.data)
 
     @requests_mock.mock()
     def test_forgot_password_post_unrecognised_email_party(self, mock_object):
-        mock_object.post(url_oauth_token, status_code=201)
-        mock_object.post(url_password_change_request, status_code=404)
+        mock_object.post(url_request_password_change, status_code=404)
 
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue('Invalid email'.encode() in response.data)
 
     @requests_mock.mock()
     def test_forgot_password_post_locked_email(self, mock_object):
-        mock_object.post(url_oauth_token, status_code=401, text='{"detail": "User account locked"}')
+        mock_object.post(url_request_password_change, status_code=401,
+                         text='{"error":{"data": {"detail": "User account locked"}}}')
 
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue('Something went wrong'.encode() in response.data)
 
     @requests_mock.mock()
     def test_forgot_password_post_not_understood_401(self, mock_object):
-        mock_object.post(url_oauth_token, status_code=401, text='{"detail": "is not understood"}')
+        mock_object.post(url_request_password_change, status_code=401,
+                         text='{"error":{"data": {"detail": "is not understood"}}}')
 
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue('Something went wrong'.encode() in response.data)
 
     @requests_mock.mock()
-    def test_forgot_password_post_party_fail(self, mock_object):
-        mock_object.post(url_oauth_token, status_code=201)
-        mock_object.post(url_password_change_request, status_code=500)
+    def test_forgot_password_post_api_call_fail(self, mock_object):
+        mock_object.post(url_request_password_change, status_code=500)
 
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
 
-        self.assertEquals(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
-
-    @requests_mock.mock()
-    def test_forgot_password_post_oauth_fail(self, mock_object):
-        mock_object.post(url_oauth_token, status_code=500)
-
-        response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
-
-        self.assertEquals(response.status_code, 500)
+        self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
 
     def test_check_email(self):
-        response = self.app.post("passwords/forgot-password/check-email", follow_redirects=True)
+        response = self.app.get("passwords/forgot-password/check-email", follow_redirects=True)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue('Check your email'.encode() in response.data)
 
     @requests_mock.mock()
@@ -120,7 +108,7 @@ class TestPasswords(unittest.TestCase):
 
         response = self.app.get("passwords/reset-password/{}".format(token), follow_redirects=True)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue('Reset your password'.encode() in response.data)
 
     @requests_mock.mock()
@@ -129,7 +117,7 @@ class TestPasswords(unittest.TestCase):
 
         response = self.app.post("passwords/reset-password/{}".format(token), follow_redirects=True)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue('Your link has expired'.encode() in response.data)
 
     @requests_mock.mock()
@@ -138,7 +126,7 @@ class TestPasswords(unittest.TestCase):
 
         response = self.app.post("passwords/reset-password/{}".format(token), follow_redirects=True)
 
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
         self.assertTrue('Page not found'.encode() in response.data)
 
     @requests_mock.mock()
@@ -147,7 +135,7 @@ class TestPasswords(unittest.TestCase):
 
         response = self.app.post("passwords/reset-password/{}".format(token), follow_redirects=True)
 
-        self.assertEquals(response.status_code, 500)
+        self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
 
     @requests_mock.mock()
@@ -158,7 +146,7 @@ class TestPasswords(unittest.TestCase):
 
         response = self.app.post("passwords/reset-password/{}".format(token), data=password_form, follow_redirects=True)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue('Your password has been changed'.encode() in response.data)
 
     @requests_mock.mock()
@@ -169,7 +157,7 @@ class TestPasswords(unittest.TestCase):
 
         response = self.app.post("passwords/reset-password/{}".format(token), data=password_form, follow_redirects=True)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue('Your passwords do not match'.encode() in response.data)
 
     @requests_mock.mock()
@@ -180,7 +168,7 @@ class TestPasswords(unittest.TestCase):
 
         response = self.app.post("passwords/reset-password/{}".format(token), data=password_form, follow_redirects=True)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue("Your password doesn&#39;t meet the requirements".encode() in response.data)
 
     @requests_mock.mock()
@@ -191,7 +179,7 @@ class TestPasswords(unittest.TestCase):
 
         response = self.app.post("passwords/reset-password/{}".format(token), data=password_form, follow_redirects=True)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue("Password is required".encode() in response.data)
 
     @requests_mock.mock()
@@ -202,11 +190,11 @@ class TestPasswords(unittest.TestCase):
 
         response = self.app.post("passwords/reset-password/{}".format(token), data=password_form, follow_redirects=True)
 
-        self.assertEquals(response.status_code, 500)
+        self.assertEqual(response.status_code, 500)
         self.assertTrue("Server error".encode() in response.data)
 
     def test_reset_password_confirmation(self):
         response = self.app.post("passwords/reset-password/confirmation", follow_redirects=True)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue('Your password has been changed'.encode() in response.data)

@@ -66,7 +66,6 @@ class Config(object):
     RAS_PARTY_VERIFY_EMAIL = '{}party-api/v1/emailverification/{}'
     RAS_PARTY_GET_BY_EMAIL = '{}party-api/v1/respondents/email/{}'
     RAS_PARTY_RESEND_VERIFICATION = '{}party-api/v1/resend-verification-email/{}'
-    RAS_PARTY_RESET_PASSWORD_REQUEST = '{}party-api/v1/respondents/request_password_change'
     RAS_PARTY_VERIFY_PASSWORD_TOKEN = '{}party-api/v1/tokens/verify/{}'
     RAS_PARTY_CHANGE_PASSWORD = '{}party-api/v1/respondents/change_password/{}'
 
@@ -108,6 +107,8 @@ class Config(object):
     SEND_MESSAGE_URL = 'send_message'
 
     SIGN_IN_URL = 'sign-in'
+
+    REQUEST_PASSWORD_CHANGE = 'request_password_change'
 
 
 class DevelopmentConfig(Config):

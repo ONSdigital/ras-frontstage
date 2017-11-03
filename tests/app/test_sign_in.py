@@ -14,7 +14,7 @@ encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoX3Rva2VuIj
                     "icmVzcG9uZGVudCIsInBhcnR5X2lkIjoiZGIwMzZmZDctY2UxNy00MGMyLWE4ZmMtOTMyZTdjMjI4Mzk3In0.hh9sFpiPA-O" \
                     "8kugpDi3_GSDnxWh5rz2e5GQuBx7kmLM"
 
-url_oauth_token = url_send_message = app.config['RAS_FRONTSTAGE_API_SERVICE'] + 'sign-in'
+url_oauth_token = url_send_message = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['SIGN_IN_URL']
 
 
 class TestSignIn(unittest.TestCase):

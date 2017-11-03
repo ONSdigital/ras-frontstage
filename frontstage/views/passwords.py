@@ -1,12 +1,13 @@
 import json
 import logging
-from os import getenv
 
 from flask import Blueprint, render_template, request, redirect, url_for
 import requests
 from structlog import wrap_logger
 
 from frontstage import app
+from frontstage.common.api_call import api_call
+from frontstage.exceptions.exceptions import ApiError
 from frontstage.exceptions.exceptions import ExternalServiceError
 from frontstage.models import ForgotPasswordForm, ResetPasswordForm
 
@@ -23,56 +24,35 @@ def forgot_password():
 
     if request.method == 'POST' and form.validate():
         email_address = request.form.get('email_address')
-        post_data = {"email_address": email_address}
+        post_data = {"username": email_address}
 
+        response = api_call('POST', app.config['REQUEST_PASSWORD_CHANGE'], json=post_data)
 
-        token_url = app.config['ONS_TOKEN']
-
-        data = {
-            'grant_type': 'password',
-            'client_id': app.config['RAS_FRONTSTAGE_CLIENT_ID'],
-            'client_secret': app.config['RAS_FRONTSTAGE_CLIENT_SECRET'],
-            'username': email_address,
-            'password': 'password'
-        }
-        headers = {
-            'Accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-        }
-
-        oauth2_response = requests.post(url=token_url, data=data,
-                                        headers=headers, auth=(app.config['RAS_FRONTSTAGE_CLIENT_ID'],
-                                                               app.config['RAS_FRONTSTAGE_CLIENT_SECRET']))
-        # Check to see that this user account is not locked
-        if oauth2_response.status_code == 401:
-            oauth2Error = json.loads(oauth2_response.text)
-            if 'Unauthorized user credentials' in oauth2Error['detail']:
-                logger.warning('Email address is not registered')
+        if response.status_code == 401:
+            error_json = json.loads(response.text).get('error')
+            error_message = error_json.get('data', {}).get('detail')
+            if 'Unauthorized user credentials' in error_message:
+                logger.info('Requesting password change for unregistered email on OAuth2 server')
                 template_data = {"error": {"type": {"Email address is not registered"}}}
-                return render_template('passwords/forgot-password.html', _theme='default', form=form,
-                                       data=template_data)
-            elif 'User account locked' in oauth2Error['detail']:
-                logger.warning('Trying to reset password when user account is locked on the OAuth2 server')
+                return render_template('passwords/forgot-password.html', _theme='default', form=form, data=template_data)
+            elif 'User account locked' in error_message:
+                logger.warning('Requesting password change for locked email on OAuth2 server')
             else:
-                logger.error('OAuth 2 server generated 401 which is not understood',
-                             oauth2error=oauth2Error.get('detail'))
-
+                logger.warning('Unknown 401 OAuth2 error')
             return render_template('passwords/reset-password.trouble.html', _theme='default',
                                    data={"error": {"type": "failed"}})
-        if oauth2_response.status_code != 201:
-            logger.error('Unknown error from the OAuth2 server')
-            raise ExternalServiceError(oauth2_response)
 
-        url = app.config['RAS_PARTY_RESET_PASSWORD_REQUEST'].format(app.config['RAS_PARTY_SERVICE'])
-        response = requests.post(url, auth=app.config['BASIC_AUTH'], json=post_data, verify=False)
-        if response.status_code == 404:
-            logger.warning('Email address is not registered')
+        elif response.status_code == 404:
+            logger.error('Requesting password change for email registered on OAuth2 server but not in party service')
             template_data = {"error": {"type": {"Email address is not registered"}}}
             return render_template('passwords/forgot-password.html', _theme='default', form=form, data=template_data)
+
         if response.status_code != 200:
-            logger.error('Failed to send password change request email')
-            raise ExternalServiceError(response)
+            logger.error('Unable to send password change request')
+            raise ApiError(response)
+
         logger.debug('Successfully sent password change request email')
+
         return redirect(url_for('passwords_bp.forgot_password_check_email'))
 
     template_data = {
@@ -83,7 +63,7 @@ def forgot_password():
     return render_template('passwords/forgot-password.html', _theme='default', form=form, data=template_data)
 
 
-@passwords_bp.route('/forgot-password/check-email', methods=['GET', 'POST'])
+@passwords_bp.route('/forgot-password/check-email', methods=['GET'])
 def forgot_password_check_email():
     return render_template('passwords/forgot-password.check-email.html', _theme='default')
 

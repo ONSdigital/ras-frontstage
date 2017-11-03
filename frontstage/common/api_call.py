@@ -29,5 +29,5 @@ def api_call(method, endpoint, parameters=None, json=None, headers=None):
         logger.error('Invalid request method', method=method, url=url)
         raise InvalidRequestMethod(method, url)
 
-    logger.debug('Frontstage-api response', method=method, url=url, status_code=response.status_code)
+    logger.debug('Frontstage-api response', method=method, url=url, status=response.status_code)
     return response

@@ -149,6 +149,26 @@ class TestPasswords(unittest.TestCase):
         self.assertTrue('Your password has been changed'.encode() in response.data)
 
     @requests_mock.mock()
+    def test_reset_password_post_token_expired(self, mock_object):
+        mock_object.put(url_password_change, status_code=409)
+        password_form = {"password": "Gizmo007!", "password_confirm": "Gizmo007!"}
+
+        response = self.app.post("passwords/reset-password/{}".format(token), data=password_form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Your link has expired'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_reset_password_post_token_invalid(self, mock_object):
+        mock_object.put(url_password_change, status_code=404)
+        password_form = {"password": "Gizmo007!", "password_confirm": "Gizmo007!"}
+
+        response = self.app.post("passwords/reset-password/{}".format(token), data=password_form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue('Page not found'.encode() in response.data)
+
+    @requests_mock.mock()
     def test_reset_password_post_different_passwords(self, mock_object):
         mock_object.get(url_verify_token + '?token=' + token, status_code=200)
         password_form = {"password": "Gizmo008!", "password_confirm": "Gizmo007!"}

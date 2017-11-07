@@ -77,7 +77,7 @@ def forgot_password_check_email():
 
 # ===== Reset password =====
 @passwords_bp.route('/reset-password/<token>', methods=['GET'])
-def get_reset_password(token):
+def get_reset_password(token, form_errors=None):
     form = ResetPasswordForm(request.form)
 
     url = app.config['VERIFY_PASSWORD_TOKEN']
@@ -96,7 +96,7 @@ def get_reset_password(token):
 
     template_data = {
         "error": {
-            "type": form.errors
+            "type": form_errors
         },
         'token': token
     }
@@ -107,25 +107,17 @@ def get_reset_password(token):
 def post_reset_password(token):
     form = ResetPasswordForm(request.form)
 
-    if form.validate():
-        password = request.form.get('password')
-        put_data = {
-            "new_password": password,
-            "token": token
-        }
+    if not form.validate():
+        return get_reset_password(token, form_errors=form.errors)
 
-        url = app.config['CHANGE_PASSWORD']
-        response = api_call('PUT', url, json=put_data)
+    password = request.form.get('password')
+    put_data = {
+        "new_password": password,
+        "token": token
+    }
 
-        if response.status_code == 200:
-            logger.info('Successfully change user password', token=token)
-            return redirect(url_for('passwords_bp.reset_password_confirmation'))
-        else:
-            logger.error('Failed to change user password', token=token)
-    else:
-        url = app.config['VERIFY_PASSWORD_TOKEN']
-        parameters = {"token": token}
-        response = api_call('GET', url, parameters=parameters)
+    url = app.config['CHANGE_PASSWORD']
+    response = api_call('PUT', url, json=put_data)
 
     if response.status_code == 409:
         logger.warning('Token expired', token=token)
@@ -137,13 +129,8 @@ def post_reset_password(token):
         logger.error('Party service failed to verify token')
         raise ApiError(response)
 
-    template_data = {
-        "error": {
-            "type": form.errors
-        },
-        'token': token
-    }
-    return render_template('passwords/reset-password.html', _theme='default', form=form, data=template_data)
+    logger.info('Successfully change user password', token=token)
+    return redirect(url_for('passwords_bp.reset_password_confirmation'))
 
 
 @passwords_bp.route('/reset-password/confirmation', methods=['GET'])

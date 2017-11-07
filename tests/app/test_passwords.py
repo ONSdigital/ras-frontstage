@@ -191,9 +191,3 @@ class TestPasswords(unittest.TestCase):
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue("Server error".encode() in response.data)
-
-    def test_reset_password_confirmation(self):
-        response = self.app.post("passwords/reset-password/confirmation", follow_redirects=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('Your password has been changed'.encode() in response.data)

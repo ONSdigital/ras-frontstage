@@ -16,11 +16,22 @@ passwords_bp = Blueprint('passwords_bp', __name__, static_folder='static', templ
 
 
 # ===== Forgot password =====
-@passwords_bp.route('/forgot-password', methods=['GET', 'POST'])
-def forgot_password():
+@passwords_bp.route('/forgot-password', methods=['GET'])
+def get_forgot_password():
+    form = ForgotPasswordForm(request.form)
+    template_data = {
+        "error": {
+            "type": {}
+        }
+    }
+    return render_template('passwords/forgot-password.html', _theme='default', form=form, data=template_data)
+
+
+@passwords_bp.route('/forgot-password', methods=['POST'])
+def post_forgot_password():
     form = ForgotPasswordForm(request.form)
 
-    if request.method == 'POST' and form.validate():
+    if form.validate():
         email_address = request.form.get('email_address')
         post_data = {"username": email_address}
 
@@ -29,14 +40,12 @@ def forgot_password():
         if response.status_code == 401:
             error_json = json.loads(response.text).get('error')
             error_message = error_json.get('data', {}).get('detail')
+            logger.info(error_message=error_message)
             if 'Unauthorized user credentials' in error_message:
                 logger.info('Requesting password change for unregistered email on OAuth2 server')
                 template_data = {"error": {"type": {"Email address is not registered"}}}
-                return render_template('passwords/forgot-password.html', _theme='default', form=form, data=template_data)
-            elif 'User account locked' in error_message:
-                logger.warning('Requesting password change for locked email on OAuth2 server')
-            else:
-                logger.warning('Unknown 401 OAuth2 error')
+                return render_template('passwords/forgot-password.html', _theme='default', form=form,
+                                       data=template_data)
             return render_template('passwords/reset-password.trouble.html', _theme='default',
                                    data={"error": {"type": "failed"}})
 
@@ -67,11 +76,38 @@ def forgot_password_check_email():
 
 
 # ===== Reset password =====
-@passwords_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
-def reset_password(token):
+@passwords_bp.route('/reset-password/<token>', methods=['GET'])
+def get_reset_password(token):
     form = ResetPasswordForm(request.form)
 
-    if request.method == 'POST' and form.validate():
+    url = app.config['VERIFY_PASSWORD_TOKEN']
+    parameters = {"token": token}
+    response = api_call('GET', url, parameters=parameters)
+
+    if response.status_code == 409:
+        logger.warning('Token expired', token=token)
+        return render_template('passwords/password-expired.html', _theme='default')
+    elif response.status_code == 404:
+        logger.warning('Invalid token sent to party service', token=token)
+        return redirect(url_for('error_bp.not_found_error_page'))
+    elif response.status_code != 200:
+        logger.error('Party service failed to verify token')
+        raise ApiError(response)
+
+    template_data = {
+        "error": {
+            "type": form.errors
+        },
+        'token': token
+    }
+    return render_template('passwords/reset-password.html', _theme='default', form=form, data=template_data)
+
+
+@passwords_bp.route('/reset-password/<token>', methods=['POST'])
+def post_reset_password(token):
+    form = ResetPasswordForm(request.form)
+
+    if form.validate():
         password = request.form.get('password')
         put_data = {
             "new_password": password,
@@ -110,6 +146,6 @@ def reset_password(token):
     return render_template('passwords/reset-password.html', _theme='default', form=form, data=template_data)
 
 
-@passwords_bp.route('/reset-password/confirmation', methods=['GET', 'POST'])
+@passwords_bp.route('/reset-password/confirmation', methods=['GET'])
 def reset_password_confirmation():
     return render_template('passwords/reset-password.confirmation.html', _theme='default')

@@ -109,6 +109,10 @@ class Config(object):
     REQUEST_PASSWORD_CHANGE = 'request_password_change'
     VERIFY_PASSWORD_TOKEN = 'verify_password_token'
     CHANGE_PASSWORD = 'change_password'
+    VALIDATE_ENROLMENT = 'validate-enrolment'
+    CONFIRM_ORGANISATION_SURVEY = 'confirm-organisation-survey'
+    CREATE_ACCOUNT = 'create-account'
+    VERIFY_EMAIL = 'verify-email'
 
 
 class DevelopmentConfig(Config):

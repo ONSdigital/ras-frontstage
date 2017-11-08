@@ -2,15 +2,14 @@ import json
 import logging
 from os import getenv
 
-from flask import Blueprint, render_template, request, redirect, url_for
-import requests
+from flask import Blueprint, redirect, render_template, request, url_for
 from structlog import wrap_logger
 
 from frontstage import app
+from frontstage.common.api_call import api_call
 from frontstage.common.cryptographer import Cryptographer
-from frontstage.common.post_event import post_event
-from frontstage.exceptions.exceptions import ExternalServiceError
-from frontstage.models import RegistrationForm, EnrolmentCodeForm, RespondentStatus
+from frontstage.exceptions.exceptions import ApiError
+from frontstage.models import EnrolmentCodeForm, RegistrationForm
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -20,235 +19,114 @@ register_bp = Blueprint('register_bp', __name__, static_folder='static', templat
 cryptographer = Cryptographer()
 
 
-def validate_enrolment_code(enrolment_code):
-    case_id = None
-
-    # TODO Calling methods have been written to expect a 'None' case_id to be returned if
-    # the IAC code has already been used (active=false). This makes the following implementation
-    # unnecessarily complicated.
-
-    url = app.config['RM_IAC_GET'].format(app.config['RM_IAC_SERVICE'], enrolment_code)
-    logger.debug('Enrolment code validation attempt', url=url, enrolment_code=enrolment_code)
-
-    result = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
-    logger.debug('IAC service response', status_code=result.status_code, reason=result.reason, text=result.text)
-
-    if result.status_code == 200:
-        # The IAC does exist
-        result = json.loads(result.text)
-        active = result['active']
-        if active:
-            # assign the case_id as expected by calling methods
-            case_id = result['caseId']
-            logger.info('Active enrolment code used', case_id=case_id)
-        else:
-            # don't assign the case_id even though one does exist
-            logger.info('Inactive enrolment code used', case_id=case_id)
-
-    elif result.status_code == 404:
-        logger.info('Enrolment code not found', enrolment_code=enrolment_code)
-    elif result.status_code != 200:
-        raise ExternalServiceError(result)
-
-    return case_id
-
-
-# ===== Registration =====
 @register_bp.route('/create-account', methods=['GET', 'POST'])
 def register():
-    """Handles user registration"""
-
     form = EnrolmentCodeForm(request.form)
 
-    template_data = {
-        "error": {}
-    }
-
     if request.method == 'POST' and form.validate():
-
+        logger.info('Enrolment code submitted')
         enrolment_code = request.form.get('enrolment_code').lower()
-        logger.debug('Enrolment code submitted', enrolment_code=enrolment_code)
+        request_data = {
+            'enrolment_code': enrolment_code,
+            'initial': True
+        }
 
-        case_id = validate_enrolment_code(enrolment_code)
+        response = api_call('POST', app.config['VALIDATE_ENROLMENT'], json=request_data)
 
-        if case_id:
-
-            url = app.config['RM_CASE_GET_BY_IAC'].format(app.config['RM_CASE_SERVICE'], enrolment_code)
-            case = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
-
-            if case.status_code == 200:
-                case = json.loads(case.text)
-                business_party_id = case.get('partyId')
-            elif case.status_code != 200:
-                raise ExternalServiceError(case)
-
-            post_event(case_id,
-                       category='ACCESS_CODE_AUTHENTICATION_ATTEMPT',
-                       created_by='FRONTSTAGE',
-                       party_id=business_party_id,
-                       description='Access code authentication attempted')
-
-            # Encrypt the enrolment code
-            coded_token = cryptographer.encrypt(enrolment_code.encode()).decode()
-
-            return redirect(url_for('register_bp.register_confirm_organisation_survey',
-                                    enrolment_code=coded_token,
-                                    _external=True,
-                                    _scheme=getenv('SCHEME', 'http')))
-        else:
+        # Handle API errors
+        if response.status_code == 404:
+            logger.info('Enrolment code not found')
             template_data = {"error": {"type": "failed"}}
+            return render_template('register/register.enter-enrolment-code.html', _theme='default', form=form, data=template_data), 202
+        elif response.status_code == 401 and not json.loads(response.text).get('active'):
+            logger.info('Enrolment code not active')
+            template_data = {"error": {"type": "failed"}}
+            return render_template('register/register.enter-enrolment-code.html', _theme='default', form=form, data=template_data), 200
+        elif response.status_code != 200:
+            logger.error('Failed to submit enrolment code')
+            raise ApiError(response)
 
-        return render_template('register/register.enter-enrolment-code.html', _theme='default', form=form,
-                               data=template_data), 202
-
-    return render_template('register/register.enter-enrolment-code.html',
-                           _theme='default',
-                           form=form,
-                           data=template_data)
-
-
-@register_bp.route('/create-account/confirm-organisation-survey', methods=['GET', 'POST'])
-def register_confirm_organisation_survey():
-    # Validate enrolment code
-    encrypted_enrolment_code = request.args.get('enrolment_code', None)
-    if not encrypted_enrolment_code:
-        encrypted_enrolment_code = request.form.get('enrolment_code')
-
-    if encrypted_enrolment_code:
-        decrypted_enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
-    else:
-        logger.info('Enrolment code not specified')
-        return redirect(url_for('error_bp.default_error_page'))
-
-    case_id = validate_enrolment_code(decrypted_enrolment_code)
-    if not case_id:
-        return redirect(url_for('error_bp.default_error_page'))
-
-    # Look up the case by case_id
-    url = app.config['RM_CASE_GET'].format(app.config['RM_CASE_SERVICE'], case_id)
-    logger.debug('Get case', url=url)
-    case = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
-    logger.debug('Case service response', status_code=case.status_code, reason=case.reason, text=case.text)
-
-    if case.status_code == 200:
-        case = json.loads(case.text)
-        business_party_id = case['caseGroup']['partyId']
-        collection_exercise_id = case['caseGroup']['collectionExerciseId']
-    elif case.status_code != 200:
-        raise ExternalServiceError(case)
-
-    # Look up the organisation by party_id
-    url = app.config['RAS_PARTY_GET_BY_BUSINESS'].format(app.config['RAS_PARTY_SERVICE'], business_party_id)
-    logger.debug('Get organisation', url=url)
-    party = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
-    logger.debug('Party service response', status_code=party.status_code, reason=party.reason, text=party.text)
-
-    if party.status_code == 200:
-        party = json.loads(party.text)
-        organisation_name = party['name']
-    elif party.status_code != 200:
-        raise ExternalServiceError(party)
-
-    # Look up the collection exercise by collection_exercise_id
-    url = app.config['RM_COLLECTION_EXERCISES_GET'].format(app.config['RM_COLLECTION_EXERCISE_SERVICE'], collection_exercise_id)
-    logger.debug('Get collection exercise', url=url)
-    collection_exercise = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
-    logger.debug('collection exercise service response',
-                 status_code=collection_exercise.status_code,
-                 reason=collection_exercise.reason,
-                 text=collection_exercise.text)
-
-    if collection_exercise.status_code == 200:
-        collection_exercise = json.loads(collection_exercise.text)
-        survey_id = collection_exercise['surveyId']
-    elif collection_exercise != 200:
-        raise ExternalServiceError(collection_exercise)
-
-    # Look up the survey by survey_id
-    url = app.config['RM_SURVEY_GET'].format(app.config['RM_SURVEY_SERVICE'], survey_id)
-    logger.debug('Get survey', url=url)
-    survey = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
-    logger.debug('Survey response', status_code=survey.status_code, reason=survey.reason, text=survey.text)
-
-    if survey.status_code == 200:
-        survey = json.loads(survey.text)
-        survey_name = survey['longName']
-    elif survey.status_code != 200:
-        raise ExternalServiceError(collection_exercise)
-
-    if request.method == 'POST':
-        return redirect(url_for('register_bp.register_enter_your_details',
-                                enrolment_code=encrypted_enrolment_code,
+        encrypted_enrolment_code = cryptographer.encrypt(enrolment_code.encode()).decode()
+        logger.info('Successful enrolment code submitted')
+        return redirect(url_for('register_bp.register_confirm_organisation_survey',
+                                encrypted_enrolment_code=encrypted_enrolment_code,
                                 _external=True,
                                 _scheme=getenv('SCHEME', 'http')))
-    else:
-        return render_template('register/register.confirm-organisation-survey.html',
-                               _theme='default',
-                               enrolment_code=decrypted_enrolment_code,
-                               encrypted_enrolment_code=encrypted_enrolment_code,
-                               organisation_name=organisation_name,
-                               survey_name=survey_name)
+
+    return render_template('register/register.enter-enrolment-code.html', _theme='default', form=form, data={"error": {}})
 
 
-# This take all the user credentials and then creates an account on the OAuth2 server
+@register_bp.route('/create-account/confirm-organisation-survey', methods=['GET'])
+def register_confirm_organisation_survey():
+    # Get and decrypt enrolment code
+    encrypted_enrolment_code = request.args.get('encrypted_enrolment_code', None)
+    enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
+
+    logger.info('Attempting to retrieve data for confirm organisation/survey page')
+    response = api_call('POST', app.config['CONFIRM_ORGANISATION_SURVEY'], json={'enrolment_code': enrolment_code})
+    if response.status_code != 200:
+        logger.error('Failed to retrieve data for confirm organisation/survey page')
+        raise ApiError(response)
+    response_json = json.loads(response.text)
+    logger.info('Successfully retrieved data for confirm organisation/survey page')
+    return render_template('register/register.confirm-organisation-survey.html',
+                           _theme='default',
+                           enrolment_code=enrolment_code,
+                           encrypted_enrolment_code=encrypted_enrolment_code,
+                           organisation_name=response_json['organisation_name'],
+                           survey_name=response_json['survey_name'])
+
+
 @register_bp.route('/create-account/enter-account-details', methods=['GET', 'POST'])
 def register_enter_your_details():
-
-    # Validate enrolment code
-    encrypted_enrolment_code = request.args.get('enrolment_code', None)
-    if not encrypted_enrolment_code:
-        encrypted_enrolment_code = request.form.get('enrolment_code')
-
-    if encrypted_enrolment_code:
-        decrypted_enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
-    else:
-        logger.info('Enrolment code not specified')
-        return redirect(url_for('error_bp.default_error_page'))
-
-    case_id = validate_enrolment_code(decrypted_enrolment_code)
-    if not case_id:
-        return redirect(url_for('error_bp.default_error_page'))
-
+    # Get and decrypt enrolment code
+    encrypted_enrolment_code = request.args.get('encrypted_enrolment_code', None)
+    enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
     form = RegistrationForm(request.values, enrolment_code=encrypted_enrolment_code)
 
-    if request.method == 'POST' \
-            and 'create-account/enter-account-details' in request.headers['referer'] \
-            and form.validate():
-
+    if request.method == 'POST' and form.validate():
+        logger.info('Attempting to create account')
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
         email_address = request.form.get('email_address')
         password = request.form.get('password')
         phone_number = request.form.get('phone_number')
+
         registration_data = {
             'emailAddress': email_address,
             'firstName': first_name,
             'lastName': last_name,
             'password': password,
             'telephone': phone_number,
-            'enrolmentCode': decrypted_enrolment_code,
-            'status': 'CREATED'
+            'enrolmentCode': enrolment_code
         }
+        # Api will validate the enrolment code before it creates account
+        response = api_call('POST', app.config['CREATE_ACCOUNT'], json=registration_data)
 
-        party_service_url = app.config['RAS_PARTY_POST_RESPONDENTS'].format(app.config['RAS_PARTY_SERVICE'])
-        logger.debug('Attempting account creation', url=party_service_url)
-        result = requests.post(party_service_url, auth=app.config['BASIC_AUTH'], json=registration_data)
-        logger.debug('Party service response', status_code=result.status_code, reason=result.reason, text=result.text)
-
-        if result.status_code == 400:
-            duplicate_error = {"email_address": ["This email has already been used to register an account"]}
+        # Handle errors from the Api service
+        if response.status_code == 400:
+            logger.debug('Email already used')
+            error = {"email_address": ["This email has already been used to register an account"]}
             return render_template('register/register.enter-your-details.html',
                                    _theme='default',
                                    form=form,
-                                   errors=duplicate_error)
-        elif result.status_code != 200:
-            raise ExternalServiceError(result)
-        else:
-            return render_template('register/register.almost-done.html', _theme='default', email=email_address)
+                                   errors=error)
+        elif response.status_code != 201:
+            logger.error('Failed to create account')
+            raise ApiError(response)
+
+        logger.info('Successfully created account')
+        return render_template('register/register.almost-done.html', _theme='default', email=email_address)
 
     else:
-        if form.errors:
-            logger.debug('Form submitted with errors', errors=str(form.errors))
+        # Validate enrolment code before rendering form
+        response = api_call('POST', app.config['VALIDATE_ENROLMENT'], json={'enrolment_code': enrolment_code})
+        if response.status_code != 200:
+            logger.error('Failed to validate enrolment code')
+            if response.status_code == 401:
+                logger.error('Invalid enrolment code used')
+            raise ApiError(response)
+
         return render_template('register/register.enter-your-details.html', _theme='default', form=form, errors=form.errors)
 
 
@@ -259,68 +137,24 @@ def register_almost_done():
 
 @register_bp.route('/activate-account/<token>', methods=['GET'])
 def register_activate_account(token):
+    logger.info('Attempting to verify email')
+    response = api_call('PUT', app.config['VERIFY_EMAIL'], parameters={'token': token})
 
-    # Call the Party service to try to activate the account corresponding to the token that was supplied
-    url = app.config['RAS_PARTY_VERIFY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], token)
-    logger.info('Attempting to verify email', url=url)
-    result = requests.put(url, auth=app.config['BASIC_AUTH'])
-
-    if result.status_code == 409:
-        # Token is expired
-        logger.warning('Expired token', token=token)
+    # Handle api errors
+    if response.status_code == 409:
+        logger.info('Expired email verification token', token=token)
         return render_template('register/register.link-expired.html', _theme='default')
-    elif result.status_code == 404:
-        # Token not recognised
-        logger.warning("Unrecognised email verification token", token=token)
+    elif response.status_code == 404:
+        logger.warning('Unrecognised email verification token', token=token)
         return redirect(url_for('error_bp.not_found_error_page'))
-    elif result.status_code != 200:
-        raise ExternalServiceError(result)
+    elif response.status_code != 200:
+        logger.info('Failed to verify email')
+        raise ApiError(response)
 
-    # THE BELOW CODE WILL REDIRECT TO A RESEND EMAIL PAGE IF TOKEN IS EXPIRED (REQUIRES CHANGES IN PARTY SERVICE
-    # if result.status_code == 409:
-    #     # Token is expired
-    #     json_response = json.loads(result.text)
-    #     party_id = json_response.get('id')
-    #     if party_id:
-    #         logger.warning('Expired token', token=token, party_id=party_id)
-    #         return render_template('register/register.link-expired.html', _theme='default', party_id=party_id)
-    #     else:
-    #         logger.error('No party_id found', token=token)
-    #         return redirect(url_for('error_bp.default_error_page'))
-    # elif result.status_code == 404:
-    #     # Token not recognised
-    #     logger.warning("Unrecognised email verification token", token=token)
-    #     return redirect(url_for('error_bp.not_found_error_page'))
-    # elif result.status_code != 200:
-    #     raise ExternalServiceError(result)
+    # Successful account activation therefore redirect back to the login screen
+    logger.info('Successfully verified email')
+    return redirect(url_for('sign_in_bp.login',
+                            account_activated=True,
+                            _external=True,
+                            _scheme=getenv('SCHEME', 'http')))
 
-    json_response = json.loads(result.text)
-
-    if json_response.get('status') == RespondentStatus.ACTIVE.name:
-        # Successful account activation therefore redirect off to the login screen
-        logger.info('User account validated', party_id=json_response.get('id'))
-        return redirect(url_for('sign_in_bp.login',
-                                account_activated=True,
-                                _external=True,
-                                _scheme=getenv('SCHEME', 'http')))
-    else:
-        logger.error('Token status is not ACTIVE and status code is not 409 (You shouldnt get here)', status_code=result.status_code)
-        return redirect(url_for('error_bp.default_error_page'))
-
-
-# WAITING FOR PARTY SERVICE CHANGES TO IMPLEMENT
-# @register_bp.route('/create-account/email-resent', methods=['GET'])
-# def register_email_resent():
-#     # Resend email verification link
-#     party_id = request.args.get('party_id')
-#     logger.debug('Attempting to re-send email verification link', party_id=party_id)
-#     url = app.config['RAS_PARTY_RESEND_VERIFICATION'].format(app.config['RAS_PARTY_SERVICE'], party_id)
-#     response = requests.get(url, auth=app.config['BASIC_AUTH'])
-#     if response.status_code == 200:
-#         logger.info("Successfully re-sent email verification link", party_id=party_id)
-#         return render_template('register/register.email-resent.html', _theme='default', party_id=party_id)
-#     elif response.status_code == 404:
-#         logger.warning("Party not found to resend email verification link to", party_id=party_id)
-#         return redirect(url_for('error_bp.default_error_page'))
-#     else:
-#         raise ExternalServiceError(response)

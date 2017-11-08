@@ -51,6 +51,13 @@ class TestSignIn(unittest.TestCase):
         self.assertTrue('Sign in'.encode() in response.data)
         self.assertTrue('Have an enrolment code?'.encode() in response.data)
 
+    def test_view_sign_in_from_redirect(self):
+        response = self.app.get('/', follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Sign in'.encode() in response.data)
+        self.assertTrue('Have an enrolment code?'.encode() in response.data)
+
     def test_view_sign_in_account_activated(self):
         response = self.app.get('/sign-in?account_activated=True', follow_redirects=True)
 

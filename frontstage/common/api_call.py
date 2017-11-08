@@ -13,6 +13,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 def api_call(method, endpoint, parameters=None, json=None, headers=None):
     url = app.config['RAS_FRONTSTAGE_API_SERVICE'] + endpoint
 
+    logger.debug('Calling frontstage api', method=method, url=url)
     if method == 'GET':
         response = requests.get(url, headers=headers, auth=app.config['BASIC_AUTH'], params=parameters)
     elif method == 'POST':
@@ -20,7 +21,8 @@ def api_call(method, endpoint, parameters=None, json=None, headers=None):
     elif method == 'PUT':
         response = requests.put(url, headers=headers, json=json, auth=app.config['BASIC_AUTH'])
     else:
-        logger.error('Invalid request method', method=str(method), url=url)
+        logger.error('Invalid request method', method=method, url=url)
         raise InvalidRequestMethod(method, url)
 
+    logger.debug('Frontstage-api response', method=method, url=url, status=response.status_code)
     return response

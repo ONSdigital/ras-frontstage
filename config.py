@@ -109,6 +109,11 @@ class Config(object):
 
     SIGN_IN_URL = 'sign-in'
 
+    VALIDATE_ENROLMENT = 'validate-enrolment'
+    CONFIRM_ORGANISATION_SURVEY = 'confirm-organisation-survey'
+    CREATE_ACCOUNT = 'create-account'
+    VERIFY_EMAIL = 'verify-email'
+
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True

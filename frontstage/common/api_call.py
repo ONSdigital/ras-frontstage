@@ -19,7 +19,7 @@ def api_call(method, endpoint, parameters=None, json=None, headers=None):
     elif method == 'POST':
         response = requests.post(url, headers=headers, json=json, auth=app.config['BASIC_AUTH'], params=parameters)
     elif method == 'PUT':
-        response = requests.put(url, headers=headers, json=json, auth=app.config['BASIC_AUTH'])
+        response = requests.put(url, headers=headers, json=json, auth=app.config['BASIC_AUTH'], params=parameters)
     else:
         logger.error('Invalid request method', method=method, url=url)
         raise InvalidRequestMethod(method, url)

@@ -10,14 +10,14 @@ from frontstage.exceptions.exceptions import InvalidRequestMethod
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def api_call(method, endpoint, parameters=None, json=None, headers=None):
+def api_call(method, endpoint, parameters=None, json=None, files=None, headers=None):
     url = app.config['RAS_FRONTSTAGE_API_SERVICE'] + endpoint
 
     logger.debug('Calling frontstage api', method=method, url=url)
     if method == 'GET':
         response = requests.get(url, headers=headers, auth=app.config['BASIC_AUTH'], params=parameters)
     elif method == 'POST':
-        response = requests.post(url, headers=headers, json=json, auth=app.config['BASIC_AUTH'], params=parameters)
+        response = requests.post(url, headers=headers, json=json, files=files, auth=app.config['BASIC_AUTH'], params=parameters)
     elif method == 'PUT':
         response = requests.put(url, headers=headers, json=json, auth=app.config['BASIC_AUTH'], params=parameters)
     else:

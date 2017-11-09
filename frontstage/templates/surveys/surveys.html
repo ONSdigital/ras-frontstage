@@ -22,7 +22,7 @@
 
     </li>
 
-    {% for data in data_array.rows %}
+    {% for data in data_array %}
 
     <li class="grid card">
 
@@ -64,7 +64,7 @@
 
     {% endfor %}
 
-    {% if data_array.rows|length == 0 %}
+    {% if data_array|length == 0 %}
     <li class="card">
         <div class="grid__col col-12@m">{{emptySurveyListLabel}}</div>
     </li>

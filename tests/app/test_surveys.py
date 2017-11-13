@@ -156,3 +156,13 @@ class TestSurveys(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Something went wrong'.encode() in response.data)
         self.assertTrue('Please try uploading your spreadsheet again'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_upload_survey_fail(self, mock_request):
+        mock_request.post(url_upload_ci, status_code=500)
+
+        test_url = '/surveys/upload_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5'
+        response = self.app.post(test_url, data=self.survey_file, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)

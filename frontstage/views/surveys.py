@@ -19,9 +19,7 @@ surveys_bp = Blueprint('surveys_bp', __name__, static_folder='static', template_
 @jwt_authorization(request)
 def logged_in(session):
     party_id = session.get('party_id')
-    logger.info('Retrieving surveys todo list', party_id=party_id)
     surveys_list = get_surveys_list(party_id, 'todo')
-    logger.info('Successfully retrieved surveys todo list', party_id=party_id)
     return render_template('surveys/surveys-todo.html', _theme='default', surveys_list=surveys_list)
 
 
@@ -29,14 +27,12 @@ def logged_in(session):
 @jwt_authorization(request)
 def surveys_history(session):
     party_id = session['party_id']
-    logger.info('Retrieving surveys history list', party_id=party_id)
     surveys_list = get_surveys_list(party_id, 'history')
-    logger.info('Successfully retrieved surveys history list', party_id=party_id)
     return render_template('surveys/surveys-history.html',  _theme='default', surveys_list=surveys_list, history=True)
 
 
 def get_surveys_list(party_id, list_type):
-    logger.debug('Retrieving surveys list', party_id=party_id, list_type=list_type)
+    logger.info('Retrieving surveys list', party_id=party_id, list_type=list_type)
     params = {
         "party_id": party_id,
         "list": list_type
@@ -46,7 +42,7 @@ def get_surveys_list(party_id, list_type):
         logger.error('Failed to retrieve surveys list', party_id=party_id, list_type=list_type)
         raise ApiError(response)
     surveys_list = json.loads(response.text)
-    logger.debug('Successfully retrieved surveys list', party_id=party_id, list_type=list_type)
+    logger.info('Successfully retrieved surveys list', party_id=party_id, list_type=list_type)
     return surveys_list
 
 

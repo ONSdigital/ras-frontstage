@@ -42,14 +42,6 @@ def connection_error(error):
                             _scheme=getenv('SCHEME', 'http')))
 
 
-@app.errorhandler(ExternalServiceError)
-def connection_error_external_service(error):
-    logger.error('Error in external service', status_code=error.status_code, url=error.url)
-    return redirect(url_for('error_bp.server_error_page',
-                            _external=True,
-                            _scheme=getenv('SCHEME', 'http')))
-
-
 @app.errorhandler(JWTValidationError)
 def connection_error_jwt_validation(error):  # pylint: disable=unused-argument
     return redirect(url_for('error_bp.not_logged_in_error_page',

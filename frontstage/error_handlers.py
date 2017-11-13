@@ -6,7 +6,7 @@ from requests.exceptions import ConnectionError
 from structlog import wrap_logger
 
 from frontstage import app
-from frontstage.exceptions.exceptions import ApiError, ExternalServiceError, JWTValidationError
+from frontstage.exceptions.exceptions import ApiError, JWTValidationError
 
 
 logger = wrap_logger(logging.getLogger(__name__))

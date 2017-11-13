@@ -33,15 +33,15 @@ class Config(object):
     RAS_FRONTSTAGE_API_SERVICE = '{}://{}:{}/'.format(RAS_FRONTSTAGE_API_PROTOCOL,
                                                       RAS_FRONTSTAGE_API_HOST,
                                                       RAS_FRONTSTAGE_API_PORT)
-    GET_MESSAGES_URL = 'messages_list'
+    GET_MESSAGES_URL = 'messages-list'
     GET_MESSAGE_URL = 'message'
-    SEND_MESSAGE_URL = 'send_message'
+    SEND_MESSAGE_URL = 'send-message'
 
     SIGN_IN_URL = 'sign-in'
 
-    REQUEST_PASSWORD_CHANGE = 'request_password_change'
-    VERIFY_PASSWORD_TOKEN = 'verify_password_token'
-    CHANGE_PASSWORD = 'change_password'
+    REQUEST_PASSWORD_CHANGE = 'request-password-change'
+    VERIFY_PASSWORD_TOKEN = 'verify-password-token'
+    CHANGE_PASSWORD = 'change-password'
 
     VALIDATE_ENROLMENT = 'validate-enrolment'
     CONFIRM_ORGANISATION_SURVEY = 'confirm-organisation-survey'

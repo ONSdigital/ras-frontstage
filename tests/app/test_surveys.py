@@ -133,8 +133,19 @@ class TestSurveys(unittest.TestCase):
         self.assertTrue('Error uploading - file name too long'.encode() in response.data)
         self.assertTrue('The file name of your spreadsheet must be less than 50 characters long'.encode() in response.data)
 
+    def test_upload_survey_file_size_error_internal(self):
+        file_data = 'a' * 21 * 1024 * 1024
+        over_size_file = dict(file=(io.BytesIO(file_data.encode()), "testfile.xlsx"))
+
+        test_url = '/surveys/upload_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5'
+        response = self.app.post(test_url, data=over_size_file, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Error uploading - file size too large'.encode() in response.data)
+        self.assertTrue('The spreadsheet must be smaller than 20MB in size'.encode() in response.data)
+
     @requests_mock.mock()
-    def test_upload_survey_file_size_error(self, mock_request):
+    def test_upload_survey_file_size_error_external(self, mock_request):
         self.upload_error['error']['data']['message'] = 'File too large'
         mock_request.post(url_upload_ci, status_code=400, json=self.upload_error)
 

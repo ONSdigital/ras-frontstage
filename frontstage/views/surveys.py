@@ -104,6 +104,12 @@ def upload_survey(session):
     case_id = request.args['case_id']
     logger.info('Uploading collection instrument', party_id=party_id, case_id=case_id)
 
+    if request.content_length > app.config['MAX_UPLOAD_LENGTH']:
+        return redirect(url_for('surveys_bp.upload_failed',
+                                _external=True,
+                                case_id=case_id,
+                                error_info='size'))
+
     # Get the uploaded file
     upload_file = request.files['file']
     upload_filename = upload_file.filename

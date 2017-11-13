@@ -1,15 +1,14 @@
 import json
 import logging
 from os import getenv
-from uuid import uuid4
 
 from flask import Blueprint, make_response, render_template, request, redirect, url_for
-import requests
 from structlog import wrap_logger
 
-from frontstage import app, redis
+from frontstage import app
+from frontstage.common.api_call import api_call
 from frontstage.common.session import SessionHandler
-from frontstage.exceptions.exceptions import ExternalServiceError
+from frontstage.exceptions.exceptions import ApiError
 from frontstage.jwt import encode, timestamp_token
 from frontstage.models import LoginForm
 
@@ -34,76 +33,44 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
 
-        # TODO Consider moving this to a helper function.
-        # Lets get a token from the OAuth2 server
-        try:
-            token_url = app.config['ONS_TOKEN']
+        sign_in_data = {
+            "username": username,
+            "password": password
+        }
+        response = api_call('POST', app.config['SIGN_IN_URL'], json=sign_in_data)
 
-            data = {
-                'grant_type': 'password',
-                'client_id': app.config['RAS_FRONTSTAGE_CLIENT_ID'],
-                'client_secret': app.config['RAS_FRONTSTAGE_CLIENT_SECRET'],
-                'username': username,
-                'password': password,
-            }
-            headers = {
-                'Accept': 'application/json',
-                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-            }
+        # Handle OAuth2 authentication errors
+        if response.status_code == 401:
+            error_json = json.loads(response.text).get('error')
+            error_message = error_json.get('data', {}).get('detail')
+            if 'Unauthorized user credentials' in error_message:
+                return render_template('sign-in/sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
+            elif 'User account locked' in error_message:
+                logger.debug('User account is locked on the OAuth2 server')
+                return render_template('sign-in/sign-in.trouble.html', _theme='default', form=form, data={"error": {"type": "account locked"}})
+            elif 'User account not verified' in error_message:
+                logger.debug('User account is not verified on the OAuth2 server')
+                return render_template('sign-in/sign-in.account-not-verified.html', _theme='default', form=form, data={"error": {"type": "account not verified"}})
+            else:
+                logger.error('OAuth 2 server generated 401 which is not understood', oauth2error=error_message)
+                return render_template('sign-in/sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
 
-            oauth2_response = requests.post(url=token_url, data=data,
-                                            headers=headers, auth=(app.config['RAS_FRONTSTAGE_CLIENT_ID'],
-                                                                   app.config['RAS_FRONTSTAGE_CLIENT_SECRET']))
-            # Check to see that this user has not attempted to login too many times or that they have not forgot to
-            # click on the activate account URL in their email by checking the error message back from the OAuth2 server
-            if oauth2_response.status_code == 401:
-                oauth2Error = json.loads(oauth2_response.text)
-                if 'Unauthorized user credentials' in oauth2Error['detail']:
-                    return render_template('sign-in/sign-in.html', _theme='default', form=form, data={"error": {"type": "failed"}})
-                elif 'User account locked' in oauth2Error['detail']:
-                    logger.warning('User account is locked on the OAuth2 server')
-                    return render_template('sign-in/sign-in.trouble.html', _theme='default', form=form,
-                                           data={"error": {"type": "account locked"}})
-                elif 'User account not verified' in oauth2Error['detail']:
-                    logger.warning('User account is not verified on the OAuth2 server')
-                    return render_template('sign-in/sign-in.account-not-verified.html', _theme='default', form=form,
-                                           data={"error": {"type": "account not verified"}})
-                else:
-                    logger.error('OAuth 2 server generated 401 which is not understood', oauth2error=oauth2Error['detail'])
-                    return render_template('sign-in/sign-in.html', _theme='default', form=form,
-                                           data={"error": {"type": "failed"}})
-            if oauth2_response.status_code != 201:
-                logger.error('Unknown error from the OAuth2 server')
-                raise ExternalServiceError(oauth2_response)
-            logger.debug('Access Token Granted')
-        except requests.ConnectionError as e:
-            logger.warning('Connection error between the server and the OAuth2 service of: {}'.format(str(e)))
-            raise ExternalServiceError(e)
-        oauth2_token = json.loads(oauth2_response.text)
-
-        url = app.config['RAS_PARTY_GET_BY_EMAIL'].format(app.config['RAS_PARTY_SERVICE'], username)
-        req = requests.get(url, auth=app.config['BASIC_AUTH'], verify=False)
-        if req.status_code == 404:
-            logger.warning('Email not found in party service', email=username)
-            return render_template('sign-in/sign-in.html', _theme='default',
-                                   form=form, data={"error": {"type": "failed"}})
-        elif req.status_code != 200:
-            logger.error('Error retrieving respondent from party service', email=username)
-            raise ExternalServiceError(req)
-        party_id = req.json().get('id')
+        if response.status_code != 200:
+            logger.error('Failed to sign in')
+            raise ApiError(response)
 
         # Take our raw token and add a UTC timestamp to the expires_at attribute
-        data_dict_for_jwt_token = timestamp_token(oauth2_token, username, party_id)
+        response_json = json.loads(response.text)
+        data_dict_for_jwt_token = timestamp_token(response_json)
         encoded_jwt_token = encode(data_dict_for_jwt_token)
         response = make_response(redirect(url_for('surveys_bp.logged_in', _external=True,
                                                   _scheme=getenv('SCHEME', 'http'))))
 
         session = SessionHandler()
-        logger.info('Creating session', party_id=party_id)
+        logger.info('Creating session', party_id=response_json['party_id'])
         session.create_session(encoded_jwt_token)
         response.set_cookie('authorization', value=session.session_key)
-        # logger.info('Successfully created session', party_id=party_id, session_key=session.session_key)
-
+        logger.info('Successfully created session', party_id=response_json['party_id'], session_key=session.session_key)
         return response
 
     template_data = {

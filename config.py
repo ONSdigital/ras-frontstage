@@ -70,9 +70,6 @@ class Config(object):
     RAS_PARTY_VERIFY_EMAIL = '{}party-api/v1/emailverification/{}'
     RAS_PARTY_GET_BY_EMAIL = '{}party-api/v1/respondents/email/{}'
     RAS_PARTY_RESEND_VERIFICATION = '{}party-api/v1/resend-verification-email/{}'
-    RAS_PARTY_RESET_PASSWORD_REQUEST = '{}party-api/v1/respondents/request_password_change'
-    RAS_PARTY_VERIFY_PASSWORD_TOKEN = '{}party-api/v1/tokens/verify/{}'
-    RAS_PARTY_CHANGE_PASSWORD = '{}party-api/v1/respondents/change_password/{}'
 
     RM_COLLECTION_EXERCISE_SERVICE_HOST = os.getenv('RM_COLLECTION_EXERCISE_SERVICE_HOST', 'localhost')
     RM_COLLECTION_EXERCISE_SERVICE_PORT = os.getenv('RM_COLLECTION_EXERCISE_SERVICE_PORT', 8145)
@@ -101,15 +98,6 @@ class Config(object):
     ONS_OAUTH_SERVICE = '{}://{}:{}/'.format(ONS_OAUTH_SERVICE_PROTOCOL, ONS_OAUTH_SERVICE_HOST, ONS_OAUTH_SERVICE_PORT)
     ONS_TOKEN = '{}api/v1/tokens/'.format(ONS_OAUTH_SERVICE)
 
-    CREATE_MESSAGE_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'message/send'
-    MESSAGE_GET_URL = RAS_SECURE_MESSAGE_SERVICE + 'message/{}'
-    MESSAGE_MODIFY_URL = RAS_SECURE_MESSAGE_SERVICE + 'message/{}/modify'
-    DRAFT_SAVE_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'draft/save'
-    DRAFT_GET_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'draft/{}'
-    DRAFT_PUT_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'draft/{}/modify'
-    LABELS_GET_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'labels?name=unread'
-    THREAD_GET_API_URL = RAS_SECURE_MESSAGE_SERVICE + 'thread/{}'
-
     RAS_FRONTSTAGE_API_HOST = os.getenv('RAS_FRONTSTAGE_API_HOST', 'localhost')
     RAS_FRONTSTAGE_API_PORT = os.getenv('RAS_FRONTSTAGE_API_PORT', 8083)
     RAS_FRONTSTAGE_API_PROTOCOL = os.getenv('RAS_FRONTSTAGE_API_PROTOCOL', 'http')
@@ -117,15 +105,18 @@ class Config(object):
                                                       RAS_FRONTSTAGE_API_HOST,
                                                       RAS_FRONTSTAGE_API_PORT)
     GET_MESSAGES_URL = 'messages_list'
+    GET_MESSAGE_URL = 'message'
+    SEND_MESSAGE_URL = 'send_message'
 
+    SIGN_IN_URL = 'sign-in'
 
-class ProductionConfig(Config):
-    DEBUG = False
-
-
-class StagingConfig(Config):
-    DEVELOPMENT = True
-    DEBUG = True
+    REQUEST_PASSWORD_CHANGE = 'request_password_change'
+    VERIFY_PASSWORD_TOKEN = 'verify_password_token'
+    CHANGE_PASSWORD = 'change_password'
+    VALIDATE_ENROLMENT = 'validate-enrolment'
+    CONFIRM_ORGANISATION_SURVEY = 'confirm-organisation-survey'
+    CREATE_ACCOUNT = 'create-account'
+    VERIFY_EMAIL = 'verify-email'
 
 
 class DevelopmentConfig(Config):

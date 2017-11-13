@@ -6,7 +6,7 @@ from requests.exceptions import ConnectionError
 from structlog import wrap_logger
 
 from frontstage import app
-from frontstage.exceptions.exceptions import ExternalServiceError, JWTValidationError
+from frontstage.exceptions.exceptions import ApiError, ExternalServiceError, JWTValidationError
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -21,6 +21,14 @@ def connection_error_not_found(error):  # pylint: disable=unused-argument
 
 @app.errorhandler(500)
 def connection_error_internal_server(error):  # pylint: disable=unused-argument
+    return redirect(url_for('error_bp.server_error_page',
+                            _external=True,
+                            _scheme=getenv('SCHEME', 'http')))
+
+
+@app.errorhandler(ApiError)
+def api_error(error):
+    logger.error('Api failed to retrieve required data', url=error.url, status_code=str(error.status_code))
     return redirect(url_for('error_bp.server_error_page',
                             _external=True,
                             _scheme=getenv('SCHEME', 'http')))

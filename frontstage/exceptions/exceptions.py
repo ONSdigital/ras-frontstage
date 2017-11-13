@@ -1,10 +1,25 @@
 import sys
 
 
-class ExternalServiceError(Exception):
+class ApiError(Exception):
+
     def __init__(self, response):
         self.url = response.url
         self.status_code = response.status_code
+
+
+class ExternalServiceError(Exception):
+
+    def __init__(self, response):
+        self.url = response.url
+        self.status_code = response.status_code
+
+
+class InvalidRequestMethod(Exception):
+
+    def __init__(self, method, url):
+        self.method = str(method)
+        self.url = url
 
 
 class JWTValidationError(Exception):

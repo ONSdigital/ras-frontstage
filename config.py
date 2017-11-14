@@ -17,86 +17,15 @@ class Config(object):
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
     JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
     JWT_SECRET = os.getenv('JWT_SECRET')
-    RAS_FRONTSTAGE_CLIENT_ID = os.environ.get('RAS_FRONTSTAGE_CLIENT_ID')
-    RAS_FRONTSTAGE_CLIENT_SECRET = os.environ.get('RAS_FRONTSTAGE_CLIENT_SECRET')
     VALIDATE_JWT = os.environ.get('VALIDATE_JWT', True)
     GOOGLE_ANALYTICS = os.getenv('GOOGLE_ANALYTICS', None)
     SELENIUM_TEST_URL = os.environ.get('SELENIUM_TEST_URL', 'http://localhost:8080')
-    NON_DEFAULT_VARIABLES = ['SECRET_KEY', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD', 'JWT_SECRET',
-                             'RAS_FRONTSTAGE_CLIENT_ID', 'RAS_FRONTSTAGE_CLIENT_SECRET']
+    NON_DEFAULT_VARIABLES = ['SECRET_KEY', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD', 'JWT_SECRET']
 
     PASSWORD_MATCH_ERROR_TEXT = 'Your passwords do not match'
     PASSWORD_CRITERIA_ERROR_TEXT = 'Your password doesn\'t meet the requirements'
     PASSWORD_MIN_LENGTH = 8
     PASSWORD_MAX_LENGTH = 160
-
-    REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
-    REDIS_PORT = os.getenv('REDIS_PORT', 6379)
-    REDIS_DB = os.getenv('REDIS_DB', 1)
-
-    # Configurations for external services
-    RM_CASE_SERVICE_HOST = os.getenv('RM_CASE_SERVICE_HOST', 'localhost')
-    RM_CASE_SERVICE_PORT = os.getenv('RM_CASE_SERVICE_PORT', 8171)
-    RM_CASE_SERVICE_PROTOCOL = os.getenv('RM_CASE_SERVICE_PROTOCOL', 'http')
-    RM_CASE_SERVICE = '{}://{}:{}/'.format(RM_CASE_SERVICE_PROTOCOL, RM_CASE_SERVICE_HOST, RM_CASE_SERVICE_PORT)
-    RM_CASE_GET = '{}cases/{}'
-    RM_CASE_GET_BY_PARTY = '{}cases/partyid/{}?{}'
-    RM_CASE_GET_BY_IAC = '{}cases/iac/{}'
-
-    RAS_COLLECTION_INSTRUMENT_SERVICE_HOST = os.getenv('RAS_COLLECTION_INSTRUMENT_SERVICE_HOST', 'localhost')
-    RAS_COLLECTION_INSTRUMENT_SERVICE_PORT = os.getenv('RAS_COLLECTION_INSTRUMENT_SERVICE_PORT', 8002)
-    RAS_COLLECTION_INSTRUMENT_SERVICE_PROTOCOL = os.getenv('RAS_COLLECTION_INSTRUMENT_SERVICE_PROTOCOL', 'http')
-    RAS_COLLECTION_INSTRUMENT_SERVICE = '{}://{}:{}/'.format(RAS_COLLECTION_INSTRUMENT_SERVICE_PROTOCOL,
-                                                             RAS_COLLECTION_INSTRUMENT_SERVICE_HOST,
-                                                             RAS_COLLECTION_INSTRUMENT_SERVICE_PORT)
-    RAS_CI_UPLOAD = '{}collection-instrument-api/1.0.2/survey_responses/{}'
-    RAS_CI_GET = '{}collection-instrument-api/1.0.2/collectioninstrument/id/{}'
-    RAS_CI_DOWNLOAD = '{}collection-instrument-api/1.0.2/download/{}'
-    RAS_CI_SIZE = '{}collection-instrument-api/1.0.2/instrument_size/{}'
-
-    RM_IAC_SERVICE_HOST = os.getenv('RM_IAC_SERVICE_HOST', 'localhost')
-    RM_IAC_SERVICE_PORT = os.getenv('RM_IAC_SERVICE_PORT', 8121)
-    RM_IAC_SERVICE_PROTOCOL = os.getenv('RM_IAC_SERVICE_PROTOCOL', 'http')
-    RM_IAC_SERVICE = '{}://{}:{}/'.format(RM_IAC_SERVICE_PROTOCOL, RM_IAC_SERVICE_HOST, RM_IAC_SERVICE_PORT)
-    RM_IAC_GET = '{}iacs/{}'
-
-    RAS_PARTY_SERVICE_HOST = os.getenv('RAS_PARTY_SERVICE_HOST', 'localhost')
-    RAS_PARTY_SERVICE_PORT = os.getenv('RAS_PARTY_SERVICE_PORT', 8081)
-    RAS_PARTY_SERVICE_PROTOCOL = os.getenv('RAS_PARTY_SERVICE_PROTOCOL', 'http')
-    RAS_PARTY_SERVICE = '{}://{}:{}/'.format(RAS_PARTY_SERVICE_PROTOCOL, RAS_PARTY_SERVICE_HOST, RAS_PARTY_SERVICE_PORT)
-    RAS_PARTY_GET_BY_BUSINESS = '{}party-api/v1/businesses/id/{}'
-    RAS_PARTY_GET_BY_RESPONDENT = '{}party-api/v1/respondents/id/{}'
-    RAS_PARTY_POST_RESPONDENTS = '{}party-api/v1/respondents'
-    RAS_PARTY_VERIFY_EMAIL = '{}party-api/v1/emailverification/{}'
-    RAS_PARTY_GET_BY_EMAIL = '{}party-api/v1/respondents/email/{}'
-    RAS_PARTY_RESEND_VERIFICATION = '{}party-api/v1/resend-verification-email/{}'
-
-    RM_COLLECTION_EXERCISE_SERVICE_HOST = os.getenv('RM_COLLECTION_EXERCISE_SERVICE_HOST', 'localhost')
-    RM_COLLECTION_EXERCISE_SERVICE_PORT = os.getenv('RM_COLLECTION_EXERCISE_SERVICE_PORT', 8145)
-    RM_COLLECTION_EXERCISE_SERVICE_PROTOCOL = os.getenv('RM_COLLECTION_EXERCISE_SERVICE_PROTOCOL', 'http')
-    RM_COLLECTION_EXERCISE_SERVICE = '{}://{}:{}/'.format(RM_COLLECTION_EXERCISE_SERVICE_PROTOCOL,
-                                                          RM_COLLECTION_EXERCISE_SERVICE_HOST,
-                                                          RM_COLLECTION_EXERCISE_SERVICE_PORT)
-    RM_COLLECTION_EXERCISES_GET = '{}collectionexercises/{}'
-
-    RM_SURVEY_SERVICE_HOST = os.getenv('RM_SURVEY_SERVICE_HOST', 'localhost')
-    RM_SURVEY_SERVICE_PORT = os.getenv('RM_SURVEY_SERVICE_PORT', 8080)
-    RM_SURVEY_SERVICE_PROTOCOL = os.getenv('RM_SURVEY_SERVICE_PROTOCOL', 'http')
-    RM_SURVEY_SERVICE = '{}://{}:{}/'.format(RM_SURVEY_SERVICE_PROTOCOL, RM_SURVEY_SERVICE_HOST, RM_SURVEY_SERVICE_PORT)
-    RM_SURVEY_GET = '{}surveys/{}'
-
-    RAS_SECURE_MESSAGE_SERVICE_HOST = os.getenv('RAS_SECURE_MESSAGE_SERVICE_HOST', 'localhost')
-    RAS_SECURE_MESSAGE_SERVICE_PORT = os.getenv('RAS_SECURE_MESSAGE_SERVICE_PORT', 5050)
-    RAS_SECURE_MESSAGE_SERVICE_PROTOCOL = os.getenv('RAS_SECURE_MESSAGE_SERVICE_PROTOCOL', 'http')
-    RAS_SECURE_MESSAGE_SERVICE = '{}://{}:{}/'.format(RAS_SECURE_MESSAGE_SERVICE_PROTOCOL,
-                                                      RAS_SECURE_MESSAGE_SERVICE_HOST,
-                                                      RAS_SECURE_MESSAGE_SERVICE_PORT)
-
-    ONS_OAUTH_SERVICE_HOST = os.environ.get('ONS_OAUTH_HOST', 'ons-oauth2.cfapps.io')
-    ONS_OAUTH_SERVICE_PORT = os.getenv('ONS_OAUTH_PORT', 80)
-    ONS_OAUTH_SERVICE_PROTOCOL = os.environ.get('ONS_OAUTH_PROTOCOL', 'http')
-    ONS_OAUTH_SERVICE = '{}://{}:{}/'.format(ONS_OAUTH_SERVICE_PROTOCOL, ONS_OAUTH_SERVICE_HOST, ONS_OAUTH_SERVICE_PORT)
-    ONS_TOKEN = '{}api/v1/tokens/'.format(ONS_OAUTH_SERVICE)
 
     RAS_FRONTSTAGE_API_HOST = os.getenv('RAS_FRONTSTAGE_API_HOST', 'localhost')
     RAS_FRONTSTAGE_API_PORT = os.getenv('RAS_FRONTSTAGE_API_PORT', 8083)
@@ -104,19 +33,25 @@ class Config(object):
     RAS_FRONTSTAGE_API_SERVICE = '{}://{}:{}/'.format(RAS_FRONTSTAGE_API_PROTOCOL,
                                                       RAS_FRONTSTAGE_API_HOST,
                                                       RAS_FRONTSTAGE_API_PORT)
-    GET_MESSAGES_URL = 'messages_list'
+    GET_MESSAGES_URL = 'messages-list'
     GET_MESSAGE_URL = 'message'
-    SEND_MESSAGE_URL = 'send_message'
+    SEND_MESSAGE_URL = 'send-message'
 
     SIGN_IN_URL = 'sign-in'
 
-    REQUEST_PASSWORD_CHANGE = 'request_password_change'
-    VERIFY_PASSWORD_TOKEN = 'verify_password_token'
-    CHANGE_PASSWORD = 'change_password'
+    REQUEST_PASSWORD_CHANGE = 'request-password-change'
+    VERIFY_PASSWORD_TOKEN = 'verify-password-token'
+    CHANGE_PASSWORD = 'change-password'
+
     VALIDATE_ENROLMENT = 'validate-enrolment'
     CONFIRM_ORGANISATION_SURVEY = 'confirm-organisation-survey'
     CREATE_ACCOUNT = 'create-account'
     VERIFY_EMAIL = 'verify-email'
+
+    SURVEYS_LIST = 'surveys-list'
+    ACCESS_CASE = 'access-case'
+    DOWNLOAD_CI = 'download-ci'
+    UPLOAD_CI = 'upload-ci'
 
 
 class DevelopmentConfig(Config):
@@ -128,8 +63,6 @@ class DevelopmentConfig(Config):
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'test_user')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'test_password')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
-    RAS_FRONTSTAGE_CLIENT_ID = os.getenv('RAS_FRONTSTAGE_CLIENT_ID', 'test@test.test')
-    RAS_FRONTSTAGE_CLIENT_SECRET = os.getenv('RAS_FRONTSTAGE_CLIENT_SECRET', 'testtest')
 
 
 class TestingConfig(DevelopmentConfig):

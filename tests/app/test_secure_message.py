@@ -39,13 +39,18 @@ class TestSecureMessage(unittest.TestCase):
         self.app = app.test_client()
         self.app.testing = True
         self.app.set_cookie('localhost', 'authorization', encoded_jwt)
+        self.patcher = patch('redis.StrictRedis.get', return_value=encoded_jwt)
+        self.patcher.start()
         self.message_form = {
                               "secure-message-subject": "subject",
                               "secure-message-body": "body",
                               "submit": "Send",
                               "secure-message-thread-id": "7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb",
                             }
-        self.headers = {'authorization': encoded_jwt}
+        self.headers = {'jwt': encoded_jwt}
+
+    def tearDown(self):
+        self.patcher.stop()
 
     @requests_mock.mock()
     def test_get_messages_success(self, mock_request):

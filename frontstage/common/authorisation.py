@@ -44,11 +44,11 @@ def jwt_authorization(request):
         def extract_session_wrapper(*args, **kwargs):
             session_handler = SessionHandler()
             session_key = request.cookies.get('authorization')
-            encoded_jwt_token = session_handler.get_encoded_jwt(session_key)
-            if encoded_jwt_token:
+            encoded_jwt = session_handler.get_encoded_jwt(session_key)
+            if encoded_jwt:
                 logger.debug('Attempting to authorize token')
                 try:
-                    jwt_token = decode(encoded_jwt_token, jwt_secret, algorithms=jwt_algorithm)
+                    jwt = decode(encoded_jwt, jwt_secret, algorithms=jwt_algorithm)
                     logger.debug('Token decoded successfully')
                 except JWTError:
                     logger.warning('Unable to decode token')
@@ -58,10 +58,10 @@ def jwt_authorization(request):
                 raise JWTValidationError
 
             if app.config['VALIDATE_JWT']:
-                valid = validate(jwt_token)
+                valid = validate(jwt)
             if valid:
                 session_handler.update_session()
-                return original_function(jwt_token, *args, **kwargs)
+                return original_function(jwt, *args, **kwargs)
             else:
                 logger.warning('Token is not valid for this request')
                 raise JWTValidationError

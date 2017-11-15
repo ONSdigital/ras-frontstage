@@ -63,8 +63,7 @@ def login():
         response_json = json.loads(response.text)
         data_dict_for_jwt_token = timestamp_token(response_json)
         encoded_jwt_token = encode(data_dict_for_jwt_token)
-        response = make_response(redirect(url_for('surveys_bp.logged_in', _external=True,
-                                                  _scheme=getenv('SCHEME', 'http'))))
+        response = make_response(redirect(url_for('surveys_bp.logged_in', _external=True, _scheme=getenv('SCHEME', 'http'))))
 
         session = SessionHandler()
         logger.info('Creating session', party_id=response_json['party_id'])

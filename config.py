@@ -74,6 +74,4 @@ class TestingConfig(DevelopmentConfig):
     DEVELOPMENT = False
     WTF_CSRF_ENABLED = False
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-    REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
-    REDIS_PORT = os.getenv('REDIS_PORT', 6379)
     REDIS_DB = os.getenv('REDIS_DB', 13)

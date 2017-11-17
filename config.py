@@ -37,25 +37,25 @@ class Config(object):
     RAS_FRONTSTAGE_API_SERVICE = '{}://{}:{}/'.format(RAS_FRONTSTAGE_API_PROTOCOL,
                                                       RAS_FRONTSTAGE_API_HOST,
                                                       RAS_FRONTSTAGE_API_PORT)
-    GET_MESSAGES_URL = 'messages-list'
-    GET_MESSAGE_URL = 'message'
-    SEND_MESSAGE_URL = 'send-message'
+    GET_MESSAGES_URL = 'secure-messaging/messages-list'
+    GET_MESSAGE_URL = 'secure-messaging/message'
+    SEND_MESSAGE_URL = 'secure-messaging/send-message'
 
     SIGN_IN_URL = 'sign-in'
 
-    REQUEST_PASSWORD_CHANGE = 'request-password-change'
-    VERIFY_PASSWORD_TOKEN = 'verify-password-token'
-    CHANGE_PASSWORD = 'change-password'
+    REQUEST_PASSWORD_CHANGE = 'passwords/request-password-change'
+    VERIFY_PASSWORD_TOKEN = 'passwords/verify-password-token'
+    CHANGE_PASSWORD = 'passwords/change-password'
 
-    VALIDATE_ENROLMENT = 'validate-enrolment'
-    CONFIRM_ORGANISATION_SURVEY = 'confirm-organisation-survey'
-    CREATE_ACCOUNT = 'create-account'
-    VERIFY_EMAIL = 'verify-email'
+    VALIDATE_ENROLMENT = 'register/validate-enrolment'
+    CONFIRM_ORGANISATION_SURVEY = 'register/confirm-organisation-survey'
+    CREATE_ACCOUNT = 'register/create-account'
+    VERIFY_EMAIL = 'register/verify-email'
 
-    SURVEYS_LIST = 'surveys-list'
-    ACCESS_CASE = 'access-case'
-    DOWNLOAD_CI = 'download-ci'
-    UPLOAD_CI = 'upload-ci'
+    SURVEYS_LIST = 'surveys/surveys-list'
+    ACCESS_CASE = 'surveys/access-case'
+    DOWNLOAD_CI = 'surveys/download-ci'
+    UPLOAD_CI = 'surveys/upload-ci'
 
 
 class DevelopmentConfig(Config):

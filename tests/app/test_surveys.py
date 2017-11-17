@@ -8,10 +8,10 @@ import requests_mock
 from frontstage import app
 
 
-url_get_surveys_list = app.config['RAS_FRONTSTAGE_API_SERVICE'] + 'surveys-list'
-url_access_case = app.config['RAS_FRONTSTAGE_API_SERVICE'] + 'access-case'
-url_download_ci = app.config['RAS_FRONTSTAGE_API_SERVICE'] + 'download-ci'
-url_upload_ci = app.config['RAS_FRONTSTAGE_API_SERVICE'] + 'upload-ci'
+url_get_surveys_list = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['SURVEYS_LIST']
+url_access_case = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['ACCESS_CASE']
+url_download_ci = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['DOWNLOAD_CI']
+url_upload_ci = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['UPLOAD_CI']
 
 with open('tests/test_data/surveys_list.json') as json_data:
     surveys_list = json.load(json_data)

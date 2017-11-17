@@ -7,13 +7,13 @@ import requests_mock
 from frontstage import app
 
 
-url_get_messages = app.config['RAS_FRONTSTAGE_API_SERVICE'] + 'messages-list'
+url_get_messages = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['GET_MESSAGES_URL']
 with open('tests/test_data/secure_messaging/messages_get.json') as json_data:
     messages_get = json.load(json_data)
-url_get_message = app.config['RAS_FRONTSTAGE_API_SERVICE'] + 'message'
+url_get_message = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['GET_MESSAGE_URL']
 with open('tests/test_data/secure_messaging/message.json') as json_data:
     message = json.load(json_data)
-url_send_message = app.config['RAS_FRONTSTAGE_API_SERVICE'] + 'send-message'
+url_send_message = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['SEND_MESSAGE_URL']
 
 
 encoded_jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoX3Rva2VuIjoiNmY5NjM0ZGEtYTI3ZS00ZDk3LWJhZjktNjN" \

@@ -1,6 +1,7 @@
 import io
 import json
 import unittest
+from unittest.mock import patch
 
 import requests_mock
 
@@ -26,7 +27,7 @@ class TestSurveys(unittest.TestCase):
 
     def setUp(self):
         self.app = app.test_client()
-        self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
+        self.app.set_cookie('localhost', 'authorization', 'session_key')
         self.survey_file = dict(file=(io.BytesIO(b'my file contents'), "testfile.xlsx"))
         self.upload_error = {
             "error": {
@@ -35,6 +36,11 @@ class TestSurveys(unittest.TestCase):
                 }
             }
         }
+        self.patcher = patch('redis.StrictRedis.get', return_value=encoded_jwt_token)
+        self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
 
     @requests_mock.mock()
     def test_surveys_todo(self, mock_request):

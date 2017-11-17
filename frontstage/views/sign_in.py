@@ -7,6 +7,7 @@ from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.common.api_call import api_call
+from frontstage.common.session import SessionHandler
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.jwt import encode, timestamp_token
 from frontstage.models import LoginForm
@@ -31,6 +32,7 @@ def login():
     if request.method == 'POST' and form.validate():
         username = request.form.get('username')
         password = request.form.get('password')
+
         sign_in_data = {
             "username": username,
             "password": password
@@ -62,7 +64,12 @@ def login():
         data_dict_for_jwt_token = timestamp_token(response_json)
         encoded_jwt_token = encode(data_dict_for_jwt_token)
         response = make_response(redirect(url_for('surveys_bp.logged_in', _external=True, _scheme=getenv('SCHEME', 'http'))))
-        response.set_cookie('authorization', value=encoded_jwt_token)
+
+        session = SessionHandler()
+        logger.info('Creating session', party_id=response_json['party_id'])
+        session.create_session(encoded_jwt_token)
+        response.set_cookie('authorization', value=session.session_key)
+        logger.info('Successfully created session', party_id=response_json['party_id'], session_key=session.session_key)
         return response
 
     template_data = {
@@ -78,6 +85,13 @@ def login():
 
 @sign_in_bp.route('/logout')
 def logout():
+    # Delete user session in redis
+    session_key = request.cookies.get('authorization')
+    session = SessionHandler()
+    session.delete_session(session_key)
+
+    # Delete session cookie
     response = make_response(redirect(url_for('sign_in_bp.login')))
     response.set_cookie('authorization', value='', expires=0)
+
     return response

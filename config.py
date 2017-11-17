@@ -22,6 +22,10 @@ class Config(object):
     SELENIUM_TEST_URL = os.environ.get('SELENIUM_TEST_URL', 'http://localhost:8080')
     NON_DEFAULT_VARIABLES = ['SECRET_KEY', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD', 'JWT_SECRET']
 
+    REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+    REDIS_PORT = os.getenv('REDIS_PORT', 6379)
+    REDIS_DB = os.getenv('REDIS_DB', 1)
+
     PASSWORD_MATCH_ERROR_TEXT = 'Your passwords do not match'
     PASSWORD_CRITERIA_ERROR_TEXT = 'Your password doesn\'t meet the requirements'
     PASSWORD_MIN_LENGTH = 8
@@ -70,3 +74,4 @@ class TestingConfig(DevelopmentConfig):
     DEVELOPMENT = False
     WTF_CSRF_ENABLED = False
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    REDIS_DB = os.getenv('REDIS_DB', 13)

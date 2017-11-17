@@ -7,6 +7,7 @@ from jose.jwt import decode
 from structlog import wrap_logger
 
 from frontstage import app
+from frontstage.common.session import SessionHandler
 from frontstage.exceptions.exceptions import JWTValidationError
 
 
@@ -41,11 +42,13 @@ def jwt_authorization(request):
     def extract_session(original_function):
         @wraps(original_function)
         def extract_session_wrapper(*args, **kwargs):
-            encoded_jwt_token = request.cookies.get('authorization')
-            if encoded_jwt_token:
+            session_handler = SessionHandler()
+            session_key = request.cookies.get('authorization')
+            encoded_jwt = session_handler.get_encoded_jwt(session_key)
+            if encoded_jwt:
                 logger.debug('Attempting to authorize token')
                 try:
-                    jwt_token = decode(request.cookies.get('authorization'), jwt_secret, algorithms=jwt_algorithm)
+                    jwt = decode(encoded_jwt, jwt_secret, algorithms=jwt_algorithm)
                     logger.debug('Token decoded successfully')
                 except JWTError:
                     logger.warning('Unable to decode token')
@@ -55,9 +58,10 @@ def jwt_authorization(request):
                 raise JWTValidationError
 
             if app.config['VALIDATE_JWT']:
-                valid = validate(jwt_token)
+                valid = validate(jwt)
             if valid:
-                return original_function(jwt_token, *args, **kwargs)
+                session_handler.update_session()
+                return original_function(jwt, *args, **kwargs)
             else:
                 logger.warning('Token is not valid for this request')
                 raise JWTValidationError

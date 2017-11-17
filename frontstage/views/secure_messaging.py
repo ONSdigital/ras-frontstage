@@ -5,8 +5,9 @@ from frontstage.common.authorisation import jwt_authorization
 from structlog import wrap_logger
 
 from frontstage import app
-from frontstage.exceptions.exceptions import ApiError
 from frontstage.common.api_call import api_call
+from frontstage.common.session import SessionHandler
+from frontstage.exceptions.exceptions import ApiError
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -59,7 +60,7 @@ def get_messages_list(label):
     logger.debug('Attempting to retrieve messages', label=label)
 
     # Form api request
-    headers = {"jwt": request.cookies['authorization']}
+    headers = create_headers()
     endpoint = app.config['GET_MESSAGES_URL']
     parameters = {"label": label} if label else {}
     response = api_call('GET', endpoint, parameters=parameters, headers=headers)
@@ -77,7 +78,7 @@ def get_message(message_id, label, party_id):
     logger.debug('Attempting to retrieve message', message_id=message_id, party_id=party_id)
 
     # Form api request
-    headers = {"jwt": request.cookies['authorization']}
+    headers = create_headers()
     endpoint = app.config['GET_MESSAGE_URL']
     parameters = {"message_id": message_id, "label": label, "party_id": party_id}
     response = api_call('GET', endpoint, parameters=parameters, headers=headers)
@@ -95,7 +96,7 @@ def send_message(party_id, is_draft):
     logger.debug('Attempting to send message', party_id=party_id)
 
     # Form api request
-    headers = {"jwt": request.cookies['authorization']}
+    headers = create_headers()
     endpoint = app.config['SEND_MESSAGE_URL']
     message_json = {
         'msg_from': party_id,
@@ -131,3 +132,9 @@ def send_message(party_id, is_draft):
 
     logger.info('Secure message sent successfully', message_id=sent_message['msg_id'], party_id=party_id)
     return render_template('secure-messages/message-success-temp.html', _theme='default')
+
+
+def create_headers():
+    encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])
+    headers = {"jwt": encoded_jwt}
+    return headers

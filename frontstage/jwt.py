@@ -16,6 +16,7 @@ def timestamp_token(token):
     data_dict_for_jwt_token = {
         "refresh_token": token['refresh_token'],
         "access_token": token['access_token'],
+        "expires_at": expires_in.timestamp(),
         "role": "respondent",
         "party_id": token['party_id']
     }

@@ -19,13 +19,6 @@ def not_found_error(error):  # pylint: disable=unused-argument
                             _scheme=getenv('SCHEME', 'http')))
 
 
-@app.errorhandler(500)
-def server_error(error):  # pylint: disable=unused-argument
-    return redirect(url_for('error_bp.server_error_page',
-                            _external=True,
-                            _scheme=getenv('SCHEME', 'http')))
-
-
 @app.errorhandler(ApiError)
 def api_error(error):
     logger.error('Api failed to retrieve required data', url=error.url, status_code=str(error.status_code))
@@ -45,5 +38,12 @@ def connection_error(error):
 @app.errorhandler(JWTValidationError)
 def jwt_validation_error(error):  # pylint: disable=unused-argument
     return redirect(url_for('error_bp.not_logged_in_error_page',
+                            _external=True,
+                            _scheme=getenv('SCHEME', 'http')))
+
+
+@app.errorhandler(Exception)
+def server_error(error):  # pylint: disable=unused-argument
+    return redirect(url_for('error_bp.server_error_page',
                             _external=True,
                             _scheme=getenv('SCHEME', 'http')))

@@ -13,12 +13,6 @@ function display_result {
   fi
 }
 
-if ! [ -a .build ] ; then
-	echo "Creating Virtual Environment"
-	virtualenv .build -p python3
-fi
-source .build/bin/activate
-
 flake8 app/**/*.py --max-complexity 10 --count
 
 display_result $? 1 "Flake 8 code style check"

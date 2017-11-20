@@ -8,24 +8,19 @@ python: '3.5'
 cache:
   - pip
 
-env:
-  - APP_SETTINGS=TestingConfig
-
 services:
     - redis-server
 
 install:
-  - pip install -r requirements.txt
-  - pip install -r requirements-test.txt
-  - pip install codecov
-  - pip install coverage
+  - pip install pipenv==8.3.2
+  - pipenv install --dev --deploy
 
 script:
-  - pytest --cov=frontstage --cov-report xml --ignore=node_modules
-  - coverage report
+  - APP_SETTINGS=TestingConfig pipenv run pytest --cov=frontstage --cov-report xml --ignore=node_modules
+  - pipenv run coverage report
 
 after_success:
-  - codecov
+  - pipenv run codecov
 
 branches:
   only:

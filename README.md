@@ -8,17 +8,52 @@ User interface for Respondent Account Services
 ## Setup
 Based on python 3.5
 
-Create a new virtual env for python3
+Use [Pyenv](https://github.com/pyenv/pyenv) to manage installed Python versions:
 
 ```
-mkvirtualenv --python=</path/to/python3.5 <your env name>
+curl -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+pyenv versions
+* system
+  2.7
+  3.4.7
+  3.5.4
+  3.6.3
 ```
 
-Install dependencies using pip
+You can then set the default global Python version using:
+```
+pyenv global 3.6.3
+pyenv versions
+  system
+  2.7
+  3.4.7
+  3.5.4
+* 3.6.3 (set by /Users/ONS/.pyenv/version)
+
+# if pip is missing:
+easy_install pip
+```
+
+NB: install Python versions with:
+```
+pyenv install 3.6.3
+```
+
+Install dependencies to a new virtual environment using [Pipenv](https://docs.pipenv.org/):
 
 ```
-pip install -r requirements.txt
+pip install -U pipenv
+pipenv install
 ```
+
+NB: pipenv will try to use pyenv to install a missing version of Python specified in the Pipfile.
+
+Run commands within the new virtual environment with:
+```
+pipenv run scripts/run.sh
+pipenv run python run.py
+```
+
 ## Front-end Setup
 
 Download Node JS
@@ -53,7 +88,7 @@ Run the application
 -------------------
 ```
 $ cd ras-frontstage
-$ python3 run.py
+$ pipenv run python run.py
  * Running on http://127.0.0.1:5001/
  * Restarting with reloader
 ```

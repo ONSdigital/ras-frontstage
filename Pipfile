@@ -1,0 +1,40 @@
+[[source]]
+
+name = "pypi"
+verify_ssl = true
+url = "https://pypi.python.org/simple"
+
+
+[requires]
+
+python_version = "3.5"
+
+
+[packages]
+
+cfenv = "==0.5.3"
+flask = "==0.12"
+flask-wtf = "==0.14.2"
+gunicorn = "*"
+phonenumbers = "==8.4.1"
+pycrypto = "==2.6.1"
+python-jose = "==1.3.2"
+redis = "==2.10.6"
+requests = "*"
+structlog = "==17.2.0"
+
+
+[dev-packages]
+
+behave = "==1.2.5"
+codecov = "*"
+coverage = "==4.2b1"
+oauthlib = "==2.0.2"
+pylint = "==1.6.4"
+pytest = "==3.1.0"
+requests-oauthlib = "==0.8.0"
+requests-mock = "==1.3.0"
+selenium = "==3.4.3"
+pylint-mccabe = "*"
+testfixtures = "*"
+pytest-cov = "*"

@@ -13,17 +13,5 @@ class ONSCloudFoundry(object):
         return self._cf_env.app
 
     @property
-    def port(self):
-        return self._cf_env.port
-
-    @property
-    def host(self):
-        return self._host
-
-    @property
-    def protocol(self):
-        return self._protocol
-
-    @property
     def redis(self):
         return self._cf_env.get_service(label='elasticache-broker')

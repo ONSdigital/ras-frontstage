@@ -11,7 +11,10 @@ from frontstage.filters.subject_filter import subject_filter
 from frontstage.logger_config import logger_initial_config
 
 
-def create_app():
+cf = ONSCloudFoundry()
+
+
+def create_app_object():
     app = Flask(__name__)
 
     # Load app config
@@ -25,7 +28,6 @@ def create_app():
     logger.debug('App configuration set', config=app_config)
 
     # If deploying in cloudfoundry set config to use cf redis instance
-    cf = ONSCloudFoundry()
     if cf.detected:
         logger.info('Cloudfoundry detected, setting service configurations')
         app.config['REDIS_HOST'] = cf.redis.credentials['host']

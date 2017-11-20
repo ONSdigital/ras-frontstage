@@ -13,14 +13,14 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 @app.errorhandler(404)
-def connection_error_not_found(error):  # pylint: disable=unused-argument
+def not_found_error(error):  # pylint: disable=unused-argument
     return redirect(url_for('error_bp.not_found_error_page',
                             _external=True,
                             _scheme=getenv('SCHEME', 'http')))
 
 
 @app.errorhandler(500)
-def connection_error_internal_server(error):  # pylint: disable=unused-argument
+def server_error(error):  # pylint: disable=unused-argument
     return redirect(url_for('error_bp.server_error_page',
                             _external=True,
                             _scheme=getenv('SCHEME', 'http')))
@@ -43,7 +43,7 @@ def connection_error(error):
 
 
 @app.errorhandler(JWTValidationError)
-def connection_error_jwt_validation(error):  # pylint: disable=unused-argument
+def jwt_validation_error(error):  # pylint: disable=unused-argument
     return redirect(url_for('error_bp.not_logged_in_error_page',
                             _external=True,
                             _scheme=getenv('SCHEME', 'http')))

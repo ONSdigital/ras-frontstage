@@ -9,13 +9,6 @@ logger = wrap_logger(logging.getLogger(__name__))
 error_bp = Blueprint('error_bp', __name__, template_folder='templates/errors')
 
 
-@error_bp.route('/', methods=['GET', 'POST'])
-def default_error_page():
-    response = make_response(render_template('errors/error.html', _theme='default', data={"error": {"type": "failed"}}))
-    response.set_cookie('authorization', value='', expires=0)
-    return response
-
-
 @error_bp.route('/403', methods=['GET', 'POST'])
 def not_logged_in_error_page():
     return render_template('errors/not-signed-in.html', _theme='default', data={"error": {"type": "failed"}}), 403

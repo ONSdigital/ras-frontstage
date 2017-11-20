@@ -20,9 +20,6 @@ class TestErrorHandlers(unittest.TestCase):
             "username": "testuser@email.com",
             "password": "password"
         }
-        self.oauth_token = {
-            "bad_token": "bad_token"
-        }
 
     def test_not_found_error(self):
         response = self.app.get('/not-a-url', follow_redirects=True)
@@ -33,7 +30,7 @@ class TestErrorHandlers(unittest.TestCase):
     # Use bad data to raise an uncaught exception
     @requests_mock.mock()
     def test_server_error(self, mock_request):
-        mock_request.post(url_oauth, status_code=200, json=self.oauth_token)
+        mock_request.post(url_oauth, status_code=200)
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 

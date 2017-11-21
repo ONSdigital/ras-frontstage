@@ -13,4 +13,4 @@ class TestInfo(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn('"name": "ras-frontstage"'.encode(), response.data)
-        self.assertIn('test'.encode(), response.data)
+        self.assertIn('"test": "test"'.encode(), response.data)

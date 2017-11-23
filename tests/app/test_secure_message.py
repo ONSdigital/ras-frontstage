@@ -42,10 +42,10 @@ class TestSecureMessage(unittest.TestCase):
         self.patcher = patch('redis.StrictRedis.get', return_value=encoded_jwt)
         self.patcher.start()
         self.message_form = {
-                              "secure-message-subject": "subject",
-                              "secure-message-body": "body",
-                              "submit": "Send",
-                              "secure-message-thread-id": "7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb",
+                              "subject": "subject",
+                              "body": "body",
+                              "send": "Send",
+                              "thread_id": "7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb",
                             }
         self.headers = {'jwt': encoded_jwt}
 
@@ -149,7 +149,8 @@ class TestSecureMessage(unittest.TestCase):
         mock_request.post(url_send_message, json=sent_message_response)
         mock_request.get(url_get_message, json=message)
         self.message_form['msg_id'] = 'test_msg_id'
-        self.message_form['submit'] = 'Save draft'
+        del self.message_form['send']
+        self.message_form['save_draft'] = 'Save Draft'
 
         response = self.app.post("/secure-message/create-message", data=self.message_form, headers=self.headers, follow_redirects=True)
 
@@ -183,13 +184,50 @@ class TestSecureMessage(unittest.TestCase):
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
 
-    # This error is for a bad request (form errors)
-    @requests_mock.mock()
-    def test_create_message_post_success_api_error(self, mock_request):
-        form_errors = {'form_errors': {'subject': ['Please enter a subject']}}
-        mock_request.post(url_send_message, status_code=400, json=create_api_error(400, form_errors))
+    def test_create_message_post_no_body(self):
+        del self.message_form['body']
+
+        response = self.app.post("/secure-message/create-message", data=self.message_form, headers=self.headers, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Please enter a message'.encode() in response.data)
+
+    def test_create_message_post_no_subject(self):
+        del self.message_form['subject']
 
         response = self.app.post("/secure-message/create-message", data=self.message_form, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Please enter a subject'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_create_message_draft_no_body_or_subject(self, mock_request):
+        sent_message_response = {'msg_id': 'd43b6609-0875-4ef8-a34e-f7df1bcc8029', 'status': '201', 'thread_id': '8caeff79-6067-4f2a-96e0-08617fdeb496'}
+        mock_request.post(url_send_message, json=sent_message_response)
+        mock_request.get(url_get_message, json=message)
+        self.message_form['msg_id'] = 'test_msg_id'
+        del self.message_form['send']
+        self.message_form['save_draft'] = 'Save Draft'
+        del self.message_form['body']
+        del self.message_form['subject']
+
+        response = self.app.post("/secure-message/create-message", data=self.message_form, headers=self.headers, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Draft saved'.encode() in response.data)
+
+    def test_create_message_post_body_too_long(self):
+        self.message_form['body'] = 'a' * 10100
+
+        response = self.app.post("/secure-message/create-message", data=self.message_form, headers=self.headers, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Body field length must not be greater than 10000'.encode() in response.data)
+
+    def test_create_message_post_subject_too_long(self):
+        self.message_form['subject'] = 'a' * 110
+
+        response = self.app.post("/secure-message/create-message", data=self.message_form, headers=self.headers, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Subject field length must not be greater than 100'.encode() in response.data)

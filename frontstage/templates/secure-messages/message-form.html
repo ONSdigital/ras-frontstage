@@ -7,62 +7,52 @@
 <div class="secure-message-form">
     <form action="{{ url_for('secure_message_bp.create_message') }}" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-        <input name="secure-message-thread-id" type="hidden" id="secure-message-thread-id" value="{{ message['thread_id'] }}">
-
-    {% if draft['msg_id'] %}
-        <input id="msg_id" type ="hidden" name="msg_id" value="{{ draft['msg_id'] }}">
-    {% endif %}
-
-    {% if message %}
-    {% if message['subject'].startswith('Re: ') %}
-        {% set subject = message['subject'] %}
-    {% else %}
-        {% set subject = "Re: " + message['subject'] %}
-    {% endif %}
-        <input name="secure-message-subject" type="hidden" id="secure-message-subject" value="{{ subject }}">
-
-    {% else %}
-        <p>To: ONS Business Surveys team</p>
-        {% if "subject" in errors %}
-            <div class="panel panel--simple panel--error panel--spacious" id="subject-error">
-                <p class="error-message">{{ errors['subject'][0] }}</p>
+        {% if draft.get('msg_id') %}
+            {{ form.msg_id }}
         {% endif %}
-            <label class="venus" for="secure-message-subject">Subject</label>
-            <input
-                id="secure-message-subject"
-                class="secure-message-form__subject input input--text"
-                type="text"
-                name="secure-message-subject"
-                maxlength="100"
-                value="{{ draft['subject'] }}" />
-        {% if "subject" in errors %}
+        {{ form.thread_id }}
+        {{ form.thread_message_id }}
+
+        {% if message %}
+            {% if message['subject'].startswith('Re: ') %}
+                {% set subject = message['subject'] %}
+            {% else %}
+                {% set subject = "Re: " + message['subject'] %}
+            {% endif %}
+            {{ form.hidden_subject }}
+
+        {% else %}
+            <p>To: ONS Business Surveys team</p>
+            {% if "subject" in errors %}
+                <div class="panel panel--simple panel--error panel--spacious" id="subject-error">
+                    <p class="error-message">{{ errors['subject'][0] }}</p>
+            {% endif %}
+                <label class="venus" for="subject">Subject</label>
+                {{ form.subject(id='secure-message-subject', class_='secure-message-form__subject input input--text') }}
+            {% if "subject" in errors %}
+                </div>
+            {% endif %}
+            <br />
+        {% endif %}
+
+
+
+        {% if "body" in errors %}
+            <div class="panel panel--simple panel--error panel--spacious" id="body-error">
+                <p class="error-message">{{ errors['body'][0] }}</p>
+        {% endif %}
+        {% if message %}
+            <label class="venus" for="body">Reply</label>
+        {% else %}
+            <label class="venus" for="body">Message</label>
+        {% endif %}
+        {{ form.body(id='secure-message-body', class_='input input--textarea input--textarea-message', rows='10') }}
+        {% if "body" in errors %}
             </div>
         {% endif %}
-        <br />
-    {% endif %}
-
-
-
-    {% if "body" in errors %}
-        <div class="panel panel--simple panel--error panel--spacious" id="body-error">
-            <p class="error-message">{{ errors['body'][0] }}</p>
-    {% endif %}
-          {% if message %}
-          <label class="venus" for="secure-message-body">Reply</label>
-          {% else %}
-          <label class="venus" for="secure-message-body">Message</label>
-          {% endif %}
-          <textarea
-            id="secure-message-body"
-            class="input input--textarea input--textarea-message"
-            rows="10"
-            name="secure-message-body">{{ draft['body'] }}</textarea>
-    {% if "body" in errors %}
-        </div>
-    {% endif %}
 
         <br />
-        <input class="btn btn--secondary" type="submit" name ="submit" value="Save draft" id="draft">
-        <input class="btn" type="submit" name="submit" value="Send" id="submit-btn">
+        {{ form.save_draft(class_='btn btn--secondary') }}
+        {{ form.send(class_='btn') }}
     </form>
 </div>

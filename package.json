@@ -96,8 +96,10 @@
     "webdriverio": "^4.6.2"
   },
   "dependencies": {
+    "babel-register": "^6.26.0",
     "events": "^1.1.1",
     "lodash": "^4.17.4",
+    "node-sass": "^4.7.2",
     "rollup-plugin-node-resolve": "^2.0.0"
   }
 }

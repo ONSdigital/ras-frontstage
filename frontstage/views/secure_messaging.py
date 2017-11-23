@@ -13,9 +13,6 @@ from frontstage.models import SecureMessagingForm
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-modify_data = {'action': '',
-               'label': ''}
-
 secure_message_bp = Blueprint('secure_message_bp', __name__, static_folder='static', template_folder='templates')
 
 

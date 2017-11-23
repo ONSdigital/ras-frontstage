@@ -42,10 +42,10 @@ class TestSecureMessage(unittest.TestCase):
         self.patcher = patch('redis.StrictRedis.get', return_value=encoded_jwt)
         self.patcher.start()
         self.message_form = {
-                              "secure-message-subject": "subject",
-                              "secure-message-body": "body",
-                              "submit": "Send",
-                              "secure-message-thread-id": "7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb",
+                              "subject": "subject",
+                              "body": "body",
+                              "send": "Send",
+                              "thread_id": "7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb",
                             }
         self.headers = {'jwt': encoded_jwt}
 
@@ -149,7 +149,8 @@ class TestSecureMessage(unittest.TestCase):
         mock_request.post(url_send_message, json=sent_message_response)
         mock_request.get(url_get_message, json=message)
         self.message_form['msg_id'] = 'test_msg_id'
-        self.message_form['submit'] = 'Save draft'
+        del self.message_form['send']
+        self.message_form['save_draft'] = 'Save Draft'
 
         response = self.app.post("/secure-message/create-message", data=self.message_form, headers=self.headers, follow_redirects=True)
 

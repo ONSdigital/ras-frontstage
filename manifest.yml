@@ -1,5 +1,6 @@
 applications:
 - name: ras-frontstage
+  buildpack: https://github.com/cloudfoundry/python-buildpack.git#v1.6.2
   disk_quota: 1G
   health-check-http-endpoint: /info
   health-check-type: http

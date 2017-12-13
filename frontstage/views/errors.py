@@ -1,6 +1,6 @@
 import logging
 
-from flask import Blueprint, make_response, render_template
+from flask import Blueprint, render_template
 from structlog import wrap_logger
 
 

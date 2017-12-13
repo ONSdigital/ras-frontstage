@@ -158,4 +158,3 @@ def register_activate_account(token):
                             account_activated=True,
                             _external=True,
                             _scheme=getenv('SCHEME', 'http')))
-

@@ -11,14 +11,17 @@ error_bp = Blueprint('error_bp', __name__, template_folder='templates/errors')
 
 @error_bp.route('/403', methods=['GET', 'POST'])
 def not_logged_in_error_page():
-    return render_template('errors/not-signed-in.html', _theme='default', data={"error": {"type": "failed"}}), 403
+    return render_template('errors/not-signed-in.html', _theme='default',
+                           data={"error": {"type": "failed"}}), 403
 
 
 @error_bp.route('/404', methods=['GET', 'POST'])
 def not_found_error_page():
-    return render_template('errors/404-error.html', _theme='default', data={"error": {"type": "failed"}}), 404
+    return render_template('errors/404-error.html', _theme='default',
+                           data={"error": {"type": "failed"}}), 404
 
 
 @error_bp.route('/500', methods=['GET', 'POST'])
 def server_error_page():
-    return render_template('errors/500-error.html', _theme='default', data={"error": {"type": "failed"}}), 500
+    return render_template('errors/500-error.html', _theme='default',
+                           data={"error": {"type": "failed"}}), 500

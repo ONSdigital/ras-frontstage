@@ -13,9 +13,8 @@ from frontstage.models import EnrolmentCodeForm, RegistrationForm
 
 
 logger = wrap_logger(logging.getLogger(__name__))
-
-register_bp = Blueprint('register_bp', __name__, static_folder='static', template_folder='templates/register')
-
+register_bp = Blueprint('register_bp', __name__,
+                        static_folder='static', template_folder='templates/register')
 cryptographer = Cryptographer()
 
 
@@ -30,18 +29,19 @@ def register():
             'enrolment_code': enrolment_code,
             'initial': True
         }
-
         response = api_call('POST', app.config['VALIDATE_ENROLMENT'], json=request_data)
 
         # Handle API errors
         if response.status_code == 404:
             logger.info('Enrolment code not found')
             template_data = {"error": {"type": "failed"}}
-            return render_template('register/register.enter-enrolment-code.html', _theme='default', form=form, data=template_data), 202
+            return render_template('register/register.enter-enrolment-code.html', _theme='default',
+                                   form=form, data=template_data), 202
         elif response.status_code == 401 and not json.loads(response.text).get('active'):
             logger.info('Enrolment code not active')
             template_data = {"error": {"type": "failed"}}
-            return render_template('register/register.enter-enrolment-code.html', _theme='default', form=form, data=template_data), 200
+            return render_template('register/register.enter-enrolment-code.html', _theme='default',
+                                   form=form, data=template_data), 200
         elif response.status_code != 200:
             logger.error('Failed to submit enrolment code')
             raise ApiError(response)
@@ -53,7 +53,8 @@ def register():
                                 _external=True,
                                 _scheme=getenv('SCHEME', 'http')))
 
-    return render_template('register/register.enter-enrolment-code.html', _theme='default', form=form, data={"error": {}})
+    return render_template('register/register.enter-enrolment-code.html', _theme='default',
+                           form=form, data={"error": {}})
 
 
 @register_bp.route('/create-account/confirm-organisation-survey', methods=['GET'])
@@ -63,10 +64,13 @@ def register_confirm_organisation_survey():
     enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
 
     logger.info('Attempting to retrieve data for confirm organisation/survey page')
-    response = api_call('POST', app.config['CONFIRM_ORGANISATION_SURVEY'], json={'enrolment_code': enrolment_code})
+    response = api_call('POST', app.config['CONFIRM_ORGANISATION_SURVEY'],
+                        json={'enrolment_code': enrolment_code})
+
     if response.status_code != 200:
         logger.error('Failed to retrieve data for confirm organisation/survey page')
         raise ApiError(response)
+
     response_json = json.loads(response.text)
     logger.info('Successfully retrieved data for confirm organisation/survey page')
     return render_template('register/register.confirm-organisation-survey.html',
@@ -86,18 +90,12 @@ def register_enter_your_details():
 
     if request.method == 'POST' and form.validate():
         logger.info('Attempting to create account')
-        first_name = request.form.get('first_name')
-        last_name = request.form.get('last_name')
-        email_address = request.form.get('email_address')
-        password = request.form.get('password')
-        phone_number = request.form.get('phone_number')
-
         registration_data = {
-            'emailAddress': email_address,
-            'firstName': first_name,
-            'lastName': last_name,
-            'password': password,
-            'telephone': phone_number,
+            'emailAddress': request.form.get('email_address'),
+            'firstName': request.form.get('first_name'),
+            'lastName': request.form.get('last_name'),
+            'password': request.form.get('password'),
+            'telephone': request.form.get('phone_number'),
             'enrolmentCode': enrolment_code
         }
         # Api will validate the enrolment code before it creates account
@@ -116,18 +114,21 @@ def register_enter_your_details():
             raise ApiError(response)
 
         logger.info('Successfully created account')
-        return render_template('register/register.almost-done.html', _theme='default', email=email_address)
+        return render_template('register/register.almost-done.html',
+                               _theme='default', email=request.form.get('email_address'))
 
     else:
         # Validate enrolment code before rendering form
-        response = api_call('POST', app.config['VALIDATE_ENROLMENT'], json={'enrolment_code': enrolment_code})
+        response = api_call('POST', app.config['VALIDATE_ENROLMENT'],
+                            json={'enrolment_code': enrolment_code})
         if response.status_code != 200:
             logger.error('Failed to validate enrolment code')
             if response.status_code == 401:
                 logger.error('Invalid enrolment code used')
             raise ApiError(response)
 
-        return render_template('register/register.enter-your-details.html', _theme='default', form=form, errors=form.errors)
+        return render_template('register/register.enter-your-details.html', _theme='default',
+                               form=form, errors=form.errors)
 
 
 @register_bp.route('/create-account/check-email')

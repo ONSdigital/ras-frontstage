@@ -11,8 +11,8 @@ from frontstage.exceptions.exceptions import ApiError
 
 
 logger = wrap_logger(logging.getLogger(__name__))
-
-surveys_bp = Blueprint('surveys_bp', __name__, static_folder='static', template_folder='templates/surveys')
+surveys_bp = Blueprint('surveys_bp', __name__,
+                       static_folder='static', template_folder='templates/surveys')
 
 
 @surveys_bp.route('/', methods=['GET'])
@@ -28,7 +28,8 @@ def logged_in(session):
 def surveys_history(session):
     party_id = session['party_id']
     surveys_list = get_surveys_list(party_id, 'history')
-    return render_template('surveys/surveys-history.html',  _theme='default', surveys_list=surveys_list, history=True)
+    return render_template('surveys/surveys-history.html',  _theme='default',
+                           surveys_list=surveys_list, history=True)
 
 
 def get_surveys_list(party_id, list_type):
@@ -38,9 +39,11 @@ def get_surveys_list(party_id, list_type):
         "list": list_type
     }
     response = api_call('GET', app.config['SURVEYS_LIST'], parameters=params)
+
     if response.status_code != 200:
         logger.error('Failed to retrieve surveys list', party_id=party_id, list_type=list_type)
         raise ApiError(response)
+
     surveys_list = json.loads(response.text)
     logger.info('Successfully retrieved surveys list', party_id=party_id, list_type=list_type)
     return surveys_list
@@ -53,7 +56,6 @@ def access_survey(session):
     case_id = request.args['case_id']
     referer_header = request.headers.get('referer', {})
     logger.info('Retrieving case data', party_id=party_id, case_id=case_id)
-
     params = {
         "party_id": party_id,
         "case_id": case_id
@@ -82,7 +84,6 @@ def download_survey(session):
     party_id = session['party_id']
     case_id = request.args['case_id']
     logger.info('Downloading collection instrument', case_id=case_id, party_id=party_id)
-
     params = {
         "case_id": case_id,
         "party_id": party_id
@@ -93,7 +94,7 @@ def download_survey(session):
         logger.error('Failed to download collection instrument', party_id=party_id, case_id=case_id)
         raise ApiError(response)
 
-    logger.info('Sucessfully downloaded collection instrument', case_id=case_id, party_id=party_id)
+    logger.info('Successfully downloaded collection instrument', case_id=case_id, party_id=party_id)
     return response.content, response.status_code, response.headers.items()
 
 
@@ -113,8 +114,9 @@ def upload_survey(session):
     # Get the uploaded file
     upload_file = request.files['file']
     upload_filename = upload_file.filename
-    upload_file = {'file': (upload_filename, upload_file.stream, upload_file.mimetype, {'Expires': 0})}
-
+    upload_file = {
+        'file': (upload_filename, upload_file.stream, upload_file.mimetype, {'Expires': 0})
+    }
     params = {
         "case_id": case_id,
         "party_id": party_id
@@ -146,7 +148,8 @@ def upload_survey(session):
         raise ApiError(response)
 
     logger.info('Successfully uploaded collection instrument', party_id=party_id, case_id=case_id)
-    return render_template('surveys/surveys-upload-success.html', _theme='default', upload_filename=upload_filename)
+    return render_template('surveys/surveys-upload-success.html',
+                           _theme='default', upload_filename=upload_filename)
 
 
 @surveys_bp.route('/upload_failed', methods=['GET'])
@@ -161,7 +164,8 @@ def upload_failed(session):
                       'body': 'The spreadsheet must be in .xls or .xlsx format'}
     elif error_info == "charLimit":
         error_info = {'header': "Error uploading - file name too long",
-                      'body': 'The file name of your spreadsheet must be less than 50 characters long'}
+                      'body': 'The file name of your spreadsheet must be '
+                              'less than 50 characters long'}
     elif error_info == "size":
         error_info = {'header': "Error uploading - file size too large",
                       'body': 'The spreadsheet must be smaller than 20MB in size'}

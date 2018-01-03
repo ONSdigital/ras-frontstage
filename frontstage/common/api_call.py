@@ -15,11 +15,14 @@ def api_call(method, endpoint, parameters=None, json=None, files=None, headers=N
 
     logger.debug('Calling frontstage api', method=method, url=url)
     if method == 'GET':
-        response = requests.get(url, headers=headers, auth=app.config['BASIC_AUTH'], params=parameters)
+        response = requests.get(url, headers=headers,
+                                auth=app.config['BASIC_AUTH'], params=parameters)
     elif method == 'POST':
-        response = requests.post(url, headers=headers, json=json, files=files, auth=app.config['BASIC_AUTH'], params=parameters)
+        response = requests.post(url, headers=headers, json=json, files=files,
+                                 auth=app.config['BASIC_AUTH'], params=parameters)
     elif method == 'PUT':
-        response = requests.put(url, headers=headers, json=json, auth=app.config['BASIC_AUTH'], params=parameters)
+        response = requests.put(url, headers=headers, json=json,
+                                auth=app.config['BASIC_AUTH'], params=parameters)
     else:
         logger.error('Invalid request method', method=method, url=url)
         raise InvalidRequestMethod(method, url)

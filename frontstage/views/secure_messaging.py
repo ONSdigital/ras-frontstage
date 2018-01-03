@@ -12,8 +12,8 @@ from frontstage.models import SecureMessagingForm
 
 
 logger = wrap_logger(logging.getLogger(__name__))
-
-secure_message_bp = Blueprint('secure_message_bp', __name__, static_folder='static', template_folder='templates')
+secure_message_bp = Blueprint('secure_message_bp', __name__,
+                              static_folder='static', template_folder='templates')
 
 
 @secure_message_bp.route('/create-message', methods=['GET', 'POST'])
@@ -33,8 +33,12 @@ def create_message(session):
         return render_template('secure-messages/message-success-temp.html', _theme='default')
 
     else:
-        message = get_message(form['thread_message_id'].data, 'INBOX', party_id) if form['thread_message_id'].data else {}
-        return render_template('secure-messages/secure-messages-view.html', _theme='default', form=form, errors=form.errors, message=message.get('message', {}))
+        if form['thread_message_id'].data:
+            message = get_message(form['thread_message_id'].data, 'INBOX', party_id)
+        else:
+            message = {}
+        return render_template('secure-messages/secure-messages-view.html', _theme='default',
+                               form=form, errors=form.errors, message=message.get('message', {}))
 
 
 @secure_message_bp.route('/<label>/<message_id>', methods=['GET'])
@@ -71,7 +75,7 @@ def messages_get(session, label="INBOX"):
 
 
 def get_messages_list(label):
-    logger.debug('Attempting to retrieve messages', label=label)
+    logger.debug('Attempting to retrieve messages list', label=label)
 
     headers = create_headers()
     endpoint = app.config['GET_MESSAGES_URL']
@@ -121,14 +125,16 @@ def send_message(party_id, is_draft):
     # If message has previously been saved as a draft add through the message id
     if form["msg_id"].data:
         message_json["msg_id"] = form['msg_id'].data
-    response = api_call('POST', endpoint, parameters={"is_draft": is_draft}, json=message_json, headers=headers)
+    response = api_call('POST', endpoint, parameters={"is_draft": is_draft},
+                        json=message_json, headers=headers)
 
     if response.status_code != 200:
-        logger.debug('Failed to send message')
+        logger.debug('Failed to send message', party_id=party_id)
         raise ApiError(response)
     sent_message = json.loads(response.text)
 
-    logger.info('Secure message sent successfully', message_id=sent_message['msg_id'], party_id=party_id)
+    logger.info('Secure message sent successfully',
+                message_id=sent_message['msg_id'], party_id=party_id)
     return sent_message
 
 

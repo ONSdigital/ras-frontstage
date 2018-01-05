@@ -1,0 +1,54 @@
+{% import 'partials/section.html' as section %}
+
+{% extends "layouts/_onecol.html" %}
+
+{% block page_title %}Completed surveys - ONS Business Surveys{% endblock %}
+
+{% block main %}
+
+       <div class="container page__container">
+
+        <div class="grid grid--reverse">
+          <div class="grid__col col-4@m">
+          </div>
+
+          <div class="grid__col col-7@m pull-1@m">
+            <div role="main" id="main" class="page__main">
+
+
+              <div class="group">
+                <div class="block">
+                  <form action="/home2.html" method="get">
+
+                    <h1 class="saturn">Confirm organisation and survey details</h1>
+
+
+                    <dl class="enrolment-details u-mb-l">
+                      <dt>Enrolment code</dt>
+                      <dd class="info-highlight org-name"><script type="text/javascript">document.write( getEnrolcode() );</script>T3STT3STT3STT3ST</dd>
+                      <dt>Organisation</dt>
+                      <dd class="info-highlight org-name"><script type="text/javascript">document.write( organisationName );</script>Bolts and Ratchets Ltd</dd>
+                      <dt>Survey to complete</dt>
+                      <dd class="info-highlight survey-title">Monthly Business Survey - Retail Sales Index (RSI)</dd>
+                    </dl>
+
+                    <button class="btn btn--primary venus" type="submit">Confirm</button>
+
+                    <p>
+                      <a href="{{ url_for('surveys_bp.logged_in') }}">Cancel</a>
+                    </p>
+
+                    <p class="u-mb-l">If the organisation or survey details aren't what you were expecting, please contact us on <a class="nowrap" href="tel:+44-300-1234-931">0300 1234 931</a> or send an email to <a href="mailto:surveys@ons.gov.uk">surveys@ons.gov.uk</a></p>
+
+                  </form>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+{% endblock main %}

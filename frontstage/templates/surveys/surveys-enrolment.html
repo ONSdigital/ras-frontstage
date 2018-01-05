@@ -7,7 +7,7 @@
 {% block main %}
 
               <section>
-                <form id="enrolment-code" action="/enrolment/error.html" class="form">
+                <form id="enrolment-code" action="{{ url_for('surveys_bp.survey_enrolment_failure') }}" class="form">
 
                   <h1 class="saturn">Add a survey</h1>
 
@@ -19,7 +19,7 @@
 
                   <button class="btn btn--primary venus u-mt-s" type="submit">Continue</button>
                   <p>
-                    <a href="/home.html">Cancel</a>
+                    <a href="{{ url_for('surveys_bp.logged_in') }}">Cancel</a>
                   </p>
                 </form>
               </section>

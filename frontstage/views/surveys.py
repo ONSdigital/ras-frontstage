@@ -32,12 +32,28 @@ def surveys_history(session):
                            surveys_list=surveys_list, history=True)
 
 
-@surveys_bp.route('/add_survey', methods=['GET'])
+@surveys_bp.route('/survey_enrolment', methods=['GET'])
 @jwt_authorization(request)
-def add_survey(session):
+def survey_enrolment(session):
     party_id = session['party_id']
     surveys_list = get_surveys_list(party_id, 'history')
-    return render_template('surveys/surveys-add.html', _theme='default')
+    return render_template('surveys/surveys-enrolment.html', _theme='default')
+
+
+@surveys_bp.route('/survey_enrolment_failure', methods=['GET'])
+@jwt_authorization(request)
+def survey_enrolment_failure(session):
+    party_id = session['party_id']
+    surveys_list = get_surveys_list(party_id, 'history')
+    return render_template('surveys/surveys-enrolment-failure.html', _theme='default')
+
+
+@surveys_bp.route('/survey_enrolment_confirm_organisation', methods=['GET'])
+@jwt_authorization(request)
+def survey_enrolment_confirm_organisation(session):
+    party_id = session['party_id']
+    surveys_list = get_surveys_list(party_id, 'history')
+    return render_template('surveys/surveys_enrolment_confirm_organisation.html', _theme='default')
 
 
 def get_surveys_list(party_id, list_type):

@@ -32,6 +32,14 @@ def surveys_history(session):
                            surveys_list=surveys_list, history=True)
 
 
+@surveys_bp.route('/add_survey', methods=['GET'])
+@jwt_authorization(request)
+def add_survey(session):
+    party_id = session['party_id']
+    surveys_list = get_surveys_list(party_id, 'history')
+    return render_template('surveys/surveys-add.html', _theme='default')
+
+
 def get_surveys_list(party_id, list_type):
     logger.info('Retrieving surveys list', party_id=party_id, list_type=list_type)
     params = {

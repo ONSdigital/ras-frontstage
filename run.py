@@ -15,5 +15,5 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 if __name__ == '__main__':
     port = app.config['PORT']
-    logger.info(f'Starting listening port "{port}"')
+    logger.info('Starting listening port: ', port=port)
     app.run(debug=app.config['DEBUG'], host='0.0.0.0', port=int(port))

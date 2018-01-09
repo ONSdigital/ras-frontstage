@@ -56,7 +56,8 @@ class Config(object):
     ACCESS_CASE = 'surveys/access-case'
     DOWNLOAD_CI = 'surveys/download-ci'
     UPLOAD_CI = 'surveys/upload-ci'
-
+    ADD_SURVEY = 'surveys/add-survey'
+    CONFIRM_ADD_ORGANISATION_SURVEY = 'surveys/confirm-organisation-survey'
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True

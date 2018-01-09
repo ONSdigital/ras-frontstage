@@ -10,7 +10,7 @@ class Config(object):
     VERSION = os.getenv('VERSION', '0.2.0')
     MAX_UPLOAD_LENGTH = os.getenv('MAX_UPLOAD_LENGTH',  20 * 1024 * 1024)
 
-    WTF_CSRF_ENABLED = os.getenv('WTF_CSRF_ENABLED', False)
+    WTF_CSRF_ENABLED = os.getenv('WTF_CSRF_ENABLED', True)
     SECRET_KEY = os.getenv('SECRET_KEY')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD')

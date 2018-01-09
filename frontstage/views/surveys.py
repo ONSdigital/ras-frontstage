@@ -36,8 +36,7 @@ def surveys_history(session):
 
 
 @surveys_bp.route('/add_survey', methods=['GET', 'POST'])
-@jwt_authorization(request)
-def add_survey(session):
+def add_survey():
     form = EnrolmentCodeForm(request.form)
 
     if request.method == 'POST' and form.validate():
@@ -70,13 +69,13 @@ def add_survey(session):
                                 encrypted_enrolment_code=encrypted_enrolment_code,
                                 _external=True,
                                 _scheme=getenv('SCHEME', 'http')))
+
     return render_template('surveys/surveys-add.html', _theme='default',
                            form=form, data={"error": {}})
 
 
-@surveys_bp.route('/add_survey/confirm_organisation_survey', methods=['GET', 'POST'])
-@jwt_authorization(request)
-def add_survey_confirm_organisation(session):
+@surveys_bp.route('/add_survey/confirm_organisation_survey', methods=['GET'])
+def add_survey_confirm_organisation():
     # Get and decrypt enrolment code
     encrypted_enrolment_code = request.args.get('encrypted_enrolment_code', None)
     enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()

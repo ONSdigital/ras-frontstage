@@ -1,5 +1,6 @@
 import json
 import logging
+from os import getenv
 
 from flask import Blueprint, redirect, render_template, request, url_for
 from structlog import wrap_logger
@@ -7,12 +8,14 @@ from structlog import wrap_logger
 from frontstage import app
 from frontstage.common.api_call import api_call
 from frontstage.common.authorisation import jwt_authorization
+from frontstage.common.cryptographer import Cryptographer
 from frontstage.exceptions.exceptions import ApiError
-
+from frontstage.models import EnrolmentCodeForm
 
 logger = wrap_logger(logging.getLogger(__name__))
 surveys_bp = Blueprint('surveys_bp', __name__,
                        static_folder='static', template_folder='templates/surveys')
+cryptographer = Cryptographer()
 
 
 @surveys_bp.route('/', methods=['GET'])
@@ -32,16 +35,68 @@ def surveys_history(session):
                            surveys_list=surveys_list, history=True)
 
 
-@surveys_bp.route('/add_survey', methods=['GET'])
+@surveys_bp.route('/add_survey', methods=['GET', 'POST'])
 @jwt_authorization(request)
 def add_survey(session):
-    return render_template('surveys/surveys-add.html', _theme='default')
+    form = EnrolmentCodeForm(request.form)
+
+    if request.method == 'POST' and form.validate():
+        logger.info('Enrolment code submitted')
+        enrolment_code = request.form.get('enrolment_code').lower()
+        request_data = {
+            'enrolment_code': enrolment_code,
+            'initial': True
+        }
+        response = api_call('POST', app.config['VALIDATE_ENROLMENT'], json=request_data)
+
+        # Handle API errors
+        if response.status_code == 404:
+            logger.info('Enrolment code not found')
+            template_data = {"error": {"type": "failed"}}
+            return render_template('surveys/surveys-add.html', _theme='default',
+                                   form=form, data=template_data), 202
+        elif response.status_code == 401 and not json.loads(response.text).get('active'):
+            logger.info('Enrolment code not active')
+            template_data = {"error": {"type": "failed"}}
+            return render_template('surveys/surveys-add.html', _theme='default',
+                                   form=form, data=template_data), 200
+        elif response.status_code != 200:
+            logger.error('Failed to submit enrolment code')
+            raise ApiError(response)
+
+        encrypted_enrolment_code = cryptographer.encrypt(enrolment_code.encode()).decode()
+        logger.info('Successful enrolment code submitted')
+        return redirect(url_for('surveys_bp.add_survey/confirm_organisation_survey',
+                                encrypted_enrolment_code=encrypted_enrolment_code,
+                                _external=True,
+                                _scheme=getenv('SCHEME', 'http')))
+    return render_template('surveys/surveys-add.html', _theme='default',
+                           form=form, data={"error": {}})
 
 
-@surveys_bp.route('/add_survey/confirm_organisation_survey', methods=['GET'])
+@surveys_bp.route('/add_survey/confirm_organisation_survey', methods=['GET', 'POST'])
 @jwt_authorization(request)
 def add_survey_confirm_organisation(session):
-    return render_template('surveys/surveys-confirm-organisation.html', _theme='default')
+    # Get and decrypt enrolment code
+    encrypted_enrolment_code = request.args.get('encrypted_enrolment_code', None)
+    enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
+
+    logger.info('Attempting to retrieve data for confirm organisation/survey page')
+    response = api_call('POST', app.config['CONFIRM_ORGANISATION_SURVEY'],
+                        json={'enrolment_code': enrolment_code})
+
+    if response.status_code != 200:
+        logger.error('Failed to retrieve data for confirm organisation/survey page')
+        raise ApiError(response)
+
+    response_json = json.loads(response.text)
+    logger.info('Successfully retrieved data for confirm organisation/survey page')
+    return render_template('surveys/surveys-confirm-organisation.html',
+                           _theme='default',
+                           enrolment_code=enrolment_code,
+                           encrypted_enrolment_code=encrypted_enrolment_code,
+                           organisation_name=response_json['organisation_name'],
+                           survey_name=response_json['survey_name'])
 
 
 def get_surveys_list(party_id, list_type):

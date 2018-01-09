@@ -19,23 +19,33 @@
 {% endif %}
 
 <section>
-      <form id="enrolment-code" action="{{ url_for('surveys_bp.add_survey_confirm_organisation') }}" class="form">
+      <form id="enrolment-code"
+            action="{{ url_for('surveys_bp.add_survey_confirm_organisation') }}"
+            method="post"
+            class="form">
+        {{ form.csrf_token }}
 
         <h1 class="saturn">Add a survey</h1>
 
        {% if errorType == "failed" %}
         <div class="panel panel--simple panel--error panel--spacious">
             <p class="error-message">Please enter a valid enrolment code</p>
-            {% endif %}
+        {% endif %}
 
             <div class="field">
+
               {{ form.enrolment_code.label(class_='label') }}
+
               <span class="label__description label__inner pluto">You'll find this in the letter we sent you</span>
               {{ form.enrolment_code(class_='input input--text input-type__input') }}
             </div>
+
             {% if errorType == "failed" %}
         </div>
+          {% endif %}
+
         <button class="btn btn--primary venus u-mt-s" type="submit">Continue</button>
+
         <p>
           <a href="{{ url_for('surveys_bp.logged_in') }}">Cancel</a>
         </p>

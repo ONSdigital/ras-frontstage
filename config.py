@@ -8,6 +8,7 @@ class Config(object):
     TESTING = False
     NAME = os.getenv('NAME', 'ras-frontstage')
     VERSION = os.getenv('VERSION', '0.2.0')
+    PORT = os.getenv('PORT', 8082)
     MAX_UPLOAD_LENGTH = os.getenv('MAX_UPLOAD_LENGTH',  20 * 1024 * 1024)
 
     WTF_CSRF_ENABLED = os.getenv('WTF_CSRF_ENABLED', True)
@@ -61,11 +62,12 @@ class Config(object):
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
+    PORT = os.getenv('FS_DEV_PORT', 8082)
     TEMPLATES_AUTO_RELOAD = True
     SECRET_KEY = os.getenv('SECRET_KEY', 'ONS_DUMMY_KEY')
     JWT_SECRET = os.getenv('JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
-    SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'test_user')
-    SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'test_password')
+    SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')
+    SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
 
 

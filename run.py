@@ -12,7 +12,8 @@ from structlog import wrap_logger  # NOQA  # pylint: disable=wrong-import-positi
 
 logger = wrap_logger(logging.getLogger(__name__))
 
+
 if __name__ == '__main__':
-    port = os.getenv('FS_DEV_PORT', 8080)
-    logger.info('* starting listening port "{}"'.format(port))
-    app.run(debug=True, host='0.0.0.0', port=int(port))
+    port = app.config['PORT']
+    logger.info('Starting listening port: ', port=port)
+    app.run(debug=app.config['DEBUG'], host='0.0.0.0', port=int(port))

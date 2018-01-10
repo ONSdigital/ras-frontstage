@@ -1,7 +1,8 @@
 {% import 'partials/section.html' as section %}
-
 {% extends "layouts/_twocol.html" %}
+
 {% set errorType = data['error']['type'] %}
+
 {% block page_title %}Completed surveys - ONS Business Surveys{% endblock %}
 
 {% block main %}
@@ -20,8 +21,8 @@
 
 <section>
       <form id="enrolment-code"
-            action="{{ url_for('surveys_bp.add_survey_confirm_organisation') }}"
-            method="post"
+            action="{{ url_for('surveys_bp.add_survey') }}"
+            method="POST"
             class="form">
         {{ form.csrf_token }}
 
@@ -40,15 +41,16 @@
               {{ form.enrolment_code(id="ENROLEMENT_CODE_FIELD", class_='input input--text input-type__input') }}
             </div>
 
-            {% if errorType == "failed" %}
+        {% if errorType == "failed" %}
         </div>
-          {% endif %}
+        {% endif %}
 
         <button id="CONTINUE_BTN" class="btn btn--primary venus u-mt-s" type="submit">Continue</button>
 
         <p>
           <a id="CANCEL_BTN" href="{{ url_for('surveys_bp.logged_in') }}">Cancel</a>
         </p>
+
       </form>
 </section>
 

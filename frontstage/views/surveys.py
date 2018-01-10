@@ -35,7 +35,7 @@ def surveys_history(session):
                            surveys_list=surveys_list, history=True)
 
 
-@surveys_bp.route('/add_survey', methods=['GET', 'POST'])
+@surveys_bp.route('/add-survey', methods=['GET', 'POST'])
 def add_survey():
     form = EnrolmentCodeForm(request.form)
 
@@ -74,7 +74,7 @@ def add_survey():
                            form=form, data={"error": {}})
 
 
-@surveys_bp.route('/add_survey/confirm_organisation_survey', methods=['GET'])
+@surveys_bp.route('/add-survey/confirm-organisation-survey', methods=['GET'])
 def add_survey_confirm_organisation():
     # Get and decrypt enrolment code
     encrypted_enrolment_code = request.args.get('encrypted_enrolment_code', None)

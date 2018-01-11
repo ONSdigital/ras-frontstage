@@ -59,6 +59,7 @@ class Config(object):
     ADD_SURVEY = 'surveys/add-survey'
     CONFIRM_ADD_ORGANISATION_SURVEY = 'surveys/confirm-organisation-survey'
 
+
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True

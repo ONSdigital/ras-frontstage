@@ -23,7 +23,19 @@ cryptographer = Cryptographer()
 def logged_in(session):
     party_id = session.get('party_id')
     surveys_list = get_surveys_list(party_id, 'todo')
-    return render_template('surveys/surveys-todo.html', _theme='default', surveys_list=surveys_list)
+    response = api_call('GET', app.config['CONFIRM_ADD_ORGANISATION_SURVEY'])
+    template_data = {"survey": {"justAdded": "false"}}
+
+    # Checks if new survey is added and renders "survey added" notification
+    if response.status_code == 200:
+        logger.info('New survey added to TODO')
+        template_data = {"survey": {"justAdded": "true"}}
+        return render_template('surveys/surveys-todo.html', _theme='default',
+                               data=template_data, surveys_list=surveys_list)
+
+    logger.info('No new survey added')
+    return render_template('surveys/surveys-todo.html', data=template_data,
+                           _theme='default', surveys_list=surveys_list)
 
 
 @surveys_bp.route('/history', methods=['GET'])
@@ -59,13 +71,18 @@ def add_survey():
             template_data = {"error": {"type": "failed"}}
             return render_template('surveys/surveys-add.html', _theme='default',
                                    form=form, data=template_data), 200
+        elif response.status_code == 400:
+            logger.info('Enrolment code already used')
+            template_data = {"error": {"type": "failed"}}
+            return render_template('surveys/surveys-add.html', _theme='default',
+                                   form=form, data=template_data), 200
         elif response.status_code != 200:
             logger.error('Failed to submit enrolment code')
             raise ApiError(response)
 
         encrypted_enrolment_code = cryptographer.encrypt(enrolment_code.encode()).decode()
         logger.info('Successful enrolment code submitted')
-        return redirect(url_for('surveys_bp.add_survey/confirm_organisation_survey',
+        return redirect(url_for('surveys_bp.add_survey_confirm_organisation',
                                 encrypted_enrolment_code=encrypted_enrolment_code,
                                 _external=True,
                                 _scheme=getenv('SCHEME', 'http')))

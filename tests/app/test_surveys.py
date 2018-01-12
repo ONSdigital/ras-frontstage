@@ -24,7 +24,6 @@ encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoX3Rva2VuIj
                     "iOlsiIl0sImV4cGlyZXNfYXQiOjE4OTM0NTk2NjEuMCwidXNlcm5hbWUiOiJ0ZXN0dXNlckBlbWFpbC5jb20iLCJyb2xlIjo" \
                     "icmVzcG9uZGVudCIsInBhcnR5X2lkIjoiZGIwMzZmZDctY2UxNy00MGMyLWE4ZmMtOTMyZTdjMjI4Mzk3In0.hh9sFpiPA-O" \
                     "8kugpDi3_GSDnxWh5rz2e5GQuBx7kmLM"
-used_enrolment_code = "used_code"
 
 
 class TestSurveys(unittest.TestCase):
@@ -253,10 +252,10 @@ class TestSurveys(unittest.TestCase):
     def test_enter_add_survey_used_code(self, mock_object):
         mock_object.post(url_validate_enrolment, status_code=400)
 
-        response = self.app.post('/surveys/add-survey', follow_redirects=True)
+        response = self.app.post('/surveys/add-survey', data={'enrolment_code': 'test_enrolment'}, follow_redirects=True)
 
-        self.assertEqual(response.status_code, 400)
-        self.assertTrue('Server error'.encode() in response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Enrolment code not valid'.encode() in response.data)
 
     @requests_mock.mock()
     def test_add_survey_confirm_org_page(self, mock_object):

@@ -97,8 +97,8 @@ def add_survey_confirm_organisation():
     encrypted_enrolment_code = request.args.get('encrypted_enrolment_code', None)
     enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
 
-    logger.info('Attempting to retrieve data for confirm organisation/survey page')
-    response = api_call('POST', app.config['CONFIRM_ORGANISATION_SURVEY'],
+    logger.info('Attempting to retrieve data for confirm add organisation/survey page')
+    response = api_call('POST', app.config['CONFIRM_ADD_ORGANISATION_SURVEY'],
                         json={'enrolment_code': enrolment_code})
 
     if response.status_code != 200:

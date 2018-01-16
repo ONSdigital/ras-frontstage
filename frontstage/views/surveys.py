@@ -71,7 +71,7 @@ def add_survey():
             template_data = {"error": {"type": "failed"}}
             return render_template('surveys/surveys-add.html', _theme='default',
                                    form=form, data=template_data), 200
-        elif response.status_code == 400:
+        elif response.status_code == 400 and not json.loads(response.text).get('used'):
             logger.info('Enrolment code already used')
             template_data = {"error": {"type": "failed"}}
             return render_template('surveys/surveys-add.html', _theme='default',
@@ -102,11 +102,11 @@ def add_survey_confirm_organisation():
                         json={'enrolment_code': enrolment_code})
 
     if response.status_code != 200:
-        logger.error('Failed to retrieve data for confirm organisation/survey page')
+        logger.error('Failed to retrieve data for confirm add organisation/survey page')
         raise ApiError(response)
 
     response_json = json.loads(response.text)
-    logger.info('Successfully retrieved data for confirm organisation/survey page')
+    logger.info('Successfully retrieved data for confirm add organisation/survey page')
     return render_template('surveys/surveys-confirm-organisation.html',
                            _theme='default',
                            enrolment_code=enrolment_code,

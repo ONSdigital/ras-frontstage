@@ -98,11 +98,11 @@ def add_survey_confirm_organisation(session):
     if request.method == 'GET':
         # Get and decrypt enrolment code
         encrypted_enrolment_code = request.args.get('encrypted_enrolment_code', None)
-        enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
+        session['enrolment_code'] = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
 
         logger.info('Attempting to retrieve data for confirm add organisation/survey page')
         response = api_call('POST', app.config['CONFIRM_ADD_ORGANISATION_SURVEY'],
-                            json={'enrolment_code': enrolment_code})
+                            json={'enrolment_code': session['enrolment_code']})
 
         if response.status_code != 200:
             logger.error('Failed to retrieve data for confirm add organisation/survey page')
@@ -112,7 +112,7 @@ def add_survey_confirm_organisation(session):
         logger.info('Successfully retrieved data for confirm add organisation/survey page')
         return render_template('surveys/surveys-confirm-organisation.html',
                                _theme='default',
-                               enrolment_code=enrolment_code,
+                               enrolment_code=session['enrolment_code'],
                                encrypted_enrolment_code=encrypted_enrolment_code,
                                organisation_name=response_json['organisation_name'],
                                survey_name=response_json['survey_name'])
@@ -120,6 +120,7 @@ def add_survey_confirm_organisation(session):
     elif request.method == 'POST':
         logger.info('Assigning new survey to a user')
         params = {
+            "enrolment_code": session['enrolment_code'],
             "party_id": party_id
         }
         response = api_call('POST', app.config['SURVEYS_LIST'],
@@ -129,11 +130,10 @@ def add_survey_confirm_organisation(session):
             logger.error('Failed to assign user to a survey')
             raise ApiError(response)
 
-        surveys_list = json.loads(response.text)
         logger.info('Successfully retrieved data for confirm add organisation/survey page')
-        return render_template('surveys/',
-                               _theme='default',
-                               surveys_list=surveys_list)
+        return redirect(url_for('surveys_bp.logged_in',
+                                _theme='default',
+                                _external=True))
 
 
 def get_surveys_list(party_id, list_type):

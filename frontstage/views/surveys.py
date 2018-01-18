@@ -92,13 +92,13 @@ def add_survey():
 
 
 @surveys_bp.route('/add-survey/confirm-organisation-survey', methods=['GET', 'POST'])
-def add_survey_confirm_organisation(session):
+def add_survey_confirm_organisation():
     party_id = session['party_id']
 
     if request.method == 'GET':
         # Get and decrypt enrolment code
         encrypted_enrolment_code = request.args.get('encrypted_enrolment_code', None)
-        session['enrolment_code'] = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
+        enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
 
         logger.info('Attempting to retrieve data for confirm add organisation/survey page')
         response = api_call('POST', app.config['CONFIRM_ADD_ORGANISATION_SURVEY'],
@@ -112,7 +112,7 @@ def add_survey_confirm_organisation(session):
         logger.info('Successfully retrieved data for confirm add organisation/survey page')
         return render_template('surveys/surveys-confirm-organisation.html',
                                _theme='default',
-                               enrolment_code=session['enrolment_code'],
+                               enrolment_code=enrolment_code,
                                encrypted_enrolment_code=encrypted_enrolment_code,
                                organisation_name=response_json['organisation_name'],
                                survey_name=response_json['survey_name'])

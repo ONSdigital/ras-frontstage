@@ -26,18 +26,18 @@ def logged_in(session):
     response = api_call('GET', app.config['CONFIRM_ADD_ORGANISATION_SURVEY'])
     template_data = {"survey": {"justAdded": "false"}}
 
-    sorted_surveys_list = sorted(surveys_list, key=lambda k: k.scheduledReturnDateTime)
+    # sorted_surveys_list = sorted(surveys_list, key=lambda k: k.scheduledReturnDateTime)
 
     # Checks if new survey is added and renders "survey added" notification
     if response.status_code == 200:
         logger.info('New survey added to TODO')
         template_data = {"survey": {"justAdded": "true"}}
         return render_template('surveys/surveys-todo.html', _theme='default',
-                               data=template_data, sorted_surveys_list=sorted_surveys_list)
+                               data=template_data, sorted_surveys_list=surveys_list)
 
     logger.info('No new survey added')
     return render_template('surveys/surveys-todo.html', data=template_data,
-                           _theme='default', sorted_surveys_list=sorted_surveys_list)
+                           _theme='default', sorted_surveys_list=surveys_list)
 
 
 @surveys_bp.route('/history', methods=['GET'])
@@ -50,7 +50,8 @@ def surveys_history(session):
 
 
 @surveys_bp.route('/add-survey', methods=['GET', 'POST'])
-def add_survey():
+@jwt_authorization(request)
+def add_survey(session):
     form = EnrolmentCodeForm(request.form)
 
     if request.method == 'POST' and form.validate():
@@ -94,13 +95,14 @@ def add_survey():
 
 
 @surveys_bp.route('/add-survey/confirm-organisation-survey', methods=['GET', 'POST'])
-def add_survey_confirm_organisation():
+@jwt_authorization(request)
+def add_survey_confirm_organisation(session):
     party_id = session['party_id']
 
     if request.method == 'GET':
         # Get and decrypt enrolment code
         encrypted_enrolment_code = request.args.get('encrypted_enrolment_code', None)
-        enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
+        session['enrolment_code'] = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
 
         logger.info('Attempting to retrieve data for confirm add organisation/survey page')
         response = api_call('POST', app.config['CONFIRM_ADD_ORGANISATION_SURVEY'],
@@ -114,7 +116,7 @@ def add_survey_confirm_organisation():
         logger.info('Successfully retrieved data for confirm add organisation/survey page')
         return render_template('surveys/surveys-confirm-organisation.html',
                                _theme='default',
-                               enrolment_code=enrolment_code,
+                               enrolment_code=session['enrolment_code'],
                                encrypted_enrolment_code=encrypted_enrolment_code,
                                organisation_name=response_json['organisation_name'],
                                survey_name=response_json['survey_name'])

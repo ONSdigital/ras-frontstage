@@ -22,7 +22,7 @@
 
     </li>
 
-    {% for data in surveys_list %}
+    {% for data in sorted_surveys_list %}
 
     <li class="grid card">
 
@@ -64,7 +64,7 @@
 
     {% endfor %}
 
-    {% if surveys_list|length == 0 %}
+    {% if sorted_surveys_list|length == 0 %}
     <li class="card">
         <div class="grid__col col-12@m">{{emptySurveyListLabel}}</div>
     </li>

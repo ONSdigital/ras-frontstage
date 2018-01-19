@@ -127,7 +127,7 @@ def add_survey_confirm_organisation(session):
             "enrolment_code": session['enrolment_code'],
             "party_id": party_id
         }
-        response = api_call('POST', app.config['SURVEYS_LIST'],
+        response = api_call('POST', app.config['ADD_SURVEY'],
                             parameters=params)
 
         if response.status_code != 200:

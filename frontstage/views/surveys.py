@@ -26,18 +26,19 @@ def logged_in(session):
     response = api_call('GET', app.config['CONFIRM_ADD_ORGANISATION_SURVEY'])
     template_data = {"survey": {"justAdded": "false"}}
 
-    # sorted_surveys_list = sorted(surveys_list, key=lambda k: k.scheduledReturnDateTime)
+    sorted_surveys_list = sorted(surveys_list, key=lambda k: k['collection_exercise']['scheduledReturnDateTime'],
+                                 reverse=True)
 
     # Checks if new survey is added and renders "survey added" notification
     if response.status_code == 200:
         logger.info('New survey added to TODO')
         template_data = {"survey": {"justAdded": "true"}}
         return render_template('surveys/surveys-todo.html', _theme='default',
-                               data=template_data, sorted_surveys_list=surveys_list)
+                               data=template_data, sorted_surveys_list=sorted_surveys_list)
 
     logger.info('No new survey added')
     return render_template('surveys/surveys-todo.html', data=template_data,
-                           _theme='default', sorted_surveys_list=surveys_list)
+                           _theme='default', sorted_surveys_list=sorted_surveys_list)
 
 
 @surveys_bp.route('/history', methods=['GET'])

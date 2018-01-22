@@ -131,12 +131,12 @@ def add_survey_submit(session):
     logger.info('Assigning new survey to a user')
     encrypted_enrolment_code = request.args.get('encrypted_enrolment_code')
     enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
-    params = {
+    json_params = {
         "enrolment_code": enrolment_code,
         "party_id": party_id
     }
     response = api_call('POST', app.config['ADD_SURVEY'],
-                        parameters=params)
+                        json=json_params)
 
     if response.status_code != 200:
         logger.error('Failed to assign user to a survey')

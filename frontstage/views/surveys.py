@@ -107,7 +107,7 @@ def survey_confirm_organisation(session):
 
         logger.info('Attempting to retrieve data for confirm add organisation/survey page')
         response = api_call('POST', app.config['CONFIRM_ADD_ORGANISATION_SURVEY'],
-                            json={'enrolment_code': session['enrolment_code']})
+                            json={'enrolment_code': enrolment_code})
 
         if response.status_code != 200:
             logger.error('Failed to retrieve data for confirm add organisation/survey page')

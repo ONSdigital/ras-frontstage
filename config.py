@@ -7,7 +7,7 @@ class Config(object):
     DEBUG = False
     TESTING = False
     NAME = os.getenv('NAME', 'ras-frontstage')
-    VERSION = os.getenv('VERSION', '0.2.0')
+    VERSION = os.getenv('VERSION', '0.2.1')
     PORT = os.getenv('PORT', 8082)
     MAX_UPLOAD_LENGTH = os.getenv('MAX_UPLOAD_LENGTH',  20 * 1024 * 1024)
 

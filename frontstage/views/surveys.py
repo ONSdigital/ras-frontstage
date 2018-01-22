@@ -86,7 +86,7 @@ def add_survey(session):
 
         encrypted_enrolment_code = cryptographer.encrypt(enrolment_code.encode()).decode()
         logger.info('Successful enrolment code submitted')
-        return redirect(url_for('surveys_bp.add_survey_confirm_organisation',
+        return redirect(url_for('surveys_bp.survey_confirm_organisation',
                                 encrypted_enrolment_code=encrypted_enrolment_code,
                                 _external=True,
                                 _scheme=getenv('SCHEME', 'http')))

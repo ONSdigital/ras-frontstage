@@ -95,15 +95,15 @@ def add_survey(session):
                            form=form, data={"error": {}})
 
 
-@surveys_bp.route('/add-survey/confirm-organisation-survey', methods=['GET', 'POST'])
+@surveys_bp.route('/add-survey/confirm-organisation-survey', methods=['GET'])
 @jwt_authorization(request)
-def add_survey_confirm_organisation(session):
+def survey_confirm_organisation(session):
     party_id = session['party_id']
 
     if request.method == 'GET':
         # Get and decrypt enrolment code
         encrypted_enrolment_code = request.args.get('encrypted_enrolment_code', None)
-        session['enrolment_code'] = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
+        enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
 
         logger.info('Attempting to retrieve data for confirm add organisation/survey page')
         response = api_call('POST', app.config['CONFIRM_ADD_ORGANISATION_SURVEY'],
@@ -117,28 +117,35 @@ def add_survey_confirm_organisation(session):
         logger.info('Successfully retrieved data for confirm add organisation/survey page')
         return render_template('surveys/surveys-confirm-organisation.html',
                                _theme='default',
-                               enrolment_code=session['enrolment_code'],
+                               enrolment_code=enrolment_code,
                                encrypted_enrolment_code=encrypted_enrolment_code,
                                organisation_name=response_json['organisation_name'],
                                survey_name=response_json['survey_name'])
 
-    elif request.method == 'POST':
-        logger.info('Assigning new survey to a user')
-        params = {
-            "enrolment_code": session['enrolment_code'],
-            "party_id": party_id
-        }
-        response = api_call('POST', app.config['ADD_SURVEY'],
-                            parameters=params)
 
-        if response.status_code != 200:
-            logger.error('Failed to assign user to a survey')
-            raise ApiError(response)
+@surveys_bp.route('/add-survey/add-survey-submit', methods=['GET'])
+@jwt_authorization(request)
+def add_survey_submit(session):
+    party_id = session['party_id']
 
-        logger.info('Successfully retrieved data for confirm add organisation/survey page')
-        return redirect(url_for('surveys_bp.logged_in',
-                                _theme='default',
-                                _external=True))
+    logger.info('Assigning new survey to a user')
+    encrypted_enrolment_code = request.args.get('encrypted_enrolment_code')
+    enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
+    params = {
+        "enrolment_code": enrolment_code,
+        "party_id": party_id
+    }
+    response = api_call('POST', app.config['ADD_SURVEY'],
+                        parameters=params)
+
+    if response.status_code != 200:
+        logger.error('Failed to assign user to a survey')
+        raise ApiError(response)
+
+    logger.info('Successfully retrieved data for confirm add organisation/survey page')
+    return redirect(url_for('surveys_bp.logged_in',
+                            _theme='default',
+                            _external=True))
 
 
 def get_surveys_list(party_id, list_type):

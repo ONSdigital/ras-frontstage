@@ -23,14 +23,13 @@ cryptographer = Cryptographer()
 def logged_in(session):
     party_id = session.get('party_id')
     surveys_list = get_surveys_list(party_id, 'todo')
-    response = api_call('GET', app.config['CONFIRM_ADD_ORGANISATION_SURVEY'])
     template_data = {"survey": {"justAdded": "false"}}
 
     sorted_surveys_list = sorted(surveys_list, key=lambda k: k['collection_exercise']['scheduledReturnDateTime'],
                                  reverse=True)
 
     # Checks if new survey is added and renders "survey added" notification
-    if response.status_code == 200:
+    if request.args.get('new_survey'):
         logger.info('New survey added to TODO')
         template_data = {"survey": {"justAdded": "true"}}
         return render_template('surveys/surveys-todo.html', _theme='default',
@@ -145,7 +144,8 @@ def add_survey_submit(session):
     logger.info('Successfully retrieved data for confirm add organisation/survey page')
     return redirect(url_for('surveys_bp.logged_in',
                             _theme='default',
-                            _external=True))
+                            _external=True,
+                            new_survey=True))
 
 
 def get_surveys_list(party_id, list_type):

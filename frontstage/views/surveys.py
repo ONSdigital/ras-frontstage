@@ -90,6 +90,12 @@ def add_survey(session):
                                 _external=True,
                                 _scheme=getenv('SCHEME', 'http')))
 
+    elif request.method == 'POST' and not form.validate():
+        logger.info('Invalid character length, must be 12 characters')
+        template_data = {"error": {"type": "failed"}}
+        return render_template('surveys/surveys-add.html', _theme='default',
+                               form=form, data=template_data)
+
     return render_template('surveys/surveys-add.html', _theme='default',
                            form=form, data={"error": {}})
 

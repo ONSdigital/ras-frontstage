@@ -15,7 +15,8 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 class EnrolmentCodeForm(FlaskForm):
-    enrolment_code = StringField('Enrolment Code', [InputRequired()])
+    enrolment_code = StringField('Enrolment Code', [InputRequired(), Length(min=12, max=12,
+                                                                            message='Your code must be 12 characters')])
 
 
 class RegistrationForm(FlaskForm):

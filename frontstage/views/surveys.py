@@ -141,18 +141,17 @@ def add_survey_submit(session):
         "enrolment_code": enrolment_code,
         "party_id": party_id
     }
-    # response = api_call('POST', app.config['ADD_SURVEY'],
-    #                     json=json_params)
+    response = api_call('POST', app.config['ADD_SURVEY'],
+                        json=json_params)
 
-    # if response.status_code != 200:
-    #     logger.error('Failed to assign user to a survey')
-    #     raise ApiError(response)
-    #
-    # response_json = json.loads(response.text)
-    case_id = 'ae0b691d-913b-4c55-a409-d886b66fb798'
-    # case_id = response_json['case_id']
+    if response.status_code != 200:
+        logger.error('Failed to assign user to a survey')
+        raise ApiError(response)
 
-    logger.info('Successfully retrieved data for confirm add organisation/survey page')
+    response_json = json.loads(response.text)
+    case_id = response_json['case_id']
+
+    logger.info('Successfully retrieved data for confirm add organisation/survey page', case_id=case_id)
     return redirect(url_for('surveys_bp.logged_in',
                             _theme='default',
                             _external=True,

@@ -148,7 +148,8 @@ def add_survey_submit(session):
         logger.error('Failed to assign user to a survey')
         raise ApiError(response)
 
-    case_id = response['case_id']
+    response_json = json.loads(response.text)
+    case_id = response_json['case_id']
 
     logger.info('Successfully retrieved data for confirm add organisation/survey page')
     return redirect(url_for('surveys_bp.logged_in',

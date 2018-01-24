@@ -33,7 +33,7 @@ def logged_in(session):
         logger.info('New survey added to TODO')
         template_data = {"survey": {"justAdded": "true"}}
         return render_template('surveys/surveys-todo.html', _theme='default',
-                               data=template_data, sorted_surveys_list=sorted_surveys_list)
+                               data=template_data, sorted_surveys_list=sorted_surveys_list, case_id=request.args.get('case_id'))
 
     logger.info('No new survey added')
     return render_template('surveys/surveys-todo.html', data=template_data,
@@ -103,7 +103,6 @@ def add_survey(session):
 @surveys_bp.route('/add-survey/confirm-organisation-survey', methods=['GET'])
 @jwt_authorization(request)
 def survey_confirm_organisation(session):
-    party_id = session['party_id']
 
     if request.method == 'GET':
         # Get and decrypt enrolment code
@@ -147,11 +146,14 @@ def add_survey_submit(session):
         logger.error('Failed to assign user to a survey')
         raise ApiError(response)
 
+    case_id = response['case_id']
+
     logger.info('Successfully retrieved data for confirm add organisation/survey page')
     return redirect(url_for('surveys_bp.logged_in',
                             _theme='default',
                             _external=True,
-                            new_survey=True))
+                            new_survey=True,
+                            case_id=case_id))
 
 
 def get_surveys_list(party_id, list_type):

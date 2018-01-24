@@ -44,8 +44,9 @@ def logged_in(session):
 @jwt_authorization(request)
 def surveys_history(session):
     party_id = session['party_id']
+    template_data = {"survey": {"justAdded": "false"}}
     surveys_list = get_surveys_list(party_id, 'history')
-    return render_template('surveys/surveys-history.html',  _theme='default',
+    return render_template('surveys/surveys-history.html',  _theme='default', data=template_data,
                            surveys_list=surveys_list, history=True)
 
 

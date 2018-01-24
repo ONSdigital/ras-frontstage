@@ -25,10 +25,8 @@
     </li>
 
     {% for data in sorted_surveys_list %}
-        {% if surveyAdded == "true" %}
-            {% if just_added_case_id == data.case.id  %}
-                <li class="grid card panel--simple panel--success survey--success col-13@m u-mb-m">
-             {% endif %}
+        {% if surveyAdded == "true" and just_added_case_id == data.case.id %}
+            <li class="grid card panel--simple panel--success survey--success col-13@m u-mb-m">
         {% else %}
             <li class="grid card">
         {% endif %}

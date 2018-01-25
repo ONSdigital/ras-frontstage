@@ -140,6 +140,7 @@ def add_survey_submit(session):
     enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
     json_params = {
         "enrolment_code": enrolment_code,
+        "initial": True,
         "party_id": party_id
     }
     response = api_call('POST', app.config['ADD_SURVEY'],

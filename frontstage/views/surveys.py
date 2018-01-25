@@ -33,7 +33,8 @@ def logged_in(session):
         logger.info('New survey added to TODO')
         template_data = {"survey": {"justAdded": "true"}}
         return render_template('surveys/surveys-todo.html', _theme='default',
-                               data=template_data, sorted_surveys_list=sorted_surveys_list, case_id=request.args.get('case_id'))
+                               data=template_data, sorted_surveys_list=sorted_surveys_list,
+                               just_added_case_id=request.args.get('case_id'))
 
     logger.info('No new survey added')
     return render_template('surveys/surveys-todo.html', data=template_data,
@@ -148,9 +149,10 @@ def add_survey_submit(session):
         logger.error('Failed to assign user to a survey')
         raise ApiError(response)
 
-    case_id = response['case_id']
+    response_json = json.loads(response.text)
+    case_id = response_json['case_id']
 
-    logger.info('Successfully retrieved data for confirm add organisation/survey page')
+    logger.info('Successfully retrieved data for confirm add organisation/survey page', case_id=case_id)
     return redirect(url_for('surveys_bp.logged_in',
                             _theme='default',
                             _external=True,

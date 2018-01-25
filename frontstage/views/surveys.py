@@ -32,6 +32,7 @@ def logged_in(session):
     if request.args.get('new_survey'):
         logger.info('New survey added to TODO')
         template_data = {"survey": {"justAdded": "true"}}
+        logger.info("Case ids", just_added_case_id=request.args.get('case_id'), template_data=template_data)
         return render_template('surveys/surveys-todo.html', _theme='default',
                                data=template_data, sorted_surveys_list=sorted_surveys_list,
                                just_added_case_id=request.args.get('case_id'))

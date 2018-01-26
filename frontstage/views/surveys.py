@@ -29,15 +29,13 @@ def logged_in(session):
                                  reverse=True)
 
     # Checks if new survey is added and renders "survey added" notification
-    if request.args.get('new_survey'):
-        logger.info('New survey added to TODO')
+    if request.args.get('new_survey') and ['NEW_SURVEY_NOTIF_HIGHLIGHTING'] == 1:
+        logger.info('New survey added highlighted')
         template_data = {"survey": {"justAdded": "true"}}
-        logger.info("Case ids", just_added_case_id=request.args.get('case_id'), sorted_surveys_list=sorted_surveys_list)
         return render_template('surveys/surveys-todo.html', _theme='default',
                                data=template_data, sorted_surveys_list=sorted_surveys_list,
                                just_added_case_id=request.args.get('case_id'))
 
-    logger.info('No new survey added')
     return render_template('surveys/surveys-todo.html', data=template_data,
                            _theme='default', sorted_surveys_list=sorted_surveys_list)
 
@@ -77,7 +75,7 @@ def add_survey(session):
             template_data = {"error": {"type": "failed"}}
             return render_template('surveys/surveys-add.html', _theme='default',
                                    form=form, data=template_data), 200
-        elif response.status_code == 400 and not json.loads(response.text).get('used'):
+        elif response.status_code == 400:
             logger.info('Enrolment code already used')
             template_data = {"error": {"type": "failed"}}
             return render_template('surveys/surveys-add.html', _theme='default',

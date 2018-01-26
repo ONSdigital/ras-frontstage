@@ -31,6 +31,9 @@ class Config(object):
     PASSWORD_MIN_LENGTH = 8
     PASSWORD_MAX_LENGTH = 160
 
+    # Survey highlighting config
+    NEW_SURVEY_NOTIF_HIGHLIGHTING = os.getenv('NEW_SURVEY_NOTIF_HIGHLIGHTING', '1')
+
     RAS_FRONTSTAGE_API_HOST = os.getenv('RAS_FRONTSTAGE_API_HOST', 'localhost')
     RAS_FRONTSTAGE_API_PORT = os.getenv('RAS_FRONTSTAGE_API_PORT', 8083)
     RAS_FRONTSTAGE_API_PROTOCOL = os.getenv('RAS_FRONTSTAGE_API_PROTOCOL', 'http')
@@ -69,6 +72,7 @@ class DevelopmentConfig(Config):
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'test_user')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'test_password')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
+    NEW_SURVEY_NOTIF_HIGHLIGHTING = os.getenv('NEW_SURVEY_NOTIF_HIGHLIGHTING', '1')
 
 
 class TestingConfig(DevelopmentConfig):
@@ -77,3 +81,4 @@ class TestingConfig(DevelopmentConfig):
     WTF_CSRF_ENABLED = False
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     REDIS_DB = os.getenv('REDIS_DB', 13)
+    NEW_SURVEY_NOTIF_HIGHLIGHTING = '1'

@@ -73,7 +73,11 @@
                         <p class="error-message">{{ errorType['password'][0] }}</p>
                     {% endif %}
                         {{ form.password.label(class_='label') }}
-                        {{ form.password(class_='input input--text input-type__input js-password-obfuscation-field') }}
+                        <span>
+                            <input class="js-password-obfuscation-toggle" type="checkbox" id="password-toggle" />
+                            <label for="password-toggle">Show password</label>
+                        </span>
+                        {{ form.password(class_='input input--text input-type__input js-password-obfuscation-field', autocomplete="off") }}
                         <br />
                         <a href="/passwords/forgot-password">Forgot password?</a>
                     {% if errorType.password %}

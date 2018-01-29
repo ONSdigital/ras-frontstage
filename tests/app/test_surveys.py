@@ -16,11 +16,10 @@ url_upload_ci = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['UPLOAD_CI
 with open('tests/test_data/surveys_list.json') as json_data:
     surveys_list = json.load(json_data)
 
-encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoX3Rva2VuIjoiNmY5NjM0ZGEtYTI3ZS00ZDk3LWJhZjktNjN" \
-                    "jOGRjY2IyN2M2IiwiYWNjZXNzX3Rva2VuIjoiMjUwMDM4YzUtM2QxOS00OGVkLThlZWMtODFmNTQyMDRjNDE1Iiwic2NvcGU" \
-                    "iOlsiIl0sImV4cGlyZXNfYXQiOjE4OTM0NTk2NjEuMCwidXNlcm5hbWUiOiJ0ZXN0dXNlckBlbWFpbC5jb20iLCJyb2xlIjo" \
-                    "icmVzcG9uZGVudCIsInBhcnR5X2lkIjoiZGIwMzZmZDctY2UxNy00MGMyLWE4ZmMtOTMyZTdjMjI4Mzk3In0.hh9sFpiPA-O" \
-                    "8kugpDi3_GSDnxWh5rz2e5GQuBx7kmLM"
+encoded_jwt_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdG9rZW4iOiIyMGNkM2RhOC05ODZhLTQzNzAtYTEwOC01Y2M" \
+                    "1Y2NlOWFjOWIiLCJyb2xlIjoicmVzcG9uZGVudCIsInJlZnJlc2hfdG9rZW4iOiI3NmZmN2Q1NC0yYmQ4LTQwMTgtOTg2OS0" \
+                    "5NzBjNDk4NzZmOWIiLCJwYXJ0eV9pZCI6ImY5NTZlOGFlLTZlMGYtNDQxNC1iMGNmLWEwN2MxYWEzZTM3YiIsImV4cGlyZXN" \
+                    "fYXQiOjE1MTcyMjk4NDIuMDA2MjQ0fQ.ybIm2NpOAmNEVne70MVaXOdcGz2NCIpbeB9YVcd4M2I"
 
 
 class TestSurveys(unittest.TestCase):

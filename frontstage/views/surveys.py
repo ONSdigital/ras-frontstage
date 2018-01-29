@@ -62,15 +62,20 @@ def add_survey(session):
         response = api_call('POST', app.config['VALIDATE_ENROLMENT'], json=request_data)
 
         # Handle API errors
-        if response.status_code == 404 or 400:
-            logger.info('Enrolment code not found', status=response.status_code)
+        if response.status_code == 404:
+            logger.info('Enrolment code not found')
             return render_template('surveys/surveys-add.html', _theme='default', form=form,
                                    data={"error": {"type": "failed"}}), 202
 
         elif response.status_code == 401 and not json.loads(response.text).get('active'):
-            logger.info('Enrolment code not active', status=response.status_code)
+            logger.info('Enrolment code not active')
             return render_template('surveys/surveys-add.html', _theme='default', form=form,
-                                   data={"error": {"type": "failed"}}), 200
+                                   data={"error": {"type": "failed"}})
+
+        elif response.status_code == 400:
+            logger.info('Enrolment code already used')
+            return render_template('surveys/surveys-add.html', _theme='default', form=form,
+                                   data={"error": {"type": "failed"}})
 
         elif response.status_code != 200:
             logger.error('Failed to submit enrolment code')

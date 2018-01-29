@@ -2,8 +2,6 @@
 
 {% extends "layouts/_onecol.html" %}
 
-{% set surveyAdded = data['survey']['justAdded'] %}
-
 {% block page_title %}Surveys to complete - ONS Business Surveys{% endblock %}
 
 {% block main %}
@@ -23,7 +21,7 @@
     </li>
 </ul>
 
-{% if surveyAdded == "true" %}
+{% if surveyAdded %}
 <div class="panel panel--simple panel--success survey--success col-5@m u-mb-m ">
     <div class="panel__body">
           <div>Your <a id="NEW_SURVEY_NOTIF" href="#RSI-survey">new survey</a> has been added</div>

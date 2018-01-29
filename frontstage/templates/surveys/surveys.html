@@ -1,5 +1,3 @@
-{% set surveyAdded = data['survey']['justAdded'] %}
-
 <ul class="survey-list">
 
     <li class="header-row">
@@ -25,7 +23,7 @@
     </li>
 
     {% for survey in sorted_surveys_list %}
-        {% if surveyAdded == "true" and just_added_case_id == survey.case.id %}
+        {% if surveyAdded and just_added_case_id == survey.case.id %}
             <li class="grid card panel--simple panel--success survey--success col-13@m u-mb-m">
         {% else %}
             <li class="grid card">

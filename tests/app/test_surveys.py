@@ -224,7 +224,7 @@ class TestSurveys(unittest.TestCase):
     def test_enter_add_survey_inactive_code(self, mock_object):
         mock_object.post(url_validate_enrolment, status_code=401, json={'active': False})
 
-        response = self.app.post('/surveys/add-survey', data={'enrolment_code': 'test_enrolment'})
+        response = self.app.post('/surveys/add-survey', data={'enrolment_code': '123456789012'})
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Enrolment code not valid'.encode() in response.data)

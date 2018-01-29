@@ -23,7 +23,6 @@ cryptographer = Cryptographer()
 def logged_in(session):
     party_id = session.get('party_id')
     surveys_list = get_surveys_list(party_id, 'todo')
-    template_data = {"survey": {"justAdded": "false"}}
 
     sorted_surveys_list = sorted(surveys_list, key=lambda k: k['collection_exercise']['scheduledReturnDateTime'],
                                  reverse=True)
@@ -31,12 +30,11 @@ def logged_in(session):
     # Checks if new survey is added and renders "survey added" notification
     if request.args.get('new_survey') and ['NEW_SURVEY_NOTIF_HIGHLIGHTING'] == 1:
         logger.info('New survey added highlighted')
-        template_data = {"survey": {"justAdded": "true"}}
         return render_template('surveys/surveys-todo.html', _theme='default',
-                               data=template_data, sorted_surveys_list=sorted_surveys_list,
+                               surveyAdded=True, sorted_surveys_list=sorted_surveys_list,
                                just_added_case_id=request.args.get('case_id'))
 
-    return render_template('surveys/surveys-todo.html', data=template_data,
+    return render_template('surveys/surveys-todo.html', surveyAdded=False,
                            _theme='default', sorted_surveys_list=sorted_surveys_list)
 
 
@@ -44,10 +42,9 @@ def logged_in(session):
 @jwt_authorization(request)
 def surveys_history(session):
     party_id = session['party_id']
-    surveys_list = get_surveys_list(party_id, 'history')
-    template_data = {"survey": {"justAdded": "false"}}
-    return render_template('surveys/surveys-history.html',  _theme='default', data=template_data,
-                           surveys_list=surveys_list, history=True)
+    sorted_surveys_list = get_surveys_list(party_id, 'history')
+    return render_template('surveys/surveys-history.html', _theme='default',
+                           sorted_surveys_list=sorted_surveys_list, history=True)
 
 
 @surveys_bp.route('/add-survey', methods=['GET', 'POST'])

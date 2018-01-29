@@ -47,7 +47,7 @@ class TestRegistration(unittest.TestCase):
     def test_enter_enrolment_code_success(self, mock_object):
         mock_object.post(url_validate_enrolment)
 
-        response = self.app.post('/register/create-account', data={'enrolment_code': 'test_enrolment'})
+        response = self.app.post('/register/create-account', data={'enrolment_code': '123456789012'})
 
         # Check that we redirect to the confirm-organisation-survey page
         self.assertEqual(response.status_code, 302)
@@ -63,7 +63,7 @@ class TestRegistration(unittest.TestCase):
     def test_enter_enrolment_code_inactive_code(self, mock_object):
         mock_object.post(url_validate_enrolment, status_code=401, json={'active': False})
 
-        response = self.app.post('/register/create-account', data={'enrolment_code': 'test_enrolment'})
+        response = self.app.post('/register/create-account', data={'enrolment_code': '123456789012'})
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Enrolment code not valid'.encode() in response.data)
@@ -72,7 +72,7 @@ class TestRegistration(unittest.TestCase):
     def test_enter_enrolment_code_invalid_code(self, mock_object):
         mock_object.post(url_validate_enrolment, status_code=404)
 
-        response = self.app.post('/register/create-account', data={'enrolment_code': 'test_enrolment'})
+        response = self.app.post('/register/create-account', data={'enrolment_code': '123456789012'})
 
         self.assertEqual(response.status_code, 202)
         self.assertTrue('Enrolment code not valid'.encode() in response.data)
@@ -81,7 +81,7 @@ class TestRegistration(unittest.TestCase):
     def test_enter_enrolment_code_fail(self, mock_object):
         mock_object.post(url_validate_enrolment, status_code=500)
 
-        response = self.app.post('/register/create-account', data={'enrolment_code': 'test_enrolment'}, follow_redirects=True)
+        response = self.app.post('/register/create-account', data={'enrolment_code': '123456789012'}, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)

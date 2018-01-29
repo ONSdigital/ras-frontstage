@@ -16,10 +16,10 @@ with open('tests/test_data/secure_messaging/message.json') as json_data:
 url_send_message = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['SEND_MESSAGE_URL']
 
 
-encoded_jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdG9rZW4iOiIyMGNkM2RhOC05ODZhLTQzNzAtYTEwOC01Y2M" \
-              "1Y2NlOWFjOWIiLCJyb2xlIjoicmVzcG9uZGVudCIsInJlZnJlc2hfdG9rZW4iOiI3NmZmN2Q1NC0yYmQ4LTQwMTgtOTg2OS0" \
-              "5NzBjNDk4NzZmOWIiLCJwYXJ0eV9pZCI6ImY5NTZlOGFlLTZlMGYtNDQxNC1iMGNmLWEwN2MxYWEzZTM3YiIsImV4cGlyZXN" \
-              "fYXQiOjE1MTcyMjk4NDIuMDA2MjQ0fQ.ybIm2NpOAmNEVne70MVaXOdcGz2NCIpbeB9YVcd4M2I"
+encoded_jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoicmVzcG9uZGVudCIsImFjY2Vzc190b2tlbiI6ImI5OWIyMjA0LWYxM" \
+              "DAtNDcxZS1iOTQ1LTIyN2EyNmVhNjljZCIsInJlZnJlc2hfdG9rZW4iOiIxZTQyY2E2MS02ZDBkLTQxYjMtODU2Yy02YjhhMDhlYmI" \
+              "yZTMiLCJleHBpcmVzX2F0IjoxNzM4MTU4MzI4LjAsInBhcnR5X2lkIjoiZjk1NmU4YWUtNmUwZi00NDE0LWIwY2YtYTA3YzFhYTNlM" \
+              "zdiIn0.7W9yikGtX2gbKLclxv-dajcJ2NL0Nb_HDVqHrCrYvQE"
 
 
 def create_api_error(status_code, data=None):

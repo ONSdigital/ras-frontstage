@@ -24,7 +24,7 @@ class Config(object):
     NON_DEFAULT_VARIABLES = ['SECRET_KEY', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD', 'JWT_SECRET']
 
     REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
-    REDIS_PORT = os.getenv('REDIS_PORT', 7379)
+    REDIS_PORT = os.getenv('REDIS_PORT', 6379)
     REDIS_DB = os.getenv('REDIS_DB', 1)
 
     PASSWORD_MATCH_ERROR_TEXT = 'Your passwords do not match'
@@ -64,7 +64,7 @@ class DevelopmentConfig(Config):
     DEBUG = True
     TEMPLATES_AUTO_RELOAD = True
     SECRET_KEY = os.getenv('SECRET_KEY', 'ONS_DUMMY_KEY')
-    JWT_SECRET = os.getenv('JWT_SECRET', 'testsecret')
+    JWT_SECRET = os.getenv('JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)

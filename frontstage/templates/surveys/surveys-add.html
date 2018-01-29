@@ -20,38 +20,38 @@
 {% endif %}
 
 <section>
-      <form id="enrolment-code"
-            action="{{ url_for('surveys_bp.add_survey') }}"
-            method="POST"
-            class="form">
+    <form id="enrolment-code"
+          action="{{ url_for('surveys_bp.add_survey') }}"
+          method="POST"
+          class="form">
         {{ form.csrf_token }}
 
         <h1 class="saturn">Add a survey</h1>
 
-       {% if errorType == "failed" %}
+        {% if errorType == "failed" %}
         <div class="panel panel--simple panel--error panel--spacious">
             <p class="error-message">Please enter a valid enrolment code</p>
-        {% endif %}
+            {% endif %}
 
             <div class="field">
 
-              {{ form.enrolment_code.label(class_='label') }}
+                {{ form.enrolment_code.label(class_='label') }}
 
-              <span class="label__description label__inner pluto">You'll find this in the letter we sent you</span>
-              {{ form.enrolment_code(id="ENROLEMENT_CODE_FIELD", class='input input--text input-type__input') }}
+                <span class="label__description label__inner pluto">You'll find this in the letter we sent you</span>
+                {{ form.enrolment_code(id="ENROLEMENT_CODE_FIELD", class='input input--text input-type__input') }}
             </div>
 
-        {% if errorType == "failed" %}
+            {% if errorType == "failed" %}
         </div>
         {% endif %}
 
         <button id="CONTINUE_BTN" class="btn btn--primary venus u-mt-s" type="submit">Continue</button>
 
         <p>
-          <a id="CANCEL_BTN" href="{{ url_for('surveys_bp.logged_in') }}">Cancel</a>
+            <a id="CANCEL_BTN" href="{{ url_for('surveys_bp.logged_in') }}">Cancel</a>
         </p>
 
-      </form>
+    </form>
 </section>
 
 {% endblock main %}

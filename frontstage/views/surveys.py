@@ -28,7 +28,7 @@ def logged_in(session):
                                  reverse=True)
 
     # Checks if new survey is added and renders "survey added" notification
-    if request.args.get('new_survey') and ['NEW_SURVEY_NOTIF_HIGHLIGHTING'] == 1:
+    if request.args.get('new_survey') and ['NEW_SURVEY_NOTIF_HIGHLIGHTING']:
         logger.info('New survey added highlighted')
         return render_template('surveys/surveys-todo.html', _theme='default',
                                surveyAdded=True, sorted_surveys_list=sorted_surveys_list,
@@ -62,21 +62,16 @@ def add_survey(session):
         response = api_call('POST', app.config['VALIDATE_ENROLMENT'], json=request_data)
 
         # Handle API errors
-        if response.status_code == 404:
-            logger.info('Enrolment code not found')
-            template_data = {"error": {"type": "failed"}}
-            return render_template('surveys/surveys-add.html', _theme='default',
-                                   form=form, data=template_data), 202
+        if response.status_code == 404 or 400:
+            logger.info('Enrolment code not found', status=response.status_code)
+            return render_template('surveys/surveys-add.html', _theme='default', form=form,
+                                   data={"error": {"type": "failed"}}), 202
+
         elif response.status_code == 401 and not json.loads(response.text).get('active'):
-            logger.info('Enrolment code not active')
-            template_data = {"error": {"type": "failed"}}
-            return render_template('surveys/surveys-add.html', _theme='default',
-                                   form=form, data=template_data), 200
-        elif response.status_code == 400:
-            logger.info('Enrolment code already used')
-            template_data = {"error": {"type": "failed"}}
-            return render_template('surveys/surveys-add.html', _theme='default',
-                                   form=form, data=template_data), 200
+            logger.info('Enrolment code not active', status=response.status_code)
+            return render_template('surveys/surveys-add.html', _theme='default', form=form,
+                                   data={"error": {"type": "failed"}}), 200
+
         elif response.status_code != 200:
             logger.error('Failed to submit enrolment code')
             raise ApiError(response)
@@ -90,9 +85,8 @@ def add_survey(session):
 
     elif request.method == 'POST' and not form.validate():
         logger.info('Invalid character length, must be 12 characters')
-        template_data = {"error": {"type": "failed"}}
-        return render_template('surveys/surveys-add.html', _theme='default',
-                               form=form, data=template_data)
+        return render_template('surveys/surveys-add.html', _theme='default', form=form,
+                               data={"error": {"type": "failed"}})
 
     return render_template('surveys/surveys-add.html', _theme='default',
                            form=form, data={"error": {}})
@@ -102,27 +96,26 @@ def add_survey(session):
 @jwt_authorization(request)
 def survey_confirm_organisation(session):
 
-    if request.method == 'GET':
-        # Get and decrypt enrolment code
-        encrypted_enrolment_code = request.args.get('encrypted_enrolment_code', None)
-        enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
+    # Get and decrypt enrolment code
+    encrypted_enrolment_code = request.args.get('encrypted_enrolment_code', None)
+    enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
 
-        logger.info('Attempting to retrieve data for confirm add organisation/survey page')
-        response = api_call('POST', app.config['CONFIRM_ADD_ORGANISATION_SURVEY'],
-                            json={'enrolment_code': enrolment_code})
+    logger.info('Attempting to retrieve data for confirm add organisation/survey page')
+    response = api_call('POST', app.config['CONFIRM_ADD_ORGANISATION_SURVEY'],
+                        json={'enrolment_code': enrolment_code})
 
-        if response.status_code != 200:
-            logger.error('Failed to retrieve data for confirm add organisation/survey page')
-            raise ApiError(response)
+    if response.status_code != 200:
+        logger.error('Failed to retrieve data for confirm add organisation/survey page')
+        raise ApiError(response)
 
-        response_json = json.loads(response.text)
-        logger.info('Successfully retrieved data for confirm add organisation/survey page')
-        return render_template('surveys/surveys-confirm-organisation.html',
-                               _theme='default',
-                               enrolment_code=enrolment_code,
-                               encrypted_enrolment_code=encrypted_enrolment_code,
-                               organisation_name=response_json['organisation_name'],
-                               survey_name=response_json['survey_name'])
+    response_json = json.loads(response.text)
+    logger.info('Successfully retrieved data for confirm add organisation/survey page', status=response.status_code)
+    return render_template('surveys/surveys-confirm-organisation.html',
+                           _theme='default',
+                           enrolment_code=enrolment_code,
+                           encrypted_enrolment_code=encrypted_enrolment_code,
+                           organisation_name=response_json['organisation_name'],
+                           survey_name=response_json['survey_name'])
 
 
 @surveys_bp.route('/add-survey/add-survey-submit', methods=['GET'])
@@ -130,7 +123,7 @@ def survey_confirm_organisation(session):
 def add_survey_submit(session):
     party_id = session['party_id']
 
-    logger.info('Assigning new survey to a user')
+    logger.info('Assigning new survey to a user', party_id=party_id)
     encrypted_enrolment_code = request.args.get('encrypted_enrolment_code')
     enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
     json_params = {
@@ -138,11 +131,10 @@ def add_survey_submit(session):
         "initial": True,
         "party_id": party_id
     }
-    response = api_call('POST', app.config['ADD_SURVEY'],
-                        json=json_params)
+    response = api_call('POST', app.config['ADD_SURVEY'], json=json_params)
 
     if response.status_code != 200:
-        logger.error('Failed to assign user to a survey')
+        logger.error('Failed to assign user to a survey', status=response.status_code)
         raise ApiError(response)
 
     response_json = json.loads(response.text)

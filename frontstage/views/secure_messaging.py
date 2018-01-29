@@ -83,7 +83,7 @@ def get_messages_list(label):
     response = api_call('GET', endpoint, parameters=parameters, headers=headers)
 
     if response.status_code != 200:
-        logger.error('Failed to retrieve messages list', label=label)
+        logger.error('Failed to retrieve messages list', label=label, status=response.status_code)
         raise ApiError(response)
 
     messages_list = json.loads(response.text)
@@ -100,7 +100,8 @@ def get_message(message_id, label, party_id):
     response = api_call('GET', endpoint, parameters=parameters, headers=headers)
 
     if response.status_code != 200:
-        logger.error('Failed to retrieve message', message_id=message_id, party_id=party_id)
+        logger.error('Failed to retrieve message', message_id=message_id, party_id=party_id,
+                     status=response.status_code)
         raise ApiError(response)
 
     message = json.loads(response.text)
@@ -129,7 +130,7 @@ def send_message(party_id, is_draft):
                         json=message_json, headers=headers)
 
     if response.status_code != 200:
-        logger.debug('Failed to send message', party_id=party_id)
+        logger.debug('Failed to send message', party_id=party_id, status=response.status_code)
         raise ApiError(response)
     sent_message = json.loads(response.text)
 

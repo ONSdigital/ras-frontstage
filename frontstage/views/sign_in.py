@@ -59,7 +59,7 @@ def login():
                                        form=form, data={"error": {"type": "failed"}})
 
         if response.status_code != 200:
-            logger.error('Failed to sign in')
+            logger.error('Failed to sign in', status=response.status_code)
             raise ApiError(response)
 
         # Take our raw token and add a UTC timestamp to the expires_at attribute

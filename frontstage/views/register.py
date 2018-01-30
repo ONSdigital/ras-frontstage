@@ -110,7 +110,7 @@ def register_enter_your_details():
                                    form=form,
                                    errors=error)
         elif response.status_code != 201:
-            logger.error('Failed to create account')
+            logger.error('Failed to create account', status=response.status_code)
             raise ApiError(response)
 
         logger.info('Successfully created account')

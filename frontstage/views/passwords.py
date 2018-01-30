@@ -58,7 +58,7 @@ def post_forgot_password():
                                    form=form, data=template_data)
 
         if response.status_code != 200:
-            logger.error('Unable to send password change request', status=response.status_code)
+            logger.error('Unable to send password change request')
             raise ApiError(response)
 
         logger.debug('Successfully sent password change request email')
@@ -93,7 +93,7 @@ def get_reset_password(token, form_errors=None):
         logger.warning('Invalid token sent to party service', token=token)
         return redirect(url_for('error_bp.not_found_error_page'))
     elif response.status_code != 200:
-        logger.error('Party service failed to verify token', status=response.status_code)
+        logger.error('Party service failed to verify token')
         raise ApiError(response)
 
     template_data = {
@@ -129,7 +129,7 @@ def post_reset_password(token):
         logger.warning('Invalid token sent to party service', token=token)
         return redirect(url_for('error_bp.not_found_error_page'))
     elif response.status_code != 200:
-        logger.error('Party service failed to verify token', status=response.status_code)
+        logger.error('Party service failed to verify token')
         raise ApiError(response)
 
     logger.info('Successfully changed user password', token=token)

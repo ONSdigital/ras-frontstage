@@ -146,8 +146,7 @@ def upload_survey(session):
                                 case_id=case_id,
                                 error_info=error_info))
     elif response.status_code != 200:
-        logger.error('Failed to upload collection instrument', party_id=party_id, case_id=case_id,
-                     status=response.status_code)
+        logger.error('Failed to upload collection instrument', party_id=party_id, case_id=case_id)
         raise ApiError(response)
 
     logger.info('Successfully uploaded collection instrument', party_id=party_id, case_id=case_id)

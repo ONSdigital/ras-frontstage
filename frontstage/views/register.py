@@ -43,7 +43,7 @@ def register():
             return render_template('register/register.enter-enrolment-code.html', _theme='default',
                                    form=form, data=template_data), 200
         elif response.status_code != 200:
-            logger.error('Failed to submit enrolment code', status=response.status_code)
+            logger.error('Failed to submit enrolment code')
             raise ApiError(response)
 
         encrypted_enrolment_code = cryptographer.encrypt(enrolment_code.encode()).decode()
@@ -68,7 +68,7 @@ def register_confirm_organisation_survey():
                         json={'enrolment_code': enrolment_code})
 
     if response.status_code != 200:
-        logger.error('Failed to retrieve data for confirm organisation/survey page', status=response.status_code)
+        logger.error('Failed to retrieve data for confirm organisation/survey page')
         raise ApiError(response)
 
     response_json = json.loads(response.text)
@@ -122,7 +122,7 @@ def register_enter_your_details():
         response = api_call('POST', app.config['VALIDATE_ENROLMENT'],
                             json={'enrolment_code': enrolment_code})
         if response.status_code != 200:
-            logger.error('Failed to validate enrolment code', status=response.status_code)
+            logger.error('Failed to validate enrolment code')
             if response.status_code == 401:
                 logger.error('Invalid enrolment code used')
             raise ApiError(response)
@@ -149,7 +149,7 @@ def register_activate_account(token):
         logger.warning('Unrecognised email verification token', token=token)
         return redirect(url_for('error_bp.not_found_error_page'))
     elif response.status_code != 200:
-        logger.info('Failed to verify email', status=response.status_code)
+        logger.info('Failed to verify email')
         raise ApiError(response)
 
     # Successful account activation therefore redirect back to the login screen

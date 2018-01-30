@@ -21,7 +21,7 @@ def not_found_error(error):  # pylint: disable=unused-argument
 
 @app.errorhandler(ApiError)
 def api_error(error):
-    logger.error('Api failed to retrieve required data', url=error.url, status_code=str(error.status_code))
+    logger.error('Api failed to retrieve required data', url=error.url, status=error.status_code)
     return redirect(url_for('error_bp.server_error_page',
                             _external=True,
                             _scheme=getenv('SCHEME', 'http')))

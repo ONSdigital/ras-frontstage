@@ -41,7 +41,8 @@ def get_surveys_list(party_id, list_type):
     response = api_call('GET', app.config['SURVEYS_LIST'], parameters=params)
 
     if response.status_code != 200:
-        logger.error('Failed to retrieve surveys list', party_id=party_id, list_type=list_type)
+        logger.error('Failed to retrieve surveys list', party_id=party_id, list_type=list_type,
+                     status=response.status_code)
         raise ApiError(response)
 
     surveys_list = json.loads(response.text)
@@ -63,7 +64,7 @@ def access_survey(session):
     response = api_call('GET', app.config['ACCESS_CASE'], parameters=params)
 
     if response.status_code != 200:
-        logger.error('Failed to retrieve case data', party_id=party_id, case_id=case_id)
+        logger.error('Failed to retrieve case data', party_id=party_id, case_id=case_id, status=response.status_code)
         raise ApiError(response)
     case_data = json.loads(response.text)
 
@@ -91,7 +92,8 @@ def download_survey(session):
     response = api_call('GET', app.config['DOWNLOAD_CI'], parameters=params)
 
     if response.status_code != 200:
-        logger.error('Failed to download collection instrument', party_id=party_id, case_id=case_id)
+        logger.error('Failed to download collection instrument', party_id=party_id, case_id=case_id,
+                     status=response.status_code)
         raise ApiError(response)
 
     logger.info('Successfully downloaded collection instrument', case_id=case_id, party_id=party_id)
@@ -134,7 +136,7 @@ def upload_survey(session):
             error_info = 'size'
         else:
             logger.error('Unexpected error message returned from collection instrument',
-                         status_code=response.status_code,
+                         status=response.status_code,
                          error_message=error_message,
                          party_id=party_id,
                          case_id=case_id)

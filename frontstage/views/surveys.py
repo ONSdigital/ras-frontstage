@@ -22,19 +22,13 @@ cryptographer = Cryptographer()
 @jwt_authorization(request)
 def logged_in(session):
     party_id = session.get('party_id')
-    surveys_list = get_surveys_list(party_id, 'todo')
 
+    surveys_list = get_surveys_list(party_id, 'todo')
     sorted_surveys_list = sorted(surveys_list, key=lambda k: k['collection_exercise']['scheduledReturnDateTime'],
                                  reverse=True)
 
-    # Checks if new survey is added and renders "survey added" notification
-    if request.args.get('new_survey') and ['NEW_SURVEY_NOTIF_HIGHLIGHTING']:
-        logger.info('New survey added highlighted')
-        return render_template('surveys/surveys-todo.html', _theme='default',
-                               surveyAdded=True, sorted_surveys_list=sorted_surveys_list,
-                               just_added_case_id=request.args.get('case_id'))
-
-    return render_template('surveys/surveys-todo.html', surveyAdded=False,
+    return render_template('surveys/surveys-todo.html',
+                           just_added_case_id=request.args.get('case_id'),
                            _theme='default', sorted_surveys_list=sorted_surveys_list)
 
 

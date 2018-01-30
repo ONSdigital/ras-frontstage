@@ -50,8 +50,7 @@ def add_survey(session):
         logger.info('Enrolment code submitted')
         enrolment_code = request.form.get('enrolment_code').lower()
         request_data = {
-            'enrolment_code': enrolment_code,
-            'initial': True
+            'enrolment_code': enrolment_code
         }
         response = api_call('POST', app.config['VALIDATE_ENROLMENT'], json=request_data)
 

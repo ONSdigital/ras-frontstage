@@ -59,7 +59,7 @@ def add_survey(session):
         if response.status_code == 404:
             logger.info('Enrolment code not found')
             return render_template('surveys/surveys-add.html', _theme='default', form=form,
-                                   data={"error": {"type": "failed"}}), 202
+                                   data={"error": {"type": "failed"}}), 200
 
         elif response.status_code == 401 and not json.loads(response.text).get('active'):
             logger.info('Enrolment code not active')
@@ -127,23 +127,22 @@ def add_survey_submit(session):
     enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
     json_params = {
         "enrolment_code": enrolment_code,
-        "initial": True,
         "party_id": party_id
     }
     response = api_call('POST', app.config['ADD_SURVEY'], json=json_params)
 
     if response.status_code != 200:
-        logger.error('Failed to assign user to a survey', status=response.status_code)
+        logger.error('Failed to assign user to a survey', status=response.status_code, party_id=party_id)
         raise ApiError(response)
 
     response_json = json.loads(response.text)
     case_id = response_json['case_id']
 
-    logger.info('Successfully retrieved data for confirm add organisation/survey page', case_id=case_id)
+    logger.info('Successfully retrieved data for confirm add organisation/survey page', case_id=case_id,
+                party_id=party_id)
     return redirect(url_for('surveys_bp.logged_in',
                             _theme='default',
                             _external=True,
-                            new_survey=True,
                             case_id=case_id))
 
 

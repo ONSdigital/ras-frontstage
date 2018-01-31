@@ -96,6 +96,15 @@ class TestSurveys(unittest.TestCase):
         self.assertTrue('RUNAME1_COMPANY4 RUNNAME2_COMPANY4'.encode() in response.data)
 
     @requests_mock.mock()
+    def test_access_survey_title(self, mock_request):
+        mock_request.get(url_access_case, json=surveys_list[1])
+
+        response = self.app.get('/surveys/access_survey?case_id=t3577bd4-004d-42d1-a1c6-a514973d9ae5', follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Test Survey December 2017 - ONS Business Surveys'.encode() in response.data)
+
+    @requests_mock.mock()
     def test_access_survey_fail(self, mock_request):
         mock_request.get(url_access_case, status_code=500)
 

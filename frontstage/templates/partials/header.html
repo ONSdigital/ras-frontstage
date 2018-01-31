@@ -30,7 +30,7 @@
 
     {% if 'authorization' in request.cookies %}
     <div class="sign-out header__sign-out">
-      <a class="u-ml-s nowrap" href="{{ url_for('sign_in_bp.logout') }}">Sign out</a>
+      <a id="SIGN_OUT_BTN" class="u-ml-s nowrap" href="{{ url_for('sign_in_bp.logout') }}">Sign out</a>
     </div>
     
     {% endif %}

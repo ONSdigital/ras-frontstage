@@ -22,52 +22,52 @@
 
     </li>
 
-    {% for data in surveys_list %}
-
+    {% for survey in sorted_surveys_list %}
+    {% if just_added_case_id == survey.case.id %}
+    <li class="grid card panel--simple panel--success survey--success col-13@m u-mb-m">
+        {% else %}
     <li class="grid card">
-
+        {% endif %}
         <div class="grid__col col-4@m">
             <span class="survey-list-item__label mercury">SURVEY: </span>
-            <span>{{ data.survey.longName }}</span><br/>
+            <span>{{ survey.survey.longName }}</span><br/>
             <span class="survey-list-item pluto">
-                BUSINESS: {{ data.business_party.name }}<br/>
-                REF: {{data.case.caseGroup.sampleUnitRef }}
-            </span>
+                        BUSINESS: {{ survey.business_party.name }}<br/>
+                        REF: {{survey.case.caseGroup.sampleUnitRef }}
+                    </span>
         </div>
 
         <div class="grid__col col-2@m">
             <span class="survey-list-item__label mercury">PERIOD COVERED: </span>
-            <span class="survey-list-item__nowrap">{{ data.collection_exercise.periodEndDateTimeFormatted}}</span>
+            <span class="survey-list-item__nowrap">{{ survey.collection_exercise.periodEndDateTimeFormatted}}</span>
         </div>
 
         <div class="grid__col col-2@m">
             {% if not history %}
             <span class="survey-list-item__label mercury">SUBMIT BY: </span>
-            <span>{{ data.collection_exercise.scheduledReturnDateTimeFormatted}}</span>
+            <span>{{ survey.collection_exercise.scheduledReturnDateTimeFormatted}}</span>
             {% endif %}
         </div>
 
         <div class="grid__col col-2@m">
             <span class="survey-list-item__label mercury">STATUS: </span>
-            <span>{{ data.status }}</span>
+            <span>{{ survey.status }}</span>
         </div>
-
         <div class="grid__col col-2@m">
-            <a href="{{ url_for('surveys_bp.access_survey', case_id=data.case.id) }}">
+            <a href="{{ url_for('surveys_bp.access_survey', case_id=survey.case.id) }}">
                 <button id="ACCESS_SURVEY_BUTTON_{{loop.index}}" class="btn action-button btn--primary" type="submit">
-                    Access <span class="u-vh">{{ data.survey.longName|replace("Survey", " ") }}</span> survey
+                    Access <span class="u-vh">{{ survey.survey.longName|replace("Survey", " ") }}</span> survey
                 </button>
             </a>
         </div>
-
     </li>
-
     {% endfor %}
 
-    {% if surveys_list|length == 0 %}
+    {% if sorted_surveys_list|length == 0 %}
     <li class="card">
         <div class="grid__col col-12@m">{{emptySurveyListLabel}}</div>
     </li>
     {% endif %}
+
 
 </ul>

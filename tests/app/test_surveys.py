@@ -12,6 +12,10 @@ url_get_surveys_list = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['SU
 url_access_case = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['ACCESS_CASE']
 url_download_ci = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['DOWNLOAD_CI']
 url_upload_ci = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['UPLOAD_CI']
+url_validate_enrolment = '{}{}'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'], app.config['VALIDATE_ENROLMENT'])
+url_add_survey = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['ADD_SURVEY']
+url_confirm_add_organisation_survey = '{}{}'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'],
+                                                    app.config['CONFIRM_ADD_ORGANISATION_SURVEY'])
 
 with open('tests/test_data/surveys_list.json') as json_data:
     surveys_list = json.load(json_data)
@@ -27,6 +31,9 @@ class TestSurveys(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
         self.app.set_cookie('localhost', 'authorization', 'session_key')
+        self.headers = {
+            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"  # NOQA
+            }
         self.survey_file = dict(file=(io.BytesIO(b'my file contents'), "testfile.xlsx"))
         self.upload_error = {
             "error": {
@@ -36,6 +43,14 @@ class TestSurveys(unittest.TestCase):
             }
         }
         self.patcher = patch('redis.StrictRedis.get', return_value=encoded_jwt_token)
+        self.encrypted_enrolment_code = 'WfwJghohWOZTIYnutlTcVucqnuED5Lm9q8t0L4ASHPo='
+        self.params = {
+            "encrypted_enrolment_code": self.encrypted_enrolment_code
+        }
+        self.organisation_survey_data = {
+            'survey_name': 'test_survey',
+            'organisation_name': 'test_org'
+        }
         self.patcher.start()
 
     def tearDown(self):
@@ -191,3 +206,110 @@ class TestSurveys(unittest.TestCase):
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
+
+    def test_view_add_survey_code_page(self):
+        response = self.app.get('/surveys/add-survey')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Add a survey'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_enter_add_survey_code_success(self, mock_object):
+        mock_object.post(url_validate_enrolment)
+
+        response = self.app.post('/surveys/add-survey', data={'enrolment_code': '123456789012'})
+
+        # Check that we redirect to the confirm-organisation-survey page
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue('confirm-organisation-survey'.encode() in response.data)
+
+    def test_enter_add_survey_no_enrolment_code(self):
+        response = self.app.post('/surveys/add-survey')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Add a survey'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_enter_add_survey_inactive_code(self, mock_object):
+        mock_object.post(url_validate_enrolment, status_code=401, json={'active': False})
+
+        response = self.app.post('/surveys/add-survey', data={'enrolment_code': '123456789012'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Enrolment code not valid'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_enter_add_survey_invalid_code(self, mock_object):
+        mock_object.post(url_validate_enrolment, status_code=404)
+
+        response = self.app.post('/surveys/add-survey', data={'enrolment_code': '123456789012'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Enrolment code not valid'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_enter_add_survey_code_fail(self, mock_object):
+        mock_object.post(url_validate_enrolment, status_code=500)
+
+        response = self.app.post('/surveys/add-survey', data={'enrolment_code': '123456789012'}, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_enter_add_survey_used_code(self, mock_object):
+        mock_object.post(url_validate_enrolment, status_code=400)
+
+        response = self.app.post('/surveys/add-survey', data={'enrolment_code': '123456789012'}, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Enrolment code not valid'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_add_survey_confirm_org_page(self, mock_object):
+        mock_object.post(url_confirm_add_organisation_survey, status_code=200, json=self.organisation_survey_data)
+
+        response = self.app.get('/surveys/add-survey/confirm-organisation-survey',
+                                query_string=self.params,
+                                headers=self.headers,
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Confirm organisation'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_add_survey_confirm_org_page_fail(self, mock_object):
+        mock_object.post(url_confirm_add_organisation_survey, status_code=500)
+
+        response = self.app.get('/surveys/add-survey/confirm-organisation-survey',
+                                query_string=self.params,
+                                headers=self.headers,
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_add_survey_submit(self, mock_object):
+        mock_object.post(url_add_survey, json={'case_id': "test_case_id"})
+        mock_object.get(url_get_surveys_list, json=surveys_list)
+
+        url = '/surveys/add-survey/add-survey-submit' \
+              '?encrypted_enrolment_code=WfwJghohWOZTIYnutlTcVucqnuED5Lm9q8t0L4ASHPo='
+        response = self.app.get(url, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Business Register and Employment Survey'.encode() in response.data)
+        self.assertTrue('RUNAME1_COMPANY4 RUNNAME2_COMPANY4'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_add_survey_failure(self, mock_object):
+        mock_object.post(url_add_survey, status_code=500)
+
+        url = '/surveys/add-survey/add-survey-submit' \
+              '?encrypted_enrolment_code=WfwJghohWOZTIYnutlTcVucqnuED5Lm9q8t0L4ASHPo='
+        response = self.app.get(url, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+

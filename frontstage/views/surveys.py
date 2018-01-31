@@ -1,5 +1,6 @@
 import json
 import logging
+from os import getenv
 
 from flask import Blueprint, redirect, render_template, request, url_for
 from structlog import wrap_logger
@@ -7,29 +8,141 @@ from structlog import wrap_logger
 from frontstage import app
 from frontstage.common.api_call import api_call
 from frontstage.common.authorisation import jwt_authorization
+from frontstage.common.cryptographer import Cryptographer
 from frontstage.exceptions.exceptions import ApiError
-
+from frontstage.models import EnrolmentCodeForm
 
 logger = wrap_logger(logging.getLogger(__name__))
 surveys_bp = Blueprint('surveys_bp', __name__,
                        static_folder='static', template_folder='templates/surveys')
+cryptographer = Cryptographer()
 
 
 @surveys_bp.route('/', methods=['GET'])
 @jwt_authorization(request)
 def logged_in(session):
     party_id = session.get('party_id')
+
     surveys_list = get_surveys_list(party_id, 'todo')
-    return render_template('surveys/surveys-todo.html', _theme='default', surveys_list=surveys_list)
+    sorted_surveys_list = sorted(surveys_list, key=lambda k: k['collection_exercise']['scheduledReturnDateTime'],
+                                 reverse=True)
+
+    return render_template('surveys/surveys-todo.html',
+                           just_added_case_id=request.args.get('case_id'),
+                           _theme='default', sorted_surveys_list=sorted_surveys_list)
 
 
 @surveys_bp.route('/history', methods=['GET'])
 @jwt_authorization(request)
 def surveys_history(session):
     party_id = session['party_id']
-    surveys_list = get_surveys_list(party_id, 'history')
-    return render_template('surveys/surveys-history.html',  _theme='default',
-                           surveys_list=surveys_list, history=True)
+    sorted_surveys_list = get_surveys_list(party_id, 'history')
+    return render_template('surveys/surveys-history.html', _theme='default',
+                           sorted_surveys_list=sorted_surveys_list, history=True)
+
+
+@surveys_bp.route('/add-survey', methods=['GET', 'POST'])
+@jwt_authorization(request)
+def add_survey(session):
+    form = EnrolmentCodeForm(request.form)
+
+    if request.method == 'POST' and form.validate():
+        logger.info('Enrolment code submitted')
+        enrolment_code = request.form.get('enrolment_code').lower()
+        request_data = {
+            'enrolment_code': enrolment_code
+        }
+        response = api_call('POST', app.config['VALIDATE_ENROLMENT'], json=request_data)
+
+        # Handle API errors
+        if response.status_code == 404:
+            logger.info('Enrolment code not found')
+            return render_template('surveys/surveys-add.html', _theme='default', form=form,
+                                   data={"error": {"type": "failed"}}), 200
+
+        elif response.status_code == 401 and not json.loads(response.text).get('active'):
+            logger.info('Enrolment code not active')
+            return render_template('surveys/surveys-add.html', _theme='default', form=form,
+                                   data={"error": {"type": "failed"}})
+
+        elif response.status_code == 400:
+            logger.info('Enrolment code already used')
+            return render_template('surveys/surveys-add.html', _theme='default', form=form,
+                                   data={"error": {"type": "failed"}})
+
+        elif response.status_code != 200:
+            logger.error('Failed to submit enrolment code')
+            raise ApiError(response)
+
+        encrypted_enrolment_code = cryptographer.encrypt(enrolment_code.encode()).decode()
+        logger.info('Successful enrolment code submitted')
+        return redirect(url_for('surveys_bp.survey_confirm_organisation',
+                                encrypted_enrolment_code=encrypted_enrolment_code,
+                                _external=True,
+                                _scheme=getenv('SCHEME', 'http')))
+
+    elif request.method == 'POST' and not form.validate():
+        logger.info('Invalid character length, must be 12 characters')
+        return render_template('surveys/surveys-add.html', _theme='default', form=form,
+                               data={"error": {"type": "failed"}})
+
+    return render_template('surveys/surveys-add.html', _theme='default',
+                           form=form, data={"error": {}})
+
+
+@surveys_bp.route('/add-survey/confirm-organisation-survey', methods=['GET'])
+@jwt_authorization(request)
+def survey_confirm_organisation(session):
+
+    # Get and decrypt enrolment code
+    encrypted_enrolment_code = request.args.get('encrypted_enrolment_code', None)
+    enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
+
+    logger.info('Attempting to retrieve data for confirm add organisation/survey page')
+    response = api_call('POST', app.config['CONFIRM_ADD_ORGANISATION_SURVEY'],
+                        json={'enrolment_code': enrolment_code})
+
+    if response.status_code != 200:
+        logger.error('Failed to retrieve data for confirm add organisation/survey page')
+        raise ApiError(response)
+
+    response_json = json.loads(response.text)
+    logger.info('Successfully retrieved data for confirm add organisation/survey page', status=response.status_code)
+    return render_template('surveys/surveys-confirm-organisation.html',
+                           _theme='default',
+                           enrolment_code=enrolment_code,
+                           encrypted_enrolment_code=encrypted_enrolment_code,
+                           organisation_name=response_json['organisation_name'],
+                           survey_name=response_json['survey_name'])
+
+
+@surveys_bp.route('/add-survey/add-survey-submit', methods=['GET'])
+@jwt_authorization(request)
+def add_survey_submit(session):
+    party_id = session['party_id']
+
+    logger.info('Assigning new survey to a user', party_id=party_id)
+    encrypted_enrolment_code = request.args.get('encrypted_enrolment_code')
+    enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
+    json_params = {
+        "enrolment_code": enrolment_code,
+        "party_id": party_id
+    }
+    response = api_call('POST', app.config['ADD_SURVEY'], json=json_params)
+
+    if response.status_code != 200:
+        logger.error('Failed to assign user to a survey', status=response.status_code, party_id=party_id)
+        raise ApiError(response)
+
+    response_json = json.loads(response.text)
+    case_id = response_json['case_id']
+
+    logger.info('Successfully retrieved data for confirm add organisation/survey page', case_id=case_id,
+                party_id=party_id)
+    return redirect(url_for('surveys_bp.logged_in',
+                            _theme='default',
+                            _external=True,
+                            case_id=case_id))
 
 
 def get_surveys_list(party_id, list_type):
@@ -41,7 +154,8 @@ def get_surveys_list(party_id, list_type):
     response = api_call('GET', app.config['SURVEYS_LIST'], parameters=params)
 
     if response.status_code != 200:
-        logger.error('Failed to retrieve surveys list', party_id=party_id, list_type=list_type)
+        logger.error('Failed to retrieve surveys list', party_id=party_id, list_type=list_type,
+                     status=response.status_code)
         raise ApiError(response)
 
     surveys_list = json.loads(response.text)
@@ -63,7 +177,7 @@ def access_survey(session):
     response = api_call('GET', app.config['ACCESS_CASE'], parameters=params)
 
     if response.status_code != 200:
-        logger.error('Failed to retrieve case data', party_id=party_id, case_id=case_id)
+        logger.error('Failed to retrieve case data', party_id=party_id, case_id=case_id, status=response.status_code)
         raise ApiError(response)
     case_data = json.loads(response.text)
 
@@ -91,7 +205,8 @@ def download_survey(session):
     response = api_call('GET', app.config['DOWNLOAD_CI'], parameters=params)
 
     if response.status_code != 200:
-        logger.error('Failed to download collection instrument', party_id=party_id, case_id=case_id)
+        logger.error('Failed to download collection instrument', party_id=party_id, case_id=case_id,
+                     status=response.status_code)
         raise ApiError(response)
 
     logger.info('Successfully downloaded collection instrument', case_id=case_id, party_id=party_id)
@@ -134,7 +249,7 @@ def upload_survey(session):
             error_info = 'size'
         else:
             logger.error('Unexpected error message returned from collection instrument',
-                         status_code=response.status_code,
+                         status=response.status_code,
                          error_message=error_message,
                          party_id=party_id,
                          case_id=case_id)

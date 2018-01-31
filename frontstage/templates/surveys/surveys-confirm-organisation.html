@@ -1,0 +1,31 @@
+{% import 'partials/section.html' as section %}
+{% extends "layouts/_twocol.html" %}
+
+{% block page_title %}Confirm organisation and survey - ONS Business Surveys{% endblock %}
+
+{% block main %}
+
+<h1 id="confirm-org-title" class="saturn">Confirm organisation and survey details</h1>
+
+<div class="grid">
+    <div class="grid__col col-4@m">Enrolment code:</div>
+    <div class="grid__col col-8@m"><strong>{{ enrolment_code }}</strong></div>
+    <div class="grid__col col-4@m">Organisation:</div>
+    <div class="grid__col col-8@m"><strong>{{ organisation_name }}</strong></div>
+    <div class="grid__col col-4@m">Survey to complete:</div>
+    <div class="grid__col col-8@m"><strong>{{ survey_name }}</strong></div>
+</div>
+
+<br/>
+
+<a id="CONFIRM_SURVEY_BTN" href="{{ url_for('surveys_bp.add_survey_submit', encrypted_enrolment_code=encrypted_enrolment_code) }}" class="btn action-button btn--primary">
+    Confirm
+</a>
+<p>
+  <a id="CANCEL_BTN" href="{{ url_for('surveys_bp.logged_in') }}">Cancel</a>
+</p>
+<p>If the organisation or survey details aren't what you were expecting, please contact us on <a class="nowrap" href="tel:+44-300-1234-931">0300 1234 931</a>
+    or send an email to <a href="mailto:surveys@ons.gov.uk">surveys@ons.gov.uk</a>
+</p>
+
+{% endblock main %}

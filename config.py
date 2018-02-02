@@ -6,12 +6,9 @@ import os
 class Config(object):
     DEBUG = False
     TESTING = False
-    NAME = os.getenv('NAME', 'ras-frontstage')
-    VERSION = os.getenv('VERSION', '0.2.1')
     PORT = os.getenv('PORT', 8082)
     MAX_UPLOAD_LENGTH = os.getenv('MAX_UPLOAD_LENGTH',  20 * 1024 * 1024)
 
-    WTF_CSRF_ENABLED = os.getenv('WTF_CSRF_ENABLED', True)
     SECRET_KEY = os.getenv('SECRET_KEY')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD')

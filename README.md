@@ -12,7 +12,7 @@ Use [Pyenv](https://github.com/pyenv/pyenv) to manage installed Python versions
 
 Install dependencies to a new virtual environment using [Pipenv](https://docs.pipenv.org/)
 
-```
+```bash
 pip install -U pipenv
 pipenv install
 ```
@@ -21,11 +21,15 @@ pipenv install
 ras-frontstage requires a redis instance to store user jwt's when they are logged in
 
 For local development this can be installed using Homebrew
-```
+```bash
 brew install redis
 ```
-
 For more information see [here](https://medium.com/@petehouston/install-and-config-redis-on-mac-os-x-via-homebrew-eb8df9a4f298)
+
+It can also be run with docker
+```bash
+docker run --name redis -p 6379:6379 -d redis
+```
 
 ## ras-frontstage-api
 ras-frontstage calls one other service, [ras-frontstage-api](https://github.com/ONSdigital/ras-frontstage-api)

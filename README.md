@@ -41,6 +41,10 @@ pipenv run python run.py
 ```
 
 ## Run tests
+Install test dependencies with
+```bash
+pipenv install --dev
+```
 The [run_tests.py](run_tests.py) script will run the tests in the [/tests](tests) folder using pytest and present a coverage report
 ```bash
 pipenv run python run_tests.py

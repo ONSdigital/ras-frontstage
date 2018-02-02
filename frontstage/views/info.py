@@ -21,7 +21,7 @@ if Path('git_info').exists():
 @info_bp.route('/', methods=['GET'])
 def get_info():
     info = {
-        "name": app.config['NAME'],
+        "name": 'ras-frontstage',
         "version": app.config['VERSION'],
     }
     info = dict(_health_check, **info)

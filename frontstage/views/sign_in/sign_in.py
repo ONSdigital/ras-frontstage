@@ -2,7 +2,7 @@ import json
 import logging
 from os import getenv
 
-from flask import Blueprint, make_response, render_template, redirect, request, url_for
+from flask import make_response, render_template, redirect, request, url_for
 from structlog import wrap_logger
 
 from frontstage import app
@@ -11,10 +11,10 @@ from frontstage.common.session import SessionHandler
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.jwt import encode, timestamp_token
 from frontstage.models import LoginForm
+from frontstage.views.sign_in import sign_in_bp
 
 
 logger = wrap_logger(logging.getLogger(__name__))
-sign_in_bp = Blueprint('sign_in_bp', __name__, static_folder='static', template_folder='frontstage/templates/sign-in')
 
 
 @app.route('/', methods=['GET'])
@@ -85,16 +85,3 @@ def login():
         'account_activated': account_activated
     }
     return render_template('sign-in/sign-in.html', _theme='default', form=form, data=template_data)
-
-
-@sign_in_bp.route('/logout')
-def logout():
-    # Delete user session in redis
-    session_key = request.cookies.get('authorization')
-    session = SessionHandler()
-    session.delete_session(session_key)
-
-    # Delete session cookie
-    response = make_response(redirect(url_for('sign_in_bp.login')))
-    response.set_cookie('authorization', value='', expires=0)
-    return response

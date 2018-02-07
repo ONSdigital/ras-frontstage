@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 
 from structlog import configure
 from structlog.stdlib import add_log_level, filter_by_level
@@ -33,7 +34,7 @@ def logger_initial_config(service_name=None,
         event_dict['service'] = service_name
         return event_dict
 
-    logging.basicConfig(level=log_level, format=logger_format)
+    logging.basicConfig(stream=sys.stdout, level=log_level, format=logger_format)
     configure(processors=[add_log_level, filter_by_level, add_service,
                           TimeStamper(fmt=logger_date_format, utc=True, key="created_at"), JSONRenderer(indent=indent)])
     oauth_log = logging.getLogger("requests_oauthlib")

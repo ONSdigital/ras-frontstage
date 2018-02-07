@@ -81,13 +81,13 @@ pipeline {
                 sh "cf login -a https://${env.CLOUDFOUNDRY_API} --skip-ssl-validation -u ${CF_USER_USR} -p ${CF_USER_PSW} -o rmras -s ci"
                 sh 'cf push --no-start ras-frontstage-ci'
                 sh 'cf set-env ras-frontstage-ci ONS_ENV ci'
-                sh "cf set-env ras-frontstage-dev SECURITY_USER_NAME ${env.DEV_SECURITY_USR}"
-                sh "cf set-env ras-frontstage-dev SECRET_KEY ${env.OAUTH_SECRET_KEY}"
-                sh "cf set-env ras-frontstage-dev SECURITY_USER_PASSWORD ${env.DEV_SECURITY_PSW}"
-                sh "cf set-env ras-frontstage-dev JWT_SECRET ${env.JWT_SECRET}"
+                sh "cf set-env ras-frontstage-ci SECURITY_USER_NAME ${env.DEV_SECURITY_USR}"
+                sh "cf set-env ras-frontstage-ci SECRET_KEY ${env.OAUTH_SECRET_KEY}"
+                sh "cf set-env ras-frontstage-ci SECURITY_USER_PASSWORD ${env.DEV_SECURITY_PSW}"
+                sh "cf set-env ras-frontstage-ci JWT_SECRET ${env.JWT_SECRET}"
 
-                sh "cf set-env ras-frontstage-dev RAS_FRONTSTAGE_API_HOST ras-frontstage-api-dev.${env.CF_DOMAIN}"
-                sh "cf set-env ras-frontstage-dev RAS_FRONTSTAGE_API_PORT 80"
+                sh "cf set-env ras-frontstage-ci RAS_FRONTSTAGE_API_HOST ras-frontstage-api-ci.${env.CF_DOMAIN}"
+                sh "cf set-env ras-frontstage-ci RAS_FRONTSTAGE_API_PORT 80"
                 sh 'cf start ras-frontstage-ci'
             }
         }
@@ -157,13 +157,13 @@ pipeline {
                 sh "cf login -a https://${env.CLOUDFOUNDRY_API} --skip-ssl-validation -u ${CF_USER_USR} -p ${CF_USER_PSW} -o rmras -s test"
                 sh 'cf push --no-start ras-frontstage-test'
                 sh 'cf set-env ras-frontstage-test ONS_ENV test'
-                sh "cf set-env ras-frontstage-dev SECURITY_USER_NAME ${env.DEV_SECURITY_USR}"
-                sh "cf set-env ras-frontstage-dev SECRET_KEY ${env.OAUTH_SECRET_KEY}"
-                sh "cf set-env ras-frontstage-dev SECURITY_USER_PASSWORD ${env.DEV_SECURITY_PSW}"
-                sh "cf set-env ras-frontstage-dev JWT_SECRET ${env.JWT_SECRET}"
+                sh "cf set-env ras-frontstage-test SECURITY_USER_NAME ${env.DEV_SECURITY_USR}"
+                sh "cf set-env ras-frontstage-test SECRET_KEY ${env.OAUTH_SECRET_KEY}"
+                sh "cf set-env ras-frontstage-test SECURITY_USER_PASSWORD ${env.DEV_SECURITY_PSW}"
+                sh "cf set-env ras-frontstage-test JWT_SECRET ${env.JWT_SECRET}"
 
-                sh "cf set-env ras-frontstage-dev RAS_FRONTSTAGE_API_HOST ras-frontstage-api-dev.${env.CF_DOMAIN}"
-                sh "cf set-env ras-frontstage-dev RAS_FRONTSTAGE_API_PORT 80"
+                sh "cf set-env ras-frontstage-test RAS_FRONTSTAGE_API_HOST ras-frontstage-api-test.${env.CF_DOMAIN}"
+                sh "cf set-env ras-frontstage-test RAS_FRONTSTAGE_API_PORT 80"
                 sh 'cf start ras-frontstage-test'
             }
         }

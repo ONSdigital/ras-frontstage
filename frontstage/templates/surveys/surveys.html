@@ -30,7 +30,7 @@
         {% endif %}
         <div class="grid__col col-4@m">
             <span class="survey-list-item__label mercury">SURVEY: </span>
-            <span>{{ survey.survey.longName }}</span><br/>
+            <span id="SURVEY_NAME">{{ survey.survey.longName }}</span><br/>
             <span class="survey-list-item pluto">
                         BUSINESS: {{ survey.business_party.name }}<br/>
                         REF: {{survey.case.caseGroup.sampleUnitRef }}
@@ -39,7 +39,7 @@
 
         <div class="grid__col col-2@m">
             <span class="survey-list-item__label mercury">PERIOD COVERED: </span>
-            <span class="survey-list-item__nowrap">{{ survey.collection_exercise.userDescription}}</span>
+            <span id="SURVEY_PERIOD" class="survey-list-item__nowrap">{{ survey.collection_exercise.userDescription}}</span>
         </div>
 
         <div class="grid__col col-2@m">

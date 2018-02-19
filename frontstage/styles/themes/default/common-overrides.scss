@@ -339,3 +339,12 @@ input[type=file]::-webkit-file-upload-button:hover {
 .nowrap {
   white-space: nowrap;
 }
+
+.survey-message {
+  float: left;
+  padding-left: 0.75rem;
+}
+
+.survey-message.history__message {
+  margin-left: 5.5rem;
+}

@@ -18,12 +18,12 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 @secure_message_bp.route('/create-message', methods=['GET', 'POST'])
 @jwt_authorization(request)
-def create_message(session):
+def create_message(session, case_id=None, ru_ref=None, survey=None):
     party_id = session['party_id']
     form = SecureMessagingForm(request.form)
     if request.method == 'POST' and form.validate():
         is_draft = form.save_draft.data
-        sent_message = send_message(party_id, is_draft)
+        sent_message = send_message(party_id, is_draft, case_id, survey, ru_ref)
 
         # If draft was saved retrieve the saved draft
         if is_draft:
@@ -37,11 +37,11 @@ def create_message(session):
             message = get_message(form['thread_message_id'].data, 'INBOX', party_id)
         else:
             message = {}
-        return render_template('secure-messages/secure-messages-view.html', _theme='default',
-                               form=form, errors=form.errors, message=message.get('message', {}))
+        return render_template('secure-messages/secure-messages-view.html', _theme='default', ru_ref=ru_ref,
+                               survey=survey, form=form, errors=form.errors, message=message.get('message', {}))
 
 
-def send_message(party_id, is_draft):
+def send_message(party_id, is_draft, case_id, survey, ru_ref):
     logger.debug('Attempting to send message', party_id=party_id)
     form = SecureMessagingForm(request.form)
 
@@ -50,9 +50,13 @@ def send_message(party_id, is_draft):
     subject = form['subject'].data if form['subject'].data else form['hidden_subject'].data
     message_json = {
         'msg_from': party_id,
+        'msg_to': 'GROUP',
         'subject': subject,
         'body': form['body'].data,
-        'thread_id': form['thread_id'].data
+        'thread_id': form['thread_id'].data,
+        'ru_id': ru_ref,
+        'survey_id': survey,
+        'case_id': case_id
     }
 
     # If message has previously been saved as a draft add through the message id

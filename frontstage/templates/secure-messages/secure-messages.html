@@ -5,6 +5,15 @@
 
 
 {% block messages %}
+{% if new_message == 'True' %}
+    <div class="panel panel--simple panel--success">
+        <div id="message-success-notif" class="panel__body">
+            <p>
+                Message sent
+            </p>
+        </div>
+    </div>
+{% endif %}
 
 <ul class="navigation-tabs navigation-tabs--pills">
 

@@ -1,7 +1,7 @@
 import json
 import logging
 
-from flask import render_template, request
+from flask import redirect, render_template, request, url_for
 from frontstage.common.authorisation import jwt_authorization
 from structlog import wrap_logger
 
@@ -33,7 +33,7 @@ def create_message(session):
             logger.info('Draft sent successfully', message_id=sent_message['msg_id'], party_id=party_id)
             return message_get('DRAFT', sent_message['msg_id'])
 
-        return render_template('secure-messages/message-success-temp.html', _theme='default')
+        return redirect(url_for('secure_message_bp.messages_get', new_message=True))
 
     else:
         if form['thread_message_id'].data:
@@ -41,7 +41,7 @@ def create_message(session):
         else:
             message = {}
         return render_template('secure-messages/secure-messages-view.html', _theme='default', ru_ref=ru_ref,
-                               survey=survey, form=form, errors=form.errors, message=message.get('message', {}))
+                               survey=survey, case_id=case_id, form=form, errors=form.errors, message=message.get('message', {}))
 
 
 def send_message(party_id, is_draft, case_id, survey, ru_ref):
@@ -53,13 +53,13 @@ def send_message(party_id, is_draft, case_id, survey, ru_ref):
     subject = form['subject'].data if form['subject'].data else form['hidden_subject'].data
     message_json = {
         'msg_from': party_id,
-        'msg_to': 'GROUP',
+        'msg_to': ['GROUP'],
         'subject': subject,
         'body': form['body'].data,
         'thread_id': form['thread_id'].data,
         'ru_id': ru_ref,
-        'survey_id': survey,
-        'case_id': case_id
+        'survey': survey,
+        'collection_case': case_id
     }
 
     # If message has previously been saved as a draft add through the message id

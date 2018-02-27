@@ -98,7 +98,7 @@ class TestSurveys(unittest.TestCase):
 
     @requests_mock.mock()
     def test_access_survey_eq(self, mock_request):
-        mock_request.get(url_generate_eq_url, json={'EQ_URL': 'http://test-eq-url/session?token=test'})
+        mock_request.get(url_generate_eq_url, json={'eq_url': 'http://test-eq-url/session?token=test'})
 
         response = self.app.get('/surveys/access_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5&ci_type=EQ')
         self.assertEqual(response.status_code, 302)

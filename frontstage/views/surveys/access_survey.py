@@ -29,7 +29,7 @@ def access_survey(session):
     if collection_instrument_type == 'EQ':
         logger.info('redirecting to EQ', party_id=party_id, case_id=case_id)
         response = api_call('GET', app.config['GENERATE_EQ_URL'], parameters=params)
-        eq_url = json.loads(response.text)['EQ_URL']
+        eq_url = json.loads(response.text)['eq_url']
         return redirect(eq_url)
 
     logger.info('Retrieving case data', party_id=party_id, case_id=case_id)

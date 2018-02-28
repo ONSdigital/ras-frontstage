@@ -136,6 +136,7 @@ class TestSecureMessage(unittest.TestCase):
     def test_create_message_post_success(self, mock_request):
         sent_message_response = {'msg_id': 'd43b6609-0875-4ef8-a34e-f7df1bcc8029', 'status': '201', 'thread_id': '8caeff79-6067-4f2a-96e0-08617fdeb496'}
         mock_request.post(url_send_message, json=sent_message_response)
+        mock_request.get(url_get_messages, json=messages_get)
 
         response = self.app.post("/secure-message/create-message", data=self.message_form, headers=self.headers, follow_redirects=True)
 

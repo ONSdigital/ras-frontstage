@@ -1,7 +1,7 @@
 import json
 import logging
 
-from flask import render_template, request
+from flask import render_template, request, redirect
 from structlog import wrap_logger
 
 from frontstage import app
@@ -19,12 +19,21 @@ logger = wrap_logger(logging.getLogger(__name__))
 def access_survey(session):
     party_id = session['party_id']
     case_id = request.args['case_id']
-    referer_header = request.headers.get('referer', {})
-    logger.info('Retrieving case data', party_id=party_id, case_id=case_id)
+    collection_instrument_type = request.args['ci_type']
+
     params = {
         "party_id": party_id,
         "case_id": case_id
     }
+
+    if collection_instrument_type == 'EQ':
+        logger.info('redirecting to EQ', party_id=party_id, case_id=case_id)
+        response = api_call('GET', app.config['GENERATE_EQ_URL'], parameters=params)
+        eq_url = json.loads(response.text)['eq_url']
+        return redirect(eq_url)
+
+    logger.info('Retrieving case data', party_id=party_id, case_id=case_id)
+    referer_header = request.headers.get('referer', {})
     response = api_call('GET', app.config['ACCESS_CASE'], parameters=params)
 
     if response.status_code != 200:

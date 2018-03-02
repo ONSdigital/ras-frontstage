@@ -1,7 +1,7 @@
 import json
 import logging
 
-from flask import render_template, request
+from flask import render_template, request, make_response
 from structlog import wrap_logger
 
 from frontstage import app
@@ -23,10 +23,14 @@ def logged_in(session):
     sorted_surveys_list = sorted(surveys_list, key=lambda k: k['collection_exercise']['scheduledReturnDateTime'],
                                  reverse=True)
 
-    return render_template('surveys/surveys-todo.html',
+    response = make_response(render_template('surveys/surveys-todo.html',
                            just_added_case_id=request.args.get('case_id'),
-                           _theme='default', sorted_surveys_list=sorted_surveys_list)
+                           _theme='default', sorted_surveys_list=sorted_surveys_list))
 
+    # Ensure any return to list of surveys (e.g. browser back) round trips the server to display the latest statuses
+    response.headers.set("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store")
+
+    return response
 
 @surveys_bp.route('/history', methods=['GET'])
 @jwt_authorization(request)

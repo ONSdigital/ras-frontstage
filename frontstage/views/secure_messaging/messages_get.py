@@ -17,11 +17,10 @@ logger = wrap_logger(logging.getLogger(__name__))
 @secure_message_bp.route('/messages/', methods=['GET'])
 @secure_message_bp.route('/messages/<label>', methods=['GET'])
 @jwt_authorization(request)
-def messages_get(session, label="INBOX", new_message=False):
+def messages_get(session, label="INBOX"):
     messages_list = get_messages_list(label)
     messages = messages_list['messages']
-    if request.args.get('new_message'):
-        new_message = request.args.get('new_message')
+    new_message = request.args.get('new_message', None)
     unread_msg_total = messages_list.get('unread_messages_total', 0)
     return render_template('secure-messages/secure-messages.html', _theme='default', messages=messages['messages'],
                            links=messages['_links'], label=label, total=unread_msg_total, new_message=new_message)

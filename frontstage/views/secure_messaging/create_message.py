@@ -19,9 +19,9 @@ logger = wrap_logger(logging.getLogger(__name__))
 @secure_message_bp.route('/create-message/', methods=['GET', 'POST'])
 @jwt_authorization(request)
 def create_message(session):
-    case_id = request.args.get('case_id')
-    survey = request.args.get('survey')
-    ru_ref = request.args.get('ru_ref')
+    case_id = request.args['case_id']
+    survey = request.args['survey']
+    ru_ref = request.args['ru_ref']
     party_id = session['party_id']
     form = SecureMessagingForm(request.form)
     if request.method == 'POST' and form.validate():

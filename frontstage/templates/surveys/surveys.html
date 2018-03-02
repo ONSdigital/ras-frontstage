@@ -1,4 +1,4 @@
-<ul class="survey-list">
+<ul class="survey-list" id="survey-list">
 
     <li class="header-row">
 
@@ -54,7 +54,7 @@
             <span>{{ survey.status }}</span>
         </div>
         <div class="grid__col col-2@m">
-            <a href="{{ url_for('surveys_bp.access_survey', case_id=survey.case.id) }}">
+            <a href="{{ url_for('surveys_bp.access_survey', case_id=survey.case.id, ci_type = survey.collection_instrument_type) }}">
                 <button id="ACCESS_SURVEY_BUTTON_{{loop.index}}" class="btn action-button btn--primary" type="submit">
                     Access <span class="u-vh">{{ survey.survey.longName|replace("Survey", " ") }}</span> survey
                 </button>

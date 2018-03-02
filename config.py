@@ -57,6 +57,7 @@ class Config(object):
     UPLOAD_CI = 'surveys/upload-ci'
     ADD_SURVEY = 'surveys/add-survey'
     CONFIRM_ADD_ORGANISATION_SURVEY = 'surveys/add-survey/confirm-add-organisation-survey'
+    GENERATE_EQ_URL = 'surveys/generate-eq-url'
 
 
 class DevelopmentConfig(Config):

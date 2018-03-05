@@ -5,30 +5,34 @@
 
 
 {% block messages %}
+{% if new_message == 'True' %}
+    <div class="panel panel--simple panel--success">
+        <div id="message-success-notif" class="panel__body">
+            <p>
+                Message sent
+            </p>
+        </div>
+    </div>
+{% endif %}
 
 <ul class="navigation-tabs navigation-tabs--pills">
 
     <li id="Inbox"
         class="navigation-tabs__item navigation-tabs__item--primary {% if label == 'INBOX' %}{{'navigation-tabs__item--active'}}{% endif %}">
-        <a href="/secure-message/messages/INBOX"
+        <a id='inbox-list' href="/secure-message/messages/INBOX"
            class="navigation-tabs__tab {% if label == 'INBOX' %}{{'navigation-tabs__tab--active'}}{% endif %}">Inbox ({{total}})</a>
     </li>
 
     <li id="Sent"
         class="navigation-tabs__item navigation-tabs__item--primary {% if label == 'SENT' %}{{'navigation-tabs__item--active'}}{% endif %}">
-        <a href="/secure-message/messages/SENT"
+        <a id='sent-list' href="/secure-message/messages/SENT"
            class="navigation-tabs__tab {% if label == 'SENT' %}{{'navigation-tabs__tab--active'}}{% endif %}">Sent</a>
     </li>
 
     <li id="Draft"
         class="navigation-tabs__item navigation-tabs__item--primary {% if label == 'DRAFT' %}{{'navigation-tabs__item--active'}}{% endif %}">
-        <a href="/secure-message/messages/DRAFT"
+        <a id='draft-list' href="/secure-message/messages/DRAFT"
            class="navigation-tabs__tab {% if label == 'DRAFT' %}{{'navigation-tabs__tab--active'}}{% endif %}">Draft</a>
-    </li>
-
-    <li class="navigation-tabs__item navigation-tabs__item--secondary">
-        <a href="/secure-message/create-message"
-           class="navigation-tabs__tab navigation-tabs__tab--link">Create a message</a>
     </li>
 </ul>
 

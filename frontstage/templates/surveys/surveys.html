@@ -59,6 +59,7 @@
                     Access <span class="u-vh">{{ survey.survey.longName|replace("Survey", " ") }}</span> survey
                 </button>
             </a>
+            <a id="create-message-link-{{loop.index}}" href="/secure-message/create-message/?case_id={{survey.case.id}}&survey={{survey.survey.id}}&ru_ref={{survey.business_party.id}} " class="pluto survey-message history__message">Send a message </span></a>
         </div>
     </li>
     {% endfor %}

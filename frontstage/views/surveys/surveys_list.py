@@ -24,13 +24,14 @@ def logged_in(session):
                                  reverse=True)
 
     response = make_response(render_template('surveys/surveys-todo.html',
-                           just_added_case_id=request.args.get('case_id'),
-                           _theme='default', sorted_surveys_list=sorted_surveys_list))
+                             just_added_case_id=request.args.get('case_id'),
+                             _theme='default', sorted_surveys_list=sorted_surveys_list))
 
     # Ensure any return to list of surveys (e.g. browser back) round trips the server to display the latest statuses
     response.headers.set("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store")
 
     return response
+
 
 @surveys_bp.route('/history', methods=['GET'])
 @jwt_authorization(request)

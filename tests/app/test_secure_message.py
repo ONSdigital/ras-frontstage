@@ -37,7 +37,7 @@ class TestSecureMessage(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
         self.app.testing = True
-        self.app.set_cookie('localhost', 'authorization', encoded_jwt)
+        self.app.set_cookie('localhost', 'authorization', 'session_key')
         self.patcher = patch('redis.StrictRedis.get', return_value=encoded_jwt)
         self.patcher.start()
         self.message_form = {
@@ -46,7 +46,9 @@ class TestSecureMessage(unittest.TestCase):
                               "send": "Send",
                               "thread_id": "7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb",
                             }
-        self.headers = {'jwt': encoded_jwt}
+        self.headers = {
+            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"  # NOQA
+            }
 
     def tearDown(self):
         self.patcher.stop()
@@ -84,7 +86,7 @@ class TestSecureMessage(unittest.TestCase):
         del unread_total_fail_json['unread_messages_total']
         mock_request.get(url_get_messages, json=unread_total_fail_json)
 
-        response = self.app.get("/secure-message/messages", headers=self.headers, follow_redirects=True)
+        response = self.app.get("/secure-message/messages", follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('The European languages are members of the same family'.encode() in response.data)
@@ -93,7 +95,7 @@ class TestSecureMessage(unittest.TestCase):
     def test_get_message_success(self, mock_request):
         mock_request.get(url_get_message, json=message)
 
-        response = self.app.get("/secure-message/INBOX/29000d7b-dfd8-47fa-8e15-5650a985243b", headers=self.headers, follow_redirects=True)
+        response = self.app.get("/secure-message/INBOX/29000d7b-dfd8-47fa-8e15-5650a985243b", follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('The European languages are members of the same family'.encode() in response.data)
@@ -127,7 +129,7 @@ class TestSecureMessage(unittest.TestCase):
         self.assertTrue('Server error'.encode() in response.data)
 
     def test_create_message_get(self):
-        response = self.app.get("/secure-message/create-message", headers=self.headers, follow_redirects=True)
+        response = self.app.get("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789", headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Create message'.encode() in response.data)
@@ -136,8 +138,9 @@ class TestSecureMessage(unittest.TestCase):
     def test_create_message_post_success(self, mock_request):
         sent_message_response = {'msg_id': 'd43b6609-0875-4ef8-a34e-f7df1bcc8029', 'status': '201', 'thread_id': '8caeff79-6067-4f2a-96e0-08617fdeb496'}
         mock_request.post(url_send_message, json=sent_message_response)
+        mock_request.get(url_get_messages, json=messages_get)
 
-        response = self.app.post("/secure-message/create-message", data=self.message_form, headers=self.headers, follow_redirects=True)
+        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789", data=self.message_form, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Message sent'.encode() in response.data)
@@ -151,7 +154,7 @@ class TestSecureMessage(unittest.TestCase):
         del self.message_form['send']
         self.message_form['save_draft'] = 'Save Draft'
 
-        response = self.app.post("/secure-message/create-message", data=self.message_form, headers=self.headers, follow_redirects=True)
+        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789", data=self.message_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Draft saved'.encode() in response.data)
@@ -160,7 +163,7 @@ class TestSecureMessage(unittest.TestCase):
     def test_create_message_post_success_api_failure(self, mock_request):
         mock_request.post(url_send_message, status_code=500)
 
-        response = self.app.post("/secure-message/create-message", data=self.message_form, headers=self.headers, follow_redirects=True)
+        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789", data=self.message_form, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
@@ -169,7 +172,7 @@ class TestSecureMessage(unittest.TestCase):
     def test_create_message_post_success_api_failure(self, mock_request):
         mock_request.post(url_send_message, status_code=500)
 
-        response = self.app.post("/secure-message/create-message", data=self.message_form, headers=self.headers, follow_redirects=True)
+        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789", data=self.message_form, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
@@ -178,7 +181,7 @@ class TestSecureMessage(unittest.TestCase):
     def test_create_message_post_bad_gateway(self, mock_request):
         mock_request.post(url_send_message, status_code=502)
 
-        response = self.app.post("/secure-message/create-message", data=self.message_form, headers=self.headers, follow_redirects=True)
+        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789", data=self.message_form, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
@@ -186,7 +189,7 @@ class TestSecureMessage(unittest.TestCase):
     def test_create_message_post_no_body(self):
         del self.message_form['body']
 
-        response = self.app.post("/secure-message/create-message", data=self.message_form, headers=self.headers, follow_redirects=True)
+        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789", data=self.message_form, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Please enter a message'.encode() in response.data)
@@ -194,7 +197,7 @@ class TestSecureMessage(unittest.TestCase):
     def test_create_message_post_no_subject(self):
         del self.message_form['subject']
 
-        response = self.app.post("/secure-message/create-message", data=self.message_form, headers=self.headers, follow_redirects=True)
+        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789", data=self.message_form, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Please enter a subject'.encode() in response.data)
@@ -210,7 +213,7 @@ class TestSecureMessage(unittest.TestCase):
         del self.message_form['body']
         del self.message_form['subject']
 
-        response = self.app.post("/secure-message/create-message", data=self.message_form, headers=self.headers, follow_redirects=True)
+        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789", data=self.message_form, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Draft saved'.encode() in response.data)
@@ -218,7 +221,7 @@ class TestSecureMessage(unittest.TestCase):
     def test_create_message_post_body_too_long(self):
         self.message_form['body'] = 'a' * 10100
 
-        response = self.app.post("/secure-message/create-message", data=self.message_form, headers=self.headers, follow_redirects=True)
+        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789", data=self.message_form, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Body field length must not be greater than 10000'.encode() in response.data)
@@ -226,7 +229,22 @@ class TestSecureMessage(unittest.TestCase):
     def test_create_message_post_subject_too_long(self):
         self.message_form['subject'] = 'a' * 110
 
-        response = self.app.post("/secure-message/create-message", data=self.message_form, headers=self.headers, follow_redirects=True)
+        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789", data=self.message_form, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Subject field length must not be greater than 100'.encode() in response.data)
+
+    def test_create_message_post_no_case_id(self):
+        response = self.app.post("/secure-message/create-message/?ru_ref=456&survey=789", data=self.message_form, headers=self.headers, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_create_message_post_no_survey_id(self):
+        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456", data=self.message_form, headers=self.headers, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_create_message_post_no_ru_ref(self):
+        response = self.app.post("/secure-message/create-message/?case_id=123&survey=789", data=self.message_form, headers=self.headers, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 400)

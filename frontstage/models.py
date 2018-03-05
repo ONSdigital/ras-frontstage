@@ -101,7 +101,7 @@ class ResetPasswordForm(FlaskForm):
 
 class SecureMessagingForm(FlaskForm):
     save_draft = SubmitField(label='Save Draft')
-    send = SubmitField(label='Send')
+    send = SubmitField(label='Send', id='send-message-btn')
     subject = StringField('Subject')
     body = TextAreaField('Message')
     thread_message_id = HiddenField('Thread message id')

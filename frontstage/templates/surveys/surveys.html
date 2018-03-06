@@ -51,7 +51,7 @@
 
         <div class="grid__col col-2@m">
             <span class="survey-list-item__label mercury">STATUS: </span>
-            <span>{{ survey.status }}</span>
+            <span id="status-{{ loop.index }}">{{ survey.status }}</span>
         </div>
         <div class="grid__col col-2@m">
             <a href="{{ url_for('surveys_bp.access_survey', case_id=survey.case.id, ci_type = survey.collection_instrument_type) }}">
@@ -59,6 +59,7 @@
                     Access <span class="u-vh">{{ survey.survey.longName|replace("Survey", " ") }}</span> survey
                 </button>
             </a>
+            <a id="create-message-link-{{loop.index}}" href="/secure-message/create-message/?case_id={{survey.case.id}}&survey={{survey.survey.id}}&ru_ref={{survey.business_party.id}} " class="pluto survey-message history__message">Send a message </span></a>
         </div>
     </li>
     {% endfor %}

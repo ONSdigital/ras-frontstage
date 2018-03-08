@@ -32,6 +32,9 @@ def message_get(session, label, message_id):
     return render_template('secure-messages/secure-messages-view.html',
                            _theme='default',
                            message=message_json['message'],
+                           ru_ref=message_json['message'].get('ru_id'),
+                           survey=message_json['message'].get('survey'),
+                           case_id=message_json['message'].get('case_id'),
                            draft=message_json['draft'],
                            form=form,
                            label=label)

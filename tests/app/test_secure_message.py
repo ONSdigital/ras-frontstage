@@ -234,10 +234,17 @@ class TestSecureMessage(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Subject field length must not be greater than 100'.encode() in response.data)
 
-    def test_create_message_post_no_case_id(self):
-        response = self.app.post("/secure-message/create-message/?ru_ref=456&survey=789", data=self.message_form, headers=self.headers, follow_redirects=True)
+    @requests_mock.mock()
+    def test_create_message_post_no_case_id(self, mock_request):
+        sent_message_response = {'msg_id': 'd43b6609-0875-4ef8-a34e-f7df1bcc8029', 'status': '201',
+                                 'thread_id': '8caeff79-6067-4f2a-96e0-08617fdeb496'}
+        mock_request.post(url_send_message, json=sent_message_response)
+        mock_request.get(url_get_messages, json=messages_get)
 
-        self.assertEqual(response.status_code, 400)
+        response = self.app.post("/secure-message/create-message/?ru_ref=456&survey=789", data=self.message_form, headers=self.headers, follow_redirects=True)
+        # case id is optional
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Message sent'.encode() in response.data)
 
     def test_create_message_post_no_survey_id(self):
         response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456", data=self.message_form, headers=self.headers, follow_redirects=True)

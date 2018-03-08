@@ -19,7 +19,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 @secure_message_bp.route('/create-message/', methods=['GET', 'POST'])
 @jwt_authorization(request)
 def create_message(session):
-    case_id = request.args['case_id']
+    case_id = request.args.get('case_id')
     survey = request.args['survey']
     ru_ref = request.args['ru_ref']
     party_id = session['party_id']
@@ -59,8 +59,9 @@ def send_message(party_id, is_draft, case_id, survey, ru_ref):
         'thread_id': form['thread_id'].data,
         'ru_id': ru_ref,
         'survey': survey,
-        'collection_case': case_id
     }
+    if case_id:
+        message_json['collection_case'] = case_id
 
     # If message has previously been saved as a draft add through the message id
     if form["msg_id"].data:

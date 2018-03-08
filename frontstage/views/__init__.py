@@ -28,7 +28,7 @@ from frontstage.views.surveys import (access_survey, add_survey, add_survey_conf
                                       upload_survey_failed)
 app.register_blueprint(surveys_bp, url_prefix='/surveys')
 
-from frontstage.views.secure_messaging import create_message, message_get, messages_get, send_message
+from frontstage.views.secure_messaging import create_message, message_get, messages_get
 app.register_blueprint(secure_message_bp, url_prefix='/secure-message')
 
 app.register_blueprint(cookies_privacy_bp, url_prefix='/cookies-privacy')

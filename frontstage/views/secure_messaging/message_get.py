@@ -22,20 +22,32 @@ def message_get(session, label, message_id):
 
     message_json = get_message(message_id, label, party_id)
     # Initialise SecureMessagingForm with values for the draft and hidden fields
+    draft = message_json['draft']
+    message = message_json['message']
     form = SecureMessagingForm(formdata=None,
-                               thread_message_id=message_json['message'].get('msg_id'),
-                               thread_id=message_json['message'].get('thread_id'),
-                               msg_id=message_json['draft'].get('msg_id'),
-                               hidden_subject=message_json['message'].get('subject'),
-                               subject=message_json['draft'].get('subject'),
-                               body=message_json['draft'].get('body'))
+                               thread_message_id=message.get('msg_id'),
+                               thread_id=message.get('thread_id'),
+                               msg_id=draft.get('msg_id'),
+                               hidden_subject=message.get('subject'),
+                               subject=draft.get('subject'),
+                               body=draft.get('body'))
+    # TODO this whole function needs looking at. When getting a draft it should use the draft end point not message
+    if label == "DRAFT":
+        ru_ref = draft.get('ru_id')
+        survey = draft.get('survey')
+        case_id = draft.get('case_id')
+    else:
+        ru_ref = message.get('ru_id')
+        survey = message.get('survey')
+        case_id = message.get('case_id')
+
     return render_template('secure-messages/secure-messages-view.html',
                            _theme='default',
-                           message=message_json['message'],
-                           ru_ref=message_json['message'].get('ru_id'),
-                           survey=message_json['message'].get('survey'),
-                           case_id=message_json['message'].get('case_id'),
-                           draft=message_json['draft'],
+                           message=message,
+                           ru_ref=ru_ref,
+                           survey=survey,
+                           case_id=case_id,
+                           draft=draft,
                            form=form,
                            label=label)
 

@@ -202,6 +202,14 @@ class TestSecureMessage(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Please enter a subject'.encode() in response.data)
 
+    def test_create_message_post_whitespace_subject(self):
+        self.message_form['subject'] = ' '
+
+        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789", data=self.message_form, headers=self.headers, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Please enter a subject'.encode() in response.data)
+
     @requests_mock.mock()
     def test_create_message_draft_no_body_or_subject(self, mock_request):
         sent_message_response = {'msg_id': 'd43b6609-0875-4ef8-a34e-f7df1bcc8029', 'status': '201', 'thread_id': '8caeff79-6067-4f2a-96e0-08617fdeb496'}

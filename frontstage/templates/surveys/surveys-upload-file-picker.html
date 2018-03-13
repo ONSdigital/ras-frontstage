@@ -1,7 +1,7 @@
 {% set survey_name = survey_info['longName'] if survey_info %}
 <form
         method="post"
-        action="{{ url_for('surveys_bp.upload_survey', case_id=case_id, survey_name=survey_name) }}"
+        action="{{ url_for('surveys_bp.upload_survey', case_id=case_id) }}"
         class="form"
         role="form"
         enctype="multipart/form-data">

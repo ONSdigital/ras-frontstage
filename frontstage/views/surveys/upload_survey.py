@@ -19,13 +19,12 @@ logger = wrap_logger(logging.getLogger(__name__))
 def upload_survey(session):
     party_id = session['party_id']
     case_id = request.args['case_id']
-    survey_name = request.args.get('survey_name')
     logger.info('Uploading collection instrument', party_id=party_id, case_id=case_id)
 
     if request.content_length > app.config['MAX_UPLOAD_LENGTH']:
         return redirect(url_for('surveys_bp.upload_failed',
                                 _external=True,
-                                case_id=case_id, survey_name=survey_name,
+                                case_id=case_id,
                                 error_info='size'))
 
     # Get the uploaded file
@@ -58,7 +57,7 @@ def upload_survey(session):
             error_info = "unexpected"
         return redirect(url_for('surveys_bp.upload_failed',
                                 _external=True,
-                                case_id=case_id, survey_name=survey_name,
+                                case_id=case_id,
                                 error_info=error_info))
     elif response.status_code != 200:
         logger.error('Failed to upload collection instrument', party_id=party_id, case_id=case_id)
@@ -67,5 +66,4 @@ def upload_survey(session):
     logger.info('Successfully uploaded collection instrument', party_id=party_id, case_id=case_id)
     return render_template('surveys/surveys-upload-success.html',
                            _theme='default',
-                           upload_filename=upload_filename,
-                           survey_name=survey_name)
+                           upload_filename=upload_filename)

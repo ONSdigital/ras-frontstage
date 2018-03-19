@@ -54,12 +54,14 @@
             <span id="status-{{ loop.index }}">{{ survey.status }}</span>
         </div>
         <div class="grid__col col-2@m">
+            {% if not survey.status == 'Complete' or survey.case.caseEvents|selectattr('category', 'equalto', 'EQ_LAUNCH')|list|length == 0 %}
             <a href="{{ url_for('surveys_bp.access_survey', case_id=survey.case.id, ci_type = survey.collection_instrument_type) }}">
                 <button id="ACCESS_SURVEY_BUTTON_{{loop.index}}" class="btn action-button btn--primary" type="submit">
                     Access <span class="u-vh">{{ survey.survey.longName|replace("Survey", " ") }}</span> survey
                 </button>
             </a>
             <a id="create-message-link-{{loop.index}}" href="/secure-message/create-message/?case_id={{survey.case.id}}&survey={{survey.survey.id}}&ru_ref={{survey.business_party.id}} " class="pluto survey-message history__message">Send a message </span></a>
+            {% endif %}
         </div>
     </li>
     {% endfor %}

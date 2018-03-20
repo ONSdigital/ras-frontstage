@@ -31,6 +31,15 @@ class TestSignIn(unittest.TestCase):
             "refresh_token": "b7ac07a6-4c28-43bd-a335-00250b490e9f",
             "party_id": "test-id"
         }
+        self.expired_oauth_token = {
+            "id": 1,
+            "access_token": "8c77e013-d8dc-472c-b4d3-d4fbe21f80e7",
+            "expires_in": -1,
+            "token_type": "Bearer",
+            "scope": "",
+            "refresh_token": "b7ac07a6-4c28-43bd-a335-00250b490e9f",
+            "party_id": "test-id"
+        }
         self.sign_in_form = {
             "username": "testuser@email.com",
             "password": "password"
@@ -98,6 +107,16 @@ class TestSignIn(unittest.TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertTrue('/surveys/'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_sign_in_expired(self, mock_object):
+        mock_object.post(url_oauth_token, status_code=200, json=self.expired_oauth_token)
+
+        self.app.get('/sign-in/', data=self.sign_in_form)
+
+        response = self.app.get('/surveys/',  follow_redirects=True)
+        self.assertEqual(response.status_code, 403)
+        self.assertIn(b'Error - Not signed in', response.data)
 
     @requests_mock.mock()
     def test_sign_in_oauth_fail(self, mock_object):

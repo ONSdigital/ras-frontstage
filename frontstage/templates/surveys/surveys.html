@@ -1,4 +1,4 @@
-<ul class="survey-list">
+<ul class="survey-list" id="survey-list">
 
     <li class="header-row">
 
@@ -39,7 +39,7 @@
 
         <div class="grid__col col-2@m">
             <span class="survey-list-item__label mercury">PERIOD COVERED: </span>
-            <span id="SURVEY_PERIOD" class="survey-list-item__nowrap">{{ survey.collection_exercise.userDescription}}</span>
+            <span id="SURVEY_PERIOD">{{ survey.collection_exercise.userDescription}}</span>
         </div>
 
         <div class="grid__col col-2@m">
@@ -51,14 +51,15 @@
 
         <div class="grid__col col-2@m">
             <span class="survey-list-item__label mercury">STATUS: </span>
-            <span>{{ survey.status }}</span>
+            <span id="status-{{ loop.index }}">{{ survey.status }}</span>
         </div>
         <div class="grid__col col-2@m">
-            <a href="{{ url_for('surveys_bp.access_survey', case_id=survey.case.id) }}">
+            <a href="{{ url_for('surveys_bp.access_survey', case_id=survey.case.id, ci_type = survey.collection_instrument_type) }}">
                 <button id="ACCESS_SURVEY_BUTTON_{{loop.index}}" class="btn action-button btn--primary" type="submit">
                     Access <span class="u-vh">{{ survey.survey.longName|replace("Survey", " ") }}</span> survey
                 </button>
             </a>
+            <a id="create-message-link-{{loop.index}}" href="/secure-message/create-message/?case_id={{survey.case.id}}&survey={{survey.survey.id}}&ru_ref={{survey.business_party.id}} " class="pluto survey-message history__message">Send a message </span></a>
         </div>
     </li>
     {% endfor %}

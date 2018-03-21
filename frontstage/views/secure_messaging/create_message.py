@@ -1,7 +1,7 @@
 import json
 import logging
 
-from flask import render_template, request
+from flask import redirect, render_template, request, url_for
 from frontstage.common.authorisation import jwt_authorization
 from structlog import wrap_logger
 
@@ -16,32 +16,35 @@ from frontstage.views.secure_messaging import secure_message_bp
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-@secure_message_bp.route('/create-message', methods=['GET', 'POST'])
+@secure_message_bp.route('/create-message/', methods=['GET', 'POST'])
 @jwt_authorization(request)
 def create_message(session):
+    case_id = request.args.get('case_id')
+    survey = request.args['survey']
+    ru_ref = request.args['ru_ref']
     party_id = session['party_id']
     form = SecureMessagingForm(request.form)
     if request.method == 'POST' and form.validate():
         is_draft = form.save_draft.data
-        sent_message = send_message(party_id, is_draft)
+        sent_message = send_message(party_id, is_draft, case_id, survey, ru_ref)
 
         # If draft was saved retrieve the saved draft
         if is_draft:
             logger.info('Draft sent successfully', message_id=sent_message['msg_id'], party_id=party_id)
             return message_get('DRAFT', sent_message['msg_id'])
 
-        return render_template('secure-messages/message-success-temp.html', _theme='default')
+        return redirect(url_for('secure_message_bp.messages_get', new_message=True))
 
     else:
         if form['thread_message_id'].data:
             message = get_message(form['thread_message_id'].data, 'INBOX', party_id)
         else:
             message = {}
-        return render_template('secure-messages/secure-messages-view.html', _theme='default',
-                               form=form, errors=form.errors, message=message.get('message', {}))
+        return render_template('secure-messages/secure-messages-view.html', _theme='default', ru_ref=ru_ref,
+                               survey=survey, case_id=case_id, form=form, errors=form.errors, message=message.get('message', {}))
 
 
-def send_message(party_id, is_draft):
+def send_message(party_id, is_draft, case_id, survey, ru_ref):
     logger.debug('Attempting to send message', party_id=party_id)
     form = SecureMessagingForm(request.form)
 
@@ -50,10 +53,15 @@ def send_message(party_id, is_draft):
     subject = form['subject'].data if form['subject'].data else form['hidden_subject'].data
     message_json = {
         'msg_from': party_id,
+        'msg_to': ['GROUP'],
         'subject': subject,
         'body': form['body'].data,
-        'thread_id': form['thread_id'].data
+        'thread_id': form['thread_id'].data,
+        'ru_id': ru_ref,
+        'survey': survey,
     }
+    if case_id:
+        message_json['collection_case'] = case_id
 
     # If message has previously been saved as a draft add through the message id
     if form["msg_id"].data:

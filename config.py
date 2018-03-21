@@ -6,7 +6,7 @@ import os
 class Config(object):
     DEBUG = False
     TESTING = False
-    VERSION = '0.2.2'
+    VERSION = '0.2.3'
     PORT = os.getenv('PORT', 8082)
     MAX_UPLOAD_LENGTH = os.getenv('MAX_UPLOAD_LENGTH',  20 * 1024 * 1024)
 
@@ -57,6 +57,7 @@ class Config(object):
     UPLOAD_CI = 'surveys/upload-ci'
     ADD_SURVEY = 'surveys/add-survey'
     CONFIRM_ADD_ORGANISATION_SURVEY = 'surveys/add-survey/confirm-add-organisation-survey'
+    GENERATE_EQ_URL = 'surveys/generate-eq-url'
 
 
 class DevelopmentConfig(Config):

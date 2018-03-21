@@ -101,7 +101,7 @@ class ResetPasswordForm(FlaskForm):
 
 class SecureMessagingForm(FlaskForm):
     save_draft = SubmitField(label='Save Draft')
-    send = SubmitField(label='Send')
+    send = SubmitField(label='Send', id='send-message-btn')
     subject = StringField('Subject')
     body = TextAreaField('Message')
     thread_message_id = HiddenField('Thread message id')
@@ -112,9 +112,10 @@ class SecureMessagingForm(FlaskForm):
     @staticmethod
     def validate_subject(form, field):
         subject = form['hidden_subject'].data if form['hidden_subject'].data else field.data
+
         if len(subject) > 96:
             raise ValidationError('Subject field length must not be greater than 100')
-        if form.send.data and not subject:
+        if form.send.data and not subject or subject.isspace():
             raise ValidationError('Please enter a subject')
 
     @staticmethod

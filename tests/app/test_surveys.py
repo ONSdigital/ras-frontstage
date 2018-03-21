@@ -10,6 +10,7 @@ from frontstage import app
 
 url_get_surveys_list = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['SURVEYS_LIST']
 url_access_case = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['ACCESS_CASE']
+url_generate_eq_url = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['GENERATE_EQ_URL']
 url_download_ci = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['DOWNLOAD_CI']
 url_upload_ci = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['UPLOAD_CI']
 url_validate_enrolment = '{}{}'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'], app.config['VALIDATE_ENROLMENT'])
@@ -89,17 +90,25 @@ class TestSurveys(unittest.TestCase):
     def test_access_survey(self, mock_request):
         mock_request.get(url_access_case, json=surveys_list[0])
 
-        response = self.app.get('/surveys/access_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5', follow_redirects=True)
+        response = self.app.get('/surveys/access_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5&ci_type=SEFT', follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Business Register and Employment Survey'.encode() in response.data)
         self.assertTrue('RUNAME1_COMPANY4 RUNNAME2_COMPANY4'.encode() in response.data)
 
     @requests_mock.mock()
+    def test_access_survey_eq(self, mock_request):
+        mock_request.get(url_generate_eq_url, json={'eq_url': 'http://test-eq-url/session?token=test'})
+
+        response = self.app.get('/surveys/access_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5&ci_type=EQ')
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue('http://test-eq-url/session?token=test'.encode() in response.data)
+
+    @requests_mock.mock()
     def test_access_survey_title(self, mock_request):
         mock_request.get(url_access_case, json=surveys_list[1])
 
-        response = self.app.get('/surveys/access_survey?case_id=t3577bd4-004d-42d1-a1c6-a514973d9ae5', follow_redirects=True)
+        response = self.app.get('/surveys/access_survey?case_id=t3577bd4-004d-42d1-a1c6-a514973d9ae5&ci_type=SEFT', follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Test Survey December 2017 - ONS Business Surveys'.encode() in response.data)
@@ -108,7 +117,7 @@ class TestSurveys(unittest.TestCase):
     def test_access_survey_fail(self, mock_request):
         mock_request.get(url_access_case, status_code=500)
 
-        response = self.app.get('/surveys/access_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5', follow_redirects=True)
+        response = self.app.get('/surveys/access_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5&ci_type=SEFT', follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
@@ -143,7 +152,7 @@ class TestSurveys(unittest.TestCase):
     def test_upload_survey_type_error(self, mock_request):
         mock_request.post(url_upload_ci, status_code=400, json=self.upload_error)
 
-        test_url = '/surveys/upload_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5'
+        test_url = '/surveys/upload_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5&survey_name=Survey+Name'
         response = self.app.post(test_url, data=self.survey_file, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -155,7 +164,7 @@ class TestSurveys(unittest.TestCase):
         self.upload_error['error']['data']['message'] = '50 characters'
         mock_request.post(url_upload_ci, status_code=400, json=self.upload_error)
 
-        test_url = '/surveys/upload_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5'
+        test_url = '/surveys/upload_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5&survey_name=Survey+Name'
         response = self.app.post(test_url, data=self.survey_file, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -166,7 +175,7 @@ class TestSurveys(unittest.TestCase):
         file_data = 'a' * 21 * 1024 * 1024
         over_size_file = dict(file=(io.BytesIO(file_data.encode()), "testfile.xlsx"))
 
-        test_url = '/surveys/upload_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5'
+        test_url = '/surveys/upload_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5&survey_name=Survey+Name'
         response = self.app.post(test_url, data=over_size_file, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -178,7 +187,7 @@ class TestSurveys(unittest.TestCase):
         self.upload_error['error']['data']['message'] = 'File too large'
         mock_request.post(url_upload_ci, status_code=400, json=self.upload_error)
 
-        test_url = '/surveys/upload_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5'
+        test_url = '/surveys/upload_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5&survey_name=Survey+Name'
         response = self.app.post(test_url, data=self.survey_file, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -190,7 +199,7 @@ class TestSurveys(unittest.TestCase):
         self.upload_error['error']['data']['message'] = 'Random message'
         mock_request.post(url_upload_ci, status_code=400, json=self.upload_error)
 
-        test_url = '/surveys/upload_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5'
+        test_url = '/surveys/upload_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5&survey_name=Survey+Name'
         response = self.app.post(test_url, data=self.survey_file, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)

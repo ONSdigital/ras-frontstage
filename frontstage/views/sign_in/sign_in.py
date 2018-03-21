@@ -72,7 +72,9 @@ def login():
         session = SessionHandler()
         logger.info('Creating session', party_id=response_json['party_id'])
         session.create_session(encoded_jwt_token)
-        response.set_cookie('authorization', value=session.session_key)
+        response.set_cookie('authorization',
+                            value=session.session_key,
+                            expires=data_dict_for_jwt_token['expires_at'])
         logger.info('Successfully created session', party_id=response_json['party_id'],
                     session_key=session.session_key)
         return response

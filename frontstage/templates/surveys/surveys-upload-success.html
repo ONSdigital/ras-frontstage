@@ -12,8 +12,8 @@
             <div class="panel__body">
                 <h1 class="venus">File uploaded successfully</h1>
                 <p>{{ upload_filename }} has been uploaded.</p>
-                <p>Business Register and Employment Survey has now moved into your <a href="{{ url_for('surveys_bp.surveys_history') }}">history</a>.</p>
-                <p><a href="{{ url_for('surveys_bp.logged_in') }}">Return to my 'To do' list</a></p>
+                <p>This survey has now moved into your <a href="{{ url_for('surveys_bp.surveys_history') }}">history</a>.</p>
+                <p><a id='return-survey-list' href="{{ url_for('surveys_bp.logged_in') }}">Return to my 'To do' list</a></p>
             </div>
         </div>
     </div>

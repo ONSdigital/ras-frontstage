@@ -65,4 +65,5 @@ def upload_survey(session):
 
     logger.info('Successfully uploaded collection instrument', party_id=party_id, case_id=case_id)
     return render_template('surveys/surveys-upload-success.html',
-                           _theme='default', upload_filename=upload_filename)
+                           _theme='default',
+                           upload_filename=upload_filename)

@@ -54,7 +54,7 @@
             <span id="status-{{ loop.index }}">{{ survey.status }}</span>
         </div>
         <div class="grid__col col-2@m">
-            {% if not survey.status == 'Complete' or survey.case.caseEvents|selectattr('category', 'equalto', 'EQ_LAUNCH')|list|length == 0 %}
+            {% if not survey.status == 'Complete' or not survey.collection_instrument_type == 'EQ' %}
             <a href="{{ url_for('surveys_bp.access_survey', case_id=survey.case.id, ci_type = survey.collection_instrument_type) }}">
                 <button id="ACCESS_SURVEY_BUTTON_{{loop.index}}" class="btn action-button btn--primary" type="submit">
                     Access <span class="u-vh">{{ survey.survey.longName|replace("Survey", " ") }}</span> survey

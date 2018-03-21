@@ -41,7 +41,7 @@ def step_impl_reply_to_bres_message(context):
 
 
 @then('I send an empty reply')
-def step_impl_reply_to_bres_message(context):
+def step_impl_empty_reply_to_bres_message(context):
     context.browser.find_by_id('secure-message-body').send_keys()
     context.browser.find_by_id('submit-btn').click()
 

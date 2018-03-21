@@ -1,7 +1,7 @@
 import requests
 
 from flask import json
-from behave import given, when, then
+from behave import given, then
 from tests.behavioural.features.steps.common import maxtext10000, is_element_present_by_id
 
 
@@ -10,8 +10,8 @@ def step_impl_received_message_from_bres(context):
     url = 'http://localhost:5050/message/send'
     # This authorization needs to be valid for the user or the test will not work
     headers = {
-        'Authorization': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoX3Rva2VuIjoiNGE3NThlZTUtNDQ2My00ZWZjLTk4MGItOTcyYjcxMjIyN2U5IiwiYW' \
-        'NjZXNzX3Rva2VuIjoiNWZhNmZkYTgtYzQ1Zi00YTE5LWEzZDYtNGMzYWUzMTI0NjMxIiwiZXhwaXJlc19hdCI6MTUwNjA3NjY1OC40ODk1OTYsInJvb' \
+        'Authorization': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoX3Rva2VuIjoiNGE3NThlZTUtNDQ2My00ZWZjLTk4MGItOTcyYjcxMjIyN2U5IiwiYW'
+        'NjZXNzX3Rva2VuIjoiNWZhNmZkYTgtYzQ1Zi00YTE5LWEzZDYtNGMzYWUzMTI0NjMxIiwiZXhwaXJlc19hdCI6MTUwNjA3NjY1OC40ODk1OTYsInJvb'
         'GUiOiJpbnRlcm5hbCIsInBhcnR5X2lkIjoiQlJFUyJ9.gBqxH_HgK7TRUxBtpgiI97QsHBPhfzbNdHyC8Nm8caw',
         'Content-Type': 'application/json'
     }
@@ -52,11 +52,11 @@ def step_impl_subject_and_body_error(context):
 
 
 @then('I send a reply that\'s too long')
-def step_impl_reply_to_bres_message(context):
+def step_impl_reply_to_bres_message_too_long(context):
     context.browser.find_by_id('secure-message-body').send_keys(maxtext10000)
     context.browser.find_by_id('submit-btn').click()
 
 
 @then('I should receive a reply too long error')
-def step_impl_subject_and_body_error(context):
+def step_impl_subject_and_body_error_too_long(context):
     context.browser.find_by_link_text('Body field length must not be greater than 10000')

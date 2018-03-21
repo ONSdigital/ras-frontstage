@@ -111,15 +111,6 @@ class TestSecureMessage(unittest.TestCase):
         self.assertTrue('Server error'.encode() in response.data)
 
     @requests_mock.mock()
-    def test_get_message_api_failure(self, mock_request):
-        mock_request.get(url_get_message, status_code=500)
-
-        response = self.app.get("/secure-message/INBOX/29000d7b-dfd8-47fa-8e15-5650a985243b", headers=self.headers, follow_redirects=True)
-
-        self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
-
-    @requests_mock.mock()
     def test_get_message_api_error_FA003(self, mock_request):
         mock_request.get(url_get_message, status_code=502)
 
@@ -140,7 +131,8 @@ class TestSecureMessage(unittest.TestCase):
         mock_request.post(url_send_message, json=sent_message_response)
         mock_request.get(url_get_messages, json=messages_get)
 
-        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789", data=self.message_form, headers=self.headers, follow_redirects=True)
+        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789",
+                                 data=self.message_form, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Message sent'.encode() in response.data)
@@ -159,16 +151,6 @@ class TestSecureMessage(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Draft saved'.encode() in response.data)
-
-    @requests_mock.mock()
-    def test_create_message_post_success_api_failure(self, mock_request):
-        mock_request.post(url_send_message, status_code=500)
-
-        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789",
-                                 data=self.message_form, headers=self.headers, follow_redirects=True)
-
-        self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_message_post_success_api_failure(self, mock_request):

@@ -80,8 +80,8 @@ class TestSurveys(unittest.TestCase):
         self.assertTrue('Business Register and Employment Survey'.encode() in response.data)
         self.assertTrue('RUNAME1_COMPANY4 RUNNAME2_COMPANY4'.encode() in response.data)
         # Two entries in array, both SEFT. Although 1 is status Complete 2 buttons should show
-        self.assertTrue('ACCESS_SURVEY_BUTTON_1'.encode() in response.data)
-        self.assertTrue('ACCESS_SURVEY_BUTTON_2'.encode() in response.data)
+        self.assertIn('ACCESS_SURVEY_BUTTON_1'.encode(), response.data)
+        self.assertIn('ACCESS_SURVEY_BUTTON_2'.encode(), response.data)
 
     @requests_mock.mock()
     def test_surveys_history_eq(self, mock_request):
@@ -93,8 +93,8 @@ class TestSurveys(unittest.TestCase):
         self.assertTrue('Business Register and Employment Survey'.encode() in response.data)
         self.assertTrue('RUNAME1_COMPANY4 RUNNAME2_COMPANY4'.encode() in response.data)
         # Two entries in array, one is Complete one is not, so there should be 1 button only
-        self.assertTrue('ACCESS_SURVEY_BUTTON_1'.encode() in response.data)
-        self.assertFalse('ACCESS_SURVEY_BUTTON_2'.encode() in response.data)
+        self.assertIn('ACCESS_SURVEY_BUTTON_1'.encode(), response.data)
+        self.assertNotIn('ACCESS_SURVEY_BUTTON_2'.encode(), response.data)
 
     @requests_mock.mock()
     def test_surveys_todo_fail(self, mock_request):

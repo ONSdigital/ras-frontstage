@@ -45,10 +45,20 @@ Install test dependencies with
 ```bash
 pipenv install --dev
 ```
-The [run_tests.py](run_tests.py) script will run the tests in the [/tests](tests) folder using pytest and present a coverage report
+The [run_tests.py](run_tests.py) script will run the tests in the [/tests](tests) folder using pytest and present a coverage report.  This script can be easily run via the following command
 ```bash
-pipenv run python run_tests.py
+make test
 ```
+or if you are running redis in the docker environment
+```bash
+make docker-test
+```
+or if you wish to run a single test file it can be specified as follows
+```bash
+make TEST_TARGET=tests/app/test_surveys.py test
+```
+The syntax above will work equally well with the 'docker-test' target
+
 
 Note that this script will fail if there is a `node_modules` folder in the repo
 

@@ -18,8 +18,11 @@ url_add_survey = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['ADD_SURV
 url_confirm_add_organisation_survey = '{}{}'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'],
                                                     app.config['CONFIRM_ADD_ORGANISATION_SURVEY'])
 
-with open('tests/test_data/surveys_list.json') as json_data:
-    surveys_list = json.load(json_data)
+with open('tests/test_data/surveys_list_seft.json') as json_data:
+    surveys_list_seft = json.load(json_data)
+
+with open('tests/test_data/surveys_list_eq.json') as json_data:
+    surveys_list_eq = json.load(json_data)
 
 encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoicmVzcG9uZGVudCIsImFjY2Vzc190b2tlbiI6ImI5OWIyMjA" \
                     "0LWYxMDAtNDcxZS1iOTQ1LTIyN2EyNmVhNjljZCIsInJlZnJlc2hfdG9rZW4iOiIxZTQyY2E2MS02ZDBkLTQxYjMtODU2Yy0" \
@@ -59,7 +62,7 @@ class TestSurveys(unittest.TestCase):
 
     @requests_mock.mock()
     def test_surveys_todo(self, mock_request):
-        mock_request.get(url_get_surveys_list, json=surveys_list)
+        mock_request.get(url_get_surveys_list, json=surveys_list_seft)
 
         response = self.app.get('/surveys/')
 
@@ -68,14 +71,30 @@ class TestSurveys(unittest.TestCase):
         self.assertTrue('RUNAME1_COMPANY4 RUNNAME2_COMPANY4'.encode() in response.data)
 
     @requests_mock.mock()
-    def test_surveys_history(self, mock_request):
-        mock_request.get(url_get_surveys_list, json=surveys_list)
+    def test_surveys_history_seft(self, mock_request):
+        mock_request.get(url_get_surveys_list, json=surveys_list_seft)
 
         response = self.app.get('/surveys/history')
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Business Register and Employment Survey'.encode() in response.data)
         self.assertTrue('RUNAME1_COMPANY4 RUNNAME2_COMPANY4'.encode() in response.data)
+        # Two entries in array, both SEFT. Although 1 is status Complete 2 buttons should show
+        self.assertIn('ACCESS_SURVEY_BUTTON_1'.encode(), response.data)
+        self.assertIn('ACCESS_SURVEY_BUTTON_2'.encode(), response.data)
+
+    @requests_mock.mock()
+    def test_surveys_history_eq(self, mock_request):
+        mock_request.get(url_get_surveys_list, json=surveys_list_eq)
+
+        response = self.app.get('/surveys/history')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Business Register and Employment Survey'.encode() in response.data)
+        self.assertTrue('RUNAME1_COMPANY4 RUNNAME2_COMPANY4'.encode() in response.data)
+        # Two entries in array, one is Complete one is not, so there should be 1 button only
+        self.assertIn('ACCESS_SURVEY_BUTTON_1'.encode(), response.data)
+        self.assertNotIn('ACCESS_SURVEY_BUTTON_2'.encode(), response.data)
 
     @requests_mock.mock()
     def test_surveys_todo_fail(self, mock_request):
@@ -88,7 +107,7 @@ class TestSurveys(unittest.TestCase):
 
     @requests_mock.mock()
     def test_access_survey(self, mock_request):
-        mock_request.get(url_access_case, json=surveys_list[0])
+        mock_request.get(url_access_case, json=surveys_list_seft[0])
 
         response = self.app.get('/surveys/access_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5&ci_type=SEFT', follow_redirects=True)
 
@@ -106,7 +125,7 @@ class TestSurveys(unittest.TestCase):
 
     @requests_mock.mock()
     def test_access_survey_title(self, mock_request):
-        mock_request.get(url_access_case, json=surveys_list[1])
+        mock_request.get(url_access_case, json=surveys_list_seft[1])
 
         response = self.app.get('/surveys/access_survey?case_id=t3577bd4-004d-42d1-a1c6-a514973d9ae5&ci_type=SEFT', follow_redirects=True)
 
@@ -301,7 +320,7 @@ class TestSurveys(unittest.TestCase):
     @requests_mock.mock()
     def test_add_survey_submit(self, mock_object):
         mock_object.post(url_add_survey, json={'case_id': "test_case_id"})
-        mock_object.get(url_get_surveys_list, json=surveys_list)
+        mock_object.get(url_get_surveys_list, json=surveys_list_seft)
 
         url = '/surveys/add-survey/add-survey-submit' \
               '?encrypted_enrolment_code=WfwJghohWOZTIYnutlTcVucqnuED5Lm9q8t0L4ASHPo='

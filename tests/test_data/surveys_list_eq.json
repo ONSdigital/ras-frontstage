@@ -73,8 +73,9 @@
       "longName": "Business Register and Employment Survey",
       "surveyRef": "221"
     },
-    "collection_instrument_size": 5302,
-    "status": "None"
+    "status": "None",
+    "collection_instrument_type": "EQ",
+    "collection_instrument_size": 5302
   },
   {
     "case": {
@@ -151,7 +152,8 @@
       "longName": "Test Survey",
       "surveyRef": "221"
     },
-    "collection_instrument_size": 5302,
-    "status": "None"
+    "status": "Complete",
+    "collection_instrument_type": "EQ",
+    "collection_instrument_size": 5302
   }
 ]

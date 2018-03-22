@@ -5,8 +5,14 @@ lint:
 	pipenv run flake8 ./frontstage ./tests
 	pipenv check ./frontstage ./tests
 
-test: lint
-	pipenv run python run_tests.py
-
 start:
 	pipenv run python run.py
+
+TEST_TARGET=tests
+
+docker-test: REDIS_PORT=7379
+docker-test: test
+
+test: 
+	APP_SETTINGS=TestingConfig pipenv run pytest $(TEST_TARGET) --cov frontstage --cov-report term-missing	
+

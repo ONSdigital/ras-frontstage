@@ -64,7 +64,6 @@ class TestPasswords(unittest.TestCase):
 
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
 
-
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Invalid email'.encode() in response.data)
 

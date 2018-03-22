@@ -25,13 +25,13 @@ def step_impl_signed_out(context):
 
 
 @given('I enter the incorrect password')
-def step_impl_incorrect_credentials(context):
+def step_impl_incorrect_password(context):
     context.browser.find_by_id('username').send_keys('tejas.patel@ons.gov.uk')
     context.browser.find_by_id('password').send_keys('Gizmo7')
 
 
 @given('I enter the incorrect email')
-def step_impl_incorrect_credentials(context):
+def step_impl_incorrect_email(context):
     context.browser.find_by_id('username').send_keys('tas.patel@ons.gov.uk')
     context.browser.find_by_id('password').send_keys('Gizmo007!')
 

@@ -55,7 +55,7 @@ def step_impl_add_text_to_body_too_long(context):
 
 
 @given('I have a message with subject and body too long')
-def step_impl_add_text_to_body_too_long(context):
+def step_impl_add_text_to_body_and_subject_too_long(context):
     step_impl_subject_too_long(context)
     step_impl_body_too_long(context)
 

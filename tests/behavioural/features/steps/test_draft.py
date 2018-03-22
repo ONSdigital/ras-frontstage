@@ -11,21 +11,21 @@ def step_impl_create_draft(context):
 
 
 @given('there is a draft with no subject')
-def step_impl_create_draft(context):
+def step_impl_create_draft_no_subject(context):
     context.browser.visit('/secure-message/create-message')
     context.browser.find_by_id('secure-message-body').send_keys('Test Body')
     context.browser.find_by_id('draft').click()
 
 
 @given('there is a draft with no body')
-def step_impl_create_draft(context):
+def step_impl_create_draft_no_body(context):
     context.browser.visit('/secure-message/create-message')
     context.browser.find_by_id('secure-message-subject').send_keys('Test Subject No Body')
     context.browser.find_by_id('draft').click()
 
 
 @given('there is a draft with empty fields')
-def step_impl_create_draft(context):
+def step_impl_create_draft_empty_fields(context):
     context.browser.visit('/secure-message/create-message')
     context.browser.find_by_id('draft').click()
 
@@ -37,13 +37,13 @@ def step_impl_go_to_draft_message(context):
 
 
 @when('I open a draft with no body')
-def step_impl_go_to_draft_message(context):
+def step_impl_go_to_draft_message_no_body(context):
     context.browser.visit('/secure-message/messages/DRAFT')
     context.browser.find_by_link_text('Test Subject No Body').click()
 
 
 @when('I open a draft with the read message link')
-def step_impl_go_to_draft_message(context):
+def step_impl_go_to_draft_message_via_message_link(context):
     context.browser.visit('/secure-message/messages/DRAFT')
     context.browser.find_by_id('read-message-link-1').click()
 

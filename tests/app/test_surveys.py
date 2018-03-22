@@ -126,8 +126,10 @@ class TestSurveys(unittest.TestCase):
     @requests_mock.mock()
     def test_access_survey_eq_forbidden(self, mock_request):
         mock_request.get(url_generate_eq_url, status_code=403)
-        response = self.app.get('/surveys/access_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5&ci_type=EQ')
-        self.assertEqual(response.status_code, 403)
+        response = self.app.get('/surveys/access_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5&ci_type=EQ', follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
 
     @requests_mock.mock()
     def test_access_survey_title(self, mock_request):

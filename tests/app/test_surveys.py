@@ -321,4 +321,3 @@ class TestSurveys(unittest.TestCase):
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
-

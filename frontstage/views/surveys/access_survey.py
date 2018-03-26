@@ -29,6 +29,12 @@ def access_survey(session):
     if collection_instrument_type == 'EQ':
         logger.info('redirecting to EQ', party_id=party_id, case_id=case_id)
         response = api_call('GET', app.config['GENERATE_EQ_URL'], parameters=params)
+
+        if response.status_code != 200:
+            logger.error('Failed to retrieve EQ URL',
+                         party_id=party_id, case_id=case_id, status=response.status_code)
+            raise ApiError(response)
+
         eq_url = json.loads(response.text)['eq_url']
         return redirect(eq_url)
 

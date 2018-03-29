@@ -36,6 +36,14 @@ class Config(object):
     RAS_FRONTSTAGE_API_SERVICE = '{}://{}:{}/'.format(RAS_FRONTSTAGE_API_PROTOCOL,
                                                       RAS_FRONTSTAGE_API_HOST,
                                                       RAS_FRONTSTAGE_API_PORT)
+
+    RAS_SECURE_MESSAGE_PROTOCOL = os.getenv('RAS_SECURE_MESSAGE_PROTOCOL', 'http')
+    RAS_SECURE_MESSAGE_HOST = os.getenv('RAS_SECURE_MESSAGE_HOST', 'localhost')
+    RAS_SECURE_MESSAGE_PORT = os.getenv('RAS_SECURE_MESSAGE_PORT', 5050)
+
+    RAS_SECURE_MESSAGE_SERVICE = '{}://{}:{}/'.format(RAS_SECURE_MESSAGE_PROTOCOL,
+                                                      RAS_SECURE_MESSAGE_HOST,
+                                                      RAS_SECURE_MESSAGE_PORT)
     GET_MESSAGES_URL = 'secure-messaging/messages-list'
     GET_MESSAGE_URL = 'secure-messaging/message'
     SEND_MESSAGE_URL = 'secure-messaging/send-message'

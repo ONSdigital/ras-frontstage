@@ -1,0 +1,14 @@
+{% extends "secure-messages/messages.html" %}
+
+{% block page_title %}View message - ONS Business Surveys{% endblock %}
+
+{% block messages %}
+
+<div class="secure-message-view-component">
+    {{ thread }}
+
+    <p><a href="{{ url_for('secure_message_bp.messages_get') }}">Cancel</a></p>
+
+</div>
+
+{% endblock messages %}

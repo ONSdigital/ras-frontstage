@@ -7,12 +7,25 @@ from structlog import wrap_logger
 from frontstage import app
 from frontstage.common.api_call import api_call
 from frontstage.common.session import SessionHandler
+from frontstage.controllers.conversation_controller import get_conversation
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.models import SecureMessagingForm
 from frontstage.views.secure_messaging import secure_message_bp
 
 
 logger = wrap_logger(logging.getLogger(__name__))
+
+
+@secure_message_bp.route('/thread/<thread_id>', methods=['GET'])
+@jwt_authorization(request)
+def view_conversation(session, thread_id):
+    logger.info("Getting conversation", thread_id=thread_id)
+    conversation = get_conversation(thread_id)
+    logger.info(conversation)
+    #refined_thread = [_refine(message) for message in reversed(conversation)]
+    # refine conversation to be easily digested by template
+    return render_template('secure-messages/conversation-view.html',
+                           thread=conversation)
 
 
 @secure_message_bp.route('/<label>/<message_id>', methods=['GET'])

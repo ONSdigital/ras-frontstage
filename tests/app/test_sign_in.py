@@ -114,7 +114,7 @@ class TestSignIn(unittest.TestCase):
 
         self.app.get('/sign-in/', data=self.sign_in_form)
 
-        response = self.app.get('/surveys/',  follow_redirects=True)
+        response = self.app.get('/surveys/todo',  follow_redirects=True)
         self.assertEqual(response.status_code, 403)
         self.assertIn(b'Error - Not signed in', response.data)
 

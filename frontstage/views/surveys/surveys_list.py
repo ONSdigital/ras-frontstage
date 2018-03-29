@@ -14,7 +14,7 @@ from frontstage.views.surveys import surveys_bp
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-@surveys_bp.route('/', methods=['GET'])
+@surveys_bp.route('/todo', methods=['GET'])
 @jwt_authorization(request)
 def logged_in(session):
     party_id = session.get('party_id')

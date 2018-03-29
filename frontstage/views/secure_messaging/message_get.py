@@ -6,13 +6,47 @@ from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.common.api_call import api_call
+from frontstage.common.message_helper import refine
 from frontstage.common.session import SessionHandler
+from frontstage.controllers.conversation_controller import get_conversation, get_conversation_list
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.models import SecureMessagingForm
 from frontstage.views.secure_messaging import secure_message_bp
 
 
 logger = wrap_logger(logging.getLogger(__name__))
+
+
+@secure_message_bp.route('/thread/<thread_id>', methods=['GET'])
+@jwt_authorization(request)
+def view_conversation(session, thread_id):
+    logger.info("Getting conversation", thread_id=thread_id)
+    conversation = get_conversation(thread_id)['messages']
+    try:
+        refined_conversation = [refine(message) for message in reversed(conversation)]
+    except KeyError as e:
+        logger.exception("A key error occurred", thread_id=thread_id)
+        raise ApiError(e)
+
+    return render_template('secure-messages/conversation_view.html',
+                           _theme='default',
+                           conversation=refined_conversation)
+
+
+@secure_message_bp.route('/threads', methods=['GET'])
+@jwt_authorization(request)
+def view_conversation_list(session):
+    logger.info("Getting conversation list")
+    conversation = get_conversation_list()
+    try:
+        refined_conversation = [refine(message) for message in reversed(conversation)]
+    except KeyError as e:
+        logger.exception("A key error occurred")
+        raise ApiError(e)
+
+    return render_template('secure-messages/conversation_list.html',
+                           _theme='default',
+                           messages=refined_conversation)
 
 
 @secure_message_bp.route('/<label>/<message_id>', methods=['GET'])

@@ -1,0 +1,36 @@
+{% extends "secure-messages/messages.html" %}
+
+{% block page_title %}View message - ONS Business Surveys{% endblock %}
+
+{% block messages %}
+
+<div class="secure-message-view-component">
+    {% for message in conversation %}
+       <div class="secure-message-sent-message">
+    {% if message.get('internal') == True %}
+        <div name="sm-from-ons" id="sm-from-ons-{{ loop.index }}">
+    {% else %}
+        <div name="sm-from-respondent" id="sm-from-respondent-{{ loop.index }}">
+    {% endif %}
+            {% if loop.last %}<div name="latest-message"   id='latest-message' ></div>{% endif %}
+            <span>
+                From:
+                <span name="sm-from-user" id="sm-from-user-{{ loop.index }}">{{ message.get('username') }}</span>
+            </span>
+            <span>
+                Sent:
+                <span name="sm-sent-date" id="sm-sent-date-{{ loop.index }}">{{ message.get('sent_date') }}</span>
+
+            </span>
+        </div>
+        <div>
+            <span style="white-space:pre-line">{{ message.get('body') }}</span>
+        </div>
+    </div>
+    {% endfor %}
+
+    <p><a href="{{ url_for('secure_message_bp.messages_get') }}">Cancel</a></p>
+
+</div>
+
+{% endblock messages %}

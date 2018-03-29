@@ -8,7 +8,7 @@ class Config(object):
     TESTING = False
     VERSION = '0.2.3'
     PORT = os.getenv('PORT', 8082)
-    MAX_UPLOAD_LENGTH = os.getenv('MAX_UPLOAD_LENGTH',  20 * 1024 * 1024)
+    MAX_UPLOAD_LENGTH = os.getenv('MAX_UPLOAD_LENGTH', 20 * 1024 * 1024)
 
     SECRET_KEY = os.getenv('SECRET_KEY')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME')
@@ -36,6 +36,14 @@ class Config(object):
     RAS_FRONTSTAGE_API_SERVICE = '{}://{}:{}/'.format(RAS_FRONTSTAGE_API_PROTOCOL,
                                                       RAS_FRONTSTAGE_API_HOST,
                                                       RAS_FRONTSTAGE_API_PORT)
+
+    RAS_SECURE_MESSAGING_PROTOCOL = os.getenv('RAS_SECURE_MESSAGE_PROTOCOL', 'http')
+    RAS_SECURE_MESSAGING_HOST = os.getenv('RAS_SECURE_MESSAGE_HOST', 'localhost')
+    RAS_SECURE_MESSAGING_PORT = os.getenv('RAS_SECURE_MESSAGE_PORT', 5050)
+    RAS_SECURE_MESSAGING_SERVICE = '{}://{}:{}/'.format(RAS_SECURE_MESSAGING_PROTOCOL,
+                                                        RAS_SECURE_MESSAGING_HOST,
+                                                        RAS_SECURE_MESSAGING_PORT)
+
     GET_MESSAGES_URL = 'secure-messaging/messages-list'
     GET_MESSAGE_URL = 'secure-messaging/message'
     SEND_MESSAGE_URL = 'secure-messaging/send-message'

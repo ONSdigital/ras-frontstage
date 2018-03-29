@@ -64,7 +64,7 @@ class TestSurveys(unittest.TestCase):
     def test_surveys_todo(self, mock_request):
         mock_request.get(url_get_surveys_list, json=surveys_list_seft)
 
-        response = self.app.get('/surveys/')
+        response = self.app.get('/surveys/todo')
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Business Register and Employment Survey'.encode() in response.data)
@@ -100,7 +100,7 @@ class TestSurveys(unittest.TestCase):
     def test_surveys_todo_fail(self, mock_request):
         mock_request.get(url_get_surveys_list, status_code=500)
 
-        response = self.app.get('/surveys/', follow_redirects=True)
+        response = self.app.get('/surveys/todo', follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)

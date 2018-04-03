@@ -13,35 +13,34 @@
       <p>No new messages</p>
     {% else %}
 
-      <ul class="message-list">
+      <ul class="message-list col-9@m">
         {% for message in messages %}
-          <li id="message-list" class="message-list__item">
+          {% if message['unread'] %}
+            <li id="message-list-unread" class="message-list__item venus">
+              <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" id="message-link-{{ loop.index }}">{{ message.subject }}</a>
+              <span class="secure-message-conversation-meta__label mercury" style="color: #666;"> (New) </span>
+          {% else %}
+            <li id="message-list" class="message-list__item mars">
             <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" id="message-link-{{ loop.index }}">{{ message.subject }}</a>
+          {% endif %}
 
-            <dl class="grid">
-              <dt class="grid__col col-2@m">
-                  From:
-              </dt>
+            <div class="message-details">
+              <div class="secure-message-sent-message-meta-from mars">
+                <span class="tempHack u-vh">From: </span>
+                ONS Business Surveys Team
+              </div>
 
-              <dd class="grid__col col-9@m pull-1@m">
-                  {{ message.from or 'Unavailable' }}
-              </dd>
-            </dl>
+              <div class="secure-message-sent-message-meta-datetime mars u-mb-s" style="display: block; color: #666;">
+                <span class="tempHack u-vh">Sent: </span>
+                {{ message.sent_date or 'Unavailable' }}
+              </div>
+            </div>
 
-            <dl class="grid">
-              <dt class="grid__col col-2@m">
-                  Sent date:
-              </dt>
+            <p class="message-list__item-preview">{{ message['body']|truncate(80, False, '...', 0) }}</p>
 
-              <dd class="grid__col col-9@m pull-1@m">
-                  {{ message.sent_date or 'Unavailable' }}
-              </dd>
-            </dl>
-
-            <p>{{ message['body']|truncate(100) }}</p>
-
-            <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" id="open-conversation-link-{{ loop.index }}">View conversation</a>
-
+            <p class="message-list__item-preview--link">
+              <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" id="open-conversation-link-{{ loop.index }}">Read full message</a>
+            </p>
           </li>
         {% endfor %}
       </ul>

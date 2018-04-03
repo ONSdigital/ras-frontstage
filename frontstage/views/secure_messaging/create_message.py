@@ -33,15 +33,18 @@ def create_message(session):
             logger.info('Draft sent successfully', message_id=sent_message['msg_id'], party_id=party_id)
             return message_get('DRAFT', sent_message['msg_id'])
 
-        return redirect(url_for('secure_message_bp.messages_get', new_message=True))
+        return redirect(url_for('secure_message_bp.view_conversation_list'))
 
     else:
         if form['thread_message_id'].data:
             message = get_message(form['thread_message_id'].data, 'INBOX', party_id)
         else:
             message = {}
-        return render_template('secure-messages/secure-messages-view.html', _theme='default', ru_ref=ru_ref,
-                               survey=survey, case_id=case_id, form=form, errors=form.errors, message=message.get('message', {}))
+        return render_template('secure-messages/secure-messages-view.html',
+                               _theme='default', ru_ref=ru_ref,
+                               survey=survey, case_id=case_id,
+                               form=form, errors=form.errors,
+                               message=message.get('message', {}))
 
 
 def send_message(party_id, is_draft, case_id, survey, ru_ref):

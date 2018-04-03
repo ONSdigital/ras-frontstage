@@ -1,0 +1,796 @@
+/* Override styles - temporary for prototype */
+
+@import "/css/components/breadcrumb.css";
+@import "/css/components/data-panel.css";
+@import "/css/components/file-picker.css";
+@import "/css/components/footer.css";
+@import "/css/components/header.css";
+@import "/css/components/headings.css";
+@import "/css/components/images.css";
+@import "/css/components/lists.css";
+@import "/css/components/nav.css";
+@import "/css/components/spoke.css";
+@import "/css/components/table.css";
+/* @import "/css/components/utilities.css"; */
+
+
+html{
+  height: 100%;
+}
+
+body{
+  min-height: 100%;
+  display: grid;
+  grid-template: 1fr auto;
+}
+
+footer{
+  grid-row-start: 2;
+  grid-row-end: 3;
+}
+
+
+
+/* For when we really do want not to display something! */
+
+.hidden{display:none;}
+
+.not-mvp{
+  display: none;
+}
+
+
+
+/* Does this active style need to go into CDN? */
+
+a:active{
+  color: white;
+  background: #4263c2;
+  outline: 3px solid white;
+}
+
+
+
+
+/* new button icon for copy from material design icon library */
+
+.btn__icon--copy-link{
+
+  background-image: url(/s/img/icons/ic_content_copy_black_18px.svg);
+  width: 1.2rem;
+
+}
+
+
+
+
+/* Colletcion exercise page START */
+
+
+#output{
+
+}
+
+#output .panel{
+  margin-top: 1rem;
+}
+
+#output h3{
+  margin-bottom: 0;
+}
+
+button.unready{
+  background:#6a6a6a;
+}
+
+button.unready:hover,
+button.unready:focus{
+  background:#6a6a6a;
+}
+
+button.cancel{
+ padding: 0.6rem 1rem !important;
+ margin-left: 0.5rem;
+}
+
+button.hidden{
+  display: none;
+}
+
+#btn-check-sample-contents,
+#btn-load-sample,
+#btn-cancel-load-sample,
+#btn-add-ci{
+  margin-top: 0.6rem;
+}
+
+
+.list__item--ci{
+  list-style-type: square;
+}
+
+
+
+
+/* .current-value::before{
+  content: "(";
+}
+
+.current-value::after{
+  content: ")";
+} */
+
+
+
+/* grid and layout - needs checking! */
+
+
+/**
+ * Structure/layout
+
+
+ see responsive.css
+ changed 18px to 16px, 9px to 8px and 36px to 32px
+ others will need changing and all will need rethinking
+
+
+ */
+
+
+
+
+/* used on CE page */
+
+.btn--light.btn--border {
+    font-weight: 600;
+    background: transparent;
+    border: 2px solid #033e58;
+    color: #033e58;
+    padding: 8px 32px;
+    padding: 0.5rem 2rem;
+}
+.btn--light.btn--border:hover, .btn--light.btn--border:focus {
+    background: #033e58;
+    color: #fff;
+}
+
+
+
+
+
+.ce-ci-info-list__item{
+  list-style: square;
+}
+
+.ce-ci-info-list__item.success{
+  list-style: none;
+  background-image: url("/s/img/tick-green.png");
+  background-size: 20px 20px;
+  background-repeat: no-repeat;
+  background-position: left center;
+  padding-left: 24px;
+  margin-left: -20px;
+}
+
+
+
+.btn--secondary.btn--border.btn--small{
+  margin: 0 0.5rem;
+  padding: 0.25rem 1rem;
+  width: auto;
+}
+
+.lock:before {
+  background: #fff url(/s/img/icons/icons--lock.svg) no-repeat center center;
+}
+
+.page__content{
+  overflow-x: visible;
+}
+
+
+
+
+
+.bar__title{
+    margin-right: auto;
+}
+
+.bar__title a{
+  color: #fff;
+  text-decoration: none;
+}
+
+.bar__title a:hover, .bar__title a:active, .bar__title a:focus{
+  color: #fff;
+  text-decoration: underline;
+}
+
+
+
+.field--search{
+  display: inline-block;
+}
+
+.label--search{
+  display: inline;
+}
+
+.input--search{
+  display: inline;
+  padding: 0.1rem 0.25rem;
+  border: 1px solid #000;
+  /*font-size: 0.8rem;*/
+  width: 10rem;
+  color: #222;
+}
+
+.btn--search{
+  color: #222;
+  font-size: 0.8rem;
+  padding: 0.25rem 0.5rem;
+  margin: auto 0;
+}
+
+
+.header__site{
+  border-top: 1px solid rgba(191, 206, 213, 1);
+  border-top: 1px solid rgba(128, 158, 171, 1);
+}
+
+
+
+/* RU page Reporting unit page*/
+
+.ru-survey{
+  margin: 1rem 0;
+  /* padding: 1.5rem 1.5rem 0.5rem 1.5rem; */
+  border: 0.5rem solid #eeecec;
+}
+
+
+.ru-survey h3{
+  font-weight: 500;
+}
+
+
+
+.tbl-ru-survey-respondents{
+  /* width: 75%; */
+}
+
+
+
+
+.response__changed{
+  background-color: #edf4f0;
+}
+
+
+
+
+
+/* Collection exercise views */
+
+
+.ce-section h2{
+  border-bottom: 2px solid #222;
+  margin-bottom: 0.3rem;
+}
+
+
+
+
+
+.ce-event-date{
+  color: #666;
+  font-weight: 400;
+}
+
+
+.ce-event-date em{
+  color: #222;
+  font-weight: 500;
+}
+
+
+table.ce-cis .tbl-ce-label{
+  vertical-align: middle;
+}
+
+
+.ci-info-panel{
+  margin: 2rem 0;
+}
+
+.ce-events__list{
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.3rem 0 0.3rem 0;
+  margin-left:auto;
+}
+
+.ce-events__list th, .ce-events__list td{
+  text-align: left;
+  vertical-align: top;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ccc;
+}
+
+.ce-events__list th{
+  font-weight: 700;
+  border-bottom: 1px solid #222;
+}
+
+.ce-events-action{
+  /*display:none;*/
+}
+
+.action-area{
+  margin-top: 1rem;
+  margin-bottom: 3rem;
+}
+
+input[type="file"] {
+
+}
+
+#upload legend{
+  display: none;
+}
+
+#filedrag
+{
+	display: none;
+	font-weight: bold;
+	text-align: center;
+	padding: 1em 0;
+	margin: 1em 0;
+	color: #555;
+	border: 2px dashed #555;
+	border-radius: 7px;
+	cursor: default;
+}
+
+#filedrag.hover
+{
+  color: #0f8243;
+	border-color: #0f8243;
+	border-style: solid;
+	box-shadow: inset 0 3px 4px #888;
+}
+
+
+
+.ci-list{
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.ci-list th, .ci-list td{
+  text-align: left;
+  padding: 0.5rem;
+}
+
+.ci-list th{
+  border-bottom: 1px solid #222;
+}
+
+
+/* Collection exercise - Reporting unit styles */
+
+.ceru-headline{
+  background: #f5f6ff;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+
+
+
+
+
+
+/*** this is nic confessing to the horror of this little bit below on 3 May - need to sort it out sooner rather than later! */
+
+
+.message-list,
+.message-actions,
+.sm-nav,
+.sm-form label.venus,
+.sm-form input,
+.sm-form textarea,
+.sm-form button,
+.secure-message__header,
+.message-content-view
+{
+
+  font-size: 81.25%;
+  font-size: 90%;
+
+}
+
+
+
+.list-item-cta{
+  list-style: square;
+}
+
+
+
+#message-list-sent tbody tr{
+  display: none;
+}
+
+
+
+
+
+
+
+
+.message-list-actions{
+  display: none;
+}
+
+
+.message-list{
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.message-list--no-messages{
+  height: 300px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.rainbow{
+  background-image: url("/images/rainbow-butterfly.png");
+  background-repeat: no-repeat;
+  background-position: bottom;
+}
+
+.message-list thead tr{
+  border-bottom: 2px solid #666;
+}
+
+.message-list tbody tr{
+  border-bottom: 1px solid #ccc;
+}
+
+.message-list tbody tr:hover{
+cursor: pointer;
+background: #e4d8eb;
+background: #eee;
+}
+
+
+.message-list th, .message-list td{
+  text-align: left;
+  padding: 0.5rem 0 0.5rem 1rem;
+}
+
+
+.message-list th{
+  padding-bottom: 0.25rem;
+  background: #e4e8eb;
+  background: #fff;
+}
+
+
+
+.message-list__select{
+  /*display: none;*/
+}
+
+.message-list input[type="checkbox"]{
+}
+
+.message-list__date-time{
+  width: 10rem;
+  white-space: nowrap;
+}
+
+.message-list__ru-ref{
+  width: 8rem;
+  white-space: nowrap;
+}
+
+.message-list__ru-name{
+  width: 10rem;
+  max-width: 12rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.message-list__subject{
+  max-width: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.message-list__from{
+  width: 10rem;
+  max-width: 12rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.message-list__to{
+  padding: 0.5rem 1rem 0.5rem 1rem;
+  width: 8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.message-list__item--unread{
+  font-weight: 800;
+}
+
+
+
+@media only screen and (min-width: 740px) {
+
+
+  .message-list__date-time{
+    padding-right: 2rem;
+  }
+
+  .message-list__ru-ref{
+    padding-right: 2rem;
+  }
+
+  .message-list__ru-name{
+    padding-right: 2rem;
+  }
+
+
+  .message-list__subject{
+    min-width: 250px;
+    padding-right: 2rem;
+  }
+
+  .message-list__from{
+    min-width: 150px;
+    padding-right: 2rem;
+  }
+
+  .message-list__to{
+    min-width: 150px;
+  }
+
+}
+
+
+.sm-draft{
+  text-transform: uppercase;
+  font-weight: 400;
+  color: #000;
+  background: #ff0;
+  padding: 2px;
+  font-size: 12px;
+}
+
+
+@media only screen and (min-width: 740px) {
+  .create-message.block{
+    width: 60%;
+  }
+}
+
+.message-view.block{
+  width: 60%;
+}
+
+.message-reply.block{
+  width: 60%;
+}
+
+.secure-message__header dl{
+  display: block;
+  float: left;
+  clear: both;
+  padding-bottom: 2rem;
+}
+
+.secure-message__header dt::after{
+  content: ": "
+}
+
+.secure-message__header dt, .secure-message__header dd{
+  display: inline-block;
+  float: left;
+}
+
+.secure-message__header dt{
+  margin-right: 0;
+  padding-right: 0;
+  clear: left;
+}
+
+.secure-message__header dd{
+  clear: right;
+}
+
+.message-content-view{
+  display: block;
+  float: left;
+  clear:both;
+  margin: 2rem 0;
+}
+
+@media only screen and (min-width: 740px) {
+  .secure-message-conversation{
+    width: 62.5%;
+  }
+}
+
+.secure-message-sent-message{
+  width: 96%;
+}
+
+.secure-message-sent-message-meta.sm-from-ons{
+  background: #033E58;
+}
+
+.secure-message-sent-message-meta.sm-from-respondent{
+  background: #0F8243;
+}
+
+.secure-message-conversation-meta{
+  margin-bottom: 1rem;
+}
+
+.sm-from-respondent .secure-message-conversation-meta{
+    text-align: right;
+}
+
+.secure-message-sent-message{
+   border: 1px solid #666;
+   margin-bottom: 2rem;
+}
+
+.secure-message-sent-message-meta,
+.secure-message-sent-message-body{
+  padding: 0.5rem;
+  font-size: 16px;
+}
+
+.secure-message-sent-message-meta{
+  border-top-left-radius: 0.2rem;
+  border-top-right-radius: 0.2rem;
+  padding-top: 0.333rem;
+  padding-bottom: 0.333rem;
+  font-size: 18px;
+}
+
+
+.secure-message-sent-message-meta__label{
+  display: none;
+}
+
+.secure-message-sent-message-meta-datetime{
+  display: block;
+  color: #666;
+}
+.secure-message-sent-message-meta-from{
+  display: block;
+}
+.secure-message-sent-message-meta-to{
+  display: block;
+}
+
+.tempHack{
+  width: 2.5rem;
+  display: inline-block;
+}
+
+.secure-message-sent-message-actions{
+  padding: 0.5rem;
+}
+
+.secure-message-sent-message-actions{
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  padding-top: 0.333rem;
+  padding-bottom: 0.333rem;
+  text-align: left;
+}
+
+.sm-message-action{
+  float: right;
+  margin-right: 0.5rem;
+}
+
+
+
+
+
+.secure-message--recipient,
+.secure-message--meta{
+  font-size: 81.25%;
+  /*margin-bottom: 1rem;*/
+}
+
+.sm-form-recipient-label,
+.sm-form-meta-label{
+  display: inline-block;
+  width: 5rem;
+  color: #666;
+}
+
+
+.secure-message-conversation-meta__label{
+  display: inline-block;
+  width: 5rem;
+  color: #666;
+}
+
+
+
+.secure-message--subject, .secure-message--message{
+  display: block;
+  width: 100%;
+}
+
+
+
+
+
+input.secure-message--recipient{
+  width: 80%;
+  font-size: 1rem; /* avert your eyes! */
+  margin-bottom: 1rem;
+}
+
+label.secure-message--subject{
+  margin-top: 1rem;
+}
+
+input.secure-message--subject{
+  border: 1px solid #222;
+  margin-bottom: 1rem;
+}
+
+textarea.secure-message--message{
+  border: 1px solid #222;
+  margin-bottom: 1rem;
+}
+
+.error-message {
+  color: #D0021B;
+}
+
+.circle-icon:before {
+  content: ' \25CF';
+  font-size: 16px;
+  color: #4263C2;
+  margin-left: -0.75rem;
+  margin-right: .2rem;
+}
+
+.secure-message-sent-message-meta-from > span{
+  width: 2.5rem;
+  display: inline-block;
+}
+
+a.sign-out,
+a.sign-out:hover {
+  color :#fff;
+}
+
+button{
+     background:none;
+     color: #4263c2;
+     border:none;
+     padding:0;
+     font: inherit;
+     border-bottom:1px solid #4263c2;
+     cursor: pointer;
+}

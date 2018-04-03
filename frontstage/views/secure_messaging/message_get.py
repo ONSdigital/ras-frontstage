@@ -8,7 +8,7 @@ from frontstage import app
 from frontstage.common.api_call import api_call
 from frontstage.common.message_helper import refine
 from frontstage.common.session import SessionHandler
-from frontstage.controllers.conversation_controller import get_conversation
+from frontstage.controllers.conversation_controller import get_conversation, send_message
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.models import SecureMessagingForm
 from frontstage.views.secure_messaging import secure_message_bp
@@ -17,10 +17,12 @@ from frontstage.views.secure_messaging import secure_message_bp
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-@secure_message_bp.route('/thread/<thread_id>', methods=['GET'])
+@secure_message_bp.route('/thread/<thread_id>', methods=['GET', 'POST'])
 @jwt_authorization(request)
 def view_conversation(session, thread_id):
     logger.info("Getting conversation", thread_id=thread_id)
+    # TODO, do we really want to do a GET every time, even if we're POSTing? Rops does it this
+    # way so we can get it working, then get it right.
     conversation = get_conversation(thread_id)['messages']
     try:
         refined_conversation = [refine(message) for message in reversed(conversation)]
@@ -28,10 +30,36 @@ def view_conversation(session, thread_id):
         logger.exception("A key error occurred", thread_id=thread_id)
         raise ApiError(e)
 
+    form = SecureMessagingForm(request.form)
+    form.subject.data = conversation[0].get('subject')
+    # TODO error handling?  I don't think we can get to this point if the thread doesnt exist
+    # so we can probably get away with it.
+    survey = conversation[0].get('survey_id')
+
+    logger.info(conversation[0])
+
+    if form.validate_on_submit():
+        logger.info("Sending message", thread_id=thread_id)
+        # TODO fix method signature.. this should be cleaner
+        send_message(_get_message_json(form, conversation[0], session))
+        logger.info("Successfully sent message", thread_id=thread_id)
+
     return render_template('secure-messages/conversation-view.html',
                            _theme='default',
+                           form=form,
                            conversation=refined_conversation)
 
+
+def _get_message_json(form, message, session):
+    return json.dumps({
+        'msg_from': session['party_id'],
+        'msg_to': [form.hidden_to_uuid.data],
+        'subject': form.subject.data,
+        'body': form.body.data,
+        'thread_id': message.get('thread_id'),
+        'collection_case': "",
+        'survey': message.get('survey'),
+        'ru_id': form.hidden_to_ru_id.data})
 
 
 @secure_message_bp.route('/<label>/<message_id>', methods=['GET'])

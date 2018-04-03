@@ -9,62 +9,42 @@
 
 <div role="main" id="main" class="page__main">
   <div class="container">
-    <h1 class="jupiter" name="page-messages-title">Messages</h1>
-
     {% if not messages %}
       <p>No new messages</p>
     {% else %}
 
-    <table id="tbl-messages" class="message-list sortable" summary="messages in the system">
-
-      <thead class="table--head">
-        <tr class="table--row">
-          <th scope="col" class="message-list__ru-ref sortable-column">
-            RU Ref
-          </th>
-          <th scope="col" class="message-list__ru-name sortable-column">
-            Business name
-          </th>
-          <th scope="col" class="message-list__subject sortable-column">
-            Subject
-          </th>
-          <th scope="col" class="message-list__from sortable-column">
-            From
-          </th>
-          <th scope="col" class="message-list__to sortable-column">
-            To
-          </th>
-          <th scope="col" class="message-list__date-time sortable-column">
-            Date and time
-          </th>
-        </tr>
-      </thead>
-
-      <tbody>
+      <ul class="message-list">
         {% for message in messages %}
-             <tr name="message" class="table--row table--row__selectable" id="message-{{ loop.index }}">
-              <td name="tbl-messages-RU_Ref" class="message-list__ru-ref" id="ru-ref-{{ loop.index }}">
-              {{ message.ru_ref or 'Unavailable' }}
-          </td>
-          <td name="tbl-messages-business" class="message-list__ru-name" id="business-name-{{ loop.index }}">
-              {{ message.business_name or 'Unavailable' }}
-          </td>
-          <td name="tbl-messages-subject" class="message-list__subject">
-              <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" id="message-link-{{ loop.index }}">{{ message.subject }}</a>
-          </td>
-          <td name="tbl-messages-from" class="message-list__from" id="message-from-{{ loop.index }}">
-              {{ message.from or 'Unavailable' }}
-          </td>
-          <td name="tbl-messages-to" class="message-list__to" id="message-to-{{ loop.index }}">
-              {{ message.to or 'Unavailable' }}
-          </td>
-          <td name="tbl-messages-received" class="message-list__date-time" id="received-time-{{ loop.index }}">
-             {{ message.sent_date or 'Unavailable' }}
-          </td>
-         </tr>
+          <li id="message-list" class="message-list__item">
+            <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" id="message-link-{{ loop.index }}">{{ message.subject }}</a>
+
+            <dl class="grid">
+              <dt class="grid__col col-2@m">
+                  From:
+              </dt>
+
+              <dd class="grid__col col-9@m pull-1@m">
+                  {{ message.from or 'Unavailable' }}
+              </dd>
+            </dl>
+
+            <dl class="grid">
+              <dt class="grid__col col-2@m">
+                  Sent date:
+              </dt>
+
+              <dd class="grid__col col-9@m pull-1@m">
+                  {{ message.sent_date or 'Unavailable' }}
+              </dd>
+            </dl>
+
+            <p>{{ message['body']|truncate(100) }}</p>
+
+            <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" id="open-conversation-link-{{ loop.index }}">View conversation</a>
+
+          </li>
         {% endfor %}
-      </tbody>
-    </table>
+      </ul>
     {% endif %}
   </div>
 </div>

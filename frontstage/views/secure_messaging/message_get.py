@@ -39,7 +39,7 @@ def view_conversation_list(session):
     logger.info("Getting conversation list")
     conversation = get_conversation_list()
     try:
-        refined_conversation = [refine(message) for message in reversed(conversation)]
+        refined_conversation = [refine(message) for message in conversation]
     except KeyError as e:
         logger.exception("A key error occurred")
         raise ApiError(e)

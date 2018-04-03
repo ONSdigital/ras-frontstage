@@ -1,6 +1,6 @@
 import logging
 
-from flask import json, render_template, request
+from flask import json, render_template, redirect, request, url_for
 from frontstage.common.authorisation import jwt_authorization
 from structlog import wrap_logger
 
@@ -24,6 +24,7 @@ def view_conversation(session, thread_id):
     # TODO, do we really want to do a GET every time, even if we're POSTing? Rops does it this
     # way so we can get it working, then get it right.
     conversation = get_conversation(thread_id)['messages']
+    logger.info("Successfully retrieved conversation", thread_id=thread_id)
     try:
         refined_conversation = [refine(message) for message in reversed(conversation)]
     except KeyError as e:
@@ -31,18 +32,13 @@ def view_conversation(session, thread_id):
         raise ApiError(e)
 
     form = SecureMessagingForm(request.form)
-    form.subject.data = conversation[0].get('subject')
-    # TODO error handling?  I don't think we can get to this point if the thread doesnt exist
-    # so we can probably get away with it.
-    survey = conversation[0].get('survey_id')
-
-    logger.info(conversation[0])
+    form.subject.data = refined_conversation[0].get('subject')
 
     if form.validate_on_submit():
         logger.info("Sending message", thread_id=thread_id)
-        # TODO fix method signature.. this should be cleaner
-        send_message(_get_message_json(form, conversation[0], session))
+        send_message(_get_message_json(form, refined_conversation[0], party_id=session['party_id']))
         logger.info("Successfully sent message", thread_id=thread_id)
+        return redirect(url_for('secure_message_bp.messages_get', new_message=True))
 
     return render_template('secure-messages/conversation-view.html',
                            _theme='default',
@@ -50,16 +46,17 @@ def view_conversation(session, thread_id):
                            conversation=refined_conversation)
 
 
-def _get_message_json(form, message, session):
+def _get_message_json(form, message, party_id):
+    logger.info(message)
     return json.dumps({
-        'msg_from': session['party_id'],
-        'msg_to': [form.hidden_to_uuid.data],
+        'msg_from': party_id,
+        'msg_to': ["GROUP"],
         'subject': form.subject.data,
         'body': form.body.data,
-        'thread_id': message.get('thread_id'),
+        'thread_id': message['thread_id'],
         'collection_case': "",
-        'survey': message.get('survey'),
-        'ru_id': form.hidden_to_ru_id.data})
+        'survey': message['survey_id'],
+        'ru_id': message['ru_ref']})
 
 
 @secure_message_bp.route('/<label>/<message_id>', methods=['GET'])

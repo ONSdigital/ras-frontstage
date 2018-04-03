@@ -1,7 +1,6 @@
 import logging
 from datetime import datetime, date
 
-import requests
 from structlog import wrap_logger
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -14,17 +13,18 @@ def refine(message):
         'body': message.get('body'),
         'internal': message.get('from_internal'),
         'username': _get_user_summary_for_message(message),
-        #'survey_ref': survey_controllers.get_survey_ref_by_id(message.get('survey')),
-        #'survey': survey_controller.get_survey_short_name_by_id(message.get('survey')),
+        # 'survey_ref': survey_controllers.get_survey_ref_by_id(message.get('survey')),
+        # 'survey': survey_controller.get_survey_short_name_by_id(message.get('survey')),
         'survey_id': message.get('survey'),
         'ru_ref': _get_ru_ref_from_message(message),
         'business_name': _get_business_name_from_message(message),
         'from': _get_from_name(message),
-        #'to': _get_to_name(message),
+        # 'to': _get_to_name(message),
         'sent_date': _get_human_readable_date(message.get('sent_date')),
         'unread': _get_unread_status(message),
         'message_id': message.get('msg_id')
     }
+
 
 def _get_message_subject(thread):
     try:
@@ -33,6 +33,7 @@ def _get_message_subject(thread):
     except KeyError:
         logger.exception("Failed to retrieve Subject from thread")
         return None
+
 
 def _get_user_summary_for_message(message):
     if message.get('from_internal'):

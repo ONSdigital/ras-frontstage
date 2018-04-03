@@ -15,11 +15,6 @@
         </div>
         <div class="panel__body">
             <ol>
-              {% for field in form.errors %}
-                {% for error in form.errors[field] %}
-                  <li class="panel__title venus"><a>{{ error }}</a></li>
-                {% endfor %}
-              {% endfor %}
               {% if form.body.errors %}
                 {% for error in form.body.errors %}
                   <li class="panel__title venus"><a href='#secure-message-body'>{{ error }}</a></li>

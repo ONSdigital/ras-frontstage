@@ -3,7 +3,7 @@ import requests
 from json import JSONDecodeError
 import logging
 
-from flask import current_app, session, request
+from flask import current_app, request
 from frontstage.common.session import SessionHandler
 from frontstage.exceptions.exceptions import ApiError
 from requests.exceptions import HTTPError, RequestException
@@ -32,6 +32,7 @@ def get_conversation(thread_id):
         logger.exception("the response could not be decoded", thread_id=thread_id)
         raise ApiError(response)
 
+
 def send_message(message_json):
     logger.info("About to send message")
     url = '{}v2/messages'.format(current_app.config["RAS_SECURE_MESSAGE_SERVICE"])
@@ -39,9 +40,6 @@ def send_message(message_json):
     try:
         response = requests.post(url, headers=headers, data=message_json)
         response.raise_for_status()
-    except KeyError as ex:
-        logger.exception("Message sending failed due to internal error")
-        raise InternalError(ex)
     except HTTPError as ex:
         logger.exception("Message sending failed due to API Error")
         raise ApiError(ex.response)
@@ -50,10 +48,11 @@ def send_message(message_json):
 
 def _create_get_conversation_headers():
     encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])
-    headers = { "Authorization": encoded_jwt }
+    headers = {"Authorization": encoded_jwt}
     return headers
+
 
 def _create_send_message_headers():
     encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])
-    headers = { "Authorization": encoded_jwt, 'Content-Type': 'application/json', 'Accept': 'application/json' }
+    headers = {"Authorization": encoded_jwt, 'Content-Type': 'application/json', 'Accept': 'application/json'}
     return headers

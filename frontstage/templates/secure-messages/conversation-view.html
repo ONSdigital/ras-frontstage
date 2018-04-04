@@ -41,7 +41,7 @@
     {% endif %}
             {% if loop.last %}<div name="latest-message"   id='latest-message' ></div>{% endif %}
             <span class="secure-message-sent-message-meta-from venus">
-                <span name="sm-from-user" id="sm-from-user-{{ loop.index }}" style="display:block; padding:4px;">{{ message.get('username') }}</span>
+                <span name="sm-from-user" id="sm-from-user-{{ loop.index }}" style="display:block; padding:4px;">{{ message.get('from') }}</span>
             </span>
 
             <span class="secure-message-sent-message-meta-from mercury ">

@@ -20,9 +20,9 @@ def refine(message):
     }
 
 
-def _get_message_subject(thread):
+def _get_message_subject(message):
     try:
-        subject = thread["subject"]
+        subject = message["subject"]
         return subject
     except KeyError:
         logger.exception("Failed to retrieve Subject from thread")

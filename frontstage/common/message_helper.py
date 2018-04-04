@@ -28,6 +28,7 @@ def _get_message_subject(thread):
         logger.exception("Failed to retrieve Subject from thread")
         return None
 
+
 def _get_from_name(message):
     if message.get('from_internal'):
         return "ONS Business Surveys Team"

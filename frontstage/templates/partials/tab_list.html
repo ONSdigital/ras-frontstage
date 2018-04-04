@@ -1,6 +1,6 @@
 
-<div class="container">
-  <ul class="navigation-tabs navigation-tabs-component">
+<div class="container navigation-tabs">
+  <ul class="navigation-tabs-component" style="list-style-type:none">
       <li class="navigation-tabs__item navigation-tabs__item--primary
                  {% if request.path.startswith('/surveys/todo') %} navigation-tabs__item--active {% endif %}">
           <a id="SURVEY_TODO_TAB" href="{{ url_for('surveys_bp.logged_in') }}"

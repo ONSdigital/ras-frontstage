@@ -47,7 +47,6 @@ def view_conversation(session, thread_id):
 
 
 def _get_message_json(form, message, party_id):
-    logger.info(message)
     return json.dumps({
         'msg_from': party_id,
         'msg_to': ["GROUP"],

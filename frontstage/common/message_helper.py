@@ -11,10 +11,8 @@ def refine(message):
         'thread_id': message.get('thread_id'),
         'subject': _get_message_subject(message),
         'body': message.get('body'),
-        'internal': message.get('from_internal'),
         'survey_id': message.get('survey'),
         'ru_ref': _get_ru_ref_from_message(message),
-        'business_name': _get_business_name_from_message(message),
         'from': _get_from_name(message),
         'sent_date': _get_human_readable_date(message.get('sent_date')),
         'unread': _get_unread_status(message),
@@ -31,6 +29,8 @@ def _get_message_subject(thread):
         return None
 
 def _get_from_name(message):
+    if message.get('from_internal'):
+        return "ONS Business Surveys Team"
     try:
         msg_from = message['@msg_from']
         return "{} {}".format(msg_from.get('firstName'), msg_from.get('lastName'))
@@ -43,13 +43,6 @@ def _get_ru_ref_from_message(message):
         return message['@ru_id']['id']
     except (KeyError, TypeError):
         logger.exception("Failed to retrieve RU ref from message", message_id=message.get('msg_id'))
-
-
-def _get_business_name_from_message(message):
-    try:
-        return message['@ru_id']['name']
-    except (KeyError, TypeError):
-        logger.exception("Failed to retrieve business name from message", message_id=message.get('msg_id'))
 
 
 def _get_human_readable_date(sent_date):

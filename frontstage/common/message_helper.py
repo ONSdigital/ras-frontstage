@@ -26,17 +26,18 @@ def _get_message_subject(message):
         return subject
     except KeyError:
         logger.exception("Failed to retrieve Subject from thread")
-        return None
+        raise
 
 
 def _get_from_name(message):
-    if message.get('from_internal'):
-        return "ONS Business Surveys Team"
     try:
+        if message['from_internal']:
+            return "ONS Business Surveys Team"
         msg_from = message['@msg_from']
         return "{} {}".format(msg_from.get('firstName'), msg_from.get('lastName'))
     except KeyError:
-        logger.exception("Failed to retrieve message from name", message_id=message.get('msg_id'))
+        logger.exception("Failed to retrieve name from message", message_id=message.get('msg_id'))
+        raise
 
 
 def _get_ru_ref_from_message(message):

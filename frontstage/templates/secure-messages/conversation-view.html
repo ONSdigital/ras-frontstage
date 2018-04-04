@@ -27,22 +27,24 @@
 {% endif %}
 
 <h1 class="saturn" name="page-messages-title" style="padding-bottom:5px">{{ subject }}</h1>
+<div class="secure-message-view-component">
     {% for message in conversation %}
-      <div id="sm-from-ons-{{ loop.index }}">
+      <div class="secure-message-sent-message" id="sm-from-ons-{{ loop.index }}">
         {% if loop.last %}<div name="latest-message" id='latest-message'></div>{% endif %}
-        <span class="venus">
-            <span name="sm-from-user" id="sm-from-user-{{ loop.index }}" style="display:block; padding:4px;">{{ message.get('from') }}</span>
+        <span class="secure-message-sent-message-meta-from venus">
+            <span name="sm-from-user" id="sm-from-user-{{ loop.index }}" >{{ message.get('from') }}</span>
         </span>
-        <span class="mercury">
-            <span name="sm-sent-date" id="sm-sent-date-{{ loop.index }}" style="display:block; padding:4px;">{{ message.get('sent_date') }}</span>
+        <span class="secure-message-sent-message-meta-datetime mercury">
+            <span name="sm-sent-date" id="sm-sent-date-{{ loop.index }}">{{ message.get('sent_date') }}</span>
         </span>
+        <span class="secure-message-sent-message-body">{{ message.get('body') }}</span>
     </div>
-    <div>
-        <span style="white-space:pre-line; word-wrap:break-word">{{ message.get('body') }}</span>
-    </div>
-    <hr>
+     {% if not loop.last %}
+           <hr>
+        {% endif %}
     {% endfor %}
-
+</div>
+<div class="secure-message-reply">
     <form action="{{ url_for('secure_message_bp.view_conversation', thread_id=conversation[0].thread_id) }}" method="post" id="create-message-form">
         <label class="venus" for="message-text">Reply</label>
         {{ form.csrf_token }}
@@ -53,5 +55,4 @@
 
     <p><a href="{{ url_for('secure_message_bp.messages_get') }}">Cancel</a></p>
 </div>
-
 {% endblock messages %}

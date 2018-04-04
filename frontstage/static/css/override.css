@@ -1,0 +1,75 @@
+.secure-message-sent-message{
+   /*margin: 1rem;*/
+   display:block;
+   padding-top:4%;
+   padding-bottom:2%;
+
+}
+
+.secure-message-sent-message-body{
+  white-space:pre-line;
+  word-wrap:break-word;
+  padding-top:2%;
+  padding-bottom:2%;
+}
+
+.secure-message-sent-message-meta{
+  border-top-left-radius: 0.2rem;
+  border-top-right-radius: 0.2rem;
+  padding-top: 0.333rem;
+  padding-bottom: 0.333rem;
+  font-size: 18px;
+}
+
+
+.secure-message-sent-message-meta__label{
+  display: none;
+}
+
+.secure-message-sent-message-meta-datetime{
+  display: block;
+  padding-bottom:3%;
+}
+.secure-message-sent-message-meta-from{
+    display:block;
+}
+
+.secure-message--subject, .secure-message--message{
+  display: block;
+  width: 100%;
+}
+
+input.secure-message--recipient{
+  width: 80%;
+  font-size: 1rem; /* avert your eyes! */
+  margin-bottom: 1rem;
+}
+
+label.secure-message--subject{
+  margin-top: 1rem;
+}
+
+input.secure-message--subject{
+  border: 1px solid #222;
+  margin-bottom: 1rem;
+}
+
+textarea.secure-message--message{
+  border: 1px solid #222;
+  margin-bottom: 1rem;
+}
+
+.secure-message-sent-message-meta-from > span{
+  width: 2.5rem;
+}
+
+
+.secure-message-view-component{
+   width:75%;
+   padding-bottom:3.7774%;
+}
+
+.secure-message-reply{
+    width:75%;
+
+}

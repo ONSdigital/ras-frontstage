@@ -28,8 +28,8 @@ def view_conversation(session, thread_id):
     try:
         refined_conversation = [refine(message) for message in reversed(conversation)]
     except KeyError as e:
-        logger.exception("A key error occurred", thread_id=thread_id)
-        raise ApiError(e)
+        logger.exception("Message is missing important data", thread_id=thread_id)
+        raise
 
     form = SecureMessagingForm(request.form)
     form.subject.data = refined_conversation[0].get('subject')

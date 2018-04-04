@@ -44,6 +44,8 @@ def _get_ru_ref_from_message(message):
         return message['@ru_id']['id']
     except (KeyError, TypeError):
         logger.exception("Failed to retrieve RU ref from message", message_id=message.get('msg_id'))
+        raise
+
 
 
 def _get_human_readable_date(sent_date):

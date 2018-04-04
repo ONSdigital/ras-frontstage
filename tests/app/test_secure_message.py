@@ -5,7 +5,11 @@ from unittest.mock import patch
 import requests_mock
 
 from frontstage import app
+from frontstage.exceptions.exceptions import ApiError
 
+url_get_thread = app.config['RAS_SECURE_MESSAGE_SERVICE'] + "v2/threads/9e3465c0-9172-4974-a7d1-3a01592d1594"
+with open('tests/test_data/conversation.json') as json_data:
+    conversation_json = json.load(json_data)
 
 url_get_messages = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['GET_MESSAGES_URL']
 with open('tests/test_data/secure_messaging/messages_get.json') as json_data:
@@ -54,6 +58,27 @@ class TestSecureMessage(unittest.TestCase):
         self.patcher.stop()
 
     @requests_mock.mock()
+    def test_get_thread_success(self, mock_request):
+        mock_request.get(url_get_thread, json={'messages': [conversation_json]})
+
+        response = self.app.get("secure-message/thread/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers, follow_redirects=True)
+        self.assertTrue(response.status_code, 200)
+        self.assertTrue('Peter Griffin'.encode() in response.data)
+        self.assertTrue('testy2'.encode() in response.data)
+        self.assertTrue('something else'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_get_thread_failure(self, mock_request):
+        conversation_json_copy = conversation_json.copy()
+        del conversation_json_copy['@ru_id']
+        mock_request.get(url_get_thread, json={'messages': [conversation_json_copy]})
+
+        response = self.app.get("secure-message/thread/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers, follow_redirects=True)
+        self.assertTrue(response.status_code, 500)
+        self.assertTrue('Something has gone wrong with the website.'.encode() in response.data)
+
+
+    @requests_mock.mock()
     def test_get_messages_success(self, mock_request):
         mock_request.get(url_get_messages, json=messages_get)
 
@@ -78,6 +103,7 @@ class TestSecureMessage(unittest.TestCase):
         response = self.app.get("/secure-message/messages", headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
+        print(response.data)
         self.assertTrue('Server error'.encode() in response.data)
 
     @requests_mock.mock()

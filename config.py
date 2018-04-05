@@ -44,7 +44,6 @@ class Config(object):
     RAS_SECURE_MESSAGE_SERVICE = '{}://{}:{}/'.format(RAS_SECURE_MESSAGE_PROTOCOL,
                                                       RAS_SECURE_MESSAGE_HOST,
                                                       RAS_SECURE_MESSAGE_PORT)
-
     GET_MESSAGES_URL = 'secure-messaging/messages-list'
     GET_MESSAGE_URL = 'secure-messaging/message'
     SEND_MESSAGE_URL = 'secure-messaging/send-message'

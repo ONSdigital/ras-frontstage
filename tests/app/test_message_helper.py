@@ -58,26 +58,20 @@ class TestMessageHelper(unittest.TestCase):
     def test_missing_subject(self):
         test_copy = test_data.copy()
         del test_copy['subject']
-        refined_data_copy = refined_data.copy()
-        refined_data_copy['subject'] = None
-        refined_message = refine(test_copy)
-        self.assertEqual(refined_message, refined_data_copy)
+        with self.assertRaises(KeyError):
+            refined_message = refine(test_copy)
 
     def test_missing_name(self):
         test_copy = test_data.copy()
         del test_copy['@msg_from']
-        refined_data_copy = refined_data.copy()
-        refined_data_copy['from'] = None
-        refined_message = refine(test_copy)
-        self.assertEqual(refined_message, refined_data_copy)
+        with self.assertRaises(KeyError):
+            refined_message = refine(test_copy)
 
     def test_missing_ru_id(self):
         test_copy = test_data.copy()
         del test_copy['@ru_id']
-        refined_data_copy = refined_data.copy()
-        refined_data_copy['ru_ref'] = None
-        refined_message = refine(test_copy)
-        self.assertEqual(refined_message, refined_data_copy)
+        with self.assertRaises(KeyError):
+            refined_message = refine(test_copy)
 
     def test_refine(self):
         refined_message = refine(test_data)

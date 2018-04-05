@@ -47,7 +47,7 @@ def send_message(party_id, is_draft, case_id, survey, ru_ref):
     form = SecureMessagingForm(request.form)
 
     headers = create_headers()
-    endpoint = app.config['SEND_MESSAGE_URL']
+    endpoint = 'secure-messaging/send-message'
     subject = form['subject'].data if form['subject'].data else form['hidden_subject'].data
     message_json = {
         'msg_from': party_id,
@@ -87,7 +87,7 @@ def get_message(message_id, label, party_id):
     logger.debug('Attempting to retrieve message', message_id=message_id, party_id=party_id)
 
     headers = create_headers()
-    endpoint = app.config['GET_MESSAGE_URL']
+    endpoint = 'secure-messaging/message'
     parameters = {"message_id": message_id, "label": label, "party_id": party_id}
     response = api_call('GET', endpoint, parameters=parameters, headers=headers)
 

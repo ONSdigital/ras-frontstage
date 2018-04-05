@@ -4,7 +4,29 @@
 
 {% block messages %}
 
-{% include 'secure-messages/message-error-summary.html' %}
+{% if "subject" in errors or "body" in errors %}
+    <div class="panel panel--error">
+        <div class="panel__header">
+        {% if errors|length == 1 %}
+            <h1 class="panel__title venus">This page has 1 error</h1>
+        {% elif errors|length > 1 %}
+            <h1 class="panel__title venus">This page has {{ errors|length }} errors</h1>
+        {% endif %}
+        </div>
+        <div class="panel__body" data-qa="error-body">
+        {% if errors|length == 1 %}
+            <p>This <b>must be corrected </b>to continue.</p>
+        {% elif errors|length > 1 %}
+            <p>These <b>must be corrected </b>to continue.</p>
+        {% endif %}
+
+        {% for error in errors %}
+            <p class=“mars”>{{ loop.index0 + 1 }}) <a class="js-inpagelink" href="#{{error}}-error">{{ errors[error][0] }}</a></p>
+        {% endfor %}
+        </div>
+    </div>
+    <br/>
+{% endif %}
 
 <div class="secure-message-view-component">
 

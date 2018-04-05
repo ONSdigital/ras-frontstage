@@ -14,10 +14,10 @@
                     {% if request.path.startswith('/surveys/history') %} navigation-tabs__tab--active {% endif %}">History</a>
       </li>
       <li class="navigation-tabs__item navigation-tabs__item--primary
-                 {% if request.path.startswith('/secure-message/threads') %} navigation-tabs__item--active {% endif %}">
+                 {% if request.path.startswith('/secure-message/thread') %} navigation-tabs__item--active {% endif %}">
           <a id="SURVEY_MESSAGES_TAB" href="{{ url_for('secure_message_bp.view_conversation_list') }}"
              class="btn btn--secondary btn--border navigation-tabs__tab
-                    {% if request.path.startswith('/secure-message/threads') %} navigation-tabs__tab--active {% endif %}">Messages</a>
+                    {% if request.path.startswith('/secure-message/thread') %} navigation-tabs__tab--active {% endif %}">Messages</a>
       </li>
   </ul>
 </div>

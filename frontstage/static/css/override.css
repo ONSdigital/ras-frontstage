@@ -1,16 +1,11 @@
 .secure-message-sent-message{
    /*margin: 1rem;*/
    display:block;
-   padding-top:4%;
-   padding-bottom:2%;
-
 }
 
 .secure-message-sent-message-body{
   white-space:pre-line;
   word-wrap:break-word;
-  padding-top:2%;
-  padding-bottom:2%;
 }
 
 .secure-message-sent-message-meta{
@@ -27,9 +22,10 @@
 }
 
 .secure-message-sent-message-meta-datetime{
-  display: block;
-  padding-bottom:3%;
+	color: #666;
+	display: block;
 }
+
 .secure-message-sent-message-meta-from{
     display:block;
 }

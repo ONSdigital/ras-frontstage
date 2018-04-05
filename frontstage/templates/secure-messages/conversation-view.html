@@ -26,7 +26,7 @@
 <br />
 {% endif %}
 
-<h1 class="saturn" name="page-messages-title" style="padding-bottom:5px">{{ subject }}</h1>
+<h1 class="saturn" name="page-messages-title">{{ subject }}</h1>
 <div class="secure-message-view-component">
     {% for message in conversation %}
       <div class="secure-message-sent-message" id="sm-from-ons-{{ loop.index }}">
@@ -34,7 +34,7 @@
         <span class="secure-message-sent-message-meta-from venus">
             <span name="sm-from-user" id="sm-from-user-{{ loop.index }}" >{{ message.get('from') }}</span>
         </span>
-        <span class="secure-message-sent-message-meta-datetime mercury">
+        <span class="secure-message-sent-message-meta-datetime u-mb-s mars">
             <span name="sm-sent-date" id="sm-sent-date-{{ loop.index }}">{{ message.get('sent_date') }}</span>
         </span>
         <span class="secure-message-sent-message-body">{{ message.get('body') }}</span>

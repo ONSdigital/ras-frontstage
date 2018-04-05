@@ -38,7 +38,7 @@ def view_conversation(session, thread_id):
         logger.info("Sending message", thread_id=thread_id)
         send_message(_get_message_json(form, refined_conversation[0], party_id=session['party_id']))
         logger.info("Successfully sent message", thread_id=thread_id)
-        return redirect(url_for('secure_message_bp.messages_get', new_message=True))
+        return redirect(url_for('secure_message_bp.view_conversation_list', new_message=True))
 
     return render_template('secure-messages/conversation-view.html',
                            _theme='default',
@@ -51,6 +51,7 @@ def view_conversation(session, thread_id):
 def view_conversation_list(session):
     logger.info("Getting conversation list")
     conversation = get_conversation_list()
+    new_message = request.args.get('new_message', None)
     try:
         refined_conversation = [refine(message) for message in conversation]
     except KeyError as e:
@@ -59,7 +60,8 @@ def view_conversation_list(session):
 
     return render_template('secure-messages/conversation-list.html',
                            _theme='default',
-                           messages=refined_conversation)
+                           messages=refined_conversation,
+                           new_message=new_message)
 
 
 def _get_message_json(form, message, party_id):

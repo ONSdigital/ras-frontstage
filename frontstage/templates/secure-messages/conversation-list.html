@@ -9,6 +9,15 @@
 
 <div role="main" id="main" class="page__main">
   <div class="container">
+    {% if new_message %}
+        <div class="panel panel--simple panel--success">
+            <div id="message-success-notif" class="panel__body">
+                <p>
+                    Message sent
+                </p>
+            </div>
+        </div>
+    {% endif %}
     {% if not messages %}
       <p>No new messages</p>
     {% else %}

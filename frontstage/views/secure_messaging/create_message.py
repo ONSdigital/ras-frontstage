@@ -25,13 +25,20 @@ def create_message(session):
     party_id = session['party_id']
     form = SecureMessagingForm(request.form)
     if request.method == 'POST' and form.validate():
-        send_message(party_id, case_id, survey, ru_ref)
+        sent_message = send_message(party_id, case_id, survey, ru_ref)
+
         return redirect(url_for('secure_message_bp.view_conversation_list'))
 
-    return render_template('secure-messages/secure-messages-view.html',
-                           _theme='default', ru_ref=ru_ref,
-                           survey=survey, case_id=case_id,
-                           form=form, errors=form.errors)
+    else:
+        if form['thread_message_id'].data:
+            message = get_message(form['thread_message_id'].data, 'INBOX', party_id)
+        else:
+            message = {}
+        return render_template('secure-messages/secure-messages-view.html',
+                               _theme='default', ru_ref=ru_ref,
+                               survey=survey, case_id=case_id,
+                               form=form, errors=form.errors,
+                               message=message.get('message', {}))
 
 
 def send_message(party_id, case_id, survey, ru_ref):
@@ -69,3 +76,20 @@ def create_headers():
     encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])
     headers = {"jwt": encoded_jwt}
     return headers
+
+
+def get_message(message_id, label, party_id):
+    logger.debug('Attempting to retrieve message', message_id=message_id, party_id=party_id)
+
+    headers = create_headers()
+    endpoint = app.config['GET_MESSAGE_URL']
+    parameters = {"message_id": message_id, "label": label, "party_id": party_id}
+    response = api_call('GET', endpoint, parameters=parameters, headers=headers)
+
+    if response.status_code != 200:
+        logger.error('Failed to retrieve message', message_id=message_id, party_id=party_id)
+        raise ApiError(response)
+
+    message = json.loads(response.text)
+    logger.debug('Retrieved message successfully', message_id=message_id, party_id=party_id)
+    return message

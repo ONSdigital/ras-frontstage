@@ -5,7 +5,6 @@ from unittest.mock import patch
 import requests_mock
 
 from frontstage import app
-from frontstage.exceptions.exceptions import ApiError
 
 url_get_thread = app.config['RAS_SECURE_MESSAGE_SERVICE'] + "v2/threads/9e3465c0-9172-4974-a7d1-3a01592d1594"
 with open('tests/test_data/conversation.json') as json_data:
@@ -76,7 +75,6 @@ class TestSecureMessage(unittest.TestCase):
         response = self.app.get("secure-message/thread/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers, follow_redirects=True)
         self.assertTrue(response.status_code, 500)
         self.assertTrue('Something has gone wrong with the website.'.encode() in response.data)
-
 
     @requests_mock.mock()
     def test_get_messages_success(self, mock_request):

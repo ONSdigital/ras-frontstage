@@ -11,6 +11,7 @@ refined_data = {"subject": "testy2", "survey_id": "02b9c366-7397-42f7-942a-76dc5
                 "from": "Peter Griffin", "ru_ref": "e359b838-0d89-43e8-b5d0-68079916de80", "sent_date": "02 Apr 2018 09:27",
                 "body": "something else", "message_id": "2ac51b39-a0d7-465d-92a4-263dfe3eb475", "unread": False}
 
+
 class TestMessageHelper(unittest.TestCase):
 
     def test_from_internal(self):
@@ -24,7 +25,7 @@ class TestMessageHelper(unittest.TestCase):
     def test_get_formatted_date_incorrect_date(self):
         date_str = "018-04-04 09:27:11.354399"
         refined_date = get_formatted_date(date_str)
-        self.assertEqual(date_str, "018-04-04 09:27:11.354399")
+        self.assertEqual(refined_date, "018-04-04 09:27:11.354399")
 
     def test_get_formatted_date_today_date(self):
         today_date_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -59,19 +60,19 @@ class TestMessageHelper(unittest.TestCase):
         test_copy = test_data.copy()
         del test_copy['subject']
         with self.assertRaises(KeyError):
-            refined_message = refine(test_copy)
+            refine(test_copy)
 
     def test_missing_name(self):
         test_copy = test_data.copy()
         del test_copy['@msg_from']
         with self.assertRaises(KeyError):
-            refined_message = refine(test_copy)
+            refine(test_copy)
 
     def test_missing_ru_id(self):
         test_copy = test_data.copy()
         del test_copy['@ru_id']
         with self.assertRaises(KeyError):
-            refined_message = refine(test_copy)
+            refine(test_copy)
 
     def test_refine(self):
         refined_message = refine(test_data)

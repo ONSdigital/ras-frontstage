@@ -9,7 +9,7 @@ from frontstage import app
 from frontstage.common.api_call import api_call
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.models import SecureMessagingForm
-from frontstage.views.secure_messaging.message_get import create_headers, get_message, message_get
+from frontstage.views.secure_messaging.message_get import get_message, message_get
 from frontstage.views.secure_messaging import secure_message_bp
 
 
@@ -80,3 +80,8 @@ def send_message(party_id, is_draft, case_id, survey, ru_ref):
     logger.info('Secure message sent successfully',
                 message_id=sent_message['msg_id'], party_id=party_id)
     return sent_message
+
+def create_headers():
+    encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])
+    headers = {"jwt": encoded_jwt}
+    return headers

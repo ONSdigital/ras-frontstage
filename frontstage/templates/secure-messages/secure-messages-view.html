@@ -14,9 +14,9 @@
             <li class="system-feedback__list-item system-feedback__list-item--success"> 
                 <i class="fa fa-check-circle system-feedback__icon" aria-hidden="true" id="inbox-link"> </i>
                 Draft saved
-                <a href="{{ url_for('secure_message_bp.messages_get') }}">View your inbox</a> 
-            </li> 
-        </ul> 
+                <a href="{{ url_for('secure_message_bp.view_conversation_list') }}">View your inbox</a>
+            </li>
+        </ul>
     </div>
 {% endif %}
 
@@ -33,7 +33,7 @@
         </div>
     </div>
 
-    <p><a href="{{ url_for('secure_message_bp.messages_get') }}">Cancel</a></p>
+    <p><a href="{{ url_for('secure_message_bp.view_conversation_list') }}">Cancel</a></p>
 
 </div>
 

@@ -10,9 +10,6 @@ url_get_thread = app.config['RAS_SECURE_MESSAGE_SERVICE'] + "v2/threads/9e3465c0
 with open('tests/test_data/conversation.json') as json_data:
     conversation_json = json.load(json_data)
 
-url_get_messages = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['GET_MESSAGES_URL']
-with open('tests/test_data/secure_messaging/messages_get.json') as json_data:
-    messages_get = json.load(json_data)
 url_get_message = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['GET_MESSAGE_URL']
 with open('tests/test_data/secure_messaging/message.json') as json_data:
     message = json.load(json_data)
@@ -77,45 +74,6 @@ class TestSecureMessage(unittest.TestCase):
         self.assertTrue('Something has gone wrong with the website.'.encode() in response.data)
 
     @requests_mock.mock()
-    def test_get_messages_success(self, mock_request):
-        mock_request.get(url_get_messages, json=messages_get)
-
-        response = self.app.get("/secure-message/messages", headers=self.headers, follow_redirects=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('The European languages are members of the same family'.encode() in response.data)
-
-    @requests_mock.mock()
-    def test_get_messages_api_failure(self, mock_request):
-        mock_request.get(url_get_messages, status_code=500)
-
-        response = self.app.get("/secure-message/messages", headers=self.headers, follow_redirects=True)
-
-        self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
-
-    @requests_mock.mock()
-    def test_get_messages_api_error_bad_gateway(self, mock_request):
-        mock_request.get(url_get_messages, status_code=502)
-
-        response = self.app.get("/secure-message/messages", headers=self.headers, follow_redirects=True)
-
-        self.assertEqual(response.status_code, 500)
-        print(response.data)
-        self.assertTrue('Server error'.encode() in response.data)
-
-    @requests_mock.mock()
-    def test_get_messages_api_error_FA002(self, mock_request):
-        unread_total_fail_json = {**messages_get, **create_api_error(500)}
-        del unread_total_fail_json['unread_messages_total']
-        mock_request.get(url_get_messages, json=unread_total_fail_json)
-
-        response = self.app.get("/secure-message/messages", follow_redirects=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('The European languages are members of the same family'.encode() in response.data)
-
-    @requests_mock.mock()
     def test_get_message_success(self, mock_request):
         mock_request.get(url_get_message, json=message)
 
@@ -153,7 +111,7 @@ class TestSecureMessage(unittest.TestCase):
     def test_create_message_post_success(self, mock_request):
         sent_message_response = {'msg_id': 'd43b6609-0875-4ef8-a34e-f7df1bcc8029', 'status': '201', 'thread_id': '8caeff79-6067-4f2a-96e0-08617fdeb496'}
         mock_request.post(url_send_message, json=sent_message_response)
-        mock_request.get(url_get_messages, json=messages_get)
+        mock_request.get(url_get_thread, json=conversation_json)
 
         response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789",
                                  data=self.message_form, headers=self.headers, follow_redirects=True)
@@ -263,7 +221,7 @@ class TestSecureMessage(unittest.TestCase):
         sent_message_response = {'msg_id': 'd43b6609-0875-4ef8-a34e-f7df1bcc8029', 'status': '201',
                                  'thread_id': '8caeff79-6067-4f2a-96e0-08617fdeb496'}
         mock_request.post(url_send_message, json=sent_message_response)
-        mock_request.get(url_get_messages, json=messages_get)
+        mock_request.get(url_get_thread, json=conversation_json)
 
         response = self.app.post("/secure-message/create-message/?ru_ref=456&survey=789",
                                  data=self.message_form, headers=self.headers, follow_redirects=True)

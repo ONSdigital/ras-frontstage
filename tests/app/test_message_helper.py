@@ -8,7 +8,7 @@ with open('tests/test_data/conversation.json') as json_data:
     test_data = json.load(json_data)
 
 refined_data = {"subject": "testy2", "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d", "thread_id": "9e3465c0-9172-4974-a7d1-3a01592d1594",
-                "from": "Peter Griffin", "ru_ref": "e359b838-0d89-43e8-b5d0-68079916de80", "sent_date": "Today at 09:27",
+                "from": "Peter Griffin", "ru_ref": "e359b838-0d89-43e8-b5d0-68079916de80", "sent_date": "02 Apr 2018 09:27",
                 "body": "something else", "message_id": "2ac51b39-a0d7-465d-92a4-263dfe3eb475", "unread": False}
 
 class TestMessageHelper(unittest.TestCase):

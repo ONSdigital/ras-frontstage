@@ -9,7 +9,8 @@ from frontstage import app
 from frontstage.common.api_call import api_call
 from frontstage.common.message_helper import refine
 from frontstage.common.session import SessionHandler
-from frontstage.controllers.conversation_controller import get_conversation, send_message, get_conversation_list
+from frontstage.controllers.conversation_controller import get_conversation, get_conversation_list,\
+    remove_unread_label, send_message
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.models import SecureMessagingForm
 from frontstage.views.secure_messaging import secure_message_bp
@@ -31,6 +32,9 @@ def view_conversation(session, thread_id):
     except KeyError as e:
         logger.exception("Message is missing important data", thread_id=thread_id)
         raise
+
+    if refined_conversation[-1]['unread']:
+        remove_unread_label(refined_conversation[-1]['thread_id'])
 
     form = SecureMessagingForm(request.form)
     form.subject.data = refined_conversation[0].get('subject')

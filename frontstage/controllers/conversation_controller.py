@@ -16,7 +16,7 @@ def get_conversation(thread_id):
     logger.info("Retrieving conversation", thread_id=thread_id)
 
     headers = _create_get_conversation_headers()
-    url = '{}v2/threads/{}'.format(current_app.config["RAS_SECURE_MESSAGE_SERVICE"], thread_id)
+    url = '{}v2/threads/{}'.format(current_app.config["RAS_SECURE_MESSAGING_SERVICE"], thread_id)
 
     try:
         response = requests.get(url, headers=headers)
@@ -37,7 +37,7 @@ def get_conversation_list():
     logger.info("Retrieving threads list")
 
     headers = _create_get_conversation_headers()
-    url = '{}threads'.format(current_app.config["RAS_SECURE_MESSAGE_SERVICE"])
+    url = '{}threads'.format(current_app.config["RAS_SECURE_MESSAGING_SERVICE"])
 
     response = requests.get(url, headers=headers)
 
@@ -58,7 +58,7 @@ def get_conversation_list():
 
 def send_message(message_json):
     logger.info("About to send message")
-    url = '{}v2/messages'.format(current_app.config["RAS_SECURE_MESSAGE_SERVICE"])
+    url = '{}v2/messages'.format(current_app.config["RAS_SECURE_MESSAGING_SERVICE"])
     headers = _create_send_message_headers()
     try:
         response = requests.post(url, headers=headers, data=message_json)

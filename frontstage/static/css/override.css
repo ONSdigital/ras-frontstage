@@ -67,5 +67,13 @@ textarea.secure-message--message{
 
 .secure-message-reply{
     width:75%;
+}
 
+a:link {
+	color: #4263c2;
+}
+
+.message-read {
+color: purple;
+font-weight: 400;
 }

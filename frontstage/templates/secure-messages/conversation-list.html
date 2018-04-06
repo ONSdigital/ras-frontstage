@@ -9,20 +9,24 @@
 
 <div role="main" id="main" class="page__main">
   <div class="container">
-    {% if new_message %}
-        <div class="panel panel--simple panel--success">
-            <div id="message-success-notif" class="panel__body">
-                <p>
-                    Message sent
-                </p>
-            </div>
-        </div>
-    {% endif %}
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+      <div class="panel panel--simple panel--success col-6@m">
+          <div class="panel__body" data-qa="success-body">
+            {% for message in messages %}
+            <p class="mars" id="flashed-message-{{ loop.index }}">{{ message }}</p>
+            {% endfor %}
+          </div>
+      </div>
+      <br>
+      {% endif %}
+    {% endwith %}
+
     {% if not messages %}
       <p>No new messages</p>
     {% else %}
 
-      <ul class="message-list col-9@m">
+      <ul class="message-list col-12@m">
         {% for message in messages %}
           {% if message['unread'] %}
             <li id="message-list-unread" class="message-list__item venus">
@@ -30,7 +34,7 @@
               <span class="secure-message-conversation-meta__label mercury" style="color: #666;"> (New) </span>
           {% else %}
             <li id="message-list" class="message-list__item mars">
-            <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" id="message-link-{{ loop.index }}">{{ message.subject }}</a>
+            <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" class="message-read" id="message-link-{{ loop.index }}">{{ message.subject }}</a>
           {% endif %}
 
             <div class="message-details">
@@ -45,11 +49,16 @@
               </div>
             </div>
 
-            <p class="message-list__item-preview">{{ message['body']|truncate(80, False, '...', 0) }}</p>
-
-            <p class="message-list__item-preview--link">
-              <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" id="open-conversation-link-{{ loop.index }}">Read full message</a>
-            </p>
+            <p class="message-list__item-preview mars">{{ message['body']|truncate(100, False, '...', 0) }}</p>
+            {% if message['unread'] %}
+              <p class="message-list__item-preview--link">
+                <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" class="venus" id="open-conversation-link-{{ loop.index }}">Read full message</a>
+              </p>
+            {% else %}
+              <p class="message-list__item-preview--link">
+                <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" class="message-read" id="open-conversation-link-{{ loop.index }}">Read full message</a>
+              </p>
+            {% endif %}
           </li>
         {% endfor %}
       </ul>

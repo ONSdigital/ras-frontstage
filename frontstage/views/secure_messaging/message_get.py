@@ -1,6 +1,7 @@
 import logging
 
-from flask import json, render_template, redirect, request, url_for
+from flask import json, flash, Markup, render_template, redirect, request, url_for
+
 from frontstage.common.authorisation import jwt_authorization
 from structlog import wrap_logger
 
@@ -35,7 +36,9 @@ def view_conversation(session, thread_id):
         logger.info("Sending message", thread_id=thread_id)
         send_message(_get_message_json(form, refined_conversation[0], party_id=session['party_id']))
         logger.info("Successfully sent message", thread_id=thread_id)
-        return redirect(url_for('secure_message_bp.view_conversation_list', new_message=True))
+        thread_url = url_for("secure_message_bp.view_conversation", thread_id=thread_id) + "#latest-message"
+        flash(Markup('Message sent. <a href={}>View Message</a>'.format(thread_url)))
+        return redirect(url_for('secure_message_bp.view_conversation_list'))
 
     return render_template('secure-messages/conversation-view.html',
                            _theme='default',
@@ -48,7 +51,6 @@ def view_conversation(session, thread_id):
 def view_conversation_list(session):
     logger.info("Getting conversation list")
     conversation = get_conversation_list()
-    new_message = request.args.get('new_message', None)
     try:
         refined_conversation = [refine(message) for message in conversation]
     except KeyError as e:
@@ -57,8 +59,7 @@ def view_conversation_list(session):
 
     return render_template('secure-messages/conversation-list.html',
                            _theme='default',
-                           messages=refined_conversation,
-                           new_message=new_message)
+                           messages=refined_conversation)
 
 
 def _get_message_json(form, message, party_id):

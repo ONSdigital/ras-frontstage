@@ -1,7 +1,8 @@
 import json
 import logging
 
-from flask import redirect, render_template, request, url_for
+from flask import flash, Markup, redirect, render_template, request, url_for
+
 from frontstage.common.authorisation import jwt_authorization
 from structlog import wrap_logger
 
@@ -28,6 +29,9 @@ def create_message(session):
         is_draft = form.save_draft.data
         sent_message = send_message(party_id, is_draft, case_id, survey, ru_ref)
 
+        thread_url = url_for("secure_message_bp.view_conversation",
+                             thread_id=sent_message['thread_id']) + "#latest-message"
+        flash(Markup('Message sent. <a href={}>View Message</a>'.format(thread_url)))
         return redirect(url_for('secure_message_bp.view_conversation_list'))
 
     else:

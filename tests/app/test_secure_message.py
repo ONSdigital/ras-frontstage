@@ -6,8 +6,8 @@ import requests_mock
 
 from frontstage import app
 
-url_get_thread = app.config['RAS_SECURE_MESSAGE_SERVICE'] + "v2/threads/9e3465c0-9172-4974-a7d1-3a01592d1594"
-url_get_threads = app.config['RAS_SECURE_MESSAGE_SERVICE'] + "threads"
+url_get_thread = app.config['RAS_SECURE_MESSAGING_SERVICE'] + "v2/threads/9e3465c0-9172-4974-a7d1-3a01592d1594"
+url_get_threads = app.config['RAS_SECURE_MESSAGING_SERVICE'] + "threads"
 with open('tests/test_data/conversation.json') as json_data:
     conversation_json = json.load(json_data)
 with open('tests/test_data/conversation_list.json') as json_data:

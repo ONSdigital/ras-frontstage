@@ -6,7 +6,6 @@ from frontstage.common.authorisation import jwt_authorization
 from structlog import wrap_logger
 
 from frontstage.common.message_helper import refine
-from frontstage.common.session import SessionHandler
 from frontstage.controllers.conversation_controller import get_conversation, get_conversation_list,\
     remove_unread_label, send_message
 from frontstage.exceptions.exceptions import ApiError
@@ -21,8 +20,6 @@ logger = wrap_logger(logging.getLogger(__name__))
 @jwt_authorization(request)
 def view_conversation(session, thread_id):
     logger.info("Getting conversation", thread_id=thread_id)
-    # TODO, do we really want to do a GET every time, even if we're POSTing? Rops does it this
-    # way so we can get it working, then get it right.
     conversation = get_conversation(thread_id)['messages']
     logger.info("Successfully retrieved conversation", thread_id=thread_id)
     try:

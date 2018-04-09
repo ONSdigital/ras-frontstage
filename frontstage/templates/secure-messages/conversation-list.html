@@ -49,7 +49,7 @@
               </div>
             </div>
 
-            <p class="message-list__item-preview mars">{{ message['body']|truncate(100, False, '...', 0) }}</p>
+            <p class="message-list__item-preview mars" id="message-summary-{{ loop.index }}">{{ message['body']|truncate(100, False, '...', 0) }}</p>
             {% if message['unread'] %}
               <p class="message-list__item-preview--link">
                 <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" class="venus" id="open-conversation-link-{{ loop.index }}">Read full message</a>

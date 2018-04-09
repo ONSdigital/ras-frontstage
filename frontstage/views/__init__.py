@@ -12,9 +12,8 @@ from frontstage.views.secure_messaging import create_message, message_get # noqa
 from frontstage.views.sign_in import sign_in_bp
 from frontstage.views.sign_in import logout, sign_in # noqa
 from frontstage.views.surveys import surveys_bp
-from frontstage.views.surveys import (access_survey, add_survey, add_survey_confirm_organisation_survey,
-                                      add_survey_submit,  download_survey, surveys_list, upload_survey,
-                                      upload_survey_failed)
+from frontstage.views.surveys import access_survey, add_survey, add_survey_confirm_organisation_survey, add_survey_submit # noqa
+from frontstage.views.surveys import download_survey, surveys_list, upload_survey, upload_survey_failed # noqa
 
 
 # Import endpoints and register blueprints

@@ -79,3 +79,18 @@ def _create_send_message_headers():
     encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])
     headers = {"Authorization": encoded_jwt, 'Content-Type': 'application/json', 'Accept': 'application/json'}
     return headers
+
+
+def remove_unread_label(message_id):
+    url = '{}v2/messages/modify/{}'.format(current_app.config["RAS_SECURE_MESSAGING_SERVICE"], message_id)
+    data = '{"label": "UNREAD", "action": "remove"}'
+
+    logger.debug("Removing message unread label", message_id=message_id)
+    headers = _create_send_message_headers()
+
+    try:
+        response = requests.put(url, headers=headers, data=data)
+        response.raise_for_status()
+        logger.debug("Successfully removed unread label", message_id=message_id)
+    except HTTPError:
+        logger.exception("Failed to remove unread label", message_id=message_id)

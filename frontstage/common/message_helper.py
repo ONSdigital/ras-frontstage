@@ -9,18 +9,18 @@ logger = wrap_logger(logging.getLogger(__name__))
 def refine(message):
     return {
         'thread_id': message.get('thread_id'),
-        'subject': _get_message_subject(message),
+        'subject': get_message_subject(message),
         'body': message.get('body'),
         'survey_id': message.get('survey'),
-        'ru_ref': _get_ru_ref_from_message(message),
-        'from': _get_from_name(message),
-        'sent_date': _get_human_readable_date(message.get('sent_date')),
-        'unread': _get_unread_status(message),
+        'ru_ref': get_ru_ref_from_message(message),
+        'from': get_from_name(message),
+        'sent_date': get_human_readable_date(message.get('sent_date')),
+        'unread': get_unread_status(message),
         'message_id': message.get('msg_id')
     }
 
 
-def _get_message_subject(message):
+def get_message_subject(message):
     try:
         subject = message["subject"]
         return subject
@@ -29,7 +29,7 @@ def _get_message_subject(message):
         raise
 
 
-def _get_from_name(message):
+def get_from_name(message):
     try:
         if message['from_internal']:
             return "ONS Business Surveys Team"
@@ -40,7 +40,7 @@ def _get_from_name(message):
         raise
 
 
-def _get_ru_ref_from_message(message):
+def get_ru_ref_from_message(message):
     try:
         return message['@ru_id']['id']
     except (KeyError, TypeError):
@@ -48,7 +48,7 @@ def _get_ru_ref_from_message(message):
         raise
 
 
-def _get_human_readable_date(sent_date):
+def get_human_readable_date(sent_date):
     try:
         formatted_date = get_formatted_date(sent_date.split('.')[0])
         return formatted_date
@@ -56,7 +56,7 @@ def _get_human_readable_date(sent_date):
         logger.exception("Failed to parse sent date from message", sent_date=sent_date)
 
 
-def _get_unread_status(message):
+def get_unread_status(message):
     return 'UNREAD' in message.get('labels', [])
 
 

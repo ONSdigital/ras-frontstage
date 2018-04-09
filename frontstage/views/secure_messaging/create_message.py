@@ -45,7 +45,7 @@ def create_message(session):
 
 
 def send_message(party_id, is_draft, case_id, survey, ru_ref):
-    logger.debug('Attempting to send message', party_id=party_id)
+    logger.info('Attempting to send message', party_id=party_id)
     form = SecureMessagingForm(request.form)
 
     headers = create_headers()
@@ -70,7 +70,7 @@ def send_message(party_id, is_draft, case_id, survey, ru_ref):
                         json=message_json, headers=headers)
 
     if response.status_code != 200:
-        logger.debug('Failed to send message', party_id=party_id)
+        logger.info('Failed to send message', party_id=party_id)
         raise ApiError(response)
     sent_message = json.loads(response.text)
 
@@ -86,7 +86,7 @@ def create_headers():
 
 
 def get_message(message_id, label, party_id):
-    logger.debug('Attempting to retrieve message', message_id=message_id, party_id=party_id)
+    logger.info('Attempting to retrieve message', message_id=message_id, party_id=party_id)
 
     headers = create_headers()
     endpoint = 'secure-messaging/message'
@@ -98,5 +98,5 @@ def get_message(message_id, label, party_id):
         raise ApiError(response)
 
     message = json.loads(response.text)
-    logger.debug('Retrieved message successfully', message_id=message_id, party_id=party_id)
+    logger.info('Retrieved message successfully', message_id=message_id, party_id=party_id)
     return message

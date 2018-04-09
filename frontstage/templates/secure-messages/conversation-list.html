@@ -39,12 +39,12 @@
 
             <div class="message-details">
               <div class="secure-message-sent-message-meta-from mars">
-                <span class="tempHack u-vh">From: </span>
-                ONS Business Surveys Team
+                <span class="u-vh">From: </span>
+                {{ message.from or 'Unavailable' }}
               </div>
 
               <div class="secure-message-sent-message-meta-datetime mars u-mb-s" style="display: block; color: #666;">
-                <span class="tempHack u-vh">Sent: </span>
+                <span class="u-vh">Sent: </span>
                 {{ message.sent_date or 'Unavailable' }}
               </div>
             </div>

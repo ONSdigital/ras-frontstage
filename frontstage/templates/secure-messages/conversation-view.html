@@ -32,10 +32,10 @@
       <div class="secure-message-sent-message" id="conversation-message-{{ loop.index }}" name="conversation-message">
         {% if loop.last %}<div name="latest-message" id="latest-message"></div>{% endif %}
         <span class="secure-message-sent-message-meta-from venus">
-            <span name="sm-from-user" id="sm-sender-{{ loop.index }}" name="sm-sender">{{ message.get('from') }}</span>
+            <span name="sm-sender" id="sm-sender-{{ loop.index }}">{{ message.get('from') }}</span>
         </span>
         <span class="secure-message-sent-message-meta-datetime u-mb-s mars">
-            <span name="sm-sent-date" id="sm-sent-date-{{ loop.index }}" name="sm-sent-date">{{ message.get('sent_date') }}</span>
+            <span name="sm-sent-date" id="sm-sent-date-{{ loop.index }}">{{ message.get('sent_date') }}</span>
         </span>
         <span class="secure-message-sent-message-body" id="conversation-message-body-{{ loop.index }}" name="conversation-message-body">{{ message.get('body') }}</span>
     </div>

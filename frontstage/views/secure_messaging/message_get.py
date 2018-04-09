@@ -48,7 +48,6 @@ def view_conversation(session, thread_id):
         return redirect(url_for('secure_message_bp.view_conversation_list'))
 
     return render_template('secure-messages/conversation-view.html',
-                           _theme='default',
                            form=form,
                            conversation=refined_conversation)
 
@@ -64,9 +63,7 @@ def view_conversation_list(session):
         logger.exception("A key error occurred")
         raise ApiError(e)
 
-    return render_template('secure-messages/conversation-list.html',
-                           _theme='default',
-                           messages=refined_conversation)
+    return render_template('secure-messages/conversation-list.html', messages=refined_conversation)
 
 
 def _get_message_json(form, message, party_id):
@@ -108,7 +105,6 @@ def message_get(session, label, message_id):
         case_id = message.get('case_id')
 
     return render_template('secure-messages/secure-messages-view.html',
-                           _theme='default',
                            message=message,
                            ru_ref=ru_ref,
                            survey=survey,

@@ -64,6 +64,4 @@ def upload_survey(session):
         raise ApiError(response)
 
     logger.info('Successfully uploaded collection instrument', party_id=party_id, case_id=case_id)
-    return render_template('surveys/surveys-upload-success.html',
-                           _theme='default',
-                           upload_filename=upload_filename)
+    return render_template('surveys/surveys-upload-success.html', upload_filename=upload_filename)

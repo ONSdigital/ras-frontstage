@@ -45,8 +45,7 @@ def create_message(session):
         else:
             message = {}
         return render_template('secure-messages/secure-messages-view.html',
-                               _theme='default', ru_ref=ru_ref,
-                               survey=survey, case_id=case_id,
+                               ru_ref=ru_ref, survey=survey, case_id=case_id,
                                form=form, errors=form.errors,
                                message=message.get('message', {}))
 

@@ -22,8 +22,7 @@ def get_forgot_password():
             "type": {}
         }
     }
-    return render_template('passwords/forgot-password.html', _theme='default',
-                           form=form, data=template_data)
+    return render_template('passwords/forgot-password.html', form=form, data=template_data)
 
 
 @passwords_bp.route('/forgot-password', methods=['POST'])
@@ -43,17 +42,14 @@ def post_forgot_password():
             if 'Unauthorized user credentials' in error_message:
                 logger.info('Requesting password change for unregistered email on OAuth2 server')
                 template_data = {"error": {"type": {"Email address is not registered"}}}
-                return render_template('passwords/forgot-password.html', _theme='default', form=form,
-                                       data=template_data)
-            return render_template('passwords/reset-password.trouble.html', _theme='default',
-                                   data={"error": {"type": "failed"}})
+                return render_template('passwords/forgot-password.html', form=form, data=template_data)
+            return render_template('passwords/reset-password.trouble.html', data={"error": {"type": "failed"}})
 
         elif response.status_code == 404:
             logger.error('Requesting password change for email registered'
                          ' on OAuth2 server but not in party service')
             template_data = {"error": {"type": {"Email address is not registered"}}}
-            return render_template('passwords/forgot-password.html', _theme='default',
-                                   form=form, data=template_data)
+            return render_template('passwords/forgot-password.html', form=form, data=template_data)
 
         if response.status_code != 200:
             logger.error('Unable to send password change request')
@@ -67,10 +63,9 @@ def post_forgot_password():
             "type": form.errors
         }
     }
-    return render_template('passwords/forgot-password.html', _theme='default',
-                           form=form, data=template_data)
+    return render_template('passwords/forgot-password.html', form=form, data=template_data)
 
 
 @passwords_bp.route('/forgot-password/check-email', methods=['GET'])
 def forgot_password_check_email():
-    return render_template('passwords/forgot-password.check-email.html', _theme='default')
+    return render_template('passwords/forgot-password.check-email.html')

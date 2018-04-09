@@ -35,7 +35,6 @@ def survey_confirm_organisation(session):
     response_json = json.loads(response.text)
     logger.info('Successfully retrieved data for confirm add organisation/survey page', status=response.status_code)
     return render_template('surveys/surveys-confirm-organisation.html',
-                           _theme='default',
                            enrolment_code=enrolment_code,
                            encrypted_enrolment_code=encrypted_enrolment_code,
                            organisation_name=response_json['organisation_name'],

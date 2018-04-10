@@ -6,13 +6,11 @@ from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.common.api_call import api_call
-from frontstage.common.cryptographer import Cryptographer
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.views.register import register_bp
 
 
 logger = wrap_logger(logging.getLogger(__name__))
-cryptographer = Cryptographer()
 
 
 @register_bp.route('/activate-account/<token>', methods=['GET'])

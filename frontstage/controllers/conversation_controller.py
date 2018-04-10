@@ -5,7 +5,7 @@ import logging
 
 from flask import current_app, request
 from frontstage.common.session import SessionHandler
-from frontstage.exceptions.exceptions import ApiError, NoMessagesError
+from frontstage.exceptions.exceptions import ApiError, NoMessagesError, AuthorizationTokenMissing
 from requests.exceptions import HTTPError, RequestException
 from structlog import wrap_logger
 
@@ -70,13 +70,21 @@ def send_message(message_json):
 
 
 def _create_get_conversation_headers():
-    encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])
+    try:
+        encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])
+    except KeyError:
+        logger.exception("Authorization token missing in cookie")
+        raise AuthorizationTokenMissing
     headers = {"Authorization": encoded_jwt}
     return headers
 
 
 def _create_send_message_headers():
-    encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])
+    try:
+        encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])
+    except KeyError:
+        logger.exception("Authorization token missing in cookie")
+        raise AuthorizationTokenMissing
     headers = {"Authorization": encoded_jwt, 'Content-Type': 'application/json', 'Accept': 'application/json'}
     return headers
 

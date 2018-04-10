@@ -37,13 +37,7 @@ class Config(object):
                                                       RAS_FRONTSTAGE_API_HOST,
                                                       RAS_FRONTSTAGE_API_PORT)
 
-    RAS_SECURE_MESSAGING_PROTOCOL = os.getenv('RAS_SECURE_MESSAGING_PROTOCOL', 'http')
-    RAS_SECURE_MESSAGING_HOST = os.getenv('RAS_SECURE_MESSAGING_HOST', 'localhost')
-    RAS_SECURE_MESSAGING_PORT = os.getenv('RAS_SECURE_MESSAGING_PORT', 5050)
-
-    RAS_SECURE_MESSAGING_SERVICE = '{}://{}:{}/'.format(RAS_SECURE_MESSAGING_PROTOCOL,
-                                                        RAS_SECURE_MESSAGING_HOST,
-                                                        RAS_SECURE_MESSAGING_PORT)
+    RAS_SECURE_MESSAGING_SERVICE = os.getenv('RAS_SECURE_MESSAGING_SERVICE', 'http://localhost:5050')
 
     GET_MESSAGES_URL = 'secure-messaging/messages-list'
     GET_MESSAGE_URL = 'secure-messaging/message'

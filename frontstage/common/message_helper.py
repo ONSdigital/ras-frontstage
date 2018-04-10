@@ -30,14 +30,14 @@ def get_message_subject(message):
 
 
 def get_from_name(message):
+    if message.get('from_internal', False):
+        return "ONS Business Surveys Team"
     try:
-        if message['from_internal']:
-            return "ONS Business Surveys Team"
         msg_from = message['@msg_from']
-        return "{} {}".format(msg_from.get('firstName'), msg_from.get('lastName'))
     except KeyError:
         logger.exception("Failed to retrieve name from message", message_id=message.get('msg_id'))
         raise
+    return "{} {}".format(msg_from.get('firstName'), msg_from.get('lastName'))
 
 
 def get_ru_ref_from_message(message):

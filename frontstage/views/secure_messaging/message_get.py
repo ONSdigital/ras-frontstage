@@ -34,7 +34,7 @@ def view_conversation(session, thread_id):
         raise
 
     if refined_conversation[-1]['unread']:
-        remove_unread_label(refined_conversation[-1]['thread_id'])
+        remove_unread_label(refined_conversation[-1]['message_id'])
 
     form = SecureMessagingForm(request.form)
     form.subject.data = refined_conversation[0].get('subject')

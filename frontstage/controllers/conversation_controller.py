@@ -1,13 +1,14 @@
-import requests
-
 from json import JSONDecodeError
 import logging
 
 from flask import current_app, request
-from frontstage.common.session import SessionHandler
-from frontstage.exceptions.exceptions import ApiError, NoMessagesError, AuthorizationTokenMissing
-from requests.exceptions import HTTPError, RequestException
+import requests
 from structlog import wrap_logger
+
+from frontstage.common.session import SessionHandler
+from frontstage.exceptions.exceptions import ApiError, AuthorizationTokenMissing, NoMessagesError
+from requests.exceptions import HTTPError, RequestException
+
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -29,7 +30,7 @@ def get_conversation(thread_id):
     try:
         return response.json()
     except JSONDecodeError:
-        logger.exception("the response could not be decoded", thread_id=thread_id)
+        logger.exception("The response could not be decoded", thread_id=thread_id)
         raise ApiError(response)
 
 

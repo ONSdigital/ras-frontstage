@@ -69,10 +69,6 @@ textarea.secure-message--message{
     width:75%;
 }
 
-.message-unread {
-	color: #4263c2;
-}
-
 .message-read {
 color: purple;
 font-weight: 400;

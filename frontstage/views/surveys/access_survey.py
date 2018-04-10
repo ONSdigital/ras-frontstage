@@ -48,8 +48,7 @@ def access_survey(session):
     case_data = json.loads(response.text)
 
     logger.info('Successfully retrieved case data', party_id=party_id, case_id=case_id)
-    return render_template('surveys/surveys-access.html', _theme='default',
-                           case_id=case_id,
+    return render_template('surveys/surveys-access.html', case_id=case_id,
                            collection_instrument_id=case_data['case']['collectionInstrumentId'],
                            collection_instrument_size=case_data['collection_instrument_size'],
                            survey_info=case_data['survey'],

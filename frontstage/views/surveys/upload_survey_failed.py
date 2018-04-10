@@ -31,7 +31,4 @@ def upload_failed(session):
         error_info = {'header': "Something went wrong",
                       'body': 'Please try uploading your spreadsheet again'}
 
-    return render_template('surveys/surveys-upload-failure.html',
-                           _theme='default',
-                           error_info=error_info,
-                           case_id=case_id)
+    return render_template('surveys/surveys-upload-failure.html', error_info=error_info, case_id=case_id)

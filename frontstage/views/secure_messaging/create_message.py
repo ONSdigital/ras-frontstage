@@ -1,7 +1,8 @@
 import json
 import logging
 
-from flask import redirect, render_template, request, url_for
+from flask import flash, Markup, redirect, render_template, request, url_for
+
 from frontstage.common.authorisation import jwt_authorization
 from structlog import wrap_logger
 
@@ -33,15 +34,20 @@ def create_message(session):
             logger.info('Draft sent successfully', message_id=sent_message['msg_id'], party_id=party_id)
             return message_get('DRAFT', sent_message['msg_id'])
 
-        return redirect(url_for('secure_message_bp.messages_get', new_message=True))
+        thread_url = url_for("secure_message_bp.view_conversation",
+                             thread_id=sent_message['thread_id']) + "#latest-message"
+        flash(Markup('Message sent. <a href={}>View Message</a>'.format(thread_url)))
+        return redirect(url_for('secure_message_bp.view_conversation_list'))
 
     else:
         if form['thread_message_id'].data:
             message = get_message(form['thread_message_id'].data, 'INBOX', party_id)
         else:
             message = {}
-        return render_template('secure-messages/secure-messages-view.html', _theme='default', ru_ref=ru_ref,
-                               survey=survey, case_id=case_id, form=form, errors=form.errors, message=message.get('message', {}))
+        return render_template('secure-messages/secure-messages-view.html',
+                               ru_ref=ru_ref, survey=survey, case_id=case_id,
+                               form=form, errors=form.errors,
+                               message=message.get('message', {}))
 
 
 def send_message(party_id, is_draft, case_id, survey, ru_ref):

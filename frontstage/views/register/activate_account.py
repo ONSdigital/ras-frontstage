@@ -21,7 +21,7 @@ def register_activate_account(token):
     # Handle api errors
     if response.status_code == 409:
         logger.info('Expired email verification token', token=token)
-        return render_template('register/register.link-expired.html', _theme='default')
+        return render_template('register/register.link-expired.html')
     elif response.status_code == 404:
         logger.warning('Unrecognised email verification token', token=token)
         return redirect(url_for('error_bp.not_found_error_page'))

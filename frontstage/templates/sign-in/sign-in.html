@@ -32,11 +32,7 @@
     </div>
     <br />
     {% endif %}
-    <form
-          method="post"
-          class="form"
-          action="{{ url_for('sign_in_bp.login') }}"
-          role="form">
+    <form method="post" class="form" action="{{ url_for('sign_in_bp.login') }}" role="form">
         {{ form.csrf_token }}
 
         {% if data['account_activated'] %}
@@ -53,7 +49,6 @@
             {% if errorType == "failed" %}
             <div class="panel panel--simple panel--error">
             {% endif %}
-                {{ form.csrf_token}}
                 <div class="field">
                     {% if errorType.username %}
                     <div class="panel panel--simple panel--error">

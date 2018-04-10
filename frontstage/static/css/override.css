@@ -69,7 +69,7 @@ textarea.secure-message--message{
     width:75%;
 }
 
-a:link {
+.message-unread {
 	color: #4263c2;
 }
 

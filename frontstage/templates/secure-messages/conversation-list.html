@@ -30,7 +30,7 @@
         {% for message in messages %}
           {% if message['unread'] %}
             <li id="message-list-unread" class="message-list__item venus">
-              <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" id="message-link-{{ loop.index }}">{{ message.subject }}</a>
+              <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" class="message-unread" id="message-link-{{ loop.index }}">{{ message.subject }}</a>
               <span class="secure-message-conversation-meta__label mercury" style="color: #666;"> (New) </span>
           {% else %}
             <li id="message-list" class="message-list__item mars">

@@ -45,9 +45,6 @@ class Config(object):
                                                         RAS_SECURE_MESSAGE_SERVICE_HOST,
                                                         RAS_SECURE_MESSAGE_SERVICE_PORT)
 
-    GET_MESSAGES_URL = 'secure-messaging/messages-list'
-    GET_MESSAGE_URL = 'secure-messaging/message'
-
     SIGN_IN_URL = 'sign-in'
 
     REQUEST_PASSWORD_CHANGE = 'passwords/request-password-change'

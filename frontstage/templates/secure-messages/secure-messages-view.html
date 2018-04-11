@@ -24,7 +24,6 @@
                 <form action="{{ url_for('secure_message_bp.create_message', ru_ref=ru_ref, survey=survey, case_id=case_id) }}" method="post">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     {{ form.thread_id }}
-                    {{ form.thread_message_id }}
 
                     {% if message %}
                         {{ form.hidden_subject }}

@@ -37,28 +37,30 @@
             <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" class="message-read" id="message-link-{{ loop.index }}">{{ message.subject }}</a>
           {% endif %}
 
-            <div class="message-details">
-              <div class="secure-message-sent-message-meta-from mars">
-                <span class="u-vh">From: </span>
-                {{ message.from or 'Unavailable' }}
-              </div>
-
-              <div class="secure-message-sent-message-meta-datetime mars u-mb-s" style="display: block; color: #666;">
-                <span class="u-vh">Sent: </span>
-                {{ message.sent_date or 'Unavailable' }}
-              </div>
+          <div class="message-details">
+            <div class="secure-message-sent-message-meta-from mars">
+              <span class="u-vh">From: </span>
+              {{ message.from or 'Unavailable' }}
             </div>
 
-            <p class="message-list__item-preview mars">{{ message['body']|truncate(100, False, '...', 0) }}</p>
-            {% if message['unread'] %}
-              <p class="message-list__item-preview--link">
-                <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" class="venus" id="open-conversation-link-{{ loop.index }}">Read full message</a>
-              </p>
-            {% else %}
-              <p class="message-list__item-preview--link">
-                <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" class="message-read" id="open-conversation-link-{{ loop.index }}">Read full message</a>
-              </p>
-            {% endif %}
+            <div class="secure-message-sent-message-meta-datetime mars u-mb-s" style="display: block; color: #666;">
+              <span class="u-vh">Sent: </span>
+              {{ message.sent_date or 'Unavailable' }}
+            </div>
+          </div>
+
+          <p class="message-list__item-preview mars" id="message-summary-{{ loop.index }}">{{ message['body']|truncate(80, False, '...', 0) }}</p>
+
+          {% if message['unread'] %}
+            <p class="message-list__item-preview--link">
+              <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" class="venus" id="open-conversation-link-{{ loop.index }}">Read full message</a>
+            </p>
+          {% else %}
+            <p class="message-list__item-preview--link">
+              <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" class="message-read" id="open-conversation-link-{{ loop.index }}">Read full message</a>
+            </p>
+          {% endif %}
+
           </li>
         {% endfor %}
       </ul>

@@ -75,6 +75,74 @@ class TestSecureMessage(unittest.TestCase):
         self.assertTrue(response.status_code, 500)
         self.assertTrue('Something has gone wrong with the website.'.encode() in response.data)
 
+    @requests_mock.mock()
+    def test_get_messages_success(self, mock_request):
+        mock_request.get(url_get_messages, json=messages_get)
+
+        response = self.app.get("/secure-message/messages", headers=self.headers, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('The European languages are members of the same family'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_get_messages_api_failure(self, mock_request):
+        mock_request.get(url_get_messages, status_code=500)
+
+        response = self.app.get("/secure-message/messages", headers=self.headers, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_get_messages_api_error_bad_gateway(self, mock_request):
+        mock_request.get(url_get_messages, status_code=502)
+
+        response = self.app.get("/secure-message/messages", headers=self.headers, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        print(response.data)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_get_messages_api_error_FA002(self, mock_request):
+        unread_total_fail_json = {**messages_get, **create_api_error(500)}
+        del unread_total_fail_json['unread_messages_total']
+        mock_request.get(url_get_messages, json=unread_total_fail_json)
+
+        response = self.app.get("/secure-message/messages", follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('The European languages are members of the same family'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_get_message_success(self, mock_request):
+        mock_request.get(url_get_message, json=message)
+
+        response = self.app.get("/secure-message/INBOX/29000d7b-dfd8-47fa-8e15-5650a985243b", follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('The European languages are members of the same family'.encode() in response.data)
+        self.assertTrue('Test draft'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_get_message_api_failure(self, mock_request):
+        mock_request.get(url_get_message, status_code=500)
+
+        response = self.app.get("/secure-message/INBOX/29000d7b-dfd8-47fa-8e15-5650a985243b", headers=self.headers, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_get_thread_failure(self, mock_request):
+        conversation_json_copy = conversation_json.copy()
+        del conversation_json_copy['@ru_id']
+        mock_request.get(url_get_thread, json={'messages': [conversation_json_copy]})
+
+        response = self.app.get("secure-message/thread/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers, follow_redirects=True)
+        self.assertTrue(response.status_code, 500)
+        self.assertTrue('Something has gone wrong with the website.'.encode() in response.data)
+
     def test_create_message_get(self):
         response = self.app.get("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789", headers=self.headers, follow_redirects=True)
 

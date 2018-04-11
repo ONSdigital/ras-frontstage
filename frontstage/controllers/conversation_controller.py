@@ -1,15 +1,25 @@
-import requests
-
 from json import JSONDecodeError
 import logging
 
 from flask import current_app, request
-from frontstage.common.session import SessionHandler
-from frontstage.exceptions.exceptions import ApiError, NoMessagesError
+from structlog import wrap_logger
+import requests
+from requests.adapters import HTTPAdapter
 from requests.exceptions import HTTPError, RequestException
 from structlog import wrap_logger
+from urllib3 import Retry
+
+from frontstage.common.session import SessionHandler
+from frontstage.exceptions.exceptions import ApiError, AuthorizationTokenMissing, NoMessagesError
 
 logger = wrap_logger(logging.getLogger(__name__))
+
+
+# Configure number of retries on requests
+session = requests.Session()
+retries = Retry(total=10, backoff_factor=0.1)
+session.mount('http://', HTTPAdapter(max_retries=retries))
+session.mount('https://', HTTPAdapter(max_retries=retries))
 
 
 def get_conversation(thread_id):
@@ -19,7 +29,7 @@ def get_conversation(thread_id):
     url = '{}v2/threads/{}'.format(current_app.config["RAS_SECURE_MESSAGING_SERVICE"], thread_id)
 
     try:
-        response = requests.get(url, headers=headers)
+        response = session.get(url, headers=headers)
         response.raise_for_status()
     except (HTTPError, RequestException):
         logger.exception("Thread retrieval failed", thread_id=thread_id)
@@ -29,7 +39,7 @@ def get_conversation(thread_id):
     try:
         return response.json()
     except JSONDecodeError:
-        logger.exception("the response could not be decoded", thread_id=thread_id)
+        logger.exception("The response could not be decoded", thread_id=thread_id)
         raise ApiError(response)
 
 
@@ -39,9 +49,8 @@ def get_conversation_list():
     headers = _create_get_conversation_headers()
     url = '{}threads'.format(current_app.config["RAS_SECURE_MESSAGING_SERVICE"])
 
-    response = requests.get(url, headers=headers)
-
     try:
+        response = session.get(url, headers=headers)
         response.raise_for_status()
     except HTTPError:
         logger.exception("Threads retrieval failed")
@@ -61,7 +70,7 @@ def send_message(message_json):
     url = '{}v2/messages'.format(current_app.config["RAS_SECURE_MESSAGING_SERVICE"])
     headers = _create_send_message_headers()
     try:
-        response = requests.post(url, headers=headers, data=message_json)
+        response = session.post(url, headers=headers, data=message_json)
         response.raise_for_status()
     except HTTPError as ex:
         logger.exception("Message sending failed due to API Error")
@@ -70,13 +79,21 @@ def send_message(message_json):
 
 
 def _create_get_conversation_headers():
-    encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])
+    try:
+        encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])
+    except KeyError:
+        logger.exception("Authorization token missing in cookie")
+        raise AuthorizationTokenMissing
     headers = {"Authorization": encoded_jwt}
     return headers
 
 
 def _create_send_message_headers():
-    encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])
+    try:
+        encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])
+    except KeyError:
+        logger.exception("Authorization token missing in cookie")
+        raise AuthorizationTokenMissing
     headers = {"Authorization": encoded_jwt, 'Content-Type': 'application/json', 'Accept': 'application/json'}
     return headers
 
@@ -89,7 +106,7 @@ def remove_unread_label(message_id):
     headers = _create_send_message_headers()
 
     try:
-        response = requests.put(url, headers=headers, data=data)
+        response = session.put(url, headers=headers, data=data)
         response.raise_for_status()
         logger.debug("Successfully removed unread label", message_id=message_id)
     except HTTPError:

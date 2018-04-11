@@ -19,25 +19,28 @@ logger = wrap_logger(logging.getLogger(__name__))
 @secure_message_bp.route('/thread/<thread_id>', methods=['GET', 'POST'])
 @jwt_authorization(request)
 def view_conversation(session, thread_id):
-    logger.info("Getting conversation", thread_id=thread_id)
+    party_id = session.get('party_id')
+    logger.info("Getting conversation", thread_id=thread_id, party_id=party_id)
+    # TODO, do we really want to do a GET every time, even if we're POSTing? Rops does it this
+    # way so we can get it working, then get it right.
     conversation = get_conversation(thread_id)['messages']
-    logger.info("Successfully retrieved conversation", thread_id=thread_id)
+    logger.info("Successfully retrieved conversation", thread_id=thread_id, party_id=party_id)
     try:
         refined_conversation = [refine(message) for message in reversed(conversation)]
     except KeyError as e:
-        logger.exception("Message is missing important data", thread_id=thread_id)
-        raise
+        logger.exception("Message is missing important data", thread_id=thread_id, party_id=party_id)
+        raise ApiError(e)
 
     if refined_conversation[-1]['unread']:
-        remove_unread_label(refined_conversation[-1]['thread_id'])
+        remove_unread_label(refined_conversation[-1]['message_id'])
 
     form = SecureMessagingForm(request.form)
     form.subject.data = refined_conversation[0].get('subject')
 
     if form.validate_on_submit():
-        logger.info("Sending message", thread_id=thread_id)
+        logger.info("Sending message", thread_id=thread_id, party_id=party_id)
         send_message(_get_message_json(form, refined_conversation[0], party_id=session['party_id']))
-        logger.info("Successfully sent message", thread_id=thread_id)
+        logger.info("Successfully sent message", thread_id=thread_id, party_id=party_id)
         thread_url = url_for("secure_message_bp.view_conversation", thread_id=thread_id) + "#latest-message"
         flash(Markup('Message sent. <a href={}>View Message</a>'.format(thread_url)))
         return redirect(url_for('secure_message_bp.view_conversation_list'))

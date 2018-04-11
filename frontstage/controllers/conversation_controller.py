@@ -106,7 +106,7 @@ def remove_unread_label(message_id):
     headers = _create_send_message_headers()
 
     try:
-        response = requests.put(url, headers=headers, data=data)
+        response = session.put(url, headers=headers, data=data)
         response.raise_for_status()
         logger.debug("Successfully removed unread label", message_id=message_id)
     except HTTPError:

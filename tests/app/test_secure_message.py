@@ -75,16 +75,6 @@ class TestSecureMessage(unittest.TestCase):
         self.assertTrue(response.status_code, 500)
         self.assertTrue('Something has gone wrong with the website.'.encode() in response.data)
 
-    @requests_mock.mock()
-    def test_get_thread_failure(self, mock_request):
-        conversation_json_copy = conversation_json.copy()
-        del conversation_json_copy['@ru_id']
-        mock_request.get(url_get_thread, json={'messages': [conversation_json_copy]})
-
-        response = self.app.get("secure-message/thread/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers, follow_redirects=True)
-        self.assertTrue(response.status_code, 500)
-        self.assertTrue('Something has gone wrong with the website.'.encode() in response.data)
-
     def test_create_message_get(self):
         response = self.app.get("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789", headers=self.headers, follow_redirects=True)
 

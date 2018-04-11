@@ -2,7 +2,6 @@ from json import JSONDecodeError
 import logging
 
 from flask import current_app, request
-from structlog import wrap_logger
 import requests
 from requests.adapters import HTTPAdapter
 from requests.exceptions import HTTPError, RequestException

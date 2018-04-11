@@ -23,7 +23,7 @@ def get_reset_password(token, form_errors=None):
 
     if response.status_code == 409:
         logger.warning('Token expired', token=token)
-        return render_template('passwords/password-expired.html', _theme='default')
+        return render_template('passwords/password-expired.html')
     elif response.status_code == 404:
         logger.warning('Invalid token sent to party service', token=token)
         return redirect(url_for('error_bp.not_found_error_page'))
@@ -37,8 +37,7 @@ def get_reset_password(token, form_errors=None):
         },
         'token': token
     }
-    return render_template('passwords/reset-password.html', _theme='default',
-                           form=form, data=template_data)
+    return render_template('passwords/reset-password.html', form=form, data=template_data)
 
 
 @passwords_bp.route('/reset-password/<token>', methods=['POST'])
@@ -59,7 +58,7 @@ def post_reset_password(token):
 
     if response.status_code == 409:
         logger.warning('Token expired', token=token)
-        return render_template('passwords/password-expired.html', _theme='default')
+        return render_template('passwords/password-expired.html')
     elif response.status_code == 404:
         logger.warning('Invalid token sent to party service', token=token)
         return redirect(url_for('error_bp.not_found_error_page'))
@@ -73,4 +72,4 @@ def post_reset_password(token):
 
 @passwords_bp.route('/reset-password/confirmation', methods=['GET'])
 def reset_password_confirmation():
-    return render_template('passwords/reset-password.confirmation.html', _theme='default')
+    return render_template('passwords/reset-password.confirmation.html')

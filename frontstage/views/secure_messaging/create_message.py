@@ -2,15 +2,13 @@ import json
 import logging
 
 from flask import flash, Markup, redirect, render_template, request, url_for
-
-from frontstage.common.authorisation import jwt_authorization
 from structlog import wrap_logger
 
-from frontstage import app
 from frontstage.common.api_call import api_call
+from frontstage.common.authorisation import jwt_authorization
+from frontstage.common.session import SessionHandler
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.models import SecureMessagingForm
-from frontstage.views.secure_messaging.message_get import create_headers, get_message, message_get
 from frontstage.views.secure_messaging import secure_message_bp
 
 
@@ -28,11 +26,6 @@ def create_message(session):
     if request.method == 'POST' and form.validate():
         is_draft = form.save_draft.data
         sent_message = send_message(party_id, is_draft, case_id, survey, ru_ref)
-
-        # If draft was saved retrieve the saved draft
-        if is_draft:
-            logger.info('Draft sent successfully', message_id=sent_message['msg_id'], party_id=party_id)
-            return message_get('DRAFT', sent_message['msg_id'])
 
         thread_url = url_for("secure_message_bp.view_conversation",
                              thread_id=sent_message['thread_id']) + "#latest-message"
@@ -52,11 +45,11 @@ def create_message(session):
 
 
 def send_message(party_id, is_draft, case_id, survey, ru_ref):
-    logger.debug('Attempting to send message', party_id=party_id)
+    logger.info('Attempting to send message', party_id=party_id)
     form = SecureMessagingForm(request.form)
 
     headers = create_headers()
-    endpoint = app.config['SEND_MESSAGE_URL']
+    endpoint = 'secure-messaging/send-message'
     subject = form['subject'].data if form['subject'].data else form['hidden_subject'].data
     message_json = {
         'msg_from': party_id,
@@ -77,10 +70,33 @@ def send_message(party_id, is_draft, case_id, survey, ru_ref):
                         json=message_json, headers=headers)
 
     if response.status_code != 200:
-        logger.debug('Failed to send message', party_id=party_id)
+        logger.info('Failed to send message', party_id=party_id)
         raise ApiError(response)
     sent_message = json.loads(response.text)
 
     logger.info('Secure message sent successfully',
                 message_id=sent_message['msg_id'], party_id=party_id)
     return sent_message
+
+
+def create_headers():
+    encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])
+    headers = {"jwt": encoded_jwt}
+    return headers
+
+
+def get_message(message_id, label, party_id):
+    logger.info('Attempting to retrieve message', message_id=message_id, party_id=party_id)
+
+    headers = create_headers()
+    endpoint = 'secure-messaging/message'
+    parameters = {"message_id": message_id, "label": label, "party_id": party_id}
+    response = api_call('GET', endpoint, parameters=parameters, headers=headers)
+
+    if response.status_code != 200:
+        logger.error('Failed to retrieve message', message_id=message_id, party_id=party_id)
+        raise ApiError(response)
+
+    message = json.loads(response.text)
+    logger.info('Retrieved message successfully', message_id=message_id, party_id=party_id)
+    return message

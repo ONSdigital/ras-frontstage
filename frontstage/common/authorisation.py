@@ -27,10 +27,6 @@ def validate(token):
         logger.warning('No expiration date in token')
         return False
 
-    # if not set('respondent').intersection(token.get('scope', [])):
-    #     # logger.warning('event="unable to validate scope", token="{}"'.format(token))
-    #     return False
-
     logger.debug('Token is valid')
     return True
 

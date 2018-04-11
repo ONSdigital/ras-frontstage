@@ -4,21 +4,31 @@
 
 {% block messages %}
 
-{% include 'secure-messages/message-error-summary.html' %}
+{% if "subject" in errors or "body" in errors %}
+    <div class="panel panel--error">
+        <div class="panel__header">
+        {% if errors|length == 1 %}
+            <h1 class="panel__title venus">This page has 1 error</h1>
+        {% elif errors|length > 1 %}
+            <h1 class="panel__title venus">This page has {{ errors|length }} errors</h1>
+        {% endif %}
+        </div>
+        <div class="panel__body" data-qa="error-body">
+        {% if errors|length == 1 %}
+            <p>This <b>must be corrected </b>to continue.</p>
+        {% elif errors|length > 1 %}
+            <p>These <b>must be corrected </b>to continue.</p>
+        {% endif %}
+
+        {% for error in errors %}
+            <p class=“mars”>{{ loop.index0 + 1 }}) <a class="js-inpagelink" href="#{{error}}-error">{{ errors[error][0] }}</a></p>
+        {% endfor %}
+        </div>
+    </div>
+    <br/>
+{% endif %}
 
 <div class="secure-message-view-component">
-
-{% if label == 'DRAFT' and errors|length == 0%}
-    <div class="system-feedback"> 
-        <ul class="system-feedback__list"> 
-            <li class="system-feedback__list-item system-feedback__list-item--success"> 
-                <i class="fa fa-check-circle system-feedback__icon" aria-hidden="true" id="inbox-link"> </i>
-                Draft saved
-                <a href="{{ url_for('secure_message_bp.messages_get') }}">View your inbox</a> 
-            </li> 
-        </ul> 
-    </div>
-{% endif %}
 
     {% if message %}
         {% include 'secure-messages/thread-message.html' %}
@@ -27,13 +37,56 @@
     <div class="grid grid--reverse">
         <div class="grid__col col-4@m"></div>
         <div class="grid__col col-7@m pull-1@m">
-        {% if label != 'SENT' %}
-            {% include 'secure-messages/message-form.html' %}
-        {% endif %}
+          {% set message = {} if not message else message %}
+
+          {% if not message %}<h1 class="saturn">Create message</h1>{% endif %}
+
+          <div class="secure-message-form">
+              <form action="{{ url_for('secure_message_bp.create_message', ru_ref=ru_ref, survey=survey, case_id=case_id) }}" method="post">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                  {{ form.thread_id }}
+                  {{ form.thread_message_id }}
+
+                  {% if message %}
+                      {{ form.hidden_subject }}
+
+                  {% else %}
+                      <p>To: ONS Business Surveys team</p>
+                      {% if "subject" in errors %}
+                          <div class="panel panel--simple panel--error panel--spacious" id="subject-error">
+                              <p class="error-message">{{ errors['subject'][0] }}</p>
+                      {% endif %}
+                          <label class="venus" for="subject">Subject</label>
+                          {{ form.subject(id='secure-message-subject', class_='secure-message-form__subject input input--text') }}
+                      {% if "subject" in errors %}
+                          </div>
+                      {% endif %}
+                      <br />
+                  {% endif %}
+
+                  {% if "body" in errors %}
+                      <div class="panel panel--simple panel--error panel--spacious" id="body-error">
+                          <p class="error-message">{{ errors['body'][0] }}</p>
+                  {% endif %}
+                  {% if message %}
+                      <label class="venus" for="body">Reply</label>
+                  {% else %}
+                      <label class="venus" for="body">Message</label>
+                  {% endif %}
+                  {{ form.body(id='secure-message-body', class_='input input--textarea input--textarea-message', rows='10') }}
+                  {% if "body" in errors %}
+                      </div>
+                  {% endif %}
+
+                  <br />
+                  {{ form.send(class_='btn' ) }}
+              </form>
+          </div>
+
         </div>
     </div>
 
-    <p><a href="{{ url_for('secure_message_bp.messages_get') }}">Cancel</a></p>
+    <p><a href="{{ url_for('secure_message_bp.view_conversation_list') }}">Cancel</a></p>
 
 </div>
 

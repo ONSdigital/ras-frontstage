@@ -4,13 +4,12 @@ import logging
 from flask import current_app, request
 import requests
 from requests.adapters import HTTPAdapter
+from requests.exceptions import HTTPError, RequestException
 from structlog import wrap_logger
 from urllib3 import Retry
 
 from frontstage.common.session import SessionHandler
 from frontstage.exceptions.exceptions import ApiError, AuthorizationTokenMissing, NoMessagesError
-from requests.exceptions import HTTPError, RequestException
-
 
 logger = wrap_logger(logging.getLogger(__name__))
 

@@ -60,6 +60,7 @@ def view_conversation_list(session):
     party_id = session.get('party_id')
     logger.info("Getting conversation list", party_id=party_id)
     conversation = get_conversation_list()
+
     try:
         refined_conversation = [refine(message) for message in conversation]
     except KeyError as e:

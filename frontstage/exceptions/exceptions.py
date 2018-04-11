@@ -21,6 +21,7 @@ class NoMessagesError(Exception):
     """
     pass
 
+
 class AuthorizationTokenMissing(Exception):
     """ Thrown when the authorization token is missing from the cookie.
     """

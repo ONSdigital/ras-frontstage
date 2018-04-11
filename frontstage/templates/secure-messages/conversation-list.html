@@ -1,0 +1,70 @@
+{% import 'partials/section.html' as section %}
+{% extends "layouts/_onecol.html" %}
+
+{% block page_title %}Messages - ONS Business Surveys{% endblock %}
+
+{% block main %}
+
+{% include 'partials/tab_list.html' %}
+
+<div role="main" id="main" class="page__main">
+  <div class="container">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+      <div class="panel panel--simple panel--success col-6@m">
+          <div class="panel__body" data-qa="success-body">
+            {% for message in messages %}
+            <p class="mars" id="flashed-message-{{ loop.index }}">{{ message }}</p>
+            {% endfor %}
+          </div>
+      </div>
+      <br>
+      {% endif %}
+    {% endwith %}
+
+    {% if not messages %}
+      <p>No new messages</p>
+    {% else %}
+
+      <ul class="message-list col-12@m">
+        {% for message in messages %}
+          {% if message['unread'] %}
+            <li id="message-list-unread" class="message-list__item venus">
+              <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" id="message-link-{{ loop.index }}">{{ message.subject }}</a>
+              <span class="secure-message-conversation-meta__label mercury" style="color: #666;"> (New) </span>
+          {% else %}
+            <li id="message-list" class="message-list__item mars">
+            <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" class="message-read" id="message-link-{{ loop.index }}">{{ message.subject }}</a>
+          {% endif %}
+
+          <div class="message-details">
+            <div class="secure-message-sent-message-meta-from mars">
+              <span class="u-vh">From: </span>
+              {{ message.from or 'Unavailable' }}
+            </div>
+
+            <div class="secure-message-sent-message-meta-datetime mars u-mb-s" style="display: block; color: #666;">
+              <span class="u-vh">Sent: </span>
+              {{ message.sent_date or 'Unavailable' }}
+            </div>
+          </div>
+
+          <p class="message-list__item-preview mars" id="message-summary-{{ loop.index }}">{{ message['body']|truncate(80, False, '...', 0) }}</p>
+
+          {% if message['unread'] %}
+            <p class="message-list__item-preview--link">
+              <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" class="venus" id="open-conversation-link-{{ loop.index }}">Read full message</a>
+            </p>
+          {% else %}
+            <p class="message-list__item-preview--link">
+              <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" class="message-read" id="open-conversation-link-{{ loop.index }}">Read full message</a>
+            </p>
+          {% endif %}
+
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+</div>
+{% endblock main %}

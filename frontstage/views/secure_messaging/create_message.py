@@ -26,8 +26,8 @@ def create_message(session):
     party_id = session['party_id']
     form = SecureMessagingForm(request.form)
     if request.method == 'POST' and form.validate():
-        is_draft = form.save_draft.data
-        sent_message = send_message(party_id, is_draft, case_id, survey, ru_ref)
+        logger.info("Form validation successful", party_id=party_id)
+        sent_message = send_message(party_id, case_id, survey, ru_ref)
         thread_url = url_for("secure_message_bp.view_conversation",
                              thread_id=sent_message['thread_id']) + "#latest-message"
         flash(Markup('Message sent. <a href={}>View Message</a>'.format(thread_url)))
@@ -41,7 +41,7 @@ def create_message(session):
                                message={})
 
 
-def send_message(party_id, is_draft, case_id, survey, ru_ref):
+def send_message(party_id, case_id, survey, ru_ref):
     logger.info('Attempting to send message', party_id=party_id)
     form = SecureMessagingForm(request.form)
 
@@ -63,7 +63,9 @@ def send_message(party_id, is_draft, case_id, survey, ru_ref):
     # If message has previously been saved as a draft add through the message id
     if form["msg_id"].data:
         message_json["msg_id"] = form['msg_id'].data
-    response = api_call('POST', endpoint, parameters={"is_draft": is_draft},
+    # Without is_draft parameter, date/time on the message doesn't get saved correctly,
+    # resulting in missing date/time in conversation list.
+    response = api_call('POST', endpoint, parameters={"is_draft": False},
                         json=message_json, headers=headers)
 
     if response.status_code != 200:

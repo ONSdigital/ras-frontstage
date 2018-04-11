@@ -15,6 +15,19 @@ class InvalidRequestMethod(Exception):
         self.url = url
 
 
+class NoMessagesError(Exception):
+    """ Thrown when getting a list of messages but the response doesn't
+    contain a key named 'messages'.
+    """
+    pass
+
+
+class AuthorizationTokenMissing(Exception):
+    """ Thrown when the authorization token is missing from the cookie.
+    """
+    pass
+
+
 class JWTValidationError(Exception):
     pass
 

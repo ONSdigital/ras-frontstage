@@ -6,7 +6,6 @@ from flask import flash, Markup, redirect, render_template, request, url_for
 from frontstage.common.authorisation import jwt_authorization
 from structlog import wrap_logger
 
-from frontstage import app
 from frontstage.common.api_call import api_call
 from frontstage.common.session import SessionHandler
 from frontstage.exceptions.exceptions import ApiError
@@ -76,6 +75,7 @@ def send_message(party_id, case_id, survey, ru_ref):
     logger.info('Secure message sent successfully',
                 message_id=sent_message['msg_id'], party_id=party_id)
     return sent_message
+
 
 def create_headers():
     encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])

@@ -92,7 +92,7 @@ class TestSecureMessage(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('ONS Business Surveys Team'.encode() in response.data)
-        
+
     @requests_mock.mock()
     def test_create_message_post_success_api_failure(self, mock_request):
         mock_request.post(url_send_message, status_code=500)

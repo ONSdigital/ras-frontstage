@@ -5,10 +5,7 @@ from flask import json, flash, Markup, render_template, redirect, request, url_f
 from frontstage.common.authorisation import jwt_authorization
 from structlog import wrap_logger
 
-from frontstage import app
-from frontstage.common.api_call import api_call
 from frontstage.common.message_helper import refine
-from frontstage.common.session import SessionHandler
 from frontstage.controllers.conversation_controller import get_conversation, get_conversation_list,\
     remove_unread_label, send_message
 from frontstage.exceptions.exceptions import ApiError

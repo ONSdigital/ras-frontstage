@@ -47,7 +47,6 @@ class Config(object):
 
     GET_MESSAGES_URL = 'secure-messaging/messages-list'
     GET_MESSAGE_URL = 'secure-messaging/message'
-    SEND_MESSAGE_URL = 'secure-messaging/send-message'
 
     SIGN_IN_URL = 'sign-in'
 

@@ -9,7 +9,7 @@ from frontstage.views.register import register_bp
 from frontstage.views.register import (activate_account, check_email, confirm_organisation_survey, create_account,
                                        enter_account_details)
 from frontstage.views.secure_messaging import secure_message_bp
-from frontstage.views.secure_messaging import create_message, message_get, messages_get # noqa
+from frontstage.views.secure_messaging import create_message, message_get # noqa
 from frontstage.views.sign_in import sign_in_bp
 from frontstage.views.sign_in import logout, sign_in # noqa
 from frontstage.views.surveys import surveys_bp

@@ -13,13 +13,9 @@ with open('tests/test_data/conversation.json') as json_data:
 with open('tests/test_data/conversation_list.json') as json_data:
     conversation_list_json = json.load(json_data)
 
-url_get_messages = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['GET_MESSAGES_URL']
-with open('tests/test_data/secure_messaging/messages_get.json') as json_data:
-    messages_get = json.load(json_data)
-url_get_message = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['GET_MESSAGE_URL']
 with open('tests/test_data/secure_messaging/message.json') as json_data:
     message = json.load(json_data)
-url_send_message = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['SEND_MESSAGE_URL']
+url_send_message = app.config['RAS_FRONTSTAGE_API_SERVICE'] + 'secure-messaging/send-message'
 
 
 encoded_jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoicmVzcG9uZGVudCIsImFjY2Vzc190b2tlbiI6ImI5OWIyMjA0LWYxM" \
@@ -77,74 +73,6 @@ class TestSecureMessage(unittest.TestCase):
 
         response = self.app.get("secure-message/thread/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers, follow_redirects=True)
         self.assertTrue(response.status_code, 500)
-        self.assertTrue('Something has gone wrong with the website.'.encode() in response.data)
-
-    @requests_mock.mock()
-    def test_get_messages_success(self, mock_request):
-        mock_request.get(url_get_messages, json=messages_get)
-
-        response = self.app.get("/secure-message/messages", headers=self.headers, follow_redirects=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('The European languages are members of the same family'.encode() in response.data)
-
-    @requests_mock.mock()
-    def test_get_messages_api_failure(self, mock_request):
-        mock_request.get(url_get_messages, status_code=500)
-
-        response = self.app.get("/secure-message/messages", headers=self.headers, follow_redirects=True)
-
-        self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
-
-    @requests_mock.mock()
-    def test_get_messages_api_error_bad_gateway(self, mock_request):
-        mock_request.get(url_get_messages, status_code=502)
-
-        response = self.app.get("/secure-message/messages", headers=self.headers, follow_redirects=True)
-
-        self.assertEqual(response.status_code, 500)
-        print(response.data)
-        self.assertTrue('Server error'.encode() in response.data)
-
-    @requests_mock.mock()
-    def test_get_messages_api_error_FA002(self, mock_request):
-        unread_total_fail_json = {**messages_get, **create_api_error(500)}
-        del unread_total_fail_json['unread_messages_total']
-        mock_request.get(url_get_messages, json=unread_total_fail_json)
-
-        response = self.app.get("/secure-message/messages", follow_redirects=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('The European languages are members of the same family'.encode() in response.data)
-
-    @requests_mock.mock()
-    def test_get_message_success(self, mock_request):
-        mock_request.get(url_get_message, json=message)
-
-        response = self.app.get("/secure-message/INBOX/29000d7b-dfd8-47fa-8e15-5650a985243b", follow_redirects=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('The European languages are members of the same family'.encode() in response.data)
-        self.assertTrue('Test draft'.encode() in response.data)
-
-    @requests_mock.mock()
-    def test_get_message_api_failure(self, mock_request):
-        mock_request.get(url_get_message, status_code=500)
-
-        response = self.app.get("/secure-message/INBOX/29000d7b-dfd8-47fa-8e15-5650a985243b", headers=self.headers, follow_redirects=True)
-
-        self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
-
-    @requests_mock.mock()
-    def test_get_message_api_error_FA003(self, mock_request):
-        mock_request.get(url_get_message, status_code=502)
-
-        response = self.app.get("/secure-message/INBOX/29000d7b-dfd8-47fa-8e15-5650a985243b", headers=self.headers, follow_redirects=True)
-
-        self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
 
     def test_create_message_get(self):
         response = self.app.get("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789", headers=self.headers, follow_redirects=True)
@@ -157,7 +85,6 @@ class TestSecureMessage(unittest.TestCase):
         sent_message_response = {'msg_id': 'd43b6609-0875-4ef8-a34e-f7df1bcc8029', 'status': '201',
                                  'thread_id': '8caeff79-6067-4f2a-96e0-08617fdeb496'}
         mock_request.post(url_send_message, json=sent_message_response)
-        mock_request.get(url_get_messages, json=messages_get)
         mock_request.get(url_get_threads, json=conversation_list_json)
 
         response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789",
@@ -165,22 +92,7 @@ class TestSecureMessage(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('ONS Business Surveys Team'.encode() in response.data)
-
-    @requests_mock.mock()
-    def test_create_message_draft_success(self, mock_request):
-        sent_message_response = {'msg_id': 'd43b6609-0875-4ef8-a34e-f7df1bcc8029', 'status': '201', 'thread_id': '8caeff79-6067-4f2a-96e0-08617fdeb496'}
-        mock_request.post(url_send_message, json=sent_message_response)
-        mock_request.get(url_get_message, json=message)
-        self.message_form['msg_id'] = 'test_msg_id'
-        del self.message_form['send']
-        self.message_form['save_draft'] = 'Save Draft'
-
-        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789",
-                                 data=self.message_form, follow_redirects=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('Draft saved'.encode() in response.data)
-
+        
     @requests_mock.mock()
     def test_create_message_post_success_api_failure(self, mock_request):
         mock_request.post(url_send_message, status_code=500)
@@ -228,23 +140,6 @@ class TestSecureMessage(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Please enter a subject'.encode() in response.data)
 
-    @requests_mock.mock()
-    def test_create_message_draft_no_body_or_subject(self, mock_request):
-        sent_message_response = {'msg_id': 'd43b6609-0875-4ef8-a34e-f7df1bcc8029', 'status': '201', 'thread_id': '8caeff79-6067-4f2a-96e0-08617fdeb496'}
-        mock_request.post(url_send_message, json=sent_message_response)
-        mock_request.get(url_get_message, json=message)
-        self.message_form['msg_id'] = 'test_msg_id'
-        del self.message_form['send']
-        self.message_form['save_draft'] = 'Save Draft'
-        del self.message_form['body']
-        del self.message_form['subject']
-
-        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789",
-                                 data=self.message_form, headers=self.headers, follow_redirects=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('Draft saved'.encode() in response.data)
-
     def test_create_message_post_body_too_long(self):
         self.message_form['body'] = 'a' * 10100
 
@@ -268,7 +163,6 @@ class TestSecureMessage(unittest.TestCase):
         sent_message_response = {'msg_id': 'd43b6609-0875-4ef8-a34e-f7df1bcc8029', 'status': '201',
                                  'thread_id': '8caeff79-6067-4f2a-96e0-08617fdeb496'}
         mock_request.post(url_send_message, json=sent_message_response)
-        mock_request.get(url_get_messages, json=messages_get)
         mock_request.get(url_get_threads, json=conversation_list_json)
 
         response = self.app.post("/secure-message/create-message/?ru_ref=456&survey=789",

@@ -45,10 +45,7 @@ def view_conversation(session, thread_id):
         flash(Markup('Message sent. <a href={}>View Message</a>'.format(thread_url)))
         return redirect(url_for('secure_message_bp.view_conversation_list'))
 
-    return render_template('secure-messages/conversation-view.html',
-                           _theme='default',
-                           form=form,
-                           conversation=refined_conversation)
+    return render_template('secure-messages/conversation-view.html', form=form, conversation=refined_conversation)
 
 
 @secure_message_bp.route('/threads', methods=['GET'])
@@ -65,9 +62,7 @@ def view_conversation_list(session):
         raise ApiError(e)
     logger.info("Retrieving and refining conversation successful", party_id=party_id)
 
-    return render_template('secure-messages/conversation-list.html',
-                           _theme='default',
-                           messages=refined_conversation)
+    return render_template('secure-messages/conversation-list.html', messages=refined_conversation)
 
 
 def _get_message_json(form, message, party_id):

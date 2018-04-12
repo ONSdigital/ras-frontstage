@@ -41,22 +41,18 @@ def login():
             error_json = json.loads(response.text).get('error')
             error_message = error_json.get('data', {}).get('detail')
             if 'Unauthorized user credentials' in error_message:
-                return render_template('sign-in/sign-in.html', _theme='default',
-                                       form=form, data={"error": {"type": "failed"}})
+                return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
             elif 'User account locked' in error_message:
                 logger.debug('User account is locked on the OAuth2 server')
-                return render_template('sign-in/sign-in.trouble.html', _theme='default',
-                                       form=form, data={"error": {"type": "account locked"}})
+                return render_template('sign-in/sign-in.trouble.html', form=form, data={"error": {"type": "account locked"}})
             elif 'User account not verified' in error_message:
                 logger.debug('User account is not verified on the OAuth2 server')
-                return render_template('sign-in/sign-in.account-not-verified.html',
-                                       _theme='default', form=form,
+                return render_template('sign-in/sign-in.account-not-verified.html', form=form,
                                        data={"error": {"type": "account not verified"}})
             else:
                 logger.error('OAuth 2 server generated 401 which is not understood',
                              oauth2error=error_message)
-                return render_template('sign-in/sign-in.html', _theme='default',
-                                       form=form, data={"error": {"type": "failed"}})
+                return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
 
         if response.status_code != 200:
             logger.error('Failed to sign in')
@@ -86,4 +82,4 @@ def login():
         },
         'account_activated': account_activated
     }
-    return render_template('sign-in/sign-in.html', _theme='default', form=form, data=template_data)
+    return render_template('sign-in/sign-in.html', form=form, data=template_data)

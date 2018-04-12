@@ -25,7 +25,7 @@ def logged_in(session):
 
     response = make_response(render_template('surveys/surveys-todo.html',
                              just_added_case_id=request.args.get('case_id'),
-                             _theme='default', sorted_surveys_list=sorted_surveys_list))
+                             sorted_surveys_list=sorted_surveys_list))
 
     # Ensure any return to list of surveys (e.g. browser back) round trips the server to display the latest statuses
     response.headers.set("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store")
@@ -38,8 +38,7 @@ def logged_in(session):
 def surveys_history(session):
     party_id = session['party_id']
     sorted_surveys_list = get_surveys_list(party_id, 'history')
-    return render_template('surveys/surveys-history.html', _theme='default',
-                           sorted_surveys_list=sorted_surveys_list, history=True)
+    return render_template('surveys/surveys-history.html', sorted_surveys_list=sorted_surveys_list, history=True)
 
 
 def get_surveys_list(party_id, list_type):

@@ -33,18 +33,15 @@ def add_survey(session):
         # Handle API errors
         if response.status_code == 404:
             logger.info('Enrolment code not found')
-            return render_template('surveys/surveys-add.html', _theme='default', form=form,
-                                   data={"error": {"type": "failed"}}), 200
+            return render_template('surveys/surveys-add.html', form=form, data={"error": {"type": "failed"}}), 200
 
         elif response.status_code == 401 and not json.loads(response.text).get('active'):
             logger.info('Enrolment code not active')
-            return render_template('surveys/surveys-add.html', _theme='default', form=form,
-                                   data={"error": {"type": "failed"}})
+            return render_template('surveys/surveys-add.html', form=form, data={"error": {"type": "failed"}})
 
         elif response.status_code == 400:
             logger.info('Enrolment code already used')
-            return render_template('surveys/surveys-add.html', _theme='default', form=form,
-                                   data={"error": {"type": "failed"}})
+            return render_template('surveys/surveys-add.html', form=form, data={"error": {"type": "failed"}})
 
         elif response.status_code != 200:
             logger.error('Failed to submit enrolment code')
@@ -60,8 +57,6 @@ def add_survey(session):
 
     elif request.method == 'POST' and not form.validate():
         logger.info('Invalid character length, must be 12 characters')
-        return render_template('surveys/surveys-add.html', _theme='default', form=form,
-                               data={"error": {"type": "failed"}})
+        return render_template('surveys/surveys-add.html', form=form, data={"error": {"type": "failed"}})
 
-    return render_template('surveys/surveys-add.html', _theme='default',
-                           form=form, data={"error": {}})
+    return render_template('surveys/surveys-add.html', form=form, data={"error": {}})

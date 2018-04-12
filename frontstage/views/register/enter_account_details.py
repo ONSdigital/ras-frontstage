@@ -39,17 +39,13 @@ def register_enter_your_details():
         if response.status_code == 400:
             logger.debug('Email already used')
             error = {"email_address": ["This email has already been used to register an account"]}
-            return render_template('register/register.enter-your-details.html',
-                                   _theme='default',
-                                   form=form,
-                                   errors=error)
+            return render_template('register/register.enter-your-details.html', form=form, errors=error)
         elif response.status_code != 201:
             logger.error('Failed to create account', status=response.status_code)
             raise ApiError(response)
 
         logger.info('Successfully created account')
-        return render_template('register/register.almost-done.html',
-                               _theme='default', email=request.form.get('email_address'))
+        return render_template('register/register.almost-done.html', email=request.form.get('email_address'))
 
     else:
         # Validate enrolment code before rendering form
@@ -61,5 +57,4 @@ def register_enter_your_details():
                 logger.error('Invalid enrolment code used')
             raise ApiError(response)
 
-        return render_template('register/register.enter-your-details.html', _theme='default',
-                               form=form, errors=form.errors)
+        return render_template('register/register.enter-your-details.html', form=form, errors=form.errors)

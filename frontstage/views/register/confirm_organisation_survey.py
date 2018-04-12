@@ -32,7 +32,6 @@ def register_confirm_organisation_survey():
     response_json = json.loads(response.text)
     logger.info('Successfully retrieved data for confirm organisation/survey page')
     return render_template('register/register.confirm-organisation-survey.html',
-                           _theme='default',
                            enrolment_code=enrolment_code,
                            encrypted_enrolment_code=encrypted_enrolment_code,
                            organisation_name=response_json['organisation_name'],

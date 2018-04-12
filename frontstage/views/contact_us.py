@@ -12,4 +12,4 @@ contact_us_bp = Blueprint('contact_us_bp', __name__,
 
 @contact_us_bp.route('/', methods=['GET'])
 def contact_us():
-    return render_template('contact-us.html', _theme='default')
+    return render_template('contact-us.html')

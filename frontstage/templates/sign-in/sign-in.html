@@ -41,11 +41,13 @@
         {% else %}
 
         {% if config.AVAILABILITY_BANNER %}
-        <div class="panel panel--simple panel--error">
-            <h1>Service Availability</h1>
-            <p>Thank you for visiting the Office for National Statistics Secure Data Collection website.</p>
-            <p>We will be carrying out essential maintenance to the service on Friday 13th April 17:00 to Monday 16th April 08:30.
-               You are able to use the system and submit data during this period however your response status may not display as completed until after the maintenance has been completed.</p>
+        <div class="panel panel--simple panel--info">
+            <div class="panel__body">
+                <strong class="u-d-b">Service Availability</strong>
+            </div>
+            <p class="mars u-mt-xs">Thank you for visiting the Office for National Statistics Secure Data Collection website.</p>
+            <p>We will be carrying out essential maintenance to the service on Friday 13th April 17:00 to Monday 16th April 08:30.</p>
+            <p>You are able to use the system and submit data during this period however your response status may not display as completed until after the maintenance has been completed.</p>
         </div>
         <br>
         {% endif %}

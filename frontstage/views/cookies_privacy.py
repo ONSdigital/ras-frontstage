@@ -12,4 +12,4 @@ cookies_privacy_bp = Blueprint('cookies_privacy_bp', __name__,
 
 @cookies_privacy_bp.route('/', methods=['GET'])
 def cookies_privacy():
-    return render_template('cookies-privacy.html', _theme='default')
+    return render_template('cookies-privacy.html')

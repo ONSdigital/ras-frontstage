@@ -13,6 +13,11 @@ from frontstage.logger_config import logger_initial_config
 
 cf = ONSCloudFoundry()
 
+CACHE_HEADERS = {
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    'Pragma': 'no-cache',
+    'X-Frame-Options': 'DENY'
+}
 
 def create_app_object():
     app = Flask(__name__)
@@ -45,7 +50,9 @@ def create_app_object():
 
     @app.after_request
     def apply_caching(response):
-        response.headers["X-Frame-Options"] = "DENY"
+        for k, v in CACHE_HEADERS.items():
+            response.headers[k] = v
+
         return response
 
     return app

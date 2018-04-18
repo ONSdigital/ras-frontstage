@@ -1,4 +1,4 @@
-FROM python:3.5
+FROM python:3.6
 MAINTAINER David Carboni
 
 WORKDIR /app
@@ -7,4 +7,4 @@ EXPOSE 8082
 RUN pip3 install pipenv==8.3.2 && pipenv install --system --deploy
 
 ENTRYPOINT ["python3"]
-CMD ["run.py"] 
+CMD ["run.py"]

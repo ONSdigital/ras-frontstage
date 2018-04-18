@@ -48,7 +48,7 @@ def create_app_object():
     app.jinja_env.filters['subject_filter'] = subject_filter
 
     @app.after_request
-    def apply_caching(response):
+    def apply_headers(response):
         response.headers["X-Frame-Options"] = "DENY"
         for k, v in CACHE_HEADERS.items():
             response.headers[k] = v

@@ -18,7 +18,6 @@ class Config(object):
     JWT_SECRET = os.getenv('JWT_SECRET')
     VALIDATE_JWT = os.environ.get('VALIDATE_JWT', True)
     GOOGLE_ANALYTICS = os.getenv('GOOGLE_ANALYTICS', None)
-    SELENIUM_TEST_URL = os.environ.get('SELENIUM_TEST_URL', 'http://localhost:8080')
     NON_DEFAULT_VARIABLES = ['SECRET_KEY', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD', 'JWT_SECRET']
 
     REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')

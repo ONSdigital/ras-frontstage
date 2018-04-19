@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "a0d74406cc3f8ced75113c5ad0b28a7dfde6ccdef13eab55173bb682ca8e6f2d"
+            "sha256": "05aac3550c9f8b30f596fe2948493a1a0599c92eba94ee828e62b831072e7fe1"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -250,16 +250,6 @@
             "markers": "python_version < '3.4'",
             "version": "==1.5"
         },
-        "behave": {
-            "hashes": [
-                "sha256:07c741f30497b6f9361a9bc74c68418507cd17e70d6f586faa3bff57684a2ec8",
-                "sha256:81b731ac5187e31e4aad2594944fa914943683a9818320846d037c5ebd6d5d0b",
-                "sha256:89238a5e4b11ff607e8ebc6b4b1fb1a0b1f3d794fba80e1fb4b6b3652979c927",
-                "sha256:8c182feece4a519c5ffc11e1ab3682d25d5a390dd5f4573bb1296443beb9d7c7"
-            ],
-            "index": "pypi",
-            "version": "==1.2.5"
-        },
         "certifi": {
             "hashes": [
                 "sha256:13e698f54293db9f89122b0581843a782ad0934a4fe0172d2a980ba77fc61bb7",
@@ -405,26 +395,6 @@
             "index": "pypi",
             "version": "==2.0.2"
         },
-        "ordereddict": {
-            "hashes": [
-                "sha256:1c35b4ac206cef2d24816c89f89cf289dd3d38cf7c449bb3fab7bf6d43f01b1f"
-            ],
-            "markers": "python_version < '2.7'",
-            "version": "==1.1"
-        },
-        "parse": {
-            "hashes": [
-                "sha256:8048dde3f5ca07ad7ac7350460952d83b63eaacecdac1b37f45fd74870d849d2"
-            ],
-            "version": "==1.8.2"
-        },
-        "parse-type": {
-            "hashes": [
-                "sha256:6e906a66f340252e4c324914a60d417d33a4bea01292ea9bbf68b4fc123be8c9",
-                "sha256:f596bdc75d3dd93036fbfe3d04127da9f6df0c26c36e01e76da85adef4336b3c"
-            ],
-            "version": "==0.4.2"
-        },
         "pep8": {
             "hashes": [
                 "sha256:b22cfae5db09833bb9bd7c8463b53e1a9c9b39f12e304a8d0bba729c501827ee",
@@ -501,14 +471,6 @@
             ],
             "index": "pypi",
             "version": "==0.8.0"
-        },
-        "selenium": {
-            "hashes": [
-                "sha256:0c09f437f4f6754c0543d79bae4e58b8fd40b3d7cd10889eca66dd1c7af24c63",
-                "sha256:9e4885e7c72e20126b22ce5fc5981bbedd80bff99474c0757f62d5e68e1f17ac"
-            ],
-            "index": "pypi",
-            "version": "==3.4.3"
         },
         "singledispatch": {
             "hashes": [

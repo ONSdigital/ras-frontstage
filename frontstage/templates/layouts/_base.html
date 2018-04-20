@@ -25,15 +25,17 @@
       <script>document.documentElement.className = document.documentElement.className.replace('no-js','has-js')</script>
     <!--<![endif]-->
     {%- block styles %}
-    {% set css_responsive = "css/"~_theme~"/responsive.css" %}
-    {% set css_fixed = "css/"~_theme~"/fixed.css" %}
+    {% set css_responsive = "css/responsive.css" %}
+    {% set css_fixed = "css/fixed.css" %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
     <!--[if (gt IE 9) | (IEMobile)]><!-->
     {%- if request.args.get('fixed') == 'true' %}
       <link href="{{ url_for('static', filename=css_fixed) }}" rel="stylesheet" />
+      <link href="{{ url_for('static', filename='css/override.css') }}" rel="stylesheet">
     {%- else %}
       <link href="{{ url_for('static', filename=css_responsive) }}" rel="stylesheet" />
+      <link href="{{ url_for('static', filename='css/override.css') }}" rel="stylesheet">
     {%- endif %}
     <!--<![endif]-->
     <!--[if (lte IE 9) & (!IEMobile)]>
@@ -45,9 +47,8 @@
     {{ analytics }}
     <link href="{{ url_for('static', filename='site.min.css') }}" rel="stylesheet" />
 
-    <script src="https://code.jquery.com/jquery-3.1.1.js"
-            integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA="
-            crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha384-3ceskX3iaEnIogmQchP8opvBy3Mi7Ce34nWjpBIwVTHfGYWQS9jwHDVRnpKKHJg7" crossorigin="anonymous"></script>
 
     {% if config.GOOGLE_ANALYTICS %}
     <script>

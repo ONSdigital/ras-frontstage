@@ -8,7 +8,7 @@ class Config(object):
     TESTING = False
     VERSION = '0.2.5'
     PORT = os.getenv('PORT', 8082)
-    MAX_UPLOAD_LENGTH = os.getenv('MAX_UPLOAD_LENGTH',  20 * 1024 * 1024)
+    MAX_UPLOAD_LENGTH = os.getenv('MAX_UPLOAD_LENGTH', 20 * 1024 * 1024)
 
     SECRET_KEY = os.getenv('SECRET_KEY')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME')
@@ -18,7 +18,6 @@ class Config(object):
     JWT_SECRET = os.getenv('JWT_SECRET')
     VALIDATE_JWT = os.environ.get('VALIDATE_JWT', True)
     GOOGLE_ANALYTICS = os.getenv('GOOGLE_ANALYTICS', None)
-    SELENIUM_TEST_URL = os.environ.get('SELENIUM_TEST_URL', 'http://localhost:8080')
     NON_DEFAULT_VARIABLES = ['SECRET_KEY', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD', 'JWT_SECRET']
     AVAILABILITY_BANNER = os.getenv('AVAILABILITY_BANNER', False)
 
@@ -37,9 +36,14 @@ class Config(object):
     RAS_FRONTSTAGE_API_SERVICE = '{}://{}:{}/'.format(RAS_FRONTSTAGE_API_PROTOCOL,
                                                       RAS_FRONTSTAGE_API_HOST,
                                                       RAS_FRONTSTAGE_API_PORT)
-    GET_MESSAGES_URL = 'secure-messaging/messages-list'
-    GET_MESSAGE_URL = 'secure-messaging/message'
-    SEND_MESSAGE_URL = 'secure-messaging/send-message'
+
+    RAS_SECURE_MESSAGE_SERVICE_PROTOCOL = os.getenv('RAS_SECURE_MESSAGE_SERVICE_PROTOCOL', 'http')
+    RAS_SECURE_MESSAGE_SERVICE_HOST = os.getenv('RAS_SECURE_MESSAGE_SERVICE_HOST', 'localhost')
+    RAS_SECURE_MESSAGE_SERVICE_PORT = os.getenv('RAS_SECURE_MESSAGE_SERVICE_PORT', 5050)
+
+    RAS_SECURE_MESSAGING_SERVICE = '{}://{}:{}/'.format(RAS_SECURE_MESSAGE_SERVICE_PROTOCOL,
+                                                        RAS_SECURE_MESSAGE_SERVICE_HOST,
+                                                        RAS_SECURE_MESSAGE_SERVICE_PORT)
 
     SIGN_IN_URL = 'sign-in'
 

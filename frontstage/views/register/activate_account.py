@@ -6,13 +6,11 @@ from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.common.api_call import api_call
-from frontstage.common.cryptographer import Cryptographer
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.views.register import register_bp
 
 
 logger = wrap_logger(logging.getLogger(__name__))
-cryptographer = Cryptographer()
 
 
 @register_bp.route('/activate-account/<token>', methods=['GET'])
@@ -23,7 +21,7 @@ def register_activate_account(token):
     # Handle api errors
     if response.status_code == 409:
         logger.info('Expired email verification token', token=token)
-        return render_template('register/register.link-expired.html', _theme='default')
+        return render_template('register/register.link-expired.html')
     elif response.status_code == 404:
         logger.warning('Unrecognised email verification token', token=token)
         return redirect(url_for('error_bp.not_found_error_page'))

@@ -1,7 +1,7 @@
 import logging
 import os
 
-from flask import Flask
+from flask import Flask, request
 from structlog import wrap_logger
 
 from frontstage.cloud.cloudfoundry import ONSCloudFoundry
@@ -49,6 +49,8 @@ def create_app_object():
 
     @app.after_request
     def apply_headers(response):
+        if request.path.startswith('/static/'):
+            return response
         response.headers["X-Frame-Options"] = "DENY"
         for k, v in CACHE_HEADERS.items():
             response.headers[k] = v

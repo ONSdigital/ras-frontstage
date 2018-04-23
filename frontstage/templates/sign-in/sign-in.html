@@ -39,6 +39,19 @@
         <h1 class="saturn">You've activated your account</h1>
         <p>You may now sign in.</p>
         {% else %}
+
+        {% if config.AVAILABILITY_BANNER %}
+        <div class="panel panel--simple panel--info">
+            <div class="panel__body">
+                <strong class="u-d-b">Service Availability</strong>
+            </div>
+            <p class="mars u-mt-xs">Thank you for visiting the Office for National Statistics Secure Data Collection website.</p>
+	    <p>We are carrying out essential maintenance on our internal systems.</p>
+	    <p>You are able to use the system and submit data during this period however your response status may not display as completed until after the maintenance has been completed.</p>
+        </div>
+        <br>
+        {% endif %}
+
         <p>New to this service?
            <a id="create-account" href="/register/create-account/">Create an account</a>
         </p>

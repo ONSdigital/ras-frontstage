@@ -6,7 +6,7 @@ import os
 class Config(object):
     DEBUG = False
     TESTING = False
-    VERSION = '0.2.3'
+    VERSION = '0.2.5'
     PORT = os.getenv('PORT', 8082)
     MAX_UPLOAD_LENGTH = os.getenv('MAX_UPLOAD_LENGTH', 20 * 1024 * 1024)
 
@@ -19,6 +19,7 @@ class Config(object):
     VALIDATE_JWT = os.environ.get('VALIDATE_JWT', True)
     GOOGLE_ANALYTICS = os.getenv('GOOGLE_ANALYTICS', None)
     NON_DEFAULT_VARIABLES = ['SECRET_KEY', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD', 'JWT_SECRET']
+    AVAILABILITY_BANNER = os.getenv('AVAILABILITY_BANNER', False)
 
     REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
     REDIS_PORT = os.getenv('REDIS_PORT', 6379)

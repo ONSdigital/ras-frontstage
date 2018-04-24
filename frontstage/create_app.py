@@ -1,7 +1,7 @@
 import logging
 import os
 
-from flask import Flask
+from flask import Flask, request
 from structlog import wrap_logger
 
 from frontstage.cloud.cloudfoundry import ONSCloudFoundry
@@ -13,6 +13,10 @@ from frontstage.logger_config import logger_initial_config
 
 cf = ONSCloudFoundry()
 
+CACHE_HEADERS = {
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    'Pragma': 'no-cache',
+}
 
 def create_app_object():
     app = Flask(__name__)
@@ -44,8 +48,12 @@ def create_app_object():
     app.jinja_env.filters['subject_filter'] = subject_filter
 
     @app.after_request
-    def apply_caching(response):
+    def apply_headers(response):
+        if request.path.startswith('/static/'):
+            return response
         response.headers["X-Frame-Options"] = "DENY"
+        for k, v in CACHE_HEADERS.items():
+            response.headers[k] = v
         return response
 
     return app

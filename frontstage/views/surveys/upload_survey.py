@@ -58,6 +58,7 @@ def upload_survey(session):
         return redirect(url_for('surveys_bp.upload_failed',
                                 _external=True,
                                 case_id=case_id,
+                                party_id=party_id,
                                 error_info=error_info))
     elif response.status_code != 200:
         logger.error('Failed to upload collection instrument', party_id=party_id, case_id=case_id)

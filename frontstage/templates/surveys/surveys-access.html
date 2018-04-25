@@ -31,7 +31,7 @@
 
 <a id="download-survey-button" class="btn action-button btn--primary" target="_blank"
    href="{{ url_for('surveys_bp.download_survey', cid=collection_instrument_id, case_id=case_id) }}"
-   onclick="ga('send', 'event', 'survey', 'download', 'collection instrument id = {{ collection_instrument_id }}');" >
+   onclick="ga('send', 'event', 'survey', 'download', 'survey_ref = {{ survey_info.surveyRef }} collection_exercise_ref = {{ collection_exercise_info.exerciseRef }}');" >
 
     <div>
         <span class="download__text">Download spreadsheet&nbsp;&nbsp;&nbsp;</span>

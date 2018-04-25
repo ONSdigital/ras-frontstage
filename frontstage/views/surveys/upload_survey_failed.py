@@ -15,7 +15,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 @jwt_authorization(request)
 def upload_failed(session):
     case_id = request.args.get('case_id', None)
-    party_id = request.args.get('party_id', None)
+    party_id = session['party_id']
     error_info = request.args.get('error_info', None)
     params = {
         "party_id": party_id,

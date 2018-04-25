@@ -8652,7 +8652,7 @@ function validateHasCapitalLetter(str) {
  * @returns {boolean}
  */
 function validateHasSymbol(str) {
-  return (/[-!$£%^&*()_+|~=`{}\[\]:";'<>?,.\/]/.test(str)
+  return (/[-!#$£%^&*()_+|~=`{}\[\]:";'<>?,.\/]/.test(str)
   );
 }
 

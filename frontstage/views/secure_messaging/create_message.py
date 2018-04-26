@@ -63,6 +63,7 @@ def send_message(party_id, case_id, survey, ru_ref):
         message_json["msg_id"] = form['msg_id'].data
     # Without is_draft parameter, date/time on the message doesn't get saved correctly,
     # resulting in missing date/time in conversation list.
+    # TODO: call SM service directly
     response = api_call('POST', endpoint, parameters={"is_draft": False},
                         json=message_json, headers=headers)
 

@@ -1,0 +1,22 @@
+{
+  "associations": [
+    {
+      "enrolments": [
+        {
+          "enrolmentStatus": "ENABLED", 
+          "name": "Business Register and Employment Survey", 
+          "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
+        }
+      ],
+      "partyId": "1216a88f-ee2a-420c-9e6a-ee34893c29cf",
+      "sampleUnitRef": "49900000004"
+    }
+  ], 
+  "emailAddress": "rhiannon.griffiths@ons.gov.uk",
+  "firstName": "Rhiannon",
+  "id": "07d672bc-497b-448f-a406-a20a7e6013d7",
+  "lastName": "Griffiths", 
+  "sampleUnitType": "BI", 
+  "status": "ACTIVE", 
+  "telephone": "01636 265626"
+}

@@ -3,6 +3,8 @@ import json
 import unittest
 from unittest.mock import patch
 
+import flask
+import requests
 import requests_mock
 
 from frontstage import app
@@ -159,6 +161,29 @@ class TestSurveys(unittest.TestCase):
         response = self.app.get(f'/surveys/download_survey?case_id={case_id}', follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
+
+    @requests_mock.mock()
+    def test_download_survey_connection_error(self, mock_request):
+        mock_request.get(url_get_case, json=case)
+        mock_request.get(url_get_case_categories, json=categories)
+        mock_request.post(url_post_case_event_uuid, status_code=201)
+        mock_request.get(url_download_ci, exc=requests.exceptions.ConnectionError(request=flask.request))
+
+        response = self.app.get(f'/surveys/download_survey?case_id={case_id}', follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+
+    @requests_mock.mock()
+    def test_download_survey_not_found(self, mock_request):
+        mock_request.get(url_get_case, json=case)
+        mock_request.get(url_get_case_categories, json=categories)
+        mock_request.post(url_post_case_event_uuid, status_code=201)
+        mock_request.get(url_download_ci, status_code=404)
+
+        response = self.app.get(f'/surveys/download_survey?case_id={case_id}', follow_redirects=True)
+
+        # NB: a non-200 response from a service will result in a 500 page displayed
+        self.assertEqual(response.status_code, 500)
 
     @requests_mock.mock()
     def test_download_survey_fail(self, mock_request):

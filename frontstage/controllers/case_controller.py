@@ -2,9 +2,9 @@ import json
 import logging
 
 from flask import current_app as app
+import requests
 from structlog import wrap_logger
 
-from frontstage.common.request_handler import request_handler
 from frontstage.controllers import collection_instrument_controller
 from frontstage.exceptions.exceptions import ApiError, InvalidCaseCategory, NoSurveyPermission
 
@@ -15,7 +15,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 def get_case_by_case_id(case_id):
     logger.debug('Retrieving case', case_id=case_id)
     url = f"{app.config['CASE_SERVICE_URL']}/cases/{case_id}"
-    response = request_handler('GET', url, auth=app.config['BASIC_AUTH'])
+    response = requests.get(url, auth=app.config['BASIC_AUTH'])
 
     try:
         response.raise_for_status()
@@ -30,7 +30,7 @@ def get_case_by_case_id(case_id):
 def get_case_categories():
     logger.debug('Retrieving case categories')
     url = f"{app.config['CASE_SERVICE_URL']}/categories"
-    response = request_handler('GET', url, auth=app.config['BASIC_AUTH'])
+    response = requests.get(url, auth=app.config['BASIC_AUTH'])
 
     try:
         response.raise_for_status()
@@ -60,7 +60,7 @@ def post_case_event(case_id, party_id, category, description):
         'partyId': party_id,
         'createdBy': 'RAS_FRONTSTAGE'
     }
-    response = request_handler('POST', url, auth=app.config['BASIC_AUTH'], json=message)
+    response = requests.post(url, auth=app.config['BASIC_AUTH'], json=message)
 
     try:
         response.raise_for_status()

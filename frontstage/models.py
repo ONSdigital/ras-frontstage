@@ -63,6 +63,14 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('This should be a valid UK number e.g. 01632 496 0018. ')
 
     @staticmethod
+    def validate_email_address(form, field):
+        logger.debug('Checking if the email address contains a space')
+        # this extends the email validator to check if there is whitespace in the email
+        if " " in field.data:
+            logger.debug('Space found in email address')
+            raise ValidationError('The email address should not contain a space. ')
+
+    @staticmethod
     def validate_password(form, field):
         password = field.data
         if password.isalnum() or not any(char.isupper() for char in password) or not any(char.isdigit() for char in password):

@@ -9,12 +9,12 @@ from frontstage import app
 from tests.app.mocked_services import case, categories, url_get_case, url_get_case_categories, \
     url_upload_ci, url_post_case_event_uuid, url_download_ci
 
-url_get_surveys_list = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['SURVEYS_LIST']
-url_access_case = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['ACCESS_CASE']
-url_generate_eq_url = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['GENERATE_EQ_URL']
-url_validate_enrolment = app.config["RAS_FRONTSTAGE_API_SERVICE"] + app.config["VALIDATE_ENROLMENT"]
-url_add_survey = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['ADD_SURVEY']
-url_confirm_add_organisation_survey = app.config["RAS_FRONTSTAGE_API_SERVICE"] + app.config["CONFIRM_ADD_ORGANISATION_SURVEY"]
+url_get_surveys_list = app.config['FRONTSTAGE_API_URL'] + app.config['SURVEYS_LIST']
+url_access_case = app.config['FRONTSTAGE_API_URL'] + app.config['ACCESS_CASE']
+url_generate_eq_url = app.config['FRONTSTAGE_API_URL'] + app.config['GENERATE_EQ_URL']
+url_validate_enrolment = app.config["FRONTSTAGE_API_URL"] + app.config["VALIDATE_ENROLMENT"]
+url_add_survey = app.config['FRONTSTAGE_API_URL'] + app.config['ADD_SURVEY']
+url_confirm_add_organisation_survey = app.config["FRONTSTAGE_API_URL"] + app.config["CONFIRM_ADD_ORGANISATION_SURVEY"]
 
 case_id = 'abc670a5-67c6-4d96-9164-13b4017b8704'
 

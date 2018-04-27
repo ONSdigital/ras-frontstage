@@ -44,7 +44,7 @@ def send_message(party_id, case_id, survey, ru_ref):
     form = SecureMessagingForm(request.form)
 
     headers = create_headers()
-    endpoint = 'secure-messaging/send-message'
+    endpoint = '/secure-messaging/send-message'
     subject = form['subject'].data if form['subject'].data else form['hidden_subject'].data
     message_json = {
         'msg_from': party_id,

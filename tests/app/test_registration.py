@@ -5,10 +5,10 @@ import requests_mock
 from frontstage import app
 
 
-url_validate_enrolment = '{}{}'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'], app.config['VALIDATE_ENROLMENT'])
-url_confirm_organisation_survey = '{}{}'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'], app.config['CONFIRM_ORGANISATION_SURVEY'])
-url_create_account = '{}{}'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'], app.config['CREATE_ACCOUNT'])
-url_activate_account = '{}{}?token=Test_token'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'], app.config['VERIFY_EMAIL'])
+url_validate_enrolment = '{}{}'.format(app.config['FRONTSTAGE_API_URL'], app.config['VALIDATE_ENROLMENT'])
+url_confirm_organisation_survey = '{}{}'.format(app.config['FRONTSTAGE_API_URL'], app.config['CONFIRM_ORGANISATION_SURVEY'])
+url_create_account = '{}{}'.format(app.config['FRONTSTAGE_API_URL'], app.config['CREATE_ACCOUNT'])
+url_activate_account = '{}{}?token=Test_token'.format(app.config['FRONTSTAGE_API_URL'], app.config['VERIFY_EMAIL'])
 
 
 class TestRegistration(unittest.TestCase):

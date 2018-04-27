@@ -15,8 +15,8 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def upload_collection_instrument(upload_file, case_id, party_id):
-    logger.info('Attempting to upload collection instrument', case_id=case_id)
-    url = f"{current_app.config['RAS_COLLECTION_INSTRUMENT_SERVICE']}/survey_response-api/v1/survey_responses/{case_id}"
+    logger.debug('Attempting to upload collection instrument', case_id=case_id, party_id=party_id)
+    url = f"{current_app.config['COLLECTION_INSTRUMENT_SERVICE_URL']}/survey_response-api/v1/survey_responses/{case_id}"
     response = request_handler('POST', url, auth=current_app.config['BASIC_AUTH'], files=upload_file)
 
     # Post relevant upload case event
@@ -27,19 +27,21 @@ def upload_collection_instrument(upload_file, case_id, party_id):
                                     description=f'Survey response for case {case_id} uploaded by {party_id}')
 
     if response.status_code == 400:
-        logger.exception('Invalid file uploaded', case_id=case_id)
+        logger.exception('Invalid file uploaded', case_id=case_id, party_id=party_id)
         raise CiUploadError(response, message=response.text)
 
-    if not response.ok:
-        logger.exception('Failed to upload collection instrument', case_id=case_id)
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        logger.exception('Failed to upload collection instrument', case_id=case_id, party_id=party_id)
         raise ApiError(response)
 
-    logger.debug('Successfully uploaded collection instrument', case_id=case_id)
+    logger.debug('Successfully uploaded collection instrument', case_id=case_id, party_id=party_id)
 
 
 def download_collection_instrument(collection_instrument_id, case_id, party_id):
-    logger.debug('Downloading collection instrument', collection_instrument_id=collection_instrument_id)
-    url = f"{current_app.config['RAS_COLLECTION_INSTRUMENT_SERVICE']}/collection-instrument-api/1.0.2/download/{collection_instrument_id}"
+    logger.debug('Attempting to download collection instrument', collection_instrument_id=collection_instrument_id, party_id=party_id)
+    url = f"{current_app.config['COLLECTION_INSTRUMENT_SERVICE_URL']}/collection-instrument-api/1.0.2/download/{collection_instrument_id}"
     response = request_handler('GET', url, auth=current_app.config['BASIC_AUTH'])
 
     # Post relevant download case event
@@ -49,9 +51,11 @@ def download_collection_instrument(collection_instrument_id, case_id, party_id):
                                     category=category,
                                     description=f'Instrument {collection_instrument_id} downloaded by {party_id} for case {case_id}')
 
-    if not response.ok:
-        logger.exception('Failed to download collection instrument', collection_instrument_id=collection_instrument_id)
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        logger.exception('Failed to download collection instrument', collection_instrument_id=collection_instrument_id, party_id=party_id)
         raise ApiError(response)
 
-    logger.debug('Successfully downloaded collection instrument', collection_instrument_id=collection_instrument_id)
+    logger.debug('Successfully downloaded collection instrument', collection_instrument_id=collection_instrument_id, party_id=party_id)
     return response.content, response.headers.items()

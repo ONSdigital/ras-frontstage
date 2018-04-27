@@ -26,7 +26,7 @@ def get_conversation(thread_id):
     logger.info("Retrieving conversation", thread_id=thread_id)
 
     headers = _create_get_conversation_headers()
-    url = '{}v2/threads/{}'.format(current_app.config["RAS_SECURE_MESSAGING_SERVICE"], thread_id)
+    url = '{}/v2/threads/{}'.format(current_app.config["SECURE_MESSAGE_SERVICE_URL"], thread_id)
 
     try:
         response = session.get(url, headers=headers)
@@ -47,7 +47,7 @@ def get_conversation_list():
     logger.info("Retrieving threads list")
 
     headers = _create_get_conversation_headers()
-    url = '{}threads'.format(current_app.config["RAS_SECURE_MESSAGING_SERVICE"])
+    url = '{}/threads'.format(current_app.config["SECURE_MESSAGE_SERVICE_URL"])
 
     try:
         response = session.get(url, headers=headers)
@@ -67,7 +67,7 @@ def get_conversation_list():
 
 def send_message(message_json):
     logger.info("About to send message")
-    url = '{}v2/messages'.format(current_app.config["RAS_SECURE_MESSAGING_SERVICE"])
+    url = '{}/v2/messages'.format(current_app.config["SECURE_MESSAGE_SERVICE_URL"])
     headers = _create_send_message_headers()
     try:
         response = session.post(url, headers=headers, data=message_json)
@@ -99,7 +99,7 @@ def _create_send_message_headers():
 
 
 def remove_unread_label(message_id):
-    url = '{}v2/messages/modify/{}'.format(current_app.config["RAS_SECURE_MESSAGING_SERVICE"], message_id)
+    url = '{}/v2/messages/modify/{}'.format(current_app.config["SECURE_MESSAGE_SERVICE_URL"], message_id)
     data = '{"label": "UNREAD", "action": "remove"}'
 
     logger.debug("Removing message unread label", message_id=message_id)

@@ -10,7 +10,6 @@ from wtforms.validators import InputRequired, EqualTo, Length, DataRequired, Ema
 
 from frontstage import app
 
-
 logger = wrap_logger(logging.getLogger(__name__))
 
 
@@ -68,7 +67,7 @@ class RegistrationForm(FlaskForm):
         # this extends the email validator to check if there is whitespace in the email
         if " " in field.data:
             logger.debug('Space found in email address')
-            raise ValidationError('The email address should not contain a space. ')
+            raise ValidationError("Your email should be of the form myname@email.com")
 
     @staticmethod
     def validate_password(form, field):

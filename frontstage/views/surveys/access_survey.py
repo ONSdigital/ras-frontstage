@@ -7,6 +7,7 @@ from structlog import wrap_logger
 from frontstage import app
 from frontstage.common.api_call import api_call
 from frontstage.common.authorisation import jwt_authorization
+from frontstage.controllers import case_controller
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.views.surveys import surveys_bp
 
@@ -40,12 +41,8 @@ def access_survey(session):
 
     logger.info('Retrieving case data', party_id=party_id, case_id=case_id)
     referer_header = request.headers.get('referer', {})
-    response = api_call('GET', app.config['ACCESS_CASE'], parameters=params)
 
-    if response.status_code != 200:
-        logger.error('Failed to retrieve case data', party_id=party_id, case_id=case_id, status=response.status_code)
-        raise ApiError(response)
-    case_data = json.loads(response.text)
+    case_data = case_controller.get_case_data(case_id, party_id)
 
     logger.info('Successfully retrieved case data', party_id=party_id, case_id=case_id)
     return render_template('surveys/surveys-access.html', case_id=case_id,

@@ -30,6 +30,13 @@ class Config(object):
     PASSWORD_MIN_LENGTH = 8
     PASSWORD_MAX_LENGTH = 160
 
+    CASE_SERVICE_URL = os.getenv('CASE_SERVICE_URL', 'http://localhost:8171')
+    COLLECTION_EXERCISE_SERVICE_URL = os.getenv('COLLECTION_EXERCISE_SERVICE_URL', 'http://localhost:8145')
+    COLLECTION_INSTRUMENT_SERVICE_URL = os.getenv('COLLECTION_INSTRUMENT_SERVICE_URL', 'http://localhost:8002')
+    PARTY_SERVICE_URL = os.getenv('PARTY_SERVICE_URL', 'http://localhost:8081')
+    SECURE_MESSAGE_SERVICE_URL = os.getenv('SECURE_MESSAGE_SERVICE_URL', 'http://localhost:5050')
+    SURVEY_SERVICE_URL = os.getenv('SURVEY_SERVICE_URL', 'http://localhost:8080')
+
     RAS_FRONTSTAGE_API_HOST = os.getenv('RAS_FRONTSTAGE_API_HOST', 'localhost')
     RAS_FRONTSTAGE_API_PORT = os.getenv('RAS_FRONTSTAGE_API_PORT', 8083)
     RAS_FRONTSTAGE_API_PROTOCOL = os.getenv('RAS_FRONTSTAGE_API_PROTOCOL', 'http')

@@ -1,12 +1,13 @@
 import logging
 import json
-from flask import render_template, request
+
+from flask import current_app as app, render_template, request
 from structlog import wrap_logger
-from frontstage import app
+
 from frontstage.common.authorisation import jwt_authorization
+from frontstage.controllers import case_controller
 from frontstage.views.surveys import surveys_bp
-from frontstage.common.api_call import api_call
-from frontstage.exceptions.exceptions import ApiError
+
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -17,15 +18,8 @@ def upload_failed(session):
     case_id = request.args.get('case_id', None)
     party_id = session['party_id']
     error_info = request.args.get('error_info', None)
-    params = {
-        "party_id": party_id,
-        "case_id": case_id
-    }
-    response = api_call('GET', app.config['ACCESS_CASE'], parameters=params)
-    if response.status_code != 200:
-        logger.error('Failed to retrieve case data', party_id=party_id, case_id=case_id, status=response.status_code)
-        raise ApiError(response)
-    case_data = json.loads(response.text)
+
+    case_data = case_controller.get_case_data(case_id, party_id)
 
     # Select correct error text depending on error_info
     if error_info == "type":

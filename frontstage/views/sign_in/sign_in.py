@@ -49,9 +49,10 @@ def login():
                 logger.debug('User account is not verified on the OAuth2 server')
                 return render_template('sign-in/sign-in.account-not-verified.html', form=form,
                                        data={"error": {"type": "account not verified"}})
-            logger.error('OAuth 2 server generated 401 which is not understood',
-                         oauth2error=error_message)
-            return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
+            else:
+                logger.error('OAuth 2 server generated 401 which is not understood',
+                             oauth2error=error_message)
+                return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
 
         # NB: currently not handling a failed response from the party service
         party_id = party_controller.get_party_by_email(username).get('id')

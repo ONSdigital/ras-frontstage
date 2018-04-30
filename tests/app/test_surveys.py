@@ -215,6 +215,7 @@ class TestSurveys(unittest.TestCase):
         mock_request.get(url_get_case_categories, json=categories)
         mock_request.post(url_post_case_event_uuid, status_code=201)
         mock_request.post(url_upload_ci, status_code=400, json=self.upload_error)
+        mock_request.get(url_access_case, status_code=200, json=surveys_list_seft[1])
 
         test_url = f'/surveys/upload_survey?case_id={case_id}&survey_name=Survey+Name'
         response = self.app.post(test_url, data=self.survey_file, follow_redirects=True)
@@ -230,6 +231,7 @@ class TestSurveys(unittest.TestCase):
         mock_request.get(url_get_case_categories, json=categories)
         mock_request.post(url_post_case_event_uuid, status_code=201)
         mock_request.post(url_upload_ci, status_code=400, json=self.upload_error)
+        mock_request.get(url_access_case, status_code=200, json=surveys_list_seft[1])
 
         test_url = f'/surveys/upload_survey?case_id={case_id}&survey_name=Survey+Name'
         response = self.app.post(test_url, data=self.survey_file, follow_redirects=True)
@@ -238,10 +240,11 @@ class TestSurveys(unittest.TestCase):
         self.assertTrue('Error uploading - file name too long'.encode() in response.data)
         self.assertTrue('The file name of your spreadsheet must be less than 50 characters long'.encode() in response.data)
 
-    def test_upload_survey_file_size_error_internal(self):
+    @requests_mock.mock()
+    def test_upload_survey_file_size_error_internal(self, mock_request):
         file_data = 'a' * 21 * 1024 * 1024
         over_size_file = dict(file=(io.BytesIO(file_data.encode()), "testfile.xlsx"))
-
+        mock_request.get(url_access_case, status_code=200, json=surveys_list_seft[1])
         test_url = f'/surveys/upload_survey?case_id={case_id}&survey_name=Survey+Name'
         response = self.app.post(test_url, data=over_size_file, follow_redirects=True)
 
@@ -256,6 +259,7 @@ class TestSurveys(unittest.TestCase):
         mock_request.get(url_get_case_categories, json=categories)
         mock_request.post(url_post_case_event_uuid, status_code=201)
         mock_request.post(url_upload_ci, status_code=400, json=self.upload_error)
+        mock_request.get(url_access_case, status_code=200, json=surveys_list_seft[1])
 
         test_url = f'/surveys/upload_survey?case_id={case_id}&survey_name=Survey+Name'
         response = self.app.post(test_url, data=self.survey_file, follow_redirects=True)
@@ -271,6 +275,7 @@ class TestSurveys(unittest.TestCase):
         mock_request.get(url_get_case_categories, json=categories)
         mock_request.post(url_post_case_event_uuid, status_code=201)
         mock_request.post(url_upload_ci, status_code=400, json=self.upload_error)
+        mock_request.get(url_access_case, status_code=200, json=surveys_list_seft[1])
 
         test_url = f'/surveys/upload_survey?case_id={case_id}&survey_name=Survey+Name'
         response = self.app.post(test_url, data=self.survey_file, follow_redirects=True)

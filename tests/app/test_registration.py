@@ -151,6 +151,21 @@ class TestRegistration(unittest.TestCase):
         self.assertTrue('Enter your account details'.encode() in response.data)
 
     @requests_mock.mock()
+    def test_create_account_register_space_in_email_address(self, mock_object):
+        mock_object.post(url_validate_enrolment, status_code=200)
+        self.test_user['email_address'] = 'testuser 2@email.com'
+
+        response = self.app.post('/register/create-account/enter-account-details',
+                                 query_string=self.params,
+                                 data=self.test_user,
+                                 headers=self.headers,
+                                 follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        print(response.data)
+        self.assertTrue("Your email should be of the form myname@email.com".encode() in response.data)
+
+    @requests_mock.mock()
     def test_create_account_register_no_password(self, mock_object):
         mock_object.post(url_validate_enrolment, status_code=200)
         del self.test_user['password']

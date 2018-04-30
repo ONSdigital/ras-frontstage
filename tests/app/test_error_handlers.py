@@ -8,7 +8,7 @@ from frontstage import app
 from frontstage.exceptions.exceptions import ApiError, JWTValidationError
 
 
-url_oauth = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['SIGN_IN_URL']
+url_oauth = f"{app.config['OAUTH_SERVICE_URL']}/api/v1/tokens/"
 
 
 class TestErrorHandlers(unittest.TestCase):

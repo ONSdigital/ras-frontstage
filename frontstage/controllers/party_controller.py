@@ -1,4 +1,3 @@
-import json
 import logging
 
 from flask import current_app as app
@@ -23,4 +22,4 @@ def get_party_by_email(email):
         raise ApiError(response)
 
     logger.debug('Successfully retrieved party')
-    return json.loads(response.text)
+    return response.json()

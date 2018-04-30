@@ -1,4 +1,3 @@
-import json
 import logging
 
 from flask import current_app as app
@@ -32,13 +31,12 @@ def sign_in(username, password):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         if response.status_code == 401:
-            oauth2_error = json.loads(response.text).get('error').get('data', {}).get('detail')
+            oauth2_error = response.json().get('error', {}).get('data', {}).get('detail')
             logger.exception('Authentication error in oauth2 service', error=oauth2_error)
             raise OAuth2Error(response, message=oauth2_error)
         else:
             logger.exception('Failed to retrieve OAuth2 token')
         raise ApiError(response)
 
-    oauth2_token = json.loads(response.text)
     logger.debug('Successfully retrieved OAuth2 token')
-    return oauth2_token
+    return response.json()

@@ -76,7 +76,7 @@ def setup_secure_headers(app):
         app,
         content_security_policy=CSP_POLICY,
         content_security_policy_nonce_in=['script-src'],
-        session_cookie_secure=True, # Will setting True this cause issues when https is terminated?
+        session_cookie_secure=app.config['SECURE_COOKIES'],
         force_https=False,  # this is handled at the firewall
         strict_transport_security=True,
         strict_transport_security_max_age=31536000,

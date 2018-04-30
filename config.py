@@ -20,6 +20,7 @@ class Config(object):
     GOOGLE_ANALYTICS = os.getenv('GOOGLE_ANALYTICS', None)
     NON_DEFAULT_VARIABLES = ['SECRET_KEY', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD', 'JWT_SECRET']
     AVAILABILITY_BANNER = os.getenv('AVAILABILITY_BANNER', False)
+    SECURE_COOKIES = os.getenv('SECURE_COOKIES', True)
 
     REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
     REDIS_PORT = os.getenv('REDIS_PORT', 6379)

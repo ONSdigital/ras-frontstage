@@ -1,6 +1,9 @@
 import os
 
 
+def parse_boolean(string):
+    return string.upper() != 'FALSE'
+
 # To choose which config to use when running frontstage set environment variable APP_SETTINGS to the name of the
 # config object e.g. for the dev config set APP_SETTINGS=DevelopmentConfig
 class Config(object):
@@ -16,11 +19,11 @@ class Config(object):
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
     JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
     JWT_SECRET = os.getenv('JWT_SECRET')
-    VALIDATE_JWT = os.environ.get('VALIDATE_JWT', True)
+    VALIDATE_JWT = parse_boolean(os.getenv('VALIDATE_JWT', 'True'))
     GOOGLE_ANALYTICS = os.getenv('GOOGLE_ANALYTICS', None)
     NON_DEFAULT_VARIABLES = ['SECRET_KEY', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD', 'JWT_SECRET']
-    AVAILABILITY_BANNER = os.getenv('AVAILABILITY_BANNER', False)
-    SECURE_COOKIES = os.getenv('SECURE_COOKIES', True)
+    AVAILABILITY_BANNER = parse_boolean(os.getenv('AVAILABILITY_BANNER', 'False'))
+    SECURE_COOKIES = parse_boolean(os.getenv('SECURE_COOKIES', 'True'))
 
     REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
     REDIS_PORT = os.getenv('REDIS_PORT', 6379)

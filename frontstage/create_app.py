@@ -16,8 +16,10 @@ cf = ONSCloudFoundry()
 
 CSP_POLICY = {
     'default-src': ["'self'", 'https://cdn.ons.gov.uk', ],
-    'font-src': ["'self'", 'data:', 'https://cdn.ons.gov.uk', ],
-    'script-src': ["'self'", 'https://www.google-analytics.com', 'https://cdn.ons.gov.uk', ],
+    'style-src': ["'self'", 'https://maxcdn.bootstrapcdn.com', ],
+    'font-src': ["'self'", 'data:', 'https://cdn.ons.gov.uk', 'https://fonts.gstatic.com',
+                 'https://maxcdn.bootstrapcdn.com', ],
+    'script-src': ["'self'", 'https://www.google-analytics.com', 'https://cdn.ons.gov.uk', 'https://code.jquery.com', ],
     'connect-src': ["'self'", 'https://www.google-analytics.com', 'https://cdn.ons.gov.uk', ],
     'img-src': ["'self'", 'data:', 'https://www.google-analytics.com', 'https://cdn.ons.gov.uk', ]
 }

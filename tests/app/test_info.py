@@ -26,11 +26,12 @@ class TestInfo(unittest.TestCase):
     def test_content_security_policy_header_is_set(self):
         response = self.app.get("/info")
 
-        self.assertIn('font-src \'self\' data: https://cdn.ons.gov.uk', response.headers['Content-Security-Policy'])
+        self.assertIn('font-src \'self\' data: https://cdn.ons.gov.uk https://fonts.gstatic.com https://maxcdn.bootstrapcdn.com', response.headers['Content-Security-Policy'])
         self.assertIn('default-src \'self\' https://cdn.ons.gov.uk', response.headers['Content-Security-Policy'])
         self.assertIn('connect-src \'self\' https://www.google-analytics.com https://cdn.ons.gov.uk', response.headers['Content-Security-Policy'])
         self.assertIn('img-src \'self\' data: https://www.google-analytics.com https://cdn.ons.gov.uk', response.headers['Content-Security-Policy'])
-        self.assertIn('script-src \'self\' https://www.google-analytics.com https://cdn.ons.gov.uk', response.headers['Content-Security-Policy'])
+        self.assertIn('script-src \'self\' https://www.google-analytics.com https://cdn.ons.gov.uk https://code.jquery.com', response.headers['Content-Security-Policy'])
+        self.assertIn('style-src \'self\' https://maxcdn.bootstrapcdn.com', response.headers['Content-Security-Policy'])
 
     def test_x_xss_protection_header_is_set(self):
         response = self.app.get("/info")

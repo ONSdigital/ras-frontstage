@@ -4,7 +4,7 @@ from flask import redirect, render_template, request, url_for
 from structlog import wrap_logger
 
 from frontstage import app
-from frontstage.common.api_call import api_call
+from frontstage.controllers import party_controller
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.models import ResetPasswordForm
 from frontstage.views.passwords import passwords_bp
@@ -17,19 +17,18 @@ logger = wrap_logger(logging.getLogger(__name__))
 def get_reset_password(token, form_errors=None):
     form = ResetPasswordForm(request.form)
 
-    url = app.config['VERIFY_PASSWORD_TOKEN']
-    parameters = {"token": token}
-    response = api_call('GET', url, parameters=parameters)
-
-    if response.status_code == 409:
-        logger.warning('Token expired', token=token)
-        return render_template('passwords/password-expired.html')
-    elif response.status_code == 404:
-        logger.warning('Invalid token sent to party service', token=token)
-        return redirect(url_for('error_bp.not_found_error_page'))
-    elif response.status_code != 200:
-        logger.error('Party service failed to verify token')
-        raise ApiError(response)
+    try:
+        party_controller.verify_token(token)
+    except ApiError as exc:
+        if exc.status_code == 409:
+            logger.warning('Token expired', token=token)
+            return render_template('passwords/password-expired.html')
+        elif exc.status_code == 404:
+            logger.warning('Invalid token sent to party service', token=token)
+            return redirect(url_for('error_bp.not_found_error_page'))
+        else:
+            logger.error('Party service failed to verify token')
+            raise exc
 
     template_data = {
         "error": {
@@ -48,23 +47,19 @@ def post_reset_password(token):
         return get_reset_password(token, form_errors=form.errors)
 
     password = request.form.get('password')
-    put_data = {
-        "new_password": password,
-        "token": token
-    }
 
-    url = app.config['CHANGE_PASSWORD']
-    response = api_call('PUT', url, json=put_data)
-
-    if response.status_code == 409:
-        logger.warning('Token expired', token=token)
-        return render_template('passwords/password-expired.html')
-    elif response.status_code == 404:
-        logger.warning('Invalid token sent to party service', token=token)
-        return redirect(url_for('error_bp.not_found_error_page'))
-    elif response.status_code != 200:
-        logger.error('Party service failed to verify token')
-        raise ApiError(response)
+    try:
+        party_controller.change_password(password, token)
+    except ApiError as exc:
+        if exc.status_code == 409:
+            logger.warning('Token expired', token=token)
+            return render_template('passwords/password-expired.html')
+        elif exc.status_code == 404:
+            logger.warning('Invalid token sent to party service', token=token)
+            return redirect(url_for('error_bp.not_found_error_page'))
+        else:
+            logger.error('Party service failed to verify token')
+            raise exc
 
     logger.info('Successfully changed user password', token=token)
     return redirect(url_for('passwords_bp.reset_password_confirmation'))

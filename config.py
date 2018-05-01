@@ -14,6 +14,9 @@ class Config(object):
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
+    OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID')
+    OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET')
+    OAUTH_BASIC_AUTH = (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET)
     JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
     JWT_SECRET = os.getenv('JWT_SECRET')
     VALIDATE_JWT = os.environ.get('VALIDATE_JWT', True)
@@ -29,6 +32,9 @@ class Config(object):
     PASSWORD_CRITERIA_ERROR_TEXT = 'Your password doesn\'t meet the requirements'
     PASSWORD_MIN_LENGTH = 8
     PASSWORD_MAX_LENGTH = 160
+
+    OAUTH_SERVICE_URL = os.getenv('OAUTH_SERVICE_URL', 'http://localhost:8040')
+    PARTY_SERVICE_URL = os.getenv('PARTY_SERVICE_URL', 'http://localhost:8081')
 
     RAS_FRONTSTAGE_API_HOST = os.getenv('RAS_FRONTSTAGE_API_HOST', 'localhost')
     RAS_FRONTSTAGE_API_PORT = os.getenv('RAS_FRONTSTAGE_API_PORT', 8083)
@@ -46,10 +52,6 @@ class Config(object):
                                                         RAS_SECURE_MESSAGE_SERVICE_PORT)
 
     SIGN_IN_URL = 'sign-in'
-
-    REQUEST_PASSWORD_CHANGE = 'passwords/request-password-change'
-    VERIFY_PASSWORD_TOKEN = 'passwords/verify-password-token'
-    CHANGE_PASSWORD = 'passwords/change-password'
 
     VALIDATE_ENROLMENT = 'register/validate-enrolment'
     CONFIRM_ORGANISATION_SURVEY = 'register/confirm-organisation-survey'

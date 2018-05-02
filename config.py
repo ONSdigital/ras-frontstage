@@ -30,10 +30,10 @@ class Config(object):
     PASSWORD_MIN_LENGTH = 8
     PASSWORD_MAX_LENGTH = 160
 
-    CASE_SERVICE_URL = os.getenv('CASE_SERVICE_URL', 'http://localhost:8171')
-    COLLECTION_INSTRUMENT_SERVICE_URL = os.getenv('COLLECTION_INSTRUMENT_SERVICE_URL', 'http://localhost:8002')
-    FRONTSTAGE_API_URL = os.getenv('FRONTSTAGE_API_URL', 'http://localhost:8083')
-    SECURE_MESSAGE_SERVICE_URL = os.getenv('SECURE_MESSAGE_SERVICE_URL', 'http://localhost:5050')
+    CASE_SERVICE_URL = os.getenv('CASE_SERVICE_URL')
+    COLLECTION_INSTRUMENT_SERVICE_URL = os.getenv('COLLECTION_INSTRUMENT_SERVICE_URL')
+    FRONTSTAGE_API_URL = os.getenv('FRONTSTAGE_API_URL')
+    SECURE_MESSAGE_SERVICE_URL = os.getenv('SECURE_MESSAGE_SERVICE_URL')
 
     SIGN_IN_URL = '/sign-in'
 
@@ -62,6 +62,10 @@ class DevelopmentConfig(Config):
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
+    CASE_SERVICE_URL = os.getenv('CASE_SERVICE_URL', 'http://localhost:8171')
+    COLLECTION_INSTRUMENT_SERVICE_URL = os.getenv('COLLECTION_INSTRUMENT_SERVICE_URL', 'http://localhost:8002')
+    FRONTSTAGE_API_URL = os.getenv('FRONTSTAGE_API_URL', 'http://localhost:8083')
+    SECURE_MESSAGE_SERVICE_URL = os.getenv('SECURE_MESSAGE_SERVICE_URL', 'http://localhost:5050')
 
 
 class TestingConfig(DevelopmentConfig):

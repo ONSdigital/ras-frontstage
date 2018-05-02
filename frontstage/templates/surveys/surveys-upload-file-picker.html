@@ -12,6 +12,8 @@
         accept=".xls,.xlsx" />
     </div>
 
-    <button class="btn action-button btn--secondary" id="upload-survey-button" type="submit">Upload</button>
+    <button class="btn action-button btn--secondary" id="upload-survey-button"
+            onclick="ga('send', 'event', 'survey', 'upload','survey_ref = {{ survey_info.surveyRef }} collection_exercise_ref = {{ collection_exercise_info.exerciseRef }}');"
+            type="submit">Upload</button>
 
 </form>

@@ -10,7 +10,6 @@ from wtforms.validators import InputRequired, EqualTo, Length, DataRequired, Ema
 
 from frontstage import app
 
-
 logger = wrap_logger(logging.getLogger(__name__))
 
 
@@ -61,6 +60,14 @@ class RegistrationForm(FlaskForm):
         except NumberParseException:
             logger.debug('There is a number parse exception in the phonenumber field')
             raise ValidationError('This should be a valid UK number e.g. 01632 496 0018. ')
+
+    @staticmethod
+    def validate_email_address(form, field):
+        logger.debug('Checking if the email address contains a space')
+        # this extends the email validator to check if there is whitespace in the email
+        if " " in field.data:
+            logger.debug('Space found in email address')
+            raise ValidationError("Your email should be of the form myname@email.com")
 
     @staticmethod
     def validate_password(form, field):

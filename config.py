@@ -33,8 +33,8 @@ class Config(object):
     PASSWORD_MIN_LENGTH = 8
     PASSWORD_MAX_LENGTH = 160
 
-    OAUTH_SERVICE_URL = os.getenv('OAUTH_SERVICE_URL', 'http://localhost:8040')
-    PARTY_SERVICE_URL = os.getenv('PARTY_SERVICE_URL', 'http://localhost:8081')
+    OAUTH_SERVICE_URL = os.getenv('OAUTH_SERVICE_URL')
+    PARTY_SERVICE_URL = os.getenv('PARTY_SERVICE_URL')
 
     RAS_FRONTSTAGE_API_HOST = os.getenv('RAS_FRONTSTAGE_API_HOST', 'localhost')
     RAS_FRONTSTAGE_API_PORT = os.getenv('RAS_FRONTSTAGE_API_PORT', 8083)
@@ -76,6 +76,8 @@ class DevelopmentConfig(Config):
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
+    OAUTH_SERVICE_URL = os.getenv('OAUTH_SERVICE_URL', 'http://localhost:8040')
+    PARTY_SERVICE_URL = os.getenv('PARTY_SERVICE_URL', 'http://localhost:8081')
 
 
 class TestingConfig(DevelopmentConfig):

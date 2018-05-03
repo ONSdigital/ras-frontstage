@@ -16,7 +16,6 @@ from frontstage.views.sign_in import sign_in_bp
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-ACCOUNT_LOCKED_ERROR = 'User account locked'
 BAD_AUTH_ERROR = 'Unauthorized user credentials'
 NOT_VERIFIED_ERROR = 'User account not verified'
 
@@ -41,9 +40,6 @@ def login():
             error_message = exc.message
             if BAD_AUTH_ERROR in error_message:
                 return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
-            elif ACCOUNT_LOCKED_ERROR in error_message:
-                logger.debug('User account is locked on the OAuth2 server')
-                return render_template('sign-in/sign-in.trouble.html', form=form, data={"error": {"type": "account locked"}})
             elif NOT_VERIFIED_ERROR in error_message:
                 logger.debug('User account is not verified on the OAuth2 server')
                 return render_template('sign-in/sign-in.account-not-verified.html', form=form,

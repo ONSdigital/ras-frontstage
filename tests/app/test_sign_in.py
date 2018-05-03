@@ -139,16 +139,6 @@ class TestSignIn(unittest.TestCase):
         self.assertTrue('Incorrect email or password'.encode() in response.data)
 
     @requests_mock.mock()
-    def test_sign_in_locked_account(self, mock_object):
-        self.oauth_error['detail'] = 'User account locked'
-        mock_object.post(url_oauth_token, status_code=401, json=self.oauth_error)
-
-        response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('Trouble signing in?'.encode() in response.data)
-
-    @requests_mock.mock()
     def test_sign_in_unverified_account(self, mock_object):
         self.oauth_error['detail'] = 'User account not verified'
         mock_object.post(url_oauth_token, status_code=401, json=self.oauth_error)

@@ -38,7 +38,7 @@ def login():
 
         respondent = party_controller.get_respondent_by_email(username)
         if respondent == 'Respondent not found' or respondent['status'] != 'ACTIVE':
-            logger.debug("Respondent not able to sign in")
+            logger.debug("Respondent not able to sign in as don't have an active account in the system.")
             return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
 
         response = api_call('POST', app.config['SIGN_IN_URL'], json=sign_in_data)

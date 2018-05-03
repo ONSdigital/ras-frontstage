@@ -18,7 +18,7 @@ encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoX3Rva2VuIj
 
 
 url_oauth_token = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['SIGN_IN_URL']
-get_respondent_by_email = app.config['PARTY_SERVICE_URL'] + '/party-api/v1/respondents/email'
+get_respondent_by_email = app.config['PARTY_URL'] + '/party-api/v1/respondents/email'
 
 
 class TestSignIn(unittest.TestCase):

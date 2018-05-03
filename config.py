@@ -45,9 +45,9 @@ class Config(object):
                                                         RAS_SECURE_MESSAGE_SERVICE_HOST,
                                                         RAS_SECURE_MESSAGE_SERVICE_PORT)
 
-    PARTY_SERVICE_URL = os.getenv('PARTY_SERVICE_URL')
-    PARTY_SERVICE_USERNAME = os.getenv('PARTY_SERVICE_USERNAME')
-    PARTY_SERVICE_PASSWORD = os.getenv('PARTY_SERVICE_PASSWORD')
+    PARTY_URL = os.getenv('PARTY_URL')
+    PARTY_USERNAME = os.getenv('PARTY_USERNAME')
+    PARTY_PASSWORD = os.getenv('PARTY_PASSWORD')
 
     SIGN_IN_URL = 'sign-in'
 
@@ -79,9 +79,9 @@ class DevelopmentConfig(Config):
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
 
-    PARTY_SERVICE_URL = os.getenv('PARTY_SERVICE_URL', 'http://localhost:8081')
-    PARTY_SERVICE_USERNAME = os.getenv('PARTY_SERVICE_USERNAME', 'admin')
-    PARTY_SERVICE_PASSWORD = os.getenv('PARTY_SERVICE_PASSWORD', 'secret')
+    PARTY_URL = os.getenv('PARTY_URL', 'http://localhost:8081')
+    PARTY_USERNAME = os.getenv('PARTY_USERNAME', 'admin')
+    PARTY_PASSWORD = os.getenv('PARTY_PASSWORD', 'secret')
 
 
 class TestingConfig(DevelopmentConfig):

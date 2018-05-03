@@ -10,7 +10,7 @@ from frontstage.exceptions.exceptions import ApiError, JWTValidationError
 
 
 url_oauth = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['SIGN_IN_URL']
-get_respondent_by_email_url = app.config['PARTY_SERVICE_URL'] + '/party-api/v1/respondents/email'
+get_respondent_by_email_url = app.config['PARTY_URL'] + '/party-api/v1/respondents/email'
 
 with open('tests/test_data/respondent/respondent.json') as json_data:
     respondent_data = json.load(json_data)

@@ -14,7 +14,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 def get_case_by_case_id(case_id):
     logger.debug('Retrieving case', case_id=case_id)
     url = f"{app.config['CASE_URL']}/cases/{case_id}"
-    response = requests.get(url, auth=app.config['BASIC_AUTH'])
+    response = requests.get(url, auth=app.config['CASE_AUTH'])
 
     try:
         response.raise_for_status()
@@ -29,7 +29,7 @@ def get_case_by_case_id(case_id):
 def get_case_categories():
     logger.debug('Retrieving case categories')
     url = f"{app.config['CASE_URL']}/categories"
-    response = requests.get(url, auth=app.config['BASIC_AUTH'])
+    response = requests.get(url, auth=app.config['CASE_AUTH'])
 
     try:
         response.raise_for_status()
@@ -59,7 +59,7 @@ def post_case_event(case_id, party_id, category, description):
         'partyId': party_id,
         'createdBy': 'RAS_FRONTSTAGE'
     }
-    response = requests.post(url, auth=app.config['BASIC_AUTH'], json=message)
+    response = requests.post(url, auth=app.config['CASE_AUTH'], json=message)
 
     try:
         response.raise_for_status()

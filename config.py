@@ -48,6 +48,7 @@ class Config(object):
     PARTY_URL = os.getenv('PARTY_URL')
     PARTY_USERNAME = os.getenv('PARTY_USERNAME')
     PARTY_PASSWORD = os.getenv('PARTY_PASSWORD')
+    PARTY_AUTH = (PARTY_USERNAME, PARTY_PASSWORD)
 
     SIGN_IN_URL = 'sign-in'
 
@@ -82,6 +83,7 @@ class DevelopmentConfig(Config):
     PARTY_URL = os.getenv('PARTY_URL', 'http://localhost:8081')
     PARTY_USERNAME = os.getenv('PARTY_USERNAME', 'admin')
     PARTY_PASSWORD = os.getenv('PARTY_PASSWORD', 'secret')
+    PARTY_AUTH = (PARTY_USERNAME, PARTY_PASSWORD)
 
 
 class TestingConfig(DevelopmentConfig):

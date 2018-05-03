@@ -32,7 +32,7 @@ def sign_in(username, password):
     except requests.exceptions.HTTPError:
         if response.status_code == 401:
             oauth2_error = response.json().get('detail', '')
-            logger.exception('Authentication error in oauth2 service', error=oauth2_error)
+            logger.warning('Authentication error in oauth2 service', error=oauth2_error)
             raise OAuth2Error(response, message=oauth2_error)
         else:
             logger.exception('Failed to retrieve OAuth2 token')

@@ -1,4 +1,3 @@
-import json
 import logging
 
 from flask import redirect, render_template, request, url_for
@@ -7,7 +6,7 @@ from structlog import wrap_logger
 from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import case_controller, collection_instrument_controller
-from frontstage.exceptions.exceptions import ApiError, CiUploadError
+from frontstage.exceptions.exceptions import CiUploadError
 from frontstage.views.surveys import surveys_bp
 
 

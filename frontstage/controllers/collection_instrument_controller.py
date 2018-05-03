@@ -1,9 +1,7 @@
-from json import JSONDecodeError
 import logging
 
-from flask import current_app, request
+from flask import current_app
 import requests
-from requests.exceptions import HTTPError, RequestException
 from structlog import wrap_logger
 
 from frontstage.controllers import case_controller

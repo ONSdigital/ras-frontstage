@@ -5,7 +5,6 @@ from flask import current_app as app
 import requests
 from structlog import wrap_logger
 
-from frontstage.controllers import collection_instrument_controller
 from frontstage.exceptions.exceptions import ApiError, InvalidCaseCategory, NoSurveyPermission
 
 

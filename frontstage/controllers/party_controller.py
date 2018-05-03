@@ -18,7 +18,8 @@ def get_party_by_email(email):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.exception('Failed to retrieve party')
+        log_level = logger.warning if response.status_code == 404 else logger.exception
+        log_level('Failed to retrieve party')
         raise ApiError(response)
 
     logger.debug('Successfully retrieved party')

@@ -31,7 +31,7 @@ def check_account_valid(username):
     except requests.exceptions.HTTPError:
         if response.status_code == 401:
             oauth2_error = response.json().get('detail')
-            logger.exception('Authentication error in OAuth2 service', error=oauth2_error)
+            logger.warning('Authentication error in OAuth2 service', error=oauth2_error)
             raise OAuth2Error(response, message=oauth2_error)
         else:
             logger.exception('Failed to check if account is valid in OAuth2 service')

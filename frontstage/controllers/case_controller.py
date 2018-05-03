@@ -13,7 +13,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 def get_case_by_case_id(case_id):
     logger.debug('Retrieving case', case_id=case_id)
-    url = f"{app.config['CASE_SERVICE_URL']}/cases/{case_id}"
+    url = f"{app.config['CASE_URL']}/cases/{case_id}"
     response = requests.get(url, auth=app.config['BASIC_AUTH'])
 
     try:
@@ -28,7 +28,7 @@ def get_case_by_case_id(case_id):
 
 def get_case_categories():
     logger.debug('Retrieving case categories')
-    url = f"{app.config['CASE_SERVICE_URL']}/categories"
+    url = f"{app.config['CASE_URL']}/categories"
     response = requests.get(url, auth=app.config['BASIC_AUTH'])
 
     try:
@@ -52,7 +52,7 @@ def validate_case_category(category):
 def post_case_event(case_id, party_id, category, description):
     logger.debug('Posting case event', case_id=case_id)
     validate_case_category(category)
-    url = f"{app.config['CASE_SERVICE_URL']}/cases/{case_id}/events"
+    url = f"{app.config['CASE_URL']}/cases/{case_id}/events"
     message = {
         'description': description,
         'category': category,

@@ -70,9 +70,10 @@ class Config(object):
 
 
 class DevelopmentConfig(Config):
-    DEVELOPMENT = True
-    DEBUG = True
+    DEVELOPMENT = False
+    DEBUG = False
     TEMPLATES_AUTO_RELOAD = True
+    SECURE_COOKIES = False
     SECRET_KEY = os.getenv('SECRET_KEY', 'ONS_DUMMY_KEY')
     JWT_SECRET = os.getenv('JWT_SECRET', 'testsecret')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')

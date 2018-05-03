@@ -4,10 +4,10 @@ import unittest
 from frontstage import app
 
 token = 'test_token'
-url_get_token = f"{app.config['OAUTH_SERVICE_URL']}/api/v1/tokens/"
-url_password_change = f"{app.config['PARTY_SERVICE_URL']}/party-api/v1/respondents/change_password/{token}"
-url_reset_password_request = f"{app.config['PARTY_SERVICE_URL']}/party-api/v1/respondents/request_password_change"
-url_verify_token = f"{app.config['PARTY_SERVICE_URL']}/party-api/v1/tokens/verify/{token}"
+url_get_token = f"{app.config['OAUTH_URL']}/api/v1/tokens/"
+url_password_change = f"{app.config['PARTY_URL']}/party-api/v1/respondents/change_password/{token}"
+url_reset_password_request = f"{app.config['PARTY_URL']}/party-api/v1/respondents/request_password_change"
+url_verify_token = f"{app.config['PARTY_URL']}/party-api/v1/tokens/verify/{token}"
 
 
 class TestPasswords(unittest.TestCase):

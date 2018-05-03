@@ -13,7 +13,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 def check_account_valid(username):
     logger.debug('Attempting to check if account is valid in OAuth2 service')
 
-    url = f"{app.config['OAUTH_SERVICE_URL']}/api/v1/tokens/"
+    url = f"{app.config['OAUTH_URL']}/api/v1/tokens/"
     data = {
         'grant_type': 'reset_password',
         'client_id': app.config['OAUTH_CLIENT_ID'],

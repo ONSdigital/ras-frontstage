@@ -13,7 +13,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 def sign_in(username, password):
     logger.debug('Attempting to retrieve OAuth2 token for sign-in')
 
-    url = f"{app.config['OAUTH_SERVICE_URL']}/api/v1/tokens/"
+    url = f"{app.config['OAUTH_URL']}/api/v1/tokens/"
     data = {
         'grant_type': 'password',
         'client_id': app.config['OAUTH_CLIENT_ID'],

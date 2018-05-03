@@ -12,7 +12,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 def get_party_by_email(email):
     logger.debug('Retrieving party')
-    url = f"{app.config['PARTY_SERVICE_URL']}/party-api/v1/respondents/email"
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/email"
     response = requests.get(url, json={"email": email}, auth=app.config['BASIC_AUTH'])
 
     try:

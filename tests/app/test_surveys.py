@@ -6,7 +6,10 @@ from unittest.mock import patch
 import requests_mock
 
 from frontstage import app
-from tests.app.mocked_services import business_party, case, collection_exercise, collection_exercise_before_go_live, collection_instrument_seft, survey, url_get_case, url_get_collection_exercise, url_get_collection_exercise_go_live, url_get_business_party, url_get_survey, url_get_ci
+from tests.app.mocked_services import (business_party, case, collection_exercise,
+                                       collection_exercise_before_go_live, collection_instrument_seft,
+                                       survey, url_get_case, url_get_collection_exercise, url_get_collection_exercise_go_live,
+                                       url_get_business_party, url_get_survey, url_get_ci)
 
 
 url_get_surveys_list = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['SURVEYS_LIST']

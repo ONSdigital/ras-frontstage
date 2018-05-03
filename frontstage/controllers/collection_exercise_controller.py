@@ -13,7 +13,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 def get_collection_exercise(collection_exercise_id):
     logger.debug('Attempting to retrieve collection exercise', collection_exercise_id=collection_exercise_id)
     url = f"{app.config['COLLECTION_EXERCISE_SERVICE_URL']}/collectionexercises/{collection_exercise_id}"
-    
+
     response = requests.get(url, auth=app.config['BASIC_AUTH'])
 
     try:

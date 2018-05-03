@@ -38,7 +38,6 @@ def create_message(session):
                                form=form, errors=form.errors, message={})
 
 
-
 def send_message(party_id, case_id, survey, ru_ref):
     logger.info('Attempting to send message', party_id=party_id)
     form = SecureMessagingForm(request.form)

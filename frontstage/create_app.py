@@ -18,6 +18,7 @@ CACHE_HEADERS = {
     'Pragma': 'no-cache',
 }
 
+
 def create_app_object():
     app = Flask(__name__)
 

@@ -1,7 +1,6 @@
 import logging
-import json
 
-from flask import current_app as app, render_template, request
+from flask import render_template, request
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization

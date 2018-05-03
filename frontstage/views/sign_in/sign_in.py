@@ -5,10 +5,9 @@ from flask import make_response, render_template, redirect, request, url_for
 from structlog import wrap_logger
 
 from frontstage import app
-from frontstage.common.api_call import api_call
 from frontstage.common.session import SessionHandler
 from frontstage.controllers import oauth_controller, party_controller
-from frontstage.exceptions.exceptions import ApiError, OAuth2Error
+from frontstage.exceptions.exceptions import OAuth2Error
 from frontstage.jwt import encode, timestamp_token
 from frontstage.models import LoginForm
 from frontstage.views.sign_in import sign_in_bp

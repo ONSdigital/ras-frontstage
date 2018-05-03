@@ -4,7 +4,7 @@ from frontstage import app
 
 
 with open('tests/test_data/party/party.json') as json_data:
-	party = json.load(json_data)
+    party = json.load(json_data)
 
 
 url_oauth_token = f"{app.config['OAUTH_SERVICE_URL']}/api/v1/tokens/"

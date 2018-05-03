@@ -14,7 +14,7 @@ def get_collection_instrument(collection_instrument_id):
     logger.debug('Attempting to retrieve collection instrument',
                  collection_instrument_id=collection_instrument_id)
     url = f"{app.config['COLLECTION_INSTRUMENT_URL']}/collection-instrument-api/1.0.2/collectioninstrument/id/{collection_instrument_id}"
-    response = requests.get(url, auth=app.config['BASIC_AUTH'])
+    response = requests.get(url, auth=app.config['COLLECTION_INSTRUMENT_AUTH'])
 
     try:
         response.raise_for_status()

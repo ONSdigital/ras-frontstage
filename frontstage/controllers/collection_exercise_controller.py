@@ -14,7 +14,7 @@ def get_collection_exercise(collection_exercise_id):
     logger.debug('Attempting to retrieve collection exercise', collection_exercise_id=collection_exercise_id)
     url = f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/{collection_exercise_id}"
 
-    response = requests.get(url, auth=app.config['BASIC_AUTH'])
+    response = requests.get(url, auth=app.config['COLLECTION_EXERCISE_AUTH'])
 
     try:
         response.raise_for_status()
@@ -30,7 +30,7 @@ def get_collection_exercise_event(collection_exercise_id, tag):
     logger.debug('Retrieving collection exercise event', collection_exercise_id=collection_exercise_id, tag=tag)
     url = f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/{collection_exercise_id}/events/{tag}"
 
-    response = requests.get(url, auth=app.config['BASIC_AUTH'])
+    response = requests.get(url, auth=app.config['COLLECTION_EXERCISE_AUTH'])
 
     try:
         response.raise_for_status()

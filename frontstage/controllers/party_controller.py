@@ -15,7 +15,7 @@ def get_party_by_business_id(party_id, collection_exercise_id=None):
     url = f"{app.config['PARTY_URL']}/party-api/v1/businesses/id/{party_id}"
     if collection_exercise_id:
         url += f"?collection_exercise_id={collection_exercise_id}&verbose=True"
-    response = requests.get(url, auth=app.config['BASIC_AUTH'])
+    response = requests.get(url, auth=app.config['PARTY_AUTH'])
 
     try:
         response.raise_for_status()

@@ -1,7 +1,6 @@
-import json
 import logging
 
-from flask import current_app as app, redirect, render_template, request, url_for
+from flask import redirect, render_template, request, url_for
 from structlog import wrap_logger
 
 from frontstage.controllers import oauth_controller, party_controller

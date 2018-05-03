@@ -3,7 +3,6 @@ import logging
 from flask import redirect, render_template, request, url_for
 from structlog import wrap_logger
 
-from frontstage import app
 from frontstage.controllers import party_controller
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.models import ResetPasswordForm

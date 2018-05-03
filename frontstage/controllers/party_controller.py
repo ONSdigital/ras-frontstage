@@ -15,7 +15,7 @@ def change_password(password, token):
 
     data = {"new_password": password}
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/change_password/{token}"
-    response = requests.put(url, auth=app.config['BASIC_AUTH'], json=data)
+    response = requests.put(url, auth=app.config['PARTY_AUTH'], json=data)
 
     try:
         response.raise_for_status()
@@ -31,7 +31,7 @@ def reset_password_request(username):
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/request_password_change"
     data = {"email_address": username}
-    response = requests.post(url, auth=app.config['BASIC_AUTH'], json=data)
+    response = requests.post(url, auth=app.config['PARTY_AUTH'], json=data)
 
     try:
         response.raise_for_status()
@@ -46,7 +46,7 @@ def verify_token(token):
     logger.debug('Attempting to verify token with party service')
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/tokens/verify/{token}"
-    response = requests.get(url, auth=app.config['BASIC_AUTH'])
+    response = requests.get(url, auth=app.config['PARTY_AUTH'])
 
     try:
         response.raise_for_status()

@@ -70,10 +70,10 @@ class Config(object):
 
 
 class DevelopmentConfig(Config):
-    DEVELOPMENT = False
-    DEBUG = False
-    TEMPLATES_AUTO_RELOAD = True
-    SECURE_COOKIES = False
+    DEVELOPMENT = parse_boolean(os.getenv('DEVELOPMENT', 'False'))
+    DEBUG = parse_boolean(os.getenv('DEBUG', 'False'))
+    TEMPLATES_AUTO_RELOAD = parse_boolean(os.getenv('TEMPLATES_AUTO_RELOAD', 'True'))
+    SECURE_COOKIES = parse_boolean(os.getenv('SECURE_COOKIES', 'False'))
     SECRET_KEY = os.getenv('SECRET_KEY', 'ONS_DUMMY_KEY')
     JWT_SECRET = os.getenv('JWT_SECRET', 'testsecret')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')

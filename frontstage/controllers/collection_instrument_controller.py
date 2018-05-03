@@ -24,13 +24,14 @@ def upload_collection_instrument(upload_file, case_id, party_id):
                                     description=f'Survey response for case {case_id} uploaded by {party_id}')
 
     if response.status_code == 400:
-        logger.exception('Invalid file uploaded', case_id=case_id, party_id=party_id)
+        logger.warning('Invalid file uploaded', case_id=case_id, party_id=party_id)
         raise CiUploadError(response, message=response.text)
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.exception('Failed to upload collection instrument', case_id=case_id, party_id=party_id)
+        log_level = logger.warning if response.status_code == 404 else logger.exception
+        log_level('Failed to upload collection instrument', case_id=case_id, party_id=party_id)
         raise ApiError(response)
 
     logger.debug('Successfully uploaded collection instrument', case_id=case_id, party_id=party_id)
@@ -51,7 +52,8 @@ def download_collection_instrument(collection_instrument_id, case_id, party_id):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.exception('Failed to download collection instrument', collection_instrument_id=collection_instrument_id, party_id=party_id)
+        log_level = logger.warning if response.status_code == 404 else logger.exception
+        log_level('Failed to download collection instrument', collection_instrument_id=collection_instrument_id, party_id=party_id)
         raise ApiError(response)
 
     logger.debug('Successfully downloaded collection instrument', collection_instrument_id=collection_instrument_id, party_id=party_id)

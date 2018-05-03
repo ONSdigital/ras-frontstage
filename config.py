@@ -70,8 +70,8 @@ class Config(object):
 
 
 class DevelopmentConfig(Config):
-    DEVELOPMENT = parse_boolean(os.getenv('DEVELOPMENT', 'False'))
-    DEBUG = parse_boolean(os.getenv('DEBUG', 'False'))
+    DEVELOPMENT = parse_boolean(os.getenv('DEVELOPMENT', 'True'))
+    DEBUG = parse_boolean(os.getenv('DEBUG', 'True'))
     TEMPLATES_AUTO_RELOAD = parse_boolean(os.getenv('TEMPLATES_AUTO_RELOAD', 'True'))
     SECURE_COOKIES = parse_boolean(os.getenv('SECURE_COOKIES', 'False'))
     SECRET_KEY = os.getenv('SECRET_KEY', 'ONS_DUMMY_KEY')

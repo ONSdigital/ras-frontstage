@@ -20,7 +20,8 @@ def change_password(password, token):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.exception('Failed to send change password request to party service')
+        log_level = logger.warning if response.status_code == 404 else logger.exception
+        log_level('Failed to send change password request to party service', token=token)
         raise ApiError(response)
 
     logger.debug('Successfully changed password through the party service')
@@ -36,7 +37,8 @@ def reset_password_request(username):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.exception('Failed to send reset password request to party service')
+        log_level = logger.warning if response.status_code == 404 else logger.exception
+        log_level('Failed to send reset password request to party service')
         raise ApiError(response)
 
     logger.debug('Successfully sent reset password request to party service')
@@ -51,7 +53,8 @@ def verify_token(token):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.exception('Failed to verify token')
+        log_level = logger.warning if response.status_code == 404 else logger.exception
+        log_level('Failed to verify token', token=token)
         raise ApiError(response)
 
     logger.debug('Successfully verified token')

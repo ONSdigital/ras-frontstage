@@ -14,9 +14,6 @@ class Config(object):
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
-    OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID')
-    OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET')
-    OAUTH_BASIC_AUTH = (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET)
     JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
     JWT_SECRET = os.getenv('JWT_SECRET')
     VALIDATE_JWT = os.environ.get('VALIDATE_JWT', True)
@@ -34,7 +31,14 @@ class Config(object):
     PASSWORD_MAX_LENGTH = 160
 
     OAUTH_URL = os.getenv('OAUTH_URL')
+    OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID')
+    OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET')
+    OAUTH_BASIC_AUTH = (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET)
+
     PARTY_URL = os.getenv('PARTY_URL')
+    PARTY_USERNAME = os.getenv('PARTY_USERNAME')
+    PARTY_PASSWORD = os.getenv('PARTY_PASSWORD')
+    PARTY_AUTH = (PARTY_USERNAME, PARTY_PASSWORD)
 
     RAS_FRONTSTAGE_API_HOST = os.getenv('RAS_FRONTSTAGE_API_HOST', 'localhost')
     RAS_FRONTSTAGE_API_PORT = os.getenv('RAS_FRONTSTAGE_API_PORT', 8083)
@@ -78,11 +82,16 @@ class DevelopmentConfig(Config):
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
-    OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID', 'ons@ons.gov')
-    OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET', 'password')
-    OAUTH_BASIC_AUTH = (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET)
+
     OAUTH_URL = os.getenv('OAUTH_URL', 'http://localhost:8040')
+    OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID', 'admin')
+    OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET', 'secret')
+    OAUTH_BASIC_AUTH = (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET)
+
     PARTY_URL = os.getenv('PARTY_URL', 'http://localhost:8081')
+    PARTY_USERNAME = os.getenv('PARTY_USERNAME', 'admin')
+    PARTY_PASSWORD = os.getenv('PARTY_PASSWORD', 'secret')
+    PARTY_AUTH = (PARTY_USERNAME, PARTY_PASSWORD)
 
 
 class TestingConfig(DevelopmentConfig):

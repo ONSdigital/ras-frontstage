@@ -8,6 +8,7 @@ from structlog import wrap_logger
 from frontstage import app
 from frontstage.common.api_call import api_call
 from frontstage.common.session import SessionHandler
+from frontstage.controllers import party_controller
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.jwt import encode, timestamp_token
 from frontstage.models import LoginForm
@@ -34,6 +35,12 @@ def login():
             "username": username,
             "password": password
         }
+
+        respondent = party_controller.get_respondent_by_email(username)
+        if respondent == 'Respondent not found' or respondent['status'] != 'ACTIVE':
+            logger.debug("Respondent not able to sign in")
+            return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
+
         response = api_call('POST', app.config['SIGN_IN_URL'], json=sign_in_data)
 
         # Handle OAuth2 authentication errors
@@ -42,13 +49,6 @@ def login():
             error_message = error_json.get('data', {}).get('detail')
             if 'Unauthorized user credentials' in error_message:
                 return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
-            elif 'User account locked' in error_message:
-                logger.debug('User account is locked on the OAuth2 server')
-                return render_template('sign-in/sign-in.trouble.html', form=form, data={"error": {"type": "account locked"}})
-            elif 'User account not verified' in error_message:
-                logger.debug('User account is not verified on the OAuth2 server')
-                return render_template('sign-in/sign-in.account-not-verified.html', form=form,
-                                       data={"error": {"type": "account not verified"}})
             else:
                 logger.error('OAuth 2 server generated 401 which is not understood',
                              oauth2error=error_message)

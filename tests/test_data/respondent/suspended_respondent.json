@@ -1,0 +1,23 @@
+{
+  "associations": [
+    {
+      "businessRespondentStatus": "ACTIVE",
+      "enrolments": [
+        {
+          "enrolmentStatus": "ENABLED",
+          "name": "Monthly Survey of Building Materials Bricks",
+          "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54"
+        }
+      ],
+      "partyId": "0729a886-82ff-4358-8664-546c7d42f774",
+      "sampleUnitRef": "49900000001"
+    }
+  ],
+  "emailAddress": "Jacky.Turner@email.com",
+  "firstName": "Jacky",
+  "id": "2e73f1c2-5ca0-473f-8d46-a358c3c3ee52",
+  "lastName": "Turner",
+  "sampleUnitType": "BI",
+  "status": "SUSPENDED",
+  "telephone": "0987654321"
+}

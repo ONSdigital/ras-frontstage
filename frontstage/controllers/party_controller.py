@@ -12,7 +12,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 def get_party_by_business_id(party_id, collection_exercise_id=None):
     logger.debug('Attempting to retrieve party by business', party_id=party_id)
-    url = f"{app.config['PARTY_SERVICE_URL']}/party-api/v1/businesses/id/{party_id}"
+    url = f"{app.config['PARTY_URL']}/party-api/v1/businesses/id/{party_id}"
     if collection_exercise_id:
         url += f"?collection_exercise_id={collection_exercise_id}&verbose=True"
     response = requests.get(url, auth=app.config['BASIC_AUTH'])

@@ -13,7 +13,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 def get_collection_instrument(collection_instrument_id):
     logger.debug('Attempting to retrieve collection instrument',
                  collection_instrument_id=collection_instrument_id)
-    url = f"{app.config['COLLECTION_INSTRUMENT_SERVICE_URL']}/collection-instrument-api/1.0.2/collectioninstrument/id/{collection_instrument_id}"
+    url = f"{app.config['COLLECTION_INSTRUMENT_URL']}/collection-instrument-api/1.0.2/collectioninstrument/id/{collection_instrument_id}"
     response = requests.get(url, auth=app.config['BASIC_AUTH'])
 
     try:

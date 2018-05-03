@@ -30,12 +30,12 @@ class Config(object):
     PASSWORD_MIN_LENGTH = 8
     PASSWORD_MAX_LENGTH = 160
 
-    CASE_SERVICE_URL = os.getenv('CASE_SERVICE_URL')
-    COLLECTION_EXERCISE_SERVICE_URL = os.getenv('COLLECTION_EXERCISE_SERVICE_URL')
-    COLLECTION_INSTRUMENT_SERVICE_URL = os.getenv('COLLECTION_INSTRUMENT_SERVICE_URL')
-    PARTY_SERVICE_URL = os.getenv('PARTY_SERVICE_URL')
-    SECURE_MESSAGE_SERVICE_URL = os.getenv('SECURE_MESSAGE_SERVICE_URL')
-    SURVEY_SERVICE_URL = os.getenv('SURVEY_SERVICE_URL')
+    CASE_URL = os.getenv('CASE_URL')
+    COLLECTION_EXERCISE_URL = os.getenv('COLLECTION_EXERCISE_URL')
+    COLLECTION_INSTRUMENT_URL = os.getenv('COLLECTION_INSTRUMENT_URL')
+    PARTY_URL = os.getenv('PARTY_URL')
+    SECURE_MESSAGE_URL = os.getenv('SECURE_MESSAGE_URL')
+    SURVEY_URL = os.getenv('SURVEY_URL')
 
     RAS_FRONTSTAGE_API_HOST = os.getenv('RAS_FRONTSTAGE_API_HOST', 'localhost')
     RAS_FRONTSTAGE_API_PORT = os.getenv('RAS_FRONTSTAGE_API_PORT', 8083)
@@ -81,12 +81,12 @@ class DevelopmentConfig(Config):
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
-    CASE_SERVICE_URL = os.getenv('CASE_SERVICE_URL', 'http://localhost:8171')
-    COLLECTION_EXERCISE_SERVICE_URL = os.getenv('COLLECTION_EXERCISE_SERVICE_URL', 'http://localhost:8145')
-    COLLECTION_INSTRUMENT_SERVICE_URL = os.getenv('COLLECTION_INSTRUMENT_SERVICE_URL', 'http://localhost:8002')
-    PARTY_SERVICE_URL = os.getenv('PARTY_SERVICE_URL', 'http://localhost:8081')
-    SECURE_MESSAGE_SERVICE_URL = os.getenv('SECURE_MESSAGE_SERVICE_URL', 'http://localhost:5050')
-    SURVEY_SERVICE_URL = os.getenv('SURVEY_SERVICE_URL', 'http://localhost:8080')
+    CASE_URL = os.getenv('CASE_URL', 'http://localhost:8171')
+    COLLECTION_EXERCISE_URL = os.getenv('COLLECTION_EXERCISE_URL', 'http://localhost:8145')
+    COLLECTION_INSTRUMENT_URL = os.getenv('COLLECTION_INSTRUMENT_URL', 'http://localhost:8002')
+    PARTY_URL = os.getenv('PARTY_URL', 'http://localhost:8081')
+    SECURE_MESSAGE_URL = os.getenv('SECURE_MESSAGE_URL', 'http://localhost:5050')
+    SURVEY_URL = os.getenv('SURVEY_URL', 'http://localhost:8080')
 
 
 class TestingConfig(DevelopmentConfig):

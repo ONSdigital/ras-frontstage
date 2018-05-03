@@ -12,7 +12,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 def get_survey(survey_id):
     logger.debug('Attempting to retrieve survey', survey_id=survey_id)
-    url = f"{app.config['SURVEY_SERVICE_URL']}/surveys/{survey_id}"
+    url = f"{app.config['SURVEY_URL']}/surveys/{survey_id}"
     response = requests.get(url, auth=app.config['BASIC_AUTH'])
 
     try:

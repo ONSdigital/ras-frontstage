@@ -19,7 +19,8 @@ def get_collection_instrument(collection_instrument_id):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.exception('Failed to get collection instrument', collection_instrument_id=collection_instrument_id)
+        log_level = logger.warning if response.status_code == 404 else logger.exception
+        log_level('Failed to get collection instrument', collection_instrument_id=collection_instrument_id)
         raise ApiError(response)
 
     logger.debug('Successfully retrieved collection instrument',

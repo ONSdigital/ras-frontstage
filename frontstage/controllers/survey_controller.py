@@ -18,7 +18,8 @@ def get_survey(survey_id):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.exception('Failed to retrieve survey', survey_id=survey_id)
+        log_level = logger.warning if response.status_code == 404 else logger.exception
+        log_level('Failed to retrieve survey', survey_id=survey_id)
         raise ApiError(response)
 
     logger.debug('Successfully retrieved survey', survey_id=survey_id)

@@ -33,7 +33,6 @@ class TestSignIn(unittest.TestCase):
             "token_type": "Bearer",
             "scope": "",
             "refresh_token": "b7ac07a6-4c28-43bd-a335-00250b490e9f",
-            "party_id": "test-id"
         }
         self.expired_oauth_token = {
             "id": 1,

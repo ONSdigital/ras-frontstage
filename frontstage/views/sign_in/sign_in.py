@@ -60,18 +60,18 @@ def login():
 
         # Take our raw token and add a UTC timestamp to the expires_at attribute
         response_json = json.loads(response.text)
-        data_dict_for_jwt_token = timestamp_token(response_json)
+        data_dict_for_jwt_token = timestamp_token(response_json, respondent)
         encoded_jwt_token = encode(data_dict_for_jwt_token)
         response = make_response(redirect(url_for('surveys_bp.logged_in', _external=True,
                                                   _scheme=getenv('SCHEME', 'http'))))
 
         session = SessionHandler()
-        logger.info('Creating session', party_id=response_json['party_id'])
+        logger.info('Creating session', party_id=respondent['id'])
         session.create_session(encoded_jwt_token)
         response.set_cookie('authorization',
                             value=session.session_key,
                             expires=data_dict_for_jwt_token['expires_at'])
-        logger.info('Successfully created session', party_id=response_json['party_id'],
+        logger.info('Successfully created session', party_id=respondent['id'],
                     session_key=session.session_key)
         return response
 

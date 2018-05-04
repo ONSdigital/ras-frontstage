@@ -8,4 +8,4 @@ with open('tests/test_data/party/party.json') as json_data:
 
 
 url_oauth_token = f"{app.config['OAUTH_URL']}/api/v1/tokens/"
-url_get_party_email = f"{app.config['PARTY_URL']}/party-api/v1/respondents/email"
+url_get_respondent_email = f"{app.config['PARTY_URL']}/party-api/v1/respondents/email"

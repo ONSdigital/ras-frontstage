@@ -84,8 +84,8 @@ class DevelopmentConfig(Config):
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
 
     OAUTH_URL = os.getenv('OAUTH_URL', 'http://localhost:8040')
-    OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID', 'admin')
-    OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET', 'secret')
+    OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID', 'ons@ons.gov')
+    OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET', 'password')
     OAUTH_BASIC_AUTH = (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET)
 
     PARTY_URL = os.getenv('PARTY_URL', 'http://localhost:8081')

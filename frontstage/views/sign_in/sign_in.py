@@ -34,6 +34,12 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
 
+        party_json = party_controller.get_party_by_email(username)
+        if not party_json or 'id' not in party_json:
+            logger.debug('Respondent not able to sign in as don\'t have an active account in the system.')
+            return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
+        party_id = party_json['id']
+
         try:
             oauth2_token = oauth_controller.sign_in(username, password)
         except OAuth2Error as exc:
@@ -49,8 +55,6 @@ def login():
                              oauth2error=error_message)
                 return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
 
-        # NB: currently not handling a failed response from the party service
-        party_id = party_controller.get_party_by_email(username).get('id')
         # Take our raw token and add a UTC timestamp to the expires_at attribute
         data_dict = {**oauth2_token, 'party_id': party_id}
         data_dict_for_jwt_token = timestamp_token(data_dict)

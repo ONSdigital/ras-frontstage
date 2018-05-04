@@ -45,6 +45,11 @@ class Config(object):
                                                         RAS_SECURE_MESSAGE_SERVICE_HOST,
                                                         RAS_SECURE_MESSAGE_SERVICE_PORT)
 
+    PARTY_URL = os.getenv('PARTY_URL')
+    PARTY_USERNAME = os.getenv('PARTY_USERNAME')
+    PARTY_PASSWORD = os.getenv('PARTY_PASSWORD')
+    PARTY_AUTH = (PARTY_USERNAME, PARTY_PASSWORD)
+
     SIGN_IN_URL = 'sign-in'
 
     REQUEST_PASSWORD_CHANGE = 'passwords/request-password-change'
@@ -74,6 +79,11 @@ class DevelopmentConfig(Config):
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
+
+    PARTY_URL = os.getenv('PARTY_URL', 'http://localhost:8081')
+    PARTY_USERNAME = os.getenv('PARTY_USERNAME', 'admin')
+    PARTY_PASSWORD = os.getenv('PARTY_PASSWORD', 'secret')
+    PARTY_AUTH = (PARTY_USERNAME, PARTY_PASSWORD)
 
 
 class TestingConfig(DevelopmentConfig):

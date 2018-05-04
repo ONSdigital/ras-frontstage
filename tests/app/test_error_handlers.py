@@ -1,3 +1,4 @@
+import json
 import unittest
 from unittest.mock import MagicMock
 
@@ -9,6 +10,10 @@ from frontstage.exceptions.exceptions import ApiError, JWTValidationError
 
 
 url_oauth = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['SIGN_IN_URL']
+get_respondent_by_email_url = app.config['PARTY_URL'] + '/party-api/v1/respondents/email'
+
+with open('tests/test_data/respondent/respondent.json') as json_data:
+    respondent_data = json.load(json_data)
 
 
 class TestErrorHandlers(unittest.TestCase):
@@ -30,6 +35,7 @@ class TestErrorHandlers(unittest.TestCase):
     # Use bad data to raise an uncaught exception
     @requests_mock.mock()
     def test_server_error(self, mock_request):
+        mock_request.get(get_respondent_by_email_url, status_code=200, json=respondent_data)
         mock_request.post(url_oauth, status_code=200)
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
@@ -40,6 +46,7 @@ class TestErrorHandlers(unittest.TestCase):
     @requests_mock.mock()
     def test_api_error(self, mock_request):
         response_mock = MagicMock()
+        mock_request.get(get_respondent_by_email_url, status_code=200, json=respondent_data)
         mock_request.post(url_oauth, exc=ApiError(response_mock))
 
         response = self.app.post('sign-in', data=self.sign_in_form, follow_redirects=True)
@@ -50,6 +57,7 @@ class TestErrorHandlers(unittest.TestCase):
     @requests_mock.mock()
     def test_connection_error(self, mock_request):
         mock_exception_request = MagicMock()
+        mock_request.get(get_respondent_by_email_url, status_code=200, json=respondent_data)
         mock_request.post(url_oauth, exc=ConnectionError(request=mock_exception_request))
 
         response = self.app.post('sign-in', data=self.sign_in_form, follow_redirects=True)
@@ -59,6 +67,7 @@ class TestErrorHandlers(unittest.TestCase):
 
     @requests_mock.mock()
     def test_jwt_validation_error(self, mock_request):
+        mock_request.get(get_respondent_by_email_url, status_code=200, json=respondent_data)
         mock_request.post(url_oauth, exc=JWTValidationError)
 
         response = self.app.post('sign-in', data=self.sign_in_form, follow_redirects=True)

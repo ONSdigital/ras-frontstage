@@ -18,7 +18,7 @@ class TestApiCall(unittest.TestCase):
     def test_api_call_get_success(self, mock_request):
         mock_request.get(self.test_url, status_code=200)
 
-        response = api_call('GET', 'test_endpoint')
+        response = api_call('GET', '/test_endpoint')
 
         self.assertEqual(response.status_code, 200)
 
@@ -26,7 +26,7 @@ class TestApiCall(unittest.TestCase):
     def test_api_call_post_success(self, mock_request):
         mock_request.post(self.test_url, status_code=200)
 
-        response = api_call('POST', 'test_endpoint')
+        response = api_call('POST', '/test_endpoint')
 
         self.assertEqual(response.status_code, 200)
 
@@ -34,18 +34,18 @@ class TestApiCall(unittest.TestCase):
     def test_api_call_put_success(self, mock_request):
         mock_request.put(self.test_url, status_code=200)
 
-        response = api_call('PUT', 'test_endpoint')
+        response = api_call('PUT', '/test_endpoint')
 
         self.assertEqual(response.status_code, 200)
 
     def test_api_call_invalid_method(self):
         with self.assertRaises(InvalidRequestMethod):
-            api_call('GOT', 'test_endpoint')
+            api_call('GOT', '/test_endpoint')
 
     @requests_mock.mock()
     def test_api_call_get_success_with_params(self, mock_request):
         mock_request.get(self.test_url_with_params, status_code=200)
 
-        response = api_call('GET', 'test_endpoint', {"param": "param"})
+        response = api_call('GET', '/test_endpoint', {"param": "param"})
 
         self.assertEqual(response.status_code, 200)

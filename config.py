@@ -30,39 +30,35 @@ class Config(object):
     PASSWORD_MIN_LENGTH = 8
     PASSWORD_MAX_LENGTH = 160
 
-    RAS_FRONTSTAGE_API_HOST = os.getenv('RAS_FRONTSTAGE_API_HOST', 'localhost')
-    RAS_FRONTSTAGE_API_PORT = os.getenv('RAS_FRONTSTAGE_API_PORT', 8083)
-    RAS_FRONTSTAGE_API_PROTOCOL = os.getenv('RAS_FRONTSTAGE_API_PROTOCOL', 'http')
-    RAS_FRONTSTAGE_API_SERVICE = '{}://{}:{}/'.format(RAS_FRONTSTAGE_API_PROTOCOL,
-                                                      RAS_FRONTSTAGE_API_HOST,
-                                                      RAS_FRONTSTAGE_API_PORT)
+    CASE_URL = os.getenv('CASE_URL')
+    CASE_USERNAME = os.getenv('CASE_USERNAME')
+    CASE_PASSWORD = os.getenv('CASE_PASSWORD')
+    CASE_AUTH = (CASE_USERNAME, CASE_PASSWORD)
 
-    RAS_SECURE_MESSAGE_SERVICE_PROTOCOL = os.getenv('RAS_SECURE_MESSAGE_SERVICE_PROTOCOL', 'http')
-    RAS_SECURE_MESSAGE_SERVICE_HOST = os.getenv('RAS_SECURE_MESSAGE_SERVICE_HOST', 'localhost')
-    RAS_SECURE_MESSAGE_SERVICE_PORT = os.getenv('RAS_SECURE_MESSAGE_SERVICE_PORT', 5050)
+    COLLECTION_INSTRUMENT_URL = os.getenv('COLLECTION_INSTRUMENT_URL')
+    COLLECTION_INSTRUMENT_USERNAME = os.getenv('COLLECTION_INSTRUMENT_USERNAME')
+    COLLECTION_INSTRUMENT_PASSWORD = os.getenv('COLLECTION_INSTRUMENT_PASSWORD')
+    COLLECTION_INSTRUMENT_AUTH = (COLLECTION_INSTRUMENT_USERNAME, COLLECTION_INSTRUMENT_PASSWORD)
 
-    RAS_SECURE_MESSAGING_SERVICE = '{}://{}:{}/'.format(RAS_SECURE_MESSAGE_SERVICE_PROTOCOL,
-                                                        RAS_SECURE_MESSAGE_SERVICE_HOST,
-                                                        RAS_SECURE_MESSAGE_SERVICE_PORT)
+    FRONTSTAGE_API_URL = os.getenv('FRONTSTAGE_API_URL')
+    SECURE_MESSAGE_URL = os.getenv('SECURE_MESSAGE_URL')
 
-    SIGN_IN_URL = 'sign-in'
+    SIGN_IN_URL = '/sign-in'
 
-    REQUEST_PASSWORD_CHANGE = 'passwords/request-password-change'
-    VERIFY_PASSWORD_TOKEN = 'passwords/verify-password-token'
-    CHANGE_PASSWORD = 'passwords/change-password'
+    REQUEST_PASSWORD_CHANGE = '/passwords/request-password-change'
+    VERIFY_PASSWORD_TOKEN = '/passwords/verify-password-token'
+    CHANGE_PASSWORD = '/passwords/change-password'
 
-    VALIDATE_ENROLMENT = 'register/validate-enrolment'
-    CONFIRM_ORGANISATION_SURVEY = 'register/confirm-organisation-survey'
-    CREATE_ACCOUNT = 'register/create-account'
-    VERIFY_EMAIL = 'register/verify-email'
+    VALIDATE_ENROLMENT = '/register/validate-enrolment'
+    CONFIRM_ORGANISATION_SURVEY = '/register/confirm-organisation-survey'
+    CREATE_ACCOUNT = '/register/create-account'
+    VERIFY_EMAIL = '/register/verify-email'
 
-    SURVEYS_LIST = 'surveys/surveys-list'
-    ACCESS_CASE = 'surveys/access-case'
-    DOWNLOAD_CI = 'surveys/download-ci'
-    UPLOAD_CI = 'surveys/upload-ci'
-    ADD_SURVEY = 'surveys/add-survey'
-    CONFIRM_ADD_ORGANISATION_SURVEY = 'surveys/add-survey/confirm-add-organisation-survey'
-    GENERATE_EQ_URL = 'surveys/generate-eq-url'
+    SURVEYS_LIST = '/surveys/surveys-list'
+    ACCESS_CASE = '/surveys/access-case'
+    ADD_SURVEY = '/surveys/add-survey'
+    CONFIRM_ADD_ORGANISATION_SURVEY = '/surveys/add-survey/confirm-add-organisation-survey'
+    GENERATE_EQ_URL = '/surveys/generate-eq-url'
 
 
 class DevelopmentConfig(Config):
@@ -74,6 +70,19 @@ class DevelopmentConfig(Config):
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
+
+    CASE_URL = os.getenv('CASE_URL', 'http://localhost:8171')
+    CASE_USERNAME = os.getenv('CASE_USERNAME', 'admin')
+    CASE_PASSWORD = os.getenv('CASE_PASSWORD', 'secret')
+    CASE_AUTH = (CASE_USERNAME, CASE_PASSWORD)
+
+    COLLECTION_INSTRUMENT_URL = os.getenv('COLLECTION_INSTRUMENT_URL', 'http://localhost:8002')
+    COLLECTION_INSTRUMENT_USERNAME = os.getenv('COLLECTION_INSTRUMENT_USERNAME', 'admin')
+    COLLECTION_INSTRUMENT_PASSWORD = os.getenv('COLLECTION_INSTRUMENT_PASSWORD', 'secret')
+    COLLECTION_INSTRUMENT_AUTH = (COLLECTION_INSTRUMENT_USERNAME, COLLECTION_INSTRUMENT_PASSWORD)
+
+    FRONTSTAGE_API_URL = os.getenv('FRONTSTAGE_API_URL', 'http://localhost:8083')
+    SECURE_MESSAGE_URL = os.getenv('SECURE_MESSAGE_URL', 'http://localhost:5050')
 
 
 class TestingConfig(DevelopmentConfig):

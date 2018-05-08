@@ -1,16 +1,12 @@
 [[source]]
-
 name = "pypi"
 verify_ssl = true
 url = "https://pypi.python.org/simple"
 
 [requires]
-
 python_version = "3.6"
 
-
 [packages]
-
 cfenv = "==0.5.3"
 flask = "==0.12"
 flask-wtf = "==0.14.2"
@@ -22,9 +18,7 @@ redis = "==2.10.6"
 requests = "*"
 structlog = "==17.2.0"
 
-
 [dev-packages]
-
 codecov = "*"
 coverage = "*"
 oauthlib = "==2.0.2"

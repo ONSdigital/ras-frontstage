@@ -3,20 +3,22 @@ import json
 import unittest
 from unittest.mock import patch
 
+import flask
+import requests
 import requests_mock
 
 from frontstage import app
+from tests.app.mocked_services import case, categories, url_get_case, url_get_case_categories, \
+    url_upload_ci, url_post_case_event_uuid, url_download_ci
 
+url_get_surveys_list = app.config['FRONTSTAGE_API_URL'] + app.config['SURVEYS_LIST']
+url_access_case = app.config['FRONTSTAGE_API_URL'] + app.config['ACCESS_CASE']
+url_generate_eq_url = app.config['FRONTSTAGE_API_URL'] + app.config['GENERATE_EQ_URL']
+url_validate_enrolment = app.config["FRONTSTAGE_API_URL"] + app.config["VALIDATE_ENROLMENT"]
+url_add_survey = app.config['FRONTSTAGE_API_URL'] + app.config['ADD_SURVEY']
+url_confirm_add_organisation_survey = app.config["FRONTSTAGE_API_URL"] + app.config["CONFIRM_ADD_ORGANISATION_SURVEY"]
 
-url_get_surveys_list = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['SURVEYS_LIST']
-url_access_case = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['ACCESS_CASE']
-url_generate_eq_url = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['GENERATE_EQ_URL']
-url_download_ci = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['DOWNLOAD_CI']
-url_upload_ci = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['UPLOAD_CI']
-url_validate_enrolment = '{}{}'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'], app.config['VALIDATE_ENROLMENT'])
-url_add_survey = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['ADD_SURVEY']
-url_confirm_add_organisation_survey = '{}{}'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'],
-                                                    app.config['CONFIRM_ADD_ORGANISATION_SURVEY'])
+case_id = 'abc670a5-67c6-4d96-9164-13b4017b8704'
 
 with open('tests/test_data/surveys_list_seft.json') as json_data:
     surveys_list_seft = json.load(json_data)
@@ -151,36 +153,71 @@ class TestSurveys(unittest.TestCase):
 
     @requests_mock.mock()
     def test_download_survey(self, mock_request):
+        mock_request.get(url_get_case, json=case)
         mock_request.get(url_download_ci)
+        mock_request.get(url_get_case_categories, json=categories)
+        mock_request.post(url_post_case_event_uuid, status_code=201)
 
-        response = self.app.get('/surveys/download_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5', follow_redirects=True)
+        response = self.app.get(f'/surveys/download_survey?case_id={case_id}', follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
 
     @requests_mock.mock()
+    def test_download_survey_connection_error(self, mock_request):
+        mock_request.get(url_get_case, json=case)
+        mock_request.get(url_get_case_categories, json=categories)
+        mock_request.post(url_post_case_event_uuid, status_code=201)
+        mock_request.get(url_download_ci, exc=requests.exceptions.ConnectionError(request=flask.request))
+
+        response = self.app.get(f'/surveys/download_survey?case_id={case_id}', follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+
+    @requests_mock.mock()
+    def test_download_survey_not_found(self, mock_request):
+        mock_request.get(url_get_case, json=case)
+        mock_request.get(url_get_case_categories, json=categories)
+        mock_request.post(url_post_case_event_uuid, status_code=201)
+        mock_request.get(url_download_ci, status_code=404)
+
+        response = self.app.get(f'/surveys/download_survey?case_id={case_id}', follow_redirects=True)
+
+        # NB: a non-200 response from a service will result in a 500 page displayed
+        self.assertEqual(response.status_code, 500)
+
+    @requests_mock.mock()
     def test_download_survey_fail(self, mock_request):
+        mock_request.get(url_get_case, json=case)
+        mock_request.get(url_get_case_categories, json=categories)
+        mock_request.post(url_post_case_event_uuid, status_code=201)
         mock_request.get(url_download_ci, status_code=500)
 
-        response = self.app.get('/surveys/download_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5', follow_redirects=True)
+        response = self.app.get(f'/surveys/download_survey?case_id={case_id}', follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
 
     @requests_mock.mock()
     def test_upload_survey(self, mock_request):
+        mock_request.get(url_get_case, json=case)
         mock_request.post(url_upload_ci)
+        mock_request.get(url_get_case_categories, json=categories)
+        mock_request.post(url_post_case_event_uuid, status_code=201)
 
-        test_url = '/surveys/upload_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5'
+        test_url = f'/surveys/upload_survey?case_id={case_id}'
         response = self.app.post(test_url, data=self.survey_file, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
 
     @requests_mock.mock()
     def test_upload_survey_type_error(self, mock_request):
+        mock_request.get(url_get_case, json=case)
+        mock_request.get(url_get_case_categories, json=categories)
+        mock_request.post(url_post_case_event_uuid, status_code=201)
         mock_request.post(url_upload_ci, status_code=400, json=self.upload_error)
         mock_request.get(url_access_case, status_code=200, json=surveys_list_seft[1])
 
-        test_url = '/surveys/upload_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5&survey_name=Survey+Name'
+        test_url = f'/surveys/upload_survey?case_id={case_id}&survey_name=Survey+Name'
         response = self.app.post(test_url, data=self.survey_file, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -190,10 +227,13 @@ class TestSurveys(unittest.TestCase):
     @requests_mock.mock()
     def test_upload_survey_name_length_error(self, mock_request):
         self.upload_error['error']['data']['message'] = '50 characters'
+        mock_request.get(url_get_case, json=case)
+        mock_request.get(url_get_case_categories, json=categories)
+        mock_request.post(url_post_case_event_uuid, status_code=201)
         mock_request.post(url_upload_ci, status_code=400, json=self.upload_error)
         mock_request.get(url_access_case, status_code=200, json=surveys_list_seft[1])
 
-        test_url = '/surveys/upload_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5&survey_name=Survey+Name'
+        test_url = f'/surveys/upload_survey?case_id={case_id}&survey_name=Survey+Name'
         response = self.app.post(test_url, data=self.survey_file, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -205,7 +245,7 @@ class TestSurveys(unittest.TestCase):
         file_data = 'a' * 21 * 1024 * 1024
         over_size_file = dict(file=(io.BytesIO(file_data.encode()), "testfile.xlsx"))
         mock_request.get(url_access_case, status_code=200, json=surveys_list_seft[1])
-        test_url = '/surveys/upload_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5&survey_name=Survey+Name'
+        test_url = f'/surveys/upload_survey?case_id={case_id}&survey_name=Survey+Name'
         response = self.app.post(test_url, data=over_size_file, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -215,10 +255,13 @@ class TestSurveys(unittest.TestCase):
     @requests_mock.mock()
     def test_upload_survey_file_size_error_external(self, mock_request):
         self.upload_error['error']['data']['message'] = 'File too large'
+        mock_request.get(url_get_case, json=case)
+        mock_request.get(url_get_case_categories, json=categories)
+        mock_request.post(url_post_case_event_uuid, status_code=201)
         mock_request.post(url_upload_ci, status_code=400, json=self.upload_error)
         mock_request.get(url_access_case, status_code=200, json=surveys_list_seft[1])
 
-        test_url = '/surveys/upload_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5&survey_name=Survey+Name'
+        test_url = f'/surveys/upload_survey?case_id={case_id}&survey_name=Survey+Name'
         response = self.app.post(test_url, data=self.survey_file, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -228,9 +271,13 @@ class TestSurveys(unittest.TestCase):
     @requests_mock.mock()
     def test_upload_survey_other_400(self, mock_request):
         self.upload_error['error']['data']['message'] = 'Random message'
+        mock_request.get(url_get_case, json=case)
+        mock_request.get(url_get_case_categories, json=categories)
+        mock_request.post(url_post_case_event_uuid, status_code=201)
         mock_request.post(url_upload_ci, status_code=400, json=self.upload_error)
         mock_request.get(url_access_case, status_code=200, json=surveys_list_seft[1])
-        test_url = '/surveys/upload_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5&survey_name=Survey+Name'
+
+        test_url = f'/surveys/upload_survey?case_id={case_id}&survey_name=Survey+Name'
         response = self.app.post(test_url, data=self.survey_file, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -241,7 +288,7 @@ class TestSurveys(unittest.TestCase):
     def test_upload_survey_fail(self, mock_request):
         mock_request.post(url_upload_ci, status_code=500)
 
-        test_url = '/surveys/upload_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5'
+        test_url = f'/surveys/upload_survey?case_id={case_id}'
         response = self.app.post(test_url, data=self.survey_file, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)

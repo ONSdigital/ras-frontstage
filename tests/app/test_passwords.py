@@ -4,9 +4,9 @@ import unittest
 from frontstage import app
 
 token = 'test_token'
-url_verify_token = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['VERIFY_PASSWORD_TOKEN']
-url_password_change = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['CHANGE_PASSWORD']
-url_request_password_change = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['REQUEST_PASSWORD_CHANGE']
+url_verify_token = app.config['FRONTSTAGE_API_URL'] + app.config['VERIFY_PASSWORD_TOKEN']
+url_password_change = app.config['FRONTSTAGE_API_URL'] + app.config['CHANGE_PASSWORD']
+url_request_password_change = app.config['FRONTSTAGE_API_URL'] + app.config['REQUEST_PASSWORD_CHANGE']
 
 
 class TestPasswords(unittest.TestCase):

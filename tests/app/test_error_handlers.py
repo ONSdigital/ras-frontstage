@@ -6,7 +6,7 @@ import requests_mock
 
 from frontstage import app
 from frontstage.exceptions.exceptions import ApiError, JWTValidationError
-
+from tests.app.mocked_services import url_get_respondent_email, party
 
 url_oauth = f"{app.config['OAUTH_URL']}/api/v1/tokens/"
 
@@ -59,6 +59,7 @@ class TestErrorHandlers(unittest.TestCase):
 
     @requests_mock.mock()
     def test_jwt_validation_error(self, mock_request):
+        mock_request.get(url_get_respondent_email, json=party)
         mock_request.post(url_oauth, exc=JWTValidationError)
 
         response = self.app.post('sign-in', data=self.sign_in_form, follow_redirects=True)

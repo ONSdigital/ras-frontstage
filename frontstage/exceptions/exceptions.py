@@ -15,6 +15,13 @@ class CiUploadError(ApiError):
         self.message = message
 
 
+class OAuth2Error(ApiError):
+
+    def __init__(self, response, message):
+        super(OAuth2Error, self).__init__(response)
+        self.message = message
+
+
 class InvalidRequestMethod(Exception):
 
     def __init__(self, method, url):

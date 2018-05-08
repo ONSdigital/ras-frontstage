@@ -12,10 +12,10 @@
       "sampleUnitRef": "49900000004"
     }
   ], 
-  "emailAddress": "rhiannon.griffiths@ons.gov.uk",
-  "firstName": "Rhiannon",
+  "emailAddress": "testuser@email.com",
+  "firstName": "Test",
   "id": "07d672bc-497b-448f-a406-a20a7e6013d7",
-  "lastName": "Griffiths", 
+  "lastName": "User", 
   "sampleUnitType": "BI", 
   "status": "ACTIVE", 
   "telephone": "01636 265626"

@@ -6,9 +6,7 @@ import requests_mock
 
 from frontstage import app
 from frontstage.exceptions.exceptions import ApiError, JWTValidationError
-
-
-url_oauth = app.config['FRONTSTAGE_API_URL'] + app.config['SIGN_IN_URL']
+from tests.app.mocked_services import url_get_respondent_email, url_oauth_token, party
 
 
 class TestErrorHandlers(unittest.TestCase):
@@ -30,7 +28,7 @@ class TestErrorHandlers(unittest.TestCase):
     # Use bad data to raise an uncaught exception
     @requests_mock.mock()
     def test_server_error(self, mock_request):
-        mock_request.post(url_oauth, status_code=200)
+        mock_request.post(url_oauth_token, status_code=200)
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
@@ -40,7 +38,7 @@ class TestErrorHandlers(unittest.TestCase):
     @requests_mock.mock()
     def test_api_error(self, mock_request):
         response_mock = MagicMock()
-        mock_request.post(url_oauth, exc=ApiError(response_mock))
+        mock_request.post(url_oauth_token, exc=ApiError(response_mock))
 
         response = self.app.post('sign-in', data=self.sign_in_form, follow_redirects=True)
 
@@ -50,7 +48,7 @@ class TestErrorHandlers(unittest.TestCase):
     @requests_mock.mock()
     def test_connection_error(self, mock_request):
         mock_exception_request = MagicMock()
-        mock_request.post(url_oauth, exc=ConnectionError(request=mock_exception_request))
+        mock_request.post(url_oauth_token, exc=ConnectionError(request=mock_exception_request))
 
         response = self.app.post('sign-in', data=self.sign_in_form, follow_redirects=True)
 
@@ -59,7 +57,8 @@ class TestErrorHandlers(unittest.TestCase):
 
     @requests_mock.mock()
     def test_jwt_validation_error(self, mock_request):
-        mock_request.post(url_oauth, exc=JWTValidationError)
+        mock_request.get(url_get_respondent_email, json=party)
+        mock_request.post(url_oauth_token, exc=JWTValidationError)
 
         response = self.app.post('sign-in', data=self.sign_in_form, follow_redirects=True)
 

@@ -45,6 +45,11 @@ class Config(object):
     COLLECTION_INSTRUMENT_PASSWORD = os.getenv('COLLECTION_INSTRUMENT_PASSWORD')
     COLLECTION_INSTRUMENT_AUTH = (COLLECTION_INSTRUMENT_USERNAME, COLLECTION_INSTRUMENT_PASSWORD)
 
+    OAUTH_URL = os.getenv('OAUTH_URL')
+    OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID')
+    OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET')
+    OAUTH_BASIC_AUTH = (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET)
+
     PARTY_URL = os.getenv('PARTY_URL')
     PARTY_USERNAME = os.getenv('PARTY_USERNAME')
     PARTY_PASSWORD = os.getenv('PARTY_PASSWORD')
@@ -58,8 +63,6 @@ class Config(object):
     FRONTSTAGE_API_URL = os.getenv('FRONTSTAGE_API_URL')
     SECURE_MESSAGE_URL = os.getenv('SECURE_MESSAGE_URL')
 
-    SIGN_IN_URL = '/sign-in'
-
     REQUEST_PASSWORD_CHANGE = '/passwords/request-password-change'
     VERIFY_PASSWORD_TOKEN = '/passwords/verify-password-token'
     CHANGE_PASSWORD = '/passwords/change-password'
@@ -70,7 +73,6 @@ class Config(object):
     VERIFY_EMAIL = '/register/verify-email'
 
     SURVEYS_LIST = '/surveys/surveys-list'
-    ACCESS_CASE = '/surveys/access-case'
     ADD_SURVEY = '/surveys/add-survey'
     CONFIRM_ADD_ORGANISATION_SURVEY = '/surveys/add-survey/confirm-add-organisation-survey'
     GENERATE_EQ_URL = '/surveys/generate-eq-url'
@@ -101,6 +103,11 @@ class DevelopmentConfig(Config):
     COLLECTION_INSTRUMENT_USERNAME = os.getenv('COLLECTION_INSTRUMENT_USERNAME', 'admin')
     COLLECTION_INSTRUMENT_PASSWORD = os.getenv('COLLECTION_INSTRUMENT_PASSWORD', 'secret')
     COLLECTION_INSTRUMENT_AUTH = (COLLECTION_INSTRUMENT_USERNAME, COLLECTION_INSTRUMENT_PASSWORD)
+
+    OAUTH_URL = os.getenv('OAUTH_URL', 'http://localhost:8040')
+    OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID', 'ons@ons.gov')
+    OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET', 'password')
+    OAUTH_BASIC_AUTH = (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET)
 
     PARTY_URL = os.getenv('PARTY_URL', 'http://localhost:8081')
     PARTY_USERNAME = os.getenv('PARTY_USERNAME', 'admin')

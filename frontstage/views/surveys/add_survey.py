@@ -25,27 +25,25 @@ def add_survey(session):
     if request.method == 'POST' and form.validate():
         logger.info('Enrolment code submitted')
         enrolment_code = request.form.get('enrolment_code').lower()
-        request_data = {
-            'enrolment_code': enrolment_code
-        }
-        response = api_call('POST', app.config['VALIDATE_ENROLMENT'], json=request_data)
 
-        # Handle API errors
-        if response.status_code == 404:
-            logger.info('Enrolment code not found')
-            return render_template('surveys/surveys-add.html', form=form, data={"error": {"type": "failed"}}), 200
-
-        elif response.status_code == 401 and not json.loads(response.text).get('active'):
-            logger.info('Enrolment code not active')
-            return render_template('surveys/surveys-add.html', form=form, data={"error": {"type": "failed"}})
-
-        elif response.status_code == 400:
-            logger.info('Enrolment code already used')
-            return render_template('surveys/surveys-add.html', form=form, data={"error": {"type": "failed"}})
-
-        elif response.status_code != 200:
-            logger.error('Failed to submit enrolment code')
-            raise ApiError(response)
+        # Validate the enrolment code
+        try:
+            iac = iac_controller.get_iac_from_enrolment(enrolment_code)
+            if iac is None:
+                logger.info('Enrolment code not found')
+                template_data = {"error": {"type": "failed"}}
+                return render_template('surveys/surveys-add.html', form=form, data={"error": {"type": "failed"}}), 200
+            if not iac['active']:
+                logger.info('Enrolment code not active')
+                template_data = {"error": {"type": "failed"}}
+                return render_template('surveys/surveys-add.html', form=form, data={"error": {"type": "failed"}})
+        except ApiError as exc:
+            if exc.status_code == 400:
+                logger.info('Enrolment code already used')
+                return render_template('surveys/surveys-add.html', form=form, data={"error": {"type": "failed"}})
+            else:
+                logger.error('Failed to submit enrolment code')
+                raise exc
 
         cryptographer = Cryptographer()
         encrypted_enrolment_code = cryptographer.encrypt(enrolment_code.encode()).decode()

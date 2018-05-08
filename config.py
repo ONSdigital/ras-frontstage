@@ -30,6 +30,21 @@ class Config(object):
     PASSWORD_MIN_LENGTH = 8
     PASSWORD_MAX_LENGTH = 160
 
+    CASE_URL = os.getenv('CASE_URL')
+    CASE_USERNAME = os.getenv('CASE_USERNAME')
+    CASE_PASSWORD = os.getenv('CASE_PASSWORD')
+    CASE_AUTH = (CASE_USERNAME, CASE_PASSWORD)
+
+    IAC_URL = os.getenv('IAC_URL')
+    IAC_USERNAME = os.getenv('IAC_USERNAME')
+    IAC_PASSWORD = os.getenv('IAC_PASSWORD')
+    IAC_AUTH = (IAC_USERNAME, IAC_PASSWORD)
+
+    PARTY_URL = os.getenv('PARTY_URL')
+    PARTY_USERNAME = os.getenv('PARTY_USERNAME')
+    PARTY_PASSWORD = os.getenv('PARTY_PASSWORD')
+    PARTY_AUTH = (PARTY_USERNAME, PARTY_PASSWORD)
+
     RAS_FRONTSTAGE_API_HOST = os.getenv('RAS_FRONTSTAGE_API_HOST', 'localhost')
     RAS_FRONTSTAGE_API_PORT = os.getenv('RAS_FRONTSTAGE_API_PORT', 8083)
     RAS_FRONTSTAGE_API_PROTOCOL = os.getenv('RAS_FRONTSTAGE_API_PROTOCOL', 'http')
@@ -51,7 +66,6 @@ class Config(object):
     VERIFY_PASSWORD_TOKEN = 'passwords/verify-password-token'
     CHANGE_PASSWORD = 'passwords/change-password'
 
-    VALIDATE_ENROLMENT = 'register/validate-enrolment'
     CONFIRM_ORGANISATION_SURVEY = 'register/confirm-organisation-survey'
     CREATE_ACCOUNT = 'register/create-account'
     VERIFY_EMAIL = 'register/verify-email'
@@ -74,6 +88,21 @@ class DevelopmentConfig(Config):
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
+
+    CASE_URL = os.getenv('CASE_URL', 'http://localhost:8171')
+    CASE_USERNAME = os.getenv('CASE_USERNAME', 'admin')
+    CASE_PASSWORD = os.getenv('CASE_PASSWORD', 'secret')
+    CASE_AUTH = (CASE_USERNAME, CASE_PASSWORD)
+
+    IAC_URL = os.getenv('IAC_URL', 'http://localhost:8121')
+    IAC_USERNAME = os.getenv('IAC_USERNAME', 'admin')
+    IAC_PASSWORD = os.getenv('IAC_PASSWORD', 'secret')
+    IAC_AUTH = (IAC_USERNAME, IAC_PASSWORD)
+
+    PARTY_URL = os.getenv('PARTY_URL', 'http://localhost:8081')
+    PARTY_USERNAME = os.getenv('PARTY_USERNAME', 'admin')
+    PARTY_PASSWORD = os.getenv('PARTY_PASSWORD', 'secret')
+    PARTY_AUTH = (PARTY_USERNAME, PARTY_PASSWORD)
 
 
 class TestingConfig(DevelopmentConfig):

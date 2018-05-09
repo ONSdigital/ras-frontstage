@@ -20,13 +20,13 @@ def get_reset_password(token, form_errors=None):
         party_controller.verify_token(token)
     except ApiError as exc:
         if exc.status_code == 409:
-            logger.warning('Token expired', token=token)
+            logger.warning('Token expired', status_code=exc.status_code, token=token)
             return render_template('passwords/password-expired.html')
         elif exc.status_code == 404:
-            logger.warning('Invalid token sent to party service', token=token)
+            logger.warning('Invalid token sent to party service', status_code=exc.status_code, token=token)
             return redirect(url_for('error_bp.not_found_error_page'))
         else:
-            logger.error('Party service failed to verify token')
+            logger.error('Party service failed to verify token', status_code=exc.status_code)
             raise exc
 
     template_data = {
@@ -51,13 +51,13 @@ def post_reset_password(token):
         party_controller.change_password(password, token)
     except ApiError as exc:
         if exc.status_code == 409:
-            logger.warning('Token expired', token=token)
+            logger.warning('Token expired', status_code=exc.status_code, token=token)
             return render_template('passwords/password-expired.html')
         elif exc.status_code == 404:
-            logger.warning('Invalid token sent to party service', token=token)
+            logger.warning('Invalid token sent to party service', status_code=exc.status_code, token=token)
             return redirect(url_for('error_bp.not_found_error_page'))
         else:
-            logger.error('Party service failed to verify token')
+            logger.error('Party service failed to verify token', status_code=exc.status_code)
             raise exc
 
     logger.info('Successfully changed user password', token=token)

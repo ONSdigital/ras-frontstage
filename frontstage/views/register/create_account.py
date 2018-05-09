@@ -1,12 +1,9 @@
-import json
 import logging
 import os
 
 from flask import redirect, render_template, request, url_for
 from structlog import wrap_logger
 
-from frontstage import app
-from frontstage.common.api_call import api_call
 from frontstage.common.cryptographer import Cryptographer
 from frontstage.controllers import case_controller, iac_controller
 from frontstage.exceptions.exceptions import ApiError

@@ -1,13 +1,11 @@
-import json
 import logging
 
 from flask import redirect, request, url_for
 from structlog import wrap_logger
 
-from frontstage import app
-from frontstage.common.api_call import api_call
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.common.cryptographer import Cryptographer
+from frontstage.controllers import case_controller, iac_controller, party_controller
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.views.surveys import surveys_bp
 
@@ -24,19 +22,29 @@ def add_survey_submit(session):
     cryptographer = Cryptographer()
     encrypted_enrolment_code = request.args.get('encrypted_enrolment_code')
     enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
-    json_params = {
-        "enrolment_code": enrolment_code,
-        "party_id": party_id
-    }
-    response = api_call('POST', app.config['ADD_SURVEY'], json=json_params)
 
-    if response.status_code != 200:
-        logger.error('Failed to assign user to a survey', status=response.status_code, party_id=party_id)
-        raise ApiError(response)
+    try:
+        # Verify enrolment code is active
+        iac = iac_controller.get_iac_from_enrolment(enrolment_code, validate=True)
 
-    response_json = json.loads(response.text)
-    case_id = response_json['case_id']
+        case_id = iac['caseId']
+        case = case_controller.get_case_by_enrolment_code(enrolment_code)
+        case_group_id = case.get('caseGroup', {}).get('id')
+        business_party_id = case['partyId']
+        case_controller.post_case_event(case_id,
+                                        party_id=business_party_id,
+                                        category='ACCESS_CODE_AUTHENTICATION_ATTEMPT',
+                                        description='Access code authentication attempted')
 
-    logger.info('Successfully retrieved data for confirm add organisation/survey page', case_id=case_id,
-                party_id=party_id)
+        party_controller.add_survey(party_id, enrolment_code)
+
+        case_list = case_controller.get_case_by_party_id(party_id)
+        case_id = case_controller.get_case_id_for_group(case_list, case_group_id)
+    except ApiError:
+        logger.error('Failed to assign user to a survey',
+                     enrolment_code=enrolment_code, party_id=party_id)
+        raise
+
+    logger.info('Successfully retrieved data for confirm add organisation/survey page',
+                case_id=case_id, party_id=party_id)
     return redirect(url_for('surveys_bp.logged_in', _external=True, case_id=case_id))

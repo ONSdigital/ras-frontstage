@@ -3,9 +3,8 @@ import logging
 from flask import render_template, request
 from structlog import wrap_logger
 
-from frontstage import app
-from frontstage.common.api_call import api_call
 from frontstage.common.cryptographer import Cryptographer
+from frontstage.controllers import iac_controller, party_controller
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.models import RegistrationForm
 from frontstage.views.register import register_bp

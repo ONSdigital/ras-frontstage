@@ -35,6 +35,11 @@ class Config(object):
     CASE_PASSWORD = os.getenv('CASE_PASSWORD')
     CASE_AUTH = (CASE_USERNAME, CASE_PASSWORD)
 
+    COLLECTION_EXERCISE_URL = os.getenv('COLLECTION_EXERCISE_URL')
+    COLLECTION_EXERCISE_USERNAME = os.getenv('COLLECTION_EXERCISE_USERNAME')
+    COLLECTION_EXERCISE_PASSWORD = os.getenv('COLLECTION_EXERCISE_PASSWORD')
+    COLLECTION_EXERCISE_AUTH = (COLLECTION_EXERCISE_USERNAME, COLLECTION_EXERCISE_PASSWORD)
+
     IAC_URL = os.getenv('IAC_URL')
     IAC_USERNAME = os.getenv('IAC_USERNAME')
     IAC_PASSWORD = os.getenv('IAC_PASSWORD')
@@ -44,6 +49,11 @@ class Config(object):
     PARTY_USERNAME = os.getenv('PARTY_USERNAME')
     PARTY_PASSWORD = os.getenv('PARTY_PASSWORD')
     PARTY_AUTH = (PARTY_USERNAME, PARTY_PASSWORD)
+
+    SURVEY_URL = os.getenv('SURVEY_URL')
+    SURVEY_USERNAME = os.getenv('SURVEY_USERNAME')
+    SURVEY_PASSWORD = os.getenv('SURVEY_PASSWORD')
+    SURVEY_AUTH = (SURVEY_USERNAME, SURVEY_PASSWORD)
 
     RAS_FRONTSTAGE_API_HOST = os.getenv('RAS_FRONTSTAGE_API_HOST', 'localhost')
     RAS_FRONTSTAGE_API_PORT = os.getenv('RAS_FRONTSTAGE_API_PORT', 8083)
@@ -74,7 +84,6 @@ class Config(object):
     ACCESS_CASE = 'surveys/access-case'
     DOWNLOAD_CI = 'surveys/download-ci'
     UPLOAD_CI = 'surveys/upload-ci'
-    ADD_SURVEY = 'surveys/add-survey'
     CONFIRM_ADD_ORGANISATION_SURVEY = 'surveys/add-survey/confirm-add-organisation-survey'
     GENERATE_EQ_URL = 'surveys/generate-eq-url'
 
@@ -94,6 +103,11 @@ class DevelopmentConfig(Config):
     CASE_PASSWORD = os.getenv('CASE_PASSWORD', 'secret')
     CASE_AUTH = (CASE_USERNAME, CASE_PASSWORD)
 
+    COLLECTION_EXERCISE_URL = os.getenv('COLLECTION_EXERCISE_URL', 'http://localhost:8145')
+    COLLECTION_EXERCISE_USERNAME = os.getenv('COLLECTION_EXERCISE_USERNAME', 'admin')
+    COLLECTION_EXERCISE_PASSWORD = os.getenv('COLLECTION_EXERCISE_PASSWORD', 'secret')
+    COLLECTION_EXERCISE_AUTH = (COLLECTION_EXERCISE_USERNAME, COLLECTION_EXERCISE_PASSWORD)
+
     IAC_URL = os.getenv('IAC_URL', 'http://localhost:8121')
     IAC_USERNAME = os.getenv('IAC_USERNAME', 'admin')
     IAC_PASSWORD = os.getenv('IAC_PASSWORD', 'secret')
@@ -103,6 +117,11 @@ class DevelopmentConfig(Config):
     PARTY_USERNAME = os.getenv('PARTY_USERNAME', 'admin')
     PARTY_PASSWORD = os.getenv('PARTY_PASSWORD', 'secret')
     PARTY_AUTH = (PARTY_USERNAME, PARTY_PASSWORD)
+
+    SURVEY_URL = os.getenv('SURVEY_URL', 'http://localhost:8080')
+    SURVEY_USERNAME = os.getenv('SURVEY_USERNAME', 'admin')
+    SURVEY_PASSWORD = os.getenv('SURVEY_PASSWORD', 'secret')
+    SURVEY_AUTH = (SURVEY_USERNAME, SURVEY_PASSWORD)
 
 
 class TestingConfig(DevelopmentConfig):

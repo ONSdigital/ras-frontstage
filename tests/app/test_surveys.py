@@ -6,6 +6,13 @@ from unittest.mock import patch
 import requests_mock
 
 from frontstage import app
+from tests.app.mocked_services import (business_party, case, categories, collection_exercise,
+                                       encrypted_enrolment_code, enrolment_code, survey,
+                                       url_case_by_enrolment_code, url_get_business_party,
+                                       url_get_case_by_party, url_get_case_categories,
+                                       url_get_collection_exercise, url_get_survey,
+                                       url_post_case_event_uuid, url_post_add_survey,
+                                       url_validate_enrolment)
 
 
 url_get_surveys_list = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['SURVEYS_LIST']
@@ -13,8 +20,6 @@ url_access_case = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['ACCESS_
 url_generate_eq_url = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['GENERATE_EQ_URL']
 url_download_ci = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['DOWNLOAD_CI']
 url_upload_ci = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['UPLOAD_CI']
-url_validate_enrolment = '{}{}'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'], app.config['VALIDATE_ENROLMENT'])
-url_add_survey = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['ADD_SURVEY']
 url_confirm_add_organisation_survey = '{}{}'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'],
                                                     app.config['CONFIRM_ADD_ORGANISATION_SURVEY'])
 
@@ -47,9 +52,8 @@ class TestSurveys(unittest.TestCase):
             }
         }
         self.patcher = patch('redis.StrictRedis.get', return_value=encoded_jwt_token)
-        self.encrypted_enrolment_code = 'WfwJghohWOZTIYnutlTcVucqnuED5Lm9q8t0L4ASHPo='
         self.params = {
-            "encrypted_enrolment_code": self.encrypted_enrolment_code
+            "encrypted_enrolment_code": encrypted_enrolment_code
         }
         self.organisation_survey_data = {
             'survey_name': 'test_survey',
@@ -255,9 +259,9 @@ class TestSurveys(unittest.TestCase):
 
     @requests_mock.mock()
     def test_enter_add_survey_code_success(self, mock_object):
-        mock_object.post(url_validate_enrolment)
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
 
-        response = self.app.post('/surveys/add-survey', data={'enrolment_code': '123456789012'})
+        response = self.app.post('/surveys/add-survey', data={'enrolment_code': enrolment_code})
 
         # Check that we redirect to the confirm-organisation-survey page
         self.assertEqual(response.status_code, 302)
@@ -270,44 +274,55 @@ class TestSurveys(unittest.TestCase):
         self.assertTrue('Add a survey'.encode() in response.data)
 
     @requests_mock.mock()
-    def test_enter_add_survey_inactive_code(self, mock_object):
-        mock_object.post(url_validate_enrolment, status_code=401, json={'active': False})
+    def test_enter_add_survey_bad_code_length(self, mock_object):
+        response = self.app.post('/surveys/add-survey', data={'enrolment_code': '123'})
 
-        response = self.app.post('/surveys/add-survey', data={'enrolment_code': '123456789012'})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Enrolment code not valid'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_enter_add_survey_inactive_code(self, mock_object):
+        mock_object.get(url_validate_enrolment, status_code=401, json={'active': False})
+
+        response = self.app.post('/surveys/add-survey', data={'enrolment_code': enrolment_code})
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Enrolment code not valid'.encode() in response.data)
 
     @requests_mock.mock()
     def test_enter_add_survey_invalid_code(self, mock_object):
-        mock_object.post(url_validate_enrolment, status_code=404)
+        mock_object.get(url_validate_enrolment, status_code=404)
 
-        response = self.app.post('/surveys/add-survey', data={'enrolment_code': '123456789012'})
+        response = self.app.post('/surveys/add-survey', data={'enrolment_code': enrolment_code})
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Enrolment code not valid'.encode() in response.data)
 
     @requests_mock.mock()
     def test_enter_add_survey_code_fail(self, mock_object):
-        mock_object.post(url_validate_enrolment, status_code=500)
+        mock_object.get(url_validate_enrolment, status_code=500)
 
-        response = self.app.post('/surveys/add-survey', data={'enrolment_code': '123456789012'}, follow_redirects=True)
+        response = self.app.post('/surveys/add-survey', data={'enrolment_code': enrolment_code}, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
 
     @requests_mock.mock()
     def test_enter_add_survey_used_code(self, mock_object):
-        mock_object.post(url_validate_enrolment, status_code=400)
+        mock_object.get(url_validate_enrolment, status_code=400)
 
-        response = self.app.post('/surveys/add-survey', data={'enrolment_code': '123456789012'}, follow_redirects=True)
+        response = self.app.post('/surveys/add-survey', data={'enrolment_code': enrolment_code}, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Enrolment code not valid'.encode() in response.data)
 
     @requests_mock.mock()
     def test_add_survey_confirm_org_page(self, mock_object):
-        mock_object.post(url_confirm_add_organisation_survey, status_code=200, json=self.organisation_survey_data)
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_case_by_enrolment_code, json=case)
+        mock_object.get(url_get_business_party, json=business_party)
+        mock_object.get(url_get_collection_exercise, json=collection_exercise)
+        mock_object.get(url_get_survey, json=survey)
 
         response = self.app.get('/surveys/add-survey/confirm-organisation-survey',
                                 query_string=self.params,
@@ -330,25 +345,188 @@ class TestSurveys(unittest.TestCase):
         self.assertTrue('Server error'.encode() in response.data)
 
     @requests_mock.mock()
+    def test_add_survey_confirm_org_page_validation_fail(self, mock_object):
+        mock_object.get(url_validate_enrolment, status_code=401, json={'active': False, 'caseId': case['id']})
+
+        response = self.app.get('/surveys/add-survey/confirm-organisation-survey',
+                                query_string=self.params,
+                                headers=self.headers,
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_add_survey_confirm_org_page_case_fail(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_case_by_enrolment_code, status_code=500)
+
+        response = self.app.get('/surveys/add-survey/confirm-organisation-survey',
+                                query_string=self.params,
+                                headers=self.headers,
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_add_survey_confirm_org_page_case_empty(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_case_by_enrolment_code, json={})
+
+        response = self.app.get('/surveys/add-survey/confirm-organisation-survey',
+                                query_string=self.params,
+                                headers=self.headers,
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_add_survey_confirm_org_page_party_fail(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_case_by_enrolment_code, json=case)
+        mock_object.get(url_get_business_party, status_code=500)
+
+        response = self.app.get('/surveys/add-survey/confirm-organisation-survey',
+                                query_string=self.params,
+                                headers=self.headers,
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_add_survey_confirm_org_page_collex_fail(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_case_by_enrolment_code, json=case)
+        mock_object.get(url_get_business_party, json=business_party)
+        mock_object.get(url_get_collection_exercise, status_code=500)
+
+        response = self.app.get('/surveys/add-survey/confirm-organisation-survey',
+                                query_string=self.params,
+                                headers=self.headers,
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_add_survey_confirm_org_page_collex_empty(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_case_by_enrolment_code, json=case)
+        mock_object.get(url_get_business_party, json=business_party)
+        mock_object.get(url_get_collection_exercise, json={})
+
+        response = self.app.get('/surveys/add-survey/confirm-organisation-survey',
+                                query_string=self.params,
+                                headers=self.headers,
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_add_survey_confirm_org_page_survey_fail(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_case_by_enrolment_code, json=case)
+        mock_object.get(url_get_business_party, json=business_party)
+        mock_object.get(url_get_collection_exercise, json=collection_exercise)
+        mock_object.get(url_get_survey, status_code=500)
+
+        response = self.app.get('/surveys/add-survey/confirm-organisation-survey',
+                                query_string=self.params,
+                                headers=self.headers,
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_add_survey_confirm_org_page_survey_empty(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_case_by_enrolment_code, json=case)
+        mock_object.get(url_get_business_party, json=business_party)
+        mock_object.get(url_get_collection_exercise, json=collection_exercise)
+        mock_object.get(url_get_survey, json={})
+
+        response = self.app.get('/surveys/add-survey/confirm-organisation-survey',
+                                query_string=self.params,
+                                headers=self.headers,
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Confirm organisation'.encode() in response.data)
+
+    @requests_mock.mock()
     def test_add_survey_submit(self, mock_object):
-        mock_object.post(url_add_survey, json={'case_id': "test_case_id"})
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_case_by_enrolment_code, json=case)
+        mock_object.get(url_get_case_by_party, json=[case])
+        mock_object.get(url_get_case_categories, json=categories)
+        mock_object.post(url_post_case_event_uuid, status_code=201)
+        mock_object.post(url_post_add_survey, status_code=201)
         mock_object.get(url_get_surveys_list, json=surveys_list_seft)
 
-        url = '/surveys/add-survey/add-survey-submit' \
-              '?encrypted_enrolment_code=WfwJghohWOZTIYnutlTcVucqnuED5Lm9q8t0L4ASHPo='
-        response = self.app.get(url, follow_redirects=True)
+        response = self.app.get('/surveys/add-survey/add-survey-submit',
+                                query_string=self.params, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Business Register and Employment Survey'.encode() in response.data)
         self.assertTrue('RUNAME1_COMPANY4 RUNNAME2_COMPANY4'.encode() in response.data)
 
     @requests_mock.mock()
-    def test_add_survey_failure(self, mock_object):
-        mock_object.post(url_add_survey, status_code=500)
+    def test_add_survey_validation_failure(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': False, 'caseId': case['id']})
 
-        url = '/surveys/add-survey/add-survey-submit' \
-              '?encrypted_enrolment_code=WfwJghohWOZTIYnutlTcVucqnuED5Lm9q8t0L4ASHPo='
-        response = self.app.get(url, follow_redirects=True)
+        response = self.app.get('/surveys/add-survey/add-survey-submit',
+                                query_string=self.params, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_add_survey_iac_error(self, mock_object):
+        mock_object.get(url_validate_enrolment, status_code=500)
+
+        response = self.app.get('/surveys/add-survey/add-survey-submit',
+                                query_string=self.params, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_add_survey_get_case_error(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_case_by_enrolment_code, status_code=500)
+
+        response = self.app.get('/surveys/add-survey/add-survey-submit',
+                                query_string=self.params, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_add_survey_post_case_error(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_case_by_enrolment_code, json=case)
+        mock_object.post(url_post_case_event_uuid, status_code=500)
+
+        response = self.app.get('/surveys/add-survey/add-survey-submit',
+                                query_string=self.params, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_add_survey_post_party_error(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_case_by_enrolment_code, json=case)
+        mock_object.post(url_post_case_event_uuid, status_code=201)
+        mock_object.post(url_post_add_survey, status_code=500)
+
+        response = self.app.get('/surveys/add-survey/add-survey-submit',
+                                query_string=self.params, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)

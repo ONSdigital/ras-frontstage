@@ -37,11 +37,11 @@ def add_survey(session):
                 return render_template('surveys/surveys-add.html', form=form, data=template_data)
         except ApiError as exc:
             if exc.status_code == 400:
-                logger.info('Enrolment code already used', enrolment_code=enrolment_code)
+                logger.info('Enrolment code already used', enrolment_code=enrolment_code, status_code=exc.status_code)
                 template_data = {"error": {"type": "failed"}}
                 return render_template('surveys/surveys-add.html', form=form, data=template_data)
             else:
-                logger.error('Failed to submit enrolment code', enrolment_code=enrolment_code)
+                logger.error('Failed to submit enrolment code', enrolment_code=enrolment_code, status_code=exc.status_code)
                 raise
 
         cryptographer = Cryptographer()

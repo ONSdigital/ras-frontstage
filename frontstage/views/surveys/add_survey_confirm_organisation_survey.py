@@ -38,9 +38,9 @@ def survey_confirm_organisation(session):
         collection_exercise = collection_exercise_controller.get_collection_exercise(collection_exercise_id)
         survey_id = collection_exercise['surveyId']
         survey_name = survey_controller.get_survey(survey_id).get('longName')
-    except ApiError:
+    except ApiError as exc:
         logger.error('Failed to retrieve data for confirm add organisation/survey page',
-                     enrolment_code=enrolment_code)
+                     enrolment_code=enrolment_code, status_code=exc.status_code)
         raise
 
     logger.info('Successfully retrieved data for confirm add organisation/survey page',

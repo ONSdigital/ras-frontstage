@@ -3,6 +3,9 @@ import os
 
 # To choose which config to use when running frontstage set environment variable APP_SETTINGS to the name of the
 # config object e.g. for the dev config set APP_SETTINGS=DevelopmentConfig
+from distutils.util import strtobool
+
+
 class Config(object):
     DEBUG = False
     TESTING = False
@@ -16,10 +19,11 @@ class Config(object):
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
     JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
     JWT_SECRET = os.getenv('JWT_SECRET')
-    VALIDATE_JWT = os.environ.get('VALIDATE_JWT', True)
+    VALIDATE_JWT = strtobool(os.getenv('VALIDATE_JWT', 'True'))
     GOOGLE_ANALYTICS = os.getenv('GOOGLE_ANALYTICS', None)
     NON_DEFAULT_VARIABLES = ['SECRET_KEY', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD', 'JWT_SECRET']
-    AVAILABILITY_BANNER = os.getenv('AVAILABILITY_BANNER', False)
+    AVAILABILITY_BANNER = strtobool(os.getenv('AVAILABILITY_BANNER', 'False'))
+    SECURE_COOKIES = strtobool(os.getenv('SECURE_COOKIES', 'True'))
 
     REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
     REDIS_PORT = os.getenv('REDIS_PORT', 6379)
@@ -66,9 +70,10 @@ class Config(object):
 
 
 class DevelopmentConfig(Config):
-    DEVELOPMENT = True
-    DEBUG = True
-    TEMPLATES_AUTO_RELOAD = True
+    DEVELOPMENT = strtobool(os.getenv('DEVELOPMENT', 'True'))
+    DEBUG = strtobool(os.getenv('DEBUG', 'True'))
+    TEMPLATES_AUTO_RELOAD = strtobool(os.getenv('TEMPLATES_AUTO_RELOAD', 'True'))
+    SECURE_COOKIES = strtobool(os.getenv('SECURE_COOKIES', 'False'))
     SECRET_KEY = os.getenv('SECRET_KEY', 'ONS_DUMMY_KEY')
     JWT_SECRET = os.getenv('JWT_SECRET', 'testsecret')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')

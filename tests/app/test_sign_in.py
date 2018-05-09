@@ -174,3 +174,12 @@ class TestSignIn(unittest.TestCase):
         self.assertTrue('Sign in'.encode() in response.data)
         self.assertTrue('New to this service?'.encode() in response.data)
         self.assertFalse('Sign out'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_sign_in_unknown_response(self, mock_object):
+        self.oauth_error['error']['data']['detail'] = 'wat'
+        mock_object.post(url_oauth_token, status_code=401, json=self.oauth_error)
+
+        response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True, base_url='https://localhost')
+
+        self.assertIn('Secure;', response.headers['Set-Cookie'])

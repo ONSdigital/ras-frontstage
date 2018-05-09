@@ -2,6 +2,7 @@ import logging
 import os
 
 from flask import Flask, request
+from flask_talisman import Talisman
 from structlog import wrap_logger
 
 from frontstage.cloud.cloudfoundry import ONSCloudFoundry
@@ -12,6 +13,16 @@ from frontstage.logger_config import logger_initial_config
 
 
 cf = ONSCloudFoundry()
+
+CSP_POLICY = {
+    'default-src': ["'self'", 'https://cdn.ons.gov.uk', ],
+    'style-src': ["'self'", 'https://maxcdn.bootstrapcdn.com', ],
+    'font-src': ["'self'", 'data:', 'https://cdn.ons.gov.uk', 'https://fonts.gstatic.com',
+                 'https://maxcdn.bootstrapcdn.com', ],
+    'script-src': ["'self'", 'https://www.google-analytics.com', 'https://cdn.ons.gov.uk', 'https://code.jquery.com', ],
+    'connect-src': ["'self'", 'https://www.google-analytics.com', 'https://cdn.ons.gov.uk', ],
+    'img-src': ["'self'", 'data:', 'https://www.google-analytics.com', 'https://cdn.ons.gov.uk', ]
+}
 
 CACHE_HEADERS = {
     'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -56,4 +67,21 @@ def create_app_object():
             response.headers[k] = v
         return response
 
+    setup_secure_headers(app)
+
     return app
+
+
+
+def setup_secure_headers(app):
+    Talisman(
+        app,
+        content_security_policy=CSP_POLICY,
+        content_security_policy_nonce_in=['script-src'],
+        session_cookie_secure=app.config['SECURE_COOKIES'],
+        force_https=False,  # this is handled at the firewall
+        strict_transport_security=True,
+        strict_transport_security_max_age=31536000,
+        strict_transport_security_include_subdomains=True,
+        referrer_policy='same-origin',
+        frame_options='DENY')

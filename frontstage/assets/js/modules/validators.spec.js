@@ -76,6 +76,10 @@ describe('validator [module]', () => {
 			expect(validateHasSymbol(',')).toBe(true);
 			expect(validateHasSymbol('.')).toBe(true);
 			expect(validateHasSymbol('/')).toBe(true);
+			expect(validateHasSymbol('#')).toBe(true);
+            expect(validateHasSymbol('@')).toBe(true);
+            expect(validateHasSymbol('€')).toBe(true);
+            expect(validateHasSymbol(' ')).toBe(true);
 		});
 
 		it('should return false when supplied a string without a symbol', () => {

@@ -6,9 +6,15 @@ from unittest.mock import patch
 import requests_mock
 
 from frontstage import app
+from tests.app.mocked_services import (business_party, business_party_no_trading_as,
+                                       case, collection_exercise, completed_case, completed_by_phone_case,
+                                       collection_exercise_go_live_event, collection_exercise_go_live_event_before,
+                                       collection_exercise_before_go_live, collection_instrument_seft,
+                                       collection_instrument_eq, survey,
+                                       url_get_cases_by_party, url_get_business_party, url_get_case,
+                                       url_get_collection_exercise, url_get_collection_exercise_go_live,
+                                       url_get_ci, url_get_survey)
 
-
-url_get_surveys_list = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['SURVEYS_LIST']
 url_access_case = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['ACCESS_CASE']
 url_generate_eq_url = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['GENERATE_EQ_URL']
 url_download_ci = app.config['RAS_FRONTSTAGE_API_SERVICE'] + app.config['DOWNLOAD_CI']
@@ -20,12 +26,6 @@ url_confirm_add_organisation_survey = '{}{}'.format(app.config['RAS_FRONTSTAGE_A
 
 with open('tests/test_data/surveys_list_seft.json') as fp:
     surveys_list_seft = json.load(fp)
-
-with open('tests/test_data/surveys_list_eq.json') as fp:
-    surveys_list_eq = json.load(fp)
-
-with open('tests/test_data/surveys_list_no_trading_as.json') as fp:
-    surveys_list_no_trading_as = json.load(fp)
 
 encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoicmVzcG9uZGVudCIsImFjY2Vzc190b2tlbiI6ImI5OWIyMjA" \
                     "0LWYxMDAtNDcxZS1iOTQ1LTIyN2EyNmVhNjljZCIsInJlZnJlc2hfdG9rZW4iOiIxZTQyY2E2MS02ZDBkLTQxYjMtODU2Yy0" \
@@ -64,80 +64,191 @@ class TestSurveys(unittest.TestCase):
         self.patcher.stop()
 
     @requests_mock.mock()
-    def test_surveys_todo(self, mock_request):
-        mock_request.get(url_get_surveys_list, json=surveys_list_seft)
+    def test_get_surveys_list_todo(self, mock_request):
+        mock_request.get(url_get_cases_by_party, json=[case])
+        mock_request.get(url_get_collection_exercise, json=collection_exercise)
+        mock_request.get(url_get_collection_exercise_go_live, json=collection_exercise_go_live_event)
+        mock_request.get(url_get_business_party, json=business_party)
+        mock_request.get(url_get_survey, json=survey)
+        mock_request.get(url_get_ci, json=collection_instrument_seft)
 
-        response = self.app.get('/surveys/todo')
+        response = self.app.get('/surveys/todo', follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Business Register and Employment Survey'.encode() in response.data)
-        self.assertTrue('RUNAME1_COMPANY4 RUNNAME2_COMPANY4'.encode() in response.data)
+        self.assertIn('Surveys to complete'.encode(), response.data)
 
     @requests_mock.mock()
     def test_surveys_todo_trading_as(self, mock_request):
-        mock_request.get(url_get_surveys_list, json=surveys_list_seft)
+        mock_request.get(url_get_cases_by_party, json=[case])
+        mock_request.get(url_get_collection_exercise, json=collection_exercise)
+        mock_request.get(url_get_collection_exercise_go_live, json=collection_exercise_go_live_event)
+        mock_request.get(url_get_business_party, json=business_party)
+        mock_request.get(url_get_survey, json=survey)
+        mock_request.get(url_get_ci, json=collection_instrument_seft)
 
-        response = self.app.get('/surveys/todo')
+        response = self.app.get('/surveys/todo', follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('PC Company'.encode() in response.data)
+        self.assertIn('PC Company'.encode(), response.data)
 
     @requests_mock.mock()
     def test_surveys_todo_no_trading_as(self, mock_request):
-        mock_request.get(url_get_surveys_list, json=surveys_list_no_trading_as)
+        mock_request.get(url_get_cases_by_party, json=[case])
+        mock_request.get(url_get_collection_exercise, json=collection_exercise)
+        mock_request.get(url_get_collection_exercise_go_live, json=collection_exercise_go_live_event)
+        mock_request.get(url_get_business_party, json=business_party_no_trading_as)
+        mock_request.get(url_get_survey, json=survey)
+        mock_request.get(url_get_ci, json=collection_instrument_seft)
 
         response = self.app.get('/surveys/todo')
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('PC Company'.encode() not in response.data)
+        self.assertNotIn('PC Company'.encode(), response.data)
 
     @requests_mock.mock()
     def test_surveys_history_trading_as(self, mock_request):
-        mock_request.get(url_get_surveys_list, json=surveys_list_seft)
+        mock_request.get(url_get_cases_by_party, json=[completed_case])
+        mock_request.get(url_get_collection_exercise, json=collection_exercise)
+        mock_request.get(url_get_collection_exercise_go_live, json=collection_exercise_go_live_event)
+        mock_request.get(url_get_business_party, json=business_party)
+        mock_request.get(url_get_survey, json=survey)
+        mock_request.get(url_get_ci, json=collection_instrument_seft)
 
         response = self.app.get('/surveys/history')
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('PC Company'.encode() in response.data)
+        self.assertIn('PC Company'.encode(), response.data)
 
     @requests_mock.mock()
     def test_surveys_history_no_trading_as(self, mock_request):
-        mock_request.get(url_get_surveys_list, json=surveys_list_no_trading_as)
+        mock_request.get(url_get_cases_by_party, json=[case])
+        mock_request.get(url_get_collection_exercise, json=collection_exercise)
+        mock_request.get(url_get_collection_exercise_go_live, json=collection_exercise_go_live_event)
+        mock_request.get(url_get_business_party, json=business_party_no_trading_as)
+        mock_request.get(url_get_survey, json=survey)
+        mock_request.get(url_get_ci, json=collection_instrument_seft)
 
         response = self.app.get('/surveys/history')
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('PC Company'.encode() not in response.data)
+        self.assertNotIn('PC Company'.encode(), response.data)
 
     @requests_mock.mock()
     def test_surveys_history_seft(self, mock_request):
-        mock_request.get(url_get_surveys_list, json=surveys_list_seft)
+        mock_request.get(url_get_cases_by_party, json=[case])
+        mock_request.get(url_get_collection_exercise, json=collection_exercise)
+        mock_request.get(url_get_collection_exercise_go_live, json=collection_exercise_go_live_event)
+        mock_request.get(url_get_business_party, json=business_party)
+        mock_request.get(url_get_survey, json=survey)
+        mock_request.get(url_get_ci, json=collection_instrument_seft)
 
-        response = self.app.get('/surveys/history')
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('Business Register and Employment Survey'.encode() in response.data)
-        self.assertTrue('RUNAME1_COMPANY4 RUNNAME2_COMPANY4'.encode() in response.data)
-        # Two entries in array, both SEFT. Although 1 is status Complete 2 buttons should show
-        self.assertIn('ACCESS_SURVEY_BUTTON_1'.encode(), response.data)
-        self.assertIn('ACCESS_SURVEY_BUTTON_2'.encode(), response.data)
-
-    @requests_mock.mock()
-    def test_surveys_history_eq(self, mock_request):
-        mock_request.get(url_get_surveys_list, json=surveys_list_eq)
-
-        response = self.app.get('/surveys/history')
+        response = self.app.get('/surveys/history', follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Business Register and Employment Survey'.encode() in response.data)
-        self.assertTrue('RUNAME1_COMPANY4 RUNNAME2_COMPANY4'.encode() in response.data)
-        # Two entries in array, one is Complete one is not, so there should be 1 button only
-        self.assertIn('ACCESS_SURVEY_BUTTON_1'.encode(), response.data)
-        self.assertNotIn('ACCESS_SURVEY_BUTTON_2'.encode(), response.data)
+        self.assertIn('Completed surveys'.encode(), response.data)
 
     @requests_mock.mock()
-    def test_surveys_todo_fail(self, mock_request):
-        mock_request.get(url_get_surveys_list, status_code=500)
+    def test_get_surveys_list_todo_before_go_live(self, mock_request):
+        mock_request.get(url_get_cases_by_party, json=[case])
+        mock_request.get(url_get_collection_exercise, json=collection_exercise_before_go_live)
+        mock_request.get(url_get_collection_exercise_go_live, json=collection_exercise_go_live_event_before)
+        mock_request.get(url_get_business_party, json=business_party)
+        mock_request.get(url_get_survey, json=survey)
+        mock_request.get(url_get_ci, json=collection_instrument_seft)
+
+        response = self.app.get('/surveys/todo', follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+
+    @requests_mock.mock()
+    def test_get_surveys_list_history(self, mock_request):
+        mock_request.get(url_get_cases_by_party, json=[completed_case])
+        mock_request.get(url_get_collection_exercise, json=collection_exercise)
+        mock_request.get(url_get_collection_exercise_go_live, json=collection_exercise_go_live_event)
+        mock_request.get(url_get_business_party, json=business_party)
+        mock_request.get(url_get_survey, json=survey)
+        mock_request.get(url_get_ci, json=collection_instrument_seft)
+
+        response = self.app.get('/surveys/todo', follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+
+    @requests_mock.mock()
+    def test_get_surveys_list_history_includes_completed_by_phone(self, mock_request):
+        mock_request.get(url_get_cases_by_party, json=completed_by_phone_case)
+        mock_request.get(url_get_collection_exercise, json=collection_exercise)
+        mock_request.get(url_get_collection_exercise_go_live, json=collection_exercise_go_live_event)
+        mock_request.get(url_get_business_party, json=business_party)
+        mock_request.get(url_get_survey, json=survey)
+        mock_request.get(url_get_ci, json=collection_instrument_seft)
+
+        response = self.app.get('/surveys/todo', follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+
+    @requests_mock.mock()
+    def test_get_surveys_list_todo_case_fail(self, mock_request):
+        mock_request.get(url_get_cases_by_party, status_code=500)
+
+        response = self.app.get('/surveys/todo', follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_get_surveys_list_todo_collection_exercise_fail(self, mock_request):
+        mock_request.get(url_get_cases_by_party, json=[case])
+        mock_request.get(url_get_collection_exercise, status_code=500)
+
+        response = self.app.get('/surveys/todo', follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_get_surveys_list_todo_collection_exercise_event_fail(self, mock_request):
+        mock_request.get(url_get_cases_by_party, json=[case])
+        mock_request.get(url_get_collection_exercise, json=collection_exercise)
+        mock_request.get(url_get_collection_exercise_go_live, status_code=500)
+
+        response = self.app.get('/surveys/todo', follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_get_surveys_list_todo_party_fail(self, mock_request):
+        mock_request.get(url_get_cases_by_party, json=[case])
+        mock_request.get(url_get_collection_exercise, json=collection_exercise)
+        mock_request.get(url_get_collection_exercise_go_live, json=collection_exercise_go_live_event)
+        mock_request.get(url_get_business_party, status_code=500)
+
+        response = self.app.get('/surveys/todo', follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_get_surveys_list_todo_survey_fail(self, mock_request):
+        mock_request.get(url_get_cases_by_party, json=[case])
+        mock_request.get(url_get_collection_exercise, json=collection_exercise)
+        mock_request.get(url_get_collection_exercise_go_live, json=collection_exercise_go_live_event)
+        mock_request.get(url_get_business_party, json=business_party)
+        mock_request.get(url_get_survey, status_code=500)
+
+        response = self.app.get('/surveys/todo', follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_get_surveys_list_todo_collection_instrument_fail(self, mock_request):
+        mock_request.get(url_get_cases_by_party, json=[case])
+        mock_request.get(url_get_collection_exercise, json=collection_exercise)
+        mock_request.get(url_get_collection_exercise_go_live, json=collection_exercise_go_live_event)
+        mock_request.get(url_get_business_party, json=business_party)
+        mock_request.get(url_get_survey, json=survey)
+        mock_request.get(url_get_ci, status_code=500)
 
         response = self.app.get('/surveys/todo', follow_redirects=True)
 
@@ -371,15 +482,12 @@ class TestSurveys(unittest.TestCase):
     @requests_mock.mock()
     def test_add_survey_submit(self, mock_object):
         mock_object.post(url_add_survey, json={'case_id': "test_case_id"})
-        mock_object.get(url_get_surveys_list, json=surveys_list_seft)
 
         url = '/surveys/add-survey/add-survey-submit' \
               '?encrypted_enrolment_code=WfwJghohWOZTIYnutlTcVucqnuED5Lm9q8t0L4ASHPo='
-        response = self.app.get(url, follow_redirects=True)
+        response = self.app.get(url)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('Business Register and Employment Survey'.encode() in response.data)
-        self.assertTrue('RUNAME1_COMPANY4 RUNNAME2_COMPANY4'.encode() in response.data)
+        self.assertEqual(response.status_code, 302)
 
     @requests_mock.mock()
     def test_add_survey_failure(self, mock_object):

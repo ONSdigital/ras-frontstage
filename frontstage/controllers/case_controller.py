@@ -20,8 +20,6 @@ def case_is_enrolled(case, respondent_id):
     enrolment_status = next((enrolment['enrolmentStatus']
                             for enrolment in association.get('enrolments', [])
                             if enrolment['surveyId'] == case['survey']['id']), '')
-    logger.debug('Successfully checked if case is enrolled',
-                 case=case, enrolment_status=enrolment_status, respondent_id=respondent_id)
     return enrolment_status == 'ENABLED'
 
 
@@ -75,7 +73,7 @@ def build_full_case_data(case):
 
 
 def calculate_case_status(case, collection_instrument_type):
-    logger.debug('Getting the status of case')
+    logger.debug('Getting the status of case', case=case['id'])
     status = 'Not started'
     case_group_status = case.get('caseGroup', {}).get('caseGroupStatus')
 
@@ -88,7 +86,7 @@ def calculate_case_status(case, collection_instrument_type):
     elif case_group_status == 'INPROGRESS' and collection_instrument_type == 'SEFT':
         status = 'Downloaded'
 
-    logger.debug('Retrieved the status of case', status=status)
+    logger.debug('Retrieved the status of case', case=case['id'], status=status)
     return status
 
 

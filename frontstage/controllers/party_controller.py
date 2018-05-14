@@ -11,9 +11,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def get_party_by_business_id(party_id, collection_exercise_id=None):
-    logger.debug('Attempting to retrieve party by business',
-                 collection_exercise_id=collection_exercise_id,
-                 party_id=party_id)
+    logger.debug('Attempting to retrieve party by business', party_id=party_id)
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/businesses/id/{party_id}"
     if collection_exercise_id:
@@ -29,7 +27,5 @@ def get_party_by_business_id(party_id, collection_exercise_id=None):
                   party_id=party_id)
         raise ApiError(response)
 
-    logger.debug('Successfully retrieved party by business',
-                 collection_exercise_id=collection_exercise_id,
-                 party_id=party_id)
+    logger.debug('Successfully retrieved party by business', party_id=party_id)
     return response.json()

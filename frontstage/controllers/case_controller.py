@@ -1,7 +1,7 @@
 import logging
 
-from flask import current_app as app
 import requests
+from flask import current_app as app
 from structlog import wrap_logger
 
 from frontstage.exceptions.exceptions import ApiError, InvalidCaseCategory
@@ -73,6 +73,7 @@ def validate_case_category(category):
     category_names = [cat['name'] for cat in categories]
     if category not in category_names:
         raise InvalidCaseCategory(category)
+    logger.debug('Successfully validated case category', category=category)
 
 
 def post_case_event(case_id, party_id, category, description):

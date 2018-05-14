@@ -26,7 +26,7 @@ def register_activate_account(token):
         elif exc.status_code == 404:
             logger.warning('Unrecognised email verification token', token=token)
             return redirect(url_for('error_bp.not_found_error_page'))
-        elif exc.status_code != 200:
+        else:
             logger.info('Failed to verify email', token=token)
             raise exc
 

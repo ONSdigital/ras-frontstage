@@ -75,9 +75,9 @@ def send_message(message_json):
         response.raise_for_status()
         logger.info("Message sent successfully")
         return response.json()
-    except HTTPError as ex:
+    except HTTPError:
         logger.exception("Message sending failed due to API Error")
-        raise ApiError(ex.response)
+        raise ApiError(response)
 
 
 def _create_get_conversation_headers():

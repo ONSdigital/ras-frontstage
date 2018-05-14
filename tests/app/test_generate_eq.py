@@ -1,6 +1,7 @@
 import json
 import requests_mock
 import unittest
+from unittest.mock import patch
 
 from frontstage import app
 from frontstage.controllers import collection_exercise_controller
@@ -15,6 +16,12 @@ from tests.app.mocked_services import (case, collection_exercise, collection_exe
                                        url_get_case_categories, categories, completed_case)
 
 
+encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoicmVzcG9uZGVudCIsImFjY2Vzc190b2tlbiI6ImI5OWIyMjA" \
+                    "0LWYxMDAtNDcxZS1iOTQ1LTIyN2EyNmVhNjljZCIsInJlZnJlc2hfdG9rZW4iOiIxZTQyY2E2MS02ZDBkLTQxYjMtODU2Yy0" \
+                    "2YjhhMDhlYmIyZTMiLCJleHBpcmVzX2F0IjoxNzM4MTU4MzI4LjAsInBhcnR5X2lkIjoiZjk1NmU4YWUtNmUwZi00NDE0LWI" \
+                    "wY2YtYTA3YzFhYTNlMzdiIn0.7W9yikGtX2gbKLclxv-dajcJ2NL0Nb_HDVqHrCrYvQE"
+
+
 class TestGenerateEqURL(unittest.TestCase):
 
     def setUp(self):
@@ -23,6 +30,11 @@ class TestGenerateEqURL(unittest.TestCase):
         self.headers = {
             "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"  # NOQA
         }
+        self.patcher = patch('redis.StrictRedis.get', return_value=encoded_jwt_token)
+        self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
 
     @requests_mock.mock()
     def test_generate_eq_url(self, mock_request):

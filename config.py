@@ -76,10 +76,6 @@ class Config(object):
     VERIFY_PASSWORD_TOKEN = 'passwords/verify-password-token'
     CHANGE_PASSWORD = 'passwords/change-password'
 
-    CONFIRM_ORGANISATION_SURVEY = 'register/confirm-organisation-survey'
-    CREATE_ACCOUNT = 'register/create-account'
-    VERIFY_EMAIL = 'register/verify-email'
-
     SURVEYS_LIST = 'surveys/surveys-list'
     ACCESS_CASE = 'surveys/access-case'
     DOWNLOAD_CI = 'surveys/download-ci'

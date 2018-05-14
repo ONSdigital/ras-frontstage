@@ -9,7 +9,7 @@ from frontstage import app
 from tests.app.mocked_services import (business_party, case, categories, collection_exercise,
                                        encrypted_enrolment_code, enrolment_code, survey,
                                        url_case_by_enrolment_code, url_get_business_party,
-                                       url_get_case_by_party, url_get_case_categories,
+                                       url_get_cases_by_party, url_get_case_categories,
                                        url_get_collection_exercise, url_get_survey,
                                        url_post_case_event_uuid, url_post_add_survey,
                                        url_validate_enrolment)
@@ -462,7 +462,7 @@ class TestSurveys(unittest.TestCase):
     def test_add_survey_submit(self, mock_object):
         mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
         mock_object.get(url_case_by_enrolment_code, json=case)
-        mock_object.get(url_get_case_by_party, json=[case])
+        mock_object.get(url_get_cases_by_party, json=[case])
         mock_object.get(url_get_case_categories, json=categories)
         mock_object.post(url_post_case_event_uuid, status_code=201)
         mock_object.post(url_post_add_survey, status_code=201)

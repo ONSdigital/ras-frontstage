@@ -26,8 +26,8 @@ def get_case_by_enrolment_code(enrolment_code):
     return response.json()
 
 
-def get_case_by_party_id(party_id, case_events=False):
-    logger.debug('Attempting to retrieve case by party id', party_id=party_id)
+def get_cases_by_party_id(party_id, case_events=False):
+    logger.debug('Attempting to retrieve cases by party id', party_id=party_id)
     url = f"{app.config['CASE_URL']}/cases/partyid/{party_id}"
     if case_events:
         url = f'{url}?caseevents=true'
@@ -37,10 +37,10 @@ def get_case_by_party_id(party_id, case_events=False):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         log_level = logger.warning if response.status_code == 404 else logger.exception
-        log_level('Failed to retrieve case', party_id=party_id)
+        log_level('Failed to retrieve cases', party_id=party_id)
         raise ApiError(response)
 
-    logger.debug('Successfully retrieved case by party id', party_id=party_id)
+    logger.debug('Successfully retrieved cases by party id', party_id=party_id)
     return response.json()
 
 

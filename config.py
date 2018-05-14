@@ -137,4 +137,4 @@ class TestingConfig(DevelopmentConfig):
     REDIS_DB = os.getenv('REDIS_DB', 13)
     JSON_SECRET_KEYS = open("./tests/test_data/jwt-test-keys/test_key.json").read()
     EQ_URL = 'https://eq-test/session?token='
-    ACCOUNT_SERVICE_URL = os.getenv('ACCOUNT_SERVICE_URL')
+    ACCOUNT_SERVICE_URL = 'http://frontstage-url/surveys'

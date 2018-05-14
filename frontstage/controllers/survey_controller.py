@@ -1,9 +1,9 @@
-from datetime import datetime, timezone
 import logging
+from datetime import datetime, timezone
 
+import requests
 from flask import current_app as app
 from iso8601 import parse_date
-import requests
 from structlog import wrap_logger
 
 from frontstage.controllers import case_controller

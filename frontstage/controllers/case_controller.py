@@ -1,8 +1,8 @@
 import logging
 
 import arrow
-from flask import current_app as app
 import requests
+from flask import current_app as app
 from structlog import wrap_logger
 
 from frontstage.controllers import (collection_exercise_controller, collection_instrument_controller,
@@ -20,6 +20,8 @@ def case_is_enrolled(case, respondent_id):
     enrolment_status = next((enrolment['enrolmentStatus']
                             for enrolment in association.get('enrolments', [])
                             if enrolment['surveyId'] == case['survey']['id']), '')
+    logger.debug('Successfully checked if case is enrolled',
+                 case=case, enrolment_status=enrolment_status, respondent_id=respondent_id)
     return enrolment_status == 'ENABLED'
 
 

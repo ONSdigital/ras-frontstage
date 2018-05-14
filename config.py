@@ -81,7 +81,6 @@ class Config(object):
     CREATE_ACCOUNT = 'register/create-account'
     VERIFY_EMAIL = 'register/verify-email'
 
-    SURVEYS_LIST = 'surveys/surveys-list'
     ACCESS_CASE = 'surveys/access-case'
     DOWNLOAD_CI = 'surveys/download-ci'
     UPLOAD_CI = 'surveys/upload-ci'

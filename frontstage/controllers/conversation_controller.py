@@ -1,3 +1,4 @@
+import json
 from json import JSONDecodeError
 import logging
 
@@ -72,10 +73,11 @@ def send_message(message_json):
     try:
         response = session.post(url, headers=headers, data=message_json)
         response.raise_for_status()
+        logger.info("Message sent successfully")
+        return response.json()
     except HTTPError as ex:
         logger.exception("Message sending failed due to API Error")
         raise ApiError(ex.response)
-    logger.info("Message sent successfully")
 
 
 def _create_get_conversation_headers():

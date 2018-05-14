@@ -8,6 +8,7 @@ from structlog import wrap_logger
 
 from frontstage.common.api_call import api_call
 from frontstage.common.session import SessionHandler
+from frontstage.controllers import conversation_controller
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.models import SecureMessagingForm
 from frontstage.views.secure_messaging import secure_message_bp
@@ -38,22 +39,19 @@ def create_message(session):
                                form=form, errors=form.errors, message={})
 
 
-
 def send_message(party_id, case_id, survey, ru_ref):
     logger.info('Attempting to send message', party_id=party_id)
     form = SecureMessagingForm(request.form)
 
-    headers = create_headers()
-    endpoint = 'secure-messaging/send-message'
     subject = form['subject'].data if form['subject'].data else form['hidden_subject'].data
     message_json = {
-        'msg_from': party_id,
-        'msg_to': ['GROUP'],
-        'subject': subject,
-        'body': form['body'].data,
-        'thread_id': form['thread_id'].data,
-        'ru_id': ru_ref,
-        'survey': survey,
+        "msg_from": party_id,
+        "msg_to": ['GROUP'],
+        "subject": subject,
+        "body": form['body'].data,
+        "thread_id": form['thread_id'].data,
+        "ru_id": ru_ref,
+        "survey": survey,
     }
     if case_id:
         message_json['collection_case'] = case_id
@@ -63,20 +61,9 @@ def send_message(party_id, case_id, survey, ru_ref):
         message_json["msg_id"] = form['msg_id'].data
     # Without is_draft parameter, date/time on the message doesn't get saved correctly,
     # resulting in missing date/time in conversation list.
-    response = api_call('POST', endpoint, parameters={"is_draft": False},
-                        json=message_json, headers=headers)
 
-    if response.status_code != 200:
-        logger.info('Failed to send message', party_id=party_id)
-        raise ApiError(response)
-    sent_message = json.loads(response.text)
+    response = conversation_controller.send_message(json.dumps(message_json))
 
     logger.info('Secure message sent successfully',
-                message_id=sent_message['msg_id'], party_id=party_id)
-    return sent_message
-
-
-def create_headers():
-    encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])
-    headers = {"jwt": encoded_jwt}
-    return headers
+                message_id=response['msg_id'], party_id=party_id)
+    return response

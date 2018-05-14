@@ -25,9 +25,9 @@
     {% for survey in sorted_surveys_list %}
     {% if just_added_case_id == survey.case.id %}
     <li class="grid card panel--simple panel--success survey--success col-13@m u-mb-m">
-        {% else %}
+    {% else %}
     <li class="grid card">
-        {% endif %}
+    {% endif %}
         <div class="grid__col col-4@m">
             <span class="survey-list-item__label mercury">SURVEY: </span>
             <span id="SURVEY_NAME">{{ survey.survey.longName }}</span><br/>
@@ -42,7 +42,7 @@
 
         <div class="grid__col col-2@m">
             <span class="survey-list-item__label mercury">PERIOD COVERED: </span>
-            <span id="SURVEY_PERIOD">{{ survey.collection_exercise.userDescription}}</span>
+            <span id="period-{{ loop.index }}" name="period">{{ survey.collection_exercise.userDescription}}</span>
         </div>
 
         <div class="grid__col col-2@m">

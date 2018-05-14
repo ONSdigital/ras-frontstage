@@ -1,0 +1,20 @@
+[
+    {
+      "id": "39632788-50ab-420a-9408-2979133d1fdb",
+      "collectionExerciseId": "df634637-2aac-487f-9d2f-eb56615ed80e",
+      "tag": "return_by",
+      "timestamp": "2018-05-08T00:00:00.000Z"
+    },
+    {
+    "id": "c7ea9f4a-4f6c-4d15-8996-8a08463291ee",
+    "collectionExerciseId": "df634637-2aac-487f-9d2f-eb56615ed80e",
+    "tag": "ref_period_start",
+    "timestamp": "2018-04-10T00:00:00.000Z"
+    },
+    {
+    "id": "db4bf724-cec8-4114-866d-06443efbb1cb",
+    "collectionExerciseId": "df634637-2aac-487f-9d2f-eb56615ed80e",
+    "tag": "exercise_end",
+    "timestamp": "2020-05-31T00:00:00.000Z"
+    }
+]

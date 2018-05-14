@@ -6,10 +6,7 @@ from flask import flash, Markup, redirect, render_template, request, url_for
 from frontstage.common.authorisation import jwt_authorization
 from structlog import wrap_logger
 
-from frontstage.common.api_call import api_call
-from frontstage.common.session import SessionHandler
 from frontstage.controllers import conversation_controller
-from frontstage.exceptions.exceptions import ApiError
 from frontstage.models import SecureMessagingForm
 from frontstage.views.secure_messaging import secure_message_bp
 

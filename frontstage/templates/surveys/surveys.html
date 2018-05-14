@@ -32,12 +32,12 @@
             <span class="survey-list-item__label mercury">SURVEY: </span>
             <span id="SURVEY_NAME">{{ survey.survey.longName }}</span><br/>
             <span id="REPORTING_UNIT_DETAILS_{{ survey.case.caseGroup.sampleUnitRef }}" class="survey-list-item pluto">
-                        Business: {{ survey.business_party.name }}<br/>
-                        {% if survey.business_party.trading_as %}
-                        Trading as: {{survey.business_party.trading_as }}<br/>
-                        {% endif %}
-                        Ref: {{survey.case.caseGroup.sampleUnitRef }}
-                    </span>
+                Business: {{ survey.business_party.name }}<br/>
+                {% if survey.business_party.trading_as %}
+                Trading as: {{ survey.business_party.trading_as }}<br/>
+                {% endif %}
+                Ref: {{ survey.case.caseGroup.sampleUnitRef }}
+            </span>
         </div>
 
         <div class="grid__col col-2@m">

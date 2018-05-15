@@ -3,23 +3,23 @@ import json
 from frontstage import app
 
 
-with open('tests/test_data/party/business_party.json') as json_data:
-    business_party = json.load(json_data)
+with open('tests/test_data/party/business_party.json') as fp:
+    business_party = json.load(fp)
 
-with open('tests/test_data/case/case.json') as json_data:
-    case = json.load(json_data)
+with open('tests/test_data/case/case.json') as fp:
+    case = json.load(fp)
 
-with open('tests/test_data/case/categories.json') as json_data:
-    categories = json.load(json_data)
+with open('tests/test_data/case/categories.json') as fp:
+    categories = json.load(fp)
 
-with open('tests/test_data/collection_exercise/collection_exercise.json') as json_data:
-    collection_exercise = json.load(json_data)
+with open('tests/test_data/collection_exercise/collection_exercise.json') as fp:
+    collection_exercise = json.load(fp)
 
-with open('tests/test_data/party/party.json') as json_data:
-    party = json.load(json_data)
+with open('tests/test_data/party/party.json') as fp:
+    party = json.load(fp)
 
-with open('tests/test_data/survey/survey.json') as json_data:
-    survey = json.load(json_data)
+with open('tests/test_data/survey/survey.json') as fp:
+    survey = json.load(fp)
 
 enrolment_code = 'ABCDEF123456'
 encrypted_enrolment_code = 'WfwJghohWOZTIYnutlTcVucqnuED5Lm9q8t0L4ASHPo='

@@ -69,10 +69,11 @@ def send_message(message_json):
     logger.info("About to send message")
     url = '{}v2/messages'.format(current_app.config["RAS_SECURE_MESSAGING_SERVICE"])
     headers = _create_send_message_headers()
+
+    response = session.post(url, headers=headers, data=message_json)
+
     try:
-        response = session.post(url, headers=headers, data=message_json)
         response.raise_for_status()
-        logger.info("Message sent successfully")
         return response.json()
     except HTTPError:
         logger.exception("Message sending failed due to API Error")

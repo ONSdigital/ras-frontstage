@@ -38,13 +38,12 @@ def create_message(session):
                                form=form, errors=form.errors, message={})
 
 
-
 def send_message(party_id, case_id, survey, ru_ref):
     logger.info('Attempting to send message', party_id=party_id)
     form = SecureMessagingForm(request.form)
 
     headers = create_headers()
-    endpoint = 'secure-messaging/send-message'
+    endpoint = '/secure-messaging/send-message'
     subject = form['subject'].data if form['subject'].data else form['hidden_subject'].data
     message_json = {
         'msg_from': party_id,
@@ -63,6 +62,7 @@ def send_message(party_id, case_id, survey, ru_ref):
         message_json["msg_id"] = form['msg_id'].data
     # Without is_draft parameter, date/time on the message doesn't get saved correctly,
     # resulting in missing date/time in conversation list.
+    # TODO: call SM service directly
     response = api_call('POST', endpoint, parameters={"is_draft": False},
                         json=message_json, headers=headers)
 

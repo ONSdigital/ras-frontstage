@@ -11,7 +11,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def api_call(method, endpoint, parameters=None, json=None, files=None, headers=None):
-    url = app.config['RAS_FRONTSTAGE_API_SERVICE'] + endpoint
+    url = app.config['FRONTSTAGE_API_URL'] + endpoint
 
     logger.debug('Calling frontstage api', method=method, url=url)
     if method == 'GET':

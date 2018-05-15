@@ -1,13 +1,11 @@
-import json
 import logging
 import os
 
 from flask import redirect, render_template, request, url_for
 from structlog import wrap_logger
 
-from frontstage import app
-from frontstage.common.api_call import api_call
 from frontstage.common.cryptographer import Cryptographer
+from frontstage.controllers import case_controller, iac_controller
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.models import EnrolmentCodeForm
 from frontstage.views.register import register_bp
@@ -23,25 +21,36 @@ def register():
 
     if request.method == 'POST' and form.validate():
         logger.info('Enrolment code submitted')
-        enrolment_code = request.form.get('enrolment_code').lower()
-        request_data = {
-            'enrolment_code': enrolment_code,
-            'initial': True
-        }
-        response = api_call('POST', app.config['VALIDATE_ENROLMENT'], json=request_data)
+        enrolment_code = request.form.get('enrolment_code', '').lower()
 
-        # Handle API errors
-        if response.status_code == 404:
-            logger.info('Enrolment code not found')
-            template_data = {"error": {"type": "failed"}}
-            return render_template('register/register.enter-enrolment-code.html', form=form, data=template_data), 202
-        elif response.status_code == 401 and not json.loads(response.text).get('active'):
-            logger.info('Enrolment code not active')
-            template_data = {"error": {"type": "failed"}}
-            return render_template('register/register.enter-enrolment-code.html', form=form, data=template_data), 200
-        elif response.status_code != 200:
-            logger.error('Failed to submit enrolment code')
-            raise ApiError(response)
+        # Validate the enrolment code
+        try:
+            iac = iac_controller.get_iac_from_enrolment(enrolment_code)
+            if iac is None:
+                logger.info('Enrolment code not found')
+                template_data = {"error": {"type": "failed"}}
+                return render_template('register/register.enter-enrolment-code.html', form=form, data=template_data), 202
+            if not iac['active']:
+                logger.info('Enrolment code not active')
+                template_data = {"error": {"type": "failed"}}
+                return render_template('register/register.enter-enrolment-code.html', form=form, data=template_data), 200
+        except ApiError as exc:
+            if exc.status_code == 400:
+                logger.info('Enrolment code already used')
+                template_data = {"error": {"type": "failed"}}
+                return render_template('register/register.enter-enrolment-code.html', form=form, data=template_data), 200
+            else:
+                logger.error('Failed to submit enrolment code')
+                raise exc
+
+        # This is the initial submission of enrolment code so post a case event for authentication attempt
+        case_id = iac['caseId']
+        case = case_controller.get_case_by_enrolment_code(enrolment_code)
+        business_party_id = case['partyId']
+        case_controller.post_case_event(case_id,
+                                        party_id=business_party_id,
+                                        category='ACCESS_CODE_AUTHENTICATION_ATTEMPT',
+                                        description='Access code authentication attempted')
 
         encrypted_enrolment_code = cryptographer.encrypt(enrolment_code.encode()).decode()
         logger.info('Successful enrolment code submitted')

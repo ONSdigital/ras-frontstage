@@ -30,13 +30,18 @@ with open('tests/test_data/party/party.json') as fp:
 with open('tests/test_data/survey/survey.json') as fp:
     survey = json.load(fp)
 
+
+enrolment_code = 'ABCDEF123456'
+encrypted_enrolment_code = 'WfwJghohWOZTIYnutlTcVucqnuED5Lm9q8t0L4ASHPo='
 token = 'test_token'
 
+url_create_account = f"{app.config['PARTY_URL']}/party-api/v1/respondents"
 url_download_ci = f"{app.config['COLLECTION_INSTRUMENT_URL']}/collection-instrument-api/1.0.2/download/{case['collectionInstrumentId']}"
-url_upload_ci = f"{app.config['COLLECTION_INSTRUMENT_URL']}/survey_response-api/v1/survey_responses/{case['id']}"
 url_get_business_party = f"{app.config['PARTY_URL']}/party-api/v1/businesses/id/{business_party['id']}"
 url_get_case = f"{app.config['CASE_URL']}/cases/{case['id']}"
+url_get_case_by_enrolment_code = f"{app.config['CASE_URL']}/cases/iac/{enrolment_code}"
 url_get_case_categories = f"{app.config['CASE_URL']}/categories"
+url_get_cases_by_party = f"{app.config['CASE_URL']}/cases/partyid/{case['partyId']}"
 url_get_ci = f"{app.config['COLLECTION_INSTRUMENT_URL']}/collection-instrument-api/1.0.2/collectioninstrument/id/{collection_instrument_seft['id']}"
 url_get_collection_exercise = f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/{collection_exercise['id']}"
 url_get_collection_exercise_go_live = f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/{collection_exercise['id']}/events/go_live"
@@ -45,6 +50,10 @@ url_get_survey = f"{app.config['SURVEY_URL']}/surveys/{survey['id']}"
 url_get_token = f"{app.config['OAUTH_URL']}/api/v1/tokens/"
 url_oauth_token = f"{app.config['OAUTH_URL']}/api/v1/tokens/"
 url_password_change = f"{app.config['PARTY_URL']}/party-api/v1/respondents/change_password/{token}"
-url_reset_password_request = f"{app.config['PARTY_URL']}/party-api/v1/respondents/request_password_change"
+url_post_add_survey = f"{app.config['PARTY_URL']}/party-api/v1/respondents/add_survey"
 url_post_case_event_uuid = f"{app.config['CASE_URL']}/cases/{case['id']}/events"
+url_reset_password_request = f"{app.config['PARTY_URL']}/party-api/v1/respondents/request_password_change"
+url_upload_ci = f"{app.config['COLLECTION_INSTRUMENT_URL']}/survey_response-api/v1/survey_responses/{case['id']}"
+url_validate_enrolment = f"{app.config['IAC_URL']}/iacs/{enrolment_code}"
+url_verify_email = f"{app.config['PARTY_URL']}/party-api/v1/emailverification/{token}"
 url_verify_token = f"{app.config['PARTY_URL']}/party-api/v1/tokens/verify/{token}"

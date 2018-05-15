@@ -1,8 +1,8 @@
 import logging
 
 import arrow
-from flask import current_app as app
 import requests
+from flask import current_app as app
 from structlog import wrap_logger
 
 from frontstage.controllers import collection_exercise_controller, collection_instrument_controller, party_controller, survey_controller
@@ -12,91 +12,9 @@ from frontstage.exceptions.exceptions import ApiError, InvalidCaseCategory, NoSu
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def get_case_by_case_id(case_id):
-    logger.debug('Retrieving case', case_id=case_id)
-    url = f"{app.config['CASE_URL']}/cases/{case_id}"
-    response = requests.get(url, auth=app.config['CASE_AUTH'])
-
-    try:
-        response.raise_for_status()
-    except requests.exceptions.HTTPError:
-        log_level = logger.warning if response.status_code == 404 else logger.exception
-        log_level('Failed to retrieve case', case_id=case_id)
-        raise ApiError(response)
-
-    logger.debug('Successfully retrieved case', case_id=case_id)
-    return response.json()
-
-
-def check_case_permissions(party_id, case_party_id, case_id=None):
-    logger.debug('Party requesting access to case', party_id=party_id, case_id=case_id, case_party_id=case_party_id)
-    if party_id != case_party_id:
-        raise NoSurveyPermission(party_id, case_id, case_party_id)
-
-    logger.debug('Party has permission to access case', party_id=party_id, case_id=case_id, case_party_id=case_party_id)
-
-
-def get_case_categories():
-    logger.debug('Retrieving case categories')
-    url = f"{app.config['CASE_URL']}/categories"
-    response = requests.get(url, auth=app.config['CASE_AUTH'])
-
-    try:
-        response.raise_for_status()
-    except requests.exceptions.HTTPError:
-        log_level = logger.warning if response.status_code == 404 else logger.exception
-        log_level('Failed to get case categories')
-        raise ApiError(response)
-
-    logger.debug('Successfully retrieved case categories')
-    return response.json()
-
-
-def validate_case_category(category):
-    logger.debug('Validating case category', category=category)
-    categories = get_case_categories()
-    category_names = [cat['name'] for cat in categories]
-    if category not in category_names:
-        raise InvalidCaseCategory(category)
-
-
-def post_case_event(case_id, party_id, category, description):
-    logger.debug('Posting case event', case_id=case_id)
-    validate_case_category(category)
-    url = f"{app.config['CASE_URL']}/cases/{case_id}/events"
-    message = {
-        'description': description,
-        'category': category,
-        'partyId': party_id,
-        'createdBy': 'RAS_FRONTSTAGE'
-    }
-    response = requests.post(url, auth=app.config['CASE_AUTH'], json=message)
-
-    try:
-        response.raise_for_status()
-    except requests.exceptions.HTTPError:
-        log_level = logger.warning if response.status_code == 404 else logger.exception
-        log_level('Failed to post case event', case_id=case_id)
-        raise ApiError(response)
-
-    logger.debug('Successfully posted case event', case_id=case_id)
-
-
-def get_case_data(case_id, party_id):
-    logger.debug('Attempting to retrieve detailed case data', case_id=case_id, party_id=party_id)
-
-    # Check if respondent has permission to see case data
-    case = get_case_by_case_id(case_id)
-    check_case_permissions(party_id, case['partyId'], case_id=case_id)
-
-    full_case_data = build_full_case_data(case)
-
-    logger.debug('Successfully retrieved all data relating to case', case_id=case_id, party_id=party_id)
-    return full_case_data
-
-
 def build_full_case_data(case):
     logger.debug('Attempting to build case data', case_id=case['id'])
+
     collection_exercise_id = case["caseGroup"]["collectionExerciseId"]
     collection_exercise = collection_exercise_controller.get_collection_exercise(collection_exercise_id)
     collection_exercise_formatted = format_collection_exercise_dates(collection_exercise)
@@ -128,6 +46,7 @@ def build_full_case_data(case):
 
 def calculate_case_status(case, collection_instrument_type):
     logger.debug('Getting the status of case')
+
     status = 'Not started'
     case_group_status = case.get('caseGroup', {}).get('caseGroupStatus')
 
@@ -144,12 +63,150 @@ def calculate_case_status(case, collection_instrument_type):
     return status
 
 
+def check_case_permissions(party_id, case_party_id, case_id=None):
+    logger.debug('Party requesting access to case', party_id=party_id, case_id=case_id, case_party_id=case_party_id)
+    
+    if party_id != case_party_id:
+        raise NoSurveyPermission(party_id, case_id, case_party_id)
+
+    logger.debug('Party has permission to access case', party_id=party_id, case_id=case_id, case_party_id=case_party_id)
+
+
 def format_collection_exercise_dates(collection_exercise):
     logger.debug('Formatting collection exercise dates')
+
     input_date_format = 'YYYY-MM-DDThh:mm:ss'
     output_date_format = 'D MMM YYYY'
     for key in ['periodStartDateTime', 'periodEndDateTime', 'scheduledReturnDateTime']:
         collection_exercise[key] = collection_exercise[key].replace('Z', '')
         collection_exercise[key + 'Formatted'] = arrow.get(collection_exercise[key], input_date_format).format(output_date_format)
+
     logger.debug('Successfully formatted collection exercise dates')
     return collection_exercise
+
+
+def get_case_by_case_id(case_id):
+    logger.debug('Attempting to retrieve case', case_id=case_id)
+
+    url = f"{app.config['CASE_URL']}/cases/{case_id}"
+    response = requests.get(url, auth=app.config['CASE_AUTH'])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        log_level = logger.warning if response.status_code == 404 else logger.exception
+        log_level('Failed to retrieve case', case_id=case_id)
+        raise ApiError(response)
+
+    logger.debug('Successfully retrieved case', case_id=case_id)
+    return response.json()
+
+
+def get_case_by_enrolment_code(enrolment_code):
+    logger.debug('Attempting to retrieve case by enrolment code', enrolment_code=enrolment_code)
+
+    url = f"{app.config['CASE_URL']}/cases/iac/{enrolment_code}"
+    response = requests.get(url, auth=app.config['CASE_AUTH'])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        log_level = logger.warning if response.status_code == 404 else logger.exception
+        log_level('Failed to retrieve case', enrolment_code=enrolment_code)
+        raise ApiError(response)
+
+    logger.debug('Successfully retrieved case by enrolment code', enrolment_code=enrolment_code)
+    return response.json()
+
+
+def get_case_categories():
+    logger.debug('Attempting to retrieve case categories')
+
+    url = f"{app.config['CASE_URL']}/categories"
+    response = requests.get(url, auth=app.config['CASE_AUTH'])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        log_level = logger.warning if response.status_code == 404 else logger.exception
+        log_level('Failed to get case categories')
+        raise ApiError(response)
+
+    logger.debug('Successfully retrieved case categories')
+    return response.json()
+
+
+def get_case_data(case_id, party_id):
+    logger.debug('Attempting to retrieve detailed case data', case_id=case_id, party_id=party_id)
+
+    # Check if respondent has permission to see case data
+    case = get_case_by_case_id(case_id)
+    check_case_permissions(party_id, case['partyId'], case_id=case_id)
+
+    full_case_data = build_full_case_data(case)
+
+    logger.debug('Successfully retrieved all data relating to case', case_id=case_id, party_id=party_id)
+    return full_case_data
+
+
+def get_case_id_for_group(case_list, case_group_id):
+    logger.debug('Attempting to get case for group', case_group_id=case_group_id)
+
+    if case_group_id:
+        for case in case_list:
+            if case_group_id == case.get('caseGroup', {}).get('id'):
+                logger.debug('Successfully found case for group', case_group_id=case_group_id, case_id=case['id'])
+                return case['id']
+
+
+def get_cases_by_party_id(party_id, case_events=False):
+    logger.debug('Attempting to retrieve cases by party id', party_id=party_id)
+
+    url = f"{app.config['CASE_URL']}/cases/partyid/{party_id}"
+    if case_events:
+        url = f'{url}?caseevents=true'
+    response = requests.get(url, auth=app.config['CASE_AUTH'])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        log_level = logger.warning if response.status_code == 404 else logger.exception
+        log_level('Failed to retrieve cases', party_id=party_id)
+        raise ApiError(response)
+
+    logger.debug('Successfully retrieved cases by party id', party_id=party_id)
+    return response.json()
+
+
+def post_case_event(case_id, party_id, category, description):
+    logger.debug('Attempting to post case event', case_id=case_id)
+
+    validate_case_category(category)
+    url = f"{app.config['CASE_URL']}/cases/{case_id}/events"
+    message = {
+        'description': description,
+        'category': category,
+        'partyId': party_id,
+        'createdBy': 'RAS_FRONTSTAGE'
+    }
+    response = requests.post(url, auth=app.config['CASE_AUTH'], json=message)
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        log_level = logger.warning if response.status_code == 404 else logger.exception
+        log_level('Failed to post case event', case_id=case_id)
+        raise ApiError(response)
+
+    logger.debug('Successfully posted case event', case_id=case_id)
+
+
+def validate_case_category(category):
+    logger.debug('Validating case category', category=category)
+
+    categories = get_case_categories()
+    category_names = [cat['name'] for cat in categories]
+    if category not in category_names:
+        raise InvalidCaseCategory(category)
+
+    logger.debug('Successfully validated case category', category=category)

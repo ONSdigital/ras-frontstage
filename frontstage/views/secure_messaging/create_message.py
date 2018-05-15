@@ -53,12 +53,6 @@ def send_message(party_id, case_id, survey, ru_ref):
     if case_id:
         message_json['collection_case'] = case_id
 
-    # If message has previously been saved as a draft add through the message id
-    if form["msg_id"].data:
-        message_json["msg_id"] = form['msg_id'].data
-    # Without is_draft parameter, date/time on the message doesn't get saved correctly,
-    # resulting in missing date/time in conversation list.
-
     response = conversation_controller.send_message(json.dumps(message_json))
 
     logger.info('Secure message sent successfully',

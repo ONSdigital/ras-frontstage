@@ -9,9 +9,8 @@ from frontstage import app
 from tests.app.mocked_services import (business_party, business_party_no_trading_as,
                                        case, collection_exercise, completed_case, completed_by_phone_case,
                                        collection_exercise_go_live_event, collection_exercise_go_live_event_before,
-                                       collection_exercise_before_go_live, collection_instrument_seft,
-                                       collection_instrument_eq, survey,
-                                       url_get_cases_by_party, url_get_business_party, url_get_case,
+                                       collection_exercise_before_go_live, collection_instrument_seft, survey,
+                                       url_get_cases_by_party, url_get_business_party,
                                        url_get_collection_exercise, url_get_collection_exercise_go_live,
                                        url_get_ci, url_get_survey)
 

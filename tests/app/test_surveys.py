@@ -24,11 +24,11 @@ url_generate_eq_url = app.config['FRONTSTAGE_API_URL'] + app.config['GENERATE_EQ
 url_confirm_add_organisation_survey = app.config['FRONTSTAGE_API_URL'] + app.config['CONFIRM_ADD_ORGANISATION_SURVEY']
 
 
-with open('tests/test_data/surveys_list_seft.json') as json_data:
-    surveys_list_seft = json.load(json_data)
+with open('tests/test_data/surveys_list_seft.json') as fp:
+    surveys_list_seft = json.load(fp)
 
-with open('tests/test_data/surveys_list_eq.json') as json_data:
-    surveys_list_eq = json.load(json_data)
+with open('tests/test_data/surveys_list_eq.json') as fp:
+    surveys_list_eq = json.load(fp)
 
 encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoicmVzcG9uZGVudCIsImFjY2Vzc190b2tlbiI6ImI5OWIyMjA" \
                     "0LWYxMDAtNDcxZS1iOTQ1LTIyN2EyNmVhNjljZCIsInJlZnJlc2hfdG9rZW4iOiIxZTQyY2E2MS02ZDBkLTQxYjMtODU2Yy0" \

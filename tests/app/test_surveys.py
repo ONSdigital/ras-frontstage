@@ -30,6 +30,10 @@ with open('tests/test_data/surveys_list_seft.json') as fp:
 with open('tests/test_data/surveys_list_eq.json') as fp:
     surveys_list_eq = json.load(fp)
 
+with open('tests/test_data/surveys_list_no_trading_as.json') as fp:
+    surveys_list_no_trading_as = json.load(fp)
+
+
 encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoicmVzcG9uZGVudCIsImFjY2Vzc190b2tlbiI6ImI5OWIyMjA" \
                     "0LWYxMDAtNDcxZS1iOTQ1LTIyN2EyNmVhNjljZCIsInJlZnJlc2hfdG9rZW4iOiIxZTQyY2E2MS02ZDBkLTQxYjMtODU2Yy0" \
                     "2YjhhMDhlYmIyZTMiLCJleHBpcmVzX2F0IjoxNzM4MTU4MzI4LjAsInBhcnR5X2lkIjoiZjk1NmU4YWUtNmUwZi00NDE0LWI" \
@@ -74,6 +78,42 @@ class TestSurveys(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Business Register and Employment Survey'.encode() in response.data)
         self.assertTrue('RUNAME1_COMPANY4 RUNNAME2_COMPANY4'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_surveys_todo_trading_as(self, mock_request):
+        mock_request.get(url_get_surveys_list, json=surveys_list_seft)
+
+        response = self.app.get('/surveys/todo')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('PC Company'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_surveys_todo_no_trading_as(self, mock_request):
+        mock_request.get(url_get_surveys_list, json=surveys_list_no_trading_as)
+
+        response = self.app.get('/surveys/todo')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('PC Company'.encode() not in response.data)
+
+    @requests_mock.mock()
+    def test_surveys_history_trading_as(self, mock_request):
+        mock_request.get(url_get_surveys_list, json=surveys_list_seft)
+
+        response = self.app.get('/surveys/history')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('PC Company'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_surveys_history_no_trading_as(self, mock_request):
+        mock_request.get(url_get_surveys_list, json=surveys_list_no_trading_as)
+
+        response = self.app.get('/surveys/history')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('PC Company'.encode() not in response.data)
 
     @requests_mock.mock()
     def test_surveys_history_seft(self, mock_request):

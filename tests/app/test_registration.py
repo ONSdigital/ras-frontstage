@@ -5,7 +5,7 @@ import requests_mock
 from frontstage import app
 from tests.app.mocked_services import (business_party, case, categories, collection_exercise,
                                        encrypted_enrolment_code, enrolment_code, survey, token,
-                                       url_case_by_enrolment_code, url_get_business_party,
+                                       url_get_case_by_enrolment_code, url_get_business_party,
                                        url_get_case_categories, url_get_collection_exercise,
                                        url_get_survey, url_post_case_event_uuid, url_create_account,
                                        url_validate_enrolment, url_verify_email)
@@ -45,7 +45,7 @@ class TestRegistration(unittest.TestCase):
     @requests_mock.mock()
     def test_enter_enrolment_code_success(self, mock_object):
         mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
-        mock_object.get(url_case_by_enrolment_code, json=case)
+        mock_object.get(url_get_case_by_enrolment_code, json=case)
         mock_object.get(url_get_case_categories, json=categories)
         mock_object.post(url_post_case_event_uuid, status_code=201)
         mock_object.post(url_create_account)
@@ -102,7 +102,7 @@ class TestRegistration(unittest.TestCase):
     @requests_mock.mock()
     def test_confirm_org_page(self, mock_object):
         mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
-        mock_object.get(url_case_by_enrolment_code, json=case)
+        mock_object.get(url_get_case_by_enrolment_code, json=case)
         mock_object.get(url_get_business_party, json=business_party)
         mock_object.get(url_get_collection_exercise, json=collection_exercise)
         mock_object.get(url_get_survey, json=survey)
@@ -130,7 +130,7 @@ class TestRegistration(unittest.TestCase):
     @requests_mock.mock()
     def test_confirm_org_page_case_fail(self, mock_object):
         mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
-        mock_object.get(url_case_by_enrolment_code, status_code=500)
+        mock_object.get(url_get_case_by_enrolment_code, status_code=500)
 
         response = self.app.get('/register/create-account/confirm-organisation-survey',
                                 query_string=self.params,
@@ -143,7 +143,7 @@ class TestRegistration(unittest.TestCase):
     @requests_mock.mock()
     def test_confirm_org_page_case_empty(self, mock_object):
         mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
-        mock_object.get(url_case_by_enrolment_code, json={})
+        mock_object.get(url_get_case_by_enrolment_code, json={})
 
         response = self.app.get('/register/create-account/confirm-organisation-survey',
                                 query_string=self.params,
@@ -156,7 +156,7 @@ class TestRegistration(unittest.TestCase):
     @requests_mock.mock()
     def test_confirm_org_page_party_fail(self, mock_object):
         mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
-        mock_object.get(url_case_by_enrolment_code, json=case)
+        mock_object.get(url_get_case_by_enrolment_code, json=case)
         mock_object.get(url_get_business_party, status_code=500)
 
         response = self.app.get('/register/create-account/confirm-organisation-survey',
@@ -170,7 +170,7 @@ class TestRegistration(unittest.TestCase):
     @requests_mock.mock()
     def test_confirm_org_page_collex_fail(self, mock_object):
         mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
-        mock_object.get(url_case_by_enrolment_code, json=case)
+        mock_object.get(url_get_case_by_enrolment_code, json=case)
         mock_object.get(url_get_business_party, json=business_party)
         mock_object.get(url_get_collection_exercise, status_code=500)
 
@@ -185,7 +185,7 @@ class TestRegistration(unittest.TestCase):
     @requests_mock.mock()
     def test_confirm_org_page_collex_empty(self, mock_object):
         mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
-        mock_object.get(url_case_by_enrolment_code, json=case)
+        mock_object.get(url_get_case_by_enrolment_code, json=case)
         mock_object.get(url_get_business_party, json=business_party)
         mock_object.get(url_get_collection_exercise, json={})
 
@@ -200,7 +200,7 @@ class TestRegistration(unittest.TestCase):
     @requests_mock.mock()
     def test_confirm_org_page_survey_fail(self, mock_object):
         mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
-        mock_object.get(url_case_by_enrolment_code, json=case)
+        mock_object.get(url_get_case_by_enrolment_code, json=case)
         mock_object.get(url_get_business_party, json=business_party)
         mock_object.get(url_get_collection_exercise, json=collection_exercise)
         mock_object.get(url_get_survey, status_code=500)
@@ -216,7 +216,7 @@ class TestRegistration(unittest.TestCase):
     @requests_mock.mock()
     def test_confirm_org_page_survey_empty(self, mock_object):
         mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
-        mock_object.get(url_case_by_enrolment_code, json=case)
+        mock_object.get(url_get_case_by_enrolment_code, json=case)
         mock_object.get(url_get_business_party, json=business_party)
         mock_object.get(url_get_collection_exercise, json=collection_exercise)
         mock_object.get(url_get_survey, json={})

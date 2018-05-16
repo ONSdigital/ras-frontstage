@@ -15,7 +15,7 @@ with open('tests/test_data/conversation_list.json') as json_data:
 
 with open('tests/test_data/secure_messaging/message.json') as json_data:
     message = json.load(json_data)
-url_send_message = app.config['RAS_FRONTSTAGE_API_SERVICE'] + 'secure-messaging/send-message'
+url_send_message = app.config['RAS_SECURE_MESSAGING_SERVICE'] + 'v2/messages'
 
 
 encoded_jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoicmVzcG9uZGVudCIsImFjY2Vzc190b2tlbiI6ImI5OWIyMjA0LWYxM" \

@@ -3,7 +3,6 @@ build:
 
 lint:
 	pipenv run flake8 ./frontstage ./tests
-	pipenv check ./frontstage ./tests
 
 start:
 	pipenv run python run.py

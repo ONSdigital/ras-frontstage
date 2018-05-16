@@ -1,3 +1,4 @@
+import json
 from json import JSONDecodeError
 import logging
 
@@ -66,7 +67,8 @@ def get_conversation_list():
 
 
 def send_message(message_json):
-    logger.info("About to send message")
+    party_id = json.loads(message_json).get('msg_from')
+    logger.info("About to send message", party_id=party_id)
     url = '{}v2/messages'.format(current_app.config["RAS_SECURE_MESSAGING_SERVICE"])
     headers = _create_send_message_headers()
 
@@ -74,9 +76,10 @@ def send_message(message_json):
 
     try:
         response.raise_for_status()
+        logger.info("Send message", party_id=party_id)
         return response.json()
     except HTTPError:
-        logger.exception("Message sending failed due to API Error")
+        logger.exception("Message sending failed due to API Error", party_id=party_id)
         raise ApiError(response)
 
 

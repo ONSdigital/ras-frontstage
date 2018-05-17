@@ -6,18 +6,19 @@ import requests_mock
 
 from frontstage import app
 
-url_get_thread = app.config['SECURE_MESSAGE_URL'] + "/v2/threads/9e3465c0-9172-4974-a7d1-3a01592d1594"
-url_get_threads = app.config['SECURE_MESSAGE_URL'] + "/threads"
+
+url_get_thread = app.config['SECURE_MESSAGE_URL'] + '/v2/threads/9e3465c0-9172-4974-a7d1-3a01592d1594'
+url_get_threads = app.config['SECURE_MESSAGE_URL'] + '/threads'
+url_send_message = app.config['SECURE_MESSAGE_URL'] + '/v2/messages'
+
 with open('tests/test_data/conversation.json') as json_data:
     conversation_json = json.load(json_data)
+
 with open('tests/test_data/conversation_list.json') as json_data:
     conversation_list_json = json.load(json_data)
 
 with open('tests/test_data/secure_messaging/message.json') as json_data:
     message = json.load(json_data)
-
-url_send_message = app.config['FRONTSTAGE_API_URL'] + '/secure-messaging/send-message'
-
 
 encoded_jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoicmVzcG9uZGVudCIsImFjY2Vzc190b2tlbiI6ImI5OWIyMjA0LWYxM" \
               "DAtNDcxZS1iOTQ1LTIyN2EyNmVhNjljZCIsInJlZnJlc2hfdG9rZW4iOiIxZTQyY2E2MS02ZDBkLTQxYjMtODU2Yy02YjhhMDhlYmI" \

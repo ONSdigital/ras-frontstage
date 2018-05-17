@@ -1,8 +1,9 @@
-from json import JSONDecodeError
+import json
 import logging
+from json import JSONDecodeError
 
-from flask import current_app, request
 import requests
+from flask import current_app, request
 from requests.adapters import HTTPAdapter
 from structlog import wrap_logger
 from urllib3 import Retry
@@ -23,91 +24,100 @@ session.mount('https://', HTTPAdapter(max_retries=retries))
 
 
 def get_conversation(thread_id):
-    logger.info("Retrieving conversation", thread_id=thread_id)
+    logger.debug('Attempting to retrieve thread', thread_id=thread_id)
 
     headers = _create_get_conversation_headers()
-    url = '{}/v2/threads/{}'.format(current_app.config["SECURE_MESSAGE_URL"], thread_id)
+    url = f"{current_app.config['SECURE_MESSAGE_URL']}/v2/threads/{thread_id}"
+
+    response = session.get(url, headers=headers)
 
     try:
-        response = session.get(url, headers=headers)
         response.raise_for_status()
     except (HTTPError, RequestException):
-        logger.exception("Thread retrieval failed", thread_id=thread_id)
+        logger.exception('Thread retrieval failed', thread_id=thread_id)
         raise ApiError(response)
-    logger.info("Thread retrieval successful", thread_id=thread_id)
+
+    logger.debug('Thread retrieval successful', thread_id=thread_id)
 
     try:
         return response.json()
     except JSONDecodeError:
-        logger.exception("The response could not be decoded", thread_id=thread_id)
+        logger.exception('The thread response could not be decoded', thread_id=thread_id)
         raise ApiError(response)
 
 
 def get_conversation_list():
-    logger.info("Retrieving threads list")
+    logger.debug('Attempting to retrieve threads list')
 
     headers = _create_get_conversation_headers()
-    url = '{}/threads'.format(current_app.config["SECURE_MESSAGE_URL"])
+    url = f"{current_app.config['SECURE_MESSAGE_URL']}/threads"
+
+    response = session.get(url, headers=headers)
 
     try:
-        response = session.get(url, headers=headers)
         response.raise_for_status()
     except HTTPError:
-        logger.exception("Threads retrieval failed")
+        logger.exception('Threads retrieval failed')
         raise ApiError(response)
 
-    logger.info("Retrieval successful")
+    logger.debug('Threads retrieval successful')
+
     try:
-        messages = response.json()['messages']
-        return messages
+        return response.json()['messages']
     except KeyError:
         logger.exception("Response was successful but didn't contain a 'messages' key")
         raise NoMessagesError
 
 
 def send_message(message_json):
-    logger.info("About to send message")
-    url = '{}/v2/messages'.format(current_app.config["SECURE_MESSAGE_URL"])
+    party_id = json.loads(message_json).get('msg_from')
+    logger.debug('Attempting to send message', party_id=party_id)
+
+    url = f"{current_app.config['SECURE_MESSAGE_URL']}/v2/messages"
     headers = _create_send_message_headers()
+
+    response = session.post(url, headers=headers, data=message_json)
+
     try:
-        response = session.post(url, headers=headers, data=message_json)
         response.raise_for_status()
-    except HTTPError as ex:
-        logger.exception("Message sending failed due to API Error")
-        raise ApiError(ex.response)
-    logger.info("Message sent successfully")
+    except HTTPError:
+        logger.exception('Message sending failed due to API Error', party_id=party_id)
+        raise ApiError(response)
+
+    logger.debug('Successfully sent message', party_id=party_id)
+    return response.json()
 
 
 def _create_get_conversation_headers():
     try:
         encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])
     except KeyError:
-        logger.exception("Authorization token missing in cookie")
+        logger.exception('Authorization token missing in cookie')
         raise AuthorizationTokenMissing
-    headers = {"Authorization": encoded_jwt}
-    return headers
+    return {'Authorization': encoded_jwt}
 
 
 def _create_send_message_headers():
     try:
         encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])
     except KeyError:
-        logger.exception("Authorization token missing in cookie")
+        logger.exception('Authorization token missing in cookie')
         raise AuthorizationTokenMissing
-    headers = {"Authorization": encoded_jwt, 'Content-Type': 'application/json', 'Accept': 'application/json'}
-    return headers
+    return {'Authorization': encoded_jwt, 'Content-Type': 'application/json', 'Accept': 'application/json'}
 
 
 def remove_unread_label(message_id):
-    url = '{}/v2/messages/modify/{}'.format(current_app.config["SECURE_MESSAGE_URL"], message_id)
-    data = '{"label": "UNREAD", "action": "remove"}'
+    logger.debug('Attempting to remove message unread label', message_id=message_id)
 
-    logger.debug("Removing message unread label", message_id=message_id)
+    url = f"{current_app.config['SECURE_MESSAGE_URL']}/v2/messages/modify/{message_id}"
+    data = '{"label": "UNREAD", "action": "remove"}'
     headers = _create_send_message_headers()
 
+    response = session.put(url, headers=headers, data=data)
+
     try:
-        response = session.put(url, headers=headers, data=data)
         response.raise_for_status()
-        logger.debug("Successfully removed unread label", message_id=message_id)
     except HTTPError:
-        logger.exception("Failed to remove unread label", message_id=message_id)
+        logger.exception('Failed to remove unread label', message_id=message_id)
+
+    logger.debug('Successfully removed unread label', message_id=message_id)

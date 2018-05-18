@@ -26,7 +26,8 @@ def get_party_by_business_id(party_id, collection_exercise_id=None):
         log_level = logger.warning if response.status_code == 404 else logger.exception
         log_level('Failed to retrieve party',
                   collection_exercise_id=collection_exercise_id,
-                  party_id=party_id)
+                  party_id=party_id,
+                  status=response.status_code)
         raise ApiError(response)
 
     logger.debug('Successfully retrieved party by business',

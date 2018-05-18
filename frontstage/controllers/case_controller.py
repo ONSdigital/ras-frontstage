@@ -23,7 +23,7 @@ def get_case_by_case_id(case_id):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         log_level = logger.warning if response.status_code == 404 else logger.exception
-        log_level('Failed to retrieve case', case_id=case_id)
+        log_level('Failed to retrieve case', case_id=case_id, status=response.status_code)
         raise ApiError(response)
 
     logger.debug('Successfully retrieved case', case_id=case_id)
@@ -47,7 +47,7 @@ def get_case_categories():
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         log_level = logger.warning if response.status_code == 404 else logger.exception
-        log_level('Failed to get case categories')
+        log_level('Failed to get case categories', status=response.status_code)
         raise ApiError(response)
 
     logger.debug('Successfully retrieved case categories')
@@ -80,7 +80,7 @@ def post_case_event(case_id, party_id, category, description):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         log_level = logger.warning if response.status_code == 404 else logger.exception
-        log_level('Failed to post case event', case_id=case_id)
+        log_level('Failed to post case event', case_id=case_id, status=response.status_code)
         raise ApiError(response)
 
     logger.debug('Successfully posted case event', case_id=case_id)

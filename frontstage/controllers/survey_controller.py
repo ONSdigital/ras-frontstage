@@ -22,7 +22,7 @@ def get_survey(survey_id):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         log_level = logger.warning if response.status_code == 404 else logger.exception
-        log_level('Failed to retrieve survey', survey_id=survey_id)
+        log_level('Failed to retrieve survey', status=response.status_code, survey_id=survey_id)
         raise ApiError(response)
 
     logger.debug('Successfully retrieved survey', survey_id=survey_id)
@@ -34,8 +34,11 @@ def get_surveys_list(party_id, list_type):
 
     try:
         cases = case_controller.get_cases_by_party_id(party_id, case_events=True)
-    except ApiError:
-        logger.error('Failed to retrieve surveys list', party_id=party_id, list_type=list_type)
+    except ApiError as exc:
+        logger.error('Failed to retrieve surveys list',
+                     list_type=list_type,
+                     party_id=party_id,
+                     status=exc.status_code)
         raise
 
     if list_type == 'todo':
@@ -55,8 +58,11 @@ def get_surveys_list(party_id, list_type):
         now = datetime.now(timezone.utc)
         live_cases = [survey for survey in surveys_data if parse_date(survey['go_live']['timestamp']) < now]
         enrolled_cases = [case for case in live_cases if case_controller.case_is_enrolled(case, party_id)]
-    except ApiError:
-        logger.error('Failed to retrieve surveys list', party_id=party_id, list_type=list_type)
+    except ApiError as exc:
+        logger.error('Failed to retrieve surveys list',
+                     list_type=list_type,
+                     party_id=party_id,
+                     status=exc.status_code)
         raise
 
     logger.info('Successfully retrieved surveys list', party_id=party_id, list_type=list_type)

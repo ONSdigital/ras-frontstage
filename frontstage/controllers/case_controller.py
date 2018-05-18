@@ -14,12 +14,15 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def case_is_enrolled(case, respondent_id):
+    logger.debug('Checking status of case for respondent', party_id=respondent_id)
     association = next((association
                        for association in case['business_party']['associations']
                        if association['partyId'] == respondent_id), {})
     enrolment_status = next((enrolment['enrolmentStatus']
                             for enrolment in association.get('enrolments', [])
                             if enrolment['surveyId'] == case['survey']['id']), '')
+    if not enrolment_status:
+        logger.warning('No status found for case', party_id=respondent_id)
     return enrolment_status == 'ENABLED'
 
 
@@ -34,7 +37,7 @@ def get_cases_by_party_id(party_id, case_events=False):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         log_level = logger.warning if response.status_code == 404 else logger.exception
-        log_level('Failed to retrieve cases', party_id=party_id)
+        log_level('Failed to retrieve cases', party_id=party_id, status=response.status_code)
         raise ApiError(response)
 
     logger.debug('Successfully retrieved cases by party id', party_id=party_id)

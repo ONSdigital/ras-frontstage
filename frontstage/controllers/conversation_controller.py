@@ -34,7 +34,7 @@ def get_conversation(thread_id):
     try:
         response.raise_for_status()
     except (HTTPError, RequestException):
-        logger.exception('Thread retrieval failed', thread_id=thread_id)
+        logger.exception('Thread retrieval failed', status=response.status_code, thread_id=thread_id)
         raise ApiError(response)
 
     logger.debug('Thread retrieval successful', thread_id=thread_id)
@@ -57,7 +57,7 @@ def get_conversation_list():
     try:
         response.raise_for_status()
     except HTTPError:
-        logger.exception('Threads retrieval failed')
+        logger.exception('Threads retrieval failed', status=response.status_code)
         raise ApiError(response)
 
     logger.debug('Threads retrieval successful')
@@ -81,7 +81,7 @@ def send_message(message_json):
     try:
         response.raise_for_status()
     except HTTPError:
-        logger.exception('Message sending failed due to API Error', party_id=party_id)
+        logger.exception('Message sending failed due to API Error', party_id=party_id, status=response.status_code)
         raise ApiError(response)
 
     logger.debug('Successfully sent message', party_id=party_id)
@@ -118,6 +118,6 @@ def remove_unread_label(message_id):
     try:
         response.raise_for_status()
     except HTTPError:
-        logger.exception('Failed to remove unread label', message_id=message_id)
+        logger.exception('Failed to remove unread label', message_id=message_id, status=response.status_code)
 
     logger.debug('Successfully removed unread label', message_id=message_id)

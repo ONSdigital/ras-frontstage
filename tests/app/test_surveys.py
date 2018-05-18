@@ -10,10 +10,10 @@ import requests_mock
 from frontstage import app
 from tests.app.mocked_services import (business_party, case, categories, collection_exercise,
                                        collection_exercise_before_go_live, collection_instrument_seft,
-                                       encrypted_enrolment_code, enrolment_code, survey,
+                                       encoded_jwt_token, encrypted_enrolment_code, enrolment_code, survey,
                                        url_download_ci, url_get_business_party, url_get_case,
-                                       url_get_case_by_enrolment_code, url_get_case_categories, 
-                                       url_get_cases_by_party, url_get_collection_exercise, 
+                                       url_get_case_by_enrolment_code, url_get_case_categories,
+                                       url_get_cases_by_party, url_get_collection_exercise,
                                        url_get_collection_exercise_go_live, url_get_ci,
                                        url_get_survey, url_post_add_survey, url_post_case_event_uuid,
                                        url_upload_ci, url_validate_enrolment)
@@ -32,12 +32,6 @@ with open('tests/test_data/surveys_list_eq.json') as fp:
 
 with open('tests/test_data/surveys_list_no_trading_as.json') as fp:
     surveys_list_no_trading_as = json.load(fp)
-
-
-encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoicmVzcG9uZGVudCIsImFjY2Vzc190b2tlbiI6ImI5OWIyMjA" \
-                    "0LWYxMDAtNDcxZS1iOTQ1LTIyN2EyNmVhNjljZCIsInJlZnJlc2hfdG9rZW4iOiIxZTQyY2E2MS02ZDBkLTQxYjMtODU2Yy0" \
-                    "2YjhhMDhlYmIyZTMiLCJleHBpcmVzX2F0IjoxNzM4MTU4MzI4LjAsInBhcnR5X2lkIjoiZjk1NmU4YWUtNmUwZi00NDE0LWI" \
-                    "wY2YtYTA3YzFhYTNlMzdiIn0.7W9yikGtX2gbKLclxv-dajcJ2NL0Nb_HDVqHrCrYvQE"
 
 
 class TestSurveys(unittest.TestCase):

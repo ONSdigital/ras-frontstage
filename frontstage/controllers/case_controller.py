@@ -65,7 +65,7 @@ def calculate_case_status(case, collection_instrument_type):
 
 def check_case_permissions(party_id, case_party_id, case_id=None):
     logger.debug('Party requesting access to case', party_id=party_id, case_id=case_id, case_party_id=case_party_id)
-    
+
     if party_id != case_party_id:
         raise NoSurveyPermission(party_id, case_id, case_party_id)
 

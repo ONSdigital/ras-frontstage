@@ -42,3 +42,10 @@ class MissingEnvironmentVariable(Exception):
         missing_env_variables = [var for var in self.app.config['NON_DEFAULT_VARIABLES'] if not self.app.config[var]]
         self.logger.error('Missing environment variables', variables=missing_env_variables)
         sys.exit("Application failed to start")
+
+
+class InvalidCaseCategory(Exception):
+
+    def __init__(self, category):
+        super().__init__()
+        self.category = category

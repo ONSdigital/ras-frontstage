@@ -1,17 +1,18 @@
-import json
 import logging
 
 from flask import redirect, render_template, request, url_for
 from structlog import wrap_logger
 
-from frontstage import app
-from frontstage.common.api_call import api_call
-from frontstage.exceptions.exceptions import ApiError
+from frontstage.controllers import oauth_controller, party_controller
+from frontstage.exceptions.exceptions import ApiError, OAuth2Error
 from frontstage.models import ForgotPasswordForm
 from frontstage.views.passwords import passwords_bp
 
 
 logger = wrap_logger(logging.getLogger(__name__))
+
+
+BAD_AUTH_ERROR = 'Unauthorized user credentials'
 
 
 @passwords_bp.route('/forgot-password', methods=['GET'])
@@ -31,29 +32,27 @@ def post_forgot_password():
 
     if form.validate():
         email_address = request.form.get('email_address')
-        post_data = {"username": email_address}
-        response = api_call('POST', app.config['REQUEST_PASSWORD_CHANGE'], json=post_data)
 
-        # If we receive a 401 parse the error message to display the correct reason why
-        if response.status_code == 401:
-            error_json = json.loads(response.text).get('error')
-            error_message = error_json.get('data', {}).get('detail')
+        try:
+            oauth_controller.check_account_valid(email_address)
+        except OAuth2Error as exc:
+            error_message = exc.message
             logger.info(error_message=error_message)
-            if 'Unauthorized user credentials' in error_message:
+            if BAD_AUTH_ERROR in error_message:
                 logger.info('Requesting password change for unregistered email on OAuth2 server')
                 template_data = {"error": {"type": {"Email address is not registered"}}}
                 return render_template('passwords/forgot-password.html', form=form, data=template_data)
             return render_template('passwords/reset-password.trouble.html', data={"error": {"type": "failed"}})
 
-        elif response.status_code == 404:
-            logger.error('Requesting password change for email registered'
-                         ' on OAuth2 server but not in party service')
-            template_data = {"error": {"type": {"Email address is not registered"}}}
-            return render_template('passwords/forgot-password.html', form=form, data=template_data)
-
-        if response.status_code != 200:
-            logger.error('Unable to send password change request')
-            raise ApiError(response)
+        try:
+            party_controller.reset_password_request(email_address)
+        except ApiError as exc:
+            if exc.status_code == 404:
+                logger.error('Requesting password change for email registered'
+                             ' on OAuth2 server but not in party service')
+                template_data = {"error": {"type": {"Email address is not registered"}}}
+                return render_template('passwords/forgot-password.html', form=form, data=template_data)
+            raise exc
 
         logger.debug('Successfully sent password change request email')
         return redirect(url_for('passwords_bp.forgot_password_check_email'))

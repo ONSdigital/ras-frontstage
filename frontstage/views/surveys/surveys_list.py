@@ -1,13 +1,10 @@
-import json
 import logging
 
 from flask import render_template, request, make_response
 from structlog import wrap_logger
 
-from frontstage import app
-from frontstage.common.api_call import api_call
+from frontstage.controllers import survey_controller
 from frontstage.common.authorisation import jwt_authorization
-from frontstage.exceptions.exceptions import ApiError
 from frontstage.views.surveys import surveys_bp
 
 
@@ -19,7 +16,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 def logged_in(session):
     party_id = session.get('party_id')
 
-    surveys_list = get_surveys_list(party_id, 'todo')
+    surveys_list = survey_controller.get_surveys_list(party_id, 'todo')
     sorted_surveys_list = sorted(surveys_list, key=lambda k: k['collection_exercise']['scheduledReturnDateTime'],
                                  reverse=True)
 
@@ -37,23 +34,5 @@ def logged_in(session):
 @jwt_authorization(request)
 def surveys_history(session):
     party_id = session['party_id']
-    sorted_surveys_list = get_surveys_list(party_id, 'history')
+    sorted_surveys_list = survey_controller.get_surveys_list(party_id, 'history')
     return render_template('surveys/surveys-history.html', sorted_surveys_list=sorted_surveys_list, history=True)
-
-
-def get_surveys_list(party_id, list_type):
-    logger.info('Retrieving surveys list', party_id=party_id, list_type=list_type)
-    params = {
-        "party_id": party_id,
-        "list": list_type
-    }
-    response = api_call('GET', app.config['SURVEYS_LIST'], parameters=params)
-
-    if response.status_code != 200:
-        logger.error('Failed to retrieve surveys list', party_id=party_id, list_type=list_type,
-                     status=response.status_code)
-        raise ApiError(response)
-
-    surveys_list = json.loads(response.text)
-    logger.info('Successfully retrieved surveys list', party_id=party_id, list_type=list_type)
-    return surveys_list

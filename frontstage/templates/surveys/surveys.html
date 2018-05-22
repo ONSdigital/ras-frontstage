@@ -24,14 +24,14 @@
 
     {% for survey in sorted_surveys_list %}
     {% if just_added_case_id == survey.case.id %}
-    <li class="grid card panel--simple panel--success survey--success col-13@m u-mb-m">
+    <li class="grid card panel--simple panel--success survey--success col-13@m u-mb-m" name="survey-card">
     {% else %}
-    <li class="grid card">
+    <li class="grid card" name="survey-card">
     {% endif %}
         <div class="grid__col col-4@m">
             <span class="survey-list-item__label mercury">SURVEY: </span>
             <span id="SURVEY_NAME">{{ survey.survey.longName }}</span><br/>
-            <span id="REPORTING_UNIT_DETAILS_{{ survey.case.caseGroup.sampleUnitRef }}" class="survey-list-item pluto">
+            <span id="REPORTING_UNIT_DETAILS_{{ survey.case.caseGroup.sampleUnitRef }}" name="reporting-unit-details" class="survey-list-item pluto">
                 Business: {{ survey.business_party.name }}<br/>
                 {% if survey.business_party.trading_as %}
                 Trading as: {{ survey.business_party.trading_as }}<br/>
@@ -48,13 +48,13 @@
         <div class="grid__col col-2@m">
             {% if not history %}
             <span class="survey-list-item__label mercury">SUBMIT BY: </span>
-            <span>{{ survey.collection_exercise.scheduledReturnDateTimeFormatted}}</span>
+            <span id="SUBMIT_BY_{{ loop.index }}" name="submit-by">{{ survey.collection_exercise.scheduledReturnDateTimeFormatted}}</span>
             {% endif %}
         </div>
 
         <div class="grid__col col-2@m">
             <span class="survey-list-item__label mercury">STATUS: </span>
-            <span id="status-{{ loop.index }}">{{ survey.status }}</span>
+            <span id="status-{{ loop.index }}" name="status">{{ survey.status }}</span>
         </div>
         <div class="grid__col col-2@m">
             {% if not survey.status == 'Complete' or not survey.collection_instrument_type == 'EQ' %}

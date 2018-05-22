@@ -6,6 +6,9 @@ from frontstage import app
 with open('tests/test_data/party/business_party.json') as fp:
     business_party = json.load(fp)
 
+with open('tests/test_data/party/business_party_no_trading_as.json') as fp:
+    business_party_no_trading_as = json.load(fp)
+
 with open('tests/test_data/case/case.json') as fp:
     case = json.load(fp)
 
@@ -35,6 +38,9 @@ with open('tests/test_data/collection_instrument/collection_instrument_seft.json
 
 with open('tests/test_data/case/completed_case.json') as fp:
     completed_case = json.load(fp)
+
+with open('tests/test_data/case/completed_by_phone_case.json') as fp:
+    completed_by_phone_case = [json.load(fp)]
 
 with open('tests/test_data/conversation.json') as fp:
     conversation_json = json.load(fp)

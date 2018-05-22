@@ -48,7 +48,7 @@ def build_full_case_data(case):
 
 
 def calculate_case_status(case, collection_instrument_type):
-    logger.debug('Getting the status of case')
+    logger.debug('Getting the status of case', case=case['id'])
 
     status = 'Not started'
     case_group_status = case.get('caseGroup', {}).get('caseGroupStatus')
@@ -62,8 +62,21 @@ def calculate_case_status(case, collection_instrument_type):
     elif case_group_status == 'INPROGRESS' and collection_instrument_type == 'SEFT':
         status = 'Downloaded'
 
-    logger.debug('Retrieved the status of case', status=status)
+    logger.debug('Retrieved the status of case', case=case['id'], status=status)
     return status
+
+
+def case_is_enrolled(case, respondent_id):
+    logger.debug('Checking status of case for respondent', party_id=respondent_id)
+    association = next((association
+                       for association in case['business_party']['associations']
+                       if association['partyId'] == respondent_id), {})
+    enrolment_status = next((enrolment['enrolmentStatus']
+                            for enrolment in association.get('enrolments', [])
+                            if enrolment['surveyId'] == case['survey']['id']), '')
+    if not enrolment_status:
+        logger.warning('No status found for case', party_id=respondent_id)
+    return enrolment_status == 'ENABLED'
 
 
 def check_case_permissions(party_id, case_party_id, case_id=None):
@@ -77,7 +90,6 @@ def check_case_permissions(party_id, case_party_id, case_id=None):
 
 def format_collection_exercise_dates(collection_exercise):
     logger.debug('Formatting collection exercise dates')
-
     input_date_format = 'YYYY-MM-DDThh:mm:ss'
     output_date_format = 'D MMM YYYY'
     for key in ['periodStartDateTime', 'periodEndDateTime', 'scheduledReturnDateTime']:
@@ -181,40 +193,6 @@ def get_cases_by_party_id(party_id, case_events=False):
     return response.json()
 
 
-def validate_case_category(category):
-    logger.debug('Validating case category', category=category)
-
-    categories = get_case_categories()
-    category_names = [cat['name'] for cat in categories]
-    if category not in category_names:
-        raise InvalidCaseCategory(category)
-
-    logger.debug('Successfully validated case category', category=category)
-
-
-def post_case_event(case_id, party_id, category, description):
-    logger.debug('Posting case event', case_id=case_id)
-    
-    validate_case_category(category)
-    url = f"{app.config['CASE_URL']}/cases/{case_id}/events"
-    message = {
-        'description': description,
-        'category': category,
-        'partyId': party_id,
-        'createdBy': 'RAS_FRONTSTAGE'
-    }
-    response = requests.post(url, auth=app.config['CASE_AUTH'], json=message)
-
-    try:
-        response.raise_for_status()
-    except requests.exceptions.HTTPError:
-        log_level = logger.warning if response.status_code == 404 else logger.exception
-        log_level('Failed to post case event', case_id=case_id, status=response.status_code)
-        raise ApiError(response)
-
-    logger.debug('Successfully posted case event', case_id=case_id)
-
-
 def get_eq_url(case_id, party_id):
     logger.debug('Attempting to generate EQ URL', case_id=case_id, party_id=party_id)
 
@@ -248,3 +226,37 @@ def get_eq_url(case_id, party_id):
 
     logger.debug('Successfully generated EQ URL', case_id=case_id, ci_id=ci_id, party_id=party_id)
     return eq_url
+
+
+def post_case_event(case_id, party_id, category, description):
+    logger.debug('Posting case event', case_id=case_id)
+    
+    validate_case_category(category)
+    url = f"{app.config['CASE_URL']}/cases/{case_id}/events"
+    message = {
+        'description': description,
+        'category': category,
+        'partyId': party_id,
+        'createdBy': 'RAS_FRONTSTAGE'
+    }
+    response = requests.post(url, auth=app.config['CASE_AUTH'], json=message)
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        log_level = logger.warning if response.status_code == 404 else logger.exception
+        log_level('Failed to post case event', case_id=case_id, status=response.status_code)
+        raise ApiError(response)
+
+    logger.debug('Successfully posted case event', case_id=case_id)
+
+
+def validate_case_category(category):
+    logger.debug('Validating case category', category=category)
+
+    categories = get_case_categories()
+    category_names = [cat['name'] for cat in categories]
+    if category not in category_names:
+        raise InvalidCaseCategory(category)
+
+    logger.debug('Successfully validated case category', category=category)

@@ -64,17 +64,12 @@ class Config(object):
     PARTY_PASSWORD = os.getenv('PARTY_PASSWORD')
     PARTY_AUTH = (PARTY_USERNAME, PARTY_PASSWORD)
 
+    SECURE_MESSAGE_URL = os.getenv('SECURE_MESSAGE_URL')
+
     SURVEY_URL = os.getenv('SURVEY_URL')
     SURVEY_USERNAME = os.getenv('SURVEY_USERNAME')
     SURVEY_PASSWORD = os.getenv('SURVEY_PASSWORD')
     SURVEY_AUTH = (SURVEY_USERNAME, SURVEY_PASSWORD)
-
-    FRONTSTAGE_API_URL = os.getenv('FRONTSTAGE_API_URL')
-    SECURE_MESSAGE_URL = os.getenv('SECURE_MESSAGE_URL')
-
-    SURVEYS_LIST = '/surveys/surveys-list'
-    CONFIRM_ADD_ORGANISATION_SURVEY = '/surveys/add-survey/confirm-add-organisation-survey'
-    GENERATE_EQ_URL = '/surveys/generate-eq-url'
 
 
 class DevelopmentConfig(Config):
@@ -122,13 +117,12 @@ class DevelopmentConfig(Config):
     PARTY_PASSWORD = os.getenv('PARTY_PASSWORD', 'secret')
     PARTY_AUTH = (PARTY_USERNAME, PARTY_PASSWORD)
 
+    SECURE_MESSAGE_URL = os.getenv('SECURE_MESSAGE_URL', 'http://localhost:5050')
+
     SURVEY_URL = os.getenv('SURVEY_URL', 'http://localhost:8080')
     SURVEY_USERNAME = os.getenv('SURVEY_USERNAME', 'admin')
     SURVEY_PASSWORD = os.getenv('SURVEY_PASSWORD', 'secret')
     SURVEY_AUTH = (SURVEY_USERNAME, SURVEY_PASSWORD)
-
-    FRONTSTAGE_API_URL = os.getenv('FRONTSTAGE_API_URL', 'http://localhost:8083')
-    SECURE_MESSAGE_URL = os.getenv('SECURE_MESSAGE_URL', 'http://localhost:5050')
 
 
 class TestingConfig(DevelopmentConfig):

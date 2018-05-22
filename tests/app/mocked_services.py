@@ -18,17 +18,23 @@ with open('tests/test_data/collection_exercise/collection_exercise.json') as fp:
 with open('tests/test_data/collection_exercise/collection_exercise_before_go_live.json') as fp:
     collection_exercise_before_go_live = json.load(fp)
 
+with open('tests/test_data/collection_exercise/collection_exercise_events.json') as json_data:
+    collection_exercise_events = json.load(json_data)
+
+with open('tests/test_data/collection_exercise/go_live_event.json') as fp:
+    collection_exercise_go_live_event = json.load(fp)
+
+with open('tests/test_data/collection_exercise/go_live_event_before.json') as fp:
+    collection_exercise_go_live_event_before = json.load(fp)
+
 with open('tests/test_data/collection_instrument/collection_instrument_eq.json') as fp:
     collection_instrument_eq = json.load(fp)
 
 with open('tests/test_data/collection_instrument/collection_instrument_seft.json') as fp:
     collection_instrument_seft = json.load(fp)
 
-with open('tests/test_data/party/party.json') as fp:
-    party = json.load(fp)
-
-with open('tests/test_data/survey/survey.json') as fp:
-    survey = json.load(fp)
+with open('tests/test_data/case/completed_case.json') as fp:
+    completed_case = json.load(fp)
 
 with open('tests/test_data/conversation.json') as fp:
     conversation_json = json.load(fp)
@@ -38,6 +44,12 @@ with open('tests/test_data/conversation_list.json') as fp:
 
 with open('tests/test_data/secure_messaging/message.json') as fp:
     message = json.load(fp)
+
+with open('tests/test_data/party/party.json') as fp:
+    party = json.load(fp)
+
+with open('tests/test_data/survey/survey.json') as fp:
+    survey = json.load(fp)
 
 
 encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoicmVzcG9uZGVudCIsImFjY2Vzc190b2tlbiI6ImI5OWIyMjA0LWYxM" \
@@ -57,6 +69,7 @@ url_get_case_categories = f"{app.config['CASE_URL']}/categories"
 url_get_cases_by_party = f"{app.config['CASE_URL']}/cases/partyid/{case['partyId']}"
 url_get_ci = f"{app.config['COLLECTION_INSTRUMENT_URL']}/collection-instrument-api/1.0.2/collectioninstrument/id/{collection_instrument_seft['id']}"
 url_get_collection_exercise = f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/{collection_exercise['id']}"
+url_get_collection_exercise_events = f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/{collection_exercise['id']}/events"
 url_get_collection_exercise_go_live = f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/{collection_exercise['id']}/events/go_live"
 url_get_respondent_email = f"{app.config['PARTY_URL']}/party-api/v1/respondents/email"
 url_get_survey = f"{app.config['SURVEY_URL']}/surveys/{survey['id']}"

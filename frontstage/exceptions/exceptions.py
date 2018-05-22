@@ -79,3 +79,9 @@ class InvalidSurveyList(Exception):
     def __init__(self, survey_list):
         super().__init__()
         self.survey_list = survey_list
+
+
+class InvalidEqPayLoad(Exception):
+    def __init__(self, error):
+        super().__init__()
+        self.error = error

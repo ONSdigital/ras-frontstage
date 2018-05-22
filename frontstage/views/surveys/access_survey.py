@@ -1,14 +1,10 @@
-import json
 import logging
 
 from flask import render_template, request, redirect
 from structlog import wrap_logger
 
-from frontstage import app
-from frontstage.common.api_call import api_call
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import case_controller
-from frontstage.exceptions.exceptions import ApiError
 from frontstage.views.surveys import surveys_bp
 
 
@@ -22,22 +18,9 @@ def access_survey(session):
     case_id = request.args['case_id']
     collection_instrument_type = request.args['ci_type']
 
-    params = {
-        "party_id": party_id,
-        "case_id": case_id
-    }
-
     if collection_instrument_type == 'EQ':
-        logger.info('redirecting to EQ', party_id=party_id, case_id=case_id)
-        response = api_call('GET', app.config['GENERATE_EQ_URL'], parameters=params)
-
-        if response.status_code != 200:
-            logger.error('Failed to retrieve EQ URL',
-                         party_id=party_id, case_id=case_id, status=response.status_code)
-            raise ApiError(response)
-
-        eq_url = json.loads(response.text)['eq_url']
-        return redirect(eq_url)
+        logger.info('Attempting to redirect to EQ', party_id=party_id, case_id=case_id)
+        return redirect(case_controller.get_eq_url(case_id, party_id))
 
     logger.info('Retrieving case data', party_id=party_id, case_id=case_id)
     referer_header = request.headers.get('referer', {})

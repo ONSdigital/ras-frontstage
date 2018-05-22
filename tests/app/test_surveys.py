@@ -20,8 +20,6 @@ from tests.app.mocked_services import (business_party, case, categories, collect
 
 
 url_get_surveys_list = app.config['FRONTSTAGE_API_URL'] + app.config['SURVEYS_LIST']
-url_generate_eq_url = app.config['FRONTSTAGE_API_URL'] + app.config['GENERATE_EQ_URL']
-url_confirm_add_organisation_survey = app.config['FRONTSTAGE_API_URL'] + app.config['CONFIRM_ADD_ORGANISATION_SURVEY']
 
 
 with open('tests/test_data/surveys_list_seft.json') as fp:
@@ -158,22 +156,6 @@ class TestSurveys(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Business Register and Employment Survey'.encode() in response.data)
         self.assertTrue('RUNAME1_COMPANY4 RUNNAME2_COMPANY4'.encode() in response.data)
-
-    @requests_mock.mock()
-    def test_access_survey_eq(self, mock_request):
-        mock_request.get(url_generate_eq_url, json={'eq_url': 'http://test-eq-url/session?token=test'})
-
-        response = self.app.get('/surveys/access_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5&ci_type=EQ')
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue('http://test-eq-url/session?token=test'.encode() in response.data)
-
-    @requests_mock.mock()
-    def test_access_survey_eq_forbidden(self, mock_request):
-        mock_request.get(url_generate_eq_url, status_code=403)
-        response = self.app.get('/surveys/access_survey?case_id=b2457bd4-004d-42d1-a1c6-a514973d9ae5&ci_type=EQ', follow_redirects=True)
-
-        self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
 
     @requests_mock.mock()
     def test_access_survey_title(self, mock_request):
@@ -446,18 +428,6 @@ class TestSurveys(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Confirm organisation'.encode() in response.data)
-
-    @requests_mock.mock()
-    def test_add_survey_confirm_org_page_fail(self, mock_object):
-        mock_object.post(url_confirm_add_organisation_survey, status_code=500)
-
-        response = self.app.get('/surveys/add-survey/confirm-organisation-survey',
-                                query_string=self.params,
-                                headers=self.headers,
-                                follow_redirects=True)
-
-        self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
 
     @requests_mock.mock()
     def test_add_survey_confirm_org_page_validation_fail(self, mock_object):

@@ -4,8 +4,8 @@ import unittest
 from unittest.mock import patch
 
 from frontstage import app
+from frontstage.common.eq_payload import EqPayload
 from frontstage.controllers import collection_exercise_controller
-from frontstage.controllers.eq_payload import EqPayload
 from frontstage.exceptions.exceptions import ApiError, InvalidEqPayLoad
 
 from tests.app.mocked_services import (case, collection_exercise, collection_exercise_events,

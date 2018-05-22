@@ -102,6 +102,10 @@ class DevelopmentConfig(Config):
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
 
+    ACCOUNT_SERVICE_URL = os.getenv('ACCOUNT_SERVICE_URL', 'http://localhost:8082/surveys/todo')
+    EQ_URL = os.getenv('EQ_URL', 'https://localhost:5000/session?token=')
+    JSON_SECRET_KEYS = os.getenv('JSON_SECRET_KEYS') or open("./tests/test_data/jwt-test-keys/test_key.json").read()
+
     CASE_URL = os.getenv('CASE_URL', 'http://localhost:8171')
     CASE_USERNAME = os.getenv('CASE_USERNAME', 'admin')
     CASE_PASSWORD = os.getenv('CASE_PASSWORD', 'secret')
@@ -135,6 +139,6 @@ class TestingConfig(DevelopmentConfig):
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     JWT_SECRET = 'testsecret'
     REDIS_DB = os.getenv('REDIS_DB', 13)
-    JSON_SECRET_KEYS = open("./tests/test_data/jwt-test-keys/test_key.json").read()
-    EQ_URL = 'https://eq-test/session?token='
     ACCOUNT_SERVICE_URL = 'http://frontstage-url/surveys'
+    EQ_URL = 'https://eq-test/session?token='
+    JSON_SECRET_KEYS = open("./tests/test_data/jwt-test-keys/test_key.json").read()

@@ -30,13 +30,13 @@ def download_collection_instrument(collection_instrument_id, case_id, party_id):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         log_level = logger.warning if response.status_code == 404 else logger.exception
-        log_level('Failed to download collection instrument', 
+        log_level('Failed to download collection instrument',
                   collection_instrument_id=collection_instrument_id,
                   party_id=party_id,
                   status=response.status_code)
         raise ApiError(response)
 
-    logger.debug('Successfully downloaded collection instrument', 
+    logger.debug('Successfully downloaded collection instrument',
                  collection_instrument_id=collection_instrument_id,
                  party_id=party_id)
     return response.content, response.headers.items()
@@ -65,7 +65,7 @@ def get_collection_instrument(collection_instrument_id):
 
 def upload_collection_instrument(upload_file, case_id, party_id):
     logger.debug('Attempting to upload collection instrument', case_id=case_id, party_id=party_id)
-    
+
     url = f"{app.config['COLLECTION_INSTRUMENT_URL']}/survey_response-api/v1/survey_responses/{case_id}"
     response = requests.post(url, auth=app.config['COLLECTION_INSTRUMENT_AUTH'], files=upload_file)
 

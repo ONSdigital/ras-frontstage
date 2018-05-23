@@ -4,10 +4,11 @@ import uuid
 
 import iso8601
 from flask import current_app
+from structlog import wrap_logger
+
 from frontstage.controllers import (collection_exercise_controller, collection_instrument_controller,
                                     party_controller, survey_controller)
 from frontstage.exceptions.exceptions import InvalidEqPayLoad
-from structlog import wrap_logger
 
 
 logger = wrap_logger(logging.getLogger(__name__))

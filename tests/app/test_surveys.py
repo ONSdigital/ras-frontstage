@@ -1,5 +1,4 @@
 import io
-import json
 import unittest
 from unittest.mock import patch
 
@@ -8,7 +7,7 @@ import requests
 import requests_mock
 
 from frontstage import app
-from tests.app.mocked_services import (business_party, business_party_no_trading_as, case, categories, 
+from tests.app.mocked_services import (business_party, business_party_no_trading_as, case, categories,
                                        collection_exercise, collection_exercise_before_go_live,
                                        collection_exercise_go_live_event, collection_exercise_go_live_event_before,
                                        collection_instrument_seft, completed_case, completed_by_phone_case,
@@ -660,7 +659,7 @@ class TestSurveys(unittest.TestCase):
         response = self.app.get('/surveys/add-survey/add-survey-submit',
                                 query_string=self.params, follow_redirects=True)
 
-        # redirects to todo list
+        # redirects to todo
         self.assertEqual(response.status_code, 200)
         self.assertIn('Surveys to complete'.encode(), response.data)
 

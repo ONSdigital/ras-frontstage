@@ -230,7 +230,7 @@ def get_eq_url(case_id, party_id):
 
 def post_case_event(case_id, party_id, category, description):
     logger.debug('Posting case event', case_id=case_id)
-    
+
     validate_case_category(category)
     url = f"{app.config['CASE_URL']}/cases/{case_id}/events"
     message = {

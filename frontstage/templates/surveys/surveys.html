@@ -24,7 +24,7 @@
 
     {% for survey in sorted_surveys_list %}
     {% if just_added_case_id == survey.case.id %}
-    <li class="grid card panel--simple panel--success survey--success col-13@m u-mb-m" name="survey-card">
+    <li id="ADDED_{{ just_added_case_id }}" class="grid card panel--simple panel--success survey--success col-13@m u-mb-m" name="survey-card">
     {% else %}
     <li class="grid card" name="survey-card">
     {% endif %}

@@ -16,11 +16,12 @@ from requests.exceptions import HTTPError, RequestException
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-# Configure number of retries on requests
-session = requests.Session()
-retries = Retry(total=10, backoff_factor=0.1)
-session.mount('http://', HTTPAdapter(max_retries=retries))
-session.mount('https://', HTTPAdapter(max_retries=retries))
+def get_session():
+    session = requests.Session()
+    retries = Retry(total=10, backoff_factor=0.1)
+    session.mount('http://', HTTPAdapter(max_retries=retries))
+    session.mount('https://', HTTPAdapter(max_retries=retries))
+    return session
 
 
 def get_conversation(thread_id):
@@ -30,7 +31,7 @@ def get_conversation(thread_id):
     url = '{}v2/threads/{}'.format(current_app.config["RAS_SECURE_MESSAGING_SERVICE"], thread_id)
 
     try:
-        response = session.get(url, headers=headers)
+        response = get_session().get(url, headers=headers)
         response.raise_for_status()
     except (HTTPError, RequestException):
         logger.exception("Thread retrieval failed", thread_id=thread_id)
@@ -51,7 +52,7 @@ def get_conversation_list():
     url = '{}threads'.format(current_app.config["RAS_SECURE_MESSAGING_SERVICE"])
 
     try:
-        response = session.get(url, headers=headers)
+        response = get_session().get(url, headers=headers)
         response.raise_for_status()
     except HTTPError:
         logger.exception("Threads retrieval failed")
@@ -72,7 +73,7 @@ def send_message(message_json):
     url = '{}v2/messages'.format(current_app.config["RAS_SECURE_MESSAGING_SERVICE"])
     headers = _create_send_message_headers()
 
-    response = session.post(url, headers=headers, data=message_json)
+    response = get_session().post(url, headers=headers, data=message_json)
 
     try:
         response.raise_for_status()
@@ -111,7 +112,7 @@ def remove_unread_label(message_id):
     headers = _create_send_message_headers()
 
     try:
-        response = session.put(url, headers=headers, data=data)
+        response = get_session().put(url, headers=headers, data=data)
         response.raise_for_status()
         logger.debug("Successfully removed unread label", message_id=message_id)
     except HTTPError:

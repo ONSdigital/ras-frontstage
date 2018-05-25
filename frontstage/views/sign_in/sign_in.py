@@ -36,7 +36,7 @@ def login():
 
         party_json = party_controller.get_respondent_by_email(username)
         if not party_json or 'id' not in party_json:
-            logger.debug('Respondent not able to sign in as don\'t have an active account in the system.')
+            logger.debug('Respondent not able to sign in as they don\'t have an active account in the system.')
             return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
         party_id = party_json['id']
 

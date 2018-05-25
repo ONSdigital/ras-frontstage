@@ -34,16 +34,20 @@ def get_conversation(thread_id):
     try:
         response.raise_for_status()
     except (HTTPError, RequestException):
-        logger.exception('Thread retrieval failed', status=response.status_code, thread_id=thread_id)
-        raise ApiError(response)
+        raise ApiError(logger, response,
+                       log_level='exception',
+                       message='Thread retrieval failed',
+                       thread_id=thread_id)
 
     logger.debug('Thread retrieval successful', thread_id=thread_id)
 
     try:
         return response.json()
     except JSONDecodeError:
-        logger.exception('The thread response could not be decoded', thread_id=thread_id)
-        raise ApiError(response)
+        raise ApiError(logger, response,
+                       log_level='exception',
+                       message='The thread response could not be decoded',
+                       thread_id=thread_id)
 
 
 def get_conversation_list():
@@ -57,8 +61,9 @@ def get_conversation_list():
     try:
         response.raise_for_status()
     except HTTPError:
-        logger.exception('Threads retrieval failed', status=response.status_code)
-        raise ApiError(response)
+        raise ApiError(logger, response,
+                       log_level='exception',
+                       message='Threads retrieval failed')
 
     logger.debug('Threads retrieval successful')
 
@@ -81,8 +86,10 @@ def send_message(message_json):
     try:
         response.raise_for_status()
     except HTTPError:
-        logger.exception('Message sending failed due to API Error', party_id=party_id, status=response.status_code)
-        raise ApiError(response)
+        raise ApiError(logger, response,
+                       log_level='exception',
+                       message='Message sending failed due to API Error',
+                       party_id=party_id)
 
     logger.debug('Successfully sent message', party_id=party_id)
     return response.json()

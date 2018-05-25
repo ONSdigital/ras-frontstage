@@ -38,7 +38,8 @@ class TestErrorHandlers(unittest.TestCase):
     @requests_mock.mock()
     def test_api_error(self, mock_request):
         response_mock = MagicMock()
-        mock_request.post(url_oauth_token, exc=ApiError(response_mock))
+        logger_mock = MagicMock()
+        mock_request.post(url_oauth_token, exc=ApiError(logger_mock, response_mock))
 
         response = self.app.post('sign-in', data=self.sign_in_form, follow_redirects=True)
 

@@ -83,7 +83,7 @@ class TestGenerateEqURL(unittest.TestCase):
         with app.app_context():
             with self.assertRaises(InvalidEqPayLoad) as e:
                 EqPayload().create_payload(case)
-        self.assertEqual(e.exception.error, 'Collection instrument 68ad4018-2ddd-4894-89e7-33f0135887a2 type is not EQ')
+        self.assertEqual(e.exception.message, 'Collection instrument 68ad4018-2ddd-4894-89e7-33f0135887a2 type is not EQ')
 
     @requests_mock.mock()
     def test_generate_eq_url_no_eq_id(self, mock_request):
@@ -99,7 +99,7 @@ class TestGenerateEqURL(unittest.TestCase):
         with app.app_context():
             with self.assertRaises(InvalidEqPayLoad) as e:
                 EqPayload().create_payload(case)
-        self.assertEqual(e.exception.error, 'Collection instrument 68ad4018-2ddd-4894-89e7-33f0135887a2 '
+        self.assertEqual(e.exception.message, 'Collection instrument 68ad4018-2ddd-4894-89e7-33f0135887a2 '
                                             'classifiers are incorrect or missing')
 
     @requests_mock.mock()
@@ -116,7 +116,7 @@ class TestGenerateEqURL(unittest.TestCase):
         with app.app_context():
             with self.assertRaises(InvalidEqPayLoad) as e:
                 EqPayload().create_payload(case)
-        self.assertEqual(e.exception.error, 'Collection instrument 68ad4018-2ddd-4894-89e7-33f0135887a2 '
+        self.assertEqual(e.exception.message, 'Collection instrument 68ad4018-2ddd-4894-89e7-33f0135887a2 '
                                             'classifiers are incorrect or missing')
 
     @requests_mock.mock()
@@ -141,7 +141,7 @@ class TestGenerateEqURL(unittest.TestCase):
         # Then an InvalidEqPayLoad is raised
         with self.assertRaises(InvalidEqPayLoad) as e:
             EqPayload()._format_string_long_date_time_to_short_date(date)
-        self.assertEqual(e.exception.error, 'Unable to format invalid')
+        self.assertEqual(e.exception.message, 'Unable to format invalid')
 
     def test_generate_eq_url_iso8601_date_format(self):
 
@@ -162,4 +162,4 @@ class TestGenerateEqURL(unittest.TestCase):
 
         with self.assertRaises(InvalidEqPayLoad) as e:
             EqPayload()._find_event_date_by_tag('return by', collex_events_dates, '123')
-        self.assertEqual(e.exception.error, 'Event not found for collection 123 for search param return by')
+        self.assertEqual(e.exception.message, 'Event not found for collection 123 for search param return by')

@@ -41,17 +41,16 @@ def upload_survey(session):
         # Upload the file to the collection instrument service
         collection_instrument_controller.upload_collection_instrument(upload_file, case_id, party_id)
     except CiUploadError as ex:
-        error_message = ex.message
-        if ".xlsx format" in error_message:
+        if ".xlsx format" in ex.error_message:
             error_info = "type"
-        elif "50 characters" in error_message:
+        elif "50 characters" in ex.error_message:
             error_info = "charLimit"
-        elif "File too large" in error_message:
+        elif "File too large" in ex.error_message:
             error_info = 'size'
         else:
             logger.error('Unexpected error message returned from collection instrument service',
                          status=ex.status_code,
-                         error_message=error_message,
+                         error_message=ex.error_message,
                          party_id=party_id,
                          case_id=case_id)
             error_info = "unexpected"

@@ -1,25 +1,29 @@
+import logging
 import sys
 
 
 class ApiError(Exception):
 
-    def __init__(self, response):
-        self.url = response.url
+    def __init__(self, logger, response, log_level='error', message=None, **kwargs):
+        self.kwargs = kwargs
+        self.logger = getattr(logger, log_level)
+        self.message = message
         self.status_code = response.status_code
+        self.url = response.url
 
 
 class CiUploadError(ApiError):
 
-    def __init__(self, response, message):
-        super().__init__(response)
-        self.message = message
+    def __init__(self, logger, response, error_message, **kwargs):
+        super(CiUploadError, self).__init__(logger, response, **kwargs)
+        self.error_message = error_message
 
 
 class OAuth2Error(ApiError):
 
-    def __init__(self, response, message):
-        super(OAuth2Error, self).__init__(response)
-        self.message = message
+    def __init__(self, logger, response, oauth2_error, **kwargs):
+        super(OAuth2Error, self).__init__(logger, response, **kwargs)
+        self.oauth2_error = oauth2_error
 
 
 class InvalidRequestMethod(Exception):
@@ -82,6 +86,6 @@ class InvalidSurveyList(Exception):
 
 
 class InvalidEqPayLoad(Exception):
-    def __init__(self, error):
+    def __init__(self, message):
         super().__init__()
-        self.error = error
+        self.message = message

@@ -43,7 +43,7 @@ def login():
         try:
             oauth2_token = oauth_controller.sign_in(username, password)
         except OAuth2Error as exc:
-            error_message = exc.message
+            error_message = exc.oauth2_error
             if BAD_AUTH_ERROR in error_message:
                 return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
             elif NOT_VERIFIED_ERROR in error_message:
@@ -52,7 +52,7 @@ def login():
                                        data={"error": {"type": "account not verified"}})
             else:
                 logger.error('OAuth 2 server generated 401 which is not understood',
-                             oauth2error=error_message)
+                             oauth2_error=error_message)
                 return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
 
         # Take our raw token and add a UTC timestamp to the expires_at attribute

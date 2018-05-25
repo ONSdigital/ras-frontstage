@@ -19,11 +19,10 @@ def get_collection_exercise(collection_exercise_id):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        log_level = logger.warning if response.status_code == 404 else logger.exception
-        log_level('Failed to retrieve collection exercise',
-                  collection_exercise_id=collection_exercise_id,
-                  status=response.status_code)
-        raise ApiError(response)
+        raise ApiError(logger, response,
+                       collection_exercise_id=collection_exercise_id,
+                       log_level='warning' if response.status_code == 404 else 'exception',
+                       message='Failed to retrieve collection exercise')
 
     logger.debug('Successfully retrieved collection exercise', collection_exercise_id=collection_exercise_id)
     return response.json()
@@ -38,12 +37,11 @@ def get_collection_exercise_event(collection_exercise_id, tag):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        log_level = logger.warning if response.status_code == 404 else logger.exception
-        log_level('Failed to retrieve collection exercise event',
-                  collection_exercise_id=collection_exercise_id,
-                  status=response.status_code,
-                  tag=tag)
-        raise ApiError(response)
+        raise ApiError(logger, response,
+                       collection_exercise_id=collection_exercise_id,
+                       log_level='warning' if response.status_code == 404 else 'exception',
+                       message='Failed to retrieve collection exercise event',
+                       tag=tag)
 
     logger.debug('Successfully retrieved collection exercise event', collection_exercise_id=collection_exercise_id, tag=tag)
     return response.json()
@@ -58,11 +56,10 @@ def get_collection_exercise_events(collection_exercise_id):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        log_level = logger.warning if response.status_code == 404 else logger.exception
-        log_level('Failed to retrieve collection exercise events',
-                  collection_exercise_id=collection_exercise_id,
-                  status=response.status_code)
-        raise ApiError(response)
+        raise ApiError(logger, response,
+                       collection_exercise_id=collection_exercise_id,
+                       log_level='warning' if response.status_code == 404 else 'exception',
+                       message='Failed to retrieve collection exercise events')
 
     logger.debug('Successfully retrieved collection exercise events', collection_exercise_id=collection_exercise_id)
     return response.json()

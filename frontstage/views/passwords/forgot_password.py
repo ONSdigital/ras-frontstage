@@ -36,12 +36,13 @@ def post_forgot_password():
         try:
             oauth_controller.check_account_valid(email_address)
         except OAuth2Error as exc:
-            error_message = exc.message
-            logger.info(error_message=error_message)
+            error_message = exc.oauth2_error
             if BAD_AUTH_ERROR in error_message:
-                logger.info('Requesting password change for unregistered email on OAuth2 server')
+                exc.logger('Requesting password change for unregistered email on OAuth2 server')
                 template_data = {"error": {"type": {"Email address is not registered"}}}
                 return render_template('passwords/forgot-password.html', form=form, data=template_data)
+            else:
+                exc.logger(exc.message, oauth2_error=error_message)
             return render_template('passwords/reset-password.trouble.html', data={"error": {"type": "failed"}})
 
         try:

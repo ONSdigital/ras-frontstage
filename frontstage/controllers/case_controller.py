@@ -9,7 +9,7 @@ from frontstage.common import eq_payload
 from frontstage.common.encrypter import Encrypter
 from frontstage.controllers import (collection_exercise_controller, collection_instrument_controller,
                                     party_controller, survey_controller)
-from frontstage.exceptions.exceptions import ApiError, InvalidCaseCategory, InvalidEqPayLoad, NoSurveyPermission
+from frontstage.exceptions.exceptions import ApiError, InvalidCaseCategory, NoSurveyPermission
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -109,9 +109,10 @@ def get_case_by_case_id(case_id):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        log_level = logger.warning if response.status_code == 404 else logger.exception
-        log_level('Failed to retrieve case by case id', case_id=case_id, status=response.status_code)
-        raise ApiError(response)
+        raise ApiError(logger, response,
+                       case_id=case_id,
+                       log_level='warning' if response.status_code == 404 else 'exception',
+                       message='Failed to retrieve case by case id')
 
     logger.debug('Successfully retrieved case by case id', case_id=case_id)
     return response.json()
@@ -126,9 +127,10 @@ def get_case_by_enrolment_code(enrolment_code):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        log_level = logger.warning if response.status_code == 404 else logger.exception
-        log_level('Failed to retrieve case by enrolment code', enrolment_code=enrolment_code, status=response.status_code)
-        raise ApiError(response)
+        raise ApiError(logger, response,
+                       enrolment_code=enrolment_code,
+                       log_level='warning' if response.status_code == 404 else 'exception',
+                       message='Failed to retrieve case by enrolment code')
 
     logger.debug('Successfully retrieved case by enrolment code', enrolment_code=enrolment_code)
     return response.json()
@@ -143,9 +145,9 @@ def get_case_categories():
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        log_level = logger.warning if response.status_code == 404 else logger.exception
-        log_level('Failed to get case categories', status=response.status_code)
-        raise ApiError(response)
+        raise ApiError(logger, response,
+                       log_level='warning' if response.status_code == 404 else 'exception',
+                       message='Failed to get case categories')
 
     logger.debug('Successfully retrieved case categories')
     return response.json()
@@ -185,9 +187,10 @@ def get_cases_by_party_id(party_id, case_events=False):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        log_level = logger.warning if response.status_code == 404 else logger.exception
-        log_level('Failed to retrieve cases', party_id=party_id, status=response.status_code)
-        raise ApiError(response)
+        raise ApiError(logger, response,
+                       log_level='warning' if response.status_code == 404 else 'exception',
+                       message='Failed to retrieve cases by party id',
+                       party_id=party_id)
 
     logger.debug('Successfully retrieved cases by party id', party_id=party_id)
     return response.json()
@@ -205,11 +208,7 @@ def get_eq_url(case_id, party_id):
 
     check_case_permissions(party_id, case['partyId'], case_id=case_id)
 
-    try:
-        payload = eq_payload.EqPayload().create_payload(case)
-    except InvalidEqPayLoad as exc:
-        logger.error(f'Failed to generate EQ URL: {exc.error}')
-        raise
+    payload = eq_payload.EqPayload().create_payload(case)
 
     json_secret_keys = app.config['JSON_SECRET_KEYS']
     encrypter = Encrypter(json_secret_keys)
@@ -244,9 +243,10 @@ def post_case_event(case_id, party_id, category, description):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        log_level = logger.warning if response.status_code == 404 else logger.exception
-        log_level('Failed to post case event', case_id=case_id, status=response.status_code)
-        raise ApiError(response)
+        raise ApiError(logger, response,
+                       case_id=case_id,
+                       log_level='warning' if response.status_code == 404 else 'exception',
+                       message='Failed to post case event')
 
     logger.debug('Successfully posted case event', case_id=case_id)
 

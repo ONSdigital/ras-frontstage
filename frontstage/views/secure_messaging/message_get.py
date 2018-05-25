@@ -29,7 +29,7 @@ def view_conversation(session, thread_id):
         refined_conversation = [refine(message) for message in reversed(conversation)]
     except KeyError as e:
         logger.exception("Message is missing important data", thread_id=thread_id, party_id=party_id)
-        raise ApiError(e)
+        raise e
 
     if refined_conversation[-1]['unread']:
         remove_unread_label(refined_conversation[-1]['message_id'])
@@ -59,7 +59,7 @@ def view_conversation_list(session):
         refined_conversation = [refine(message) for message in conversation]
     except KeyError as e:
         logger.exception("A key error occurred", party_id=party_id)
-        raise ApiError(e)
+        raise e
     logger.info("Retrieving and refining conversation successful", party_id=party_id)
 
     return render_template('secure-messages/conversation-list.html', messages=refined_conversation)

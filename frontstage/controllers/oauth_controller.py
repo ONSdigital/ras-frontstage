@@ -31,11 +31,11 @@ def check_account_valid(username):
     except requests.exceptions.HTTPError:
         if response.status_code == 401:
             oauth2_error = response.json().get('detail', '')
-            logger.warning('Authentication error in OAuth2 service', error=oauth2_error)
-            raise OAuth2Error(response, message=oauth2_error)
+            message = 'Authentication error in OAuth2 service'
+            raise OAuth2Error(logger, response, log_level='warning', message=message, oauth2_error=oauth2_error)
         else:
-            logger.exception('Failed to check if account is valid in OAuth2 service')
-        raise ApiError(response)
+            message = 'Failed to check if account is valid in OAuth2 service'
+            raise ApiError(logger, response, log_level=exception, message=message)
 
     logger.debug('Successfully checked account state, account is valid')
 
@@ -62,11 +62,11 @@ def sign_in(username, password):
     except requests.exceptions.HTTPError:
         if response.status_code == 401:
             oauth2_error = response.json().get('detail', '')
-            logger.warning('Authentication error in oauth2 service', error=oauth2_error)
-            raise OAuth2Error(response, message=oauth2_error)
+            message = 'Authentication error in OAuth2 service'
+            raise OAuth2Error(logger, response, log_level='warning', message=message, oauth2_error=oauth2_error)
         else:
-            logger.exception('Failed to retrieve OAuth2 token')
-        raise ApiError(response)
+            message = 'Failed to retrieve OAuth2 token'
+            raise ApiError(logger, response, log_level='exception', message=message)
 
     logger.debug('Successfully retrieved OAuth2 token')
     return response.json()

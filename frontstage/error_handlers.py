@@ -6,7 +6,7 @@ from requests.exceptions import ConnectionError
 from structlog import wrap_logger
 
 from frontstage import app
-from frontstage.exceptions.exceptions import ApiError, JWTValidationError
+from frontstage.exceptions.exceptions import ApiError, InvalidEqPayLoad, JWTValidationError
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -21,7 +21,10 @@ def not_found_error(error):  # pylint: disable=unused-argument
 
 @app.errorhandler(ApiError)
 def api_error(error):
-    logger.error('Api failed to retrieve required data', url=error.url, status=error.status_code)
+    error.logger(error.message or 'Api failed to retrieve required data',
+                 status=error.status_code,
+                 url=error.url,
+                 **error.kwargs)
     return redirect(url_for('error_bp.server_error_page',
                             _external=True,
                             _scheme=getenv('SCHEME', 'http')))
@@ -45,6 +48,14 @@ def jwt_validation_error(error):  # pylint: disable=unused-argument
 @app.errorhandler(Exception)
 def server_error(error):  # pylint: disable=unused-argument
     logger.exception('Generic exception generated', exception=error)
+    return redirect(url_for('error_bp.server_error_page',
+                            _external=True,
+                            _scheme=getenv('SCHEME', 'http')))
+
+
+@app.errorhandler(InvalidEqPayLoad)
+def eq_error(error):
+    logger.error('Failed to generate EQ URL', error=error.message)
     return redirect(url_for('error_bp.server_error_page',
                             _external=True,
                             _scheme=getenv('SCHEME', 'http')))

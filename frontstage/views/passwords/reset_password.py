@@ -26,7 +26,6 @@ def get_reset_password(token, form_errors=None):
             logger.warning('Invalid token sent to party service', status_code=exc.status_code, token=token)
             return redirect(url_for('error_bp.not_found_error_page'))
         else:
-            logger.error('Party service failed to verify token', status_code=exc.status_code)
             raise exc
 
     template_data = {
@@ -57,7 +56,6 @@ def post_reset_password(token):
             logger.warning('Invalid token sent to party service', status_code=exc.status_code, token=token)
             return redirect(url_for('error_bp.not_found_error_page'))
         else:
-            logger.error('Party service failed to verify token', status_code=exc.status_code)
             raise exc
 
     logger.info('Successfully changed user password', token=token)

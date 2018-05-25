@@ -20,27 +20,27 @@ def register():
     form = EnrolmentCodeForm(request.form)
 
     if request.method == 'POST' and form.validate():
-        logger.info('Enrolment code submitted')
         enrolment_code = request.form.get('enrolment_code', '').lower()
+        logger.info('Enrolment code submitted', enrolment_code=enrolment_code)
 
         # Validate the enrolment code
         try:
             iac = iac_controller.get_iac_from_enrolment(enrolment_code)
             if iac is None:
-                logger.info('Enrolment code not found')
+                logger.info('Enrolment code not found', enrolment_code=enrolment_code)
                 template_data = {"error": {"type": "failed"}}
                 return render_template('register/register.enter-enrolment-code.html', form=form, data=template_data), 202
             if not iac['active']:
-                logger.info('Enrolment code not active')
+                logger.info('Enrolment code not active', enrolment_code=enrolment_code)
                 template_data = {"error": {"type": "failed"}}
                 return render_template('register/register.enter-enrolment-code.html', form=form, data=template_data), 200
         except ApiError as exc:
             if exc.status_code == 400:
-                logger.info('Enrolment code already used')
+                logger.info('Enrolment code already used', enrolment_code=enrolment_code)
                 template_data = {"error": {"type": "failed"}}
                 return render_template('register/register.enter-enrolment-code.html', form=form, data=template_data), 200
             else:
-                logger.error('Failed to submit enrolment code')
+                logger.error('Failed to submit enrolment code', enrolment_code=enrolment_code)
                 raise exc
 
         # This is the initial submission of enrolment code so post a case event for authentication attempt
@@ -53,7 +53,7 @@ def register():
                                         description='Access code authentication attempted')
 
         encrypted_enrolment_code = cryptographer.encrypt(enrolment_code.encode()).decode()
-        logger.info('Successful enrolment code submitted')
+        logger.info('Successful enrolment code submitted', enrolment_code=enrolment_code)
         return redirect(url_for('register_bp.register_confirm_organisation_survey',
                                 encrypted_enrolment_code=encrypted_enrolment_code,
                                 _external=True,

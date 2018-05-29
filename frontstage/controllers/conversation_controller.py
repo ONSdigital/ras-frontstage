@@ -16,7 +16,7 @@ from requests.exceptions import HTTPError, RequestException
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def get_session():
+def _get_session():
     session = requests.Session()
     retries = Retry(total=10, backoff_factor=0.1)
     session.mount('http://', HTTPAdapter(max_retries=retries))
@@ -30,10 +30,12 @@ def get_conversation(thread_id):
     headers = _create_get_conversation_headers()
     url = '{}v2/threads/{}'.format(current_app.config["RAS_SECURE_MESSAGING_SERVICE"], thread_id)
 
+    with _get_session() as session:
+        response = session.get(url, headers=headers)
+
     try:
-        response = get_session().get(url, headers=headers)
         response.raise_for_status()
-    except (HTTPError, RequestException):
+    except RequestException:
         logger.exception("Thread retrieval failed", thread_id=thread_id)
         raise ApiError(response)
     logger.info("Thread retrieval successful", thread_id=thread_id)
@@ -51,10 +53,12 @@ def get_conversation_list():
     headers = _create_get_conversation_headers()
     url = '{}threads'.format(current_app.config["RAS_SECURE_MESSAGING_SERVICE"])
 
+    with _get_session() as session:
+        response = session.get(url, headers=headers)
+
     try:
-        response = get_session().get(url, headers=headers)
         response.raise_for_status()
-    except HTTPError:
+    except RequestException:
         logger.exception("Threads retrieval failed")
         raise ApiError(response)
 
@@ -73,13 +77,14 @@ def send_message(message_json):
     url = '{}v2/messages'.format(current_app.config["RAS_SECURE_MESSAGING_SERVICE"])
     headers = _create_send_message_headers()
 
-    response = get_session().post(url, headers=headers, data=message_json)
+    with _get_session() as session:
+        response = session.post(url, headers=headers, data=message_json)
 
     try:
         response.raise_for_status()
         logger.info("Send message", party_id=party_id)
         return response.json()
-    except HTTPError:
+    except RequestException:
         logger.exception("Message sending failed due to API Error", party_id=party_id)
         raise ApiError(response)
 
@@ -111,8 +116,10 @@ def remove_unread_label(message_id):
     logger.debug("Removing message unread label", message_id=message_id)
     headers = _create_send_message_headers()
 
+    with _get_session() as session:
+        response = session.put(url, headers=headers, data=data)
+
     try:
-        response = get_session().put(url, headers=headers, data=data)
         response.raise_for_status()
         logger.debug("Successfully removed unread label", message_id=message_id)
     except HTTPError:

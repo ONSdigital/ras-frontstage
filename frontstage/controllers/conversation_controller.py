@@ -31,20 +31,19 @@ def get_conversation(thread_id):
     url = '{}v2/threads/{}'.format(current_app.config["RAS_SECURE_MESSAGING_SERVICE"], thread_id)
 
     with _get_session() as session:
-        response = session.get(url, headers=headers)
+        try:
+            response = session.get(url, headers=headers)
+            response.raise_for_status()
+        except RequestException:
+            logger.exception("Thread retrieval failed", thread_id=thread_id)
+            raise ApiError(response)
+        logger.info("Thread retrieval successful", thread_id=thread_id)
 
-    try:
-        response.raise_for_status()
-    except HTTPError:
-        logger.exception("Thread retrieval failed", thread_id=thread_id)
-        raise ApiError(response)
-    logger.info("Thread retrieval successful", thread_id=thread_id)
-
-    try:
-        return response.json()
-    except JSONDecodeError:
-        logger.exception("The response could not be decoded", thread_id=thread_id)
-        raise ApiError(response)
+        try:
+            return response.json()
+        except JSONDecodeError:
+            logger.exception("The response could not be decoded", thread_id=thread_id)
+            raise ApiError(response)
 
 
 def get_conversation_list():
@@ -54,21 +53,20 @@ def get_conversation_list():
     url = '{}threads'.format(current_app.config["RAS_SECURE_MESSAGING_SERVICE"])
 
     with _get_session() as session:
-        response = session.get(url, headers=headers)
+        try:
+            response = session.get(url, headers=headers)
+            response.raise_for_status()
+        except RequestException:
+            logger.exception("Threads retrieval failed")
+            raise ApiError(response)
 
-    try:
-        response.raise_for_status()
-    except HTTPError:
-        logger.exception("Threads retrieval failed")
-        raise ApiError(response)
-
-    logger.info("Retrieval successful")
-    try:
-        messages = response.json()['messages']
-        return messages
-    except KeyError:
-        logger.exception("Response was successful but didn't contain a 'messages' key")
-        raise NoMessagesError
+        logger.info("Retrieval successful")
+        try:
+            messages = response.json()['messages']
+            return messages
+        except KeyError:
+            logger.exception("Response was successful but didn't contain a 'messages' key")
+            raise NoMessagesError
 
 
 def send_message(message_json):
@@ -78,15 +76,14 @@ def send_message(message_json):
     headers = _create_send_message_headers()
 
     with _get_session() as session:
-        response = session.post(url, headers=headers, data=message_json)
-
-    try:
-        response.raise_for_status()
-        logger.info("Send message", party_id=party_id)
-        return response.json()
-    except HTTPError:
-        logger.exception("Message sending failed due to API Error", party_id=party_id)
-        raise ApiError(response)
+        try:
+            response = session.post(url, headers=headers, data=message_json)
+            response.raise_for_status()
+            logger.info("Send message", party_id=party_id)
+            return response.json()
+        except RequestException:
+            logger.exception("Message sending failed due to API Error", party_id=party_id)
+            raise ApiError(response)
 
 
 def _create_get_conversation_headers():
@@ -117,10 +114,9 @@ def remove_unread_label(message_id):
     headers = _create_send_message_headers()
 
     with _get_session() as session:
-        response = session.put(url, headers=headers, data=data)
-
-    try:
-        response.raise_for_status()
-        logger.debug("Successfully removed unread label", message_id=message_id)
-    except HTTPError:
-        logger.exception("Failed to remove unread label", message_id=message_id)
+        try:
+            response = session.put(url, headers=headers, data=data)
+            response.raise_for_status()
+            logger.debug("Successfully removed unread label", message_id=message_id)
+        except HTTPError:
+            logger.exception("Failed to remove unread label", message_id=message_id)

@@ -99,8 +99,9 @@ class TestGenerateEqURL(unittest.TestCase):
         with app.app_context():
             with self.assertRaises(InvalidEqPayLoad) as e:
                 EqPayload().create_payload(case)
-        self.assertEqual(e.exception.message, 'Collection instrument 68ad4018-2ddd-4894-89e7-33f0135887a2 '
-                                            'classifiers are incorrect or missing')
+        self.assertEqual(e.exception.message,
+                         'Collection instrument 68ad4018-2ddd-4894-89e7-33f0135887a2 '
+                         'classifiers are incorrect or missing')
 
     @requests_mock.mock()
     def test_generate_eq_url_no_form_type(self, mock_request):
@@ -116,8 +117,9 @@ class TestGenerateEqURL(unittest.TestCase):
         with app.app_context():
             with self.assertRaises(InvalidEqPayLoad) as e:
                 EqPayload().create_payload(case)
-        self.assertEqual(e.exception.message, 'Collection instrument 68ad4018-2ddd-4894-89e7-33f0135887a2 '
-                                            'classifiers are incorrect or missing')
+        self.assertEqual(e.exception.message,
+                         'Collection instrument 68ad4018-2ddd-4894-89e7-33f0135887a2 '
+                         'classifiers are incorrect or missing')
 
     @requests_mock.mock()
     def test_access_collection_exercise_events_fail(self, mock_request):

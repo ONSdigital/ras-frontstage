@@ -11,7 +11,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def add_survey(party_id, enrolment_code):
-    logger.debug('Attempting to add a survey', party_id=party_id, enrolment_code=enrolment_code)
+    logger.debug('Attempting to add a survey', party_id=party_id)
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/add_survey"
     request_json = {'party_id': party_id, 'enrolment_code': enrolment_code}
@@ -21,12 +21,11 @@ def add_survey(party_id, enrolment_code):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         raise ApiError(logger, response,
-                       enrolment_code=enrolment_code,
                        log_level='warning' if response.status_code == 404 else 'error',
                        message='Failed to add a survey',
                        party_id=party_id)
 
-    logger.debug('Successfully added a survey', party_id=party_id, enrolment_code=enrolment_code)
+    logger.debug('Successfully added a survey', party_id=party_id)
 
 
 def change_password(password, token):
@@ -48,8 +47,7 @@ def change_password(password, token):
 
 
 def create_account(registration_data):
-    enrolment_code = registration_data.get('enrolment_code')
-    logger.debug('Attempting to create account', enrolment_code=enrolment_code)
+    logger.debug('Attempting to create account')
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents"
     registration_data['status'] = 'CREATED'
@@ -63,11 +61,10 @@ def create_account(registration_data):
         else:
             message = 'Failed to create account',
         raise ApiError(logger, response,
-                       enrolment_code=enrolment_code,
                        log_level='debug' if response.status_code == 400 else 'error',
                        message=message)
 
-    logger.debug('Successfully created account', enrolment_code=enrolment_code)
+    logger.debug('Successfully created account')
 
 
 def get_party_by_business_id(party_id, collection_exercise_id=None):

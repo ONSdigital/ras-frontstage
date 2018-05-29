@@ -22,8 +22,7 @@ def register_confirm_organisation_survey():
     # Validate enrolment code before retrieving organisation data
     iac_controller.validate_enrolment_code(enrolment_code)
 
-    logger.info('Attempting to retrieve data for confirm organisation/survey page',
-                enrolment_code=enrolment_code)
+    logger.info('Attempting to retrieve data for confirm organisation/survey page')
     try:
         # Get organisation name
         case = case_controller.get_case_by_enrolment_code(enrolment_code)
@@ -36,14 +35,11 @@ def register_confirm_organisation_survey():
         survey_id = collection_exercise['surveyId']
         survey_name = survey_controller.get_survey(survey_id).get('longName')
     except ApiError as exc:
-        logger.error('Failed to retrieve data for confirm organisation/survey page',
-                     enrolment_code=enrolment_code, status_code=exc.status_code)
+        logger.error('Failed to retrieve data for confirm organisation/survey page', status_code=exc.status_code)
         raise
 
-    logger.info('Successfully retrieved data for confirm organisation/survey page',
-                enrolment_code=enrolment_code)
+    logger.info('Successfully retrieved data for confirm organisation/survey page')
     return render_template('register/register.confirm-organisation-survey.html',
-                           enrolment_code=enrolment_code,
                            encrypted_enrolment_code=encrypted_enrolment_code,
                            organisation_name=organisation_name,
                            survey_name=survey_name)

@@ -28,25 +28,25 @@ def add_survey(session):
         try:
             iac = iac_controller.get_iac_from_enrolment(enrolment_code)
             if iac is None:
-                logger.info('Enrolment code not found', enrolment_code=enrolment_code)
+                logger.info('Enrolment code not found')
                 template_data = {"error": {"type": "failed"}}
                 return render_template('surveys/surveys-add.html', form=form, data=template_data), 200
             if not iac['active']:
-                logger.info('Enrolment code not active', enrolment_code=enrolment_code)
+                logger.info('Enrolment code not active')
                 template_data = {"error": {"type": "failed"}}
                 return render_template('surveys/surveys-add.html', form=form, data=template_data)
         except ApiError as exc:
             if exc.status_code == 400:
-                logger.info('Enrolment code already used', enrolment_code=enrolment_code, status_code=exc.status_code)
+                logger.info('Enrolment code already used', status_code=exc.status_code)
                 template_data = {"error": {"type": "failed"}}
                 return render_template('surveys/surveys-add.html', form=form, data=template_data)
             else:
-                logger.error('Failed to submit enrolment code', enrolment_code=enrolment_code, status_code=exc.status_code)
+                logger.error('Failed to submit enrolment code', status_code=exc.status_code)
                 raise
 
         cryptographer = Cryptographer()
         encrypted_enrolment_code = cryptographer.encrypt(enrolment_code.encode()).decode()
-        logger.info('Successful enrolment code submitted', enrolment_code=enrolment_code)
+        logger.info('Successful enrolment code submitted')
         return redirect(url_for('surveys_bp.survey_confirm_organisation',
                                 encrypted_enrolment_code=encrypted_enrolment_code,
                                 _external=True,

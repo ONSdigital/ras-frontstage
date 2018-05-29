@@ -54,8 +54,7 @@ def get_collection_instrument(collection_instrument_id):
         raise ApiError(logger, response,
                        collection_instrument_id=collection_instrument_id,
                        log_level='warning' if response.status_code == 404 else 'exception',
-                       message='Failed to get collection instrument',
-                       party_id=party_id)
+                       message='Failed to get collection instrument')
 
     logger.debug('Successfully retrieved collection instrument',
                  collection_instrument_id=collection_instrument_id)

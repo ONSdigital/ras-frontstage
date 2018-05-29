@@ -42,7 +42,7 @@ def add_survey_submit(session):
         case_id = case_controller.get_case_id_for_group(case_list, case_group_id)
     except ApiError as exc:
         logger.error('Failed to assign user to a survey',
-                     enrolment_code=enrolment_code, party_id=party_id, status_code=exc.status_code)
+                     party_id=party_id, status_code=exc.status_code)
         raise
 
     logger.info('Successfully retrieved data for confirm add organisation/survey page',

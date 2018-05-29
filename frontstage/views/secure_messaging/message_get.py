@@ -8,7 +8,6 @@ from structlog import wrap_logger
 from frontstage.common.message_helper import refine
 from frontstage.controllers.conversation_controller import get_conversation, get_conversation_list,\
     remove_unread_label, send_message
-from frontstage.exceptions.exceptions import ApiError
 from frontstage.models import SecureMessagingForm
 from frontstage.views.secure_messaging import secure_message_bp
 

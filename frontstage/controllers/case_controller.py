@@ -119,7 +119,7 @@ def get_case_by_case_id(case_id):
 
 
 def get_case_by_enrolment_code(enrolment_code):
-    logger.debug('Attempting to retrieve case by enrolment code', enrolment_code=enrolment_code)
+    logger.debug('Attempting to retrieve case by enrolment code')
 
     url = f"{app.config['CASE_URL']}/cases/iac/{enrolment_code}"
     response = requests.get(url, auth=app.config['CASE_AUTH'])
@@ -128,11 +128,10 @@ def get_case_by_enrolment_code(enrolment_code):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         raise ApiError(logger, response,
-                       enrolment_code=enrolment_code,
                        log_level='warning' if response.status_code == 404 else 'exception',
                        message='Failed to retrieve case by enrolment code')
 
-    logger.debug('Successfully retrieved case by enrolment code', enrolment_code=enrolment_code)
+    logger.debug('Successfully retrieved case by enrolment code')
     return response.json()
 
 

@@ -35,7 +35,7 @@ def check_account_valid(username):
             raise OAuth2Error(logger, response, log_level='warning', message=message, oauth2_error=oauth2_error)
         else:
             message = 'Failed to check if account is valid in OAuth2 service'
-            raise ApiError(logger, response, log_level=exception, message=message)
+            raise ApiError(logger, response, log_level='exception', message=message)
 
     logger.debug('Successfully checked account state, account is valid')
 

@@ -35,7 +35,7 @@ def get_conversation(thread_id):
 
     try:
         response.raise_for_status()
-    except RequestException:
+    except HTTPError:
         logger.exception("Thread retrieval failed", thread_id=thread_id)
         raise ApiError(response)
     logger.info("Thread retrieval successful", thread_id=thread_id)
@@ -58,7 +58,7 @@ def get_conversation_list():
 
     try:
         response.raise_for_status()
-    except RequestException:
+    except HTTPError:
         logger.exception("Threads retrieval failed")
         raise ApiError(response)
 
@@ -84,7 +84,7 @@ def send_message(message_json):
         response.raise_for_status()
         logger.info("Send message", party_id=party_id)
         return response.json()
-    except RequestException:
+    except HTTPError:
         logger.exception("Message sending failed due to API Error", party_id=party_id)
         raise ApiError(response)
 

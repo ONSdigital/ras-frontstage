@@ -8,6 +8,7 @@ from requests.adapters import HTTPAdapter
 from structlog import wrap_logger
 from urllib3 import Retry
 
+from frontstage.common.session import SessionHandler
 from frontstage.exceptions.exceptions import ApiError, AuthorizationTokenMissing, NoMessagesError
 from requests.exceptions import HTTPError
 

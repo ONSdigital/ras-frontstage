@@ -33,14 +33,15 @@ def get_survey(survey_id):
 def get_surveys_list(cases, party_id, list_type):
     logger.info('Attempting to retrieve surveys list', party_id=party_id, list_type=list_type)
 
+    history_statuses = ['COMPLETE', 'COMPLETEDBYPHONE', 'NOLONGERREQUIRED']
     if list_type == 'todo':
         filtered_cases = [case
                           for case in cases
-                          if case.get('caseGroup', {}).get('caseGroupStatus') not in ['COMPLETE', 'COMPLETEDBYPHONE']]
+                          if case.get('caseGroup', {}).get('caseGroupStatus') not in history_statuses]
     elif list_type == 'history':
         filtered_cases = [case
                           for case in cases
-                          if case.get('caseGroup', {}).get('caseGroupStatus') in ['COMPLETE', 'COMPLETEDBYPHONE']]
+                          if case.get('caseGroup', {}).get('caseGroupStatus') in history_statuses]
     else:
         logger.error('Invalid list type', party_id=party_id, list_type=list_type)
         raise InvalidSurveyList(list_type)

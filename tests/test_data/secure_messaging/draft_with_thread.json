@@ -1,0 +1,53 @@
+{
+  "@msg_from": {
+    "emailAddress": "",
+    "firstName": "BRES",
+    "id": "BRES",
+    "lastName": "",
+    "sampleUnitType": "BI",
+    "status": "",
+    "telephone": ""
+  },
+  "@msg_to": [
+    {
+      "associations": [
+        {
+          "enrolments": [
+            {
+              "enrolmentStatus": "ENABLED",
+              "name": "Business Register and Employment Survey",
+              "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
+            }
+          ],
+          "partyId": "1f5e1d68-2a4c-4698-8086-e23c0b98923f",
+          "sampleUnitRef": "49900000421"
+        }
+      ],
+      "emailAddress": "andrew.millar@ons.gov.uk",
+      "firstName": "Andrew",
+      "id": "ef7737df-2097-4a73-a530-e98dba7bf28f",
+      "lastName": "Millar",
+      "sampleUnitType": "BI",
+      "status": "ACTIVE",
+      "telephone": "07846608800"
+    }
+  ],
+  "@ru_id": "None",
+  "_links": {
+    "self": {
+      "href": "http://ras-secure-messaging-sit.apps.devtest.onsclofo.uk/message/dfcb2b2c-a1d8-4d86-a974-7ffe05a3141b"
+    }
+  },
+  "body": "TEsdfdsfST",
+  "collection_case": "ACollectionCase",
+  "collection_exercise": "ACollectionExercise",
+  "labels": ["DRAFT"],
+  "msg_from": "BRES",
+  "msg_id": "dfcb2b2c-a1d8-4d86-a974-7ffe05a3141b",
+  "msg_to": ["ef7737df-2097-4a73-a530-e98dba7bf28f"],
+  "read_date": "2017-09-20 10:35:34.250858",
+  "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+  "sent_date": "2017-09-20 10:21:51.912869",
+  "subject": "TEST", "survey": "BRES",
+  "thread_id": "dfcb2b2c-a1d8-4d86-a974-7ffe05a3141c"
+}

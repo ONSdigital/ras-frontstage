@@ -1,27 +1,11 @@
-import json
 import unittest
 from unittest.mock import patch
 
 import requests_mock
 
 from frontstage import app
-
-url_get_thread = app.config['RAS_SECURE_MESSAGING_SERVICE'] + "v2/threads/9e3465c0-9172-4974-a7d1-3a01592d1594"
-url_get_threads = app.config['RAS_SECURE_MESSAGING_SERVICE'] + "threads"
-with open('tests/test_data/conversation.json') as json_data:
-    conversation_json = json.load(json_data)
-with open('tests/test_data/conversation_list.json') as json_data:
-    conversation_list_json = json.load(json_data)
-
-with open('tests/test_data/secure_messaging/message.json') as json_data:
-    message = json.load(json_data)
-url_send_message = app.config['RAS_SECURE_MESSAGING_SERVICE'] + 'v2/messages'
-
-
-encoded_jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoicmVzcG9uZGVudCIsImFjY2Vzc190b2tlbiI6ImI5OWIyMjA0LWYxM" \
-              "DAtNDcxZS1iOTQ1LTIyN2EyNmVhNjljZCIsInJlZnJlc2hfdG9rZW4iOiIxZTQyY2E2MS02ZDBkLTQxYjMtODU2Yy02YjhhMDhlYmI" \
-              "yZTMiLCJleHBpcmVzX2F0IjoxNzM4MTU4MzI4LjAsInBhcnR5X2lkIjoiZjk1NmU4YWUtNmUwZi00NDE0LWIwY2YtYTA3YzFhYTNlM" \
-              "zdiIn0.7W9yikGtX2gbKLclxv-dajcJ2NL0Nb_HDVqHrCrYvQE"
+from tests.app.mocked_services import (conversation_json, conversation_list_json,
+                                       encoded_jwt_token, url_get_thread, url_get_threads, url_send_message)
 
 
 def create_api_error(status_code, data=None):
@@ -40,7 +24,7 @@ class TestSecureMessage(unittest.TestCase):
         self.app = app.test_client()
         self.app.testing = True
         self.app.set_cookie('localhost', 'authorization', 'session_key')
-        self.patcher = patch('redis.StrictRedis.get', return_value=encoded_jwt)
+        self.patcher = patch('redis.StrictRedis.get', return_value=encoded_jwt_token)
         self.patcher.start()
         self.message_form = {
                               "subject": "subject",

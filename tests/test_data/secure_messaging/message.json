@@ -1,141 +1,53 @@
 {
-  "draft": {
-    "@msg_from": {
+  "@msg_from": {
+    "emailAddress": "",
+    "firstName": "BRES",
+    "id": "BRES",
+    "lastName": "",
+    "sampleUnitType": "BI",
+    "status": "",
+    "telephone": ""
+  },
+  "@msg_to": [
+    {
       "associations": [
         {
           "enrolments": [
             {
               "enrolmentStatus": "ENABLED",
-              "name": "Business Register and Employment Survey", 
-              "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
-            }
-          ], 
-          "partyId": "1216a88f-ee2a-420c-9e6a-ee34893c29cf",
-          "sampleUnitRef": "49900000004"
-        }
-      ],
-      "emailAddress": "rhiannon.griffiths@ons.gov.uk",
-      "firstName": "Rhiannon", 
-      "id": "07d672bc-497b-448f-a406-a20a7e6013d7", 
-      "lastName": "Griffiths", 
-      "sampleUnitType": "BI", 
-      "status": "ACTIVE",
-      "telephone": "01636 265626"
-    },
-    "@msg_to": [
-      {
-        "emailAddress": "", 
-        "firstName": "BRES",
-        "id": "BRES", 
-        "lastName": "",
-        "sampleUnitType": "BI",
-        "status": "", 
-        "telephone": ""
-      }
-    ],
-    "@ru_id": {
-      "associations": 
-      [
-        {
-          "enrolments": [
-            {
-              "enrolmentStatus": "ENABLED", 
-              "name": "Business Register and Employment Survey", 
+              "name": "Business Register and Employment Survey",
               "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
             }
           ],
-          "partyId": "07d672bc-497b-448f-a406-a20a7e6013d7"
+          "partyId": "1f5e1d68-2a4c-4698-8086-e23c0b98923f",
+          "sampleUnitRef": "49900000421"
         }
-      ], 
-      "id": "1216a88f-ee2a-420c-9e6a-ee34893c29cf",
-      "name": "RUNAME1_COMPANY4 RUNNAME2_COMPANY4", 
-      "sampleUnitRef": "49900000004",
-      "sampleUnitType": "B"
-    }, 
-    "_links": "", 
-    "body": "Test draft",
-    "collection_case": "abc670a5-67c6-4d96-9164-13b4017b8704", 
-    "collection_exercise": "",
-    "labels": ["DRAFT"],
-    "modified_date": "2017-10-24 15:27:07.706307", 
-    "msg_from": "07d672bc-497b-448f-a406-a20a7e6013d7",
-    "msg_id": "a3bc4ad9-c5d1-4b39-88e7-691cde655f84", 
-    "msg_to": ["BRES"], 
-    "ru_id": "1216a88f-ee2a-420c-9e6a-ee34893c29cf", 
-    "subject": "Re: asda", 
-    "survey": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87",
-    "thread_id": "8caeff79-6067-4f2a-96e0-08617fdeb496"
-  }, 
-  "message": {
-    "@msg_from": {
-      "emailAddress": "", 
-      "firstName": "BRES", 
-      "id": "BRES", 
-      "lastName": "", 
+      ],
+      "emailAddress": "andrew.millar@ons.gov.uk",
+      "firstName": "Andrew",
+      "id": "ef7737df-2097-4a73-a530-e98dba7bf28f",
+      "lastName": "Millar",
       "sampleUnitType": "BI",
-      "status": "", 
-      "telephone": ""
-    },
-    "@msg_to": [
-      {
-        "associations": [
-          {
-            "enrolments": [
-              {
-                "enrolmentStatus": "ENABLED", 
-                "name": "Business Register and Employment Survey", 
-                "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
-              }
-            ],
-            "partyId": "1216a88f-ee2a-420c-9e6a-ee34893c29cf",
-            "sampleUnitRef": "49900000004"
-          }
-        ],
-        "emailAddress": "rhiannon.griffiths@ons.gov.uk", 
-        "firstName": "Rhiannon", 
-        "id": "07d672bc-497b-448f-a406-a20a7e6013d7", 
-        "lastName": "Griffiths",
-        "sampleUnitType": "BI", 
-        "status": "ACTIVE", 
-        "telephone": "01636 265626"
-      }
-    ],
-    "@ru_id": {
-      "associations": [
-        {
-          "enrolments": 
-          [
-            {
-              "enrolmentStatus": "ENABLED", 
-              "name": "Business Register and Employment Survey", 
-              "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
-            }
-          ],
-          "partyId": "07d672bc-497b-448f-a406-a20a7e6013d7"
-        }
-      ],
-      "id": "1216a88f-ee2a-420c-9e6a-ee34893c29cf", 
-      "name": "RUNAME1_COMPANY4 RUNNAME2_COMPANY4", 
-      "sampleUnitRef": "49900000004", 
-      "sampleUnitType": "B"
-    }, 
-    "_links": {
-      "self": {
-        "href": "http://ras-secure-messaging-int.apps.devtest.onsclofo.uk/message/29000d7b-dfd8-47fa-8e15-5650a985243b"
-      }
-    },
-    "body": "The European languages are members of the same family. Their separate existence is a myth. For science, music, sport, etc, Europe uses the same vocabulary. The languages only differ in their grammar, their pronunciation and their most common words. Everyone realizes why a new common language would be desirable: one could refuse to pay expensive translators. To achieve this, it would be necessary to have uniform grammar, pronunciation and more common words. If several languages coalesce, the grammar of the resulting language is more simple and regular than that of the individual languages. The new common language will be more simple and regular than the existing European languages. It will be as simple as Occidental; in fact, it will be Occidental. To an English person, it will seem like simplified English, as a skeptical Cambridge friend of mine told me what Occidental is. The European languages are members of the same family. Their separate existence is a myth. For science, music, sport, etc, Europe uses the same vocabulary. The languages only differ in their grammar, their pronunciation and their most common words. Everyone realizes why a new common language would be desirable: one could refuse to pay expensive translators. To achieve this, it would be necessary to have uniform grammar, pronunciation and more common words. If several languages coalesce, the grammar of the resulting language is more simple and regular than that of the individual languages. The new common language will be more simple and regular than the existing European languages. It will be as simple as Occidental; in fact, it will be Occidental. To an English person, it will seem like simplified English, as a skeptical Cambridge friend of mine told me what Occidental is. The European languages are members of the same family. Their separate existence is a myth. For science, music, sport, etc, Europe uses the same vocabulary. The languages only differ in their grammar, their pronunciation and their most common words. Everyone realizes why a new common language would be desirable: one could refuse to pay expensive translators. To achieve this, it would be necessary to have uniform grammar, pronunciation and more common words. If several languages coalesce, the grammar of the resulting language is more simple and regular than that of the individual languages. The new common language will be more simple and regular than the existing European languages. It will be as simple as Occidental; in fact, it will be Occidental. To an English person, it will seem like simplified English, as a skeptical Cambridge friend of mine told me what Occidental is. The European languages are members of the same family. Their separate existence is a myth. For science, music, sport, etc, Europe uses the same vocabulary. The languages only differ in their grammar, their pronunciation and their most common words. Everyone realizes why a new common language would be desirable: one could refuse to pay expensive translators. To achieve this, it would be necessary to have uniform grammar, pronunciation and more common words. If several languages coalesce, the grammar of the resulting language is more simple and regular than that of the individual languages. The new common language will be more simple and regular than the existing European languages. It will be as simple as Occidental; in fact, it will be Occidental. To an English person, it will seem like simplified English, as a skeptical Cambridge friend of mine told me what Occidental is. The European languages are members of the same family. Their separate existence is a myth. For science, music, sport, etc, Europe uses the same vocabulary. The languages only differ in their grammar, their pronunciation and their most common words. Everyone realizes why a new common language would be desirable: one could refuse to pay expensive translators. To achieve this, it would be necessary to have uniform grammar, pronunciation and more common words. If several languages coalesce, the grammar of the resulting language is more simple and reg",
-    "collection_case": "abc670a5-67c6-4d96-9164-13b4017b8704", 
-    "collection_exercise": "", 
-    "labels": ["INBOX"],
-    "msg_from": "BRES",
-    "msg_id": "29000d7b-dfd8-47fa-8e15-5650a985243b", 
-    "msg_to": ["07d672bc-497b-448f-a406-a20a7e6013d7"], 
-    "read_date": "2017-10-23 12:39:54.569114",
-    "ru_id": "1216a88f-ee2a-420c-9e6a-ee34893c29cf", 
-    "sent_date": "2017-10-23 10:22:54.448561",
-    "subject": "asda",
-    "survey": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87", 
-    "thread_id": "8caeff79-6067-4f2a-96e0-08617fdeb496"
-  }
+      "status": "ACTIVE",
+      "telephone": "07846608800"
+    }
+  ],
+  "@ru_id": "None",
+  "_links": {
+    "self": {
+      "href": "http://ras-secure-messaging-sit.apps.devtest.onsclofo.uk/message/dfcb2b2c-a1d8-4d86-a974-7ffe05a3141b"
+    }
+  },
+  "body": "TEsdfdsfST",
+  "collection_case": "ACollectionCase",
+  "collection_exercise": "ACollectionExercise",
+  "labels": ["INBOX"],
+  "msg_from": "BRES",
+  "msg_id": "dfcb2b2c-a1d8-4d86-a974-7ffe05a3141b",
+  "msg_to": ["ef7737df-2097-4a73-a530-e98dba7bf28f"],
+  "read_date": "2017-09-20 10:35:34.250858",
+  "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+  "sent_date": "2017-09-20 10:21:51.912869",
+  "subject": "TEST", "survey": "BRES",
+  "thread_id": "dfcb2b2c-a1d8-4d86-a974-7ffe05a3141b"
 }

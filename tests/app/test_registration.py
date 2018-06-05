@@ -3,12 +3,12 @@ import unittest
 import requests_mock
 
 from frontstage import app
-
-
-url_validate_enrolment = '{}{}'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'], app.config['VALIDATE_ENROLMENT'])
-url_confirm_organisation_survey = '{}{}'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'], app.config['CONFIRM_ORGANISATION_SURVEY'])
-url_create_account = '{}{}'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'], app.config['CREATE_ACCOUNT'])
-url_activate_account = '{}{}?token=Test_token'.format(app.config['RAS_FRONTSTAGE_API_SERVICE'], app.config['VERIFY_EMAIL'])
+from tests.app.mocked_services import (business_party, case, categories, collection_exercise,
+                                       encrypted_enrolment_code, enrolment_code, survey, token,
+                                       url_get_case_by_enrolment_code, url_get_business_party,
+                                       url_get_case_categories, url_get_collection_exercise,
+                                       url_get_survey, url_post_case_event_uuid, url_create_account,
+                                       url_validate_enrolment, url_verify_email)
 
 
 class TestRegistration(unittest.TestCase):
@@ -31,9 +31,8 @@ class TestRegistration(unittest.TestCase):
             'survey_name': 'test_survey',
             'organisation_name': 'test_org'
         }
-        self.encrypted_enrolment_code = 'WfwJghohWOZTIYnutlTcVucqnuED5Lm9q8t0L4ASHPo='
         self.params = {
-            "encrypted_enrolment_code": self.encrypted_enrolment_code
+            "encrypted_enrolment_code": encrypted_enrolment_code
         }
 
     def test_view_enrolment_code_page(self):
@@ -45,9 +44,13 @@ class TestRegistration(unittest.TestCase):
 
     @requests_mock.mock()
     def test_enter_enrolment_code_success(self, mock_object):
-        mock_object.post(url_validate_enrolment)
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_get_case_by_enrolment_code, json=case)
+        mock_object.get(url_get_case_categories, json=categories)
+        mock_object.post(url_post_case_event_uuid, status_code=201)
+        mock_object.post(url_create_account)
 
-        response = self.app.post('/register/create-account', data={'enrolment_code': '123456789012'})
+        response = self.app.post('/register/create-account', data={'enrolment_code': enrolment_code})
 
         # Check that we redirect to the confirm-organisation-survey page
         self.assertEqual(response.status_code, 302)
@@ -61,27 +64,36 @@ class TestRegistration(unittest.TestCase):
 
     @requests_mock.mock()
     def test_enter_enrolment_code_inactive_code(self, mock_object):
-        mock_object.post(url_validate_enrolment, status_code=401, json={'active': False})
+        mock_object.get(url_validate_enrolment, status_code=401, json={'active': False})
 
-        response = self.app.post('/register/create-account', data={'enrolment_code': '123456789012'})
+        response = self.app.post('/register/create-account', data={'enrolment_code': enrolment_code})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Enrolment code not valid'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_enter_enrolment_code_already_used(self, mock_object):
+        mock_object.get(url_validate_enrolment, status_code=400)
+
+        response = self.app.post('/register/create-account', data={'enrolment_code': enrolment_code})
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Enrolment code not valid'.encode() in response.data)
 
     @requests_mock.mock()
     def test_enter_enrolment_code_invalid_code(self, mock_object):
-        mock_object.post(url_validate_enrolment, status_code=404)
+        mock_object.get(url_validate_enrolment, status_code=404)
 
-        response = self.app.post('/register/create-account', data={'enrolment_code': '123456789012'})
+        response = self.app.post('/register/create-account', data={'enrolment_code': enrolment_code})
 
         self.assertEqual(response.status_code, 202)
         self.assertTrue('Enrolment code not valid'.encode() in response.data)
 
     @requests_mock.mock()
     def test_enter_enrolment_code_fail(self, mock_object):
-        mock_object.post(url_validate_enrolment, status_code=500)
+        mock_object.get(url_validate_enrolment, status_code=500)
 
-        response = self.app.post('/register/create-account', data={'enrolment_code': '123456789012'}, follow_redirects=True)
+        response = self.app.post('/register/create-account', data={'enrolment_code': enrolment_code}, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
@@ -89,7 +101,11 @@ class TestRegistration(unittest.TestCase):
     # ============== CONFIRM ORG AND SURVEY ===============
     @requests_mock.mock()
     def test_confirm_org_page(self, mock_object):
-        mock_object.post(url_confirm_organisation_survey, status_code=200, json=self.organisation_survey_data)
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_get_case_by_enrolment_code, json=case)
+        mock_object.get(url_get_business_party, json=business_party)
+        mock_object.get(url_get_collection_exercise, json=collection_exercise)
+        mock_object.get(url_get_survey, json=survey)
 
         response = self.app.get('/register/create-account/confirm-organisation-survey',
                                 query_string=self.params,
@@ -100,8 +116,8 @@ class TestRegistration(unittest.TestCase):
         self.assertTrue('Confirm organisation'.encode() in response.data)
 
     @requests_mock.mock()
-    def test_confirm_org_page_fail(self, mock_object):
-        mock_object.post(url_confirm_organisation_survey, status_code=500)
+    def test_confirm_org_page_validation_fail(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': False, 'caseId': case['id']})
 
         response = self.app.get('/register/create-account/confirm-organisation-survey',
                                 query_string=self.params,
@@ -111,10 +127,112 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
 
+    @requests_mock.mock()
+    def test_confirm_org_page_case_fail(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_get_case_by_enrolment_code, status_code=500)
+
+        response = self.app.get('/register/create-account/confirm-organisation-survey',
+                                query_string=self.params,
+                                headers=self.headers,
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_confirm_org_page_case_empty(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_get_case_by_enrolment_code, json={})
+
+        response = self.app.get('/register/create-account/confirm-organisation-survey',
+                                query_string=self.params,
+                                headers=self.headers,
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_confirm_org_page_party_fail(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_get_case_by_enrolment_code, json=case)
+        mock_object.get(url_get_business_party, status_code=500)
+
+        response = self.app.get('/register/create-account/confirm-organisation-survey',
+                                query_string=self.params,
+                                headers=self.headers,
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_confirm_org_page_collex_fail(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_get_case_by_enrolment_code, json=case)
+        mock_object.get(url_get_business_party, json=business_party)
+        mock_object.get(url_get_collection_exercise, status_code=500)
+
+        response = self.app.get('/register/create-account/confirm-organisation-survey',
+                                query_string=self.params,
+                                headers=self.headers,
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_confirm_org_page_collex_empty(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_get_case_by_enrolment_code, json=case)
+        mock_object.get(url_get_business_party, json=business_party)
+        mock_object.get(url_get_collection_exercise, json={})
+
+        response = self.app.get('/register/create-account/confirm-organisation-survey',
+                                query_string=self.params,
+                                headers=self.headers,
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_confirm_org_page_survey_fail(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_get_case_by_enrolment_code, json=case)
+        mock_object.get(url_get_business_party, json=business_party)
+        mock_object.get(url_get_collection_exercise, json=collection_exercise)
+        mock_object.get(url_get_survey, status_code=500)
+
+        response = self.app.get('/register/create-account/confirm-organisation-survey',
+                                query_string=self.params,
+                                headers=self.headers,
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_confirm_org_page_survey_empty(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_get_case_by_enrolment_code, json=case)
+        mock_object.get(url_get_business_party, json=business_party)
+        mock_object.get(url_get_collection_exercise, json=collection_exercise)
+        mock_object.get(url_get_survey, json={})
+
+        response = self.app.get('/register/create-account/confirm-organisation-survey',
+                                query_string=self.params,
+                                headers=self.headers,
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Confirm organisation'.encode() in response.data)
+
     # ============== ENTER YOUR ACCOUNT DETAILS ===============
     @requests_mock.mock()
     def test_create_account_get_page_with_active_enrolment_code(self, mock_object):
-        mock_object.post(url_validate_enrolment, status_code=200)
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
 
         response = self.app.get('/register/create-account/enter-account-details',
                                 query_string=self.params,
@@ -126,7 +244,7 @@ class TestRegistration(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_account_get_page_with_inactive_enrolment_code(self, mock_object):
-        mock_object.post(url_validate_enrolment, status_code=401)
+        mock_object.get(url_validate_enrolment, status_code=401)
 
         response = self.app.get('/register/create-account/enter-account-details',
                                 query_string=self.params,
@@ -138,7 +256,7 @@ class TestRegistration(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_account_register_no_email_address(self, mock_object):
-        mock_object.post(url_validate_enrolment, status_code=200)
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
         del self.test_user['email_address']
 
         response = self.app.post('/register/create-account/enter-account-details',
@@ -152,7 +270,7 @@ class TestRegistration(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_account_register_space_in_email_address(self, mock_object):
-        mock_object.post(url_validate_enrolment, status_code=200)
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
         self.test_user['email_address'] = 'testuser 2@email.com'
 
         response = self.app.post('/register/create-account/enter-account-details',
@@ -167,7 +285,7 @@ class TestRegistration(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_account_register_no_password(self, mock_object):
-        mock_object.post(url_validate_enrolment, status_code=200)
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
         del self.test_user['password']
         del self.test_user['password_confirm']
 
@@ -182,7 +300,7 @@ class TestRegistration(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_account_register_wrong_password(self, mock_object):
-        mock_object.post(url_validate_enrolment, status_code=200)
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
         self.test_user['password_confirm'] = 'wrongpassword'
 
         response = self.app.post('register/create-account/enter-account-details',
@@ -196,7 +314,7 @@ class TestRegistration(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_account_register_no_phone_number(self, mock_object):
-        mock_object.post(url_validate_enrolment, status_code=200)
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
         del self.test_user['phone_number']
 
         response = self.app.post('register/create-account/enter-account-details',
@@ -210,7 +328,7 @@ class TestRegistration(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_account_register_illegal_phone_number(self, mock_object):
-        mock_object.post(url_validate_enrolment, status_code=200)
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
         self.test_user['phone_number'] = 'not a number'
 
         response = self.app.post('register/create-account/enter-account-details',
@@ -224,7 +342,7 @@ class TestRegistration(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_account_register_phone_number_too_small(self, mock_object):
-        mock_object.post(url_validate_enrolment, status_code=200)
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
         self.test_user['phone_number'] = '12345678'
 
         response = self.app.post('register/create-account/enter-account-details',
@@ -238,7 +356,7 @@ class TestRegistration(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_account_register_phone_number_too_big(self, mock_object):
-        mock_object.post(url_validate_enrolment, status_code=200)
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
         self.test_user['phone_number'] = '1234567890123456'
 
         response = self.app.post('register/create-account/enter-account-details',
@@ -252,6 +370,7 @@ class TestRegistration(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_account_success(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
         mock_object.post(url_create_account, status_code=201)
 
         response = self.app.post('register/create-account/enter-account-details',
@@ -265,6 +384,7 @@ class TestRegistration(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_account_duplicate_email(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
         mock_object.post(url_create_account, status_code=400)
 
         response = self.app.post('register/create-account/enter-account-details',
@@ -278,6 +398,7 @@ class TestRegistration(unittest.TestCase):
 
     @requests_mock.mock()
     def test_create_account_fail(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
         mock_object.post(url_create_account, status_code=500)
 
         response = self.app.post('register/create-account/enter-account-details',
@@ -298,36 +419,36 @@ class TestRegistration(unittest.TestCase):
     # ============== ACTIVATE ACCOUNT ===============
     @requests_mock.mock()
     def test_activate_account_success(self, mock_object):
-        mock_object.put(url_activate_account)
+        mock_object.put(url_verify_email)
 
-        response = self.app.get('/register/activate-account/Test_token', headers=self.headers, follow_redirects=True)
+        response = self.app.get(f'/register/activate-account/{token}', headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('You\'ve activated your account'.encode() in response.data)
 
     @requests_mock.mock()
     def test_activate_account_token_expired(self, mock_object):
-        mock_object.put(url_activate_account, status_code=409)
+        mock_object.put(url_verify_email, status_code=409)
 
-        response = self.app.get('/register/activate-account/Test_token', headers=self.headers, follow_redirects=True)
+        response = self.app.get(f'/register/activate-account/{token}', headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Your link has expired'.encode() in response.data)
 
     @requests_mock.mock()
     def test_activate_account_token_not_found(self, mock_object):
-        mock_object.put(url_activate_account, status_code=404)
+        mock_object.put(url_verify_email, status_code=404)
 
-        response = self.app.get('/register/activate-account/Test_token', headers=self.headers, follow_redirects=True)
+        response = self.app.get(f'/register/activate-account/{token}', headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 404)
         self.assertTrue('404'.encode() in response.data)
 
     @requests_mock.mock()
     def test_activate_account_fail(self, mock_object):
-        mock_object.put(url_activate_account, status_code=500)
+        mock_object.put(url_verify_email, status_code=500)
 
-        response = self.app.get('/register/activate-account/Test_token', headers=self.headers, follow_redirects=True)
+        response = self.app.get(f'/register/activate-account/{token}', headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)

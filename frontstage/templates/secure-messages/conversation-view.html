@@ -44,6 +44,7 @@
         {% endif %}
     {% endfor %}
 </div>
+{% if not conversation_data.is_closed %}
 <div class="secure-message-reply">
     <form action="{{ url_for('secure_message_bp.view_conversation', thread_id=conversation[0].thread_id) }}" method="post" id="create-message-form">
         <label class="venus" for="message-text">Reply</label>
@@ -53,4 +54,7 @@
         <input class="btn" id="send-message-btn" name="send" type="submit" value="Send" />
     </form>
 </div>
+{% else %}
+Closed conversation
+{% endif %}
 {% endblock messages %}

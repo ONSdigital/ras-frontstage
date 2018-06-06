@@ -22,10 +22,10 @@ def view_conversation(session, thread_id):
     logger.info("Getting conversation", thread_id=thread_id, party_id=party_id)
     # TODO, do we really want to do a GET every time, even if we're POSTing? Rops does it this
     # way so we can get it working, then get it right.
-    conversation = get_conversation(thread_id)['messages']
+    conversation = get_conversation(thread_id)
     logger.info("Successfully retrieved conversation", thread_id=thread_id, party_id=party_id)
     try:
-        refined_conversation = [refine(message) for message in reversed(conversation)]
+        refined_conversation = [refine(message) for message in reversed(conversation['messages'])]
     except KeyError as e:
         logger.exception("Message is missing important data", thread_id=thread_id, party_id=party_id)
         raise e
@@ -44,7 +44,10 @@ def view_conversation(session, thread_id):
         flash(Markup('Message sent. <a href={}>View Message</a>'.format(thread_url)))
         return redirect(url_for('secure_message_bp.view_conversation_list'))
 
-    return render_template('secure-messages/conversation-view.html', form=form, conversation=refined_conversation)
+    return render_template('secure-messages/conversation-view.html',
+                           form=form,
+                           conversation=refined_conversation,
+                           conversation_data=conversation)
 
 
 @secure_message_bp.route('/threads', methods=['GET'])

@@ -4,6 +4,18 @@
 
 {% block messages %}
 
+{% if conversation_data.is_closed %}
+<div class="panel panel--simple panel--info u-mb-s">
+    <div class="panel__body">
+        <p class="mars u-mb-xs">Thank you, this conversation has now been closed. <br>
+          You can still send a message from your
+          <a href="/surveys/todo">to do list</a> or
+          <a href="/surveys/history">history</a>
+        </p>
+    </div>
+</div>
+{% endif %}
+
 {% if form.errors %}
     <div class="panel panel--error col-7@m">
         <div class="panel__header">
@@ -54,7 +66,5 @@
         <input class="btn" id="send-message-btn" name="send" type="submit" value="Send" />
     </form>
 </div>
-{% else %}
-Closed conversation
 {% endif %}
 {% endblock messages %}

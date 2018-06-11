@@ -51,14 +51,14 @@ def get_conversation(thread_id):
                        thread_id=thread_id)
 
 
-def get_conversation_list():
+def get_conversation_list(params):
     logger.debug('Attempting to retrieve threads list')
 
     headers = _create_get_conversation_headers()
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/threads"
 
     with _get_session() as session:
-        response = session.get(url, headers=headers)
+        response = session.get(url, headers=headers, params=params)
         try:
             response.raise_for_status()
         except HTTPError:

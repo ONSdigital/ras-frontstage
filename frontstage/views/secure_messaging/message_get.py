@@ -55,7 +55,10 @@ def view_conversation(session, thread_id):
 def view_conversation_list(session):
     party_id = session.get('party_id')
     logger.info("Getting conversation list", party_id=party_id)
-    conversation = get_conversation_list()
+    is_closed = request.args.get('is_closed')
+    params = {'is_closed': is_closed}
+
+    conversation = get_conversation_list(params=params)
 
     try:
         refined_conversation = [refine(message) for message in conversation]
@@ -64,7 +67,9 @@ def view_conversation_list(session):
         raise e
     logger.info("Retrieving and refining conversation successful", party_id=party_id)
 
-    return render_template('secure-messages/conversation-list.html', messages=refined_conversation)
+    return render_template('secure-messages/conversation-list.html',
+                           messages=refined_conversation,
+                           is_closed=is_closed)
 
 
 def _get_message_json(form, message, party_id):

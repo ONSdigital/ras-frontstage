@@ -90,7 +90,7 @@ class EqPayload(object):
         collex_events = collection_exercise_controller.get_collection_exercise_events(collex_id)
         return {
              "ref_p_start_date": self._find_event_date_by_tag('ref_period_start', collex_events, collex_id),
-             "ref_p_end_date": self._find_event_date_by_tag('exercise_end', collex_events, collex_id),
+             "ref_p_end_date": self._find_event_date_by_tag('ref_period_end', collex_events, collex_id),
              "return_by": self._find_event_date_by_tag('return_by', collex_events, collex_id)
         }
 

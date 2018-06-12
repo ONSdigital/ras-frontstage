@@ -155,13 +155,44 @@ class TestGenerateEqURL(unittest.TestCase):
         result = EqPayload()._format_string_long_date_time_to_short_date(date)
         self.assertEqual(result, '2007-01-25')
 
-    def test_generate_eq_url_missing_event_date(self):
+    def test_generate_eq_url_missing_mandatory_event_date(self):
 
-        # Given no event dates
-        collex_events_dates = []
+        # Given a mandatory event date does not exist
+        collex_events_dates = [{'id': 'e82e7ec9-b14e-412c-813e-edfd2e03e773',
+                                'collectionExerciseId': '8d926ae3-fb3c-4c25-9f0f-356ded7d1ac0',
+                                'tag': 'return_by', 'timestamp': '2018-03-27T01:00:00.000+01:00'},
+                               {'id': '8a24731e-3d79-4f3c-b6eb-3b199f53694f',
+                                'collectionExerciseId': '8d926ae3-fb3c-4c25-9f0f-356ded7d1ac0',
+                                'tag': 'reminder', 'timestamp': '2018-04-03T01:00:00.000+01:00'}]
+
         # When find_event_date_by_tag is called with a search param
         # Then an InvalidEqPayLoad is raised
 
         with self.assertRaises(InvalidEqPayLoad) as e:
-            EqPayload()._find_event_date_by_tag('return by', collex_events_dates, '123')
-        self.assertEqual(e.exception.message, 'Event not found for collection 123 for search param return by')
+            EqPayload()._find_event_date_by_tag('return by', collex_events_dates, '123', True)
+        self.assertEqual(e.exception.message, 'Mandatory event not found for collection 123 for search param return by')
+
+    def test_generate_eq_url_non_mandatory_event_date_is_none(self):
+
+        # Given a non mandatory event date does not exist
+        collex_events_dates = []
+        # When find_event_date_by_tag is called with a search param
+        # Then a None response is returned and no exception is raised
+
+        response = EqPayload()._find_event_date_by_tag('employment', collex_events_dates, '123', False)
+        self.assertEqual(response, None)
+
+    def test_generate_eq_url_non_mandatory_event_date_is_returned(self):
+
+        # Given a non mandatory event date exists
+        collex_events_dates = [{'id': 'e82e7ec9-b14e-412c-813e-edfd2e03e773',
+                                'collectionExerciseId': '8d926ae3-fb3c-4c25-9f0f-356ded7d1ac0',
+                                'tag': 'return_by', 'timestamp': '2018-03-27T01:00:00.000+01:00'},
+                               {'id': '8a24731e-3d79-4f3c-b6eb-3b199f53694f',
+                                'collectionExerciseId': '8d926ae3-fb3c-4c25-9f0f-356ded7d1ac0',
+                                'tag': 'employment', 'timestamp': '2018-04-03T01:00:00.000+01:00'}]
+        # When find_event_date_by_tag is called with a search param
+        # Then the formatted date is returned
+
+        response = EqPayload()._find_event_date_by_tag('employment', collex_events_dates, '123', False)
+        self.assertEqual(response, '2018-04-03')

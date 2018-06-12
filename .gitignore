@@ -13,6 +13,9 @@ __pycache__/
 # C extensions
 *.so
 
+# Redis files
+*.rdb
+
 # Distribution / packaging
 .Python
 env/

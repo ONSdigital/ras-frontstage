@@ -57,7 +57,7 @@ class EqPayload(object):
         iat = time.time()
         exp = time.time() + (5 * 60)
 
-        return {
+        payload = {
             'jti': str(uuid.uuid4()),
             'tx_id': tx_id,
             'user_id': case['partyId'],
@@ -68,17 +68,21 @@ class EqPayload(object):
             'period_id': collex['exerciseRef'],
             'form_type': form_type,
             'collection_exercise_sid': collex['id'],
-            'ref_p_start_date': collex_event_dates['ref_p_start_date'],
-            'ref_p_end_date': collex_event_dates['ref_p_end_date'],
             'ru_ref': party['sampleUnitRef'] + party['checkletter'],
             'ru_name': party['name'],
-            'return_by': collex_event_dates['return_by'],
             'survey_id': survey['surveyRef'],
             'case_id': case['id'],
             'case_ref': case['caseRef'],
             'account_service_url': account_service_url,
             'trad_as': f"{party['tradstyle1']} {party['tradstyle2']} {party['tradstyle3']}"
         }
+
+        # Add any non null event dates that exist for this collection exercise
+        payload.update([(key, value) for key, value in collex_event_dates.items() if value is not None])
+
+        logger.debug(payload=payload)
+
+        return payload
 
     def _get_collex_event_dates(self, collex_id):
         """
@@ -89,23 +93,28 @@ class EqPayload(object):
 
         collex_events = collection_exercise_controller.get_collection_exercise_events(collex_id)
         return {
-             "ref_p_start_date": self._find_event_date_by_tag('ref_period_start', collex_events, collex_id),
-             "ref_p_end_date": self._find_event_date_by_tag('exercise_end', collex_events, collex_id),
-             "return_by": self._find_event_date_by_tag('return_by', collex_events, collex_id)
+             "ref_p_start_date": self._find_event_date_by_tag('ref_period_start', collex_events, collex_id, True),
+             "ref_p_end_date": self._find_event_date_by_tag('ref_period_end', collex_events, collex_id, True),
+             "employment_date": self._find_event_date_by_tag('employment', collex_events, collex_id, False),
+             "return_by": self._find_event_date_by_tag('return_by', collex_events, collex_id, True),
         }
 
-    def _find_event_date_by_tag(self, search_param, collex_events, collex_id):
+    def _find_event_date_by_tag(self, search_param, collex_events, collex_id, mandatory):
         """
         Finds the required date from the list of all the events
         :param search_param: the string name of the date searching for
         :param collex_events: All the Collection Exercise dates
+        :param mandatory: Specifies if the event date being searched for is mandatory
         :return exercise
+        :raises InvalidEqPayLoad if a mandatory event tag is not found in the collectionexercise events
         """
 
         for event in collex_events:
             if event['tag'] == search_param and event.get('timestamp'):
                 return self._format_string_long_date_time_to_short_date(event['timestamp'])
-        raise InvalidEqPayLoad(f'Event not found for collection {collex_id} for search param {search_param}')
+
+        if mandatory:
+            raise InvalidEqPayLoad(f'Mandatory event not found for collection {collex_id} for search param {search_param}')
 
     @staticmethod
     def _format_string_long_date_time_to_short_date(string_date):

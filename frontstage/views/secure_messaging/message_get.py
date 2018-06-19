@@ -1,3 +1,4 @@
+from distutils.util import strtobool
 import logging
 
 from flask import json, flash, Markup, render_template, redirect, request, url_for
@@ -55,7 +56,7 @@ def view_conversation(session, thread_id):
 def view_conversation_list(session):
     party_id = session.get('party_id')
     logger.info("Getting conversation list", party_id=party_id)
-    is_closed = request.args.get('is_closed')
+    is_closed = request.args.get('is_closed', default='false')
     params = {'is_closed': is_closed}
 
     conversation = get_conversation_list(params=params)
@@ -69,7 +70,7 @@ def view_conversation_list(session):
 
     return render_template('secure-messages/conversation-list.html',
                            messages=refined_conversation,
-                           is_closed=is_closed)
+                           is_closed=strtobool(is_closed))
 
 
 def _get_message_json(form, message, party_id):

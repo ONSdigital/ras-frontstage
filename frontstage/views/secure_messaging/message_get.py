@@ -38,6 +38,8 @@ def view_conversation(session, thread_id):
     form.subject.data = refined_conversation[0].get('subject')
 
     if form.validate_on_submit():
+        if conversation['is_closed']:
+            return redirect(url_for('secure_message_bp.view_conversation', thread_id=thread_id))
         logger.info("Sending message", thread_id=thread_id, party_id=party_id)
         send_message(_get_message_json(form, refined_conversation[0], party_id=session['party_id']))
         logger.info("Successfully sent message", thread_id=thread_id, party_id=party_id)

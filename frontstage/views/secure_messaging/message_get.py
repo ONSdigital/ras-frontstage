@@ -37,7 +37,7 @@ def view_conversation(session, thread_id):
     form = SecureMessagingForm(request.form)
     form.subject.data = refined_conversation[0].get('subject')
 
-    if not conversation['messages'][0]['is_closed']:
+    if not conversation['is_closed']:
         if form.validate_on_submit():
             logger.info("Sending message", thread_id=thread_id, party_id=party_id)
             send_message(_get_message_json(form, refined_conversation[0], party_id=session['party_id']))

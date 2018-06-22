@@ -79,5 +79,6 @@
     "name": "OFFICE FOR NATIONAL STATISTICS"
   },
   "collection_case": "",
-  "body": "something else"
+  "body": "something else",
+  "is_closed": false
 }

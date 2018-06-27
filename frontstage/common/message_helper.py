@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, date
+from dateutil.tz import tz
 
 from structlog import wrap_logger
 
@@ -74,10 +75,19 @@ def get_formatted_date(datetime_string, string_format='%Y-%m-%d %H:%M:%S'):
         logger.exception("Failed to parse date", sent_date=datetime_string)
         return datetime_string
 
-    time_difference = datetime.date(datetime_parsed) - date.today()
+    time_difference = datetime_parsed.date() - date.today()
+
+    time = convert_to_bst(datetime_parsed).strftime('%H:%M')
 
     if time_difference.days == 0:
-        return "Today at {}".format(datetime_parsed.strftime('%H:%M'))
+        return "Today at {}".format(time)
     elif time_difference.days == -1:
-        return "Yesterday at {}".format(datetime_parsed.strftime('%H:%M'))
-    return "{} {}".format(datetime_parsed.strftime('%d %b %Y').title(), datetime_parsed.strftime('%H:%M'))
+        return "Yesterday at {}".format(time)
+    return "{} {}".format(datetime_parsed.strftime('%d %b %Y'), time)
+
+
+def convert_to_bst(datetime_parsed):
+    """Takes a datetime and adjusts based on BST or GMT.
+    Returns adjusted datetime
+    """
+    return datetime_parsed.replace(tzinfo=tz.gettz('UTC')).astimezone(tz.gettz('Europe/London'))

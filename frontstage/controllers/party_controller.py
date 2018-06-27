@@ -59,7 +59,7 @@ def create_account(registration_data):
         if response.status_code == 400:
             message = 'Email has already been used'
         else:
-            message = 'Failed to create account',
+            message = 'Failed to create account'
         raise ApiError(logger, response,
                        log_level='debug' if response.status_code == 400 else 'error',
                        message=message)

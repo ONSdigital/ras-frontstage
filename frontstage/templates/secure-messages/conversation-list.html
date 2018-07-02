@@ -31,7 +31,11 @@
     </nav>
 
     {% if not messages %}
+      {% if is_closed %}
+      <p>No closed conversations</p>
+      {% else %}
       <p>No new conversations</p>
+      {% endif %}
     {% else %}
 
       <ul class="message-list col-12@m">

@@ -22,6 +22,7 @@ structlog = "==17.2.0"
 arrow = "==0.12.0"
 "iso8601" = "==0.1.12"
 sdc-cryptography = "==0.2.1"
+greenlet = "==0.4.13"
 
 [dev-packages]
 codecov = "*"

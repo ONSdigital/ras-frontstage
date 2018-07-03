@@ -41,7 +41,7 @@ class TestSecureMessage(unittest.TestCase):
 
     @requests_mock.mock()
     def test_get_thread_success(self, mock_request):
-        mock_request.get(url_get_thread, json={'messages': [conversation_json]})
+        mock_request.get(url_get_thread, json={'messages': [conversation_json], 'is_closed': False})
 
         response = self.app.get("secure-message/thread/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers, follow_redirects=True)
         self.assertTrue(response.status_code, 200)

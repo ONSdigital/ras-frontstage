@@ -22,8 +22,20 @@
       {% endif %}
     {% endwith %}
 
+    <nav class="sm-nav u-mb-l">
+      <h2 class="u-vh">Messages navigation</h2>
+        <ul class="nav-pills">
+          <li class="nav-pills__pill{% if not is_closed %}--active {% endif %}"><a class="pill-label" href="{{ url_for('secure_message_bp.view_conversation_list') }}">Open</a></li>
+          <li class="nav-pills__pill{% if is_closed %}--active {% endif %}"><a class="pill-label" href="{{ url_for('secure_message_bp.view_conversation_list', is_closed='true') }}">Closed</a></li>
+        </ul>
+    </nav>
+
     {% if not messages %}
-      <p>No new messages</p>
+      {% if is_closed %}
+      <p>No closed conversations</p>
+      {% else %}
+      <p>No new conversations</p>
+      {% endif %}
     {% else %}
 
       <ul class="message-list col-12@m">

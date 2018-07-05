@@ -261,3 +261,22 @@ def validate_case_category(category):
         raise InvalidCaseCategory(category)
 
     logger.debug('Successfully validated case category', category=category)
+
+
+def get_cases_for_list_type_by_party_id(party_id, list_type='todo'):
+    logger.debug('Get cases for party for list', party_id=party_id, list_type=list_type)
+
+    business_cases = get_cases_by_party_id(party_id)
+
+    history_statuses = ['COMPLETE', 'COMPLETEDBYPHONE', 'NOLONGERREQUIRED']
+    if list_type == 'history':
+        filtered_cases = [business_case
+                          for business_case in business_cases
+                          if business_case.get('caseGroup', {}).get('caseGroupStatus') in history_statuses]
+    else:
+        filtered_cases = [business_case
+                          for business_case in business_cases
+                          if business_case.get('caseGroup', {}).get('caseGroupStatus') not in history_statuses]
+
+    logger.debug("Sucessfully retrieved cases for party survey list", party_id=party_id, list_type=list_type)
+    return filtered_cases

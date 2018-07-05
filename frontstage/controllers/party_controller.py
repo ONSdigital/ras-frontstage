@@ -4,10 +4,32 @@ import requests
 from flask import current_app as app
 from structlog import wrap_logger
 
+from frontstage.controllers import case_controller, collection_exercise_controller, collection_instrument_controller,\
+    survey_controller
 from frontstage.exceptions.exceptions import ApiError
 
 
 logger = wrap_logger(logging.getLogger(__name__))
+
+
+def get_party_by_id(party_id):
+    logger.debug('Retrieving party from party service by id', party_id=party_id)
+
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/id/{party_id}"
+    response = requests.get(url, auth=app.config['PARTY_AUTH'])
+
+    if response.status_code == 404:
+        return
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        raise ApiError(logger, response,
+                       message='Failed to find respondent',
+                       party_id=party_id)
+
+    logger.debug('Successfully retrieved party details', party_id=party_id)
+    return response.json()
 
 
 def add_survey(party_id, enrolment_code):
@@ -154,3 +176,34 @@ def verify_token(token):
         raise ApiError(logger, response, log_level=log_level, message='Failed to verify token', token=token)
 
     logger.debug('Successfully verified token')
+
+
+def get_party_enabled_enrolments_details(party_id, tag):
+    logger.debug("Get party enrolments", party_id=party_id)
+
+    respondent = get_party_by_id(party_id)
+    surveys_list = []
+    for association in respondent['associations']:
+        business_details = get_party_by_business_id(association['partyId'])
+        business_cases = case_controller.get_cases_for_list_type_by_party_id(association['partyId'], tag)
+        for enrolment in association['enrolments']:
+            if enrolment['enrolmentStatus'] == "ENABLED":
+                survey = survey_controller.get_survey(enrolment['surveyId'])
+                collection_exercises = collection_exercise_controller.get_collection_exercises_for_survey(enrolment['surveyId'])
+                for collection_exercise in collection_exercises:
+                    if collection_exercise['state'] == 'LIVE':
+                        for business_case in business_cases:
+                            if business_case['caseGroup']['collectionExerciseId'] == collection_exercise['id']:
+                                survey_data = {
+                                    "business_party": business_details,
+                                    "survey": survey,
+                                    "return_by": collection_exercise_controller.get_collection_exercise_events_by_tag(
+                                        collection_exercise['id'], 'return_by'),
+                                    "status": business_case['caseGroup']['caseGroupStatus'],
+                                    "collection_instrument": collection_instrument_controller.get_collection_instrument(
+                                        business_case['collectionInstrumentId'])
+                                }
+                                surveys_list.append(survey_data)
+
+    logger.debug("Successfully retrieved party survey list", party_id=party_id, tag=tag)
+    return surveys_list

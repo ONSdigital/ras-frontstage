@@ -47,11 +47,11 @@ def build_full_case_data(case):
     return survey_data
 
 
-def calculate_case_status(case, collection_instrument_type):
-    logger.debug('Getting the status of case', case=case['id'])
+def calculate_case_status(case_group_status, collection_instrument_type):
+    logger.debug('Getting the status of caseGroup', case_group_status=case_group_status,
+                 collection_instrument_type=collection_instrument_type)
 
     status = 'Not started'
-    case_group_status = case.get('caseGroup', {}).get('caseGroupStatus')
 
     if case_group_status == 'COMPLETE':
         status = 'Complete'
@@ -64,7 +64,8 @@ def calculate_case_status(case, collection_instrument_type):
     elif case_group_status == 'INPROGRESS' and collection_instrument_type == 'SEFT':
         status = 'Downloaded'
 
-    logger.debug('Retrieved the status of case', case=case['id'], status=status)
+    logger.debug('Retrieved the status of case', collection_instrument_type=collection_instrument_type,
+                 status=status)
     return status
 
 
@@ -154,7 +155,7 @@ def get_case_categories():
     return response.json()
 
 
-def get_case_data(case_id, party_id):
+def get_case_data(case_id):
     logger.debug('Attempting to retrieve detailed case data', case_id=case_id, party_id=party_id)
 
     # Check if respondent has permission to see case data

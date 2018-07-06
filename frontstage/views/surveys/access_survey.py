@@ -25,7 +25,7 @@ def access_survey(session):
     logger.info('Retrieving case data', party_id=party_id, case_id=case_id)
     referer_header = request.headers.get('referer', {})
 
-    case_data = case_controller.get_case_data(case_id, party_id)
+    case_data = case_controller.get_case_data(case_id)
 
     logger.info('Successfully retrieved case data', party_id=party_id, case_id=case_id)
     return render_template('surveys/surveys-access.html', case_id=case_id,

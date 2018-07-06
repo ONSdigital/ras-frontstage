@@ -23,26 +23,22 @@
     </li>
 
     {% for survey in sorted_surveys_list %}
-    {% if just_added_case_id == survey.case.id %}
-    <li id="ADDED_{{ just_added_case_id }}" class="grid card panel--simple panel--success survey--success col-13@m u-mb-m" name="survey-card">
-    {% else %}
     <li class="grid card" name="survey-card">
-    {% endif %}
         <div class="grid__col col-4@m">
             <span class="survey-list-item__label mercury">SURVEY: </span>
             <span id="SURVEY_NAME">{{ survey.survey.longName }}</span><br/>
-            <span id="REPORTING_UNIT_DETAILS_{{ survey.case.caseGroup.sampleUnitRef }}" name="reporting-unit-details" class="survey-list-item pluto">
+            <span id="REPORTING_UNIT_DETAILS_{{ survey.business_party.sampleUnitRef }}" name="reporting-unit-details" class="survey-list-item pluto">
                 Business: {{ survey.business_party.name }}<br/>
                 {% if survey.business_party.trading_as %}
                 Trading as: {{ survey.business_party.trading_as }}<br/>
                 {% endif %}
-                Ref: {{ survey.case.caseGroup.sampleUnitRef }}
+                Ref: {{ survey.business_party.sampleUnitRef }}
             </span>
         </div>
 
         <div class="grid__col col-2@m">
             <span class="survey-list-item__label mercury">PERIOD COVERED: </span>
-            <span id="period-{{ loop.index }}" name="period">{{ survey.collection_exercise.userDescription}}</span>
+            <span id="period-{{ loop.index }}" name="period">{{ survey.period}}</span>
         </div>
 
         <div class="grid__col col-2@m">
@@ -58,13 +54,13 @@
         </div>
         <div class="grid__col col-2@m">
             {% if not survey.status == 'Complete' or not survey.collection_instrument['type'] == 'EQ' %}
-            <a href="{{ url_for('surveys_bp.access_survey', case_id=survey.case.id, ci_type = survey.collection_instrument_type) }}">
+            <a href="{{ url_for('surveys_bp.access_survey', case_id=survey.case_id, ci_type = survey.collection_instrument_type) }}">
                 <button id="ACCESS_SURVEY_BUTTON_{{loop.index}}" class="btn action-button btn--primary" type="submit">
                     Access <span class="u-vh">{{ survey.survey.longName|replace("Survey", " ") }}</span> survey
                 </button>
             </a>
             {% endif %}
-            <a id="create-message-link-{{loop.index}}" href="/secure-message/create-message/?case_id={{survey.case.id}}&survey={{survey.survey.id}}&ru_ref={{survey.business_party.id}}" class="pluto survey-message history__message">Send a message </span></a>
+            <a id="create-message-link-{{loop.index}}" href="/secure-message/create-message/?case_id={{survey.case_id}}&survey={{survey.survey.id}}&ru_ref={{survey.business_party.id}}" class="pluto survey-message history__message">Send a message </span></a>
         </div>
     </li>
     {% endfor %}

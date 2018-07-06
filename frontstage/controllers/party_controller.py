@@ -191,17 +191,20 @@ def get_party_enabled_enrolments_details(party_id, tag):
                 survey = survey_controller.get_survey(enrolment['surveyId'])
                 collection_exercises = collection_exercise_controller.get_collection_exercises_for_survey(enrolment['surveyId'])
                 for collection_exercise in collection_exercises:
-                    if collection_exercise['state'] == 'LIVE':
+                    if collection_exercise['state'] == 'LIVE' and not collection_exercise['events']['go_live']['is_in_future']:
                         for business_case in business_cases:
                             if business_case['caseGroup']['collectionExerciseId'] == collection_exercise['id']:
+                                collection_instrument = collection_instrument_controller.get_collection_instrument(
+                                    business_case['collectionInstrumentId'])
                                 survey_data = {
                                     "business_party": business_details,
                                     "survey": survey,
-                                    "return_by": collection_exercise_controller.get_collection_exercise_events_by_tag(
-                                        collection_exercise['id'], 'return_by'),
-                                    "status": business_case['caseGroup']['caseGroupStatus'],
-                                    "collection_instrument": collection_instrument_controller.get_collection_instrument(
-                                        business_case['collectionInstrumentId'])
+                                    "return_by": collection_exercise['events']['return_by']['date'],
+                                    "status": case_controller.calculate_case_status(business_case.get('caseGroup', {}).get('caseGroupStatus'),
+                                                                                    collection_instrument['type']),
+                                    "collection_instrument": collection_instrument,
+                                    "period": collection_exercise['userDescription'],
+                                    "case_id": business_case['id']
                                 }
                                 surveys_list.append(survey_data)
 

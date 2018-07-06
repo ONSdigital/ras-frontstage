@@ -4,6 +4,7 @@ import requests
 from flask import current_app as app
 from structlog import wrap_logger
 
+from frontstage.common.mappers import convert_events_to_new_format
 from frontstage.exceptions.exceptions import ApiError
 
 
@@ -25,7 +26,12 @@ def get_collection_exercise(collection_exercise_id):
                        message='Failed to retrieve collection exercise')
 
     logger.debug('Successfully retrieved collection exercise', collection_exercise_id=collection_exercise_id)
-    return response.json()
+    collection_exercise = response.json()
+
+    if collection_exercise['events']:
+        collection_exercise['events'] = convert_events_to_new_format(collection_exercise['events'])
+
+    return collection_exercise
 
 
 def get_collection_exercise_event(collection_exercise_id, tag):
@@ -81,7 +87,13 @@ def get_collection_exercises_for_survey(survey_id):
                        message='Failed to retrieve collection exercises for survey')
 
     logger.debug("Successfully retrieved collection exercises for survey", survey_id=survey_id)
-    return response.json()
+    collection_exercises = response.json()
+
+    for collection_exercise in collection_exercises:
+        if collection_exercise['events']:
+            collection_exercise['events'] = convert_events_to_new_format(collection_exercise['events'])
+
+    return collection_exercises
 
 
 def get_collection_exercise_events_by_tag(collection_exercise_id, tag):

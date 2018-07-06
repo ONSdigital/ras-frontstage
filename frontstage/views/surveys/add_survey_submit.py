@@ -47,4 +47,4 @@ def add_survey_submit(session):
 
     logger.info('Successfully retrieved data for confirm add organisation/survey page',
                 case_id=case_id, party_id=party_id)
-    return redirect(url_for('surveys_bp.logged_in', _external=True, case_id=case_id))
+    return redirect(url_for('surveys_bp.get_survey_list', _external=True, case_id=case_id, tag='todo'))

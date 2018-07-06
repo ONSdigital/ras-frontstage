@@ -8,9 +8,9 @@
 
 <div>
     {% if 'history' in referer_header %}
-        <a href="{{ url_for('surveys_bp.surveys_history') }}">Back</a>
+        <a href="{{ url_for('surveys_bp.get_survey_list', tag='history') }}">Back</a>
     {% else %}
-        <a href="{{ url_for('surveys_bp.logged_in') }}">Back</a>
+        <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}">Back</a>
     {% endif %}
 </div>
 

@@ -82,13 +82,21 @@ def case_is_enrolled(case, respondent_id):
     return enrolment_status == 'ENABLED'
 
 
-def check_case_permissions(party_id, case_party_id, case_id=None):
-    logger.debug('Party requesting access to case', party_id=party_id, case_id=case_id, case_party_id=case_party_id)
+def check_case_permissions(party_id, case_party_id, business_party_id, survey_short_name):
+    logger.debug('Party requesting access to case', party_id=party_id, case_party_id=case_party_id, business_party_id=business_party_id, survey_short_name=survey_short_name)
+    match = False
 
-    if party_id != case_party_id:
-        raise NoSurveyPermission(party_id, case_id, case_party_id)
+    party = party_controller.get_party_by_id(party_id)
+    for association in party['associations']:
+        if association['partyId'] == business_party_id:
+            survey = survey_controller.get_survey_by_short_name(survey_short_name)
+            for enrolment in association['enrolments']:
+                if enrolment['surveyId'] == survey['id']:
+                    match = True
+    if not match:
+        raise NoSurveyPermission(party_id, case_party_id)
 
-    logger.debug('Party has permission to access case', party_id=party_id, case_id=case_id, case_party_id=case_party_id)
+    logger.debug('Party has permission to access case', party_id=party_id, case_party_id=case_party_id)
 
 
 def format_collection_exercise_dates(collection_exercise):
@@ -155,12 +163,12 @@ def get_case_categories():
     return response.json()
 
 
-def get_case_data(case_id):
+def get_case_data(case_id, party_id, business_party_id, survey_short_name):
     logger.debug('Attempting to retrieve detailed case data', case_id=case_id, party_id=party_id)
 
     # Check if respondent has permission to see case data
     case = get_case_by_case_id(case_id)
-    check_case_permissions(party_id, case['partyId'], case_id=case_id)
+    check_case_permissions(party_id, case['partyId'], business_party_id, survey_short_name)
 
     full_case_data = build_full_case_data(case)
 
@@ -198,7 +206,7 @@ def get_cases_by_party_id(party_id, case_events=False):
     return response.json()
 
 
-def get_eq_url(case_id, party_id):
+def get_eq_url(case_id, party_id, business_party_id, survey_short_name):
     logger.debug('Attempting to generate EQ URL', case_id=case_id, party_id=party_id)
 
     case = get_case_by_case_id(case_id)
@@ -208,7 +216,7 @@ def get_eq_url(case_id, party_id):
                     case_id=case_id, party_id=party_id)
         abort(403)
 
-    check_case_permissions(party_id, case['partyId'], case_id=case_id)
+    check_case_permissions(party_id, case['partyId'], business_party_id, survey_short_name)
 
     payload = eq_payload.EqPayload().create_payload(case)
 
@@ -225,7 +233,8 @@ def get_eq_url(case_id, party_id):
                     category=category,
                     description=f"Instrument {ci_id} launched by {party_id} for case {case_id}")
 
-    logger.debug('Successfully generated EQ URL', case_id=case_id, ci_id=ci_id, party_id=party_id)
+    logger.debug('Successfully generated EQ URL', case_id=case_id, ci_id=ci_id, party_id=party_id,
+                 business_party_id=business_party_id, survey_short_name=survey_short_name)
     return eq_url
 
 

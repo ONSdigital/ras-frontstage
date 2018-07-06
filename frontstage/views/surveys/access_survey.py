@@ -16,16 +16,18 @@ logger = wrap_logger(logging.getLogger(__name__))
 def access_survey(session):
     party_id = session['party_id']
     case_id = request.args['case_id']
+    business_party_id = request.args['business_party_id']
+    survey_short_name = request.args['survey_short_name']
     collection_instrument_type = request.args['ci_type']
 
     if collection_instrument_type == 'EQ':
         logger.info('Attempting to redirect to EQ', party_id=party_id, case_id=case_id)
-        return redirect(case_controller.get_eq_url(case_id, party_id))
+        return redirect(case_controller.get_eq_url(case_id, party_id, business_party_id, survey_short_name))
 
     logger.info('Retrieving case data', party_id=party_id, case_id=case_id)
     referer_header = request.headers.get('referer', {})
 
-    case_data = case_controller.get_case_data(case_id)
+    case_data = case_controller.get_case_data(case_id, party_id, business_party_id, survey_short_name)
 
     logger.info('Successfully retrieved case data', party_id=party_id, case_id=case_id)
     return render_template('surveys/surveys-access.html', case_id=case_id,

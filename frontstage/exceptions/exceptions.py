@@ -63,10 +63,9 @@ class MissingEnvironmentVariable(Exception):
 
 class NoSurveyPermission(Exception):
 
-    def __init__(self, party_id, case_id, case_party_id):
+    def __init__(self, party_id, case_party_id):
         super().__init__()
         self.party_id = party_id
-        self.case_id = case_id
         self.case_party_id = case_party_id
 
 

@@ -1,0 +1,13 @@
+{% block main %}
+
+<div class="panel panel--error">
+    <div class="panel__header">
+        <h1 class="panel__title venus">{{ panel_title }}</h1>
+    </div>
+    <div class="panel__body" data-qa="error-body">
+        <p class="mars"><a onclick="focusOn({{ focus_on }});" href="#enrolment_code">{{ error_message }}</a></p>
+    </div>
+</div>
+<br/>
+
+{% endblock main %}

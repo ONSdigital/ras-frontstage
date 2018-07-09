@@ -1,22 +1,21 @@
+{% extends 'layouts/_twocol.html' %}
 {% import 'partials/section.html' as section %}
-{% extends "layouts/_twocol.html" %}
 
 {% set errorType = data['error']['type'] %}
+{% set errors = form['errors'] %}
 
 {% block page_title %}Create an account - ONS Business Surveys{% endblock %}
 
 {% block main %}
 
 {% if errorType == "failed" %}
-<div class="panel panel--error">
-    <div class="panel__header">
-        <h1 class="panel__title venus">Enrolment code not valid</h1>
-    </div>
-    <div class="panel__body" data-qa="error-body">
-        <p class="mars"><a onclick="focusOn('enrolment_code');" href="#enrolment_code">Please re-enter the code and try again</a></p>
-    </div>
-</div>
-<br/>
+    {% with panel_title='Enrolment code not valid', forcus_on='enrolment_code', error_message='Please re-enter the code and try again' %}
+        {% include './errors/validation_error.html' %}
+    {%  endwith %}
+{% elif errors %}
+    {% with panel_title='Enrolment code not valid', focus_on='enrolment_code', error_message=errors.enrolment_code[0] %}
+        {% include './errors/validation_error.html' %}
+    {%  endwith %}
 {% endif %}
 
 <section>
@@ -30,7 +29,7 @@
 
         <h1 class="saturn">Create an account</h1>
 
-        {% if errorType == "failed" %}
+        {% if errorType == "failed" or errors|length > 0 %}
         <div class="panel panel--simple panel--error panel--spacious">
             <p class="error-message">Please enter a valid enrolment code</p>
         {% endif %}
@@ -43,7 +42,7 @@
                 {{ form.enrolment_code(class_='input input--text input-type__input') }}
             </div>
 
-        {% if errorType == "failed" %}
+        {% if errorType == "failed" or errors|length > 0 %}
         </div>
         {% endif %}
 

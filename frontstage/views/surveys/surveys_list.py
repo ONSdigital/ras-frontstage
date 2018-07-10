@@ -31,4 +31,4 @@ def get_survey_list(session, tag):
 
         return response
     else:
-        return render_template('surveys/surveys-todo.html', sorted_surveys_list=sorted_survey_list, history=True)
+        return render_template('surveys/surveys-history.html', sorted_surveys_list=sorted_survey_list, history=True)

@@ -14,35 +14,37 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 class EnrolmentCodeForm(FlaskForm):
-    enrolment_code = StringField('Enrolment Code', [InputRequired(), Length(min=12, max=12,
-                                                                            message='Your code must be 12 characters')])
+    enrolment_code = StringField('Enrolment Code', [InputRequired(), Length(min=12,
+                                                                            max=12,
+                                                                            message='Please re-enter '
+                                                                                    'the code and try again')])
 
 
 class RegistrationForm(FlaskForm):
     first_name = StringField('First name',
-                             validators=[InputRequired("First name is required"),
+                             validators=[InputRequired('First name is required'),
                                          Length(max=254,
                                                 message='Your first name must be less than 254 characters')])
     last_name = StringField('Last name',
-                            validators=[InputRequired("Last name is required"),
+                            validators=[InputRequired('Last name is required'),
                                         Length(max=254, message='Your last name must be less than 254 characters')])
     email_address = StringField('Enter your email address',
-                                validators=[InputRequired("Email address is required"),
+                                validators=[InputRequired('Email address is required'),
                                             Email(message="Your email should be of the form 'myname@email.com' "),
                                             Length(max=254,
                                                    message='Your email must be less than 254 characters')])
     password = PasswordField('Create a password',
-                             validators=[DataRequired("Password is required"),
+                             validators=[DataRequired('Password is required'),
                                          EqualTo('password_confirm', message=app.config['PASSWORD_MATCH_ERROR_TEXT']),
                                          Length(min=app.config['PASSWORD_MIN_LENGTH'],
                                                 max=app.config['PASSWORD_MAX_LENGTH'],
                                                 message=app.config['PASSWORD_CRITERIA_ERROR_TEXT'])])
     password_confirm = PasswordField('Re-type your password')
     phone_number = StringField('Enter your phone number',
-                               validators=[DataRequired("Phone number is required"),
+                               validators=[DataRequired('Phone number is required'),
                                            Length(min=9,
                                                   max=15,
-                                                  message="This should be a valid phone number between 9 and 15 digits")],
+                                                  message='This should be a valid phone number between 9 and 15 digits')],
                                default=None)
     enrolment_code = HiddenField('Enrolment Code')
 
@@ -50,7 +52,7 @@ class RegistrationForm(FlaskForm):
     def validate_phone_number(form, field):
         try:
             logger.debug('Checking this is a valid GB phone number')
-            input_number = phonenumbers.parse(field.data, "GB")  # Tell the parser we are looking for a GB number
+            input_number = phonenumbers.parse(field.data, 'GB')  # Tell the parser we are looking for a GB number
 
             if not phonenumbers.is_possible_number(input_number):
                 raise ValidationError('This should be a valid phone number between 9 and 15 digits')
@@ -65,9 +67,9 @@ class RegistrationForm(FlaskForm):
     def validate_email_address(form, field):
         logger.debug('Checking if the email address contains a space')
         # this extends the email validator to check if there is whitespace in the email
-        if " " in field.data:
+        if ' ' in field.data:
             logger.debug('Space found in email address')
-            raise ValidationError("Your email should be of the form myname@email.com")
+            raise ValidationError('Your email should be of the form myname@email.com')
 
     @staticmethod
     def validate_password(form, field):
@@ -77,14 +79,14 @@ class RegistrationForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    username = StringField('Email Address', [InputRequired("Email Address is required"),
+    username = StringField('Email Address', [InputRequired('Email Address is required'),
                                              Email("Your email should be of the form 'myname@email.com' ")])
-    password = PasswordField('Password', [InputRequired("Password is required")])
+    password = PasswordField('Password', [InputRequired('Password is required')])
 
 
 class ForgotPasswordForm(FlaskForm):
     email_address = StringField('Enter your email address',
-                                validators=[InputRequired("Email address is required"),
+                                validators=[InputRequired('Email address is required'),
                                             Email(message="Your email should be of the form 'myname@email.com' "),
                                             Length(max=254,
                                                    message='Your email must be less than 254 characters')])
@@ -92,7 +94,7 @@ class ForgotPasswordForm(FlaskForm):
 
 class ResetPasswordForm(FlaskForm):
     password = PasswordField('New password',
-                             validators=[DataRequired("Password is required"),
+                             validators=[DataRequired('Password is required'),
                                          EqualTo('password_confirm', message=app.config['PASSWORD_MATCH_ERROR_TEXT']),
                                          Length(min=app.config['PASSWORD_MIN_LENGTH'],
                                                 max=app.config['PASSWORD_MAX_LENGTH'],

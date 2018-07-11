@@ -9,11 +9,13 @@
 {% block main %}
 
 {% if errorType == "failed" %}
-    {% with panel_title='Enrolment code not valid', forcus_on='enrolment_code', error_message='Please re-enter the code and try again' %}
+    {% with panel_title='Enrolment code not valid', forcus_on='enrolment_code', context='#enrolment_code',
+    error_message='Please re-enter the code and try again' %}
         {% include './errors/validation_error.html' %}
     {%  endwith %}
 {% elif errors %}
-    {% with panel_title='Enrolment code not valid', focus_on='enrolment_code', error_message=errors.enrolment_code[0] %}
+    {% with panel_title='Enrolment code not valid', focus_on='enrolment_code', context='#enrolment_code',
+    error_message=errors.enrolment_code[0] %}
         {% include './errors/validation_error.html' %}
     {%  endwith %}
 {% endif %}

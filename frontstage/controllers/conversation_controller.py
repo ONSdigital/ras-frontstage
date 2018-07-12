@@ -75,7 +75,7 @@ def get_conversation_list(params):
                        log_level='exception',
                        message='The threads response could not be decoded')
     except KeyError:
-        logger.exception("Response was successful but didn't contain a 'messages' key")
+        logger.error("Response was successful but didn't contain a 'messages' key")
         raise NoMessagesError
 
 
@@ -104,7 +104,7 @@ def _create_get_conversation_headers():
     try:
         encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])
     except KeyError:
-        logger.exception('Authorization token missing in cookie')
+        logger.error('Authorization token missing in cookie')
         raise AuthorizationTokenMissing
     return {'Authorization': encoded_jwt}
 
@@ -113,7 +113,7 @@ def _create_send_message_headers():
     try:
         encoded_jwt = SessionHandler().get_encoded_jwt(request.cookies['authorization'])
     except KeyError:
-        logger.exception('Authorization token missing in cookie')
+        logger.error('Authorization token missing in cookie')
         raise AuthorizationTokenMissing
     return {'Authorization': encoded_jwt, 'Content-Type': 'application/json', 'Accept': 'application/json'}
 
@@ -130,6 +130,6 @@ def remove_unread_label(message_id):
         try:
             response.raise_for_status()
         except HTTPError:
-            logger.exception('Failed to remove unread label', message_id=message_id, status=response.status_code)
+            logger.error('Failed to remove unread label', message_id=message_id, status=response.status_code)
 
     logger.debug('Successfully removed unread label', message_id=message_id)

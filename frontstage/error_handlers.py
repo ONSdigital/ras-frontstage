@@ -39,7 +39,8 @@ def connection_error(error):
 
 
 @app.errorhandler(JWTValidationError)
-def jwt_validation_error(error):  # pylint: disable=unused-argument
+def jwt_validation_error(error):
+    del error
     return redirect(url_for('error_bp.not_logged_in_error_page',
                             _external=True,
                             _scheme=getenv('SCHEME', 'http')))
@@ -47,7 +48,8 @@ def jwt_validation_error(error):  # pylint: disable=unused-argument
 
 @app.errorhandler(Exception)
 def server_error(error):  # pylint: disable=unused-argument
-    logger.exception('Generic exception generated', exception=error)
+    logger.error('Generic exception generated', exc_info=error)
+
     return redirect(url_for('error_bp.server_error_page',
                             _external=True,
                             _scheme=getenv('SCHEME', 'http')))

@@ -28,7 +28,7 @@ def view_conversation(session, thread_id):
     try:
         refined_conversation = [refine(message) for message in reversed(conversation['messages'])]
     except KeyError as e:
-        logger.exception("Message is missing important data", thread_id=thread_id, party_id=party_id)
+        logger.error("Message is missing important data", thread_id=thread_id, party_id=party_id)
         raise e
 
     if refined_conversation[-1]['unread']:
@@ -65,7 +65,7 @@ def view_conversation_list(session):
     try:
         refined_conversation = [refine(message) for message in conversation]
     except KeyError as e:
-        logger.exception("A key error occurred", party_id=party_id)
+        logger.error("A key error occurred", party_id=party_id)
         raise e
     logger.info("Retrieving and refining conversation successful", party_id=party_id)
 

@@ -26,7 +26,7 @@ def get_message_subject(message):
         subject = message["subject"]
         return subject
     except KeyError:
-        logger.error("Failed to retrieve Subject from thread")
+        logger.error('Failed to retrieve Subject from thread')
         raise
 
 
@@ -37,7 +37,7 @@ def get_from_name(message):
     try:
         msg_from = message['@msg_from']
     except KeyError:
-        logger.error("Failed to retrieve name from message", message_id=message.get('msg_id'))
+        logger.error('Failed to retrieve name from message', message_id=message.get('msg_id'))
         raise
 
     return "{} {}".format(msg_from.get('firstName'), msg_from.get('lastName'))
@@ -47,7 +47,7 @@ def get_ru_ref_from_message(message):
     try:
         return message['@ru_id']['id']
     except (KeyError, TypeError):
-        logger.error("Failed to retrieve RU ref from message", message_id=message.get('msg_id'))
+        logger.error('Failed to retrieve RU ref from message', message_id=message.get('msg_id'))
         raise
 
 
@@ -56,7 +56,7 @@ def get_human_readable_date(sent_date):
         formatted_date = get_formatted_date(sent_date.split('.')[0])
         return formatted_date
     except (AttributeError, ValueError, IndexError, TypeError):
-        logger.error("Failed to parse sent date from message", sent_date=sent_date)
+        logger.error('Failed to parse sent date from message', sent_date=sent_date)
 
 
 def get_unread_status(message):
@@ -72,7 +72,7 @@ def get_formatted_date(datetime_string, string_format='%Y-%m-%d %H:%M:%S'):
         datetime_parsed = datetime.strptime(datetime_string, string_format)
     except (OverflowError, ValueError, AttributeError):
         # Passed value wasn't date-ish or date arguments out of range
-        logger.error("Failed to parse date", sent_date=datetime_string)
+        logger.error('Failed to parse date', sent_date=datetime_string)
         return datetime_string
 
     time_difference = datetime_parsed.date() - date.today()

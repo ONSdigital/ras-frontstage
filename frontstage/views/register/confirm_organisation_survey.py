@@ -27,7 +27,7 @@ def register_confirm_organisation_survey():
         # Get organisation name
         case = case_controller.get_case_by_enrolment_code(enrolment_code)
         business_party_id = case['caseGroup']['partyId']
-        organisation_name = party_controller.get_party_by_business_id(business_party_id).get('name')
+        business_party = party_controller.get_party_by_business_id(business_party_id)
 
         # Get survey name
         collection_exercise_id = case['caseGroup']['collectionExerciseId']
@@ -38,8 +38,22 @@ def register_confirm_organisation_survey():
         logger.error('Failed to retrieve data for confirm organisation/survey page', status_code=exc.status_code)
         raise
 
-    logger.info('Successfully retrieved data for confirm organisation/survey page')
+    business_context = {
+        'enrolment_code': enrolment_code,
+        'case': case,
+        'trading_as': business_party.get('trading_as'),
+        'organisation': business_party.get('name'),
+        'collection_exercise_id': collection_exercise_id,
+        'survey_id': collection_exercise,
+        'survey_name': survey_name,
+    }
+
+    logger.info('Successfully retrieved data for confirm organisation/survey page',
+                collection_exercise_id=collection_exercise_id,
+                business_party_id=business_party_id,
+                survey_id=survey_id
+                )
+
     return render_template('register/register.confirm-organisation-survey.html',
-                           encrypted_enrolment_code=encrypted_enrolment_code,
-                           organisation_name=organisation_name,
-                           survey_name=survey_name)
+                           context=business_context,
+                           )

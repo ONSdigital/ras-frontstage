@@ -39,6 +39,7 @@ def register_confirm_organisation_survey():
         raise
 
     business_context = {
+        'encrypted_enrolment_code': encrypted_enrolment_code,
         'enrolment_code': enrolment_code,
         'case': case,
         'trading_as': business_party.get('trading_as'),

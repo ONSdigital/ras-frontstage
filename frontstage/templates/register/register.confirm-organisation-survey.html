@@ -11,7 +11,7 @@
 
 <br/>
 
-<a href="{{ url_for('register_bp.register_enter_your_details', encrypted_enrolment_code=encrypted_enrolment_code) }}" class="btn action-button btn--primary">
+<a href="{{ url_for('register_bp.register_enter_your_details', encrypted_enrolment_code=context.encrypted_enrolment_code) }}" class="btn action-button btn--primary">
     Confirm
 </a>
 

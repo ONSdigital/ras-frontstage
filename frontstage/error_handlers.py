@@ -39,8 +39,7 @@ def connection_error(error):
 
 
 @app.errorhandler(JWTValidationError)
-def jwt_validation_error(error):
-    del error
+def jwt_validation_error(error):  # pylint: disable=unused-argument
     return redirect(url_for('error_bp.not_logged_in_error_page',
                             _external=True,
                             _scheme=getenv('SCHEME', 'http')))

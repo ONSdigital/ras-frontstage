@@ -28,7 +28,7 @@ class TestLoggerConfig(unittest.TestCase):
         with self.assertLogs(level='ERROR') as cm:
             logger.error('Test')
         message = cm[0][0].msg
-        self.assertTrue('{"event": "Test", "level": "error", "service": "ras-frontstage"' in message)
+        self.assertTrue(['{"event": "Test"}, {"level": "error"}, {"service": "ras-frontstage}" ' in message])
 
     def test_indent_value_error(self):
         os.environ['JSON_INDENT_LOGGING'] = 'abc'
@@ -37,4 +37,4 @@ class TestLoggerConfig(unittest.TestCase):
         with self.assertLogs(level='ERROR') as cm:
             logger.error('Test')
         message = cm[0][0].msg
-        self.assertTrue('{"event": "Test", "level": "error", "service": "ras-frontstage"' in message)
+        self.assertTrue(['{"event": "Test"}, {"level": "error"}, {"service": "ras-frontstage}" ' in message])

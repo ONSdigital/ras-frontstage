@@ -1,7 +1,7 @@
 import logging
 from os import getenv
 
-from flask import redirect, render_template, url_for
+from flask import redirect, render_template, url_for, abort
 from structlog import wrap_logger
 
 from frontstage.controllers import party_controller
@@ -21,13 +21,15 @@ def register_activate_account(token):
     except ApiError as exc:
         # Handle api errors
         if exc.status_code == 409:
-            logger.info('Expired email verification token', token=token)
+            logger.info('Expired email verification token', token=token, api_url=exc.url,
+                        api_status_code=exc.status_code)
             return render_template('register/register.link-expired.html')
         elif exc.status_code == 404:
-            logger.warning('Unrecognised email verification token', token=token)
-            return redirect(url_for('error_bp.not_found_error_page'))
+            logger.warning('Unrecognised email verification token', token=token, api_url=exc.url,
+                           api_status_code=exc.status_code)
+            abort(404)
         else:
-            logger.info('Failed to verify email', token=token)
+            logger.info('Failed to verify email', token=token, api_url=exc.url, api_status_code=exc.status_code)
             raise exc
 
     # Successful account activation therefore redirect back to the login screen

@@ -60,7 +60,7 @@
             {% if not survey.status == 'Complete' or not survey.collection_instrument_type == 'EQ' %}
             <a href="{{ url_for('surveys_bp.access_survey', case_id=survey.case.id, ci_type = survey.collection_instrument_type) }}"
                {% if survey.collection_instrument_type == 'EQ' %}
-                onclick="ga('send', 'event', 'survey', 'download', 'survey_ref = {{ survey.survey.surveyRef }} collection_exercise_ref = {{ survey.collection_exercise.exerciseRef }}');"
+                onclick="ga('send', 'event', 'survey', 'launcheq', 'survey_ref = {{ survey.survey.surveyRef }} collection_exercise_ref = {{ survey.collection_exercise.exerciseRef }}');"
                {% endif %}>
                 <button id="ACCESS_SURVEY_BUTTON_{{loop.index}}" class="btn action-button btn--primary" type="submit">
                     Access <span class="u-vh">{{ survey.survey.longName|replace("Survey", " ") }}</span> survey

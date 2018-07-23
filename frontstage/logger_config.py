@@ -8,7 +8,7 @@ from structlog.processors import JSONRenderer, TimeStamper, format_exc_info
 from structlog.threadlocal import wrap_dict
 
 
-def logger_initial_config(service_name=None,
+def logger_initial_config(service_name=None,  # noqa: C901  pylint: disable=too-complex
                           log_level=None,
                           logger_format=None,
                           logger_date_format=None):
@@ -52,4 +52,3 @@ def logger_initial_config(service_name=None,
                   TimeStamper(fmt=logger_date_format, utc=True, key='created_at'), parse_exception, renderer_processor]
     configure(context_class=wrap_dict(dict), logger_factory=LoggerFactory(), processors=processors,
               cache_logger_on_first_use=True)
-

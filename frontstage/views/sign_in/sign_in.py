@@ -36,7 +36,7 @@ def login():
 
         party_json = party_controller.get_respondent_by_email(username)
         if not party_json or 'id' not in party_json:
-            logger.debug('Respondent not able to sign in as they don\'t have an active account in the system.')
+            logger.info('Respondent not able to sign in as they don\'t have an active account in the system.')
             return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
         party_id = party_json['id']
 
@@ -47,12 +47,10 @@ def login():
             if BAD_AUTH_ERROR in error_message:
                 return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
             elif NOT_VERIFIED_ERROR in error_message:
-                logger.debug('User account is not verified on the OAuth2 server')
-                return render_template('sign-in/sign-in.account-not-verified.html', form=form,
-                                       data={"error": {"type": "account not verified"}})
+                logger.info('User account is not verified on the OAuth2 server')
+                return render_template('sign-in/sign-in.account-not-verified.html', form=form)
             else:
-                logger.error('OAuth 2 server generated 401 which is not understood',
-                             oauth2_error=error_message)
+                logger.info('OAuth 2 server generated 401 which is not understood', oauth2_error=error_message)
                 return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
 
         # Take our raw token and add a UTC timestamp to the expires_at attribute

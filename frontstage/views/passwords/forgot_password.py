@@ -38,11 +38,11 @@ def post_forgot_password():
         except OAuth2Error as exc:
             error_message = exc.oauth2_error
             if BAD_AUTH_ERROR in error_message:
-                exc.logger('Requesting password change for unregistered email on OAuth2 server', log_level='info')
+                logger.info('Requesting password change for unregistered email on OAuth2 server')
                 template_data = {"error": {"type": {"Email address is not registered"}}}
                 return render_template('passwords/forgot-password.html', form=form, data=template_data)
             else:
-                exc.logger(exc.message, oauth2_error=error_message, log_level='info')
+                logger.info(exc.message, oauth2_error=error_message)
             return render_template('passwords/reset-password.trouble.html')
 
         try:

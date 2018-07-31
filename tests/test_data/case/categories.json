@@ -1,44 +1,149 @@
 [
-  {
-    "name": "ACCESS_CODE_AUTHENTICATION_ATTEMPT",
-    "shortDescription": "Access code authentication attempted",
-    "longDescription": "Access code authentication attempted",
-    "role": "collect-csos, collect-admins",
-    "group": "general"
-  },
     {
-    "name": "SUCCESSFUL_RESPONSE_UPLOAD",
-    "shortDescription": "Access code authentication attempted",
-    "longDescription": "Access code authentication attempted",
-    "role": "collect-csos, collect-admins",
-    "group": "general"
-  },
+        "group": null,
+        "name": "ACCESS_CODE_AUTHENTICATION_ATTEMPT",
+        "longDescription": "Access Code authentication attempted",
+        "shortDescription": "Access Code authentication attempted",
+        "role": null
+    },
     {
-    "name": "UNSUCCESSFUL_RESPONSE_UPLOAD",
-    "shortDescription": "Access code authentication attempted",
-    "longDescription": "Access code authentication attempted",
-    "role": "collect-csos, collect-admins",
-    "group": "general"
-  },
+        "group": null,
+        "name": "ACTION_CANCELLATION_COMPLETED",
+        "longDescription": "Action Cancellation Completed",
+        "shortDescription": "Action Cancellation Completed",
+        "role": null
+    },
     {
-    "name": "COLLECTION_INSTRUMENT_DOWNLOADED",
-    "shortDescription": "Access code authentication attempted",
-    "longDescription": "Access code authentication attempted",
-    "role": "collect-csos, collect-admins",
-    "group": "general"
-  },
+        "group": null,
+        "name": "ACTION_CANCELLATION_CREATED",
+        "longDescription": "Action Cancellation Created",
+        "shortDescription": "Action Cancellation Created",
+        "role": null
+    },
     {
-    "name": "COLLECTION_INSTRUMENT_ERROR",
-    "shortDescription": "Access code authentication attempted",
-    "longDescription": "Access code authentication attempted",
-    "role": "collect-csos, collect-admins",
-    "group": "general"
-  },
-  {
-    "name": "EQ_LAUNCH",
-    "shortDescription": "Access code authentication attempted",
-    "longDescription": "Access code authentication attempted",
-    "role": "collect-csos, collect-admins",
-    "group": "general"
-  }
+        "group": null,
+        "name": "ACTION_COMPLETED",
+        "longDescription": "Action Completed",
+        "shortDescription": "Action Completed",
+        "role": null
+    },
+    {
+        "group": null,
+        "name": "ACTION_CREATED",
+        "longDescription": "Action Created",
+        "shortDescription": "Action Created",
+        "role": null
+    },
+    {
+        "group": null,
+        "name": "ACTION_UPDATED",
+        "longDescription": "Action Updated",
+        "shortDescription": "Action Updated",
+        "role": null
+    },
+    {
+        "group": null,
+        "name": "CASE_CREATED",
+        "longDescription": "Case Created",
+        "shortDescription": "Case Created",
+        "role": null
+    },
+    {
+        "group": null,
+        "name": "COLLECTION_INSTRUMENT_DOWNLOADED",
+        "longDescription": "Collection Instrument Downloaded",
+        "shortDescription": "Collection Instrument Downloaded",
+        "role": null
+    },
+    {
+        "group": null,
+        "name": "COLLECTION_INSTRUMENT_ERROR",
+        "longDescription": "Collection Instrument Error",
+        "shortDescription": "Collection Instrument Error",
+        "role": null
+    },
+    {
+        "group": null,
+        "name": "COMPLETED_BY_PHONE",
+        "longDescription": "Completed By Phone",
+        "shortDescription": "Completed By Phone",
+        "role": null
+    },
+    {
+        "group": null,
+        "name": "DISABLE_RESPONDENT_ENROLMENT",
+        "longDescription": "Disable Respondent Enrolment",
+        "shortDescription": "Disable Respondent Enrolment",
+        "role": null
+    },
+    {
+        "group": null,
+        "name": "EQ_LAUNCH",
+        "longDescription": "Collection Instrument Launched",
+        "shortDescription": "Collection Instrument Launched",
+        "role": null
+    },
+    {
+        "group": null,
+        "name": "GENERATE_ENROLMENT_CODE",
+        "longDescription": "Generate enrolment code",
+        "shortDescription": "Generate enrolment code",
+        "role": null
+    },
+    {
+        "group": null,
+        "name": "NO_LONGER_REQUIRED",
+        "longDescription": "No Longer Required",
+        "shortDescription": "No Longer Required",
+        "role": null
+    },
+    {
+        "group": null,
+        "name": "OFFLINE_RESPONSE_PROCESSED",
+        "longDescription": "Offline Response Processed",
+        "shortDescription": "Offline Response Processed",
+        "role": null
+    },
+    {
+        "group": null,
+        "name": "RESPONDENT_ACCOUNT_CREATED",
+        "longDescription": "Account created for respondent",
+        "shortDescription": "Account created for respondent",
+        "role": null
+    },
+    {
+        "group": null,
+        "name": "RESPONDENT_EMAIL_AMENDED",
+        "longDescription": "Respondent Email Amended",
+        "shortDescription": "Respondent Email Amended",
+        "role": null
+    },
+    {
+        "group": null,
+        "name": "RESPONDENT_ENROLED",
+        "longDescription": "Respondent Enroled",
+        "shortDescription": "Respondent Enroled",
+        "role": null
+    },
+    {
+        "group": null,
+        "name": "SUCCESSFUL_RESPONSE_UPLOAD",
+        "longDescription": "Successful Response Upload",
+        "shortDescription": "Successful Response Upload",
+        "role": null
+    },
+    {
+        "group": null,
+        "name": "UNSUCCESSFUL_RESPONSE_UPLOAD",
+        "longDescription": "Unsuccessful Response Upload",
+        "shortDescription": "Unsuccessful Response Upload",
+        "role": null
+    },
+    {
+        "group": null,
+        "name": "VERIFICATION_CODE_SENT",
+        "longDescription": "Verification Code Sent",
+        "shortDescription": "Verification Code Sent",
+        "role": null
+    }
 ]

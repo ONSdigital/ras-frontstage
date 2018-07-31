@@ -1,22 +1,21 @@
 {
-  "associations": [
-    {
-    "enrolments": [
-      {
-        "enrolmentStatus": "ENABLED",
-        "name": "Business Register and Employment Survey",
-        "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
-      }
+    "associations": [
+        {
+            "businessRespondentStatus": "ACTIVE",
+            "enrolments": [
+                {
+                    "enrolmentStatus": "ENABLED",
+                    "name": "Monthly Survey of Building Materials Bricks",
+                    "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54"
+                }
+            ],
+            "partyId": "f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b"
+        }
     ],
-    "partyId": "07d672bc-497b-448f-a406-a20a7e6013d7"
-    }
-  ],
-  "name": "RUNAME1_COMPANY4 RUNNAME2_COMPANY4",
-  "id": "1216a88f-ee2a-420c-9e6a-ee34893c29cf",
-  "sampleUnitRef": "50012345678",
-  "sampleUnitType": "B",
-  "checkletter":"C",
-  "tradstyle1": "TRADSTYLE1",
-  "tradstyle2": "TRADSTYLE2",
-  "tradstyle3": "TRADSTYLE3"
+    "id": "0008279d-9425-4e28-897d-bfd876aa7f3f",
+    "name": "RUNAME1_COMPANY1 RUNNAME2_COMPANY1",
+    "sampleSummaryId": "bf9477c9-ea0b-498a-87f1-c1a76d77bd29",
+    "sampleUnitRef": "49900000001",
+    "sampleUnitType": "B",
+    "trading_as": ""
 }

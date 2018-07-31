@@ -1,27 +1,57 @@
 {
-  "id": "14fb3e68-4dca-46db-bf49-04b84e07e77c",
-  "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87",
-  "name": "201601",
-  "exerciseRef": "221_201712",
-  "actualExecutionDateTime": "2017-05-15T14:20:24Z",
-  "scheduledExecutionDateTime": "2017-05-15T00:00:00Z",
-  "scheduledStartDateTime": "2017-06-01T00:00:00Z",
-  "actualPublishDateTime": "2017-06-30T00:00:00Z",
-  "periodStartDateTime": "2017-06-30T00:00:00Z",
-  "periodEndDateTime": "2017-06-30T00:00:00Z",
-  "scheduledReturnDateTime": "2017-06-30T00:00:00Z",
-  "scheduledEndDateTime": null,
-  "executedBy": "Fred Bloggs",
-  "state": "EXECUTED",
-  "userDescription": "December 2017",
-  "caseTypes": [
-    {
-      "sampleUnitType": "B",
-      "actionPlanId": "60df56d9-f491-4ac8-b256-a10154290a8b"
-    },
-    {
-      "sampleUnitType": "BI",
-      "actionPlanId": "b1f46e33-a3ef-4e50-939d-c18f8a9f11bb"
-    }
-  ]
+        "id": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+        "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
+        "name": null,
+        "actualExecutionDateTime": "2018-07-12T09:00:27.458Z",
+        "scheduledExecutionDateTime": "2018-07-12T09:00:18.000Z",
+        "scheduledStartDateTime": "2018-07-12T09:00:18.000Z",
+        "actualPublishDateTime": "2018-07-12T09:00:29.051Z",
+        "periodStartDateTime": "2018-07-12T09:00:18.000Z",
+        "periodEndDateTime": "2018-07-23T09:00:13.000Z",
+        "scheduledReturnDateTime": "2018-07-22T09:00:13.000Z",
+        "scheduledEndDateTime": "2018-07-23T09:00:13.000Z",
+        "executedBy": null,
+        "state": "LIVE",
+        "caseTypes": [
+            {
+                "actionPlanId": "0721c4bf-f3d6-4082-9cdb-cfabff1911ed",
+                "sampleUnitType": "B"
+            },
+            {
+                "actionPlanId": "ed79eba1-77d0-4db5-a033-fd47afc64984",
+                "sampleUnitType": "BI"
+            }
+        ],
+        "exerciseRef": "204901",
+        "userDescription": "test_exercise",
+        "created": "2018-07-12T09:00:21.568Z",
+        "updated": "2018-07-12T09:01:13.004Z",
+        "deleted": null,
+        "validationErrors": null,
+        "events": [
+            {
+                "id": "b3651d8b-bb0b-42f7-a2a3-d05d85822226",
+                "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+                "tag": "mps",
+                "timestamp": "2018-07-12T09:00:18.000Z"
+            },
+            {
+                "id": "052328b1-65ea-4778-a788-ec1ecc846802",
+                "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+                "tag": "go_live",
+                "timestamp": "2018-07-12T09:01:13.000Z"
+            },
+            {
+                "id": "186e1a0f-0a49-4e4a-8e0a-c8db7593117e",
+                "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+                "tag": "return_by",
+                "timestamp": "2018-07-22T09:00:13.000Z"
+            },
+            {
+                "id": "e5c34d4e-e7eb-4e38-a14a-7ca16cca4787",
+                "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+                "tag": "exercise_end",
+                "timestamp": "2018-07-23T09:00:13.000Z"
+            }
+        ]
 }

@@ -23,7 +23,8 @@ def get_survey_list(session, tag):
 
     if tag == 'todo':
         response = make_response(render_template('surveys/surveys-todo.html',
-                                                 just_added_case_id=request.args.get('case_id'),
+                                                 business=request.args.get('business_party_id'),
+                                                 added_survey=request.args.get("survey_id"),
                                                  sorted_surveys_list=sorted_survey_list))
 
         # Ensure any return to list of surveys (e.g. browser back) round trips the server to display the latest statuses

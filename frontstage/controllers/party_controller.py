@@ -12,7 +12,7 @@ from frontstage.exceptions.exceptions import ApiError
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def get_party_by_id(party_id):
+def get_respondent_party_by_id(party_id):
     logger.debug('Retrieving party from party service by id', party_id=party_id)
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/id/{party_id}"
@@ -81,7 +81,7 @@ def create_account(registration_data):
         if response.status_code == 400:
             message = 'Email has already been used'
         else:
-            message = 'Failed to create account',
+            message = 'Failed to create account'
         raise ApiError(logger, response,
                        log_level='debug' if response.status_code == 400 else 'error',
                        message=message)
@@ -181,8 +181,9 @@ def verify_token(token):
 def get_party_enabled_enrolments_details(party_id, tag):
     logger.debug("Get party enrolments", party_id=party_id)
 
-    respondent = get_party_by_id(party_id)
+    respondent = get_respondent_party_by_id(party_id)
     surveys_list = []
+
     for association in respondent['associations']:
         business_details = get_party_by_business_id(association['partyId'])
         business_cases = case_controller.get_cases_for_list_type_by_party_id(association['partyId'], tag)
@@ -199,6 +200,7 @@ def get_party_enabled_enrolments_details(party_id, tag):
                                 survey_data = {
                                     "business_party": business_details,
                                     "survey": survey,
+                                    "collection_exercise": collection_exercise,
                                     "return_by": collection_exercise['events']['return_by']['date'],
                                     "status": case_controller.calculate_case_status(business_case.get('caseGroup', {}).get('caseGroupStatus'),
                                                                                     collection_instrument['type']),

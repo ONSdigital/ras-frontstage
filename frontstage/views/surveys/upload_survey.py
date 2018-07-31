@@ -18,6 +18,8 @@ logger = wrap_logger(logging.getLogger(__name__))
 def upload_survey(session):
     party_id = session['party_id']
     case_id = request.args['case_id']
+    business_party_id = request.args['business_party_id']
+    survey_short_name = request.args['survey_short_name']
     logger.info('Attempting to upload collection instrument', case_id=case_id, party_id=party_id)
 
     if request.content_length > app.config['MAX_UPLOAD_LENGTH']:
@@ -27,8 +29,7 @@ def upload_survey(session):
                                 error_info='size'))
 
     # Check if respondent has permission to upload for this case
-    case = case_controller.get_case_by_case_id(case_id)
-    case_controller.check_case_permissions(party_id, case['partyId'], case_id)
+    case_controller.check_case_permissions(party_id, case_id, business_party_id, survey_short_name)
 
     # Get the uploaded file
     upload_file = request.files['file']

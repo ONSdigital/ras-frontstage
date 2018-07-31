@@ -5,7 +5,7 @@ from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.common.cryptographer import Cryptographer
-from frontstage.controllers import case_controller, iac_controller, party_controller
+from frontstage.controllers import case_controller, collection_exercise_controller, iac_controller, party_controller
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.views.surveys import surveys_bp
 
@@ -27,9 +27,9 @@ def add_survey_submit(session):
         # Verify enrolment code is active
         iac = iac_controller.get_iac_from_enrolment(enrolment_code, validate=True)
 
+        # Add enrolment for user in party
         case_id = iac['caseId']
         case = case_controller.get_case_by_enrolment_code(enrolment_code)
-        case_group_id = case.get('caseGroup', {}).get('id')
         business_party_id = case['partyId']
         case_controller.post_case_event(case_id,
                                         party_id=business_party_id,
@@ -38,8 +38,9 @@ def add_survey_submit(session):
 
         party_controller.add_survey(party_id, enrolment_code)
 
-        case_list = case_controller.get_cases_by_party_id(party_id)
-        case_id = case_controller.get_case_id_for_group(case_list, case_group_id)
+        # Get survey ID from collection Exercise
+        added_survey_id = collection_exercise_controller.get_collection_exercise(case['caseGroup']['collectionExerciseId']).get('surveyId')
+
     except ApiError as exc:
         logger.error('Failed to assign user to a survey',
                      party_id=party_id, status_code=exc.status_code)
@@ -47,4 +48,4 @@ def add_survey_submit(session):
 
     logger.info('Successfully retrieved data for confirm add organisation/survey page',
                 case_id=case_id, party_id=party_id)
-    return redirect(url_for('surveys_bp.get_survey_list', _external=True, case_id=case_id, tag='todo'))
+    return redirect(url_for('surveys_bp.get_survey_list', _external=True, business_party_id=business_party_id, survey_id=added_survey_id, tag='todo'))

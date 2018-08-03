@@ -1,5 +1,7 @@
 import os
 
+from schema import Schema, Regex, And, Or, Optional
+
 
 # To choose which config to use when running frontstage set environment variable APP_SETTINGS to the name of the
 # config object e.g. for the dev config set APP_SETTINGS=DevelopmentConfig
@@ -21,7 +23,7 @@ class Config(object):
     GOOGLE_TAG_MANAGER = os.getenv('GOOGLE_TAG_MANAGER', None)
     NON_DEFAULT_VARIABLES = ['SECRET_KEY', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD', 'JWT_SECRET']
     AVAILABILITY_BANNER = os.getenv('AVAILABILITY_BANNER', False)
-    
+
     ACCOUNT_SERVICE_URL = os.getenv('ACCOUNT_SERVICE_URL')
     EQ_URL = os.getenv('EQ_URL')
     JSON_SECRET_KEYS = os.getenv('JSON_SECRET_KEYS')
@@ -59,7 +61,7 @@ class Config(object):
     OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID')
     OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET')
     OAUTH_BASIC_AUTH = (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET)
-    
+
     PARTY_URL = os.getenv('PARTY_URL')
     PARTY_USERNAME = os.getenv('PARTY_USERNAME')
     PARTY_PASSWORD = os.getenv('PARTY_PASSWORD')
@@ -71,6 +73,11 @@ class Config(object):
     SURVEY_USERNAME = os.getenv('SURVEY_USERNAME')
     SURVEY_PASSWORD = os.getenv('SURVEY_PASSWORD')
     SURVEY_AUTH = (SURVEY_USERNAME, SURVEY_PASSWORD)
+
+    @classmethod
+    def as_dict(cls):
+        return {attr: getattr(cls, attr) for attr in dir(cls)
+                if not callable(getattr(cls, attr)) and not attr.startswith('__')}
 
 
 class DevelopmentConfig(Config):
@@ -136,3 +143,83 @@ class TestingConfig(DevelopmentConfig):
     ACCOUNT_SERVICE_URL = 'http://frontstage-url/surveys'
     EQ_URL = 'https://eq-test/session?token='
     JSON_SECRET_KEYS = open("./tests/test_data/jwt-test-keys/test_key.json").read()
+
+
+URL_SCHEMA = Regex(r'^https?://')
+NON_EMPTY_STRING_SCHEMA = And(str, len)
+
+CONFIG_SCHEMA = Schema({
+    'DEBUG': bool,
+    'TESTING': bool,
+    Optional('DEVELOPMENT'): bool,
+    'VERSION': str,
+    'PORT': int,
+    'MAX_UPLOAD_LENGTH': int,
+    Optional('WTF_CSRF_ENABLED'): bool,
+    Optional('TEMPLATES_AUTO_RELOAD'): bool,
+
+    'SECRET_KEY': str,
+    'SECURITY_USER_NAME': str,
+    'SECURITY_USER_PASSWORD': str,
+    'BASIC_AUTH': (str, str),
+    'JWT_ALGORITHM': str,
+    'JWT_SECRET': str,
+    'VALIDATE_JWT': bool,
+    'GOOGLE_ANALYTICS': Or(str, None),
+    'GOOGLE_TAG_MANAGER': Or(str, None),
+    'NON_DEFAULT_VARIABLES': [str],
+    'AVAILABILITY_BANNER': bool,
+
+    'ACCOUNT_SERVICE_URL': URL_SCHEMA,
+    'EQ_URL': URL_SCHEMA,
+    'JSON_SECRET_KEYS': str,
+
+    'REDIS_HOST': str,
+    'REDIS_PORT': int,
+    'REDIS_DB': int,
+
+    'PASSWORD_MATCH_ERROR_TEXT': str,
+    'PASSWORD_CRITERIA_ERROR_TEXT': str,
+    'PASSWORD_MIN_LENGTH': int,
+    'PASSWORD_MAX_LENGTH': int,
+
+    'CASE_URL': URL_SCHEMA,
+    'CASE_USERNAME': str,
+    'CASE_PASSWORD': str,
+    'CASE_AUTH': (str, str),
+
+    'COLLECTION_EXERCISE_URL': URL_SCHEMA,
+    'COLLECTION_EXERCISE_USERNAME': str,
+    'COLLECTION_EXERCISE_PASSWORD': str,
+    'COLLECTION_EXERCISE_AUTH': (str, str),
+
+    'COLLECTION_INSTRUMENT_URL': URL_SCHEMA,
+    'COLLECTION_INSTRUMENT_USERNAME': str,
+    'COLLECTION_INSTRUMENT_PASSWORD': str,
+    'COLLECTION_INSTRUMENT_AUTH': (str, str),
+
+    'IAC_URL': URL_SCHEMA,
+    'IAC_USERNAME': str,
+    'IAC_PASSWORD': str,
+    'IAC_AUTH': (str, str),
+
+    'OAUTH_URL': URL_SCHEMA,
+    'OAUTH_CLIENT_ID': str,
+    'OAUTH_CLIENT_SECRET': str,
+    'OAUTH_BASIC_AUTH': (str, str),
+
+    'PARTY_URL': URL_SCHEMA,
+    'PARTY_USERNAME': str,
+    'PARTY_PASSWORD': str,
+    'PARTY_AUTH': (str, str),
+
+    'SECURE_MESSAGE_URL': URL_SCHEMA,
+
+    'SURVEY_URL': URL_SCHEMA,
+    'SURVEY_USERNAME': str,
+    'SURVEY_PASSWORD': str,
+    'SURVEY_AUTH': (str, str),
+})
+
+app_config = '{}'.format(os.environ.get('APP_SETTINGS', 'Config'))
+CONFIG_SCHEMA.validate(globals()[app_config].as_dict())

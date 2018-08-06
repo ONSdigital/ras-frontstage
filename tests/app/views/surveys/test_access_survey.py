@@ -1,25 +1,13 @@
 import io
-import json
 import unittest
 from unittest.mock import patch
 
 from frontstage import app
-from tests.app.mocked_services import (encoded_jwt_token, encrypted_enrolment_code)
-
-with open('tests/test_data/collection_exercise/collection_exercise.json') as fp:
-    collection_exercise = json.load(fp)
-
-with open('tests/test_data/collection_instrument/collection_instrument_seft.json') as fp:
-    collection_instrument = json.load(fp)
-
-with open('tests/test_data/survey/bricks_survey.json') as fp:
-    survey = json.load(fp)
-
-with open('tests/test_data/party/business_party.json') as fp:
-    business_party = json.load(fp)
+from tests.app.mocked_services import (collection_exercise, collection_instrument_seft, survey, business_party,
+                                       encoded_jwt_token, encrypted_enrolment_code)
 
 
-class TestSurveys(unittest.TestCase):
+class TestAccessSurvey(unittest.TestCase):
 
     def setUp(self):
         self.app = app.test_client()
@@ -48,7 +36,7 @@ class TestSurveys(unittest.TestCase):
     def test_access_survey_all_expected_case_data(self, get_case_data):
         case_data = {
             "collection_exercise": collection_exercise,
-            "collection_instrument": collection_instrument,
+            "collection_instrument": collection_instrument_seft,
             "survey": survey,
             "business_party": business_party
         }
@@ -78,7 +66,7 @@ class TestSurveys(unittest.TestCase):
     @patch('frontstage.controllers.case_controller.get_case_data')
     def test_access_survey_missing_collection_exercise_from_case_data(self, get_case_data):
         case_data = {
-            "collection_instrument": collection_instrument,
+            "collection_instrument": collection_instrument_seft,
             "survey": survey,
             "business_party": business_party
         }
@@ -94,7 +82,7 @@ class TestSurveys(unittest.TestCase):
     def test_access_survey_missing_survey_from_case_data(self, get_case_data):
         case_data = {
             "collection_exercise": collection_exercise,
-            "collection_instrument": collection_instrument,
+            "collection_instrument": collection_instrument_seft,
             "business_party": business_party
         }
         get_case_data.return_value = case_data
@@ -109,7 +97,7 @@ class TestSurveys(unittest.TestCase):
     def test_access_survey_missing_business_party_from_case_data(self, get_case_data):
         case_data = {
             "collection_exercise": collection_exercise,
-            "collection_instrument": collection_instrument,
+            "collection_instrument": collection_instrument_seft,
             "survey": survey,
         }
         get_case_data.return_value = case_data

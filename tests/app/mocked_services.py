@@ -1,8 +1,9 @@
+import io
 import json
 
 from frontstage import app
 
-
+survey_file = dict(file=(io.BytesIO(b'my file contents'), "testfile.xlsx"))
 with open('tests/test_data/party/business_party.json') as fp:
     business_party = json.load(fp)
 
@@ -60,6 +61,12 @@ with open('tests/test_data/conversation_list.json') as fp:
 with open('tests/test_data/eq_payload.json') as fp:
     eq_payload = json.load(fp)
 
+with open('tests/test_data/iac/iac_active.json') as fp:
+    active_iac = json.load(fp)
+
+with open('tests/test_data/iac/iac-inactive.json') as fp:
+    inactive_iac = json.load(fp)
+
 with open('tests/test_data/secure_messaging/message.json') as fp:
     message = json.load(fp)
 
@@ -74,6 +81,12 @@ with open('tests/test_data/survey/qbs_survey.json') as fp:
 
 with open('tests/test_data/survey/rsi_survey.json') as fp:
     survey_rsi = json.load(fp)
+
+with open('tests/test_data/survey/survey_list_todo.json') as fp:
+    survey_list_todo = json.load(fp)
+
+with open('tests/test_data/survey/survey_list_history.json') as fp:
+    survey_list_history = json.load(fp)
 
 encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoicmVzcG9uZGVudCIsImFjY2Vzc190b2tlbiI6ImI5OWIyMjA0LWYxM" \
                     "DAtNDcxZS1iOTQ1LTIyN2EyNmVhNjljZCIsInJlZnJlc2hfdG9rZW4iOiIxZTQyY2E2MS02ZDBkLTQxYjMtODU2Yy02YjhhMDhlYmI" \

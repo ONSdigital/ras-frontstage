@@ -9,7 +9,7 @@ from frontstage.controllers import party_controller
 from frontstage.exceptions.exceptions import ApiError
 from tests.app.mocked_services import (business_party, case, case_list, collection_exercise, collection_exercise_by_survey,
                                        collection_instrument_seft, respondent_party, survey, url_get_business_party, url_get_respondent_email,
-                                       url_get_respondent_party, url_post_add_survey)
+                                       url_get_respondent_party, url_post_add_survey, url_reset_password_request)
 from frontstage.common.mappers import convert_events_to_new_format
 
 
@@ -160,3 +160,10 @@ class TestPartyController(unittest.TestCase):
             self.assertTrue(survey_list is not None)
             for survey_entry in survey_list:
                 self.assertEqual(survey_entry['status'], 'Not Started')
+
+    def test_reset_password_request_fail(self):
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.POST, url_reset_password_request, status=500)
+            with app.app_context():
+                with self.assertRaises(ApiError):
+                    party_controller.reset_password_request(respondent_party['emailAddress'])

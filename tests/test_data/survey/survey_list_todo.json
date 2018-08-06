@@ -1,0 +1,307 @@
+[
+  {
+    "business_party":
+      {
+        "associations":
+              [
+                {
+                  "businessRespondentStatus": "ACTIVE",
+                  "enrolments":
+                        [
+                          {
+                            "enrolmentStatus": "ENABLED",
+                            "name": "Quarterly Business Survey",
+                            "surveyId": "02b9c366-7397-42f7-942a-76dc5876d86d"
+                          }
+                        ],
+                  "partyId": "86291d4d-70f4-440f-bf8b-29d91719a6ea"
+                }
+              ],
+        "id": "272ac5cb-9052-48ec-b886-7fd5015bd327",
+        "name": "RUNAME3_COMPANY3 RUNNAME4_COMPANY3",
+        "sampleSummaryId": "b4ce9fb2-79b6-4f92-abb3-7a2f46c9524f",
+        "sampleUnitRef": "49900000003",
+        "sampleUnitType": "B",
+        "trading_as": "TOTAL UK ACTIVITY"
+      },
+    "survey":
+    {
+      "id": "02b9c366-7397-42f7-942a-76dc5876d86d",
+      "shortName": "QBS",
+      "longName": "Quarterly Business Survey",
+      "surveyRef": "139",
+      "legalBasis": "Statistics of Trade Act 1947",
+      "surveyType": "Business",
+      "legalBasisRef": "STA1947"
+    },
+    "collection_exercise":
+    {
+      "id": "75594228-fbf2-4626-80b8-488dc59eeeba",
+      "surveyId": "02b9c366-7397-42f7-942a-76dc5876d86d",
+      "name": "Quarterly Business S",
+      "actualExecutionDateTime": "2018-08-02T12:54:05.748Z",
+      "scheduledExecutionDateTime": "2018-06-13T00:00:00.000Z",
+      "scheduledStartDateTime": "2018-06-13T00:00:00.000Z",
+      "actualPublishDateTime": null,
+      "periodStartDateTime": "2018-06-13T00:00:00.000Z",
+      "periodEndDateTime": "2020-07-31T00:00:00.000Z",
+      "scheduledReturnDateTime": "2018-06-27T00:00:00.000Z",
+      "scheduledEndDateTime": "2020-07-31T00:00:00.000Z",
+      "executedBy": null,
+      "state": "LIVE",
+      "caseTypes":
+        [
+          {
+            "actionPlanId": "9277bcdb-9a0c-4680-ad2e-c0f30eb94c06",
+            "sampleUnitType": "B"
+          },
+          {
+            "actionPlanId": "666a2681-9009-4c30-a4b3-48aad4345639",
+            "sampleUnitType": "BI"
+          }
+        ],
+      "exerciseRef": "1806",
+      "userDescription": "15 June 2018",
+      "created": "2018-08-02T12:53:26.667Z",
+      "updated": "2018-08-02T12:54:06.961Z",
+      "deleted": null,
+      "validationErrors": null,
+      "events":
+        {
+          "employment":
+            {
+              "day": "Friday",
+              "date": "15 Jun 2018",
+              "month": "06",
+              "time": "00:00 GMT",
+              "is_in_future": false
+            },
+          "ref_period_start":
+            {
+              "day": "Friday",
+              "date": "15 Jun 2018",
+              "month": "06",
+              "time": "00:00 GMT",
+              "is_in_future": false
+            },
+          "ref_period_end":
+            {
+              "day": "Saturday",
+              "date": "30 Jun 2018",
+              "month": "06",
+              "time": "00:00 GMT",
+              "is_in_future": false
+            },
+          "exercise_end":
+            {
+              "day": "Friday",
+              "date": "31 Jul 2020",
+              "month": "07",
+              "time": "00:00 GMT",
+              "is_in_future": true},
+          "return_by":
+            {
+              "day": "Wednesday",
+              "date": "27 Jun 2018",
+              "month": "06",
+              "time": "00:00 GMT",
+              "is_in_future": false
+            },
+          "reminder":
+            {
+              "day": "Tuesday",
+              "date": "03 Jul 2018",
+              "month": "07",
+              "time": "00:00 GMT",
+              "is_in_future": false
+            },
+          "reminder2":
+            {
+              "day": "Monday",
+              "date": "23 Jul 2018",
+              "month": "07",
+              "time": "00:00 GMT",
+              "is_in_future": false
+            },
+          "reminder3":
+            {
+              "day": "Monday",
+              "date": "06 Aug 2018",
+              "month": "08",
+              "time": "00:00 GMT",
+              "is_in_future": true
+            },
+          "mps":
+            {
+              "day": "Wednesday",
+              "date": "13 Jun 2018",
+              "month": "06",
+              "time": "00:00 GMT",
+              "is_in_future": false
+            },
+          "go_live":
+            {
+              "day": "Monday",
+              "date": "18 Jun 2018",
+              "month": "06",
+              "time": "00:00 GMT",
+              "is_in_future": false
+            }
+        }
+    },
+    "return_by": "27 Jun 2018",
+    "status": "Not started",
+    "collection_instrument":
+      {
+        "businesses":
+            [
+
+            ],
+        "classifiers":
+          {
+            "eq_id": "2",
+            "form_type": "0001"
+          },
+        "exercises":
+          [
+            "75594228-fbf2-4626-80b8-488dc59eeeba",
+            "2dce616e-14bc-4a99-afa1-4b3331cb8a34",
+            "0cd818cd-96e6-4bb3-8244-1d56df7cfbdd"
+          ],
+        "file_name": "0001",
+        "id": "1d431e57-e259-43af-9de4-eaf04ee4929b",
+        "len": null,
+        "stamp": "Thu, 02 Aug 2018 12:53:43 GMT",
+        "survey": "02b9c366-7397-42f7-942a-76dc5876d86d",
+        "type": "EQ"
+      },
+    "period": "15 June 2018",
+    "case_id": "0bd4963e-e9e8-4297-a69d-42dd7fec8483"
+  },
+  {
+    "business_party":
+      {
+        "associations":
+          [
+            {
+              "businessRespondentStatus": "ACTIVE",
+              "enrolments":
+                [
+                  {
+                    "enrolmentStatus": "ENABLED",
+                    "name": "Monthly Survey of Building Materials Bricks",
+                    "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54"
+                  }
+                ],
+              "partyId": "86291d4d-70f4-440f-bf8b-29d91719a6ea"
+            }
+          ],
+        "id": "88d9fe35-ff6c-4ed1-b4f8-8ac548179651",
+        "name": "RED BRICKS LTD",
+        "sampleSummaryId": "b4ce9fb2-79b6-4f92-abb3-7a2f46c9524f",
+        "sampleUnitRef": "49900000008",
+        "sampleUnitType": "B",
+        "trading_as": ""
+      },
+    "survey":
+    {
+      "id": "cb8accda-6118-4d3b-85a3-149e28960c54", 
+      "shortName": "Bricks", 
+      "longName": "Monthly Survey of Building Materials Bricks", 
+      "surveyRef": "074", 
+      "legalBasis": "Voluntary - BEIS", 
+      "surveyType": "Business", 
+      "legalBasisRef": "Vol_BEIS"
+    }, 
+    "collection_exercise": 
+      {
+        "id": "cff3210d-c7f7-4cc8-ab39-bd973956839c", 
+        "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54", 
+        "name": null, 
+        "actualExecutionDateTime": "2018-08-02T12:54:49.505Z", 
+        "scheduledExecutionDateTime": "2018-08-02T12:54:48.000Z", 
+        "scheduledStartDateTime": "2018-08-02T12:54:48.000Z", 
+        "actualPublishDateTime": "2018-08-02T12:54:51.323Z", 
+        "periodStartDateTime": "2018-08-02T12:54:48.000Z", 
+        "periodEndDateTime": "2018-08-13T12:54:43.000Z", 
+        "scheduledReturnDateTime": "2018-08-12T12:54:43.000Z", 
+        "scheduledEndDateTime": "2018-08-13T12:54:43.000Z", 
+        "executedBy": null,
+        "state": "LIVE", 
+        "caseTypes": 
+          [
+            {
+              "actionPlanId": "fa7987e7-04a2-4172-af1a-611725465ea8", 
+              "sampleUnitType": "B"
+            }, 
+            {
+              "actionPlanId": "03ca2db1-efd6-4315-bb09-35ef6f813037", 
+              "sampleUnitType": "BI"
+            }
+          ], 
+        "exerciseRef": "204901", 
+        "userDescription": "test_exercise", 
+        "created": "2018-08-02T12:54:43.900Z", 
+        "updated": "2018-08-02T12:55:43.004Z", 
+        "deleted": null,
+        "validationErrors": null,
+        "events":
+        {
+          "return_by":
+            {
+              "day": "Sunday",
+              "date": "12 Aug 2018",
+              "month": "08",
+              "time": "12:54 GMT",
+              "is_in_future": true
+            },
+          "exercise_end":
+            {
+              "day": "Monday",
+              "date": "13 Aug 2018",
+              "month": "08",
+              "time": "12:54 GMT",
+              "is_in_future": true
+            },
+          "mps":
+            {
+              "day": "Thursday",
+              "date": "02 Aug 2018",
+              "month": "08",
+              "time": "12:54 GMT",
+              "is_in_future": false
+            },
+          "go_live":
+            {
+              "day": "Thursday",
+              "date": "02 Aug 2018",
+              "month": "08",
+              "time": "12:55 GMT",
+              "is_in_future": false
+            }
+        }
+      },
+    "return_by": "12 Aug 2018",
+    "status": "Not started",
+    "collection_instrument":
+      {
+        "businesses": [],
+        "classifiers":
+          {
+            "form_type": "0001"
+          },
+        "exercises":
+          [
+            "040364e2-62c3-4d83-b238-a937ee82d0b2"
+          ],
+        "file_name": "test_collection_instrument.xlxs",
+        "id": "2b28effb-21d2-4029-af0c-a27dce0b4ded",
+        "len": 5952,
+        "stamp": "Thu, 02 Aug 2018 12:53:54 GMT",
+        "survey": "cb8accda-6118-4d3b-85a3-149e28960c54",
+        "type": "SEFT"
+      },
+    "period": "test_exercise",
+    "case_id": "f1e15ffb-18d5-45b4-973d-e2dc3319bb7d"
+  }
+]

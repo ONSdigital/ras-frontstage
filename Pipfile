@@ -30,6 +30,7 @@ sdc-cryptography = "==0.2.1"
 greenlet = "==0.4.13"
 "flake8" = "*"
 responses = "*"
+werkzeug = "*"
 
 
 [dev-packages]

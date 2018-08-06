@@ -1,4 +1,3 @@
-import json
 import unittest
 
 import responses
@@ -7,12 +6,7 @@ from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import survey_controller
 from frontstage.exceptions.exceptions import ApiError
-
-with open('tests/test_data/survey/bricks_survey.json') as fp:
-    survey = json.load(fp)
-
-url_survey_by_id = f'{app.config["SURVEY_URL"]}/surveys/{survey["id"]}'
-url_survey_by_shortname = f'{app.config["SURVEY_URL"]}/surveys/shortname/{survey["shortName"]}'
+from tests.app.mocked_services import survey, url_get_survey, url_get_survey_by_short_name
 
 
 class TestSurveyController(unittest.TestCase):
@@ -24,7 +18,7 @@ class TestSurveyController(unittest.TestCase):
 
     def test_get_survey_by_id_success(self):
         with responses.RequestsMock() as rsps:
-            rsps.add(rsps.GET, url_survey_by_id, json=survey, status=200, content_type='application/json')
+            rsps.add(rsps.GET, url_get_survey, json=survey, status=200, content_type='application/json')
             with app.app_context():
                 get_survey = survey_controller.get_survey(survey['id'])
 
@@ -32,14 +26,14 @@ class TestSurveyController(unittest.TestCase):
 
     def test_get_survey_by_id_fail(self):
         with responses.RequestsMock() as rsps:
-            rsps.add(rsps.GET, url_survey_by_id, status=400)
+            rsps.add(rsps.GET, url_get_survey, status=400)
             with app.app_context():
                 with self.assertRaises(ApiError):
                         survey_controller.get_survey(survey['id'])
 
     def test_get_survey_by_short_name_success(self):
         with responses.RequestsMock() as rsps:
-            rsps.add(rsps.GET, url_survey_by_shortname, json=survey, status=200, content_type='application/json')
+            rsps.add(rsps.GET, url_get_survey_by_short_name, json=survey, status=200, content_type='application/json')
             with app.app_context():
                 get_survey = survey_controller.get_survey_by_short_name(survey['shortName'])
 
@@ -47,7 +41,7 @@ class TestSurveyController(unittest.TestCase):
 
     def test_get_survey_by_short_name_fail(self):
         with responses.RequestsMock() as rsps:
-            rsps.add(rsps.GET, url_survey_by_shortname, status=400)
+            rsps.add(rsps.GET, url_get_survey_by_short_name, status=400)
             with app.app_context():
                 with self.assertRaises(ApiError):
                     survey_controller.get_survey_by_short_name(survey['shortName'])

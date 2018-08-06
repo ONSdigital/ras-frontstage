@@ -1,4 +1,5 @@
 import logging
+import itertools
 
 import requests
 from flask import abort, current_app as app
@@ -215,16 +216,27 @@ def get_cases_for_list_type_by_party_id(party_id, list_type='todo'):
     logger.debug('Get cases for party for list', party_id=party_id, list_type=list_type)
 
     business_cases = get_cases_by_party_id(party_id)
-
+    cases = filter_cases_by_case_group(business_cases)
     history_statuses = ['COMPLETE', 'COMPLETEDBYPHONE', 'NOLONGERREQUIRED']
     if list_type == 'history':
         filtered_cases = [business_case
-                          for business_case in business_cases
+                          for business_case in cases
                           if business_case.get('caseGroup', {}).get('caseGroupStatus') in history_statuses]
     else:
         filtered_cases = [business_case
-                          for business_case in business_cases
+                          for business_case in cases
                           if business_case.get('caseGroup', {}).get('caseGroupStatus') not in history_statuses]
 
     logger.debug("Sucessfully retrieved cases for party survey list", party_id=party_id, list_type=list_type)
     return filtered_cases
+
+
+def filter_cases_by_case_group(cases):
+    for key, group in itertools.groupby(cases, key=lambda x: x['caseGroup']['id']):
+        group = list(group)
+        if len(group) > 1:
+            sorted_group = sorted(group, key=lambda k: k['createdDateTime'], reverse=True)
+            for i in sorted_group:
+                if sorted_group.index(i) != 0:
+                    cases.remove(i)
+    return cases

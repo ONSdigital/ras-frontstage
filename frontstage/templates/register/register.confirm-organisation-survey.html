@@ -7,23 +7,17 @@
 
 <h1 class="saturn">Confirm organisation and survey details</h1>
 
-<div class="grid">
-    <div class="grid__col col-4@m">Enrolment code:</div>
-    <div class="grid__col col-8@m"><strong>{{ enrolment_code }}</strong></div>
-    <div class="grid__col col-4@m">Organisation:</div>
-    <div class="grid__col col-8@m"><strong>{{ organisation_name }}</strong></div>
-    <div class="grid__col col-4@m">Survey to complete:</div>
-    <div class="grid__col col-8@m"><strong>{{ survey_name }}</strong></div>
-</div>
+ {% include('partials/business_survey_credentials.html') %}
 
 <br/>
 
-<a href="{{ url_for('register_bp.register_enter_your_details', encrypted_enrolment_code=encrypted_enrolment_code) }}" class="btn action-button btn--primary">
+<a href="{{ url_for('register_bp.register_enter_your_details', encrypted_enrolment_code=context.encrypted_enrolment_code) }}" class="btn action-button btn--primary">
     Confirm
 </a>
 
 <p>If the organisation or survey details aren't what you were expecting, please contact us on <a class="nowrap" href="tel:+44-300-1234-931">0300 1234 931</a>
-    or send an email to <a href="mailto:surveys@ons.gov.uk">surveys@ons.gov.uk</a>
-</p>
+    or send an <br/>
+    email to <a href="mailto:surveys@ons.gov.uk">surveys@ons.gov.uk</a>
+    </p>
 
 {% endblock main %}

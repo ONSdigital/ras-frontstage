@@ -27,4 +27,5 @@ def download_survey(session):
     collection_instrument, headers = collection_instrument_controller.download_collection_instrument(case['collectionInstrumentId'], case_id, party_id)
 
     logger.info('Successfully downloaded collection instrument', case_id=case_id, party_id=party_id)
+
     return collection_instrument, 200, headers

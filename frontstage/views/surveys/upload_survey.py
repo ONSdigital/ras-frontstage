@@ -26,6 +26,8 @@ def upload_survey(session):
         return redirect(url_for('surveys_bp.upload_failed',
                                 _external=True,
                                 case_id=case_id,
+                                business_party_id=business_party_id,
+                                survey_short_name=survey_short_name,
                                 error_info='size'))
 
     # Check if respondent has permission to upload for this case

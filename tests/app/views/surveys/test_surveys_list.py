@@ -19,7 +19,7 @@ class TestSurveyList(unittest.TestCase):
     def tearDown(self):
         self.patcher.stop()
 
-    @patch('frontstage.controllers.party_controller.get_party_enabled_enrolments_details')
+    @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
     def test_survey_list_todo(self, get_survey_list):
         get_survey_list.return_value = survey_list_todo
 
@@ -27,7 +27,7 @@ class TestSurveyList(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    @patch('frontstage.controllers.party_controller.get_party_enabled_enrolments_details')
+    @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
     def test_survey_list_history(self, get_survey_list):
         get_survey_list.return_value = survey_list_history
 

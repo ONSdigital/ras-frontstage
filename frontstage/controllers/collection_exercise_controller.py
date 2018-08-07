@@ -75,3 +75,27 @@ def get_collection_exercises_for_survey(survey_id):
             collection_exercise['events'] = convert_events_to_new_format(collection_exercise['events'])
 
     return collection_exercises
+
+
+def enrolment_with_collection_exercise(enrolment, collection_exercises):
+    return [{**enrolment,
+             "collection_exercise": collection_exercise}
+            for collection_exercise in collection_exercises
+            if collection_exercise['surveyId'] == enrolment['survey']['id']]
+
+
+def get_enrolments_with_collection_exercises(enrolments):
+    survey_ids = {enrolment['enrolment_details']['surveyId']
+                  for enrolment in enrolments}
+    collection_exercises = [get_collection_exercises_for_survey(survey_id)
+                            for survey_id in survey_ids]
+    flattened_collection_exercises = [collection_exercise
+                                      for subList in collection_exercises
+                                      for collection_exercise in subList]
+    live_collection_exercises = [collection_exercise
+                                 for collection_exercise in flattened_collection_exercises
+                                 if collection_exercise['state'] == 'LIVE'
+                                 and not collection_exercise['events']['go_live']['is_in_future']]
+    enrolments_with_ces = [enrolment_with_collection_exercise(enrolment, live_collection_exercises)
+                           for enrolment in enrolments]
+    return [enrolment for subList in enrolments_with_ces for enrolment in subList]

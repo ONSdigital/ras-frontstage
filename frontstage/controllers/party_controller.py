@@ -4,8 +4,7 @@ import requests
 from flask import current_app as app
 from structlog import wrap_logger
 
-from frontstage.controllers import case_controller, collection_exercise_controller, collection_instrument_controller,\
-    survey_controller
+from frontstage.controllers import case_controller, collection_exercise_controller, survey_controller
 from frontstage.exceptions.exceptions import ApiError
 
 
@@ -178,37 +177,23 @@ def verify_token(token):
     logger.debug('Successfully verified token')
 
 
-def get_party_enabled_enrolments_details(party_id, tag):
+def get_enrolment_details(business_party_id, enrolments):
+    business_details = get_party_by_business_id(business_party_id)
+    enrolments_with_details = [{"business_party": business_details, "enrolment_details": enrolment}
+                               for enrolment in enrolments
+                               if enrolment['enrolmentStatus'] == 'ENABLED']
+
+    return enrolments_with_details
+
+
+def get_survey_list_details_for_party(party_id, tag):
     logger.debug("Get party enrolments", party_id=party_id)
 
     respondent = get_respondent_party_by_id(party_id)
-    surveys_list = []
-
-    for association in respondent['associations']:
-        business_details = get_party_by_business_id(association['partyId'])
-        business_cases = case_controller.get_cases_for_list_type_by_party_id(association['partyId'], tag)
-        for enrolment in association['enrolments']:
-            if enrolment['enrolmentStatus'] == "ENABLED":
-                survey = survey_controller.get_survey(enrolment['surveyId'])
-                collection_exercises = collection_exercise_controller.get_collection_exercises_for_survey(enrolment['surveyId'])
-                for collection_exercise in collection_exercises:
-                    if collection_exercise['state'] == 'LIVE' and not collection_exercise['events']['go_live']['is_in_future']:
-                        for business_case in business_cases:
-                            if business_case['caseGroup']['collectionExerciseId'] == collection_exercise['id']:
-                                collection_instrument = collection_instrument_controller.get_collection_instrument(
-                                    business_case['collectionInstrumentId'])
-                                survey_data = {
-                                    "business_party": business_details,
-                                    "survey": survey,
-                                    "collection_exercise": collection_exercise,
-                                    "return_by": collection_exercise['events']['return_by']['date'],
-                                    "status": case_controller.calculate_case_status(business_case.get('caseGroup', {}).get('caseGroupStatus'),
-                                                                                    collection_instrument['type']),
-                                    "collection_instrument": collection_instrument,
-                                    "period": collection_exercise['userDescription'],
-                                    "case_id": business_case['id']
-                                }
-                                surveys_list.append(survey_data)
-
-    logger.debug("Successfully retrieved party survey list", party_id=party_id, tag=tag)
-    return surveys_list
+    enrolments = [get_enrolment_details(association['partyId'], association['enrolments'])
+                  for association in respondent['associations']]
+    flattened_enrolments = [enrolment for sublist in enrolments for enrolment in sublist]
+    enrolments_with_surveys = survey_controller.get_surveys_with_enrolments(flattened_enrolments)
+    enrolments_with_ces = collection_exercise_controller.get_enrolments_with_collection_exercises(enrolments_with_surveys)
+    enrolments_with_cases = case_controller.get_enrolments_with_cases(enrolments_with_ces, tag)
+    return enrolments_with_cases

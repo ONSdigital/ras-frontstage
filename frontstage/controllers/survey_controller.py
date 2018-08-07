@@ -42,3 +42,15 @@ def get_survey_by_short_name(survey_short_name):
 
     logger.debug('Successfully retrieved survey by its short name', survey_short_name=survey_short_name)
     return response.json()
+
+
+def enrolment_with_survey(enrolment, surveys):
+    survey = next(survey for survey in surveys if enrolment["enrolment_details"]["surveyId"] == survey['id'])
+    return {**enrolment, "survey": survey}
+
+
+def get_surveys_with_enrolments(enrolments):
+    survey_ids = {enrolment['enrolment_details']['surveyId']
+                  for enrolment in enrolments}
+    surveys = [get_survey(survey_id) for survey_id in survey_ids]
+    return [enrolment_with_survey(enrolment, surveys) for enrolment in enrolments]

@@ -17,9 +17,9 @@ def get_survey_list(session, tag):
     logger.info("Retrieving survey todo list")
     party_id = session.get('party_id')
 
-    survey_list = party_controller.get_party_enabled_enrolments_details(party_id, tag)
+    survey_list = party_controller.get_survey_list_details_for_party(party_id, tag)
 
-    sorted_survey_list = sorted(survey_list, key=lambda k: k['return_by'], reverse=True)
+    sorted_survey_list = sorted(survey_list, key=lambda k: k['collection_exercise']['events']['return_by']['date'], reverse=True)
 
     if tag == 'todo':
         response = make_response(render_template('surveys/surveys-todo.html',

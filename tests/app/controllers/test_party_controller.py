@@ -1,5 +1,4 @@
 import unittest
-from unittest.mock import patch
 
 import responses
 
@@ -7,10 +6,9 @@ from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import party_controller
 from frontstage.exceptions.exceptions import ApiError
-from tests.app.mocked_services import (business_party, case, case_list, collection_exercise, collection_exercise_by_survey,
-                                       collection_instrument_seft, respondent_party, survey, url_get_business_party, url_get_respondent_email,
-                                       url_get_respondent_party, url_post_add_survey, url_reset_password_request)
-from frontstage.common.mappers import convert_events_to_new_format
+from tests.app.mocked_services import (business_party, case, collection_exercise, respondent_party, survey, survey_eq,
+                                       url_get_business_party, url_get_respondent_email, url_get_respondent_party,
+                                       url_post_add_survey, url_reset_password_request)
 
 
 registration_data = {
@@ -132,38 +130,16 @@ class TestPartyController(unittest.TestCase):
                 with self.assertRaises(ApiError):
                     party_controller.get_respondent_by_email(respondent_party['emailAddress'])
 
-    @patch('frontstage.controllers.case_controller.calculate_case_status')
-    @patch('frontstage.controllers.collection_instrument_controller.get_collection_instrument')
-    @patch('frontstage.controllers.collection_exercise_controller.get_collection_exercises_for_survey')
-    @patch('frontstage.controllers.survey_controller.get_survey')
-    @patch('frontstage.controllers.case_controller.get_cases_for_list_type_by_party_id')
-    @patch('frontstage.controllers.party_controller.get_party_by_business_id')
-    @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
-    def test_get_party_enabled_enrolments_details_with_associations(self, get_respondent_by_party_id,
-                                                                    get_business_by_party_id,
-                                                                    get_case_list, get_survey_by_id,
-                                                                    get_ce_for_survey, get_collection_instrument,
-                                                                    calculate_case_status):
-
-        for exercise in collection_exercise_by_survey:
-            exercise['events'] = convert_events_to_new_format(exercise['events'])
-        get_respondent_by_party_id.return_value = respondent_party
-        get_business_by_party_id.return_value = business_party
-        get_case_list.return_value = case_list
-        get_survey_by_id.return_value = survey
-        get_ce_for_survey.return_value = collection_exercise_by_survey
-        get_collection_instrument.return_value = collection_instrument_seft
-        calculate_case_status.return_value = 'Not Started'
-        with app.app_context():
-            survey_list = party_controller.get_party_enabled_enrolments_details(respondent_party['id'], 'todo')
-
-            self.assertTrue(survey_list is not None)
-            for survey_entry in survey_list:
-                self.assertEqual(survey_entry['status'], 'Not Started')
-
     def test_reset_password_request_fail(self):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.POST, url_reset_password_request, status=500)
             with app.app_context():
                 with self.assertRaises(ApiError):
                     party_controller.reset_password_request(respondent_party['emailAddress'])
+
+
+def my_side_effect(*args):
+    if args[0] == survey['id']:
+        return survey
+    else:
+        return survey_eq

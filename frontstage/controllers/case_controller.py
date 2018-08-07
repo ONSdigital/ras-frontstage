@@ -240,3 +240,31 @@ def filter_cases_by_case_group(cases):
                 if sorted_group.index(i) != 0:
                     cases.remove(i)
     return cases
+
+
+def link_enrolment_to_cases(enrolment, cases):
+    case = next((case for case in cases
+                if enrolment['business_party']['id'] == case['partyId']
+                and enrolment['collection_exercise']['id'] == case['caseGroup']['collectionExerciseId']), None)
+    if case:
+        collection_instrument = collection_instrument_controller.get_collection_instrument(case['collectionInstrumentId'])
+        return {**enrolment,
+                "case_id": case['id'],
+                "collection_instrument": collection_instrument,
+                "status": calculate_case_status(case['caseGroup']['caseGroupStatus'], collection_instrument['type'])
+                }
+    else:
+        return
+
+
+def get_enrolments_with_cases(enrolments, tag):
+    business_ids = {enrolment['business_party']['id']
+                    for enrolment in enrolments}
+    cases = [get_cases_for_list_type_by_party_id(business_id, tag)
+             for business_id in business_ids]
+    flattened_case_list = [case for sublist in cases for case in sublist]
+    enrolments_with_cases = [link_enrolment_to_cases(enrolment, flattened_case_list)
+                             for enrolment in enrolments]
+    filtered_enrolments_with_cases = [enrolment for enrolment in enrolments_with_cases
+                                      if enrolment is not None]
+    return filtered_enrolments_with_cases

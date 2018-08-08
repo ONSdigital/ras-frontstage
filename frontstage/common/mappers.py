@@ -1,4 +1,3 @@
-import arrow
 from datetime import datetime
 
 import iso8601
@@ -16,12 +15,3 @@ def convert_events_to_new_format(events):
             "is_in_future": date_time > iso8601.parse_date(datetime.now().isoformat())
         }
     return formatted_events
-
-
-def convert_date(date):
-    input_date_format = 'YYYY-MM-DDThh:mm:ss'
-    output_date_format = 'D MMM YYYY'
-    date = date.replace('Z', '')
-    date = arrow.get(date, input_date_format).format(output_date_format)
-
-    return date

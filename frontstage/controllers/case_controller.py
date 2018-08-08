@@ -1,11 +1,12 @@
-import logging
 import itertools
+import logging
 
 import requests
 from flask import abort, current_app as app
 from structlog import wrap_logger
 
-from frontstage.common import eq_payload
+from frontstage.common.eq_payload import EqPayload
+from frontstage.common.list_helper import flatten_list
 from frontstage.common.encrypter import Encrypter
 from frontstage.controllers import (collection_exercise_controller, collection_instrument_controller,
                                     party_controller, survey_controller)
@@ -40,16 +41,18 @@ def calculate_case_status(case_group_status, collection_instrument_type):
 def check_case_permissions(party_id, case_id, business_party_id, survey_short_name):
     logger.debug('Party requesting access to case', party_id=party_id, case_id=case_id,
                  business_party_id=business_party_id, survey_short_name=survey_short_name)
-    match = False
 
     party = party_controller.get_respondent_party_by_id(party_id)
-    for association in party['associations']:
-        if association['partyId'] == business_party_id:
-            survey = survey_controller.get_survey_by_short_name(survey_short_name)
-            for enrolment in association['enrolments']:
-                if enrolment['surveyId'] == survey['id']:
-                    match = True
-    if not match:
+    associations = [association for association in party['associations']
+                    if association['partyId'] == business_party_id]
+    survey = survey_controller.get_survey_by_short_name(survey_short_name)
+    enrolments = [association['enrolments']
+                  for association in associations]
+    flattened_enrolments = [enrolment for sublist in enrolments for enrolment in sublist]
+    match_enrolment = [enrolment for enrolment in flattened_enrolments
+                       if enrolment['surveyId'] == survey['id']]
+
+    if not match_enrolment:
         raise NoSurveyPermission(party_id, case_id)
 
     logger.debug('Party has permission to access case', party_id=party_id, case_id=case_id)
@@ -150,14 +153,14 @@ def get_eq_url(case_id, party_id, business_party_id, survey_short_name):
 
     case = get_case_by_case_id(case_id)
 
-    if case['caseGroup']['caseGroupStatus'] == 'COMPLETE' or case['caseGroup']['caseGroupStatus'] == 'COMPLETEDBYPHONE':
+    if case['caseGroup']['caseGroupStatus'] in ('COMPLETE', 'COMPLETEDBYPHONE'):
         logger.info('The case group status is complete, opening an EQ is forbidden',
                     case_id=case_id, party_id=party_id)
         abort(403)
 
     check_case_permissions(party_id, case['partyId'], business_party_id, survey_short_name)
 
-    payload = eq_payload.EqPayload().create_payload(case, party_id, business_party_id, survey_short_name)
+    payload = EqPayload().create_payload(case, party_id, business_party_id, survey_short_name)
 
     json_secret_keys = app.config['JSON_SECRET_KEYS']
     encrypter = Encrypter(json_secret_keys)
@@ -221,17 +224,18 @@ def get_cases_for_list_type_by_party_id(party_id, list_type='todo'):
     if list_type == 'history':
         filtered_cases = [business_case
                           for business_case in cases
-                          if business_case.get('caseGroup', {}).get('caseGroupStatus') in history_statuses]
+                          if business_case['caseGroup']['caseGroupStatus'] in history_statuses]
     else:
         filtered_cases = [business_case
                           for business_case in cases
-                          if business_case.get('caseGroup', {}).get('caseGroupStatus') not in history_statuses]
+                          if business_case['caseGroup']['caseGroupStatus'] not in history_statuses]
 
-    logger.debug("Sucessfully retrieved cases for party survey list", party_id=party_id, list_type=list_type)
+    logger.debug("Successfully retrieved cases for party survey list", party_id=party_id, list_type=list_type)
     return filtered_cases
 
 
 def filter_cases_by_case_group(cases):
+    logger.debug("Attempting to remove multiple cases for one case group")
     for key, group in itertools.groupby(cases, key=lambda x: x['caseGroup']['id']):
         group = list(group)
         if len(group) > 1:
@@ -239,32 +243,37 @@ def filter_cases_by_case_group(cases):
             for i in sorted_group:
                 if sorted_group.index(i) != 0:
                     cases.remove(i)
+    logger.debug("Successfully removed multiple cases for case group")
     return cases
 
 
 def link_enrolment_to_cases(enrolment, cases):
+    logger.debug("Attempting to retrieve case for enrolment", business_party=enrolment['business_party']['id'],
+                 collection_exercise=enrolment['collection_exercise']['id'])
     case = next((case for case in cases
                 if enrolment['business_party']['id'] == case['partyId']
                 and enrolment['collection_exercise']['id'] == case['caseGroup']['collectionExerciseId']), None)
     if case:
         collection_instrument = collection_instrument_controller.get_collection_instrument(case['collectionInstrumentId'])
+        logger.debug("Successfully retrieved case and collection instrument for enrolment", business_party=enrolment['business_party']['id'],
+                     collection_exercise=enrolment['collection_exercise']['id'])
         return {**enrolment,
                 "case_id": case['id'],
                 "collection_instrument": collection_instrument,
                 "status": calculate_case_status(case['caseGroup']['caseGroupStatus'], collection_instrument['type'])
                 }
-    else:
-        return
 
 
 def get_enrolments_with_cases(enrolments, tag):
+    logger.debug("Attempting to retrieve cases for respondent enrolments", list_type=tag)
     business_ids = {enrolment['business_party']['id']
                     for enrolment in enrolments}
     cases = [get_cases_for_list_type_by_party_id(business_id, tag)
              for business_id in business_ids]
-    flattened_case_list = [case for sublist in cases for case in sublist]
+    flattened_case_list = flatten_list(cases)
     enrolments_with_cases = [link_enrolment_to_cases(enrolment, flattened_case_list)
                              for enrolment in enrolments]
     filtered_enrolments_with_cases = [enrolment for enrolment in enrolments_with_cases
                                       if enrolment is not None]
+    logger.debug("Successfully retrieved and linked cases with respondent enrolments", list_type=tag)
     return filtered_enrolments_with_cases

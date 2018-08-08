@@ -4,6 +4,7 @@ import requests
 from flask import current_app as app
 from structlog import wrap_logger
 
+from frontstage.common.list_helper import flatten_list
 from frontstage.controllers import case_controller, collection_exercise_controller, survey_controller
 from frontstage.exceptions.exceptions import ApiError
 
@@ -178,22 +179,37 @@ def verify_token(token):
 
 
 def get_enrolment_details(business_party_id, enrolments):
+    logger.debug("Attempt to retrieve enrolment details for association",
+                 business_party_id=business_party_id)
     business_details = get_party_by_business_id(business_party_id)
-    enrolments_with_details = [{"business_party": business_details, "enrolment_details": enrolment}
-                               for enrolment in enrolments
-                               if enrolment['enrolmentStatus'] == 'ENABLED']
+    logger.debug("Successfully retrieved enrolment details for association",
+                 business_party_id=business_party_id)
+    return [{"business_party": business_details, "enrolment_details": enrolment}
+            for enrolment in enrolments
+            if enrolment['enrolmentStatus'] == 'ENABLED']
 
-    return enrolments_with_details
+
+def get_respondent_enrolments(respondent):
+    logger.debug("Attempt to retrieve respondent enrolments",
+                 party_id=respondent['id'])
+    enrolments = [get_enrolment_details(association['partyId'], association['enrolments'])
+                  for association in respondent['associations']]
+    logger.debug("Successfully retrieved enrolments for respondent",
+                 party_id=respondent['id'])
+    return flatten_list(enrolments)
 
 
 def get_survey_list_details_for_party(party_id, tag):
-    logger.debug("Get party enrolments", party_id=party_id)
+    logger.debug("Attempt to retrieve survey list details for respondent",
+                 party_id=party_id, list_type=tag)
 
     respondent = get_respondent_party_by_id(party_id)
-    enrolments = [get_enrolment_details(association['partyId'], association['enrolments'])
-                  for association in respondent['associations']]
-    flattened_enrolments = [enrolment for sublist in enrolments for enrolment in sublist]
-    enrolments_with_surveys = survey_controller.get_surveys_with_enrolments(flattened_enrolments)
+    enrolments = get_respondent_enrolments(respondent)
+    enrolments_with_surveys = survey_controller.get_surveys_with_enrolments(enrolments)
     enrolments_with_ces = collection_exercise_controller.get_enrolments_with_collection_exercises(enrolments_with_surveys)
     enrolments_with_cases = case_controller.get_enrolments_with_cases(enrolments_with_ces, tag)
+
+    logger.debug("Successfully retrieved survey list details for respondent",
+                 party_id=party_id, list_type=tag)
+
     return enrolments_with_cases

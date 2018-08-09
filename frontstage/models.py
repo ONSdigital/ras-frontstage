@@ -30,7 +30,7 @@ class RegistrationForm(FlaskForm):
                                         Length(max=254, message='Your last name must be less than 254 characters')])
     email_address = StringField('Enter your email address',
                                 validators=[InputRequired('Email address is required'),
-                                            Email(message="Your email should be of the form 'myname@email.com' "),
+                                            Email(message="Your email should be of the form myname@email.com"),
                                             Length(max=254,
                                                    message='Your email must be less than 254 characters')])
     password = PasswordField('Create a password',
@@ -80,14 +80,14 @@ class RegistrationForm(FlaskForm):
 
 class LoginForm(FlaskForm):
     username = StringField('Email Address', [InputRequired('Email Address is required'),
-                                             Email("Your email should be of the form 'myname@email.com' ")])
+                                             Email("Your email should be of the form myname@email.com ")])
     password = PasswordField('Password', [InputRequired('Password is required')])
 
 
 class ForgotPasswordForm(FlaskForm):
     email_address = StringField('Enter your email address',
                                 validators=[InputRequired('Email address is required'),
-                                            Email(message="Your email should be of the form 'myname@email.com' "),
+                                            Email(message="Your email should be of the form myname@email.com "),
                                             Length(max=254,
                                                    message='Your email must be less than 254 characters')])
 

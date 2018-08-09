@@ -6,7 +6,6 @@ from flask import abort, current_app as app
 from structlog import wrap_logger
 
 from frontstage.common.eq_payload import EqPayload
-from frontstage.common.list_helper import flatten_list
 from frontstage.common.encrypter import Encrypter
 from frontstage.controllers import (collection_exercise_controller, collection_instrument_controller,
                                     party_controller, survey_controller)
@@ -245,35 +244,3 @@ def filter_cases_by_case_group(cases):
                     cases.remove(i)
     logger.debug("Successfully removed multiple cases for case group")
     return cases
-
-
-def link_enrolment_to_cases(enrolment, cases):
-    logger.debug("Attempting to retrieve case for enrolment", business_party=enrolment['business_party']['id'],
-                 collection_exercise=enrolment['collection_exercise']['id'])
-    case = next((case for case in cases
-                if enrolment['business_party']['id'] == case['partyId']
-                and enrolment['collection_exercise']['id'] == case['caseGroup']['collectionExerciseId']), None)
-    if case:
-        collection_instrument = collection_instrument_controller.get_collection_instrument(case['collectionInstrumentId'])
-        logger.debug("Successfully retrieved case and collection instrument for enrolment", business_party=enrolment['business_party']['id'],
-                     collection_exercise=enrolment['collection_exercise']['id'])
-        return {**enrolment,
-                "case_id": case['id'],
-                "collection_instrument": collection_instrument,
-                "status": calculate_case_status(case['caseGroup']['caseGroupStatus'], collection_instrument['type'])
-                }
-
-
-def get_enrolments_with_cases(enrolments, tag):
-    logger.debug("Attempting to retrieve cases for respondent enrolments", list_type=tag)
-    business_ids = {enrolment['business_party']['id']
-                    for enrolment in enrolments}
-    cases = [get_cases_for_list_type_by_party_id(business_id, tag)
-             for business_id in business_ids]
-    flattened_case_list = flatten_list(cases)
-    enrolments_with_cases = [link_enrolment_to_cases(enrolment, flattened_case_list)
-                             for enrolment in enrolments]
-    filtered_enrolments_with_cases = [enrolment for enrolment in enrolments_with_cases
-                                      if enrolment is not None]
-    logger.debug("Successfully retrieved and linked cases with respondent enrolments", list_type=tag)
-    return filtered_enrolments_with_cases

@@ -4,8 +4,7 @@ import requests
 from flask import current_app as app
 from structlog import wrap_logger
 
-from frontstage.common.list_helper import flatten_list
-from frontstage.controllers import case_controller, collection_exercise_controller, survey_controller
+from frontstage.controllers import case_controller, collection_exercise_controller, collection_instrument_controller, survey_controller
 from frontstage.exceptions.exceptions import ApiError
 
 
@@ -178,38 +177,39 @@ def verify_token(token):
     logger.debug('Successfully verified token')
 
 
-def get_enrolment_details(business_party_id, enrolments):
-    logger.debug("Attempt to retrieve enrolment details for association",
-                 business_party_id=business_party_id)
-    business_details = get_party_by_business_id(business_party_id)
-    logger.debug("Successfully retrieved enrolment details for association",
-                 business_party_id=business_party_id)
-    return [{"business_party": business_details, "enrolment_details": enrolment}
-            for enrolment in enrolments
-            if enrolment['enrolmentStatus'] == 'ENABLED']
-
-
-def get_respondent_enrolments(respondent):
-    logger.debug("Attempt to retrieve respondent enrolments",
-                 party_id=respondent['id'])
-    enrolments = [get_enrolment_details(association['partyId'], association['enrolments'])
-                  for association in respondent['associations']]
-    logger.debug("Successfully retrieved enrolments for respondent",
-                 party_id=respondent['id'])
-    return flatten_list(enrolments)
+def get_respondent_enrolments(party_id):
+    respondent = get_respondent_party_by_id(party_id)
+    for association in respondent['associations']:
+        for enrolment in association['enrolments']:
+            if enrolment['enrolmentStatus'] == 'ENABLED':
+                yield {
+                    'business_id': association['partyId'],
+                    'survey_id': enrolment['surveyId']
+                }
 
 
 def get_survey_list_details_for_party(party_id, tag):
-    logger.debug("Attempt to retrieve survey list details for respondent",
-                 party_id=party_id, list_type=tag)
 
-    respondent = get_respondent_party_by_id(party_id)
-    enrolments = get_respondent_enrolments(respondent)
-    enrolments_with_surveys = survey_controller.get_surveys_with_enrolments(enrolments)
-    enrolments_with_ces = collection_exercise_controller.get_enrolments_with_collection_exercises(enrolments_with_surveys)
-    enrolments_with_cases = case_controller.get_enrolments_with_cases(enrolments_with_ces, tag)
+    for enrolment in get_respondent_enrolments(party_id):
+        business_id = enrolment['business_id']
+        survey_id = enrolment['survey_id']
 
-    logger.debug("Successfully retrieved survey list details for respondent",
-                 party_id=party_id, list_type=tag)
+        live_collection_exercises = collection_exercise_controller.get_live_collection_exercises_for_survey(survey_id)
+        collection_exercises_by_id = dict((ce['id'], ce) for ce in live_collection_exercises)
 
-    return enrolments_with_cases
+        cases = case_controller.get_cases_for_list_type_by_party_id(business_id, tag)
+        enrolled_cases = [case for case in cases if case['caseGroup']['collectionExerciseId'] in collection_exercises_by_id.keys()]
+
+        for case in enrolled_cases:
+            collection_instrument = collection_instrument_controller.get_collection_instrument(
+                case['collectionInstrumentId']
+            )
+            yield {
+                'case_id': case['id'],
+                'status': case_controller.calculate_case_status(case['caseGroup']['caseGroupStatus'],
+                                                                collection_instrument['type']),
+                'collection_instrument': collection_instrument,
+                'survey': survey_controller.get_survey(survey_id),
+                'business_party': get_party_by_business_id(business_id),
+                'collection_exercise': collection_exercises_by_id[case['caseGroup']['collectionExerciseId']]
+            }

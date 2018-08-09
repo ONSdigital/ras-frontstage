@@ -4,7 +4,6 @@ import requests
 from flask import current_app as app
 from structlog import wrap_logger
 
-from frontstage.common.list_helper import flatten_list
 from frontstage.common.mappers import convert_events_to_new_format
 from frontstage.exceptions.exceptions import ApiError
 
@@ -78,28 +77,11 @@ def get_collection_exercises_for_survey(survey_id):
     return collection_exercises
 
 
-def link_enrolment_with_collection_exercise(enrolment, collection_exercises):
-    logger.debug("Attempting to retrieve collection exercise for enrolment",
-                 survey=enrolment['survey']['id'],
-                 business_party_id=enrolment['business_party']['id'])
-    return [{**enrolment,
-             "collection_exercise": collection_exercise}
-            for collection_exercise in collection_exercises
-            if collection_exercise['surveyId'] == enrolment['survey']['id']]
-
-
-def get_enrolments_with_collection_exercises(enrolments):
-    logger.debug("Attempting to retrieve collection exercises for enrolments")
-    survey_ids = {enrolment['enrolment_details']['surveyId']
-                  for enrolment in enrolments}
-    collection_exercises = [get_collection_exercises_for_survey(survey_id)
-                            for survey_id in survey_ids]
-    flattened_collection_exercises = flatten_list(collection_exercises)
+def get_live_collection_exercises_for_survey(survey_id):
+    collection_exercises = get_collection_exercises_for_survey(survey_id)
     live_collection_exercises = [collection_exercise
-                                 for collection_exercise in flattened_collection_exercises
+                                 for collection_exercise in collection_exercises
                                  if collection_exercise['state'] == 'LIVE'
                                  and not collection_exercise['events']['go_live']['is_in_future']]
-    enrolments_with_ces = [link_enrolment_with_collection_exercise(enrolment, live_collection_exercises)
-                           for enrolment in enrolments]
-    logger.debug("Successfully retrieved collection exercises for enrolments")
-    return flatten_list(enrolments_with_ces)
+
+    return live_collection_exercises

@@ -88,3 +88,9 @@ class InvalidEqPayLoad(Exception):
     def __init__(self, message):
         super().__init__()
         self.message = message
+
+
+class InvalidURLSignature(Exception):
+    def __init__(self, message):
+        super().__init__()
+        self.message = message

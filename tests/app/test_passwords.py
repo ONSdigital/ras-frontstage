@@ -4,6 +4,9 @@ import unittest
 from frontstage import app
 from tests.app.mocked_services import token, url_get_token, url_password_change, url_reset_password_request, url_verify_token
 
+encoded_valid_email = 'ImV4YW1wbGVAZXhhbXBsZS5jb20i.9IYOHBp95sMVzc1_BxxScdcX3Ms'
+encoded_invalid_email = 'abcd'
+
 
 class TestPasswords(unittest.TestCase):
 
@@ -99,11 +102,19 @@ class TestPasswords(unittest.TestCase):
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
 
-    def test_check_email(self):
-        response = self.app.get("passwords/forgot-password/check-email", follow_redirects=True)
+    def test_check_valid_email_token(self):
+        response = self.app.get(f"passwords/forgot-password/check-email?email={encoded_valid_email}",
+                                follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Check your email'.encode() in response.data)
+
+    def test_check_invalid_email_token(self):
+        response = self.app.get(f"passwords/forgot-password/check-email?email={encoded_invalid_email}",
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue("Page not found".encode() in response.data)
 
     @requests_mock.mock()
     def test_reset_password_get_success(self, mock_object):

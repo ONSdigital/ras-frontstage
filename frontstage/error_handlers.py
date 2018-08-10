@@ -5,7 +5,7 @@ from requests.exceptions import ConnectionError
 from structlog import wrap_logger
 
 from frontstage import app
-from frontstage.exceptions.exceptions import ApiError, InvalidEqPayLoad, JWTValidationError
+from frontstage.exceptions.exceptions import ApiError, InvalidEqPayLoad, InvalidURLSignature, JWTValidationError
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -50,3 +50,9 @@ def server_error(error):  # pylint: disable=unused-argument
 def eq_error(error):
     logger.error('Failed to generate EQ URL', error=error.message, url=request.url, status_code=500)
     return render_template('errors/500-error.html'), 500
+
+
+@app.errorhandler(InvalidURLSignature)
+def url_error(error):
+    logger.error('Invalid URL signature', error=error.message, url=request.url, status_code=400)
+    return render_template('errors/404-error.html'), 400

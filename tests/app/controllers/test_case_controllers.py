@@ -7,7 +7,7 @@ import responses
 from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import case_controller
-from frontstage.exceptions.exceptions import ApiError, InvalidCaseCategory
+from frontstage.exceptions.exceptions import ApiError, InvalidCaseCategory, NoSurveyPermission
 from tests.app.mocked_services import (business_party, case, case_list, categories, collection_exercise,
                                        collection_instrument_seft, eq_payload, respondent_party, survey,
                                        survey_eq, url_get_case, url_get_case_by_enrolment_code,
@@ -149,6 +149,16 @@ class TestCaseControllers(unittest.TestCase):
             with self.assertRaises(Forbidden):
                 case_controller.get_eq_url(case['id'], respondent_party['id'], business_party['id'], survey_eq['shortName'])
 
+    @patch('frontstage.controllers.case_controller.get_case_by_case_id')
+    @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
+    def test_get_eq_url_no_survey_permission(self, is_respondent_enrolled, get_case_by_id):
+        is_respondent_enrolled.return_value = False
+        get_case_by_id.return_value = case
+
+        with app.app_context():
+            with self.assertRaises(NoSurveyPermission):
+                case_controller.get_eq_url(case['id'], respondent_party['id'], business_party['id'], survey_eq['shortName'])
+
     @patch('frontstage.controllers.case_controller.validate_case_category')
     def test_post_case_event_success(self, _):
         message = {
@@ -237,6 +247,16 @@ class TestCaseControllers(unittest.TestCase):
             self.assertEqual(collection_instrument_seft['id'], case_data['collection_instrument']['id'])
             self.assertEqual(survey['shortName'], case_data['survey']['shortName'])
             self.assertEqual(business_party['id'], case_data['business_party']['id'])
+
+    @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
+    @patch('frontstage.controllers.case_controller.get_case_by_case_id')
+    def test_get_case_data_no_survey_permission(self, get_case_by_id, is_respondent_enrolled):
+        get_case_by_id.return_value = case
+        is_respondent_enrolled.return_value = False
+
+        with app.app_context():
+            with self.assertRaises(NoSurveyPermission):
+                case_controller.get_case_data(case['id'], respondent_party['id'], business_party['id'], survey['shortName'])
 
     def test_get_cases_by_party_id_with_case_events(self):
         with responses.RequestsMock() as rsps:

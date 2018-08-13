@@ -5,7 +5,7 @@ from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
-from frontstage.controllers import case_controller, collection_instrument_controller
+from frontstage.controllers import collection_instrument_controller, party_controller
 from frontstage.exceptions.exceptions import CiUploadError
 from frontstage.views.surveys import surveys_bp
 
@@ -31,7 +31,7 @@ def upload_survey(session):
                                 error_info='size'))
 
     # Check if respondent has permission to upload for this case
-    case_controller.check_case_permissions(party_id, case_id, business_party_id, survey_short_name)
+    party_controller.is_respondent_enrolled(party_id, business_party_id, survey_short_name)
 
     # Get the uploaded file
     upload_file = request.files['file']

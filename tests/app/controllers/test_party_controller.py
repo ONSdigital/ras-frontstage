@@ -175,7 +175,9 @@ class TestPartyController(unittest.TestCase):
         for survey_details in survey_list:
             self.assertTrue(survey_details['case_id'] is not None)
             self.assertTrue(survey_details['status'] is not None)
-            self.assertTrue(survey_details['collection_instrument'] is not None)
-            self.assertTrue(survey_details['survey'] is not None)
+            self.assertTrue(survey_details['collection_instrument_type'] is not None)
+            self.assertTrue(survey_details['survey_id'] is not None)
+            self.assertTrue(survey_details['survey_long_name'] is not None)
+            self.assertTrue(survey_details['survey_short_name'] is not None)
             self.assertTrue(survey_details['business_party'] is not None)
             self.assertTrue(survey_details['collection_exercise'] is not None)

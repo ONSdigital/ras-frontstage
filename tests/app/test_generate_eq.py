@@ -60,7 +60,8 @@ class TestGenerateEqURL(unittest.TestCase):
         self.assertIn("https://eq-test/session?token=", response.location)
 
     @requests_mock.mock()
-    def test_generate_eq_url_complete_case(self, mock_request):
+    @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
+    def test_generate_eq_url_complete_case(self, mock_request, _):
 
         # Given a mocked case has its caseGroup status as complete
         mock_request.get(url_get_case, json=completed_case)

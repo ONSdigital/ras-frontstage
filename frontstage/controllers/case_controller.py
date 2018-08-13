@@ -37,26 +37,6 @@ def calculate_case_status(case_group_status, collection_instrument_type):
     return status
 
 
-def check_case_permissions(party_id, case_id, business_party_id, survey_short_name):
-    logger.debug('Party requesting access to case', party_id=party_id, case_id=case_id,
-                 business_party_id=business_party_id, survey_short_name=survey_short_name)
-
-    party = party_controller.get_respondent_party_by_id(party_id)
-    associations = [association for association in party['associations']
-                    if association['partyId'] == business_party_id]
-    survey = survey_controller.get_survey_by_short_name(survey_short_name)
-    enrolments = [association['enrolments']
-                  for association in associations]
-    flattened_enrolments = [enrolment for sublist in enrolments for enrolment in sublist]
-    match_enrolment = [enrolment for enrolment in flattened_enrolments
-                       if enrolment['surveyId'] == survey['id']]
-
-    if not match_enrolment:
-        raise NoSurveyPermission(party_id, case_id)
-
-    logger.debug('Party has permission to access case', party_id=party_id, case_id=case_id)
-
-
 def get_case_by_case_id(case_id):
     logger.debug('Attempting to retrieve case by case id', case_id=case_id)
 
@@ -114,7 +94,8 @@ def get_case_data(case_id, party_id, business_party_id, survey_short_name):
 
     # Check if respondent has permission to see case data
     case = get_case_by_case_id(case_id)
-    check_case_permissions(party_id, case['id'], business_party_id, survey_short_name)
+    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey_short_name):
+        raise NoSurveyPermission(party_id, case_id)
 
     case_data = {
         "collection_exercise": collection_exercise_controller.get_collection_exercise(case['caseGroup']['collectionExerciseId']),
@@ -152,12 +133,13 @@ def get_eq_url(case_id, party_id, business_party_id, survey_short_name):
 
     case = get_case_by_case_id(case_id)
 
-    if case['caseGroup']['caseGroupStatus'] in ('COMPLETE', 'COMPLETEDBYPHONE'):
+    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey_short_name):
+        raise NoSurveyPermission(party_id, case_id)
+
+    if case['caseGroup']['caseGroupStatus'] in ('COMPLETE', 'COMPLETEDBYPHONE', 'NOLONGERREQUIRED'):
         logger.info('The case group status is complete, opening an EQ is forbidden',
                     case_id=case_id, party_id=party_id)
         abort(403)
-
-    check_case_permissions(party_id, case['partyId'], business_party_id, survey_short_name)
 
     payload = EqPayload().create_payload(case, party_id, business_party_id, survey_short_name)
 
@@ -235,12 +217,7 @@ def get_cases_for_list_type_by_party_id(party_id, list_type='todo'):
 
 def filter_cases_by_case_group(cases):
     logger.debug("Attempting to remove multiple cases for one case group")
-    for key, group in itertools.groupby(cases, key=lambda x: x['caseGroup']['id']):
-        group = list(group)
-        if len(group) > 1:
-            sorted_group = sorted(group, key=lambda k: k['createdDateTime'], reverse=True)
-            for i in sorted_group:
-                if sorted_group.index(i) != 0:
-                    cases.remove(i)
-    logger.debug("Successfully removed multiple cases for case group")
-    return cases
+    grouped_cases = (list(group)
+                     for _, group in itertools.groupby(cases, key=lambda x: x['caseGroup']['id']))
+    return (sorted(group, key=lambda k: k['createdDateTime'], reverse=True)[0]
+            for group in grouped_cases)

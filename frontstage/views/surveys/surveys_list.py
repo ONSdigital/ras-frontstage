@@ -24,7 +24,7 @@ def get_survey_list(session, tag):
 
     if tag == 'todo':
         response = make_response(render_template('surveys/surveys-todo.html',
-                                                 business=request.args.get('business_party_id'),
+                                                 business_party_id=request.args.get('business_party_id'),
                                                  added_survey=request.args.get("survey_id"),
                                                  sorted_surveys_list=sorted_survey_list))
 

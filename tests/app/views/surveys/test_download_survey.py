@@ -22,7 +22,7 @@ class TestDownloadSurvey(unittest.TestCase):
         self.patcher.stop()
 
     @patch('frontstage.controllers.collection_instrument_controller.download_collection_instrument')
-    @patch('frontstage.controllers.case_controller.check_case_permissions')
+    @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
     @patch('frontstage.controllers.case_controller.get_case_by_case_id')
     def test_download_survey_success(self, get_case_by_id, _, download_collection_instrument):
         str = json.dumps(collection_instrument_seft)

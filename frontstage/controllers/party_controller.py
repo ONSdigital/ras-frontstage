@@ -204,12 +204,24 @@ def get_survey_list_details_for_party(party_id, tag):
             collection_instrument = collection_instrument_controller.get_collection_instrument(
                 case['collectionInstrumentId']
             )
+            survey = survey_controller.get_survey(survey_id)
             yield {
                 'case_id': case['id'],
                 'status': case_controller.calculate_case_status(case['caseGroup']['caseGroupStatus'],
                                                                 collection_instrument['type']),
-                'collection_instrument': collection_instrument,
-                'survey': survey_controller.get_survey(survey_id),
+                'collection_instrument_type': collection_instrument['type'],
+                'survey_id': survey_id,
+                'survey_long_name': survey['longName'],
+                'survey_short_name': survey['shortName'],
+                'survey_ref': survey['surveyRef'],
                 'business_party': get_party_by_business_id(business_id),
                 'collection_exercise': collection_exercises_by_id[case['caseGroup']['collectionExerciseId']]
             }
+
+
+def is_respondent_enrolled(party_id, business_party_id, survey_short_name):
+    for enrolment in get_respondent_enrolments(party_id):
+        survey = survey_controller.get_survey_by_short_name(survey_short_name)
+        if enrolment['business_id'] == business_party_id and enrolment['survey_id'] == survey['id']:
+            return True
+    return

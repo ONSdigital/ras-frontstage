@@ -7,10 +7,10 @@ import responses
 from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import case_controller
-from frontstage.exceptions.exceptions import ApiError, InvalidCaseCategory, NoSurveyPermission
+from frontstage.exceptions.exceptions import ApiError, InvalidCaseCategory
 from tests.app.mocked_services import (business_party, case, case_list, categories, collection_exercise,
                                        collection_instrument_seft, eq_payload, respondent_party, survey,
-                                       survey_eq, survey_rsi, url_get_case, url_get_case_by_enrolment_code,
+                                       survey_eq, url_get_case, url_get_case_by_enrolment_code,
                                        url_get_cases_by_party, url_get_case_categories, url_post_case_event_uuid)
 
 
@@ -61,26 +61,6 @@ class TestCaseControllers(unittest.TestCase):
         self.assertEqual('Not started', case_status_seft)
         self.assertEqual('Not started', case_status_eq)
 
-    @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
-    @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_case_permissions_successful_match(self, get_survey_by_short_name, get_party_by_id):
-        get_party_by_id.return_value = respondent_party
-        get_survey_by_short_name.return_value = survey
-
-        try:
-            case_controller.check_case_permissions(respondent_party['id'], case['id'], business_party['id'], survey['shortName'])
-        except NoSurveyPermission:
-            self.fail("Case permission did not match successfully")
-
-    @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
-    @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_case_permissions_unsuccessful_match(self, get_survey_by_short_name, get_party_by_id):
-        get_party_by_id.return_value = respondent_party
-        get_survey_by_short_name.return_value = survey_rsi
-        with app.app_context():
-            with self.assertRaises(NoSurveyPermission):
-                case_controller.check_case_permissions(respondent_party['id'], case['id'], business_party['id'], survey_rsi['shortName'])
-
     def test_get_case_by_id_success(self):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_case, json=case, status=200, content_type='application/json')
@@ -127,7 +107,7 @@ class TestCaseControllers(unittest.TestCase):
                 with self.assertRaises(ApiError):
                     self.assertRaises(ApiError, case_controller.get_case_categories())
 
-    @patch('frontstage.controllers.case_controller.check_case_permissions')
+    @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
     @patch('frontstage.controllers.case_controller.post_case_event')
     @patch('frontstage.common.eq_payload.EqPayload.create_payload')
     @patch('frontstage.controllers.case_controller.get_case_by_case_id')
@@ -139,23 +119,35 @@ class TestCaseControllers(unittest.TestCase):
 
             self.assertIn("https://eq-test/session?token=", eq_url)
 
+    @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
     @patch('frontstage.controllers.case_controller.get_case_by_case_id')
-    def test_get_eq_url_when_caseGroupStatus_is_complete(self, get_case_by_id):
+    def test_get_eq_url_when_caseGroupStatus_is_complete(self, get_case_by_id, _):
 
         case['caseGroup']['caseGroupStatus'] = 'COMPLETE'
         get_case_by_id.return_value = case
+        with app.app_context():
+            with self.assertRaises(Forbidden):
+                case_controller.get_eq_url(case['id'], respondent_party['id'], business_party['id'], survey_eq['shortName'])
 
-        with self.assertRaises(Forbidden):
-            case_controller.get_eq_url(case['id'], respondent_party['id'], business_party['id'], survey_eq['shortName'])
-
+    @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
     @patch('frontstage.controllers.case_controller.get_case_by_case_id')
-    def test_get_eq_url_when_caseGroupStatus_is_completed_by_phone(self, get_case_by_id):
+    def test_get_eq_url_when_caseGroupStatus_is_completed_by_phone(self, get_case_by_id, _):
 
         case['caseGroup']['caseGroupStatus'] = 'COMPLETEDBYPHONE'
         get_case_by_id.return_value = case
+        with app.app_context():
+            with self.assertRaises(Forbidden):
+                case_controller.get_eq_url(case['id'], respondent_party['id'], business_party['id'], survey_eq['shortName'])
 
-        with self.assertRaises(Forbidden):
-            case_controller.get_eq_url(case['id'], respondent_party['id'], business_party['id'], survey_eq['shortName'])
+    @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
+    @patch('frontstage.controllers.case_controller.get_case_by_case_id')
+    def test_get_eq_url_when_caseGroupStatus_is_no_longer_required(self, get_case_by_id, _):
+
+        case['caseGroup']['caseGroupStatus'] = 'NOLONGERREQUIRED'
+        get_case_by_id.return_value = case
+        with app.app_context():
+            with self.assertRaises(Forbidden):
+                case_controller.get_eq_url(case['id'], respondent_party['id'], business_party['id'], survey_eq['shortName'])
 
     @patch('frontstage.controllers.case_controller.validate_case_category')
     def test_post_case_event_success(self, _):
@@ -223,7 +215,7 @@ class TestCaseControllers(unittest.TestCase):
             for status in ['INPROGRESS', 'NOTSTARTED', 'REOPENED']:
                 self.assertNotIn(business_case['caseGroup']['caseGroupStatus'], status)
 
-    @patch('frontstage.controllers.case_controller.check_case_permissions')
+    @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
     @patch('frontstage.controllers.case_controller.get_case_by_case_id')
     @patch('frontstage.controllers.party_controller.get_party_by_business_id')
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')

@@ -79,9 +79,7 @@ def get_collection_exercises_for_survey(survey_id):
 
 def get_live_collection_exercises_for_survey(survey_id):
     collection_exercises = get_collection_exercises_for_survey(survey_id)
-    live_collection_exercises = [collection_exercise
-                                 for collection_exercise in collection_exercises
-                                 if collection_exercise['state'] == 'LIVE'
-                                 and not collection_exercise['events']['go_live']['is_in_future']]
-
-    return live_collection_exercises
+    return [collection_exercise
+            for collection_exercise in collection_exercises
+            if collection_exercise['state'] == 'LIVE'
+            and not collection_exercise['events']['go_live']['is_in_future']]

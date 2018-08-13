@@ -29,7 +29,7 @@ class TestUploadSurvey(unittest.TestCase):
         self.patcher.stop()
 
     @patch('frontstage.controllers.collection_instrument_controller.upload_collection_instrument')
-    @patch('frontstage.controllers.case_controller.check_case_permissions')
+    @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
     def test_upload_survey_success(self, *_):
         response = self.app.post(f'/surveys/upload_survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
                                  f'&survey_short_name={survey["shortName"]}', data=self.survey_file)
@@ -37,7 +37,7 @@ class TestUploadSurvey(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     @patch('frontstage.controllers.collection_instrument_controller.upload_collection_instrument')
-    @patch('frontstage.controllers.case_controller.check_case_permissions')
+    @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
     def test_upload_survey_fail_unexpected_error(self, _, upload_ci):
         error_response = Response()
         error_response.status_code = 500
@@ -53,7 +53,7 @@ class TestUploadSurvey(unittest.TestCase):
         self.assertTrue('/surveys/upload_failed'.encode() in response.data)
 
     @patch('frontstage.controllers.collection_instrument_controller.upload_collection_instrument')
-    @patch('frontstage.controllers.case_controller.check_case_permissions')
+    @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
     def test_upload_survey_fail_type_error(self, _, upload_ci):
         error_response = Response()
         error_response.status_code = 500
@@ -69,7 +69,7 @@ class TestUploadSurvey(unittest.TestCase):
         self.assertTrue('/surveys/upload_failed'.encode() in response.data)
 
     @patch('frontstage.controllers.collection_instrument_controller.upload_collection_instrument')
-    @patch('frontstage.controllers.case_controller.check_case_permissions')
+    @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
     def test_upload_survey_fail_char_limit_error(self, _, upload_ci):
         error_response = Response()
         error_response.status_code = 500
@@ -85,7 +85,7 @@ class TestUploadSurvey(unittest.TestCase):
         self.assertTrue('/surveys/upload_failed'.encode() in response.data)
 
     @patch('frontstage.controllers.collection_instrument_controller.upload_collection_instrument')
-    @patch('frontstage.controllers.case_controller.check_case_permissions')
+    @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
     def test_upload_survey_fail_size_error(self, _, upload_ci):
         error_response = Response()
         error_response.status_code = 500

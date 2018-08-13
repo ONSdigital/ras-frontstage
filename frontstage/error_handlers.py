@@ -50,4 +50,3 @@ def server_error(error):
 def eq_error(error):
     logger.error('Failed to generate EQ URL', error=error.message, url=request.url, status_code=500)
     return render_template('errors/500-error.html'), 500
-

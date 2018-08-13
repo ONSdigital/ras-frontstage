@@ -67,6 +67,6 @@ def forgot_password_check_email():
         email = s.loads(encoded_email)
     except BadSignature:
         logger.info('Unable to decode email from URL')
-        return render_template('errors/404-error.html')
+        return render_template('errors/404-error.html'), 400
 
     return render_template('passwords/forgot-password.check-email.html', email=email)

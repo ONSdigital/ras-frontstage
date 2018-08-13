@@ -23,8 +23,8 @@
     </li>
 
     {% for survey in sorted_surveys_list %}
-    {% if added_survey_id == survey.survey_id and business_party_id == survey.business_party.id %}
-    <li class="grid card panel--simple panel--success survey--success col-13@m u-mb-m" name="survey-card" id="{{survey.business_party.id, survey.survey_id}}">
+    {% if added_survey == survey.survey_id and business_party_id == survey.business_party.id %}
+    <li class="grid card panel--simple panel--success survey--success col-13@m u-mb-m" name="survey-card">
     {% else %}
     <li class="grid card" name="survey-card">
     {% endif %}

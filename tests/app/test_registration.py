@@ -280,7 +280,6 @@ class TestRegistration(unittest.TestCase):
                                  follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        print(response.data)
         self.assertTrue("Your email should be of the form myname@email.com".encode() in response.data)
 
     @requests_mock.mock()

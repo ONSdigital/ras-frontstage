@@ -12,7 +12,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 @app.errorhandler(404)
-def not_found_error(error):  # pylint: disable=unused-argument
+def not_found_error(error):
     logger.error('Not found error', url=request.url, status_code=error.code)
     return render_template('errors/404-error.html'), 404
 
@@ -41,9 +41,9 @@ def jwt_validation_error(error):  # pylint: disable=unused-argument
 
 
 @app.errorhandler(Exception)
-def server_error(error):  # pylint: disable=unused-argument
+def server_error(error):
     logger.error('Generic exception generated', exc_info=error, url=request.url, status_code=500)
-    return render_template('errors/500-error.html'), 500
+    return render_template('errors/500-error.html'), getattr(error, 'code', 500)
 
 
 @app.errorhandler(InvalidEqPayLoad)

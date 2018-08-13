@@ -13,9 +13,9 @@ python_version = "3.6"
 [packages]
 
 cfenv = "*"
-Flask = "*"
-Flask-WTF = "*"
-WTForms = "*"
+flask = "*"
+flask-wtf = "*"
+wtforms = "*"
 gunicorn = "*"
 gevent = "*"
 phonenumbers = "*"
@@ -27,6 +27,7 @@ structlog = "*"
 "iso8601" = "*"
 sdc-cryptography = "*"
 greenlet = "*"
+dateutils = "*"
 
 
 [dev-packages]

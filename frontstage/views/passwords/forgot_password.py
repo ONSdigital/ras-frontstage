@@ -6,7 +6,7 @@ from itsdangerous import URLSafeSerializer, BadSignature
 from structlog import wrap_logger
 
 from frontstage.controllers import oauth_controller, party_controller
-from frontstage.exceptions.exceptions import ApiError, InvalidURLSignature, OAuth2Error
+from frontstage.exceptions.exceptions import ApiError, OAuth2Error
 from frontstage.models import ForgotPasswordForm
 from frontstage.views.passwords import passwords_bp
 
@@ -16,7 +16,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 BAD_AUTH_ERROR = 'Unauthorized user credentials'
 
-s = URLSafeSerializer(app.config['JWT_SECRET'])
+s = URLSafeSerializer(app.config['SECRET_KEY'])
 
 
 @passwords_bp.route('/forgot-password', methods=['GET'])
@@ -49,9 +49,8 @@ def post_forgot_password():
             party_controller.reset_password_request(email)
         except ApiError as exc:
             if exc.status_code == 404:
-                logger.error('Requesting password change for email registered'
-                             ' on OAuth2 server but not in party service')
-                return redirect(url_for('passwords_bp.forgot_password_check_email', email=encoded_email))
+                logger.error('Failed to retrieve details from party service')
+                return render_template('errors/500-error.html')
             raise exc
 
         logger.info('Successfully sent password change request email')
@@ -67,6 +66,7 @@ def forgot_password_check_email():
     try:
         email = s.loads(encoded_email)
     except BadSignature:
-        raise InvalidURLSignature('Unable to decode email from URL')
+        logger.info('Unable to decode email from URL')
+        return render_template('errors/404-error.html')
 
     return render_template('passwords/forgot-password.check-email.html', email=email)

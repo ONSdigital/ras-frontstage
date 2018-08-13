@@ -16,7 +16,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 BAD_AUTH_ERROR = 'Unauthorized user credentials'
 
-s = URLSafeSerializer(app.config['SECRET_KEY'])
+url_safe_serializer = URLSafeSerializer(app.config['SECRET_KEY'])
 
 
 @passwords_bp.route('/forgot-password', methods=['GET'])
@@ -30,7 +30,7 @@ def post_forgot_password():
     form = ForgotPasswordForm(request.form)
     email = form.data.get('email_address')
 
-    encoded_email = s.dumps(email)
+    encoded_email = url_safe_serializer.dumps(email)
 
     if form.validate():
 
@@ -50,7 +50,7 @@ def post_forgot_password():
         except ApiError as exc:
             if exc.status_code == 404:
                 logger.error('Failed to retrieve details from party service')
-                return render_template('errors/500-error.html')
+                return render_template('errors/404-error.html')
             raise exc
 
         logger.info('Successfully sent password change request email')
@@ -63,10 +63,14 @@ def post_forgot_password():
 def forgot_password_check_email():
     encoded_email = request.args.get('email', None)
 
+    if encoded_email is None:
+        logger.error('No email parameter supplied')
+        return redirect('passwords/forgot-password')
+
     try:
-        email = s.loads(encoded_email)
+        email = url_safe_serializer.loads(encoded_email)
     except BadSignature:
-        logger.info('Unable to decode email from URL')
-        return render_template('errors/404-error.html'), 400
+        logger.error('Unable to decode email from URL', encoded_email=encoded_email)
+        return render_template('errors/404-error.html'), 404
 
     return render_template('passwords/forgot-password.check-email.html', email=email)

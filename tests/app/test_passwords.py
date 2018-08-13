@@ -113,8 +113,14 @@ class TestPasswords(unittest.TestCase):
         response = self.app.get(f"passwords/forgot-password/check-email?email={encoded_invalid_email}",
                                 follow_redirects=True)
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 404)
         self.assertTrue("Page not found".encode() in response.data)
+
+    def test_check_no_email_token(self):
+        response = self.app.get("passwords/forgot-password/check-email", follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('reset your password'.encode() in response.data)
 
     @requests_mock.mock()
     def test_reset_password_get_success(self, mock_object):

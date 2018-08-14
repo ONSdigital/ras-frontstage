@@ -70,10 +70,12 @@ class TestPasswords(unittest.TestCase):
         mock_object.post(url_get_token, status_code=201, json=self.oauth2_response)
         mock_object.post(url_reset_password_request, status_code=404)
 
-        response = self.app.post("passwords/forgot-password", follow_redirects=True)
+        self.email_form['email_address'] = "test@email.com"
 
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('Invalid email'.encode() in response.data)
+        response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
 
     @requests_mock.mock()
     def test_forgot_password_post_locked_email(self, mock_object):

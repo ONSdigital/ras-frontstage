@@ -28,6 +28,7 @@ def home():
 @sign_in_bp.route('/', methods=['GET', 'POST'])
 def login():
     form = LoginForm(request.form)
+    form.username.data = form.username.data.strip()
     account_activated = request.args.get('account_activated', None)
 
     if request.method == 'POST' and form.validate():

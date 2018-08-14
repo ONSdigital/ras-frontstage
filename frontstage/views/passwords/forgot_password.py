@@ -1,12 +1,12 @@
 import logging
 
-from flask import redirect, render_template, request, url_for
+from flask import abort, redirect, render_template, request, url_for
 from frontstage import app
 from itsdangerous import URLSafeSerializer, BadSignature
 from structlog import wrap_logger
 
 from frontstage.controllers import oauth_controller, party_controller
-from frontstage.exceptions.exceptions import ApiError, OAuth2Error
+from frontstage.exceptions.exceptions import OAuth2Error
 from frontstage.models import ForgotPasswordForm
 from frontstage.views.passwords import passwords_bp
 
@@ -45,13 +45,7 @@ def post_forgot_password():
                 logger.info(exc.message, oauth2_error=error_message)
             return render_template('passwords/reset-password.trouble.html')
 
-        try:
-            party_controller.reset_password_request(email)
-        except ApiError as exc:
-            if exc.status_code == 404:
-                logger.error('Failed to retrieve details from party service')
-                return render_template('errors/404-error.html')
-            raise exc
+        party_controller.reset_password_request(email)
 
         logger.info('Successfully sent password change request email')
         return redirect(url_for('passwords_bp.forgot_password_check_email', email=encoded_email))
@@ -65,12 +59,12 @@ def forgot_password_check_email():
 
     if encoded_email is None:
         logger.error('No email parameter supplied')
-        return redirect('passwords/forgot-password')
+        return redirect(url_for('passwords_bp.get_forgot_password'))
 
     try:
         email = url_safe_serializer.loads(encoded_email)
     except BadSignature:
         logger.error('Unable to decode email from URL', encoded_email=encoded_email)
-        return render_template('errors/404-error.html'), 404
+        abort(404)
 
     return render_template('passwords/forgot-password.check-email.html', email=email)

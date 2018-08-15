@@ -220,7 +220,7 @@ def get_survey_list_details_for_party(party_id, tag):
 
 
 def is_respondent_enrolled(party_id, business_party_id, survey_short_name):
+    survey = survey_controller.get_survey_by_short_name(survey_short_name)
     for enrolment in get_respondent_enrolments(party_id):
-        survey = survey_controller.get_survey_by_short_name(survey_short_name)
         if enrolment['business_id'] == business_party_id and enrolment['survey_id'] == survey['id']:
             return True

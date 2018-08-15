@@ -216,6 +216,12 @@ def get_cases_for_list_type_by_party_id(party_id, list_type='todo'):
 
 
 def filter_cases_by_case_group(cases):
+    """
+    Some case groups have multiple B cases only the most recently created should be shown to the user this filters
+    out older B cases for a case group and only returns most recent.
+    :param cases:
+    :return: list of cases with one case per casegroup
+    """
     logger.debug("Attempting to remove multiple cases for one case group")
     grouped_cases = (list(group)
                      for _, group in itertools.groupby(cases, key=lambda x: x['caseGroup']['id']))

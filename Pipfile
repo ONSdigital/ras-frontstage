@@ -27,7 +27,6 @@ structlog = "*"
 "iso8601" = "*"
 sdc-cryptography = "*"
 greenlet = "*"
-dateutils = "*"
 
 
 [dev-packages]

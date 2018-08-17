@@ -3,6 +3,9 @@ import os
 
 # To choose which config to use when running frontstage set environment variable APP_SETTINGS to the name of the
 # config object e.g. for the dev config set APP_SETTINGS=DevelopmentConfig
+from distutils.util import strtobool
+
+
 class Config(object):
     DEBUG = False
     TESTING = False
@@ -21,7 +24,12 @@ class Config(object):
     GOOGLE_TAG_MANAGER = os.getenv('GOOGLE_TAG_MANAGER', None)
     NON_DEFAULT_VARIABLES = ['SECRET_KEY', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD', 'JWT_SECRET']
     AVAILABILITY_BANNER = os.getenv('AVAILABILITY_BANNER', False)
-    
+
+    # Zipkin
+    ZIPKIN_DISABLE = bool(strtobool(os.getenv("ZIPKIN_DISABLE", "False")))
+    ZIPKIN_DSN = os.getenv("ZIPKIN_DSN", None)
+    ZIPKIN_SAMPLE_RATE = int(os.getenv("ZIPKIN_SAMPLE_RATE", 0))
+
     ACCOUNT_SERVICE_URL = os.getenv('ACCOUNT_SERVICE_URL')
     EQ_URL = os.getenv('EQ_URL')
     JSON_SECRET_KEYS = os.getenv('JSON_SECRET_KEYS')
@@ -71,6 +79,7 @@ class Config(object):
     SURVEY_USERNAME = os.getenv('SURVEY_USERNAME')
     SURVEY_PASSWORD = os.getenv('SURVEY_PASSWORD')
     SURVEY_AUTH = (SURVEY_USERNAME, SURVEY_PASSWORD)
+
 
 
 class DevelopmentConfig(Config):

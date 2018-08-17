@@ -27,7 +27,7 @@ def register_enter_your_details():
 
     if request.method == 'POST' and form.validate():
         logger.info('Attempting to create account')
-        email_address = request.form.get('email_address')
+        email_address = form.email_address.data
         registration_data = {
             'emailAddress': email_address,
             'firstName': request.form.get('first_name'),

@@ -30,7 +30,7 @@ class RegistrationForm(FlaskForm):
                                         Length(max=254, message='Your last name must be less than 254 characters')])
     email_address = StringField('Enter your email address',
                                 validators=[InputRequired('Email address is required'),
-                                            Email(message="Your email should be of the form myname@email.com"),
+                                            Email(message='Invalid email address'),
                                             Length(max=254,
                                                    message='Your email must be less than 254 characters')])
     password = PasswordField('Create a password',
@@ -65,11 +65,8 @@ class RegistrationForm(FlaskForm):
 
     @staticmethod
     def validate_email_address(form, field):
-        logger.debug('Checking if the email address contains a space')
-        # this extends the email validator to check if there is whitespace in the email
-        if ' ' in field.data:
-            logger.debug('Space found in email address')
-            raise ValidationError('Your email should be of the form myname@email.com')
+        email = field.data
+        return _validate_email_address(email)
 
     @staticmethod
     def validate_password(form, field):
@@ -80,16 +77,44 @@ class RegistrationForm(FlaskForm):
 
 class LoginForm(FlaskForm):
     username = StringField('Email Address', [InputRequired('Email Address is required'),
-                                             Email("Your email should be of the form myname@email.com ")])
+                                             Email('Invalid email address')])
     password = PasswordField('Password', [InputRequired('Password is required')])
+
+    @staticmethod
+    def validate_username(form, field):
+        email = field.data
+        return _validate_email_address(email)
+
+
+def _validate_email_address(email):
+    """
+    Validates an email address, using regex to conform to GDS standards.
+
+    :param field:
+        Field containing email address for validation.
+    """
+    local_part, domain_part = email.rsplit('@', 1)
+    logger.debug('Checking if the email address contains a space or quotes in the local part')
+    # this extends the email validator to check if there is whitespace in the email or quotes surrounding local part
+    if ' ' in email:
+        logger.debug('Space found in email address')
+        raise ValidationError('Invalid email address')
+    if local_part.startswith('"') and local_part.endswith('"'):
+        logger.debug('Quotes found in local part of email')
+        raise ValidationError('Invalid email address')
 
 
 class ForgotPasswordForm(FlaskForm):
     email_address = StringField('Enter your email address',
                                 validators=[InputRequired('Email address is required'),
-                                            Email(message="Your email should be of the form myname@email.com "),
+                                            Email(message='Invalid email address'),
                                             Length(max=254,
                                                    message='Your email must be less than 254 characters')])
+
+    @staticmethod
+    def validate_email_address(form, field):
+        email = field.data
+        return _validate_email_address(email)
 
 
 class ResetPasswordForm(FlaskForm):

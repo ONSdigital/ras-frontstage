@@ -28,10 +28,11 @@ def home():
 @sign_in_bp.route('/', methods=['GET', 'POST'])
 def login():
     form = LoginForm(request.form)
+    form.username.data = form.username.data.strip()
     account_activated = request.args.get('account_activated', None)
 
     if request.method == 'POST' and form.validate():
-        username = request.form.get('username')
+        username = form.username.data
         password = request.form.get('password')
 
         party_json = party_controller.get_respondent_by_email(username)

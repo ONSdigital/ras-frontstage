@@ -280,7 +280,7 @@ class TestRegistration(unittest.TestCase):
                                  follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue("Your email should be of the form myname@email.com".encode() in response.data)
+        self.assertTrue('Invalid email address'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_account_register_no_password(self, mock_object):

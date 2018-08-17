@@ -28,6 +28,7 @@ def get_forgot_password():
 @passwords_bp.route('/forgot-password', methods=['POST'])
 def post_forgot_password():
     form = ForgotPasswordForm(request.form)
+    form.email_address.data = form.email_address.data.strip()
     email = form.data.get('email_address')
 
     encoded_email = url_safe_serializer.dumps(email)

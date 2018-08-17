@@ -79,7 +79,7 @@ class TestSignIn(unittest.TestCase):
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Your email should be of the form'.encode() in response.data)
+        self.assertTrue('Invalid email address'.encode() in response.data)
 
     def test_sign_in_no_password(self):
         self.sign_in_form['username'] = 'testuser@email.com'

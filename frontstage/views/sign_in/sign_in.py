@@ -11,13 +11,22 @@ from frontstage.exceptions.exceptions import OAuth2Error
 from frontstage.jwt import encode, timestamp_token
 from frontstage.models import LoginForm
 from frontstage.views.sign_in import sign_in_bp
-
+from frontstage.views.sign_in.errors_routing import RoutingAccountLocked, RoutingUnauthorizedUserCredentials, \
+    RoutingUnVerifiedError, RoutingUnVerifiedUserAccount
 
 logger = wrap_logger(logging.getLogger(__name__))
 
 
 BAD_AUTH_ERROR = 'Unauthorized user credentials'
 NOT_VERIFIED_ERROR = 'User account not verified'
+USER_ACCOUNT_LOCKED = 'User account locked'
+
+NOT_EXPECTED = "not expected"
+__DATA = {"error": {"type": "failed"}}
+
+__ERROR_ROUTES = {BAD_AUTH_ERROR: RoutingUnauthorizedUserCredentials('sign-in/sign-in.html', __DATA),
+                  NOT_VERIFIED_ERROR: RoutingUnVerifiedUserAccount('sign-in/sign-in.account-not-verified.html'),
+                  USER_ACCOUNT_LOCKED: RoutingAccountLocked('sign-in/sign-in.account-locked.html', __DATA)}
 
 
 @app.route('/', methods=['GET'])
@@ -31,30 +40,14 @@ def login():
     account_activated = request.args.get('account_activated', None)
 
     if request.method == 'POST' and form.validate():
-        username = request.form.get('username')
+        username = request.form.get('username') # This is actually the email address of the user, used as username.
         password = request.form.get('password')
 
-        party_json = party_controller.get_respondent_by_email(username)
-        if not party_json or 'id' not in party_json:
-            logger.info('Respondent not able to sign in as they don\'t have an active account in the system.')
-            return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
-        party_id = party_json['id']
-
-        try:
-            oauth2_token = oauth_controller.sign_in(username, password)
-        except OAuth2Error as exc:
-            error_message = exc.oauth2_error
-            if BAD_AUTH_ERROR in error_message:
-                return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
-            elif NOT_VERIFIED_ERROR in error_message:
-                logger.info('User account is not verified on the OAuth2 server')
-                return render_template('sign-in/sign-in.account-not-verified.html', form=form)
-            else:
-                logger.info('OAuth 2 server generated 401 which is not understood', oauth2_error=error_message)
-                return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
+        # At this stage we are checking if teh user is registered
+        party_id = __validate_accout(username, form)
 
         # Take our raw token and add a UTC timestamp to the expires_at attribute
-        data_dict = {**oauth2_token, 'party_id': party_id}
+        data_dict = {**__get_auth_token(username, password, form), 'party_id': party_id}
         data_dict_for_jwt_token = timestamp_token(data_dict)
         encoded_jwt_token = encode(data_dict_for_jwt_token)
         response = make_response(redirect(url_for('surveys_bp.logged_in', _external=True,
@@ -77,3 +70,23 @@ def login():
         'account_activated': account_activated
     }
     return render_template('sign-in/sign-in.html', form=form, data=template_data)
+
+
+def __validate_accout(username, form):
+    party_json = party_controller.get_respondent_by_email(username)
+    if not party_json or 'id' not in party_json:
+        logger.info('Respondent not able to sign in as they don\'t have an active account in the system.')
+        return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
+
+    return party_json['id']
+
+
+def __get_auth_token(username, password, form):
+
+    try:
+        return oauth_controller.sign_in(username, password)
+    except OAuth2Error as exc:
+        route_validator = __ERROR_ROUTES.get(exc.oauth2_error, RoutingUnVerifiedError('sign-in/sign-in.html', __DATA))
+        return route_validator.log_message().notify_user(username, "name").route_me(form)
+
+

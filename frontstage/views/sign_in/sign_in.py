@@ -50,7 +50,14 @@ def login():
         party_id = party_json['id']
 
         # Take our raw token and add a UTC timestamp to the expires_at attribute
-        data_dict = {**__get_auth_token(username, password, form), 'party_id': party_id}
+        try:
+            oauth2_token =  oauth_controller.sign_in(username, password)
+        except OAuth2Error as exc:
+            route_validator = __ERROR_ROUTES.get(exc.oauth2_error,
+                                                 RoutingUnVerifiedError('sign-in/sign-in.html', __DATA))
+            return route_validator.log_message(exc.oauth2_error).notify_user(username, "name").route_me(form)
+
+        data_dict = {**oauth2_token, 'party_id': party_id}
         data_dict_for_jwt_token = timestamp_token(data_dict)
         encoded_jwt_token = encode(data_dict_for_jwt_token)
         response = make_response(redirect(url_for('surveys_bp.logged_in', _external=True,
@@ -73,14 +80,5 @@ def login():
         'account_activated': account_activated
     }
     return render_template('sign-in/sign-in.html', form=form, data=template_data)
-
-
-def __get_auth_token(username, password, form):
-
-    try:
-        return oauth_controller.sign_in(username, password)
-    except OAuth2Error as exc:
-        route_validator = __ERROR_ROUTES.get(exc.oauth2_error, RoutingUnVerifiedError('sign-in/sign-in.html', __DATA))
-        return route_validator.log_message().notify_user(username, "name").route_me(form)
 
 

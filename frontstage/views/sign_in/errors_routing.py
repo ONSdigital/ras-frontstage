@@ -32,7 +32,7 @@ class RoutingValidation:
     def notify_user(self, *parameters):
         return self
 
-    def route_me(self, form, *params):
+    def route_me(self, form):
         """
         All the sub class will implement this method for default behavior.
         :param form: is passed as argument from the flask app
@@ -72,6 +72,3 @@ class RoutingUnVerifiedError(RoutingValidation):
     def log_message(self, *log_parameters):
         logger.error('OAuth 2 server generated 401 which is not understood, error message : {}'.format(log_parameters))
         return self
-
-    def route_me(self, form):
-        return render_template(self.page, form=form)

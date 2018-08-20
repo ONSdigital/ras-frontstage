@@ -170,7 +170,7 @@ class TestPartyController(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
 
-        survey_list = party_controller.get_survey_list_details_for_party(respondent_party['id'], 'todo')
+        survey_list = party_controller.get_survey_list_details_for_party(respondent_party['id'], 'todo', business_party['id'], survey['id'])
 
         for survey_details in survey_list:
             self.assertTrue(survey_details['case_id'] is not None)

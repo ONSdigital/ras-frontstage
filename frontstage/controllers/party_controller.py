@@ -188,7 +188,7 @@ def get_respondent_enrolments(party_id):
                 }
 
 
-def get_survey_list_details_for_party(party_id, tag):
+def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_id):
 
     for enrolment in get_respondent_enrolments(party_id):
         business_party = get_party_by_business_id(enrolment['business_id'])
@@ -205,6 +205,7 @@ def get_survey_list_details_for_party(party_id, tag):
                 case['collectionInstrumentId']
             )
             collection_exercise = collection_exercises_by_id[case['caseGroup']['collectionExerciseId']]
+            added_survey = True if business_party_id == business_party['id'] and survey_id == survey['id'] else None
             yield {
 
                 'case_id': case['id'],
@@ -221,7 +222,8 @@ def get_survey_list_details_for_party(party_id, tag):
                 'business_ref': business_party['sampleUnitRef'],
                 'period': collection_exercise['userDescription'],
                 'submit_by': collection_exercise['events']['return_by']['date'],
-                'collection_exercise_ref': collection_exercise['exerciseRef']
+                'collection_exercise_ref': collection_exercise['exerciseRef'],
+                'added_survey': added_survey
             }
 
 

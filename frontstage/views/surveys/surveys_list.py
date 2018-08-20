@@ -17,16 +17,18 @@ logger = wrap_logger(logging.getLogger(__name__))
 def get_survey_list(session, tag):
     logger.info("Retrieving survey todo list")
     party_id = session.get('party_id')
+    business_id = request.args.get('business_party_id')
+    survey_id = request.args.get('survey_id')
 
-    survey_list = party_controller.get_survey_list_details_for_party(party_id, tag)
+    survey_list = party_controller.get_survey_list_details_for_party(party_id, tag, business_party_id=business_id,
+                                                                     survey_id=survey_id)
 
     sorted_survey_list = sorted(survey_list, key=lambda k: datetime.strptime(k['submit_by'], '%d %b %Y'))
 
     if tag == 'todo':
         response = make_response(render_template('surveys/surveys-todo.html',
-                                                 business_party_id=request.args.get('business_party_id'),
-                                                 added_survey=request.args.get("survey_id"),
-                                                 sorted_surveys_list=sorted_survey_list))
+                                                 sorted_surveys_list=sorted_survey_list,
+                                                 added_survey=True if business_id and survey_id else None))
 
         # Ensure any return to list of surveys (e.g. browser back) round trips the server to display the latest statuses
         response.headers.set("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store")

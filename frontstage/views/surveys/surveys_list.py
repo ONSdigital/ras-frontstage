@@ -20,7 +20,7 @@ def get_survey_list(session, tag):
 
     survey_list = party_controller.get_survey_list_details_for_party(party_id, tag)
 
-    sorted_survey_list = sorted(survey_list, key=lambda k: datetime.strptime(k['collection_exercise']['events']['return_by']['date'], '%d %b %Y'))
+    sorted_survey_list = sorted(survey_list, key=lambda k: datetime.strptime(k['submit_by'], '%d %b %Y'))
 
     if tag == 'todo':
         response = make_response(render_template('surveys/surveys-todo.html',

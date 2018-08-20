@@ -2,10 +2,10 @@ import unittest
 from unittest.mock import patch
 
 import responses
+from iso8601 import ParseError
 
 from config import TestingConfig
 from frontstage import app
-from frontstage.common.mappers import convert_events_to_new_format
 from frontstage.controllers import collection_exercise_controller
 from frontstage.exceptions.exceptions import ApiError
 from tests.app.mocked_services import collection_exercise, collection_exercise_by_survey, survey, \
@@ -39,7 +39,7 @@ class TestCollectionExerciseController(unittest.TestCase):
     def test_get_live_collection_exercises_for_survey(self, get_collection_exercises_for_survey):
         for ce in collection_exercise_by_survey:
             if ce['events']:
-                ce['events'] = convert_events_to_new_format(ce['events'])
+                ce['events'] = collection_exercise_controller.convert_events_to_new_format(ce['events'])
 
         get_collection_exercises_for_survey.return_value = collection_exercise_by_survey
 
@@ -48,3 +48,18 @@ class TestCollectionExerciseController(unittest.TestCase):
         for live_collection_exercise in live_collection_exercises:
             self.assertEqual(live_collection_exercise['state'], 'LIVE')
             self.assertFalse(live_collection_exercise['events']['go_live']['is_in_future'])
+
+    def test_convert_events_to_new_format_successful(self):
+        formatted_events = collection_exercise_controller.convert_events_to_new_format(collection_exercise['events'])
+
+        self.assertTrue(formatted_events['go_live'] is not None)
+        self.assertTrue(formatted_events['go_live']['date'] is not None)
+        self.assertTrue(formatted_events['go_live']['is_in_future'] is not None)
+
+    def test_convert_events_to_new_format_fail(self):
+        events = [{
+            "timestamp": "abc"
+        }]
+
+        with self.assertRaises(ParseError):
+            collection_exercise_controller.convert_events_to_new_format(events)

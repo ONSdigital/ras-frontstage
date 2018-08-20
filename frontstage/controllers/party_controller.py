@@ -191,36 +191,44 @@ def get_respondent_enrolments(party_id):
 def get_survey_list_details_for_party(party_id, tag):
 
     for enrolment in get_respondent_enrolments(party_id):
-        business_id = enrolment['business_id']
-        survey_id = enrolment['survey_id']
+        business_party = get_party_by_business_id(enrolment['business_id'])
+        survey = survey_controller.get_survey(enrolment['survey_id'])
 
-        live_collection_exercises = collection_exercise_controller.get_live_collection_exercises_for_survey(survey_id)
+        live_collection_exercises = collection_exercise_controller.get_live_collection_exercises_for_survey(survey['id'])
         collection_exercises_by_id = dict((ce['id'], ce) for ce in live_collection_exercises)
 
-        cases = case_controller.get_cases_for_list_type_by_party_id(business_id, tag)
+        cases = case_controller.get_cases_for_list_type_by_party_id(business_party['id'], tag)
         enrolled_cases = [case for case in cases if case['caseGroup']['collectionExerciseId'] in collection_exercises_by_id.keys()]
 
         for case in enrolled_cases:
             collection_instrument = collection_instrument_controller.get_collection_instrument(
                 case['collectionInstrumentId']
             )
-            survey = survey_controller.get_survey(survey_id)
+            collection_exercise = collection_exercises_by_id[case['caseGroup']['collectionExerciseId']]
             yield {
+
                 'case_id': case['id'],
                 'status': case_controller.calculate_case_status(case['caseGroup']['caseGroupStatus'],
                                                                 collection_instrument['type']),
                 'collection_instrument_type': collection_instrument['type'],
-                'survey_id': survey_id,
+                'survey_id': survey['id'],
                 'survey_long_name': survey['longName'],
                 'survey_short_name': survey['shortName'],
                 'survey_ref': survey['surveyRef'],
-                'business_party': get_party_by_business_id(business_id),
-                'collection_exercise': collection_exercises_by_id[case['caseGroup']['collectionExerciseId']]
+                'business_party_id': business_party['id'],
+                'business_name': business_party['name'],
+                'trading_as': business_party['trading_as'],
+                'business_ref': business_party['sampleUnitRef'],
+                'period': collection_exercise['userDescription'],
+                'submit_by': collection_exercise['events']['return_by']['date'],
+                'collection_exercise_ref': collection_exercise['exerciseRef']
             }
 
 
-def is_respondent_enrolled(party_id, business_party_id, survey_short_name):
+def is_respondent_enrolled(party_id, business_party_id, survey_short_name, return_survey=False):
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
     for enrolment in get_respondent_enrolments(party_id):
         if enrolment['business_id'] == business_party_id and enrolment['survey_id'] == survey['id']:
+            if return_survey:
+                return {'survey': survey}
             return True

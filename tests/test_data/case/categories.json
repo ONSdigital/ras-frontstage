@@ -106,13 +106,6 @@
     },
     {
         "group": null,
-        "name": "RESPONDENT_ACCOUNT_CREATED",
-        "longDescription": "Account created for respondent",
-        "shortDescription": "Account created for respondent",
-        "role": null
-    },
-    {
-        "group": null,
         "name": "RESPONDENT_EMAIL_AMENDED",
         "longDescription": "Respondent Email Amended",
         "shortDescription": "Respondent Email Amended",

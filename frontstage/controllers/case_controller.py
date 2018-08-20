@@ -133,7 +133,8 @@ def get_eq_url(case_id, party_id, business_party_id, survey_short_name):
 
     case = get_case_by_case_id(case_id)
 
-    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey_short_name):
+    valid_enrolment = party_controller.is_respondent_enrolled(party_id, business_party_id, survey_short_name, return_survey=True)
+    if not valid_enrolment:
         raise NoSurveyPermission(party_id, case_id)
 
     if case['caseGroup']['caseGroupStatus'] in ('COMPLETE', 'COMPLETEDBYPHONE', 'NOLONGERREQUIRED'):
@@ -141,7 +142,7 @@ def get_eq_url(case_id, party_id, business_party_id, survey_short_name):
                     case_id=case_id, party_id=party_id)
         abort(403)
 
-    payload = EqPayload().create_payload(case, party_id, business_party_id, survey_short_name)
+    payload = EqPayload().create_payload(case, party_id, business_party_id, valid_enrolment['survey'])
 
     json_secret_keys = app.config['JSON_SECRET_KEYS']
     encrypter = Encrypter(json_secret_keys)

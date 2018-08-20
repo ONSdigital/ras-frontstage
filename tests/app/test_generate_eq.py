@@ -88,7 +88,7 @@ class TestGenerateEqURL(unittest.TestCase):
         with app.app_context():
             with self.assertRaises(InvalidEqPayLoad) as e:
                 EqPayload().create_payload(case, party_id=respondent_party['id'], business_party_id=business_party['id'],
-                                           survey_short_name=survey_eq['shortName'])
+                                           survey=survey_eq)
         self.assertEqual(e.exception.message, 'Collection instrument 68ad4018-2ddd-4894-89e7-33f0135887a2 type is not EQ')
 
     @requests_mock.mock()
@@ -105,7 +105,7 @@ class TestGenerateEqURL(unittest.TestCase):
         with app.app_context():
             with self.assertRaises(InvalidEqPayLoad) as e:
                 EqPayload().create_payload(case, party_id=respondent_party['id'], business_party_id=business_party['id'],
-                                           survey_short_name=survey_eq['shortName'])
+                                           survey=survey_eq)
         self.assertEqual(e.exception.message,
                          'Collection instrument 68ad4018-2ddd-4894-89e7-33f0135887a2 '
                          'classifiers are incorrect or missing')
@@ -124,7 +124,7 @@ class TestGenerateEqURL(unittest.TestCase):
         with app.app_context():
             with self.assertRaises(InvalidEqPayLoad) as e:
                 EqPayload().create_payload(case, party_id=respondent_party['id'], business_party_id=business_party['id'],
-                                           survey_short_name=survey_eq['shortName'])
+                                           survey=survey_eq)
         self.assertEqual(e.exception.message,
                          'Collection instrument 68ad4018-2ddd-4894-89e7-33f0135887a2 '
                          'classifiers are incorrect or missing')

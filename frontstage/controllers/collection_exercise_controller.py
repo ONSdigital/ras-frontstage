@@ -1,10 +1,12 @@
 import logging
+from datetime import datetime
+
 
 import requests
 from flask import current_app as app
+from iso8601 import parse_date, ParseError
 from structlog import wrap_logger
 
-from frontstage.common.mappers import convert_events_to_new_format
 from frontstage.exceptions.exceptions import ApiError
 
 
@@ -83,3 +85,19 @@ def get_live_collection_exercises_for_survey(survey_id):
             for collection_exercise in collection_exercises
             if collection_exercise['state'] == 'LIVE'
             and not collection_exercise['events']['go_live']['is_in_future']]
+
+
+def convert_events_to_new_format(events):
+    formatted_events = {}
+    for event in events:
+        try:
+            date_time = parse_date(event['timestamp'])
+        except ParseError:
+            raise ParseError
+
+        formatted_events[event['tag']] = {
+            "date": date_time.strftime('%d %b %Y'),
+            "month": date_time.strftime('%m'),
+            "is_in_future": date_time > parse_date(datetime.now().isoformat())
+        }
+    return formatted_events

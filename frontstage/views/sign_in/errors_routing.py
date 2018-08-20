@@ -29,7 +29,7 @@ class RoutingValidation:
     def log_message(self, **log_parameters) -> str:
         pass
 
-    def notify_user(self):
+    def notify_user(self, *parameters):
         return self
 
     def route_me(self, form, *params):
@@ -50,24 +50,28 @@ class RoutingAccountLocked(RoutingValidation):
 
     def notify_user(self, *parameters):
         AlertViaGovNotify().send(parameters)
+        return self
 
 
 class RoutingUnauthorizedUserCredentials(RoutingValidation):
 
-    def log_message(self, **log_parameters):
+    def log_message(self, *log_parameters):
         logger.error('Unauthorized user credentials')
+        return self
 
 
 class RoutingUnVerifiedUserAccount(RoutingValidation):
 
-    def log_message(self, **log_parameters):
+    def log_message(self, *log_parameters):
         logger.error('User account is not verified on the OAuth2 server')
+        return self
 
 
 class RoutingUnVerifiedError(RoutingValidation):
 
-    def log_message(self, **log_parameters):
+    def log_message(self, *log_parameters):
         logger.error('OAuth 2 server generated 401 which is not understood, error message : {}'.format(log_parameters))
+        return self
 
     def route_me(self, form):
         return render_template(self.page, form=form)

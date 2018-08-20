@@ -4,6 +4,9 @@ import unittest
 from frontstage import app
 from tests.app.mocked_services import token, url_get_token, url_password_change, url_reset_password_request, url_verify_token
 
+encoded_valid_email = 'ImV4YW1wbGVAZXhhbXBsZS5jb20i.vMOqeMafWQpuxbUBRyRs29T0vDI'
+encoded_invalid_email = 'abcd'
+
 
 class TestPasswords(unittest.TestCase):
 
@@ -67,10 +70,12 @@ class TestPasswords(unittest.TestCase):
         mock_object.post(url_get_token, status_code=201, json=self.oauth2_response)
         mock_object.post(url_reset_password_request, status_code=404)
 
-        response = self.app.post("passwords/forgot-password", follow_redirects=True)
+        self.email_form['email_address'] = "test@email.com"
 
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('Invalid email'.encode() in response.data)
+        response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)
 
     @requests_mock.mock()
     def test_forgot_password_post_locked_email(self, mock_object):
@@ -99,11 +104,25 @@ class TestPasswords(unittest.TestCase):
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
 
-    def test_check_email(self):
-        response = self.app.get("passwords/forgot-password/check-email", follow_redirects=True)
+    def test_check_valid_email_token(self):
+        response = self.app.get(f"passwords/forgot-password/check-email?email={encoded_valid_email}",
+                                follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Check your email'.encode() in response.data)
+
+    def test_check_invalid_email_token(self):
+        response = self.app.get(f"passwords/forgot-password/check-email?email={encoded_invalid_email}",
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue("Page not found".encode() in response.data)
+
+    def test_check_no_email_token(self):
+        response = self.app.get("passwords/forgot-password/check-email", follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('reset your password'.encode() in response.data)
 
     @requests_mock.mock()
     def test_reset_password_get_success(self, mock_object):

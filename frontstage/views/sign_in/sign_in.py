@@ -37,10 +37,11 @@ def home():
 @sign_in_bp.route('/', methods=['GET', 'POST'])
 def login():
     form = LoginForm(request.form)
+    form.username.data = form.username.data.strip()
     account_activated = request.args.get('account_activated', None)
 
     if request.method == 'POST' and form.validate():
-        username = request.form.get('username') # This is actually the email address of the user, used as username.
+        username = form.username.data
         password = request.form.get('password')
 
         party_json = party_controller.get_respondent_by_email(username)
@@ -57,6 +58,7 @@ def login():
                                                  RoutingUnVerifiedError('sign-in/sign-in.html', __DATA))
             return route_validator.log_message(exc.oauth2_error).notify_user(username, "name").route_me(form)
 
+        # Take our raw token and add a UTC timestamp to the expires_at attribute
         data_dict = {**oauth2_token, 'party_id': party_id}
         data_dict_for_jwt_token = timestamp_token(data_dict)
         encoded_jwt_token = encode(data_dict_for_jwt_token)
@@ -80,5 +82,3 @@ def login():
         'account_activated': account_activated
     }
     return render_template('sign-in/sign-in.html', form=form, data=template_data)
-
-

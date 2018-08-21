@@ -154,3 +154,21 @@ def verify_token(token):
         raise ApiError(logger, response, log_level=log_level, message='Failed to verify token', token=token)
 
     logger.debug('Successfully verified token')
+
+
+def change_account_status(respondent_id, status):
+    logger.debug('Changing account status', respondent_id=respondent_id, status=status)
+    url = f'{app.config["PARTY_URL"]}/party-api/v1/respondents/edit-account-status/{respondent_id}'
+    enrolment_json = {
+        'respondent_id': respondent_id,
+        'status_change': status
+    }
+    response = requests.put(url, json=enrolment_json, auth=app.config['PARTY_AUTH'])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        logger.error('Failed to change account status', respondent_id=respondent_id, status=status)
+        raise ApiError(response)
+
+    logger.info('Successfully changed account status', respondent_id=respondent_id, status=status)

@@ -7,6 +7,7 @@ from structlog import wrap_logger
 from frontstage import app
 from frontstage.common.session import SessionHandler
 from frontstage.controllers import oauth_controller, party_controller
+from frontstage.controllers.party_controller import change_account_status
 from frontstage.exceptions.exceptions import OAuth2Error
 from frontstage.jwt import encode, timestamp_token
 from frontstage.models import LoginForm
@@ -18,6 +19,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 BAD_AUTH_ERROR = 'Unauthorized user credentials'
 NOT_VERIFIED_ERROR = 'User account not verified'
+USER_ACCOUNT_LOCKED = 'User account locked'
 
 
 @app.route('/', methods=['GET'])
@@ -50,6 +52,11 @@ def login():
             elif NOT_VERIFIED_ERROR in error_message:
                 logger.info('User account is not verified on the OAuth2 server')
                 return render_template('sign-in/sign-in.account-not-verified.html', form=form)
+            elif USER_ACCOUNT_LOCKED in error_message:
+                logger.info('User account is locked on the OAuth2 server')
+                if party_json['status'] == 'ACTIVE' or party_json['status'] == 'CREATED':
+                    change_account_status(respondent_id=party_id, status='SUSPENDED')
+                return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
             else:
                 logger.info('OAuth 2 server generated 401 which is not understood', oauth2_error=error_message)
                 return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})

@@ -123,8 +123,8 @@ class DevelopmentConfig(Config):
     PARTY_PASSWORD = os.getenv('PARTY_PASSWORD', 'secret')
     PARTY_AUTH = (PARTY_USERNAME, PARTY_PASSWORD)
 
-    NOTIFICATION_TEMPLATE_ID = os.getenv(
-        'NOTIFICATION_TEMPLATE_ID', 'test_notification_template_id')
+    NOTIFICATION_TEMPLATE_ID = os.getenv('NOTIFICATION_TEMPLATE_ID', "test_notification_template_id")
+
     RM_NOTIFY_GATEWAY_URL = os.getenv(
         'RM_NOTIFY_GATEWAY_URL', "http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/")
 

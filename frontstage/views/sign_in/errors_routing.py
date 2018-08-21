@@ -49,8 +49,11 @@ class RoutingAccountLocked(RoutingValidation):
         return self
 
     def notify_user(self, *parameters):
-        AlertViaGovNotify().send(parameters)
+        AlertViaGovNotify().send(parameters[0], parameters[1])
         return self
+
+    def route_me(self, form):
+        return render_template(self.page, form=form, data=self.data)
 
 
 class RoutingUnauthorizedUserCredentials(RoutingValidation):

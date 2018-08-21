@@ -17,15 +17,13 @@ class AlertViaGovNotify:
             "emailAddress": email,
             "name": name
         }
-        url = urlparse.urljoin(current_app.config['RM_NOTIFY_GATEWAY_URL'], current_app.config['NOTIFICATION_TEMPLATE_ID'])
+        url = urlparse.urljoin(current_app.config['RM_NOTIFY_GATEWAY_URL'],
+                               current_app.config['NOTIFICATION_TEMPLATE_ID'])
 
-        response = requests.post(url, auth=current_app.config['BASIC_AUTH'], timeout=current_app.config['REQUESTS_POST_TIMEOUT'],
+        response = requests.post(url, auth=current_app.config['BASIC_AUTH'],
+                                 timeout=current_app.config['REQUESTS_POST_TIMEOUT'],
                                  json=notification)
         if response.status_code != 201:
             raise Exception(code=500)
         else:
-            logger.info('Sent email notification, via RM Notify-Gateway to GOV.UK Notify.',message_id=response.json()["id"])
-
-
-
-
+            logger.info('Sent email notification, via RM Notify-Gateway to GOV.UK Notify.')

@@ -1,12 +1,14 @@
 {% import 'partials/section.html' as section %}
 {% extends "layouts/_twocol.html" %}
 
-{% block page_title %}Trouble signing in? - ONS Business Surveys{% endblock %}
+{% block page_title %}Verify your email - ONS Business Surveys{% endblock %}
 
 {% block main %}
-    <h1 class="saturn">Trouble signing in?</h1>
+    <h1 class="saturn">Verify your email</h1>
 
-    <p>Please follow the link in the verification email we sent you.</p>
-    <p>If you haven't received an email please call us on 0300 1234 931 or email <a href="mailto:surveys@ons.gov.uk">surveys@ons.gov.uk</a></p>
+    <p>When you created your account we sent you an email to verify your email address.</p>
+    <p>Please follow the link the email to confirm your email address and sign in.</p>
+    <br>
+    <p>If you can't find it, you can <a href="{{ url_for('sign_in_bp.resend_verification', ru_ref=ru_ref, party_id=respondent.id) }}">Re-sendrequest another email</a>.</p>
 
 {% endblock main %}

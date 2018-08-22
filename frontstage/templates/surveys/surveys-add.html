@@ -48,7 +48,7 @@
         <button id="continue_button" class="btn btn--primary venus u-mt-s" type="submit">Continue</button>
 
         <p>
-            <a id="cancel_button" href="{{ url_for('surveys_bp.logged_in') }}">Cancel</a>
+            <a id="cancel_button" href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}">Cancel</a>
         </p>
 
     </form>

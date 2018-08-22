@@ -1,0 +1,34 @@
+[
+  {
+    "business_party_id": "272ac5cb-9052-48ec-b886-7fd5015bd327",
+    "business_name": "RUNAME3_COMPANY3 RUNNAME4_COMPANY3",
+    "trading_as": "TOTAL UK ACTIVITY",
+    "business_ref": "49900000003",
+    "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d",
+    "survey_long_name": "Quarterly Business Survey",
+    "survey_short_name": "QBS",
+    "survey_ref": "139",
+    "period": "15 June 2018",
+    "submit_by": "15 Jun 2018",
+    "collection_exercise_ref": "1807",
+    "status": "Not Started",
+    "collection_instrument_type": "EQ",
+    "case_id": "0bd4963e-e9e8-4297-a69d-42dd7fec8483"
+  },
+  {
+    "business_party_id": "88d9fe35-ff6c-4ed1-b4f8-8ac548179651",
+    "business_name": "RED BRICKS LTD",
+    "trading_as": "",
+    "business_ref": "49900000008",
+    "survey_id": "cb8accda-6118-4d3b-85a3-149e28960c54",
+    "survey_short_name": "Bricks",
+    "survey_long_name": "Monthly Survey of Building Materials Bricks",
+    "survey_ref": "074",
+    "period": "test_exercise",
+    "submit_by": "12 Aug 2018",
+    "collection_exercise_ref": "204901",
+    "status": "Not started",
+    "collection_instrument_type": "SEFT",
+    "case_id": "f1e15ffb-18d5-45b4-973d-e2dc3319bb7d"
+  }
+]

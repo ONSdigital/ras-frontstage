@@ -7,7 +7,7 @@ from flask import current_app
 from structlog import wrap_logger
 
 from frontstage.controllers import (collection_exercise_controller, collection_instrument_controller,
-                                    party_controller, survey_controller)
+                                    party_controller)
 from frontstage.exceptions.exceptions import InvalidEqPayLoad
 
 
@@ -16,7 +16,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 class EqPayload(object):
 
-    def create_payload(self, case):
+    def create_payload(self, case, party_id, business_party_id, survey):
         """
         Creates the payload needed to communicate with EQ, built from the Case, Collection Exercise, Party,
         Survey and Collection Instrument services
@@ -46,12 +46,7 @@ class EqPayload(object):
         collex_event_dates = self._get_collex_event_dates(collex_id)
 
         # Party
-        party_id = case['caseGroup']['partyId']
-        party = party_controller.get_party_by_business_id(party_id, collection_exercise_id=collex_id)
-
-        # Survey
-        survey_id = collex['surveyId']
-        survey = survey_controller.get_survey(survey_id)
+        party = party_controller.get_party_by_business_id(business_party_id, collection_exercise_id=collex_id)
 
         account_service_url = current_app.config['ACCOUNT_SERVICE_URL']
         iat = time.time()
@@ -60,7 +55,7 @@ class EqPayload(object):
         payload = {
             'jti': str(uuid.uuid4()),
             'tx_id': tx_id,
-            'user_id': case['partyId'],
+            'user_id': party_id,
             'iat': int(iat),
             'exp': int(exp),
             'eq_id': eq_id,

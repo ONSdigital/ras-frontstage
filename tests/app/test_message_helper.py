@@ -1,10 +1,10 @@
-import unittest
 import json
-
+import unittest
 from datetime import datetime, timedelta, timezone, date
 from unittest.mock import patch
 
 from frontstage.common.message_helper import refine, get_formatted_date, convert_to_bst
+
 
 with open('tests/test_data/conversation.json') as json_data:
     test_data = json.load(json_data)

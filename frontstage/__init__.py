@@ -1,5 +1,5 @@
-from flask_wtf.csrf import CSRFProtect
 import redis
+from flask_wtf.csrf import CSRFProtect
 
 from frontstage.create_app import create_app_object
 

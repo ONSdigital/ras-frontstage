@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch
-from werkzeug.exceptions import Forbidden
 
 import responses
+from werkzeug.exceptions import Forbidden
 
 from config import TestingConfig
 from frontstage import app

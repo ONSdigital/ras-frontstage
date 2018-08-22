@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import MagicMock
 
-from requests.exceptions import ConnectionError
 import requests_mock
+from requests.exceptions import ConnectionError
 
 from frontstage import app
 from frontstage.exceptions.exceptions import ApiError, JWTValidationError

@@ -1,11 +1,11 @@
-from datetime import datetime
 import logging
+from datetime import datetime
 
 from flask import render_template, request, make_response
 from structlog import wrap_logger
 
-from frontstage.controllers import party_controller
 from frontstage.common.authorisation import jwt_authorization
+from frontstage.controllers import party_controller
 from frontstage.views.surveys import surveys_bp
 
 

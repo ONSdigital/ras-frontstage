@@ -5,8 +5,8 @@ import requests
 from flask import abort, current_app as app
 from structlog import wrap_logger
 
-from frontstage.common.eq_payload import EqPayload
 from frontstage.common.encrypter import Encrypter
+from frontstage.common.eq_payload import EqPayload
 from frontstage.controllers import (collection_exercise_controller, collection_instrument_controller,
                                     party_controller, survey_controller)
 from frontstage.exceptions.exceptions import ApiError, InvalidCaseCategory, NoSurveyPermission

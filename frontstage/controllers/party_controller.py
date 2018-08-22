@@ -236,7 +236,7 @@ def is_respondent_enrolled(party_id, business_party_id, survey_short_name, retur
             return True
 
 
-def change_account_status(respondent_id, status):
+def change_respondent_status(respondent_id, status):
     logger.debug('Changing account status', respondent_id=respondent_id, status=status)
     url = f'{app.config["PARTY_URL"]}/party-api/v1/respondents/edit-account-status/{respondent_id}'
     enrolment_json = {

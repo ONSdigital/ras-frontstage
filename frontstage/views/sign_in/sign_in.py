@@ -7,7 +7,7 @@ from structlog import wrap_logger
 from frontstage import app
 from frontstage.common.session import SessionHandler
 from frontstage.controllers import oauth_controller, party_controller
-from frontstage.controllers.party_controller import change_account_status
+from frontstage.controllers.party_controller import change_respondent_status
 from frontstage.exceptions.exceptions import OAuth2Error
 from frontstage.jwt import encode, timestamp_token
 from frontstage.models import LoginForm
@@ -55,7 +55,7 @@ def login():
             elif USER_ACCOUNT_LOCKED in error_message:
                 logger.info('User account is locked on the OAuth2 server')
                 if party_json['status'] == 'ACTIVE' or party_json['status'] == 'CREATED':
-                    change_account_status(respondent_id=party_id, status='SUSPENDED')
+                    change_respondent_status(respondent_id=party_id, status='SUSPENDED')
                 return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
             else:
                 logger.info('OAuth 2 server generated 401 which is not understood', oauth2_error=error_message)

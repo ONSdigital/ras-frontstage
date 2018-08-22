@@ -45,7 +45,7 @@ class RoutingValidation:
 class RoutingAccountLocked(RoutingValidation):
 
     def log_message(self, *log_parameters):
-        logger.error('user account locked for too many attempts. UAA server error message : {}'.format(log_parameters))
+        logger.info('user account locked for too many attempts. UAA server error message : {}'.format(log_parameters))
         return self
 
     def notify_user(self, *parameters):
@@ -59,19 +59,19 @@ class RoutingAccountLocked(RoutingValidation):
 class RoutingUnauthorizedUserCredentials(RoutingValidation):
 
     def log_message(self, *log_parameters):
-        logger.error('Unauthorized user credentials')
+        logger.info('Unauthorized user credentials')
         return self
 
 
 class RoutingUnVerifiedUserAccount(RoutingValidation):
 
     def log_message(self, *log_parameters):
-        logger.error('User account is not verified on the OAuth2 server')
+        logger.info('User account is not verified on the OAuth2 server')
         return self
 
 
 class RoutingUnVerifiedError(RoutingValidation):
 
     def log_message(self, *log_parameters):
-        logger.error('OAuth 2 server generated 401 which is not understood, error message : {}'.format(log_parameters))
+        logger.info('OAuth 2 server generated 401 which is not understood, error message : {}'.format(log_parameters))
         return self

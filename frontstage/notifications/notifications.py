@@ -24,6 +24,6 @@ class AlertViaGovNotify:
                                  timeout=current_app.config['REQUESTS_POST_TIMEOUT'],
                                  json=notification)
         if response.status_code != 201:
-            raise Exception(code=500)
+            logger.error('This email {} , has not been sent, the service might be down or not available.'.format(email))
         else:
-            logger.info('Sent email notification, via RM Notify-Gateway to GOV.UK Notify.')
+            logger.info('Sent email notification, via RM Notify-Gateway to GOV.UK Notify. to {}'.format(email))

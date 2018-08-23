@@ -7,7 +7,8 @@ from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import party_controller
 from frontstage.exceptions.exceptions import ApiError
-from tests.app.mocked_services import (business_party, case, case_list, collection_exercise, collection_exercise_by_survey,
+from tests.app.mocked_services import (business_party, case, case_list, collection_exercise,
+                                       collection_exercise_by_survey,
                                        collection_instrument_seft, respondent_party, survey, url_get_business_party,
                                        url_get_respondent_email, url_get_respondent_party, url_post_add_survey,
                                        url_reset_password_request)

@@ -3,8 +3,8 @@ import os
 import sys
 
 from structlog import configure
-from structlog.stdlib import add_log_level, filter_by_level, LoggerFactory
 from structlog.processors import JSONRenderer, TimeStamper, format_exc_info
+from structlog.stdlib import add_log_level, filter_by_level, LoggerFactory
 from structlog.threadlocal import wrap_dict
 
 

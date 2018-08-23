@@ -1,7 +1,6 @@
 import logging
 from datetime import datetime
 
-
 import requests
 from flask import current_app as app
 from iso8601 import parse_date, ParseError

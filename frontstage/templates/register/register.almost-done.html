@@ -7,23 +7,27 @@
     <h1 class="saturn">Almost done...</h1>
     <p id="email_confirmation_sent">We've sent an email to {{ email }}</p>
     <p>Please follow the link in the email to confirm your email address and finish setting up your account.</p>
+    <div class="guidance js-details"
+        data-guidance-label="guidance-help-with-email"
+        data-guidance="Guidance help with email"
+        data-hide-label="Hide help with email"
+        data-show-label="Show help with email">
 
-    <div class="details js-details" data-guidance-label="Help with email" data-guidance="Help with email" data-hide-label="Help with email" data-show-label="Help with email">
-
-        <a class="details__link js-details-trigger js-details-label mars"
+        <a class="guidance__link js-details-trigger js-details-label icon--details mars"
+        id="guidance-help-with-email"
         data-guidance-trigger="true"
         aria-expanded="false"
         href="#guidance-help-with-email"
-        id="guidance-help-with-email"
-        aria-controls="guidance-help-with-email-body">Help with email</a>
+        aria-controls="guidance-help-with-email">Help with email</a>
 
-        <div class="details__main js-details-body" id="guidance-help-with-email-body" aria-hidden="true">
-            <div class="details__content mars">
+        <div class="guidance__main js-details-body" id="guidance-help-with-email-body" aria-hidden="true">
+            <div class="guidance__content mars">
                 <div>
                     <p>Email not arrived? It might be in your spam folder.</p>
-                    <p>If it doesn’t arrive in the next 15 minutes, please call 0300 1234 931 or send an email to <a href="mailto:surveys@ons.gov.uk">surveys@ons.gov.uk</a></p>
+                    <p>If it doesn’t arrive in the next 15 minutes, please call <a href="tel:03001234931">0300 1234 931</a></p>
                 </div>
             </div>
         </div>
+
     </div>
 {% endblock main %}

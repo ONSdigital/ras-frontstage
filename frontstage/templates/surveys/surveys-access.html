@@ -29,7 +29,7 @@
 <p>If actual figures are not available, please provide informed estimates.</p>
 
 
-<a id="download-survey-button" class="btn action-button btn--primary" target="_blank"
+<a id="download_survey_button" class="btn" target="_blank"
    href="{{ url_for('surveys_bp.download_survey', case_id=case_id, business_party_id=business_info.id, survey_short_name=survey_info.shortName) }}"
    onclick="ga('send', 'event', 'survey', 'download', 'survey_ref = {{ survey_info.surveyRef }} collection_exercise_ref = {{ collection_exercise_info.exerciseRef }}');" >
 
@@ -54,7 +54,7 @@
      data-hide-label="Hide guidance for uploading"
      data-show-label="Show guidance for uploading">
 
-    <a class="guidance__link js-details-trigger js-details-label mars"
+    <a class="guidance__link js-details-trigger js-details-label icon--details mars"
        id="guidance-for-uploading"
        data-guidance-trigger="true"
        aria-expanded="false"
@@ -76,8 +76,7 @@
 </div>
 <br/>
 
-<p class="venus"><i class="fa fa-lock" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
-    We will treat your data securely and confidentially</p>
+<p class="venus icon--lock">We will treat your data securely and confidentially</p>
 
 {% include "surveys/surveys-upload-file-picker.html" %}
 

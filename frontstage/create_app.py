@@ -1,7 +1,9 @@
 import logging
 import os
+import requestsdefaulter
 
 from flask import Flask, request
+from flask_zipkin import Zipkin
 from structlog import wrap_logger
 
 from frontstage.cloud.cloudfoundry import ONSCloudFoundry
@@ -21,10 +23,15 @@ CACHE_HEADERS = {
 
 def create_app_object():
     app = Flask(__name__)
+    app.name = "ras-frontstage"
 
     # Load app config
     app_config = 'config.{}'.format(os.environ.get('APP_SETTINGS', 'Config'))
     app.config.from_object(app_config)
+
+    # Zipkin
+    zipkin = Zipkin(app=app, sample_rate=app.config.get("ZIPKIN_SAMPLE_RATE"))
+    requestsdefaulter.default_headers(zipkin.create_http_headers_for_new_span)
 
     # Configure logger
     log_level = 'DEBUG' if app.config['DEBUG'] else None

@@ -1,7 +1,7 @@
 import logging
 
-from flask import current_app as app
 import requests
+from flask import current_app as app
 from structlog import wrap_logger
 
 from frontstage.exceptions.exceptions import ApiError, OAuth2Error

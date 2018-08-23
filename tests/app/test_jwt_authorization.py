@@ -4,8 +4,8 @@ from unittest import mock
 from jose import JWTError
 
 from frontstage import app
-from frontstage.common.session import SessionHandler
 from frontstage.common.authorisation import jwt_authorization
+from frontstage.common.session import SessionHandler
 from frontstage.exceptions.exceptions import JWTValidationError
 
 

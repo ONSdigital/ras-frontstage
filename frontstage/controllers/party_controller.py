@@ -4,7 +4,8 @@ import requests
 from flask import current_app as app
 from structlog import wrap_logger
 
-from frontstage.controllers import case_controller, collection_exercise_controller, collection_instrument_controller, survey_controller
+from frontstage.controllers import case_controller, collection_exercise_controller, collection_instrument_controller, \
+    survey_controller
 from frontstage.exceptions.exceptions import ApiError
 
 

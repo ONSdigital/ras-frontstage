@@ -43,9 +43,12 @@ def logger_initial_config(service_name=None,  # noqa: C901  pylint: disable=too-
     oauth_log.propagate = False
 
     def zipkin_ids(logger, method_name, event_dict):
+        event_dict['zipkin_trace_id'] = ''
+        event_dict['zipkin_span_id'] = ''
         if not flask.has_app_context():
-            event_dict['zipkin_trace_id'] = ''
-            event_dict['zipkin_span_id'] = ''
+            return event_dict
+
+        if '_zipkin_span' not in g:
             return event_dict
 
         event_dict['zipkin_span_id'] = g._zipkin_span.zipkin_attrs.span_id

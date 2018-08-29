@@ -10,7 +10,6 @@ from structlog.threadlocal import wrap_dict
 from flask import g
 
 
-
 def logger_initial_config(service_name=None,  # noqa: C901  pylint: disable=too-complex
                           log_level=None,
                           logger_format=None,

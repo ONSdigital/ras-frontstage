@@ -18,6 +18,7 @@ url_resend_verification_email = f'{TestingConfig.PARTY_URL}/party-api/v1/resend-
                                 f'/{respondent_party_id}'
 get_respondent_by_id_url = f'{TestingConfig.PARTY_URL}/party-api/v1/respondents/id/{respondent_party_id}'
 
+
 class TestSignIn(unittest.TestCase):
     """Test case for application endpoints and functionality"""
 
@@ -197,7 +198,7 @@ class TestSignIn(unittest.TestCase):
     @requests_mock.mock()
     def test_fail_resent_verification_email(self, mock_request):
         mock_request.get(url_resend_verification_email, status_code=500)
-        response= self.app.get(f"sign-in/resend_verification/{respondent_party_id}",
-                         follow_redirects=True)
+        response = self.app.get(f"sign-in/resend_verification/{respondent_party_id}",
+                               follow_redirects=True)
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)

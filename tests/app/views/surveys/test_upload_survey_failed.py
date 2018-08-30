@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from frontstage import app
 from tests.app.mocked_services import business_party, case, collection_instrument_seft, collection_exercise, \
-                                      encoded_jwt_token, survey
+    encoded_jwt_token, survey
 
 
 class TestUploadSurveyFailed(unittest.TestCase):

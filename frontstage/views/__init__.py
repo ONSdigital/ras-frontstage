@@ -1,6 +1,6 @@
 from frontstage import app
-from frontstage.views.cookies_privacy import cookies_privacy_bp
 from frontstage.views.contact_us import contact_us_bp
+from frontstage.views.cookies_privacy import cookies_privacy_bp
 from frontstage.views.info import info_bp
 from frontstage.views.passwords import passwords_bp
 from frontstage.views.register import register_bp

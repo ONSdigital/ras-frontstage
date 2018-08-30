@@ -1,24 +1,16 @@
 <ul class="survey-list" id="survey-list">
 
-    <li class="header-row">
+    <li class="grid header-row">
 
-        <div id="SURVEY_COLUMN_HEADING" class="grid__col col-4@m">
-            Survey
-        </div>
+        <div id="SURVEY_COLUMN_HEADING" class="grid__col col-4@m u-pb-xs u-pl-xs">Survey</div>
 
-        <div id="PERIOD_COVERED_COLUMN_HEADING" class="grid__col col-2@m">
-            Period covered
-        </div>
+        <div id="PERIOD_COVERED_COLUMN_HEADING" class="grid__col col-2@m u-pb-xs">Period covered</div>
 
-        <div id="SUBMIT_BY_COLUMN_HEADING" class="grid__col col-2@m">
-            {% if not history %}
-            Submit by
-            {% endif %}
-        </div>
+        <div id="SUBMIT_BY_COLUMN_HEADING" class="grid__col col-2@m u-pb-xs">{% if not history %}Submit by{% endif %}</div>
 
-        <div id="STATUS_COLUMN_HEADING" class="grid__col col-2@m">
-            Status
-        </div>
+        <div id="STATUS_COLUMN_HEADING" class="grid__col col-2@m u-pb-xs">Status</div>
+
+        <div id="STATUS_COLUMN_HEADING" class="grid__col col-2@m u-pb-xs u-vh">Status</div>
 
     </li>
 
@@ -28,7 +20,7 @@
     {% else %}
     <li class="grid card" name="survey-card">
     {% endif %}
-        <div class="grid__col col-4@m">
+        <div class="grid__col col-4@m u-pl-xs">
             <span class="survey-list-item__label mercury">SURVEY: </span>
             <span id="SURVEY_NAME" >{{ survey.survey_long_name }}</span><br/>
             <span id="REPORTING_UNIT_DETAILS_{{ survey.business_ref }}" name="reporting-unit-details" class="survey-list-item pluto">
@@ -62,7 +54,7 @@
                {% if survey.collection_instrument_type == 'EQ' %}
                 onclick="ga('send', 'event', 'survey', 'launcheq', 'survey_ref = {{ survey.survey_ref }} collection_exercise_ref = {{ survey.collection_exercise_ref }}');"
                {% endif %}>
-                <button id="access_survey_button_{{loop.index}}" class="btn action-button btn--primary" type="submit">
+                <button id="access_survey_button_{{loop.index}}" class="btn u-mb-s action-button" type="submit">
                     Access <span class="u-vh">{{ survey.survey_long_name|replace("Survey", " ") }}</span> survey
                 </button>
             </a>
@@ -74,7 +66,7 @@
 
     {% if sorted_surveys_list|length == 0 %}
     <li class="card">
-        <div class="grid__col col-12@m">{{emptySurveyListLabel}}</div>
+        <div class="grid__col col-12@m u-pl-xs">{{emptySurveyListLabel}}</div>
     </li>
     {% endif %}
 

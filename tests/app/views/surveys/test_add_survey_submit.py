@@ -1,14 +1,16 @@
 import logging
 import unittest
-from requests.models import Response
 from unittest.mock import patch
 
+from requests.models import Response
 from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.exceptions.exceptions import ApiError
-from tests.app.mocked_services import active_iac, case, collection_exercise, encoded_jwt_token, encrypted_enrolment_code,\
+from tests.app.mocked_services import active_iac, case, collection_exercise, encoded_jwt_token, \
+    encrypted_enrolment_code, \
     enrolment_code, url_validate_enrolment
+
 
 logger = wrap_logger(logging.getLogger(__name__))
 

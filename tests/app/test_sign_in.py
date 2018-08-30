@@ -199,6 +199,6 @@ class TestSignIn(unittest.TestCase):
     def test_fail_resent_verification_email(self, mock_request):
         mock_request.get(url_resend_verification_email, status_code=500)
         response = self.app.get(f"sign-in/resend_verification/{respondent_party_id}",
-                               follow_redirects=True)
+                                follow_redirects=True)
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)

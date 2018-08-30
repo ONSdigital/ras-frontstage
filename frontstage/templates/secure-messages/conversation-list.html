@@ -4,11 +4,9 @@
 {% block page_title %}Messages - ONS Business Surveys{% endblock %}
 
 {% block main %}
-
-{% include 'partials/tab_list.html' %}
+{% include "partials/tab_list.html" %}
 
 <div role="main" id="main" class="page__main">
-  <div class="container">
     {% with messages = get_flashed_messages() %}
       {% if messages %}
       <div class="panel panel--simple panel--success col-6@m">
@@ -21,13 +19,18 @@
       <br>
       {% endif %}
     {% endwith %}
-
-    <nav class="sm-nav u-mb-l">
-      <h2 class="u-vh">Messages navigation</h2>
-        <ul class="nav-pills">
-          <li class="nav-pills__pill{% if not is_closed %}--active {% endif %}"><a class="pill-label" href="{{ url_for('secure_message_bp.view_conversation_list') }}">Open</a></li>
-          <li class="nav-pills__pill{% if is_closed %}--active {% endif %}"><a class="pill-label" href="{{ url_for('secure_message_bp.view_conversation_list', is_closed='true') }}">Closed</a></li>
-        </ul>
+    
+    <nav class="nav nav--horizontal nav--sub nav--dark u-mb-l u-pt-s" role="menu">
+        <div class="container">
+            <ul class="nav__list" aria-label="Section navigation menu">
+                <li class="nav__item pluto {% if not is_closed %}nav__item--current{% endif %}">
+                    <a class="nav__link" href="{{ url_for('secure_message_bp.view_conversation_list') }}" aria-current="{% if not is_closed %}location{% endif %}" role="menuitem">Open</a>
+                </li>
+                <li class="nav__item pluto {% if is_closed %}nav__item--current{% endif %}">
+                    <a class="nav__link" href="{{ url_for('secure_message_bp.view_conversation_list', is_closed='true') }}" aria-current="{% if is_closed %}location{% endif %}" role="menuitem">Closed</a>
+                </li>
+            </ul>
+        </div>
     </nav>
 
     {% if not messages %}
@@ -38,7 +41,7 @@
       {% endif %}
     {% else %}
 
-      <ul class="message-list col-12@m">
+      <ul class="message-list">
         {% for message in messages %}
           {% if message['unread'] %}
             <li id="message-list-unread" class="message-list__item venus">
@@ -77,6 +80,5 @@
         {% endfor %}
       </ul>
     {% endif %}
-  </div>
 </div>
 {% endblock main %}

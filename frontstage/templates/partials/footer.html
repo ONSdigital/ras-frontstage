@@ -1,9 +1,9 @@
-<footer class="footer page__footer" role="contentinfo">
+<footer class="footer" role="contentinfo">
     <div class="container">
         <div class="grid">
             <div class="grid__col col-4@m">
                 <p class="venus footer__heading"><strong>Legal information</strong></p>
-                <ul class="list footer__list">
+                <ul class="list list--bare">
                     <li>
                         <a href="/cookies-privacy"
                            class="footer__link">Cookies and privacy</a>
@@ -13,7 +13,7 @@
 
             <div class="grid__col col-4@m">
                 <p class="venus footer__heading"><strong>About ONS</strong></p>
-                <ul class="list footer__list">
+                <ul class="list list--bare">
                     <li>
                         <a href="https://www.ons.gov.uk/aboutus/whatwedo"
                            class="footer__link">What we do</a>
@@ -31,7 +31,7 @@
 
             <div class="grid__col col-4@m">
                 <p class="venus footer__heading"><strong>Statistics</strong></p>
-                <ul class="list footer__list">
+                <ul class="list list--bare">
                     <li>
                         <a href="https://www.statisticsauthority.gov.uk/about-the-authority/"
                            class="footer__link">UK Statistics Authority</a>
@@ -47,10 +47,11 @@
                 </ul>
             </div>
 
-            <div class="grid__col col-12@m footer__license">
-                <img alt="OGL" class="ogl-icon" src="/static/images/ogl.svg"> All content is available under the <a
-                    href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government
-                    Licence v3.0</a>, except where otherwise stated
+            <div class="grid__col col-12@m">
+                <div class="footer__license footer__license--border">
+                    {% set logo_cdn = cdn_url_prefix~"/img/UKOpenGovernmentLicence-grey.svg" %}
+                    <img alt="OGL" class="footer__ogl-img" src="{{ logo_cdn }}"> All content is available under the <a class="footer__link" href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government Licence v3.0</a>, except where otherwise stated
+                </div>
             </div>
         </div>
     </div>

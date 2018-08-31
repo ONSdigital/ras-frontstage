@@ -11,7 +11,7 @@ from frontstage.notifications.notifications import AlertViaGovNotify
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-class RoutingValidation:
+class RenderValidation:
     """
     This is the basic class that identify a generic routing type for any validation error that needs to be re routed.
     All the abstract methods are mandatory to implement
@@ -42,35 +42,35 @@ class RoutingValidation:
         return render_template(self.page, form=form, data=self.data)
 
 
-class RoutingAccountLocked(RoutingValidation):
+class RenderAccountLocked(RenderValidation):
 
     def log_message(self, *log_parameters):
         logger.info('user account locked for too many attempts. UAA server error message : {}'.format(log_parameters))
         return self
 
     def notify_user(self, *parameters):
-        AlertViaGovNotify().send(parameters[0], parameters[1])
+        send(parameters[0], parameters[1])
         return self
 
     def route_me(self, form):
         return render_template(self.page, form=form, data=self.data)
 
 
-class RoutingUnauthorizedUserCredentials(RoutingValidation):
+class RenderUnauthorizedUserCredentials(RenderValidation):
 
     def log_message(self, *log_parameters):
         logger.info('Unauthorized user credentials')
         return self
 
 
-class RoutingUnVerifiedUserAccount(RoutingValidation):
+class RenderUnVerifiedUserAccount(RenderValidation):
 
     def log_message(self, *log_parameters):
         logger.info('User account is not verified on the OAuth2 server')
         return self
 
 
-class RoutingUnVerifiedError(RoutingValidation):
+class RenderUnVerifiedError(RenderValidation):
 
     def log_message(self, *log_parameters):
         logger.info('OAuth 2 server generated 401 which is not understood, error message : {}'.format(log_parameters))

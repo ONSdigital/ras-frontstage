@@ -11,8 +11,8 @@ from frontstage.exceptions.exceptions import OAuth2Error
 from frontstage.jwt import encode, timestamp_token
 from frontstage.models import LoginForm
 from frontstage.views.sign_in import sign_in_bp
-from frontstage.views.sign_in.errors_routing import RoutingAccountLocked, RoutingUnauthorizedUserCredentials, \
-    RoutingUnVerifiedError, RoutingUnVerifiedUserAccount
+from frontstage.views.sign_in.errors_render import RenderAccountLocked, RenderUnauthorizedUserCredentials, \
+    RenderUnVerifiedError, RenderUnVerifiedUserAccount
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -22,11 +22,11 @@ NOT_VERIFIED_ERROR = 'User account not verified'
 USER_ACCOUNT_LOCKED = 'User account locked'
 
 NOT_EXPECTED = "not expected"
-__DATA = {"error": {"type": "failed"}}
+_DATA = {"error": {"type": "failed"}}
 
-__ERROR_ROUTES = {BAD_AUTH_ERROR: RoutingUnauthorizedUserCredentials('sign-in/sign-in.html', __DATA),
-                  NOT_VERIFIED_ERROR: RoutingUnVerifiedUserAccount('sign-in/sign-in.account-not-verified.html', __DATA),
-                  USER_ACCOUNT_LOCKED: RoutingAccountLocked('sign-in/sign-in.account-locked.html', __DATA)}
+_ERROR_ROUTES = {BAD_AUTH_ERROR: RenderUnauthorizedUserCredentials('sign-in/sign-in.html', _DATA),
+                 NOT_VERIFIED_ERROR: RenderUnVerifiedUserAccount('sign-in/sign-in.account-not-verified.html', _DATA),
+                 USER_ACCOUNT_LOCKED: RenderAccountLocked('sign-in/sign-in.account-locked.html', _DATA)}
 
 
 @app.route('/', methods=['GET'])
@@ -46,7 +46,7 @@ def login():
 
         party_json = party_controller.get_respondent_by_email(username)
         if not party_json or 'id' not in party_json:
-            logger.info('Respondent not able to sign in as they don\'t have an active account in the system.')
+            logger.info('Respondent not able to sign in as they don\'t have an account in the system.')
             return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
         party_id = party_json['id']
 
@@ -54,8 +54,8 @@ def login():
         try:
             oauth2_token =  oauth_controller.sign_in(username, password)
         except OAuth2Error as exc:
-            route_validator = __ERROR_ROUTES.get(exc.oauth2_error,
-                                                 RoutingUnVerifiedError('sign-in/sign-in.html', __DATA))
+            route_validator = _ERROR_ROUTES.get(exc.oauth2_error,
+                                                RenderUnVerifiedError('sign-in/sign-in.html', _DATA))
             return route_validator.log_message(exc.oauth2_error).notify_user(username, "name").route_me(form)
 
         # Take our raw token and add a UTC timestamp to the expires_at attribute

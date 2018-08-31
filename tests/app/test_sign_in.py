@@ -1,16 +1,14 @@
+import os
 import unittest
+from urllib.error import HTTPError
 
 import requests_mock
-from unittest.mock import Mock, patch
 from unittest import mock
 
-
-from frontstage import app, create_app, create_app_object
+from frontstage import app, create_app_object
 from frontstage.notifications.notifications import AlertViaGovNotify
-from urllib import parse as urlparse
 
 from tests.app.mocked_services import url_get_respondent_email, url_oauth_token, party
-
 
 encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoX3Rva2VuIjoiNmY5NjM0ZGEtYTI3ZS00ZDk3LWJhZjktNjN" \
                     "jOGRjY2IyN2M2IiwiYWNjZXNzX3Rva2VuIjoiMjUwMDM4YzUtM2QxOS00OGVkLThlZWMtODFmNTQyMDRjNDE1Iiwic2NvcGU" \
@@ -113,7 +111,7 @@ class TestSignIn(unittest.TestCase):
 
         self.app.get('/sign-in/', data=self.sign_in_form)
 
-        response = self.app.get('/surveys/todo',  follow_redirects=True)
+        response = self.app.get('/surveys/todo', follow_redirects=True)
         self.assertEqual(response.status_code, 403)
         self.assertIn(b'Error - Not signed in', response.data)
 
@@ -183,13 +181,13 @@ class TestSignIn(unittest.TestCase):
         mock_object.post(url_oauth_token, status_code=401, json=self.oauth_error)
         mock_object.get(url_get_respondent_email, json=party)
 
-        mock_object.post('http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/test_notification_template_id',
-                          json={"emailAddress": "test@email.com", "name": "myReference"}, status_code=201)
+        mock_object.post(app.config['RM_NOTIFY_GATEWAY_URL'] + 'test_notification_template_id',
+                         json={"emailAddress": "test@email.com", "name": "myReference"}, status_code=201)
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        #self.assertTrue('Please follow the link in the verification email'.encode() in response.data)
+        # self.assertTrue('Please follow the link in the verification email'.encode() in response.data)
 
     @mock.patch('requests.post')
     def test_post_to_notify_gateway_with_correct_params(self, mock_notify_gateway_post):
@@ -204,13 +202,14 @@ class TestSignIn(unittest.TestCase):
         with self.app.app_context():
             alert_user.send('test@email.com', 'myReference')
 
-        mock_notify_gateway_post.assert_called_once_with(
-            'http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/test_notification_template_id',
-            auth=("admin", "secret"), json={"emailAddress": "test@email.com", "name": "myReference"},
-            timeout=20)
+        mock_notify_gateway_post.assert_called_once_with(app.config['RM_NOTIFY_GATEWAY_URL'] +
+                                                         'test_notification_template_id',
+                                                         auth=("admin", "secret"),
+                                                         json={"emailAddress": "test@email.com", "name": "myReference"},
+                                                         timeout=20)
 
     @mock.patch('requests.post')
-    def test_post_to_notify_gateway_throws_exception(self, mock_notify_gateway_post):
+    def test_post_to_notify_gateway_withi_no_email(self, mock_notify_gateway_post):
         self.app = create_app_object()
         self.app.testing = True
 
@@ -219,13 +218,10 @@ class TestSignIn(unittest.TestCase):
         mock_notify_gateway_post.return_value = mock_response
 
         alert_user = AlertViaGovNotify()
-        with self.app.app_context(), self.assertRaises(Exception):
-            alert_user.send('test@email.com', 'myReference')
+        with self.app.app_context():
+            alert_user.send('', 'myReference')
 
-        mock_notify_gateway_post.assert_called_once_with(
-            'http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/test_notification_template_id',
-            auth=("admin", "secret"), json={"emailAddress": "test@email.com", "name": "myReference"},
-            timeout=20)
+        mock_notify_gateway_post.assert_not_called()
 
     def test_logout(self):
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
@@ -235,5 +231,3 @@ class TestSignIn(unittest.TestCase):
         self.assertTrue('Sign in'.encode() in response.data)
         self.assertTrue('New to this service?'.encode() in response.data)
         self.assertFalse('Sign out'.encode() in response.data)
-
-

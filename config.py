@@ -66,9 +66,8 @@ class Config(object):
     PARTY_AUTH = (PARTY_USERNAME, PARTY_PASSWORD)
 
     REQUESTS_POST_TIMEOUT = os.getenv('REQUESTS_POST_TIMEOUT', 20)
-    NOTIFICATION_TEMPLATE_ID = os.getenv('NOTIFICATION_TEMPLATE_ID', "c69147fc-0f9c-40d4-b111-5b11acc8551f")
-    RM_NOTIFY_GATEWAY_URL = os.getenv(
-        'RM_NOTIFY_GATEWAY_URL', "http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/")
+    NOTIFICATION_TEMPLATE_ID = os.getenv('NOTIFICATION_TEMPLATE_ID')
+    RM_NOTIFY_GATEWAY_URL = os.getenv('RM_NOTIFY_GATEWAY_URL')
 
     SECURE_MESSAGE_URL = os.getenv('SECURE_MESSAGE_URL')
 
@@ -125,8 +124,7 @@ class DevelopmentConfig(Config):
 
     NOTIFICATION_TEMPLATE_ID = os.getenv('NOTIFICATION_TEMPLATE_ID', "test_notification_template_id")
 
-    RM_NOTIFY_GATEWAY_URL = os.getenv(
-        'RM_NOTIFY_GATEWAY_URL', "http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/")
+    RM_NOTIFY_GATEWAY_URL = os.getenv('RM_NOTIFY_GATEWAY_URL', 'http://localhost:5000/email/')
 
     SECURE_MESSAGE_URL = os.getenv('SECURE_MESSAGE_URL', 'http://localhost:5050')
 

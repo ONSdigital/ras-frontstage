@@ -25,9 +25,7 @@ class AlertViaGovNotify:
             response = requests.post(url, auth=current_app.config['BASIC_AUTH'],
                                      timeout=current_app.config['REQUESTS_POST_TIMEOUT'],
                                      json=notification)
-            try:
-                response.raise_for_status()
-            except HTTPError:
+            if response.status_code != 201:
                 logger.error(
                     'This email {} , has not been sent, the service might be down or not available.'.format(email))
             else:

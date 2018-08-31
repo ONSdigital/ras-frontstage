@@ -1,5 +1,7 @@
 import unittest
+
 from frontstage.common.cryptographer import Cryptographer
+
 
 cryptographer = Cryptographer()
 

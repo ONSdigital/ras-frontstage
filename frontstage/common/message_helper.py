@@ -1,8 +1,9 @@
 import logging
 from datetime import datetime, date
-from dateutil.tz import tz
 
+from dateutil.tz import tz
 from structlog import wrap_logger
+
 
 logger = wrap_logger(logging.getLogger(__name__))
 

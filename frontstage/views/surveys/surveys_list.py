@@ -1,40 +1,38 @@
 import logging
+from datetime import datetime
 
 from flask import render_template, request, make_response
 from structlog import wrap_logger
 
-from frontstage.controllers import case_controller, survey_controller
 from frontstage.common.authorisation import jwt_authorization
+from frontstage.controllers import party_controller
 from frontstage.views.surveys import surveys_bp
 
 
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-@surveys_bp.route('/todo', methods=['GET'])
+@surveys_bp.route('/<tag>', methods=['GET'])
 @jwt_authorization(request)
-def logged_in(session):
+def get_survey_list(session, tag):
+    logger.info("Retrieving survey todo list")
     party_id = session.get('party_id')
+    business_id = request.args.get('business_party_id')
+    survey_id = request.args.get('survey_id')
 
-    cases = case_controller.get_cases_by_party_id(party_id, case_events=True)
-    surveys_list = survey_controller.get_surveys_list(cases, party_id, 'todo')
-    sorted_surveys_list = sorted(surveys_list, key=lambda k: k['collection_exercise']['scheduledReturnDateTime'],
-                                 reverse=True)
+    survey_list = party_controller.get_survey_list_details_for_party(party_id, tag, business_party_id=business_id,
+                                                                     survey_id=survey_id)
 
-    response = make_response(render_template('surveys/surveys-todo.html',
-                             just_added_case_id=request.args.get('case_id'),
-                             sorted_surveys_list=sorted_surveys_list))
+    sorted_survey_list = sorted(survey_list, key=lambda k: datetime.strptime(k['submit_by'], '%d %b %Y'))
 
-    # Ensure any return to list of surveys (e.g. browser back) round trips the server to display the latest statuses
-    response.headers.set("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store")
+    if tag == 'todo':
+        response = make_response(render_template('surveys/surveys-todo.html',
+                                                 sorted_surveys_list=sorted_survey_list,
+                                                 added_survey=True if business_id and survey_id else None))
 
-    return response
+        # Ensure any return to list of surveys (e.g. browser back) round trips the server to display the latest statuses
+        response.headers.set("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store")
 
-
-@surveys_bp.route('/history', methods=['GET'])
-@jwt_authorization(request)
-def surveys_history(session):
-    party_id = session['party_id']
-    cases = case_controller.get_cases_by_party_id(party_id, case_events=True)
-    sorted_surveys_list = survey_controller.get_surveys_list(cases, party_id, 'history')
-    return render_template('surveys/surveys-history.html', sorted_surveys_list=sorted_surveys_list, history=True)
+        return response
+    else:
+        return render_template('surveys/surveys-history.html', sorted_surveys_list=sorted_survey_list, history=True)

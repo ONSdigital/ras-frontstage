@@ -20,7 +20,8 @@ class TestLoggerConfig(unittest.TestCase):
         with self.assertLogs(level='ERROR') as cm:
             logger.error('Test')
         message = cm[0][0].msg
-        self.assertTrue('{\n "event": "Test",\n "level": "error",\n "service": "ras-frontstage"' in message)
+        self.assertTrue(['{"event": "Test"}, {"level": "error"}, {"service": "ras-frontstage"},'
+                         '{"zipkin_trace_id": ""}, {"zipkin_span_id": ""' in message])
 
     def test_indent_type_error(self):
         logger_initial_config()

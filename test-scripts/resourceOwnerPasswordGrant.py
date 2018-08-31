@@ -8,9 +8,9 @@
 # 	 This is done as the dev environment is not over https
 
 
+from application import app
 from oauthlib.oauth2 import LegacyApplicationClient
 from requests_oauthlib import OAuth2Session
-from application import app
 
 
 # Setup client ID, client secret, username and password variables. Thease users must exist on the django Oauth2 server

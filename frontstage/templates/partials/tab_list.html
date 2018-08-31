@@ -3,21 +3,21 @@
   <ul class="navigation-tabs-component" style="list-style-type:none">
       <li class="navigation-tabs__item navigation-tabs__item--primary
                  {% if request.path.startswith('/surveys/todo') %} navigation-tabs__item--active {% endif %}">
-          <a id="SURVEY_TODO_TAB" href="{{ url_for('surveys_bp.logged_in') }}"
-             class="btn btn--secondary btn--border navigation-tabs__tab
+          <a id="SURVEY_TODO_TAB" href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}"
+             class="navigation-tabs__tab
                     {% if request.path.startswith('/surveys/todo') %} navigation-tabs__tab--active {% endif %}">To do</a>
       </li>
       <li class="navigation-tabs__item navigation-tabs__item--primary
                  {% if request.path.startswith('/surveys/history') %} navigation-tabs__item--active {% endif %} ">
-          <a id="SURVEY_HISTORY_TAB" href="{{ url_for('surveys_bp.surveys_history') }}"
-             class="btn btn--secondary btn--border navigation-tabs__tab
+          <a id="SURVEY_HISTORY_TAB" href="{{ url_for('surveys_bp.get_survey_list', tag='history') }}"
+             class="navigation-tabs__tab
                     {% if request.path.startswith('/surveys/history') %} navigation-tabs__tab--active {% endif %}">History</a>
       </li>
       <li class="navigation-tabs__item navigation-tabs__item--primary
-                 {% if request.path.startswith('/secure-message/thread') %} navigation-tabs__item--active {% endif %}">
+                 {% if request.path.startswith('/secure-message/') %} navigation-tabs__item--active {% endif %}">
           <a id="SURVEY_MESSAGES_TAB" href="{{ url_for('secure_message_bp.view_conversation_list') }}"
-             class="btn btn--secondary btn--border navigation-tabs__tab
-                    {% if request.path.startswith('/secure-message/thread') %} navigation-tabs__tab--active {% endif %}">Messages</a>
+             class="navigation-tabs__tab
+                    {% if request.path.startswith('/secure-message/') %} navigation-tabs__tab--active {% endif %}">Messages</a>
       </li>
   </ul>
 </div>

@@ -1,7 +1,7 @@
-import logging
 import enum
-import phonenumbers
+import logging
 
+import phonenumbers
 from flask_wtf import FlaskForm
 from phonenumbers.phonenumberutil import NumberParseException
 from structlog import wrap_logger
@@ -9,6 +9,7 @@ from wtforms import HiddenField, PasswordField, StringField, SubmitField, TextAr
 from wtforms.validators import InputRequired, EqualTo, Length, DataRequired, Email, ValidationError
 
 from frontstage import app
+
 
 logger = wrap_logger(logging.getLogger(__name__))
 

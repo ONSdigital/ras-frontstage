@@ -1,10 +1,10 @@
 import logging
 
 from flask import abort, redirect, render_template, request, url_for
-from frontstage import app
 from itsdangerous import URLSafeSerializer, BadSignature
 from structlog import wrap_logger
 
+from frontstage import app
 from frontstage.controllers import oauth_controller, party_controller
 from frontstage.exceptions.exceptions import OAuth2Error
 from frontstage.models import ForgotPasswordForm

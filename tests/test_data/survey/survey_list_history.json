@@ -1,0 +1,34 @@
+[
+  {
+    "business_party_id": "cd23d2e5-ec03-4640-bb35-98a09dfa09f6",
+    "business_name": "PC UNIVERSE",
+    "business_ref": "49900000007",
+    "trading_as": "PC LTD",
+    "survey_id": "cb8accda-6118-4d3b-85a3-149e28960c54",
+    "survey_short_name": "Bricks",
+    "survey_long_name": "Monthly Survey of Building Materials Bricks",
+    "survey_ref": "074",
+    "period": "January 2018",
+    "submit_by": "09 Feb 2018",
+    "collection_exercise_ref": "201801",
+    "status": "Completed by phone",
+    "collection_instrument_type": "SEFT",
+    "case_id": "ecb7a6c9-3053-465b-b3f3-2c8fec5c2111"
+  },
+  {
+    "business_party_id": "1764937c-b297-45cb-b9f5-920592206d77",
+    "business_name": "RUNAME1_COMPANY1 RUNNAME2_COMPANY1",
+    "trading_as": "TOTAL UK ACTIVITY",
+    "business_ref": "49900000001",
+    "survey_id": "cb8accda-6118-4d3b-85a3-149e28960c54",
+    "survey_short_name": "Bricks",
+    "survey_long_name": "Monthly Survey of Building Materials Bricks",
+    "survey_ref": "074",
+    "collection_exercise_ref": "204901",
+    "period": "test_exercise",
+    "submit_by": "12 Aug 2018",
+    "status": "Completed by phone",
+    "collection_instrument_type": "SEFT",
+    "case_id": "a5825123-b73a-4c9d-8a55-f6bb278cb17e"
+  }
+]

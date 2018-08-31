@@ -1,44 +1,56 @@
-
-<div id="helpinfo" class="helpinfo">
-  <div class="header__help js-help-body first-closed">
-    <div class="header__container container">
-      <div class="header__title">Help –</div>
-      <ul class="header__nav nav nav--horizontal">
-        <li class="nav__item">
-          <span class="mars" role="presentation">Call </span> <a class="venus nav__link" href="tel:03001234931"><span class="u-vh">For help call </span>0300 1234 931</a>
-        </li>
-        <li class="nav__item">
-          <span class="mars" role="presentation">Email </span> <a class="venus nav__link external" href="mailto:surveys@ons.gov.uk" rel="ext">surveys@ons.gov.uk</a>
-        </li>
-      </ul>
+<header class="header">
+  <div class="header__top" role="banner">
+    <div class="container">
+      <div class="grid grid--gutterless">
+        <div class="grid__col col-6@s">
+          <div class="logo">
+            <a href="/surveys/todo">
+              {% set logo_cdn = cdn_url_prefix~"/img/ons-logo-pos.svg" %}
+              <img src="{{ logo_cdn }}" alt="Office for National Statistics logo" class="logo__img header__logo">
+            </a>
+          </div>
+        </div>
+        <div class="grid__col col-6@s">
+          <nav class="nav nav--horizontal u-d-no--@xs@s u-fr" aria-label="Site services menu">
+            <ul class="nav__list" role="menubar" aria-label="Site services menu">
+              <li class="nav__item" role="menuitem"><a href="/contact-us" class="nav__link">Help</a></li>
+              <li class="nav__item" role="menuitem">
+                {% if 'authorization' in request.cookies %}
+                <a id="SIGN_OUT_BTN" class="nav__link" href="{{ url_for('sign_in_bp.logout') }}">Sign out</a>
+                {% else %}
+                <a id="SIGN_OUT_BTN" class="nav__link" href="/sign-in">Sign in</a>
+                {% endif %}
+              </li>
+            </ul>
+          </nav>  
+        </div>
+      </div>
     </div>
   </div>
-</div>
-
-<div class="container">
-
-  <header class="header">
-
-    <div class="logo header__logo">
-      <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Office for National Statistics"
-             class="logo__img"/>
+  <div class="header__main">
+    <div class="container">
+      <div class="grid grid--gutterless grid--align-mid u-cf">
+        <div class="grid__col col-10@xs col-6@s col-8@m">
+          <h1 class="header__title">ONS Business Surveys</h1>
+        </div>
+        <button class="btn btn--mobile js-nav-btn u-fr u-d-no--@s" type="button" id="menu-btn" aria-expanded="false" aria-controls="main-nav" aria-label="Toggle main navigation" aria-haspopup="true"><span class="btn--mobile__label"></span></button>
+      </div>
     </div>
-
-    <button aria-controls="helpinfo" class="header__btn btn btn--light btn--border u-vh js-help-btn">
-      Help
-    </button>
-
-    {% if 'authorization' in request.cookies %}
-    <div class="sign-out header__sign-out">
-      <a id="sign_out_button" class="u-ml-s nowrap" href="{{ url_for('sign_in_bp.logout') }}">Sign out</a>
+  </div>
+  <div class="header__nav">
+        <div class="container">
+            <nav class="nav nav--horizontal nav--light nav--main js-main-nav nav--h-m" aria-label="Main menu" id="main-nav" aria-hidden="true">
+                <ul class="nav__list" aria-label="Navigation menu" role="menubar">
+                    <li class="nav__item  u-d-no--@s" role="menuitem"><a href="/contact-us" class="nav__link print__hidden">Help</a></li>
+                    <li class="nav__item nav__item--secondary u-d-no--@s" role="menuitem">
+                      {% if 'authorization' in request.cookies %}
+                      <a id="SIGN_OUT_BTN" class="nav__link print__hidden" href="{{ url_for('sign_in_bp.logout') }}">Sign out</a>
+                      {% else %}
+                      <a id="SIGN_OUT_BTN" class="nav__link print__hidden" href="/sign-in">Sign in</a>
+                      {% endif %}
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </div>
-    
-    {% endif %}
-  </header>
-</div>
-<div class="bar " role="banner">
-    <div class="bar__inner container">
-        <div class="ons-application-title bar__title venus">ONS Business Surveys</div>&nbsp;
-    </div>
-</div>
-<div class="page__subheader"></div>
+</header>

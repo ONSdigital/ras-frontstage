@@ -1,7 +1,7 @@
 import logging
-
 from datetime import datetime
 from functools import wraps
+
 from jose import JWTError
 from jose.jwt import decode
 from structlog import wrap_logger

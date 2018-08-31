@@ -1,7 +1,4 @@
-import os
 import unittest
-from urllib.error import HTTPError
-
 import requests_mock
 from unittest import mock
 

@@ -16,7 +16,6 @@ from frontstage.views.sign_in.errors_render import RenderAccountLocked, RenderUn
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-
 BAD_AUTH_ERROR = 'Unauthorized user credentials'
 NOT_VERIFIED_ERROR = 'User account not verified'
 USER_ACCOUNT_LOCKED = 'User account locked'
@@ -52,7 +51,7 @@ def login():
 
         # Take our raw token and add a UTC timestamp to the expires_at attribute
         try:
-            oauth2_token =  oauth_controller.sign_in(username, password)
+            oauth2_token = oauth_controller.sign_in(username, password)
         except OAuth2Error as exc:
             route_validator = _ERROR_ROUTES.get(exc.oauth2_error,
                                                 RenderUnVerifiedError('sign-in/sign-in.html', _DATA))

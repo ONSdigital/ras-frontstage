@@ -12,7 +12,8 @@ logger = wrap_logger(logging.getLogger(__name__))
 class AlertViaGovNotify:
     """Notify Api handler"""
 
-    def send(self, email, name):
+    @staticmethod
+    def send(email, name):
         notification = {
             "emailAddress": email,
             "name": name
@@ -27,10 +28,10 @@ class AlertViaGovNotify:
             try:
                 response.raise_for_status()
             except HTTPError:
-                logger.error('This email {} , has not been sent, the service might be down or not available.'.format(email))
+                logger.error(
+                    'This email {} , has not been sent, the service might be down or not available.'.format(email))
             else:
                 logger.info('Sent email notification, via RM Notify-Gateway to GOV.UK Notify. to {}'.format(email))
 
         else:
             logger.error('email has not been sent, email value is not present.')
-

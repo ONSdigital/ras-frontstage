@@ -59,12 +59,9 @@ def post_reset_password(token):
             abort(404)
         else:
             raise exc
-    # finally:
-    #     if accout is verified and is locked
-    #         unlock account .
-    #
-    # logger.info('Successfully changed user password', token=token)
-    # return redirect(url_for('passwords_bp.reset_password_confirmation'))
+
+    logger.info('Successfully changed user password', token=token)
+    return redirect(url_for('passwords_bp.reset_password_confirmation'))
 
 
 @passwords_bp.route('/reset-password/confirmation', methods=['GET'])

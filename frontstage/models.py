@@ -148,7 +148,7 @@ class SecureMessagingForm(FlaskForm):
 
         if len(subject) > 96:
             raise ValidationError('Subject field length must not be greater than 100')
-        if send.data and not subject or subject.isspace():
+        if form.send.data and not subject or subject.isspace():
             raise ValidationError('Please enter a subject')
 
     @staticmethod
@@ -156,7 +156,7 @@ class SecureMessagingForm(FlaskForm):
         body = field.data
         if len(body) > 10000:
             raise ValidationError('Body field length must not be greater than 10000')
-        if send.data and not body:
+        if form.send.data and not body:
             raise ValidationError('Please enter a message')
 
 

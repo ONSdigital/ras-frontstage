@@ -49,7 +49,7 @@ class RenderAccountLocked(RenderValidation):
         return self
 
     def notify_user(self, *parameters):
-        send(parameters[0], parameters[1])
+        AlertViaGovNotify().send(parameters[0], parameters[1])
         return self
 
     def route_me(self, form):

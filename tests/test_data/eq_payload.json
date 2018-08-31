@@ -1,0 +1,23 @@
+{
+    "jti": "b50e35fc-1a88-4433-abeb-fea3bb8c2d19",
+    "tx_id": "99b890c1-c0dc-404e-a711-34bfc42d32d3",
+    "user_id": "f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b",
+    "iat": 1532692117,
+    "exp": 1532692417,
+    "eq_id": "2",
+    "period_str": "test_exercise",
+    "period_id": "204901",
+    "form_type": "0001",
+    "collection_exercise_sid": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+    "ru_ref": "49900000001F",
+    "ru_name": "RUNAME1_COMPANY1 RUNNAME2_COMPANY1",
+    "survey_id": "139",
+    "case_id": "8cdc01f9-656a-4715-a148-ffed0dbe1b04",
+    "case_ref": "1000000000000022",
+    "account_service_url": "http://localhost:8082/surveys/todo",
+    "trad_as": "TOTAL UK ACTIVITY  ",
+    "ref_p_start_date": "2018-06-15",
+    "ref_p_end_date": "2018-06-30",
+    "employment_date": "2018-06-15",
+    "return_by": "2018-06-27"
+}

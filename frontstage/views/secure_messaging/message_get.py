@@ -1,13 +1,12 @@
-from distutils.util import strtobool
 import logging
+from distutils.util import strtobool
 
 from flask import json, flash, Markup, render_template, redirect, request, url_for
-
-from frontstage.common.authorisation import jwt_authorization
 from structlog import wrap_logger
 
+from frontstage.common.authorisation import jwt_authorization
 from frontstage.common.message_helper import refine
-from frontstage.controllers.conversation_controller import get_conversation, get_conversation_list,\
+from frontstage.controllers.conversation_controller import get_conversation, get_conversation_list, \
     remove_unread_label, send_message
 from frontstage.models import SecureMessagingForm
 from frontstage.views.secure_messaging import secure_message_bp

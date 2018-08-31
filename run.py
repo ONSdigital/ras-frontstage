@@ -1,5 +1,6 @@
-import os
 import logging
+import os
+
 
 # If no APP_SETTINGS in environment variables use developer settings
 # This has to run before triggering frontstage.__init__.py

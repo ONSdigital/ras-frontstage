@@ -59,7 +59,7 @@ def login():
         data_dict = {**oauth2_token, 'party_id': party_id}
         data_dict_for_jwt_token = timestamp_token(data_dict)
         encoded_jwt_token = encode(data_dict_for_jwt_token)
-        response = make_response(redirect(url_for('surveys_bp.logged_in', _external=True,
+        response = make_response(redirect(url_for('surveys_bp.get_survey_list', tag='todo', _external=True,
                                                   _scheme=getenv('SCHEME', 'http'))))
 
         session = SessionHandler()

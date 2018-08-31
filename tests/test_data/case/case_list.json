@@ -1,60 +1,90 @@
 [
-  {
-    "state": "ACTIONABLE",
-    "id": "abc670a5-67c6-4d96-9164-13b4017b8704",
-    "actionPlanId": "0009e978-0932-463b-a2a1-b45cb3ffcb2a",
-    "collectionInstrumentId": "68ad4018-2ddd-4894-89e7-33f0135887a2",
-    "partyId": "07d672bc-497b-448f-a406-a20a7e6013d7",
-    "iac": "None",
-    "caseRef": "1000000000000502",
-    "createdBy": "Party Service",
-    "sampleUnitType": "BI",
-    "createdDateTime": "2017-10-16T12:19:22.035+0000",
-    "caseGroup": {
-      "collectionExerciseId": "14fb3e68-4dca-46db-bf49-04b84e07e77c",
-      "id": "5b511f56-ff8b-43e0-90de-5094f71dd7bf",
-      "partyId": "1216a88f-ee2a-420c-9e6a-ee34893c29cf",
-      "sampleUnitRef": "49900000004",
-      "sampleUnitType": "B"
-    },
-    "responses": [],
-    "caseEvents": [
-      {
-        "description": "Initial creation of case",
-        "category": "COLLECTION_INSTRUMENT_DOWNLOADED",
-        "subCategory": null,
+    {
+        "state": "ACTIONABLE",
+        "id": "3a7c8295-1932-4ab9-b447-a5b251d7d25d",
+        "actionPlanId": "f1a733ae-e5e6-4245-b2bd-550086f871e2",
+        "collectionInstrumentId": "e963b049-8317-4d52-87d0-01bebb31d4ac",
+        "partyId": "be3483c3-f5c9-4b13-bdd7-244db78ff687",
+        "iac": null,
+        "caseRef": "1000000000000017",
         "createdBy": "SYSTEM",
-        "createdDateTime": "2017-02-22T14:16:50Z"
-      }
-    ]
-  },
-  {
-    "state": "ACTIONABLE",
-    "id": "abc670a5-67c6-4d96-9164-13b4017b8704",
-    "actionPlanId": "0009e978-0932-463b-a2a1-b45cb3ffcb2a",
-    "collectionInstrumentId": "68ad4018-2ddd-4894-89e7-33f0135887a2",
-    "partyId": "07d672bc-497b-448f-a406-a20a7e6013d7",
-    "iac": "None",
-    "caseRef": "1000000000000502",
-    "createdBy": "Party Service",
-    "sampleUnitType": "BI",
-    "createdDateTime": "2017-10-16T12:19:22.035+0000",
-    "caseGroup": {
-      "collectionExerciseId": "14fb3e68-4dca-46db-bf49-04b84e07e77c",
-      "id": "5b511f56-ff8b-43e0-90de-5094f71dd7bf",
-      "partyId": "1216a88f-ee2a-420c-9e6a-ee34893c29cf",
-      "sampleUnitRef": "49900000004",
-      "sampleUnitType": "B"
+        "sampleUnitType": "B",
+        "createdDateTime": "2018-07-12T08:59:41.787Z",
+        "caseGroup": {
+            "collectionExerciseId": "'ed5972f6-d17d-4408-bb9a-7af54f13c88b'",
+            "id": "40d034cf-5875-4022-b160-506e094b157a",
+            "partyId": "be3483c3-f5c9-4b13-bdd7-244db78ff687",
+            "sampleUnitRef": "49900000001",
+            "sampleUnitType": "B",
+            "caseGroupStatus": "NOTSTARTED"
+        },
+        "responses": [],
+        "caseEvents": null
     },
-    "responses": [],
-    "caseEvents": [
-      {
-        "description": "Initial creation of case",
-        "category": "COLLECTION_INSTRUMENT_DOWNLOADED",
-        "subCategory": null,
+    {
+        "state": "ACTIONABLE",
+        "id": "6692033f-1d10-4cc5-a058-f2d012ce6af5",
+        "actionPlanId": "c10e98d8-88a3-4fc7-a990-22a7a926f214",
+        "collectionInstrumentId": "e963b049-8317-4d52-87d0-01bebb31d4ac",
+        "partyId": "be3483c3-f5c9-4b13-bdd7-244db78ff687",
+        "iac": null,
+        "caseRef": "1000000000000025",
         "createdBy": "SYSTEM",
-        "createdDateTime": "2017-02-22T14:16:50Z"
-      }
-    ]
-  }
+        "sampleUnitType": "B",
+        "createdDateTime": "2018-07-12T08:59:46.866Z",
+        "caseGroup": {
+            "collectionExerciseId": "4ec73b0c-c9cf-438e-a8b5-0c4bc2cf922d",
+            "id": "40d034cf-5875-4022-b160-506e094b157a",
+            "partyId": "be3483c3-f5c9-4b13-bdd7-244db78ff687",
+            "sampleUnitRef": "49900000001",
+            "sampleUnitType": "B",
+            "caseGroupStatus": "NOTSTARTED"
+        },
+        "responses": [],
+        "caseEvents": null
+    },
+    {
+        "state": "INACTIONABLE",
+        "id": "9d5ff134-79ae-4107-9441-374765399cb5",
+        "actionPlanId": "c0d5a501-de2a-4b8c-90c8-e00aa5956fed",
+        "collectionInstrumentId": "3e196ba5-a0dd-4c3d-a105-e0c1085ff882",
+        "partyId": "be3483c3-f5c9-4b13-bdd7-244db78ff687",
+        "iac": null,
+        "caseRef": "1000000000000001",
+        "createdBy": "SYSTEM",
+        "sampleUnitType": "B",
+        "createdDateTime": "2018-07-12T08:59:31.647Z",
+        "caseGroup": {
+            "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+            "id": "32fc3b86-b696-42ee-b905-a5712648711b",
+            "partyId": "be3483c3-f5c9-4b13-bdd7-244db78ff687",
+            "sampleUnitRef": "49900000001",
+            "sampleUnitType": "B",
+            "caseGroupStatus": "NOTSTARTED"
+        },
+        "responses": [],
+        "caseEvents": null
+    },
+    {
+        "state": "INACTIONABLE",
+        "id": "f8a5d864-76af-45bd-a701-cc35bbd13a89",
+        "actionPlanId": "288fcc63-b8b1-4812-bb47-3dfefd5f164f",
+        "collectionInstrumentId": "3e196ba5-a0dd-4c3d-a105-e0c1085ff882",
+        "partyId": "0008279d-9425-4e28-897d-bfd876aa7f3f",
+        "iac": null,
+        "caseRef": "1000000000000009",
+        "createdBy": "SYSTEM",
+        "sampleUnitType": "B",
+        "createdDateTime": "2018-07-12T08:59:36.720Z",
+        "caseGroup": {
+            "collectionExerciseId": "ed5972f6-d17d-4408-bb9a-7af54f13c88b",
+            "id": "e3f86bac-e6c3-4a65-82ee-a2217096b283",
+            "partyId": "0008279d-9425-4e28-897d-bfd876aa7f3f",
+            "sampleUnitRef": "49900000001",
+            "sampleUnitType": "B",
+            "caseGroupStatus": "COMPLETE"
+        },
+        "responses": [],
+        "caseEvents": null
+    }
 ]

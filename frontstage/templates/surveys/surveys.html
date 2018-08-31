@@ -1,54 +1,46 @@
 <ul class="survey-list" id="survey-list">
 
-    <li class="header-row">
+    <li class="grid header-row">
 
-        <div id="SURVEY_COLUMN_HEADING" class="grid__col col-4@m">
-            Survey
-        </div>
+        <div id="SURVEY_COLUMN_HEADING" class="grid__col col-4@m u-pb-xs u-pl-xs">Survey</div>
 
-        <div id="PERIOD_COVERED_COLUMN_HEADING" class="grid__col col-2@m">
-            Period covered
-        </div>
+        <div id="PERIOD_COVERED_COLUMN_HEADING" class="grid__col col-2@m u-pb-xs">Period covered</div>
 
-        <div id="SUBMIT_BY_COLUMN_HEADING" class="grid__col col-2@m">
-            {% if not history %}
-            Submit by
-            {% endif %}
-        </div>
+        <div id="SUBMIT_BY_COLUMN_HEADING" class="grid__col col-2@m u-pb-xs">{% if not history %}Submit by{% endif %}</div>
 
-        <div id="STATUS_COLUMN_HEADING" class="grid__col col-2@m">
-            Status
-        </div>
+        <div id="STATUS_COLUMN_HEADING" class="grid__col col-2@m u-pb-xs">Status</div>
+
+        <div id="STATUS_COLUMN_HEADING" class="grid__col col-2@m u-pb-xs u-vh">Status</div>
 
     </li>
 
     {% for survey in sorted_surveys_list %}
-    {% if just_added_case_id == survey.case.id %}
-    <li id="ADDED_{{ just_added_case_id }}" class="grid card panel--simple panel--success survey--success col-13@m u-mb-m" name="survey-card">
+    {% if survey.added_survey %}
+    <li class="grid card panel--simple panel--success survey--success col-13@m u-mb-m" name="survey-card" id="new-survey">
     {% else %}
     <li class="grid card" name="survey-card">
     {% endif %}
-        <div class="grid__col col-4@m">
+        <div class="grid__col col-4@m u-pl-xs">
             <span class="survey-list-item__label mercury">SURVEY: </span>
-            <span id="SURVEY_NAME">{{ survey.survey.longName }}</span><br/>
-            <span id="REPORTING_UNIT_DETAILS_{{ survey.case.caseGroup.sampleUnitRef }}" name="reporting-unit-details" class="survey-list-item pluto">
-                Business: {{ survey.business_party.name }}<br/>
-                {% if survey.business_party.trading_as %}
-                Trading as: {{ survey.business_party.trading_as }}<br/>
+            <span id="SURVEY_NAME" >{{ survey.survey_long_name }}</span><br/>
+            <span id="REPORTING_UNIT_DETAILS_{{ survey.business_ref }}" name="reporting-unit-details" class="survey-list-item pluto">
+                Business: {{ survey.business_name }}<br/>
+                {% if survey.trading_as %}
+                Trading as: {{ survey.trading_as }}<br/>
                 {% endif %}
-                Ref: {{ survey.case.caseGroup.sampleUnitRef }}
+                Ref: {{ survey.business_ref }}
             </span>
         </div>
 
         <div class="grid__col col-2@m">
             <span class="survey-list-item__label mercury">PERIOD COVERED: </span>
-            <span id="period-{{ loop.index }}" name="period">{{ survey.collection_exercise.userDescription}}</span>
+            <span id="period-{{ loop.index }}" name="period">{{ survey.period}}</span>
         </div>
 
         <div class="grid__col col-2@m">
             {% if not history %}
             <span class="survey-list-item__label mercury">SUBMIT BY: </span>
-            <span id="SUBMIT_BY_{{ loop.index }}" name="submit-by">{{ survey.collection_exercise.scheduledReturnDateTimeFormatted}}</span>
+            <span id="SUBMIT_BY_{{ loop.index }}" name="submit-by">{{ survey.submit_by}}</span>
             {% endif %}
         </div>
 
@@ -58,23 +50,23 @@
         </div>
         <div class="grid__col col-2@m">
             {% if not survey.status == 'Complete' or not survey.collection_instrument_type == 'EQ' %}
-            <a href="{{ url_for('surveys_bp.access_survey', case_id=survey.case.id, ci_type = survey.collection_instrument_type) }}"
+             <a href="{{ url_for('surveys_bp.access_survey', case_id=survey.case_id, ci_type = survey.collection_instrument_type, business_party_id=survey.business_party_id, survey_short_name=survey.survey_short_name) }}"
                {% if survey.collection_instrument_type == 'EQ' %}
-                onclick="ga('send', 'event', 'survey', 'launcheq', 'survey_ref = {{ survey.survey.surveyRef }} collection_exercise_ref = {{ survey.collection_exercise.exerciseRef }}');"
+                onclick="ga('send', 'event', 'survey', 'launcheq', 'survey_ref = {{ survey.survey_ref }} collection_exercise_ref = {{ survey.collection_exercise_ref }}');"
                {% endif %}>
-                <button id="access_survey_button_{{loop.index}}" class="btn action-button btn--primary" type="submit">
-                    Access <span class="u-vh">{{ survey.survey.longName|replace("Survey", " ") }}</span> survey
+                <button id="access_survey_button_{{loop.index}}" class="btn u-mb-s action-button" type="submit">
+                    Access <span class="u-vh">{{ survey.survey_long_name|replace("Survey", " ") }}</span> survey
                 </button>
             </a>
             {% endif %}
-            <a id="create-message-link-{{loop.index}}" href="/secure-message/create-message/?case_id={{survey.case.id}}&survey={{survey.survey.id}}&ru_ref={{survey.business_party.id}}" class="pluto survey-message history__message">Send a message </span></a>
+            <a id="create-message-link-{{loop.index}}" href="/secure-message/create-message/?survey={{survey.survey_id}}&ru_ref={{survey.business_party_id}}" class="pluto survey-message history__message">Send a message </span></a>
         </div>
     </li>
     {% endfor %}
 
     {% if sorted_surveys_list|length == 0 %}
     <li class="card">
-        <div class="grid__col col-12@m">{{emptySurveyListLabel}}</div>
+        <div class="grid__col col-12@m u-pl-xs">{{emptySurveyListLabel}}</div>
     </li>
     {% endif %}
 

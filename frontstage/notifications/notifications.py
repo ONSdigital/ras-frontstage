@@ -1,7 +1,5 @@
 import logging
 from urllib import parse as urlparse
-from urllib.error import HTTPError
-
 from flask import current_app
 import requests
 from structlog import wrap_logger

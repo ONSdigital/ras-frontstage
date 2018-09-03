@@ -1,12 +1,17 @@
 [[source]]
+
 name = "pypi"
 verify_ssl = true
 url = "https://pypi.python.org/simple"
 
+
 [requires]
+
 python_version = "3.6"
 
+
 [packages]
+
 cfenv = "*"
 flask = "*"
 flask-wtf = "*"
@@ -26,7 +31,9 @@ dateutils = "*"
 requestsdefaulter = "*"
 flask-zipkin = "*"
 
+
 [dev-packages]
+
 codecov = "*"
 coverage = "*"
 "flake8" = "*"

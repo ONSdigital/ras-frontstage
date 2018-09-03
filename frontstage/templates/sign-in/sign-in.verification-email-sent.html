@@ -1,0 +1,29 @@
+{% import 'partials/section.html' as section %}
+{% extends "layouts/_twocol.html" %}
+
+{% block page_title %}Check your email - ONS Business Surveys{% endblock %}
+
+{% block main %}
+    <h1 class="saturn">Check your email</h1>
+    <p id="email_confirmation_sent">Please follow the link in the email we've sent you to verify your email address and sign in to your account.</p>
+
+    <div class="details js-details" data-guidance-label="Help with email" data-guidance="Help with email" data-hide-label="Help with email" data-show-label="Help with email">
+
+        <a class="details__link js-details-trigger js-details-label mars"
+        data-guidance-trigger="true"
+        aria-expanded="false"
+        href="#guidance-help-with-email"
+        id="guidance-help-with-email"
+        aria-controls="guidance-help-with-email-body">Help with email</a>
+
+        <div class="details__main js-details-body" id="guidance-help-with-email-body" aria-hidden="true">
+            <div class="details__content mars">
+                <div>
+                    <p>If you don't receive this within 15 minutes, try checking your spam folder.</p>
+                    <br>
+                    <p>If you're still having problems, call us on <a href="tel:0300 1234 931">0300 1234 931</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock main %}

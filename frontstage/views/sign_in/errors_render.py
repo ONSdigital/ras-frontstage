@@ -45,7 +45,7 @@ class RenderValidation:
 class RenderAccountLocked(RenderValidation):
 
     def log_message(self, *log_parameters):
-        logger.info('user account locked for too many attempts. UAA server error message : {}'.format(log_parameters))
+        logger.info('User account locked for too many attempts. UAA server error message : {}'.format(log_parameters))
         return self
 
     def notify_user(self, *parameters):

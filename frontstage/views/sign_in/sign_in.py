@@ -55,7 +55,8 @@ def login():
         except OAuth2Error as exc:
             route_validator = _ERROR_ROUTES.get(exc.oauth2_error,
                                                 RenderUnVerifiedError('sign-in/sign-in.html', _DATA))
-            return route_validator.log_message(exc.oauth2_error).notify_user(username, "name").route_me(form)
+            return route_validator.log_message(exc.oauth2_error).\
+                notify_user(username, party_json['lastName'] + ' ' + party_json['firstName']).route_me(form)
 
         # Take our raw token and add a UTC timestamp to the expires_at attribute
         data_dict = {**oauth2_token, 'party_id': party_id}

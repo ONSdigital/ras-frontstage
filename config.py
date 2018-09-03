@@ -133,7 +133,7 @@ class DevelopmentConfig(Config):
 
     NOTIFICATION_TEMPLATE_ID = os.getenv('NOTIFICATION_TEMPLATE_ID', "test_notification_template_id")
 
-    RM_NOTIFY_GATEWAY_URL = os.getenv('RM_NOTIFY_GATEWAY_URL', 'http://localhost:5000/email/')
+    RM_NOTIFY_GATEWAY_URL = os.getenv('RM_NOTIFY_GATEWAY_URL', 'http://localhost:5181/email/')
 
     SECURE_MESSAGE_URL = os.getenv('SECURE_MESSAGE_URL', 'http://localhost:5050')
 

@@ -27,9 +27,9 @@ class AlertViaGovNotify:
                                      json=notification)
             if response.status_code != 201:
                 logger.error(
-                    'This email {} , has not been sent, the service might be down or not available.'.format(email))
+                    'This email {} , has not been sent, the service might be down or not available.')
             else:
-                logger.info('Sent email notification, via RM Notify-Gateway to GOV.UK Notify. to {}'.format(email))
+                logger.info('Sent email notification, via RM Notify-Gateway to GOV.UK Notify.')
 
         else:
             logger.error('email has not been sent, email value is not present.')

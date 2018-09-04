@@ -82,3 +82,10 @@ def login():
         'account_activated': account_activated
     }
     return render_template('sign-in/sign-in.html', form=form, data=template_data)
+
+
+@sign_in_bp.route('/resend_verification/<party_id>', methods=['GET'])
+def resend_verification(party_id):
+    party_controller.resend_verification_email(party_id)
+    logger.info('Re-sent verification email.', party_id=party_id)
+    return render_template('sign-in/sign-in.verification-email-sent.html')

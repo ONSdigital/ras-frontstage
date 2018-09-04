@@ -192,7 +192,6 @@ class TestSignIn(unittest.TestCase):
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        # self.assertTrue('Please follow the link in the verification email'.encode() in response.data)
 
     @mock.patch('requests.post')
     def test_post_to_notify_gateway_with_correct_params(self, mock_notify_gateway_post):
@@ -214,7 +213,7 @@ class TestSignIn(unittest.TestCase):
                                                          timeout=20)
 
     @mock.patch('requests.post')
-    def test_post_to_notify_gateway_withi_no_email(self, mock_notify_gateway_post):
+    def test_post_to_notify_gateway_with_no_email(self, mock_notify_gateway_post):
         self.app = create_app_object()
         self.app.testing = True
 

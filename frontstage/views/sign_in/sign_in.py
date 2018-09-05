@@ -7,6 +7,7 @@ from structlog import wrap_logger
 from frontstage import app
 from frontstage.common.session import SessionHandler
 from frontstage.controllers import oauth_controller, party_controller
+from frontstage.controllers.party_controller import change_respondent_status
 from frontstage.exceptions.exceptions import OAuth2Error
 from frontstage.jwt import encode, timestamp_token
 from frontstage.models import LoginForm
@@ -53,8 +54,13 @@ def login():
         try:
             oauth2_token = oauth_controller.sign_in(username, password)
         except OAuth2Error as exc:
+            if exc.oauth2_error == USER_ACCOUNT_LOCKED:
+                if party_json['status'] == 'ACTIVE' or party_json['status'] == 'CREATED':
+                    change_respondent_status(respondent_id=party_id, status='SUSPENDED')
+
             route_validator = _ERROR_ROUTES.get(exc.oauth2_error,
                                                 RenderUnVerifiedError('sign-in/sign-in.html', _DATA))
+
             return route_validator.log_message(exc.oauth2_error).\
                 notify_user(username, party_json['firstName']).route_me(form)
 

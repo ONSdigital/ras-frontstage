@@ -49,7 +49,8 @@ def login():
                 return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
             elif NOT_VERIFIED_ERROR in error_message:
                 logger.info('User account is not verified on the OAuth2 server')
-                return render_template('sign-in/sign-in.account-not-verified.html', form=form)
+                return render_template('sign-in/sign-in.account-not-verified.html', party_id=party_id,
+                                       email=username)
             else:
                 logger.info('OAuth 2 server generated 401 which is not understood', oauth2_error=error_message)
                 return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
@@ -78,3 +79,10 @@ def login():
         'account_activated': account_activated
     }
     return render_template('sign-in/sign-in.html', form=form, data=template_data)
+
+
+@sign_in_bp.route('/resend_verification/<party_id>', methods=['GET'])
+def resend_verification(party_id):
+    party_controller.resend_verification_email(party_id)
+    logger.info('Re-sent verification email.', party_id=party_id)
+    return render_template('sign-in/sign-in.verification-email-sent.html')

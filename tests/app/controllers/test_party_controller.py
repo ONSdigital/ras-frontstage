@@ -6,12 +6,13 @@ import responses
 from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import party_controller
+from frontstage.controllers.party_controller import change_respondent_status
 from frontstage.exceptions.exceptions import ApiError
 from tests.app.mocked_services import (business_party, case, case_list, collection_exercise,
                                        collection_exercise_by_survey,
                                        collection_instrument_seft, respondent_party, survey, url_get_business_party,
                                        url_get_respondent_email, url_get_respondent_party, url_post_add_survey,
-                                       url_reset_password_request)
+                                       url_reset_password_request, url_change_respondent_status)
 
 
 registration_data = {
@@ -139,6 +140,22 @@ class TestPartyController(unittest.TestCase):
             with app.app_context():
                 with self.assertRaises(ApiError):
                     party_controller.reset_password_request(respondent_party['emailAddress'])
+
+    def test_change_respondent_status_success(self):
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.PUT, url_change_respondent_status, status=200)
+            with app.app_context():
+                try:
+                    change_respondent_status(respondent_party['id'], status='ACTIVE')
+                except ApiError:
+                    self.fail('Change respondent status fail to PUT your request')
+
+    def test_change_respondent_status_fail(self):
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.PUT, url_change_respondent_status, status=400)
+            with app.app_context():
+                with self.assertRaises(ApiError):
+                    party_controller.change_respondent_status(respondent_party['id'], status='ACTIVE')
 
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
     def test_get_respondent_enrolments(self, get_respondent_party):

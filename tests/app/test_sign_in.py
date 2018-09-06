@@ -1,9 +1,11 @@
 import unittest
-
 import requests_mock
+from unittest import mock
 
 from config import TestingConfig
-from frontstage import app
+from frontstage import app, create_app_object
+from frontstage.notifications.notifications import AlertViaGovNotify
+
 from tests.app.mocked_services import url_get_respondent_email, url_oauth_token, party
 
 respondent_party_id = "cd592e0f-8d07-407b-b75d-e01fbdae8233"
@@ -113,7 +115,7 @@ class TestSignIn(unittest.TestCase):
 
         self.app.get('/sign-in/', data=self.sign_in_form)
 
-        response = self.app.get('/surveys/todo',  follow_redirects=True)
+        response = self.app.get('/surveys/todo', follow_redirects=True)
         self.assertEqual(response.status_code, 403)
         self.assertIn(b'Error - Not signed in', response.data)
 
@@ -177,6 +179,53 @@ class TestSignIn(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Incorrect email or password'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_sign_in_account_locked(self, mock_object):
+        self.oauth_error['detail'] = 'User account locked'
+        mock_object.post(url_oauth_token, status_code=401, json=self.oauth_error)
+        mock_object.get(url_get_respondent_email, json=party)
+
+        mock_object.post(app.config['RM_NOTIFY_GATEWAY_URL'] + 'test_notification_template_id',
+                         json={"emailAddress": "test@email.com", "name": "myReference"}, status_code=201)
+
+        response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+
+    @mock.patch('requests.post')
+    def test_post_to_notify_gateway_with_correct_params(self, mock_notify_gateway_post):
+        self.app = create_app_object()
+        self.app.testing = True
+        mock_response = mock.Mock()
+        mock_response.status_code = 201
+        mock_response.json.return_value = {"id": 1}
+        mock_notify_gateway_post.return_value = mock_response
+
+        alert_user = AlertViaGovNotify()
+        with self.app.app_context():
+            alert_user.send('test@email.com', 'myReference')
+
+        mock_notify_gateway_post.assert_called_once_with(app.config['RM_NOTIFY_GATEWAY_URL'] +
+                                                         'test_notification_template_id',
+                                                         auth=("admin", "secret"),
+                                                         json={"emailAddress": "test@email.com", "name": "myReference"},
+                                                         timeout=20)
+
+    @mock.patch('requests.post')
+    def test_post_to_notify_gateway_with_no_email(self, mock_notify_gateway_post):
+        self.app = create_app_object()
+        self.app.testing = True
+
+        mock_response = mock.MagicMock()
+        mock_response.status_code = 500
+        mock_notify_gateway_post.return_value = mock_response
+
+        alert_user = AlertViaGovNotify()
+        with self.app.app_context():
+            alert_user.send('', 'myReference')
+
+        mock_notify_gateway_post.assert_not_called()
 
     def test_logout(self):
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)

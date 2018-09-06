@@ -264,6 +264,6 @@ def change_respondent_status(respondent_id, status):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Failed to change account status', respondent_id=respondent_id, status=status)
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully changed account status', respondent_id=respondent_id, status=status)

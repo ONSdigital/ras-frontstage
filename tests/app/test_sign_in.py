@@ -191,7 +191,7 @@ class TestSignIn(unittest.TestCase):
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 500)
 
     @mock.patch('requests.post')
     def test_post_to_notify_gateway_with_correct_params(self, mock_notify_gateway_post):

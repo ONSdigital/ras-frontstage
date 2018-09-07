@@ -131,6 +131,20 @@ def get_respondent_by_email(email):
     return response.json()
 
 
+def resend_verification_email(party_id):
+    logger.debug('Re-sending verification email', party_id=party_id)
+    url = f'{app.config["PARTY_URL"]}/party-api/v1/resend-verification-email/{party_id}'
+    response = requests.get(url, auth=app.config['PARTY_AUTH'])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        logger.exception('Re-sending of verification email failed', party_id=party_id)
+        raise ApiError(response)
+
+    logger.debug('Successfully re-sent verification email', party_id=party_id)
+
+
 def reset_password_request(username):
     logger.debug('Attempting to send reset password request to party service')
 

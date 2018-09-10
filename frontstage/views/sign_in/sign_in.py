@@ -53,7 +53,7 @@ def login():
                 logger.info('User account is locked on the OAuth2 server')
                 if party_json['status'] == 'ACTIVE' or party_json['status'] == 'CREATED':
                     change_respondent_status(respondent_id=party_id, status='SUSPENDED')
-                return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
+                return render_template('sign-in/sign-in.account-locked.html', form=form)
             elif NOT_VERIFIED_ERROR in error_message:
                 logger.info('User account is not verified on the OAuth2 server')
                 return render_template('sign-in/sign-in.account-not-verified.html', party_id=party_id,

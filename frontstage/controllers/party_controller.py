@@ -267,3 +267,18 @@ def change_respondent_status(respondent_id, status):
         raise ApiError(logger, response)
 
     logger.info('Successfully changed account status', respondent_id=respondent_id, status=status)
+
+
+def notify_account_locked(username):
+    logger.debug('Sending notification email for password reset')
+    url = f'{app.config["PARTY_URL"]}/party-api/v1/respondents/notify-respondent'
+    data = {"email_address": username}
+    response = requests.get(url, auth=app.config['PARTY_AUTH'], json=data)
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        logger.error('Failed to update party to notify user')
+        raise ApiError(logger, response)
+
+    logger.info('Successfully notified respondent')

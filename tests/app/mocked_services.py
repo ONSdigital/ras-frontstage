@@ -129,3 +129,4 @@ url_validate_enrolment = f"{app.config['IAC_URL']}/iacs/{enrolment_code}"
 url_verify_email = f"{app.config['PARTY_URL']}/party-api/v1/emailverification/{token}"
 url_verify_token = f"{app.config['PARTY_URL']}/party-api/v1/tokens/verify/{token}"
 url_change_respondent_status = f'{app.config["PARTY_URL"]}/party-api/v1/respondents/edit-account-status/{party["id"]}'
+url_notify_respondent = f'{app.config["PARTY_URL"]}/party-api/v1/respondents/notify-respondent'

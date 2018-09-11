@@ -11,7 +11,6 @@ from frontstage.controllers.party_controller import change_respondent_status, no
 from frontstage.exceptions.exceptions import OAuth2Error
 from frontstage.jwt import encode, timestamp_token
 from frontstage.models import LoginForm
-from frontstage.notifications.notifications import AlertViaGovNotify
 from frontstage.views.sign_in import sign_in_bp
 
 

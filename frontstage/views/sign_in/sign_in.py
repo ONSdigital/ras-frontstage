@@ -51,7 +51,7 @@ def login():
                 logger.info('User account is locked on the OAuth2 server')
                 if party_json['status'] == 'ACTIVE' or party_json['status'] == 'CREATED':
                     change_respondent_status(respondent_id=party_id, status='SUSPENDED')
-                notify_account_locked(username=username)
+                    notify_account_locked(username=username)
                 return render_template('sign-in/sign-in.account-locked.html', form=form)
             elif BAD_AUTH_ERROR in error_message:
                 return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})

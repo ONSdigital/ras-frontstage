@@ -86,3 +86,10 @@ def resend_verification(party_id):
     party_controller.resend_verification_email(party_id)
     logger.info('Re-sent verification email.', party_id=party_id)
     return render_template('sign-in/sign-in.verification-email-sent.html')
+
+
+@sign_in_bp.route('/resend-verification-expired-token/<token>', methods=['GET'])
+def resend_verification_expired_token(token):
+    party_controller.resend_verification_email_expired_token(token)
+    logger.info('Re-sent verification email for expired token.', token=token)
+    return render_template('sign-in/sign-in.verification-email-sent.html')

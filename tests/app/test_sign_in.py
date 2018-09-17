@@ -4,10 +4,10 @@ import requests_mock
 
 from config import TestingConfig
 from frontstage import app, create_app_object
-from frontstage.controllers.party_controller import notify_account_locked
+from frontstage.controllers.party_controller import notify_party_and_respondent_account_locked
 from frontstage.exceptions.exceptions import ApiError
-from tests.app.mocked_services import url_get_respondent_email, url_oauth_token, party, url_change_respondent_status, \
-    url_notify_respondent
+from tests.app.mocked_services import url_get_respondent_email, url_oauth_token, party, \
+    url_notify_party_and_respondent_account_locked
 
 respondent_party_id = "cd592e0f-8d07-407b-b75d-e01fbdae8233"
 
@@ -211,9 +211,10 @@ class TestSignIn(unittest.TestCase):
         self.oauth_error['detail'] = 'User account locked'
         mock_object.post(url_oauth_token, status_code=401, json=self.oauth_error)
         mock_object.get(url_get_respondent_email, json=party)
-        mock_object.get(url_notify_respondent, json={"email_address": 'test@test.com'})
-        mock_object.put(url_change_respondent_status, json={'respondent_id': 'f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b',
-                                                            'status_change': 'SUSPENDED'})
+        mock_object.put(url_notify_party_and_respondent_account_locked,
+                        json={'respondent_id': 'f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b',
+                              'status_change': 'SUSPENDED',
+                              'email_address': 'test@test.com'})
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
 
@@ -221,7 +222,11 @@ class TestSignIn(unittest.TestCase):
     def test_notify_account_error(self, mock_object):
         self.app = create_app_object()
         self.app.testing = True
-        mock_object.get(url_notify_respondent, json={"email_address": 'test@test.com'}, status_code=500)
+        mock_object.put(url_notify_party_and_respondent_account_locked,
+                        json={'respondent_id': 'f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b',
+                              'status_change': 'SUSPENDED',
+                              'email_address': 'test@test.com'}, status_code=500)
         with self.app.app_context():
             with self.assertRaises(ApiError):
-                notify_account_locked('test@test.com')
+                notify_party_and_respondent_account_locked(respondent_id='f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b',
+                                                           email_address='test@test.com')

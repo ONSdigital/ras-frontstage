@@ -7,7 +7,7 @@
     <h1 class="saturn">Check your email</h1>
 
     <p>You've tried to sign in few times with the wrong details.</p>
-    <p>If your email is registered to an account, we will send an email explaining how to sign in.</p>
+    <p>If {{ form.data['username'] }} is registered to an account, we'll send an email explaining how to sign in.</p>
 
     <div class="guidance js-details"
      data-guidance-label="Help with email"

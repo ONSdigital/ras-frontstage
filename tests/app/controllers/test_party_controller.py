@@ -6,6 +6,8 @@ import responses
 from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import party_controller
+from frontstage.controllers.collection_exercise_controller import convert_events_to_new_format
+from frontstage.controllers.party_controller import change_respondent_status
 from frontstage.exceptions.exceptions import ApiError
 from tests.app.mocked_services import (business_party, case, case_list, collection_exercise,
                                        collection_exercise_by_survey,
@@ -183,6 +185,11 @@ class TestPartyController(unittest.TestCase):
             'business_id': business_party['id'],
             'survey_id': survey['id']
         }]
+
+        for collection_exercise_index in collection_exercise_by_survey:
+            if collection_exercise_index['events']:
+                collection_exercise_index['events'] = convert_events_to_new_format(collection_exercise_index['events'])
+
         get_respondent_enrolments.return_value = enrolments
         get_collection_exercises.return_value = collection_exercise_by_survey
         get_cases.return_value = case_list

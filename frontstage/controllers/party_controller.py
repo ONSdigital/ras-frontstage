@@ -261,3 +261,21 @@ def is_respondent_enrolled(party_id, business_party_id, survey_short_name, retur
             if return_survey:
                 return {'survey': survey}
             return True
+
+
+def change_respondent_status(respondent_id, status):
+    logger.debug('Changing account status', respondent_id=respondent_id, status=status)
+    url = f'{app.config["PARTY_URL"]}/party-api/v1/respondents/edit-account-status/{respondent_id}'
+    enrolment_json = {
+        'respondent_id': respondent_id,
+        'status_change': status
+    }
+    response = requests.put(url, json=enrolment_json, auth=app.config['PARTY_AUTH'])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        logger.error('Failed to change account status', respondent_id=respondent_id, status=status)
+        raise ApiError(logger, response)
+
+    logger.info('Successfully changed account status', respondent_id=respondent_id, status=status)

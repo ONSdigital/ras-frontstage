@@ -53,10 +53,13 @@ def get_collection_exercise_events(collection_exercise_id):
     return response.json()
 
 
-def get_collection_exercises_for_survey(survey_id):
+def get_collection_exercises_for_survey(survey_id, live_only=None):
     logger.debug('Retrieving collection exercises for survey', survey_id=survey_id)
 
-    url = f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/survey/{survey_id}"
+    if live_only is True:
+        url = f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/survey/{survey_id}?liveOnly=true"
+    else:
+        url = f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/survey/{survey_id}"
 
     response = requests.get(url, auth=app.config['COLLECTION_EXERCISE_AUTH'])
 
@@ -79,11 +82,7 @@ def get_collection_exercises_for_survey(survey_id):
 
 
 def get_live_collection_exercises_for_survey(survey_id):
-    collection_exercises = get_collection_exercises_for_survey(survey_id)
-    return [collection_exercise
-            for collection_exercise in collection_exercises
-            if collection_exercise['state'] == 'LIVE'
-            and not collection_exercise['events']['go_live']['is_in_future']]
+    return get_collection_exercises_for_survey(survey_id, True)
 
 
 def convert_events_to_new_format(events):

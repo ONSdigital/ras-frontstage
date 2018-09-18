@@ -6,7 +6,6 @@ import responses
 from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import party_controller
-from frontstage.controllers.party_controller import notify_party_and_respondent_account_locked
 from frontstage.exceptions.exceptions import ApiError
 from tests.app.mocked_services import (business_party, case, case_list, collection_exercise,
                                        collection_exercise_by_survey,

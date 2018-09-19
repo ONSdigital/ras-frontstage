@@ -7,7 +7,7 @@ from frontstage import app, create_app_object
 from frontstage.controllers.party_controller import notify_party_and_respondent_account_locked
 from frontstage.exceptions.exceptions import ApiError
 from tests.app.mocked_services import url_get_respondent_email, url_oauth_token, party, \
-    url_notify_party_and_respondent_account_locked
+    url_notify_party_and_respondent_account_locked, token
 
 respondent_party_id = "cd592e0f-8d07-407b-b75d-e01fbdae8233"
 
@@ -19,6 +19,8 @@ encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoX3Rva2VuIj
 
 url_resend_verification_email = f'{TestingConfig.PARTY_URL}/party-api/v1/resend-verification-email' \
                                 f'/{respondent_party_id}'
+url_resend_verification_expired_token = f'{TestingConfig.PARTY_URL}/party-api/v1' \
+                                        f'/resend-verification-email-expired-token/{token}'
 get_respondent_by_id_url = f'{TestingConfig.PARTY_URL}/party-api/v1/respondents/id/{respondent_party_id}'
 
 
@@ -193,14 +195,14 @@ class TestSignIn(unittest.TestCase):
     @requests_mock.mock()
     def test_resend_verification_email(self, mock_object):
         mock_object.get(get_respondent_by_id_url, json=party)
-        mock_object.get(url_resend_verification_email, status_code=200)
+        mock_object.post(url_resend_verification_email, status_code=200)
         response = self.app.get(f"/sign-in/resend_verification/{respondent_party_id}", follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Check your email'.encode() in response.data)
 
     @requests_mock.mock()
     def test_fail_resent_verification_email(self, mock_request):
-        mock_request.get(url_resend_verification_email, status_code=500)
+        mock_request.post(url_resend_verification_email, status_code=500)
         response = self.app.get(f"sign-in/resend_verification/{respondent_party_id}",
                                 follow_redirects=True)
         self.assertEqual(response.status_code, 500)
@@ -230,3 +232,23 @@ class TestSignIn(unittest.TestCase):
             with self.assertRaises(ApiError):
                 notify_party_and_respondent_account_locked(respondent_id='f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b',
                                                            email_address='test@test.com')
+
+    @requests_mock.mock()
+    def test_resend_verification_email_using_expired_token(self, mock_object):
+        mock_object.post(url_resend_verification_expired_token, status_code=200)
+
+        response = self.app.get(f'sign-in/resend-verification-expired-token/{token}',
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Check your email'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_fail_resend_verification_email_using_expired_token(self, mock_object):
+        mock_object.post(url_resend_verification_expired_token, status_code=500)
+
+        response = self.app.get(f'sign-in/resend-verification-expired-token/{token}',
+                                follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)

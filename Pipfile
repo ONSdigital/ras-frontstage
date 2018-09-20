@@ -19,7 +19,6 @@ wtforms = "*"
 gunicorn = "*"
 gevent = "*"
 phonenumbers = "*"
-pycrypto = "*"
 python-jose = "*"
 redis = "*"
 requests = "*"
@@ -30,6 +29,7 @@ greenlet = "*"
 dateutils = "*"
 requestsdefaulter = "*"
 flask-zipkin = "*"
+pycryptodome = "*"
 
 
 [dev-packages]

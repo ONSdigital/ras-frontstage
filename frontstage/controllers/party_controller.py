@@ -174,6 +174,18 @@ def reset_password_request(username):
     logger.debug('Successfully sent reset password request to party service')
 
 
+def resend_password_email_expired_token(token):
+    logger.debug('Re-sending verification email', token=token)
+    url = f'{app.config["PARTY_URL"]}/party-api/v1/resend-password-email-expired-token/{token}'
+    response = requests.post(url, auth=app.config['PARTY_AUTH'])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        raise ApiError(logger, response, log_level='exception',
+                       message='Re-sending of password email for expired token failed')
+
+
 def verify_email(token):
     logger.debug('Attempting to verify email address', token=token)
 

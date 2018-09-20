@@ -21,7 +21,7 @@ def get_reset_password(token, form_errors=None):
     except ApiError as exc:
         if exc.status_code == 409:
             logger.warning('Token expired', api_url=exc.url, api_status_code=exc.status_code, token=token)
-            return render_template('passwords/password-expired.html')
+            return render_template('passwords/password-expired.html', token=token)
         elif exc.status_code == 404:
             logger.warning('Invalid token sent to party service', api_url=exc.url, api_status_code=exc.status_code,
                            token=token)
@@ -52,7 +52,7 @@ def post_reset_password(token):
     except ApiError as exc:
         if exc.status_code == 409:
             logger.warning('Token expired', api_url=exc.url, api_status_code=exc.status_code, token=token)
-            return render_template('passwords/password-expired.html')
+            return render_template('passwords/password-expired.html', token=token)
         elif exc.status_code == 404:
             logger.warning('Invalid token sent to party service', api_url=exc.url, api_status_code=exc.status_code,
                            token=token)
@@ -67,3 +67,10 @@ def post_reset_password(token):
 @passwords_bp.route('/reset-password/confirmation', methods=['GET'])
 def reset_password_confirmation():
     return render_template('passwords/reset-password.confirmation.html')
+
+
+@passwords_bp.route('/resend-password-email-expired-token/<token>', methods=['GET'])
+def resend_password_email_expired_token(token):
+    party_controller.resend_password_email_expired_token(token)
+    logger.info('Re-sent password email for expired token.', token=token)
+    return render_template('sign-in/sign-in.verification-email-sent.html')

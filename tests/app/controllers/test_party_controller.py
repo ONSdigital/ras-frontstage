@@ -7,7 +7,6 @@ from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import party_controller
 from frontstage.controllers.collection_exercise_controller import convert_events_to_new_format
-from frontstage.controllers.party_controller import change_respondent_status
 from frontstage.exceptions.exceptions import ApiError
 from tests.app.mocked_services import (business_party, case, case_list, collection_exercise,
                                        collection_exercise_by_survey,
@@ -147,9 +146,9 @@ class TestPartyController(unittest.TestCase):
             rsps.add(rsps.PUT, url_notify_party_and_respondent_account_locked, status=200)
             with app.app_context():
                 try:
-                    notify_party_and_respondent_account_locked(respondent_party['id'],
-                                                               respondent_party['emailAddress'],
-                                                               status='ACTIVE')
+                    party_controller.notify_party_and_respondent_account_locked(respondent_party['id'],
+                                                                                respondent_party['emailAddress'],
+                                                                                status='ACTIVE')
                 except ApiError:
                     self.fail('Change respondent status fail to PUT your request')
 

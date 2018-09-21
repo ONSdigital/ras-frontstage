@@ -15,6 +15,7 @@
     "case_id": "8cdc01f9-656a-4715-a148-ffed0dbe1b04",
     "case_ref": "1000000000000022",
     "account_service_url": "http://localhost:8082/surveys/todo",
+    "account_service_log_out_url": "http://localhost:8082/sign-in/logout",
     "trad_as": "TOTAL UK ACTIVITY  ",
     "ref_p_start_date": "2018-06-15",
     "ref_p_end_date": "2018-06-30",

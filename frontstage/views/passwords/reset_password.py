@@ -73,4 +73,4 @@ def reset_password_confirmation():
 def resend_password_email_expired_token(token):
     party_controller.resend_password_email_expired_token(token)
     logger.info('Re-sent password email for expired token.', token=token)
-    return render_template('sign-in/sign-in.verification-email-sent.html')
+    return render_template('passwords/reset-password.check-email.html')

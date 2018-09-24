@@ -2,6 +2,7 @@ import unittest
 
 import requests_mock
 
+from config import TestingConfig
 from frontstage import app
 from tests.app.mocked_services import token, url_get_token, url_password_change, url_reset_password_request, \
     url_verify_token
@@ -9,6 +10,9 @@ from tests.app.mocked_services import token, url_get_token, url_password_change,
 
 encoded_valid_email = 'ImV4YW1wbGVAZXhhbXBsZS5jb20i.vMOqeMafWQpuxbUBRyRs29T0vDI'
 encoded_invalid_email = 'abcd'
+
+url_resend_password_email_expired_token = f'{TestingConfig.PARTY_URL}/party-api/v1' \
+                                          f'/resend-password-email-expired-token/{token}'
 
 
 class TestPasswords(unittest.TestCase):
@@ -232,3 +236,19 @@ class TestPasswords(unittest.TestCase):
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue("Server error".encode() in response.data)
+
+    @requests_mock.mock()
+    def test_resend_verification_email_using_expired_token(self, mock_object):
+        mock_object.post(url_resend_password_email_expired_token, status_code=200)
+        response = self.app.get(f'passwords/resend-password-email-expired-token/{token}',
+                                follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Check your email'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_fail_resend_verification_email_using_expired_token(self, mock_object):
+        mock_object.post(url_resend_password_email_expired_token, status_code=500)
+        response = self.app.get(f'passwords/resend-password-email-expired-token/{token}',
+                                follow_redirects=True)
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('Server error'.encode() in response.data)

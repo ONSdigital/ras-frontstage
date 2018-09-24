@@ -60,6 +60,8 @@ def upload_survey(session):
         return redirect(url_for('surveys_bp.upload_failed',
                                 _external=True,
                                 case_id=case_id,
+                                business_party_id=business_party_id,
+                                survey_short_name=survey_short_name,
                                 error_info=error_info))
 
     logger.info('Successfully uploaded collection instrument', party_id=party_id, case_id=case_id)

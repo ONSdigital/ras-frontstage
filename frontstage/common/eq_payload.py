@@ -49,6 +49,7 @@ class EqPayload(object):
         party = party_controller.get_party_by_business_id(business_party_id, collection_exercise_id=collex_id)
 
         account_service_url = current_app.config['ACCOUNT_SERVICE_URL']
+        account_service_log_out_url = current_app.config['ACCOUNT_SERVICE_LOG_OUT_URL']
         iat = time.time()
         exp = time.time() + (5 * 60)
 
@@ -69,6 +70,7 @@ class EqPayload(object):
             'case_id': case['id'],
             'case_ref': case['caseRef'],
             'account_service_url': account_service_url,
+            'account_service_log_out_url': account_service_log_out_url,
             'trad_as': f"{party['tradstyle1']} {party['tradstyle2']} {party['tradstyle3']}"
         }
 

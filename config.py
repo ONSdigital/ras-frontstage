@@ -31,6 +31,7 @@ class Config(object):
     ZIPKIN_SAMPLE_RATE = int(os.getenv("ZIPKIN_SAMPLE_RATE", 0))
 
     ACCOUNT_SERVICE_URL = os.getenv('ACCOUNT_SERVICE_URL')
+    ACCOUNT_SERVICE_LOG_OUT_URL = os.getenv('ACCOUNT_SERVICE_LOG_OUT_URL')
     EQ_URL = os.getenv('EQ_URL')
     JSON_SECRET_KEYS = os.getenv('JSON_SECRET_KEYS')
 
@@ -81,7 +82,6 @@ class Config(object):
     SURVEY_AUTH = (SURVEY_USERNAME, SURVEY_PASSWORD)
 
 
-
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
@@ -94,6 +94,7 @@ class DevelopmentConfig(Config):
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
 
     ACCOUNT_SERVICE_URL = os.getenv('ACCOUNT_SERVICE_URL', 'http://localhost:8082/surveys/todo')
+    ACCOUNT_SERVICE_LOG_OUT_URL = os.getenv('ACCOUNT_SERVICE_LOG_OUT_URL', 'http://localhost:8082/sign-in/logout')
     EQ_URL = os.getenv('EQ_URL', 'https://localhost:5000/session?token=')
     JSON_SECRET_KEYS = os.getenv('JSON_SECRET_KEYS') or open("./tests/test_data/jwt-test-keys/test_key.json").read()
 
@@ -143,5 +144,6 @@ class TestingConfig(DevelopmentConfig):
     JWT_SECRET = 'testsecret'
     REDIS_DB = os.getenv('REDIS_DB', 13)
     ACCOUNT_SERVICE_URL = 'http://frontstage-url/surveys'
+    ACCOUNT_SERVICE_LOG_OUT_URL = 'http://frontstage-url/sign-in/logout'
     EQ_URL = 'https://eq-test/session?token='
     JSON_SECRET_KEYS = open("./tests/test_data/jwt-test-keys/test_key.json").read()

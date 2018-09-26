@@ -5,8 +5,8 @@ from itsdangerous import URLSafeSerializer, BadSignature
 from structlog import wrap_logger
 
 from frontstage import app
-from frontstage.controllers import oauth_controller, party_controller
-from frontstage.exceptions.exceptions import OAuth2Error
+from frontstage.controllers import party_controller
+from frontstage.exceptions.exceptions import UserDoesNotExist
 from frontstage.models import ForgotPasswordForm
 from frontstage.views.passwords import passwords_bp
 
@@ -36,17 +36,10 @@ def post_forgot_password():
     if form.validate():
 
         try:
-            oauth_controller.check_account_valid(email)
-        except OAuth2Error as exc:
-            error_message = exc.oauth2_error
-            if BAD_AUTH_ERROR in error_message:
-                logger.info('Requesting password change for unregistered email on OAuth2 server')
-                return redirect(url_for('passwords_bp.forgot_password_check_email', email=encoded_email))
-            else:
-                logger.info(exc.message, oauth2_error=error_message)
-            return render_template('passwords/reset-password.trouble.html')
-
-        party_controller.reset_password_request(email)
+            party_controller.reset_password_request(email)
+        except UserDoesNotExist:
+            logger.info('Requesting password change for unregistered email in party service')
+            return redirect(url_for('passwords_bp.forgot_password_check_email', email=encoded_email))
 
         logger.info('Successfully sent password change request email')
         return redirect(url_for('passwords_bp.forgot_password_check_email', email=encoded_email))

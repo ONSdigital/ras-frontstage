@@ -6,8 +6,7 @@ from structlog import wrap_logger
 
 from frontstage.controllers import case_controller, collection_exercise_controller, collection_instrument_controller, \
     survey_controller
-from frontstage.exceptions.exceptions import ApiError
-
+from frontstage.exceptions.exceptions import ApiError, UserDoesNotExist
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -167,9 +166,10 @@ def reset_password_request(username):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        log_level = 'warning' if response.status_code == 404 else 'exception'
+        if response.status_code == 404:
+            raise UserDoesNotExist("User does not exist in party service")
         message = 'Failed to send reset password request to party service'
-        raise ApiError(logger, response, log_level=log_level, message=message)
+        raise ApiError(logger, response, log_level='exception', message=message)
 
     logger.debug('Successfully sent reset password request to party service')
 

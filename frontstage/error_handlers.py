@@ -13,7 +13,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 @app.errorhandler(404)
 def not_found_error(error):
-    logger.error('Not found error', url=request.url, status_code=error.code)
+    logger.info('Not found error', url=request.url, status_code=error.code)
     return render_template('errors/404-error.html'), 404
 
 

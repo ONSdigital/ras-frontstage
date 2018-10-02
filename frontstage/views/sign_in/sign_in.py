@@ -7,6 +7,7 @@ from structlog import wrap_logger
 from frontstage import app
 from frontstage.common.session import SessionHandler
 from frontstage.controllers import oauth_controller, party_controller
+from frontstage.controllers.party_controller import notify_party_and_respondent_account_locked
 from frontstage.exceptions.exceptions import OAuth2Error
 from frontstage.jwt import encode, timestamp_token
 from frontstage.models import LoginForm
@@ -18,6 +19,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 BAD_AUTH_ERROR = 'Unauthorized user credentials'
 NOT_VERIFIED_ERROR = 'User account not verified'
+USER_ACCOUNT_LOCKED = 'User account locked'
 
 
 @app.route('/', methods=['GET'])
@@ -45,7 +47,14 @@ def login():
             oauth2_token = oauth_controller.sign_in(username, password)
         except OAuth2Error as exc:
             error_message = exc.oauth2_error
-            if BAD_AUTH_ERROR in error_message:
+            if USER_ACCOUNT_LOCKED in error_message:
+                logger.info('User account is locked on the OAuth2 server')
+                if party_json['status'] == 'ACTIVE' or party_json['status'] == 'CREATED':
+                    notify_party_and_respondent_account_locked(respondent_id=party_id,
+                                                               email_address=username,
+                                                               status='SUSPENDED')
+                return render_template('sign-in/sign-in.account-locked.html', form=form)
+            elif BAD_AUTH_ERROR in error_message:
                 return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
             elif NOT_VERIFIED_ERROR in error_message:
                 logger.info('User account is not verified on the OAuth2 server')
@@ -85,4 +94,11 @@ def login():
 def resend_verification(party_id):
     party_controller.resend_verification_email(party_id)
     logger.info('Re-sent verification email.', party_id=party_id)
+    return render_template('sign-in/sign-in.verification-email-sent.html')
+
+
+@sign_in_bp.route('/resend-verification-expired-token/<token>', methods=['GET'])
+def resend_verification_expired_token(token):
+    party_controller.resend_verification_email_expired_token(token)
+    logger.info('Re-sent verification email for expired token.', token=token)
     return render_template('sign-in/sign-in.verification-email-sent.html')

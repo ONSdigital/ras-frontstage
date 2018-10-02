@@ -128,3 +128,5 @@ url_upload_ci = f"{app.config['COLLECTION_INSTRUMENT_URL']}/survey_response-api/
 url_validate_enrolment = f"{app.config['IAC_URL']}/iacs/{enrolment_code}"
 url_verify_email = f"{app.config['PARTY_URL']}/party-api/v1/emailverification/{token}"
 url_verify_token = f"{app.config['PARTY_URL']}/party-api/v1/tokens/verify/{token}"
+url_notify_party_and_respondent_account_locked = f'{app.config["PARTY_URL"]}/party-api/v1/respondents/edit-account-' \
+                                                 f'status/{party["id"]}'

@@ -6,12 +6,13 @@ import responses
 from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import party_controller
+from frontstage.controllers.collection_exercise_controller import convert_events_to_new_format
 from frontstage.exceptions.exceptions import ApiError
 from tests.app.mocked_services import (business_party, case, case_list, collection_exercise,
                                        collection_exercise_by_survey,
                                        collection_instrument_seft, respondent_party, survey, url_get_business_party,
                                        url_get_respondent_email, url_get_respondent_party, url_post_add_survey,
-                                       url_reset_password_request)
+                                       url_reset_password_request, url_notify_party_and_respondent_account_locked)
 
 
 registration_data = {
@@ -140,6 +141,26 @@ class TestPartyController(unittest.TestCase):
                 with self.assertRaises(ApiError):
                     party_controller.reset_password_request(respondent_party['emailAddress'])
 
+    def test_lock_respondent_account_success(self):
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.PUT, url_notify_party_and_respondent_account_locked, status=200)
+            with app.app_context():
+                try:
+                    party_controller.notify_party_and_respondent_account_locked(respondent_party['id'],
+                                                                                respondent_party['emailAddress'],
+                                                                                status='ACTIVE')
+                except ApiError:
+                    self.fail('Change respondent status fail to PUT your request')
+
+    def test_lock_respondent_account_fail(self):
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.PUT, url_notify_party_and_respondent_account_locked, status=400)
+            with app.app_context():
+                with self.assertRaises(ApiError):
+                    party_controller.notify_party_and_respondent_account_locked(respondent_party['id'],
+                                                                                respondent_party['emailAddress'],
+                                                                                status='ACTIVE')
+
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
     def test_get_respondent_enrolments(self, get_respondent_party):
         get_respondent_party.return_value = respondent_party
@@ -163,6 +184,11 @@ class TestPartyController(unittest.TestCase):
             'business_id': business_party['id'],
             'survey_id': survey['id']
         }]
+
+        for collection_exercise_index in collection_exercise_by_survey:
+            if collection_exercise_index['events']:
+                collection_exercise_index['events'] = convert_events_to_new_format(collection_exercise_index['events'])
+
         get_respondent_enrolments.return_value = enrolments
         get_collection_exercises.return_value = collection_exercise_by_survey
         get_cases.return_value = case_list

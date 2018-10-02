@@ -6,8 +6,7 @@ from structlog import wrap_logger
 
 from frontstage.controllers import case_controller, collection_exercise_controller, collection_instrument_controller, \
     survey_controller
-from frontstage.exceptions.exceptions import ApiError
-
+from frontstage.exceptions.exceptions import ApiError, UserDoesNotExist
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -134,15 +133,27 @@ def get_respondent_by_email(email):
 def resend_verification_email(party_id):
     logger.debug('Re-sending verification email', party_id=party_id)
     url = f'{app.config["PARTY_URL"]}/party-api/v1/resend-verification-email/{party_id}'
-    response = requests.get(url, auth=app.config['PARTY_AUTH'])
+    response = requests.post(url, auth=app.config['PARTY_AUTH'])
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.exception('Re-sending of verification email failed', party_id=party_id)
-        raise ApiError(response)
+        raise ApiError(logger, response, log_level='exception', message='Re-sending of verification email failed')
 
     logger.debug('Successfully re-sent verification email', party_id=party_id)
+
+
+def resend_verification_email_expired_token(token):
+    logger.debug('Re-sending verification email', token=token)
+    url = f'{app.config["PARTY_URL"]}/party-api/v1/resend-verification-email-expired-token/{token}'
+    response = requests.post(url, auth=app.config['PARTY_AUTH'])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        raise ApiError(logger, response, log_level='exception',
+                       message='Re-sending of verification email for expired token failed')
 
 
 def reset_password_request(username):
@@ -155,11 +166,24 @@ def reset_password_request(username):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        log_level = 'warning' if response.status_code == 404 else 'exception'
+        if response.status_code == 404:
+            raise UserDoesNotExist("User does not exist in party service")
         message = 'Failed to send reset password request to party service'
-        raise ApiError(logger, response, log_level=log_level, message=message)
+        raise ApiError(logger, response, log_level='exception', message=message)
 
     logger.debug('Successfully sent reset password request to party service')
+
+
+def resend_password_email_expired_token(token):
+    logger.debug('Re-sending verification email', token=token)
+    url = f'{app.config["PARTY_URL"]}/party-api/v1/resend-password-email-expired-token/{token}'
+    response = requests.post(url, auth=app.config['PARTY_AUTH'])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        raise ApiError(logger, response, log_level='exception',
+                       message='Re-sending of password email for expired token failed')
 
 
 def verify_email(token):
@@ -249,3 +273,24 @@ def is_respondent_enrolled(party_id, business_party_id, survey_short_name, retur
             if return_survey:
                 return {'survey': survey}
             return True
+
+
+def notify_party_and_respondent_account_locked(respondent_id, email_address, status=None):
+    logger.debug('Notifying respondent and party service that account is locked')
+    url = f'{app.config["PARTY_URL"]}/party-api/v1/respondents/edit-account-status/{respondent_id}'
+
+    data = {
+        'respondent_id': respondent_id,
+        'email_address': email_address,
+        'status_change': status
+    }
+
+    response = requests.put(url, json=data, auth=app.config['PARTY_AUTH'])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        logger.error('Failed to notify party', respondent_id=respondent_id, status=status)
+        raise ApiError(logger, response)
+
+    logger.info('Successfully notified party and respondent', respondent_id=respondent_id, status=status)

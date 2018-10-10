@@ -8,6 +8,8 @@ from frontstage.controllers import case_controller, collection_exercise_controll
     survey_controller
 from frontstage.exceptions.exceptions import ApiError, UserDoesNotExist
 
+CLOSED_STATE = ['COMPLETE', 'COMPLETEDBYPHONE', 'NOLONGERREQUIRED']
+
 logger = wrap_logger(logging.getLogger(__name__))
 
 
@@ -245,6 +247,8 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
             )
             collection_exercise = collection_exercises_by_id[case['caseGroup']['collectionExerciseId']]
             added_survey = True if business_party_id == business_party['id'] and survey_id == survey['id'] else None
+            display_access_button = display_button(case['caseGroup']['caseGroupStatus'], collection_instrument['type'])
+
             yield {
 
                 'case_id': case['id'],
@@ -262,8 +266,13 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
                 'period': collection_exercise['userDescription'],
                 'submit_by': collection_exercise['events']['return_by']['date'],
                 'collection_exercise_ref': collection_exercise['exerciseRef'],
-                'added_survey': added_survey
+                'added_survey': added_survey,
+                'display_button': display_access_button
             }
+
+
+def display_button(status, ci_type):
+    return not(ci_type == 'EQ' and status in CLOSED_STATE)
 
 
 def is_respondent_enrolled(party_id, business_party_id, survey_short_name, return_survey=False):

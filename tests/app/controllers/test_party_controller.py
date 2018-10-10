@@ -1,4 +1,5 @@
 import unittest
+from collections import namedtuple
 from unittest.mock import patch
 
 import responses
@@ -7,6 +8,7 @@ from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import party_controller
 from frontstage.controllers.collection_exercise_controller import convert_events_to_new_format
+from frontstage.controllers.party_controller import display_button
 from frontstage.exceptions.exceptions import ApiError
 from tests.app.mocked_services import (business_party, case, case_list, collection_exercise,
                                        collection_exercise_by_survey,
@@ -197,7 +199,8 @@ class TestPartyController(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
 
-        survey_list = party_controller.get_survey_list_details_for_party(respondent_party['id'], 'todo', business_party['id'], survey['id'])
+        survey_list = party_controller.get_survey_list_details_for_party(respondent_party['id'], 'todo',
+                                                                         business_party['id'], survey['id'])
 
         for survey_details in survey_list:
             self.assertTrue(survey_details['case_id'] is not None)
@@ -208,3 +211,22 @@ class TestPartyController(unittest.TestCase):
             self.assertTrue(survey_details['survey_short_name'] is not None)
             self.assertTrue(survey_details['business_party_id'] is not None)
             self.assertTrue(survey_details['collection_exercise_ref'] is not None)
+
+    def test_display_button(self):
+        Combination = namedtuple("Combination", ["status", "ci_type", "expected"])
+        combinations = [
+            Combination('COMPLETE', 'SEFT', True),
+            Combination('COMPLETEDBYPHONE', 'SEFT', True),
+            Combination('NOLONGERREQUIRED', 'SEFT', True),
+            Combination('NOTSTARTED', 'SEFT', True),
+            Combination('INPROGRESS', 'SEFT', True),
+            Combination('REOPENED', 'SEFT', True),
+            Combination('REOPENED', 'EQ', True),
+            Combination('INPROGRESS', 'EQ', True),
+            Combination('NOTSTARTED', 'EQ', True),
+            Combination('NOLONGERREQUIRED', 'EQ', False),
+            Combination('COMPLETEDBYPHONE', 'EQ', False),
+            Combination('COMPLETE', 'EQ', False),
+        ]
+        for combination in combinations:
+            self.assertEqual(display_button(combination.status, combination.ci_type), combination.expected)

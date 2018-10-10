@@ -1,4 +1,3 @@
-import itertools
 import logging
 
 import requests
@@ -200,8 +199,7 @@ def validate_case_category(category):
 def get_cases_for_list_type_by_party_id(party_id, list_type='todo'):
     logger.debug('Get cases for party for list', party_id=party_id, list_type=list_type)
 
-    business_cases = get_cases_by_party_id(party_id)
-    cases = filter_cases_by_case_group(business_cases)
+    cases = get_cases_by_party_id(party_id)
     history_statuses = ['COMPLETE', 'COMPLETEDBYPHONE', 'NOLONGERREQUIRED']
     if list_type == 'history':
         filtered_cases = [business_case
@@ -214,17 +212,3 @@ def get_cases_for_list_type_by_party_id(party_id, list_type='todo'):
 
     logger.debug("Successfully retrieved cases for party survey list", party_id=party_id, list_type=list_type)
     return filtered_cases
-
-
-def filter_cases_by_case_group(cases):
-    """
-    Some case groups have multiple B cases only the most recently created should be shown to the user this filters
-    out older B cases for a case group and only returns most recent.
-    :param cases:
-    :return: list of cases with one case per casegroup
-    """
-    logger.debug("Attempting to remove multiple cases for one case group")
-    grouped_cases = (list(group)
-                     for _, group in itertools.groupby(cases, key=lambda x: x['caseGroup']['id']))
-    return (sorted(group, key=lambda k: k['createdDateTime'], reverse=True)[0]
-            for group in grouped_cases)

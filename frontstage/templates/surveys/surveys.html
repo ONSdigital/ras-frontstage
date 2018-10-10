@@ -49,7 +49,7 @@
             <span id="status-{{ loop.index }}" name="status">{{ survey.status }}</span>
         </div>
         <div class="grid__col col-2@m">
-            {% if not survey.display_access_button %}
+            {% if survey.display_button %}
              <a href="{{ url_for('surveys_bp.access_survey', case_id=survey.case_id, ci_type = survey.collection_instrument_type, business_party_id=survey.business_party_id, survey_short_name=survey.survey_short_name) }}"
                {% if survey.collection_instrument_type == 'EQ' %}
                 onclick="ga('send', 'event', 'survey', 'launcheq', 'survey_ref = {{ survey.survey_ref }} collection_exercise_ref = {{ survey.collection_exercise_ref }}');"

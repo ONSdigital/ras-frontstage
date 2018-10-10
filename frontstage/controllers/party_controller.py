@@ -247,8 +247,7 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
             )
             collection_exercise = collection_exercises_by_id[case['caseGroup']['collectionExerciseId']]
             added_survey = True if business_party_id == business_party['id'] and survey_id == survey['id'] else None
-            display_access_button = should_display_access_button(case['caseGroup']['caseGroupStatus'],
-                                                                 collection_instrument['type'])
+            display_access_button = display_button(case['caseGroup']['caseGroupStatus'], collection_instrument['type'])
 
             yield {
 
@@ -268,14 +267,12 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
                 'submit_by': collection_exercise['events']['return_by']['date'],
                 'collection_exercise_ref': collection_exercise['exerciseRef'],
                 'added_survey': added_survey,
-                'display_access_button': display_access_button
+                'display_button': display_access_button
             }
 
 
-def should_display_access_button(status, ci_type):
-    if status not in CLOSED_STATE or not ci_type == 'EQ':
-        return True
-    return False
+def display_button(status, ci_type):
+    return not(ci_type == 'EQ' and status in CLOSED_STATE)
 
 
 def is_respondent_enrolled(party_id, business_party_id, survey_short_name, return_survey=False):

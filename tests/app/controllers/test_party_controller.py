@@ -7,6 +7,7 @@ from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import party_controller
 from frontstage.controllers.collection_exercise_controller import convert_events_to_new_format
+from frontstage.controllers.party_controller import should_display_access_button
 from frontstage.exceptions.exceptions import ApiError
 from tests.app.mocked_services import (business_party, case, case_list, collection_exercise,
                                        collection_exercise_by_survey,
@@ -197,7 +198,8 @@ class TestPartyController(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
 
-        survey_list = party_controller.get_survey_list_details_for_party(respondent_party['id'], 'todo', business_party['id'], survey['id'])
+        survey_list = party_controller.get_survey_list_details_for_party(respondent_party['id'], 'todo',
+                                                                         business_party['id'], survey['id'])
 
         for survey_details in survey_list:
             self.assertTrue(survey_details['case_id'] is not None)
@@ -208,3 +210,12 @@ class TestPartyController(unittest.TestCase):
             self.assertTrue(survey_details['survey_short_name'] is not None)
             self.assertTrue(survey_details['business_party_id'] is not None)
             self.assertTrue(survey_details['collection_exercise_ref'] is not None)
+
+    def test_should_not_display_access_button_for_eQ(self):
+        self.assertFalse(should_display_access_button(status='COMPLETE', ci_type='EQ'))
+
+    def test_should_display_access_button_for_eQ(self):
+        self.assertTrue(should_display_access_button(status='NOTSTARTED', ci_type='SEFT'))
+
+    def test_should_display_access_button_for_SEFT(self):
+        self.assertTrue(should_display_access_button(status='COMPLETE', ci_type='SEFT'))

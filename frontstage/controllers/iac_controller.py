@@ -20,7 +20,7 @@ def get_iac_from_enrolment(enrolment_code):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         if response.status_code == 404:
-            logger.info('IAC not found')
+            logger.info('IAC not found', status_code=response.status_code)
             return
         # 401s may include error context in the JSON response
         elif response.status_code != 401:
@@ -28,6 +28,7 @@ def get_iac_from_enrolment(enrolment_code):
 
     if response.json().get('active', False):
         logger.info("Invalid IAC used")
+        return
 
     logger.info('Successfully retrieved IAC')
     return response.json()

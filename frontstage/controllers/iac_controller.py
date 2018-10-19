@@ -26,7 +26,7 @@ def get_iac_from_enrolment(enrolment_code):
         elif response.status_code != 401:
             raise ApiError(logger, response, message='Failed to retrieve IAC')
 
-    if response.json().get('active', False):
+    if response.json().get('active') is False:
         logger.info("Invalid IAC used")
         return
 

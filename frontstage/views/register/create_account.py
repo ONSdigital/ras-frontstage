@@ -29,11 +29,6 @@ def register():
         try:
             iac = iac_controller.get_iac_from_enrolment(enrolment_code)
             if iac is None:
-                logger.info('Enrolment code not found')
-                template_data = {"error": {"type": "failed"}}
-                return render_template('register/register.enter-enrolment-code.html', form=form, data=template_data), 202
-            if not iac['active']:
-                logger.info('Enrolment code not active')
                 template_data = {"error": {"type": "failed"}}
                 return render_template('register/register.enter-enrolment-code.html', form=form, data=template_data), 200
         except ApiError as exc:

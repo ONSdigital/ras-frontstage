@@ -44,7 +44,7 @@ class TestRegistration(unittest.TestCase):
 
     @requests_mock.mock()
     def test_enter_enrolment_code_success(self, mock_object):
-        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']}, status_code=200)
         mock_object.get(url_get_case_by_enrolment_code, json=case)
         mock_object.get(url_get_case_categories, json=categories)
         mock_object.post(url_post_case_event_uuid, status_code=201)
@@ -64,7 +64,7 @@ class TestRegistration(unittest.TestCase):
 
     @requests_mock.mock()
     def test_enter_enrolment_code_inactive_code(self, mock_object):
-        mock_object.get(url_validate_enrolment, status_code=401, json={'active': False})
+        mock_object.get(url_validate_enrolment, status_code=200, json={'active': False})
 
         response = self.app.post('/register/create-account', data={'enrolment_code': enrolment_code})
 
@@ -86,7 +86,7 @@ class TestRegistration(unittest.TestCase):
 
         response = self.app.post('/register/create-account', data={'enrolment_code': enrolment_code})
 
-        self.assertEqual(response.status_code, 202)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue('Enrolment code not valid'.encode() in response.data)
 
     @requests_mock.mock()

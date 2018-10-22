@@ -25,7 +25,7 @@ def add_survey_submit(session):
 
     try:
         # Verify enrolment code is active
-        iac = iac_controller.get_iac_from_enrolment(enrolment_code, validate=True)
+        iac = iac_controller.get_iac_from_enrolment(enrolment_code)
 
         # Add enrolment for user in party
         case_id = iac['caseId']

@@ -48,7 +48,7 @@ def login():
         except OAuth2Error as exc:
             error_message = exc.oauth2_error
             if USER_ACCOUNT_LOCKED in error_message:
-                logger.info('User account is locked on the OAuth2 server')
+                logger.info('User account is locked on the OAuth2 server', party_id=party_id)
                 if party_json['status'] == 'ACTIVE' or party_json['status'] == 'CREATED':
                     notify_party_and_respondent_account_locked(respondent_id=party_id,
                                                                email_address=username,

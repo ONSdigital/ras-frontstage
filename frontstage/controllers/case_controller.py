@@ -156,7 +156,7 @@ def get_eq_url(case_id, party_id, business_party_id, survey_short_name):
                     category=category,
                     description=f"Instrument {ci_id} launched by {party_id} for case {case_id}")
 
-    logger.debug('Successfully generated EQ URL', case_id=case_id, ci_id=ci_id, party_id=party_id,
+    logger.info('Successfully generated EQ URL', case_id=case_id, ci_id=ci_id, party_id=party_id,
                  business_party_id=business_party_id, survey_short_name=survey_short_name, tx_id=payload['tx_id'])
     return eq_url
 

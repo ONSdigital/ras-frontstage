@@ -97,7 +97,7 @@ class TestPartyController(unittest.TestCase):
 
     def test_get_party_by_business_id_success_with_collection_exercise_id(self):
         with responses.RequestsMock() as rsps:
-            url = f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}"
+            url = f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True"
             rsps.add(rsps.GET, url, json=business_party, status=200)
             with app.app_context():
                 business = party_controller.get_party_by_business_id(business_party['id'], collection_exercise['id'])

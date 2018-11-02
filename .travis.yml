@@ -16,6 +16,7 @@ install:
   - pipenv install --dev --deploy
 
 script:
+  - make check
   - make lint
   - APP_SETTINGS=TestingConfig pipenv run pytest --cov=frontstage --cov-report xml --ignore=node_modules
   - pipenv run coverage report

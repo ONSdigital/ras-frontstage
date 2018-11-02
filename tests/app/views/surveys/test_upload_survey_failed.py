@@ -72,10 +72,10 @@ class TestUploadSurveyFailed(unittest.TestCase):
     def test_upload_survey_failed_with_no_business_party_id_fails(self):
         response = self.app.get(f'/surveys/upload_failed?case_id={case["id"]}&survey_short_name={survey["shortName"]}&error_info=size')
 
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
     def test_upload_survey_failed_with_no_survey_short_name_fails(self):
         response = self.app.get(f'/surveys/upload_failed?case_id={case["id"]}&business_party_id={business_party["id"]}'
                                 f'&error_info=size')
 
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)

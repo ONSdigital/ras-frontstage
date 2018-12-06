@@ -169,7 +169,7 @@ def post_case_event(case_id, party_id, category, description):
     message = {
         'description': description,
         'category': category,
-        'partyId': party_id,
+        'metadata': {'partyId': party_id},
         'createdBy': 'RAS_FRONTSTAGE'
     }
     response = requests.post(url, auth=app.config['CASE_AUTH'], json=message)

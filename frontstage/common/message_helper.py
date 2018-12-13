@@ -15,11 +15,25 @@ def refine(message):
         'body': message.get('body'),
         'survey_id': message.get('survey'),
         'ru_ref': get_ru_ref_from_message(message),
-        'from': get_from_name(message),
+        'from': get_from_name(message),                     # As displayed to user
+        'from_internal': from_internal(message),
+        'internal_user': get_internal_user_id(message),
         'sent_date': get_human_readable_date(message.get('sent_date')),
         'unread': get_unread_status(message),
         'message_id': message.get('msg_id')
     }
+
+
+def from_internal(message):
+    """returns True if this message was sent by an internal user, else False"""
+    return message.get('from_internal', False)
+
+
+def get_internal_user_id(message):
+    """Determine the secure message id of the internal user associated with this message. Note the @msg_to field
+    supports multiple recipients and is a list , hence for msg_to we use the 0th element"""
+
+    return message['@msg_from']['id'] if from_internal(message) else message['@msg_to'][0]['id']
 
 
 def get_message_subject(message):
@@ -32,7 +46,7 @@ def get_message_subject(message):
 
 
 def get_from_name(message):
-    if message.get('from_internal', False):
+    if from_internal(message):
         return "ONS Business Surveys Team"
 
     try:
@@ -41,7 +55,7 @@ def get_from_name(message):
         logger.error('Failed to retrieve name from message', message_id=message.get('msg_id'))
         raise
 
-    return "{} {}".format(msg_from.get('firstName'), msg_from.get('lastName'))
+    return f"{msg_from.get('firstName')} {msg_from.get('lastName')}"
 
 
 def get_ru_ref_from_message(message):

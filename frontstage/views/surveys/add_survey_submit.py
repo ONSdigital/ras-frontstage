@@ -63,8 +63,6 @@ def add_survey_submit(session):
 
 
 def is_business_enrolled(associations, survey_id):
-    for info in associations:
-        enrolled = [s for s in info['enrolments'] if s['surveyId'] == survey_id]
-        if len(enrolled) > 0:
-                return True
-    return False
+    return any(survey for info in associations
+               for survey in info['enrolments']
+               if survey['surveyId'] == survey_id)

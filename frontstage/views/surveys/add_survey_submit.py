@@ -40,8 +40,8 @@ def add_survey_submit(session):
 
         already_enrolled = None
         if is_business_enrolled(info['associations'], case['caseGroup']['surveyId']):
-            logger.error('User tried to enrol onto a survey they are already enrolled on',
-                         case_id=case_id, party_id=party_id)
+            logger.info('User tried to enrol onto a survey they are already enrolled on',
+                        case_id=case_id, party_id=party_id)
             already_enrolled = True
         else:
             case_controller.post_case_event(case_id,

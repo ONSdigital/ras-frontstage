@@ -112,15 +112,23 @@ class TestSignIn(unittest.TestCase):
         self.assertTrue('/surveys/'.encode() in response.data)
 
     @requests_mock.mock()
-    def test_sign_in_expired(self, mock_object):
+    def test_sign_in_success_redirect_to_url(self, mock_object):
+        mock_object.get(url_get_respondent_email, json=party)
+        mock_object.post(url_oauth_token, status_code=200, json=self.oauth_token)
+        response = self.app.post('/sign-in/', data=self.sign_in_form, query_string={'next': 'http://localhost:8082/secure-message/threads'})
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue('/secure-message/threads'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_sign_in_expired_redirects_to_login_page(self, mock_object):
         mock_object.get(url_get_respondent_email, json=party)
         mock_object.post(url_oauth_token, status_code=200, json=self.expired_oauth_token)
 
         self.app.get('/sign-in/', data=self.sign_in_form)
 
         response = self.app.get('/surveys/todo',  follow_redirects=True)
-        self.assertEqual(response.status_code, 403)
-        self.assertIn(b'Error - Not signed in', response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Sign in', response.data)
 
     @requests_mock.mock()
     def test_sign_in_oauth_fail(self, mock_object):

@@ -5,6 +5,7 @@ import uuid
 import iso8601
 from flask import current_app
 from structlog import wrap_logger
+from datetime import datetime, timezone
 
 from frontstage.controllers import (collection_exercise_controller, collection_instrument_controller,
                                     party_controller)
@@ -122,6 +123,6 @@ class EqPayload(object):
         """
 
         try:
-            return iso8601.parse_date(string_date).strftime('%Y-%m-%d')
+            return iso8601.parse_date(string_date).astimezone().strftime('%Y-%m-%d')
         except (ValueError, iso8601.iso8601.ParseError):
             raise InvalidEqPayLoad(f'Unable to format {string_date}')

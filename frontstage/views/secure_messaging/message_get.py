@@ -5,7 +5,7 @@ from flask import json, flash, Markup, render_template, redirect, request, url_f
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
-from frontstage.common.message_helper import refine
+from frontstage.common.message_helper import from_internal, refine
 from frontstage.controllers.conversation_controller import get_conversation, get_conversation_list, \
     remove_unread_label, send_message
 from frontstage.models import SecureMessagingForm
@@ -39,7 +39,8 @@ def view_conversation(session, thread_id):
     if not conversation['is_closed']:
         if form.validate_on_submit():
             logger.info("Sending message", thread_id=thread_id, party_id=party_id)
-            send_message(_get_message_json(form, refined_conversation[0], party_id=session['party_id']))
+            msg_to = get_msg_to(refined_conversation)
+            send_message(_get_message_json(form, refined_conversation[0], msg_to=msg_to, msg_from=session['party_id']))
             logger.info("Successfully sent message", thread_id=thread_id, party_id=party_id)
             thread_url = url_for("secure_message_bp.view_conversation", thread_id=thread_id) + "#latest-message"
             flash(Markup('Message sent. <a href={}>View Message</a>'.format(thread_url)))
@@ -73,13 +74,23 @@ def view_conversation_list(session):
                            is_closed=strtobool(is_closed))
 
 
-def _get_message_json(form, message, party_id):
+def _get_message_json(form, first_message_in_conversation, msg_to, msg_from):
+
     return json.dumps({
-        'msg_from': party_id,
-        'msg_to': ["GROUP"],
+        'msg_from': msg_from,
+        'msg_to': msg_to,
         'subject': form.subject.data,
         'body': form.body.data,
-        'thread_id': message['thread_id'],
+        'thread_id': first_message_in_conversation['thread_id'],
         'collection_case': "",
-        'survey': message['survey_id'],
-        'ru_id': message['ru_ref']})
+        'survey': first_message_in_conversation['survey_id'],
+        'ru_id': first_message_in_conversation['ru_ref']})
+
+
+def get_msg_to(conversation):
+    """Walks the conversation from latest sent message to first and looks for the latest message sent from internal.
+    Uses that as the to , if none found then defaults to group """
+    for message in reversed(conversation):
+        if from_internal(message):
+            return [message['internal_user']]
+    return ['GROUP']

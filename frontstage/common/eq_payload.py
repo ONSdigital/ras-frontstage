@@ -122,6 +122,6 @@ class EqPayload(object):
         """
 
         try:
-            return iso8601.parse_date(string_date).strftime('%Y-%m-%d')
+            return iso8601.parse_date(string_date).astimezone().strftime('%Y-%m-%d')
         except (ValueError, iso8601.iso8601.ParseError):
             raise InvalidEqPayLoad(f'Unable to format {string_date}')

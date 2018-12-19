@@ -155,13 +155,23 @@ class TestGenerateEqURL(unittest.TestCase):
 
     def test_generate_eq_url_iso8601_date_format(self):
 
-        # Given an invalid date
+        # Given a valid date
         date = '2007-01-25T12:00:00Z'
 
         # When format_string_long_date_time_to_short_date is called
-        # Then an InvalidEqPayLoad is raised
+        # Then the correct date is returned
         result = EqPayload()._format_string_long_date_time_to_short_date(date)
         self.assertEqual(result, '2007-01-25')
+
+    def test_iso8601_adjusts_to_local_time(self):
+        # Given a valid date in tz -1hr before midnight
+        date = '2007-01-25T23:59:59-0100'
+
+        # When format_date is called
+        result = EqPayload()._format_string_long_date_time_to_short_date(date)
+
+        # Then the date is localised to the next day
+        self.assertEqual(result, '2007-01-26')
 
     def test_generate_eq_url_missing_mandatory_event_date(self):
 

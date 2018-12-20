@@ -32,7 +32,7 @@
     </div>
     <br />
     {% endif %}
-    <form method="post" class="form" action="{{ url_for('sign_in_bp.login', next_url=next_url) }}" role="form">
+    <form method="post" class="form" action="{{ url_for('sign_in_bp.login', next=next) }}" role="form">
         {{ form.csrf_token }}
 
         {% if data['account_activated'] %}

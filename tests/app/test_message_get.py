@@ -11,7 +11,7 @@ class TestMessageGet(unittest.TestCase):
 
         to = get_msg_to(conversation)
 
-        self.assertEquals(to, ['GROUP'])
+        self.assertEqual(to, ['GROUP'])
 
     def test_get_msg_to_returns_newest_internal_user_if_known(self):
         msg = {'something': 'somethings'}
@@ -22,4 +22,4 @@ class TestMessageGet(unittest.TestCase):
 
         to = get_msg_to(conversation)
 
-        self.assertEquals(to, ['user2'])
+        self.assertEqual(to, ['user2'])

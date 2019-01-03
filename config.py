@@ -147,4 +147,3 @@ class TestingConfig(DevelopmentConfig):
     ACCOUNT_SERVICE_LOG_OUT_URL = 'http://frontstage-url/sign-in/logout'
     EQ_URL = 'https://eq-test/session?token='
     JSON_SECRET_KEYS = open("./tests/test_data/jwt-test-keys/test_key.json").read()
-    SERVER_NAME = 'localhost:8082'

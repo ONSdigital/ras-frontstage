@@ -27,7 +27,7 @@ def home():
     return redirect(url_for('sign_in_bp.login', _external=True, _scheme=getenv('SCHEME', 'http')))
 
 
-def get_oauth_token(username, password, party_id, party_json, form):
+def get_oauth_token(username, password, party_id, party_json, form, next):
     try:
         oauth2_token = oauth_controller.sign_in(username, password)
         return oauth2_token
@@ -41,7 +41,7 @@ def get_oauth_token(username, password, party_id, party_json, form):
                                                            status='SUSPENDED')
             return render_template('sign-in/sign-in.account-locked.html', form=form)
         elif BAD_AUTH_ERROR in error_message:
-            return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
+            return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}}, next=next)
         elif NOT_VERIFIED_ERROR in error_message:
             logger.info('User account is not verified on the OAuth2 server')
             return render_template('sign-in/sign-in.account-not-verified.html', party_id=party_id,
@@ -67,7 +67,7 @@ def login():
             return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
         party_id = party_json['id']
 
-        oauth2_token = get_oauth_token(username, password, party_id, party_json, form)
+        oauth2_token = get_oauth_token(username, password, party_id, party_json, form, request.args.get('next'))
 
         if not isinstance(oauth2_token, dict):
             return oauth2_token

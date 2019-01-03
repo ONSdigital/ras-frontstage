@@ -48,12 +48,6 @@ class TestJWTAuthorization(unittest.TestCase):
         # If this function runs without exceptions the test is considered passed
         self.decorator_test(request)
 
-    def test_jwt_authorization_no_jwt(self):
-        request = mock.MagicMock()
-
-        with self.assertRaises(JWTValidationError):
-            self.decorator_test(request)
-
     def test_jwt_authorization_expired_jwt(self):
         self.session.create_session(expired_jwt)
         request = mock.MagicMock(cookies={"authorization": self.session.session_key})
@@ -61,7 +55,7 @@ class TestJWTAuthorization(unittest.TestCase):
         with self.assertRaises(JWTValidationError):
             self.decorator_test(request)
 
-    def test_jwt_authorization_no_exipry(self):
+    def test_jwt_authorization_no_expiry(self):
         self.session.create_session(no_expiry_jwt)
         request = mock.MagicMock(cookies={"authorization": self.session.session_key})
 

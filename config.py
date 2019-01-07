@@ -9,7 +9,7 @@ from distutils.util import strtobool
 class Config(object):
     DEBUG = False
     TESTING = False
-    VERSION = '1.6.0'
+    VERSION = '1.9.0'
     PORT = os.getenv('PORT', 8082)
     MAX_UPLOAD_LENGTH = os.getenv('MAX_UPLOAD_LENGTH', 20 * 1024 * 1024)
 
@@ -118,9 +118,9 @@ class DevelopmentConfig(Config):
     IAC_PASSWORD = os.getenv('IAC_PASSWORD', 'secret')
     IAC_AUTH = (IAC_USERNAME, IAC_PASSWORD)
 
-    OAUTH_URL = os.getenv('OAUTH_URL', 'http://localhost:8040')
-    OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID', 'ons@ons.gov')
-    OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET', 'password')
+    OAUTH_URL = os.getenv('OAUTH_URL', 'http://localhost:8041')
+    OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID', 'admin')
+    OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET', 'secret')
     OAUTH_BASIC_AUTH = (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET)
 
     PARTY_URL = os.getenv('PARTY_URL', 'http://localhost:8081')

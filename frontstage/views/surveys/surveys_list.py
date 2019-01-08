@@ -19,6 +19,7 @@ def get_survey_list(session, tag):
     party_id = session.get('party_id')
     business_id = request.args.get('business_party_id')
     survey_id = request.args.get('survey_id')
+    already_enrolled = request.args.get('already_enrolled')
 
     survey_list = party_controller.get_survey_list_details_for_party(party_id, tag, business_party_id=business_id,
                                                                      survey_id=survey_id)
@@ -28,7 +29,9 @@ def get_survey_list(session, tag):
     if tag == 'todo':
         response = make_response(render_template('surveys/surveys-todo.html',
                                                  sorted_surveys_list=sorted_survey_list,
-                                                 added_survey=True if business_id and survey_id else None))
+                                                 added_survey=True if business_id and survey_id and not already_enrolled else None,
+                                                 already_enrolled=already_enrolled
+                                                 ))
 
         # Ensure any return to list of surveys (e.g. browser back) round trips the server to display the latest statuses
         response.headers.set("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store")

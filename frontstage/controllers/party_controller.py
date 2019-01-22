@@ -229,62 +229,83 @@ def get_respondent_enrolments(party_id):
                     'survey_id': enrolment['surveyId']
                 }
 
+# This method has gone through a rewrite in an attempt to make the to-do page more performant. Before the rewrite, it
+# was making REST calls in a for loop and this was causing frontstage to time out for some respondents trying to access
+# their surveys. Some of the calls were repeating what it's already done so, we've decided to
+# cache the relevent data before it enters the main for loop in attempt to make less calls which are repeating. We've
+# used sets to make sure its not using any duplicate ids for the business, survey and collection instrument. With the
+# ids we then cache the data into a dictionary which can then be used later.
 
 def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_id):
     enrolment_data = get_respondent_enrolments(party_id)
+
+    # The sets below are used for getting survey and business for the data that is going to
+    # be cached. we add the survey_ids and business_ids for the enrolment data into the sets
+
     surveys_ids = set()
-    businesses_ids = set()
-    collection_instrument_ids = set()
+    business_ids = set()
+
     for enrolment in enrolment_data:
         surveys_ids.add(enrolment['survey_id'])
-        businesses_ids.add(enrolment['business_id'])
+        business_ids.add(enrolment['business_id'])
+
+    # This is a dictionary that will store all of the data that is going to be cached instead of making mulitple calls
+    # inside of the for loop for get_respondent_enrolments.
+
     cache_data = {'surveys': dict(),
                   'businesses': dict(),
                   'collexes': dict(),
                   'cases': dict(),
                   'instrument': dict()}
 
+    # These two for loops make calls to survey, collex, party and case services to then store cached information which
+    # can be used later on.
+
     for survey_id in surveys_ids:
         cache_data['surveys'][survey_id] = survey_controller.get_survey(survey_id)
         cache_data['collexes'][survey_id] = collection_exercise_controller.get_live_collection_exercises_for_survey(survey_id)
 
-    for business_id in businesses_ids:
+    for business_id in business_ids:
         cache_data['businesses'][business_id] = get_party_by_business_id(business_id)
         cache_data['cases'][business_id] = case_controller.get_cases_for_list_type_by_party_id(business_id, tag)
-    start_time = time.time()
+
+    # This is slightly different to the above because we need to get the collection_instrument_ids out of the cases
+    # first then we can make a call to the collection_instrument service and cache the relevant data for the collection
+    # instrument. This can then be used to get the type for the specific case.
+
+    collection_instrument_ids = set()
     for business_id, cases in cache_data['cases'].items():
         for case in cases:
             collection_instrument_ids.add(case['collectionInstrumentId'])
+
     for collection_instrument_id in collection_instrument_ids:
             cache_data['instrument'][collection_instrument_id] = collection_instrument_controller.\
                 get_collection_instrument(collection_instrument_id)
-    logger.info(f'CI time- {(time.time() - start_time) * 1000}')
+
+    # Now instead of making REST calls inside this for loop, for the enrolment its on it will use the cached data and
+    # get the relevant information from that.
 
     for enrolment in get_respondent_enrolments(party_id):
 
         business_party = cache_data['businesses'][enrolment['business_id']]
-
         survey = cache_data['surveys'][enrolment['survey_id']]
-
         live_collection_exercises = cache_data['collexes'][survey['id']]
-
         collection_exercises_by_id = dict((ce['id'], ce) for ce in live_collection_exercises)
-
         cases = cache_data['cases'][business_party['id']]
-
         enrolled_cases = [case for case in cases if case['caseGroup']['collectionExerciseId'] in collection_exercises_by_id.keys()]
 
         for case in enrolled_cases:
             collection_exercise = collection_exercises_by_id[case['caseGroup']['collectionExerciseId']]
             added_survey = True if business_party_id == business_party['id'] and survey_id == survey['id'] else None
-            display_access_button = display_button(case['caseGroup']['caseGroupStatus'], cache_data['instrument'][case['collectionInstrumentId']]['type'])
+            display_access_button = display_button(case['caseGroup']['caseGroupStatus'], cache_data['instrument']
+                                                                    [case['collectionInstrumentId']]['type'])
 
             yield {
 
                 'case_id': case['id'],
                 'status': case_controller.calculate_case_status(case['caseGroup']['caseGroupStatus'],
-                                                                cache_data['instrument'][
-                                                                    case['collectionInstrumentId']]['type']),
+                                                                cache_data['instrument']
+                                                                [case['collectionInstrumentId']]['type']),
                 'collection_instrument_type': cache_data['instrument'][case['collectionInstrumentId']]['type'],
                 'survey_id': survey['id'],
                 'survey_long_name': survey['longName'],

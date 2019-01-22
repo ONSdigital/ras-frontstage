@@ -7,6 +7,7 @@ from structlog import wrap_logger
 from frontstage.controllers import case_controller, collection_exercise_controller, collection_instrument_controller, \
     survey_controller
 from frontstage.exceptions.exceptions import ApiError, UserDoesNotExist
+import time
 
 CLOSED_STATE = ['COMPLETE', 'COMPLETEDBYPHONE', 'NOLONGERREQUIRED']
 
@@ -230,31 +231,50 @@ def get_respondent_enrolments(party_id):
 
 
 def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_id):
+    enrolment_data = get_respondent_enrolments(party_id)
+    surveys_ids = set()
+    businesses_ids = set()
+    for enrolment in enrolment_data:
+        surveys_ids.add(enrolment['survey_id'])
+        businesses_ids.add(enrolment['business_id'])
+    cache_data = {'surveys': dict(),
+                  'businesses': dict(),
+                  'collexes': dict(),
+                  'cases': dict()}
+
+    for survey_id in surveys_ids:
+        cache_data['surveys'][survey_id] = survey_controller.get_survey(survey_id)
+        cache_data['collexes'][survey_id] = collection_exercise_controller.get_live_collection_exercises_for_survey(survey_id)
+
+    for business_id in businesses_ids:
+        cache_data['businesses'][business_id] = get_party_by_business_id(business_id)
+        cache_data['cases'][business_id] = case_controller.get_cases_for_list_type_by_party_id(business_id, tag)
 
     for enrolment in get_respondent_enrolments(party_id):
-        business_party = get_party_by_business_id(enrolment['business_id'])
-        survey = survey_controller.get_survey(enrolment['survey_id'])
 
-        live_collection_exercises = collection_exercise_controller.get_live_collection_exercises_for_survey(survey['id'])
+        business_party = cache_data['businesses'][enrolment['business_id']]
+
+        survey = cache_data['surveys'][enrolment['survey_id']]
+
+        live_collection_exercises = cache_data['collexes'][enrolment['survey_id']]
+
         collection_exercises_by_id = dict((ce['id'], ce) for ce in live_collection_exercises)
 
-        cases = case_controller.get_cases_for_list_type_by_party_id(business_party['id'], tag)
+        cases = cache_data['cases'][business_party['id']]
+
         enrolled_cases = [case for case in cases if case['caseGroup']['collectionExerciseId'] in collection_exercises_by_id.keys()]
 
         for case in enrolled_cases:
-            collection_instrument = collection_instrument_controller.get_collection_instrument(
-                case['collectionInstrumentId']
-            )
             collection_exercise = collection_exercises_by_id[case['caseGroup']['collectionExerciseId']]
             added_survey = True if business_party_id == business_party['id'] and survey_id == survey['id'] else None
-            display_access_button = display_button(case['caseGroup']['caseGroupStatus'], collection_instrument['type'])
+            display_access_button = display_button(case['caseGroup']['caseGroupStatus'], 'SEFT')
 
             yield {
 
                 'case_id': case['id'],
                 'status': case_controller.calculate_case_status(case['caseGroup']['caseGroupStatus'],
-                                                                collection_instrument['type']),
-                'collection_instrument_type': collection_instrument['type'],
+                                                                'SEFT'),
+                'collection_instrument_type': 'SEFT',
                 'survey_id': survey['id'],
                 'survey_long_name': survey['longName'],
                 'survey_short_name': survey['shortName'],

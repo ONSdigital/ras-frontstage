@@ -234,13 +234,15 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
     enrolment_data = get_respondent_enrolments(party_id)
     surveys_ids = set()
     businesses_ids = set()
+    collection_instrument_ids = set()
     for enrolment in enrolment_data:
         surveys_ids.add(enrolment['survey_id'])
         businesses_ids.add(enrolment['business_id'])
     cache_data = {'surveys': dict(),
                   'businesses': dict(),
                   'collexes': dict(),
-                  'cases': dict()}
+                  'cases': dict(),
+                  'instrument': dict()}
 
     for survey_id in surveys_ids:
         cache_data['surveys'][survey_id] = survey_controller.get_survey(survey_id)
@@ -249,6 +251,14 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
     for business_id in businesses_ids:
         cache_data['businesses'][business_id] = get_party_by_business_id(business_id)
         cache_data['cases'][business_id] = case_controller.get_cases_for_list_type_by_party_id(business_id, tag)
+    start_time = time.time()
+    for business_id, cases in cache_data['cases'].items():
+        for case in cases:
+            collection_instrument_ids.add(case['collectionInstrumentId'])
+    for collection_instrument_id in collection_instrument_ids:
+            cache_data['instrument'][collection_instrument_id] = collection_instrument_controller.\
+                get_collection_instrument(collection_instrument_id)
+    logger.info(f'CI time- {(time.time() - start_time) * 1000}')
 
     for enrolment in get_respondent_enrolments(party_id):
 
@@ -256,7 +266,7 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
 
         survey = cache_data['surveys'][enrolment['survey_id']]
 
-        live_collection_exercises = cache_data['collexes'][enrolment['survey_id']]
+        live_collection_exercises = cache_data['collexes'][survey['id']]
 
         collection_exercises_by_id = dict((ce['id'], ce) for ce in live_collection_exercises)
 
@@ -267,14 +277,15 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
         for case in enrolled_cases:
             collection_exercise = collection_exercises_by_id[case['caseGroup']['collectionExerciseId']]
             added_survey = True if business_party_id == business_party['id'] and survey_id == survey['id'] else None
-            display_access_button = display_button(case['caseGroup']['caseGroupStatus'], 'SEFT')
+            display_access_button = display_button(case['caseGroup']['caseGroupStatus'], cache_data['instrument'][case['collectionInstrumentId']]['type'])
 
             yield {
 
                 'case_id': case['id'],
                 'status': case_controller.calculate_case_status(case['caseGroup']['caseGroupStatus'],
-                                                                'SEFT'),
-                'collection_instrument_type': 'SEFT',
+                                                                cache_data['instrument'][
+                                                                    case['collectionInstrumentId']]['type']),
+                'collection_instrument_type': cache_data['instrument'][case['collectionInstrumentId']]['type'],
                 'survey_id': survey['id'],
                 'survey_long_name': survey['longName'],
                 'survey_short_name': survey['shortName'],

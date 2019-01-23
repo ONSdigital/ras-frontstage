@@ -7,7 +7,7 @@ from structlog import wrap_logger
 from frontstage.controllers import case_controller, collection_exercise_controller, collection_instrument_controller, \
     survey_controller
 from frontstage.exceptions.exceptions import ApiError, UserDoesNotExist
-import time
+import threading
 
 CLOSED_STATE = ['COMPLETE', 'COMPLETEDBYPHONE', 'NOLONGERREQUIRED']
 
@@ -98,6 +98,29 @@ def get_party_by_business_id(party_id, collection_exercise_id=None):
     if collection_exercise_id:
         url += f"?collection_exercise_id={collection_exercise_id}&verbose=True"
     response = requests.get(url, auth=app.config['PARTY_AUTH'])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        raise ApiError(logger, response,
+                       collection_exercise_id=collection_exercise_id,
+                       log_level='warning' if response.status_code == 404 else 'exception',
+                       message='Failed to retrieve party by business',
+                       party_id=party_id)
+
+    logger.debug('Successfully retrieved party by business',
+                 collection_exercise_id=collection_exercise_id,
+                 party_id=party_id)
+    return response.json()
+
+
+def get_party_by_business_id_with_config(config, party_id, collection_exercise_id=None):
+    logger.debug('Attempting to retrieve party by business', party_id=party_id)
+
+    url = f"{config['PARTY_URL']}/party-api/v1/businesses/id/{party_id}"
+    if collection_exercise_id:
+        url += f"?collection_exercise_id={collection_exercise_id}&verbose=True"
+    response = requests.get(url, auth=config['PARTY_AUTH'])
 
     try:
         response.raise_for_status()
@@ -229,6 +252,22 @@ def get_respondent_enrolments(party_id):
                     'survey_id': enrolment['surveyId']
                 }
 
+
+class myThread(threading.Thread):
+    def __init__(self,function, cache_data, config, id, tag=None):
+        threading.Thread.__init__(self)
+        self.function = function
+        self.cache_data = cache_data
+        self.config = config
+        self.id = id
+        self.tag = tag
+
+    def run(self):
+        if self.tag is None:
+            self.function(self.cache_data, self.config ,self.id)
+        else:
+            self.function(self.cache_data, self.config, self.id, self.tag)
+
 # This method has gone through a rewrite in an attempt to make the to-do page more performant. Before the rewrite, it
 # was making REST calls in a for loop and this was causing frontstage to time out for some respondents trying to access
 # their surveys. Some of the calls were repeating what it's already done so, we've decided to
@@ -258,30 +297,49 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
                   'cases': dict(),
                   'instrument': dict()}
 
-    # These two for loops make calls to survey, collex, party and case services to then store cached information which
-    # can be used later on.
-
-    for survey_id in surveys_ids:
-        cache_data['surveys'][survey_id] = survey_controller.get_survey(survey_id)
-        cache_data['collexes'][survey_id] = collection_exercise_controller.get_live_collection_exercises_for_survey(survey_id)
+    # These two for loops make calls to survey, collex, party and case services to store the response in cache_data
+    # which can be used later on.
+    threads = []
 
     for business_id in business_ids:
-        cache_data['businesses'][business_id] = get_party_by_business_id(business_id)
-        cache_data['cases'][business_id] = case_controller.get_cases_for_list_type_by_party_id(business_id, tag)
+        threads.append(myThread(get_case, cache_data, app.config, business_id, tag))
 
-    # This is slightly different to the above because we need to get the collection_instrument_ids out of the cases
-    # first then we can make a call to the collection_instrument service and cache the relevant data for the collection
-    # instrument. This can then be used to get the type for the specific case.
+    for thread in threads:
+        thread.start()
+
+    for thread in threads:
+        thread.join()
 
     collection_instrument_ids = set()
     for business_id, cases in cache_data['cases'].items():
         for case in cases:
             collection_instrument_ids.add(case['collectionInstrumentId'])
-
+    threads.clear()
     for collection_instrument_id in collection_instrument_ids:
-            cache_data['instrument'][collection_instrument_id] = collection_instrument_controller.\
-                get_collection_instrument(collection_instrument_id)
+        threads.append(myThread(get_collection_instrument, cache_data, app.config, collection_instrument_id))
+            # cache_data['instrument'][collection_instrument_id] = collection_instrument_controller.\
+            #     get_collection_instrument(collection_instrument_id)
 
+    for survey_id in surveys_ids:
+        threads.append(myThread(get_survey, cache_data, app.config, survey_id))
+        threads.append(myThread(get_collex, cache_data, app.config, survey_id))
+        # cache_data['surveys'][survey_id] = survey_controller.get_survey(survey_id)
+        # cache_data['collexes'][survey_id] = collection_exercise_controller.get_live_collection_exercises_for_survey(survey_id)
+
+    for business_id in business_ids:
+        threads.append(myThread(get_party, cache_data, app.config, business_id))
+        # cache_data['businesses'][business_id] = get_party_by_business_id(business_id)
+        # cache_data['cases'][business_id] = case_controller.get_cases_for_list_type_by_party_id(business_id, tag)
+
+    # This is slightly different to the above because we need to get the collection_instrument_ids out of the cases
+    # first then we can make a call to the collection_instrument service and cache the relevant data for the collection
+    # instrument. This can then be used to get the type for the specific case.
+
+    for thread in threads:
+        thread.start()
+
+    for thread in threads:
+        thread.join()
     # Now instead of making REST calls inside this for loop, for the enrolment its on it will use the cached data and
     # get the relevant information from that.
 
@@ -321,6 +379,28 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
                 'added_survey': added_survey,
                 'display_button': display_access_button
             }
+
+
+def get_survey(cache_data,config, survey_id):
+    cache_data['surveys'][survey_id] = survey_controller.get_survey_with_config(config,survey_id)
+
+
+def get_collex(cache_data,config, survey_id):
+    cache_data['collexes'][survey_id] = collection_exercise_controller.get_live_collection_exercises_for_survey_with_config(config,
+        survey_id)
+
+
+def get_case(cache_data ,config, business_id, tag):
+    cache_data['cases'][business_id] = case_controller.get_cases_for_list_type_by_party_id_with_config(config, business_id, tag)
+
+
+def get_party(cache_data, config, business_id):
+    cache_data['businesses'][business_id] = get_party_by_business_id_with_config(config, business_id)
+
+
+def get_collection_instrument(cache_data, config, collection_instrument_id):
+    cache_data['instrument'][collection_instrument_id] = collection_instrument_controller. \
+        get_collection_instrument_with_config(config, collection_instrument_id)
 
 
 def display_button(status, ci_type):

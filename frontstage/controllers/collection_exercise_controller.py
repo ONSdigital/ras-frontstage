@@ -80,9 +80,40 @@ def get_collection_exercises_for_survey(survey_id, live_only=None):
 
     return collection_exercises
 
+def get_collection_exercises_for_survey_with_config(config, survey_id, live_only=None):
+    logger.debug('Retrieving collection exercises for survey', survey_id=survey_id)
+
+    if live_only is True:
+        url = f"{config['COLLECTION_EXERCISE_URL']}/collectionexercises/survey/{survey_id}?liveOnly=true"
+    else:
+        url = f"{config['COLLECTION_EXERCISE_URL']}/collectionexercises/survey/{survey_id}"
+
+    response = requests.get(url, auth=config['COLLECTION_EXERCISE_AUTH'])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        raise ApiError(logger, response,
+                       survey_id=survey_id,
+                       log_level='warning' if response.status_code == 404 else 'exception',
+                       message='Failed to retrieve collection exercises for survey')
+
+    logger.debug("Successfully retrieved collection exercises for survey", survey_id=survey_id)
+    collection_exercises = response.json()
+
+    for collection_exercise in collection_exercises:
+        if collection_exercise['events']:
+            collection_exercise['events'] = convert_events_to_new_format(collection_exercise['events'])
+
+    return collection_exercises
+
 
 def get_live_collection_exercises_for_survey(survey_id):
     return get_collection_exercises_for_survey(survey_id, True)
+
+def get_live_collection_exercises_for_survey_with_config(config, survey_id):
+    return get_collection_exercises_for_survey_with_config(config,survey_id, True)
+
 
 
 def convert_events_to_new_format(events):

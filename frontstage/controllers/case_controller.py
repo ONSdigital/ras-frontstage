@@ -126,6 +126,25 @@ def get_cases_by_party_id(party_id, case_events=False):
     logger.debug('Successfully retrieved cases by party id', party_id=party_id)
     return response.json()
 
+def get_cases_by_party_id_with_url(config ,party_id, case_events=False):
+    logger.debug('Attempting to retrieve cases by party id', party_id=party_id)
+
+    url = f"{config['CASE_URL']}/cases/partyid/{party_id}"
+    if case_events:
+        url = f'{url}?caseevents=true'
+    response = requests.get(url, auth=config['CASE_AUTH'])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        raise ApiError(logger, response,
+                       log_level='warning' if response.status_code == 404 else 'exception',
+                       message='Failed to retrieve cases by party id',
+                       party_id=party_id)
+
+    logger.debug('Successfully retrieved cases by party id', party_id=party_id)
+    return response.json()
+
 
 def get_eq_url(case_id, party_id, business_party_id, survey_short_name):
     logger.debug('Attempting to generate EQ URL', case_id=case_id, party_id=party_id)
@@ -212,3 +231,21 @@ def get_cases_for_list_type_by_party_id(party_id, list_type='todo'):
 
     logger.debug("Successfully retrieved cases for party survey list", party_id=party_id, list_type=list_type)
     return filtered_cases
+
+def get_cases_for_list_type_by_party_id_with_config(config, party_id, list_type='todo'):
+    logger.debug('Get cases for party for list', party_id=party_id, list_type=list_type)
+
+    cases = get_cases_by_party_id_with_url(config ,party_id)
+    history_statuses = ['COMPLETE', 'COMPLETEDBYPHONE', 'NOLONGERREQUIRED']
+    if list_type == 'history':
+        filtered_cases = [business_case
+                          for business_case in cases
+                          if business_case['caseGroup']['caseGroupStatus'] in history_statuses]
+    else:
+        filtered_cases = [business_case
+                          for business_case in cases
+                          if business_case['caseGroup']['caseGroupStatus'] not in history_statuses]
+
+    logger.debug("Successfully retrieved cases for party survey list", party_id=party_id, list_type=list_type)
+    return filtered_cases
+

@@ -12,10 +12,6 @@ import threading
 
 CLOSED_STATE = ['COMPLETE', 'COMPLETEDBYPHONE', 'NOLONGERREQUIRED']
 
-# global global_case_time
-# global global_party_time
-# global global_collex_time
-# global global_survey_time
 
 class metrics(object):
     def __init__(self):
@@ -23,6 +19,10 @@ class metrics(object):
         self.global_case_time = 0
         self.global_collex_time = 0
         self.global_survey_time = 0
+        self.survey_count = 0
+        self.collex_count = 0
+        self.party_count = 0
+        self.case_count = 0
 
 theMetrics = metrics()
 
@@ -350,11 +350,21 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
     for thread in threads:
         thread.join()
     logger.warn(f'second thread time= {(time.time() - start_time) * 1000}')
+
     logger.warn(f'survey thread time= {theMetrics.global_survey_time * 1000}')
     logger.warn(f'collex thread time= {theMetrics.global_collex_time * 1000}')
     logger.warn(f'party thread time= {theMetrics.global_party_time * 1000}')
     logger.warn(f'case thread time= {theMetrics.global_case_time * 1000}')
 
+    logger.warn(f'survey thread count= {theMetrics.survey_count}')
+    logger.warn(f'collex thread count= {theMetrics.collex_count}')
+    logger.warn(f'party thread count= {theMetrics.party_count }')
+    logger.warn(f'case thread count= {theMetrics.case_count}')
+
+    logger.warn(f'average survey thread time= {(theMetrics.global_survey_time / theMetrics.survey_count) * 1000}')
+    logger.warn(f'average collex thread time= {(theMetrics.global_collex_time / theMetrics.collex_count) * 1000}')
+    logger.warn(f'average party thread time= {(theMetrics.global_party_time / theMetrics.party_count) * 1000}')
+    logger.warn(f'average case thread time= {(theMetrics.global_case_time / theMetrics.case_count) * 1000}')
 
     for enrolment in get_respondent_enrolments(party_id):
 
@@ -395,12 +405,14 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
 
 
 def get_survey(cache_data,config, survey_id):
+    theMetrics.survey_count += 1
     start_time = time.time()
     cache_data['surveys'][survey_id] = survey_controller.get_survey_with_config(config,survey_id)
     theMetrics.global_survey_time += time.time() - start_time
 
 
 def get_collex(cache_data,config, survey_id):
+    theMetrics.collex_count += 1
     start_time = time.time()
     cache_data['collexes'][survey_id] = collection_exercise_controller.\
         get_live_collection_exercises_for_survey_with_config(config, survey_id)
@@ -408,6 +420,7 @@ def get_collex(cache_data,config, survey_id):
 
 
 def get_case(cache_data ,config, business_id, tag):
+    theMetrics.case_count += 1
     start_time = time.time()
     cache_data['cases'][business_id] = case_controller.get_cases_for_list_type_by_party_id_with_config(config,
                                                                                                        business_id, tag)
@@ -415,6 +428,7 @@ def get_case(cache_data ,config, business_id, tag):
 
 
 def get_party(cache_data, config, business_id):
+    theMetrics.party_count += 1
     start_time = time.time()
     cache_data['businesses'][business_id] = get_party_by_business_id_with_config(config, business_id)
     theMetrics.global_party_time += time.time() - start_time

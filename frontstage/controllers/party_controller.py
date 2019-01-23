@@ -310,10 +310,12 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
         threads.append(CachingDataThreadCreation(get_case, cache_data, app.config, business_id, tag))
         threads.append(CachingDataThreadCreation(get_party, cache_data, app.config, business_id))
 
+    start_time = time.time()
     for thread in threads:
         thread.start()
     for thread in threads:
         thread.join()
+    logger.warn(f'First thread time= {(time.time() - start_time) * 1000}')
     threads.clear()
 
     # This is slightly different to the above because we need to get the collection_instrument_ids out of the cases
@@ -328,10 +330,12 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
         threads.append(CachingDataThreadCreation(get_collection_instrument, cache_data, app.config,
                                                  collection_instrument_id))
 
+    start_time = time.time()
     for thread in threads:
         thread.start()
     for thread in threads:
         thread.join()
+    logger.warn(f'second thread time= {(time.time() - start_time) * 1000}')
 
     for enrolment in get_respondent_enrolments(party_id):
 

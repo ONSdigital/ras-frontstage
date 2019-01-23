@@ -80,6 +80,7 @@ def get_collection_exercises_for_survey(survey_id, live_only=None):
 
     return collection_exercises
 
+
 def get_collection_exercises_for_survey_with_config(config, survey_id, live_only=None):
     logger.debug('Retrieving collection exercises for survey', survey_id=survey_id)
 

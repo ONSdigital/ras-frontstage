@@ -26,6 +26,7 @@ def get_survey(survey_id):
     logger.debug('Successfully retrieved survey', survey_id=survey_id)
     return response.json()
 
+
 def get_survey_with_config(config, survey_id):
     logger.debug('Attempting to retrieve survey', survey_id=survey_id)
     url = f"{config['SURVEY_URL']}/surveys/{survey_id}"

@@ -81,7 +81,6 @@ def get_collection_instrument_with_config(config, collection_instrument_id):
     return response.json()
 
 
-
 def upload_collection_instrument(upload_file, case_id, party_id):
     logger.debug('Attempting to upload collection instrument', case_id=case_id, party_id=party_id)
 

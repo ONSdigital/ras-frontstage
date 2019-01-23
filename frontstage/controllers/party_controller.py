@@ -1,4 +1,5 @@
 import logging
+import time
 
 import requests
 from flask import current_app as app
@@ -253,8 +254,8 @@ def get_respondent_enrolments(party_id):
                 }
 
 
-class myThread(threading.Thread):
-    def __init__(self,function, cache_data, config, id, tag=None):
+class CachingDataThreadCreation(threading.Thread):
+    def __init__(self, function, cache_data, config, id, tag=None):
         threading.Thread.__init__(self)
         self.function = function
         self.cache_data = cache_data
@@ -264,7 +265,7 @@ class myThread(threading.Thread):
 
     def run(self):
         if self.tag is None:
-            self.function(self.cache_data, self.config ,self.id)
+            self.function(self.cache_data, self.config, self.id)
         else:
             self.function(self.cache_data, self.config, self.id, self.tag)
 
@@ -274,6 +275,7 @@ class myThread(threading.Thread):
 # cache the relevent data before it enters the main for loop in attempt to make less calls which are repeating. We've
 # used sets to make sure its not using any duplicate ids for the business, survey and collection instrument. With the
 # ids we then cache the data into a dictionary which can then be used later.
+
 
 def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_id):
     enrolment_data = get_respondent_enrolments(party_id)
@@ -300,48 +302,36 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
     # These two for loops make calls to survey, collex, party and case services to store the response in cache_data
     # which can be used later on.
     threads = []
+    for survey_id in surveys_ids:
+        threads.append(CachingDataThreadCreation(get_survey, cache_data, app.config, survey_id))
+        threads.append(CachingDataThreadCreation(get_collex, cache_data, app.config, survey_id))
 
     for business_id in business_ids:
-        threads.append(myThread(get_case, cache_data, app.config, business_id, tag))
+        threads.append(CachingDataThreadCreation(get_case, cache_data, app.config, business_id, tag))
+        threads.append(CachingDataThreadCreation(get_party, cache_data, app.config, business_id))
 
     for thread in threads:
         thread.start()
-
     for thread in threads:
         thread.join()
-
-    collection_instrument_ids = set()
-    for business_id, cases in cache_data['cases'].items():
-        for case in cases:
-            collection_instrument_ids.add(case['collectionInstrumentId'])
     threads.clear()
-    for collection_instrument_id in collection_instrument_ids:
-        threads.append(myThread(get_collection_instrument, cache_data, app.config, collection_instrument_id))
-            # cache_data['instrument'][collection_instrument_id] = collection_instrument_controller.\
-            #     get_collection_instrument(collection_instrument_id)
-
-    for survey_id in surveys_ids:
-        threads.append(myThread(get_survey, cache_data, app.config, survey_id))
-        threads.append(myThread(get_collex, cache_data, app.config, survey_id))
-        # cache_data['surveys'][survey_id] = survey_controller.get_survey(survey_id)
-        # cache_data['collexes'][survey_id] = collection_exercise_controller.get_live_collection_exercises_for_survey(survey_id)
-
-    for business_id in business_ids:
-        threads.append(myThread(get_party, cache_data, app.config, business_id))
-        # cache_data['businesses'][business_id] = get_party_by_business_id(business_id)
-        # cache_data['cases'][business_id] = case_controller.get_cases_for_list_type_by_party_id(business_id, tag)
 
     # This is slightly different to the above because we need to get the collection_instrument_ids out of the cases
     # first then we can make a call to the collection_instrument service and cache the relevant data for the collection
     # instrument. This can then be used to get the type for the specific case.
 
-    for thread in threads:
-        thread.start()
+    collection_instrument_ids = set()
+    for business_id, cases in cache_data['cases'].items():
+        for case in cases:
+            collection_instrument_ids.add(case['collectionInstrumentId'])
+    for collection_instrument_id in collection_instrument_ids:
+        threads.append(CachingDataThreadCreation(get_collection_instrument, cache_data, app.config,
+                                                 collection_instrument_id))
 
     for thread in threads:
+        thread.start()
+    for thread in threads:
         thread.join()
-    # Now instead of making REST calls inside this for loop, for the enrolment its on it will use the cached data and
-    # get the relevant information from that.
 
     for enrolment in get_respondent_enrolments(party_id):
 
@@ -386,12 +376,13 @@ def get_survey(cache_data,config, survey_id):
 
 
 def get_collex(cache_data,config, survey_id):
-    cache_data['collexes'][survey_id] = collection_exercise_controller.get_live_collection_exercises_for_survey_with_config(config,
-        survey_id)
+    cache_data['collexes'][survey_id] = collection_exercise_controller.\
+        get_live_collection_exercises_for_survey_with_config(config, survey_id)
 
 
 def get_case(cache_data ,config, business_id, tag):
-    cache_data['cases'][business_id] = case_controller.get_cases_for_list_type_by_party_id_with_config(config, business_id, tag)
+    cache_data['cases'][business_id] = case_controller.get_cases_for_list_type_by_party_id_with_config(config,
+                                                                                                       business_id, tag)
 
 
 def get_party(cache_data, config, business_id):

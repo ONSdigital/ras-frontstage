@@ -6,7 +6,6 @@ import iso8601
 from flask import current_app
 from structlog import wrap_logger
 
-from frontstage import app
 from frontstage.controllers import (collection_exercise_controller, collection_instrument_controller,
                                     party_controller)
 from frontstage.exceptions.exceptions import InvalidEqPayLoad
@@ -30,7 +29,7 @@ class EqPayload(object):
 
         # Collection Instrument
         ci_id = case['collectionInstrumentId']
-        ci = collection_instrument_controller.get_collection_instrument(app.config, ci_id)
+        ci = collection_instrument_controller.get_collection_instrument(current_app.config, ci_id)
         if ci['type'] != 'EQ':
             raise InvalidEqPayLoad(f'Collection instrument {ci_id} type is not EQ')
 
@@ -47,7 +46,7 @@ class EqPayload(object):
         collex_event_dates = self._get_collex_event_dates(collex_id)
 
         # Party
-        party = party_controller.get_party_by_business_id(app.config, business_party_id, collection_exercise_id=collex_id)
+        party = party_controller.get_party_by_business_id(current_app.config, business_party_id, collection_exercise_id=collex_id)
 
         account_service_url = current_app.config['ACCOUNT_SERVICE_URL']
         account_service_log_out_url = current_app.config['ACCOUNT_SERVICE_LOG_OUT_URL']

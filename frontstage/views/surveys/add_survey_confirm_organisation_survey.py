@@ -1,9 +1,8 @@
 import logging
 
-from flask import render_template, request
+from flask import render_template, request, current_app as app
 from structlog import wrap_logger
 
-from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.common.cryptographer import Cryptographer
 from frontstage.controllers import (case_controller, collection_exercise_controller,

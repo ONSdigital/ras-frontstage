@@ -1,10 +1,9 @@
 
 import logging
 
-from flask import redirect, request, url_for
+from flask import redirect, request, url_for, current_app as app
 from structlog import wrap_logger
 
-from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.common.cryptographer import Cryptographer
 from frontstage.controllers import case_controller, collection_exercise_controller, iac_controller, party_controller

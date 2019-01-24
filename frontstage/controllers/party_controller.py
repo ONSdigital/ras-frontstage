@@ -231,53 +231,30 @@ def get_respondent_enrolments(party_id):
 
 
 class CachingDataThreadCreation(threading.Thread):
-    def __init__(self, function, cache_data, config, id, tag=None):
+    def __init__(self, function, *args):
         threading.Thread.__init__(self)
         self.function = function
-        self.cache_data = cache_data
-        self.config = config
-        self.id = id
-        self.tag = tag
+        self.args = args
 
     def run(self):
-        if self.tag is None:
-            self.function(self.cache_data, self.config, self.id)
-        else:
-            self.function(self.cache_data, self.config, self.id, self.tag)
-
-# This method has gone through a rewrite in an attempt to make the to-do page more performant. Before the rewrite, it
-# was making REST calls in a for loop and this was causing frontstage to time out for some respondents trying to access
-# their surveys. Some of the calls were repeating what it's already done so, we've decided to
-# cache the relevent data before it enters the main for loop in attempt to make less calls which are repeating. We've
-# used sets to make sure its not using any duplicate ids for the business, survey and collection instrument. With the
-# ids we then cache the data into a dictionary which can then be used later.
+        self.function(*self.args)
 
 
-def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_id):
-    enrolment_data = get_respondent_enrolments(party_id)
-
-    # The sets below are used for getting survey and business for the data that is going to
-    # be cached. we add the survey_ids and business_ids for the enrolment data into the sets
-
+def set_enrolment_data(enrolment_data):
     surveys_ids = set()
     business_ids = set()
-
     for enrolment in enrolment_data:
         surveys_ids.add(enrolment['survey_id'])
         business_ids.add(enrolment['business_id'])
+    return surveys_ids, business_ids
 
-    # This is a dictionary that will store all of the data that is going to be cached instead of making mulitple calls
-    # inside of the for loop for get_respondent_enrolments.
 
-    cache_data = {'surveys': dict(),
-                  'businesses': dict(),
-                  'collexes': dict(),
-                  'cases': dict(),
-                  'instrument': dict()}
+def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
+    # Creates a list of threads which will call functions to set the survey, case, party and collex responses
+    # in the cache_data.
 
-    # These two for loops make calls to survey, collex, party and case services to store the response in cache_data
-    # which can be used later on.
     threads = []
+
     for survey_id in surveys_ids:
         threads.append(CachingDataThreadCreation(get_survey, cache_data, app.config, survey_id))
         threads.append(CachingDataThreadCreation(get_collex, cache_data, app.config, survey_id))
@@ -290,13 +267,12 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
         thread.start()
     for thread in threads:
         thread.join()
-    threads.clear()
 
-    # This is slightly different to the above because we need to get the collection_instrument_ids out of the cases
-    # first then we can make a call to the collection_instrument service and cache the relevant data for the collection
-    # instrument. This can then be used to get the type for the specific case.
 
+def caching_data_for_collection_instrument(cache_data):
+    # This function creates a list of threads from the collection instrument id in the cache_data of the cases.
     collection_instrument_ids = set()
+    threads = []
     for business_id, cases in cache_data['cases'].items():
         for case in cases:
             collection_instrument_ids.add(case['collectionInstrumentId'])
@@ -308,6 +284,35 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
         thread.start()
     for thread in threads:
         thread.join()
+
+# This method has gone through a rewrite in an attempt to make the to-do page more performant. Before the rewrite, it
+# was making REST calls in a for loop and this was causing frontstage to time out for some respondents trying to access
+# their surveys. Some of the calls were repeating what it's already done so, we've decided to
+# cache the relevant data before it enters the main for loop in attempt to increase the performance. We've
+# used sets to make sure its not using any duplicate ids for the business, survey and collection instrument. With the
+# ids we then cache the data into a dictionary which can then be used later.
+
+
+def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_id):
+    enrolment_data = get_respondent_enrolments(party_id)
+
+    # Gets the survey ids and business ids from the enrolment data that has been generated.
+
+    surveys_ids, business_ids = set_enrolment_data(enrolment_data)
+
+    # This is a dictionary that will store all of the data that is going to be cached instead of making multiple calls
+    # inside of the for loop for get_respondent_enrolments.
+
+    cache_data = {'surveys': dict(),
+                  'businesses': dict(),
+                  'collexes': dict(),
+                  'cases': dict(),
+                  'instrument': dict()}
+
+    # These two will call the services to get responses and cache the data for later use.
+
+    caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag)
+    caching_data_for_collection_instrument(cache_data)
 
     for enrolment in get_respondent_enrolments(party_id):
 

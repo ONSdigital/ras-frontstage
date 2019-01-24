@@ -34,6 +34,7 @@ class TestPartyController(unittest.TestCase):
         app_config = TestingConfig()
         app.config.from_object(app_config)
         self.app = app.test_client()
+        self.app_config = self.app.application.config
 
     def test_get_respondent_by_party_id_success(self):
         with responses.RequestsMock() as rsps:
@@ -90,7 +91,7 @@ class TestPartyController(unittest.TestCase):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_business_party, json=business_party, status=200)
             with app.app_context():
-                business = party_controller.get_party_by_business_id(business_party['id'])
+                business = party_controller.get_party_by_business_id(self.app_config, business_party['id'])
 
                 self.assertEqual(business['id'], business_party['id'])
                 self.assertEqual(business['name'], business_party['name'])
@@ -100,7 +101,8 @@ class TestPartyController(unittest.TestCase):
             url = f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True"
             rsps.add(rsps.GET, url, json=business_party, status=200)
             with app.app_context():
-                business = party_controller.get_party_by_business_id(business_party['id'], collection_exercise['id'])
+                business = party_controller.get_party_by_business_id(self.app_config,
+                                                                     business_party['id'], collection_exercise['id'])
 
                 self.assertEqual(business['id'], business_party['id'])
                 self.assertEqual(business['name'], business_party['name'])
@@ -110,7 +112,7 @@ class TestPartyController(unittest.TestCase):
             rsps.add(rsps.GET, url_get_business_party, status=400)
             with app.app_context():
                 with self.assertRaises(ApiError):
-                    party_controller.get_party_by_business_id(business_party['id'])
+                    party_controller.get_party_by_business_id(self.app_config, business_party['id'])
 
     def test_get_respondent_by_email_success(self):
         with responses.RequestsMock() as rsps:
@@ -201,16 +203,16 @@ class TestPartyController(unittest.TestCase):
 
         survey_list = party_controller.get_survey_list_details_for_party(respondent_party['id'], 'todo',
                                                                          business_party['id'], survey['id'])
-
-        for survey_details in survey_list:
-            self.assertTrue(survey_details['case_id'] is not None)
-            self.assertTrue(survey_details['status'] is not None)
-            self.assertTrue(survey_details['collection_instrument_type'] is not None)
-            self.assertTrue(survey_details['survey_id'] is not None)
-            self.assertTrue(survey_details['survey_long_name'] is not None)
-            self.assertTrue(survey_details['survey_short_name'] is not None)
-            self.assertTrue(survey_details['business_party_id'] is not None)
-            self.assertTrue(survey_details['collection_exercise_ref'] is not None)
+        with app.app_context():
+            for survey_details in survey_list:
+                self.assertTrue(survey_details['case_id'] is not None)
+                self.assertTrue(survey_details['status'] is not None)
+                self.assertTrue(survey_details['collection_instrument_type'] is not None)
+                self.assertTrue(survey_details['survey_id'] is not None)
+                self.assertTrue(survey_details['survey_long_name'] is not None)
+                self.assertTrue(survey_details['survey_short_name'] is not None)
+                self.assertTrue(survey_details['business_party_id'] is not None)
+                self.assertTrue(survey_details['collection_exercise_ref'] is not None)
 
     def test_display_button(self):
         Combination = namedtuple("Combination", ["status", "ci_type", "expected"])

@@ -3,6 +3,7 @@ import logging
 from flask import render_template, request
 from structlog import wrap_logger
 
+from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.common.cryptographer import Cryptographer
 from frontstage.controllers import (case_controller, collection_exercise_controller,
@@ -30,13 +31,13 @@ def survey_confirm_organisation(_):
         # Get organisation name
         case = case_controller.get_case_by_enrolment_code(enrolment_code)
         business_party_id = case['caseGroup']['partyId']
-        business_party = party_controller.get_party_by_business_id(business_party_id)
+        business_party = party_controller.get_party_by_business_id(app.config, business_party_id)
 
         # Get survey name
         collection_exercise_id = case['caseGroup']['collectionExerciseId']
         collection_exercise = collection_exercise_controller.get_collection_exercise(collection_exercise_id)
         survey_id = collection_exercise['surveyId']
-        survey_name = survey_controller.get_survey(survey_id).get('longName')
+        survey_name = survey_controller.get_survey(app.config, survey_id).get('longName')
     except ApiError as exc:
         logger.error('Failed to retrieve data for confirm add organisation/survey page', api_url=exc.url,
                      api_status_code=exc.status_code)

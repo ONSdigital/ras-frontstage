@@ -20,6 +20,7 @@ class TestCaseControllers(unittest.TestCase):
         app_config = TestingConfig()
         app.config.from_object(app_config)
         self.app = app.test_client()
+        self.app_config = self.app.application.config
 
     def test_calculate_case_status_returns_correct_status_for_complete_for_eq_and_seft(self):
 
@@ -209,7 +210,7 @@ class TestCaseControllers(unittest.TestCase):
     def test_get_cases_for_list_type_by_party_id_todo(self, get_cases_by_party_id):
         get_cases_by_party_id.return_value = case_list
 
-        cases = case_controller.get_cases_for_list_type_by_party_id(respondent_party['id'])
+        cases = case_controller.get_cases_for_list_type_by_party_id(self.app_config, respondent_party['id'])
 
         for business_case in cases:
             for status in ['COMPLETE', 'COMPLETEDBYPHONE', 'NOLONGERREQUIRED']:
@@ -219,7 +220,8 @@ class TestCaseControllers(unittest.TestCase):
     def test_get_cases_for_list_type_by_party_id_history(self, get_cases_by_party_id):
         get_cases_by_party_id.return_value = case_list
 
-        cases = case_controller.get_cases_for_list_type_by_party_id(respondent_party['id'], list_type='history')
+        cases = case_controller.get_cases_for_list_type_by_party_id(self.app_config, respondent_party['id'],
+                                                                    list_type='history')
 
         for business_case in cases:
             for status in ['INPROGRESS', 'NOTSTARTED', 'REOPENED']:
@@ -263,7 +265,7 @@ class TestCaseControllers(unittest.TestCase):
             url = f"{url_get_cases_by_party}?caseevents=true"
             rsps.add(rsps.GET, url, json=case_list, status=200)
             with app.app_context():
-                returned_cases = case_controller.get_cases_by_party_id(case['partyId'], case_events=True)
+                returned_cases = case_controller.get_cases_by_party_id(self.app_config, case['partyId'], case_events=True)
 
                 self.assertNotEqual(len(returned_cases), 0)
 
@@ -271,7 +273,7 @@ class TestCaseControllers(unittest.TestCase):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_cases_by_party, json=case_list, status=200)
             with app.app_context():
-                returned_cases = case_controller.get_cases_by_party_id(case['partyId'])
+                returned_cases = case_controller.get_cases_by_party_id(self.app_config, case['partyId'])
 
                 self.assertNotEqual(len(returned_cases), 0)
 
@@ -280,4 +282,4 @@ class TestCaseControllers(unittest.TestCase):
             rsps.add(rsps.GET, url_get_cases_by_party, status=400)
             with app.app_context():
                 with self.assertRaises(ApiError):
-                    case_controller.get_cases_by_party_id(case['partyId'])
+                    case_controller.get_cases_by_party_id(self.app_config, case['partyId'])

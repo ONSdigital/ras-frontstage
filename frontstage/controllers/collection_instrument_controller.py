@@ -41,27 +41,7 @@ def download_collection_instrument(collection_instrument_id, case_id, party_id):
     return response.content, response.headers.items()
 
 
-def get_collection_instrument(collection_instrument_id):
-    logger.debug('Attempting to retrieve collection instrument',
-                 collection_instrument_id=collection_instrument_id)
-
-    url = f"{app.config['COLLECTION_INSTRUMENT_URL']}/collection-instrument-api/1.0.2/collectioninstrument/id/{collection_instrument_id}"
-    response = requests.get(url, auth=app.config['COLLECTION_INSTRUMENT_AUTH'])
-
-    try:
-        response.raise_for_status()
-    except requests.exceptions.HTTPError:
-        raise ApiError(logger, response,
-                       collection_instrument_id=collection_instrument_id,
-                       log_level='warning' if response.status_code == 404 else 'exception',
-                       message='Failed to get collection instrument')
-
-    logger.debug('Successfully retrieved collection instrument',
-                 collection_instrument_id=collection_instrument_id)
-    return response.json()
-
-
-def get_collection_instrument_with_config(config, collection_instrument_id):
+def get_collection_instrument(config, collection_instrument_id):
     logger.debug('Attempting to retrieve collection instrument',
                  collection_instrument_id=collection_instrument_id)
 

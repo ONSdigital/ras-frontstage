@@ -4,10 +4,10 @@ import requests
 from flask import current_app as app
 from structlog import wrap_logger
 
+from frontstage.common.thread_wrapper import ThreadWrapper
 from frontstage.controllers import case_controller, collection_exercise_controller, collection_instrument_controller, \
     survey_controller
 from frontstage.exceptions.exceptions import ApiError, UserDoesNotExist
-import threading
 
 CLOSED_STATE = ['COMPLETE', 'COMPLETEDBYPHONE', 'NOLONGERREQUIRED']
 
@@ -230,16 +230,6 @@ def get_respondent_enrolments(party_id):
                 }
 
 
-class CachingDataThreadCreation(threading.Thread):
-    def __init__(self, function, *args):
-        threading.Thread.__init__(self)
-        self.function = function
-        self.args = args
-
-    def run(self):
-        self.function(*self.args)
-
-
 def set_enrolment_data(enrolment_data):
     surveys_ids = set()
     business_ids = set()
@@ -256,15 +246,17 @@ def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
     threads = []
 
     for survey_id in surveys_ids:
-        threads.append(CachingDataThreadCreation(get_survey, cache_data, app.config, survey_id))
-        threads.append(CachingDataThreadCreation(get_collex, cache_data, app.config, survey_id))
+        threads.append(ThreadWrapper(get_survey, cache_data, app.config, survey_id))
+        threads.append(ThreadWrapper(get_collex, cache_data, app.config, survey_id))
 
     for business_id in business_ids:
-        threads.append(CachingDataThreadCreation(get_case, cache_data, app.config, business_id, tag))
-        threads.append(CachingDataThreadCreation(get_party, cache_data, app.config, business_id))
+        threads.append(ThreadWrapper(get_case, cache_data, app.config, business_id, tag))
+        threads.append(ThreadWrapper(get_party, cache_data, app.config, business_id))
 
     for thread in threads:
         thread.start()
+
+    # We do a thread join to make sure that the threads have all terminated before it carries on
     for thread in threads:
         thread.join()
 
@@ -277,23 +269,31 @@ def caching_data_for_collection_instrument(cache_data):
         for case in cases:
             collection_instrument_ids.add(case['collectionInstrumentId'])
     for collection_instrument_id in collection_instrument_ids:
-        threads.append(CachingDataThreadCreation(get_collection_instrument, cache_data, app.config,
-                                                 collection_instrument_id))
+        threads.append(ThreadWrapper(get_collection_instrument, cache_data, app.config,
+                                     collection_instrument_id))
 
     for thread in threads:
         thread.start()
+
+    # We do a thread join to make sure that the threads have all terminated before it carries on
     for thread in threads:
         thread.join()
 
-# This method has gone through a rewrite in an attempt to make the to-do page more performant. Before the rewrite, it
-# was making REST calls in a for loop and this was causing frontstage to time out for some respondents trying to access
-# their surveys. Some of the calls were repeating what it's already done so, we've decided to
-# cache the relevant data before it enters the main for loop in attempt to increase the performance. We've
-# used sets to make sure its not using any duplicate ids for the business, survey and collection instrument. With the
-# ids we then cache the data into a dictionary which can then be used later.
-
 
 def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_id):
+
+    """
+    This function uses threads to get responses from Case, Party, Collection exercise, Survey and
+    Collection Instrument services. Some respondents to-do pages can have so many Surveys/Collection exercises
+    that it'll cause the page to timeout before finishing the load. Doing this in threads speeds it up and using
+    sets makes sure we're not using repeating calls to the services.
+
+    :party_id: This is the respondents uuid
+    :tag: This is the page that is being called e.g. to-do, history
+    :business_party_id: This is the businesses uuid
+    :survey_id: This is the surveys uuid
+
+    """
     enrolment_data = get_respondent_enrolments(party_id)
 
     # Gets the survey ids and business ids from the enrolment data that has been generated.

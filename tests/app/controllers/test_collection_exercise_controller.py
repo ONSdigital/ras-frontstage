@@ -25,7 +25,9 @@ class TestCollectionExerciseController(unittest.TestCase):
 
             with app.app_context():
                 collection_exercises = collection_exercise_controller.\
-                    get_collection_exercises_for_survey(self.app_config, collection_exercise['surveyId'])
+                    get_collection_exercises_for_survey(self.app_config['COLLECTION_EXERCISE_URL'],
+                                                        self.app_config['COLLECTION_EXERCISE_AUTH'],
+                                                        collection_exercise['surveyId'])
 
                 self.assertTrue(collection_exercises is not None)
 
@@ -34,8 +36,10 @@ class TestCollectionExerciseController(unittest.TestCase):
             rsps.add(rsps.GET, url_get_collection_exercises_by_survey, status=400)
             with app.app_context():
                 with self.assertRaises(ApiError):
-                    collection_exercise_controller.\
-                        get_collection_exercises_for_survey(self.app_config, collection_exercise['surveyId'])
+                    collection_exercise_controller. \
+                        get_collection_exercises_for_survey(self.app_config['COLLECTION_EXERCISE_URL'],
+                                                            self.app_config['COLLECTION_EXERCISE_AUTH'],
+                                                            collection_exercise['surveyId'])
 
     def test_convert_events_to_new_format_successful(self):
         formatted_events = collection_exercise_controller.convert_events_to_new_format(collection_exercise['events'])

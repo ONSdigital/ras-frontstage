@@ -91,7 +91,9 @@ class TestPartyController(unittest.TestCase):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_business_party, json=business_party, status=200)
             with app.app_context():
-                business = party_controller.get_party_by_business_id(self.app_config, business_party['id'])
+                business = party_controller.get_party_by_business_id(self.app_config['PARTY_URL'],
+                                                                     self.app_config['PARTY_AUTH'],
+                                                                     business_party['id'])
 
                 self.assertEqual(business['id'], business_party['id'])
                 self.assertEqual(business['name'], business_party['name'])
@@ -101,7 +103,8 @@ class TestPartyController(unittest.TestCase):
             url = f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True"
             rsps.add(rsps.GET, url, json=business_party, status=200)
             with app.app_context():
-                business = party_controller.get_party_by_business_id(self.app_config,
+                business = party_controller.get_party_by_business_id(self.app_config['PARTY_URL'],
+                                                                     self.app_config['PARTY_AUTH'],
                                                                      business_party['id'], collection_exercise['id'])
 
                 self.assertEqual(business['id'], business_party['id'])
@@ -112,7 +115,8 @@ class TestPartyController(unittest.TestCase):
             rsps.add(rsps.GET, url_get_business_party, status=400)
             with app.app_context():
                 with self.assertRaises(ApiError):
-                    party_controller.get_party_by_business_id(self.app_config, business_party['id'])
+                    party_controller.get_party_by_business_id(self.app_config['PARTY_URL'],
+                                                              self.app_config['PARTY_AUTH'], business_party['id'])
 
     def test_get_respondent_by_email_success(self):
         with responses.RequestsMock() as rsps:

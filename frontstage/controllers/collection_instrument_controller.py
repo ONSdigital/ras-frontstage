@@ -41,12 +41,12 @@ def download_collection_instrument(collection_instrument_id, case_id, party_id):
     return response.content, response.headers.items()
 
 
-def get_collection_instrument(config, collection_instrument_id):
+def get_collection_instrument(collection_instrument_url, collection_instrument_auth, collection_instrument_id):
     logger.debug('Attempting to retrieve collection instrument',
                  collection_instrument_id=collection_instrument_id)
 
-    url = f"{config['COLLECTION_INSTRUMENT_URL']}/collection-instrument-api/1.0.2/collectioninstrument/id/{collection_instrument_id}"
-    response = requests.get(url, auth=config['COLLECTION_INSTRUMENT_AUTH'])
+    url = f"{collection_instrument_url}/collection-instrument-api/1.0.2/collectioninstrument/id/{collection_instrument_id}"
+    response = requests.get(url, auth=collection_instrument_auth)
 
     try:
         response.raise_for_status()

@@ -53,15 +53,15 @@ def get_collection_exercise_events(collection_exercise_id):
     return response.json()
 
 
-def get_collection_exercises_for_survey(config, survey_id, live_only=None):
+def get_collection_exercises_for_survey(collex_url, collex_auth, survey_id, live_only=None):
     logger.debug('Retrieving collection exercises for survey', survey_id=survey_id)
 
     if live_only is True:
-        url = f"{config['COLLECTION_EXERCISE_URL']}/collectionexercises/survey/{survey_id}?liveOnly=true"
+        url = f"{collex_url}/collectionexercises/survey/{survey_id}?liveOnly=true"
     else:
-        url = f"{config['COLLECTION_EXERCISE_URL']}/collectionexercises/survey/{survey_id}"
+        url = f"{collex_url}/collectionexercises/survey/{survey_id}"
 
-    response = requests.get(url, auth=config['COLLECTION_EXERCISE_AUTH'])
+    response = requests.get(url, auth=collex_auth)
 
     try:
         response.raise_for_status()
@@ -81,8 +81,8 @@ def get_collection_exercises_for_survey(config, survey_id, live_only=None):
     return collection_exercises
 
 
-def get_live_collection_exercises_for_survey(config, survey_id):
-    return get_collection_exercises_for_survey(config, survey_id, True)
+def get_live_collection_exercises_for_survey(collex_url, collex_auth, survey_id):
+    return get_collection_exercises_for_survey(collex_url, collex_auth, survey_id, True)
 
 
 def convert_events_to_new_format(events):

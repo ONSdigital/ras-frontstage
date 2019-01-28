@@ -91,13 +91,13 @@ def create_account(registration_data):
     logger.debug('Successfully created account')
 
 
-def get_party_by_business_id(config, party_id, collection_exercise_id=None):
+def get_party_by_business_id(party_url, party_auth, party_id, collection_exercise_id=None):
     logger.debug('Attempting to retrieve party by business', party_id=party_id)
 
-    url = f"{config['PARTY_URL']}/party-api/v1/businesses/id/{party_id}"
+    url = f"{party_url}/party-api/v1/businesses/id/{party_id}"
     if collection_exercise_id:
         url += f"?collection_exercise_id={collection_exercise_id}&verbose=True"
-    response = requests.get(url, auth=config['PARTY_AUTH'])
+    response = requests.get(url, auth=party_auth)
 
     try:
         response.raise_for_status()
@@ -246,12 +246,16 @@ def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
     threads = []
 
     for survey_id in surveys_ids:
-        threads.append(ThreadWrapper(get_survey, cache_data, app.config, survey_id))
-        threads.append(ThreadWrapper(get_collex, cache_data, app.config, survey_id))
+        threads.append(ThreadWrapper(get_survey, cache_data, app.config['SURVEY_URL'], app.config['SURVEY_AUTH'],
+                                     survey_id))
+        threads.append(ThreadWrapper(get_collex, cache_data, app.config['COLLECTION_EXERCISE_URL'],
+                                     app.config['COLLECTION_EXERCISE_AUTH'], survey_id))
 
     for business_id in business_ids:
-        threads.append(ThreadWrapper(get_case, cache_data, app.config, business_id, tag))
-        threads.append(ThreadWrapper(get_party, cache_data, app.config, business_id))
+        threads.append(ThreadWrapper(get_case, cache_data, app.config['CASE_URL'], app.config['CASE_AUTH'],
+                                     business_id, tag))
+        threads.append(ThreadWrapper(get_party, cache_data, app.config['PARTY_URL'], app.config['PARTY_AUTH'],
+                                     business_id))
 
     for thread in threads:
         thread.start()
@@ -269,8 +273,8 @@ def caching_data_for_collection_instrument(cache_data):
         for case in cases:
             collection_instrument_ids.add(case['collectionInstrumentId'])
     for collection_instrument_id in collection_instrument_ids:
-        threads.append(ThreadWrapper(get_collection_instrument, cache_data, app.config,
-                                     collection_instrument_id))
+        threads.append(ThreadWrapper(get_collection_instrument, cache_data, app.config['COLLECTION_INSTRUMENT_URL'],
+                                     app.config['COLLECTION_INSTRUMENT_AUTH'], collection_instrument_id))
 
     for thread in threads:
         thread.start()
@@ -352,26 +356,27 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
             }
 
 
-def get_survey(cache_data, config, survey_id):
-    cache_data['surveys'][survey_id] = survey_controller.get_survey(config, survey_id)
+def get_survey(cache_data, survey_url, survey_auth, survey_id):
+    cache_data['surveys'][survey_id] = survey_controller.get_survey(survey_url, survey_auth, survey_id)
 
 
-def get_collex(cache_data, config, survey_id):
+def get_collex(cache_data, collex_url, collex_auth, survey_id):
     cache_data['collexes'][survey_id] = collection_exercise_controller.\
-        get_live_collection_exercises_for_survey(config, survey_id)
+        get_live_collection_exercises_for_survey(collex_url, collex_auth, survey_id)
 
 
-def get_case(cache_data, config, business_id, tag):
-    cache_data['cases'][business_id] = case_controller.get_cases_for_list_type_by_party_id(config, business_id, tag)
+def get_case(cache_data, case_url, case_auth, business_id, tag):
+    cache_data['cases'][business_id] = case_controller.get_cases_for_list_type_by_party_id(case_url, case_auth, business_id, tag)
 
 
-def get_party(cache_data, config, business_id):
-    cache_data['businesses'][business_id] = get_party_by_business_id(config, business_id)
+def get_party(cache_data, party_url, party_auth, business_id):
+    cache_data['businesses'][business_id] = get_party_by_business_id(party_url, party_auth, business_id)
 
 
-def get_collection_instrument(cache_data, config, collection_instrument_id):
+def get_collection_instrument(cache_data, collection_instrument_url, collection_instrument_auth,
+                              collection_instrument_id):
     cache_data['instrument'][collection_instrument_id] = collection_instrument_controller. \
-        get_collection_instrument(config, collection_instrument_id)
+        get_collection_instrument(collection_instrument_url, collection_instrument_auth, collection_instrument_id)
 
 
 def display_button(status, ci_type):

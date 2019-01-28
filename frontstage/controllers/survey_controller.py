@@ -10,10 +10,10 @@ from frontstage.exceptions.exceptions import ApiError
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def get_survey(config, survey_id):
+def get_survey(survey_url, survey_auth, survey_id):
     logger.debug('Attempting to retrieve survey', survey_id=survey_id)
-    url = f"{config['SURVEY_URL']}/surveys/{survey_id}"
-    response = requests.get(url, auth=config['SURVEY_AUTH'])
+    url = f"{survey_url}/surveys/{survey_id}"
+    response = requests.get(url, auth=survey_auth)
 
     try:
         response.raise_for_status()

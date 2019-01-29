@@ -99,18 +99,18 @@ def get_case_data(case_id, party_id, business_party_id, survey_short_name):
     case_data = {
         "collection_exercise": collection_exercise_controller.get_collection_exercise(case['caseGroup']['collectionExerciseId']),
         "collection_instrument": collection_instrument_controller.get_collection_instrument
-        (app.config['COLLECTION_INSTRUMENT_URL'], app.config['COLLECTION_INSTRUMENT_URL'],
-         case['collectionInstrumentId']),
+        (case['collectionInstrumentId'], app.config['COLLECTION_INSTRUMENT_URL'],
+         app.config['COLLECTION_INSTRUMENT_AUTH']),
         "survey": survey_controller.get_survey_by_short_name(survey_short_name),
-        "business_party": party_controller.get_party_by_business_id(app.config['PARTY_URL'],
-                                                                    app.config['PARTY_AUTH'], business_party_id)
+        "business_party": party_controller.get_party_by_business_id(business_party_id, app.config['PARTY_URL'],
+                                                                    app.config['PARTY_AUTH'])
     }
 
     logger.debug('Successfully retrieved all data relating to case', case_id=case_id, party_id=party_id)
     return case_data
 
 
-def get_cases_by_party_id(case_url, case_auth, party_id, case_events=False):
+def get_cases_by_party_id(party_id, case_url, case_auth, case_events=False):
     logger.debug('Attempting to retrieve cases by party id', party_id=party_id)
 
     url = f"{case_url}/cases/partyid/{party_id}"
@@ -199,10 +199,10 @@ def validate_case_category(category):
     logger.debug('Successfully validated case category', category=category)
 
 
-def get_cases_for_list_type_by_party_id(case_url, case_auth, party_id, list_type='todo'):
+def get_cases_for_list_type_by_party_id(party_id, case_url, case_auth, list_type='todo'):
     logger.debug('Get cases for party for list', party_id=party_id, list_type=list_type)
 
-    cases = get_cases_by_party_id(case_url, case_auth, party_id)
+    cases = get_cases_by_party_id(party_id, case_url, case_auth)
     history_statuses = ['COMPLETE', 'COMPLETEDBYPHONE', 'NOLONGERREQUIRED']
     if list_type == 'history':
         filtered_cases = [business_case

@@ -41,7 +41,7 @@ def download_collection_instrument(collection_instrument_id, case_id, party_id):
     return response.content, response.headers.items()
 
 
-def get_collection_instrument(collection_instrument_url, collection_instrument_auth, collection_instrument_id):
+def get_collection_instrument(collection_instrument_id, collection_instrument_url, collection_instrument_auth):
     logger.debug('Attempting to retrieve collection instrument',
                  collection_instrument_id=collection_instrument_id)
 

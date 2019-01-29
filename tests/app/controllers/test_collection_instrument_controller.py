@@ -46,9 +46,9 @@ class TestCollectionInstrumentController(unittest.TestCase):
             rsps.add(rsps.GET, url_get_ci, json=collection_instrument_seft, status=200)
             with app.app_context():
                 returned_ci = collection_instrument_controller.\
-                    get_collection_instrument(self.app_config['COLLECTION_INSTRUMENT_URL'],
-                                              self.app_config['COLLECTION_INSTRUMENT_AUTH'],
-                                              collection_instrument_seft['id'])
+                    get_collection_instrument(collection_instrument_seft['id'],
+                                              self.app_config['COLLECTION_INSTRUMENT_URL'],
+                                              self.app_config['COLLECTION_INSTRUMENT_AUTH'])
 
                 self.assertEqual(collection_instrument_seft['id'], returned_ci['id'])
 
@@ -57,11 +57,11 @@ class TestCollectionInstrumentController(unittest.TestCase):
             rsps.add(rsps.GET, url_get_ci, status=400)
             with app.app_context():
                 with self.assertRaises(ApiError):
-                    collection_instrument_controller.get_collection_instrument(self.app_config[
+                    collection_instrument_controller.get_collection_instrument(collection_instrument_seft['id'],
+                                                                               self.app_config[
                                                                                    'COLLECTION_INSTRUMENT_URL'],
                                                                                self.app_config[
-                                                                                   'COLLECTION_INSTRUMENT_AUTH'],
-                                                                               collection_instrument_seft['id'])
+                                                                                   'COLLECTION_INSTRUMENT_AUTH'])
 
     @patch('frontstage.controllers.case_controller.post_case_event')
     def test_upload_collection_instrument_success(self, _):

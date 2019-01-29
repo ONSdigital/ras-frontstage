@@ -53,7 +53,7 @@ def get_collection_exercise_events(collection_exercise_id):
     return response.json()
 
 
-def get_collection_exercises_for_survey(collex_url, collex_auth, survey_id, live_only=None):
+def get_collection_exercises_for_survey(survey_id, collex_url, collex_auth,  live_only=None):
     logger.debug('Retrieving collection exercises for survey', survey_id=survey_id)
 
     if live_only is True:
@@ -81,8 +81,8 @@ def get_collection_exercises_for_survey(collex_url, collex_auth, survey_id, live
     return collection_exercises
 
 
-def get_live_collection_exercises_for_survey(collex_url, collex_auth, survey_id):
-    return get_collection_exercises_for_survey(collex_url, collex_auth, survey_id, True)
+def get_live_collection_exercises_for_survey(survey_id, collex_url, collex_auth):
+    return get_collection_exercises_for_survey(survey_id, collex_url, collex_auth, True)
 
 
 def convert_events_to_new_format(events):

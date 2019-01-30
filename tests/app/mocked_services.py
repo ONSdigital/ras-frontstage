@@ -17,9 +17,6 @@ with open('tests/test_data/party/party.json') as fp:
 with open('tests/test_data/case/case.json') as fp:
     case = json.load(fp)
 
-with open('tests/test_data/case/case_diff_surveyId.json') as fp:
-    case_diff_surveyId = json.load(fp)
-
 with open('tests/test_data/case/case_list.json') as fp:
     case_list = json.load(fp)
 

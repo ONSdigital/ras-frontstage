@@ -231,6 +231,9 @@ def get_respondent_enrolments(party_id):
 
 
 def set_enrolment_data(enrolment_data):
+    # In this function, we're getting all the unique set of partys and surveys, so that we don't get the data more
+    # than once.
+
     surveys_ids = set()
     business_ids = set()
     for enrolment in enrolment_data:

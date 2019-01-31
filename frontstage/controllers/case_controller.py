@@ -110,12 +110,18 @@ def get_case_data(case_id, party_id, business_party_id, survey_short_name):
     return case_data
 
 
-def get_cases_by_party_id(party_id, case_url, case_auth, case_events=False):
+def get_cases_by_party_id(party_id, case_url, case_auth, case_events=False, iac=True):
     logger.debug('Attempting to retrieve cases by party id', party_id=party_id)
 
     url = f"{case_url}/cases/partyid/{party_id}"
     if case_events:
         url = f'{url}?caseevents=true'
+    if not iac:
+        if case_events:
+            url = f'{url}&'
+        else:
+            url = f'{url}?'
+        url = f'{url}iac=false'
     response = requests.get(url, auth=case_auth)
 
     try:
@@ -202,7 +208,7 @@ def validate_case_category(category):
 def get_cases_for_list_type_by_party_id(party_id, case_url, case_auth, list_type='todo'):
     logger.debug('Get cases for party for list', party_id=party_id, list_type=list_type)
 
-    cases = get_cases_by_party_id(party_id, case_url, case_auth)
+    cases = get_cases_by_party_id(party_id, case_url, case_auth, iac=False)
     history_statuses = ['COMPLETE', 'COMPLETEDBYPHONE', 'NOLONGERREQUIRED']
     if list_type == 'history':
         filtered_cases = [business_case

@@ -1,0 +1,136 @@
+[
+  {
+    "state": "ACTIONABLE",
+    "id": "3a7c8295-1932-4ab9-b447-a5b251d7d25d",
+    "actionPlanId": "f1a733ae-e5e6-4245-b2bd-550086f871e2",
+    "collectionInstrumentId": "e963b049-8317-4d52-87d0-01bebb31d4ac",
+    "partyId": "be3483c3-f5c9-4b13-bdd7-244db78ff687",
+    "iac": null,
+    "caseRef": "1000000000000017",
+    "createdBy": "SYSTEM",
+    "sampleUnitType": "B",
+    "createdDateTime": "2018-07-12T08:59:41.787Z",
+    "caseGroup": {
+      "collectionExerciseId": "'ed5972f6-d17d-4408-bb9a-7af54f13c88b'",
+      "id": "40d034cf-5875-4022-b160-506e094b157a",
+      "partyId": "be3483c3-f5c9-4b13-bdd7-244db78ff687",
+      "sampleUnitRef": "49900000001",
+      "sampleUnitType": "B",
+      "caseGroupStatus": "NOTSTARTED"
+    },
+    "responses": [],
+    "caseEvents": [
+      {
+        "createdDateTime": 1460736159699,
+        "caseEventPK": 1,
+        "caseFK": 1,
+        "category": "ONLINE_QUESTIONNAIRE_RESPONSE",
+        "subCategory": "subcat 1",
+        "createdBy": "me 1",
+        "description": "desc 1",
+        "metadata": {
+          "partyId": "3b136c4b-7a14-4904-9e01-13364dd7b972"
+        }
+      }
+    ]
+  },
+  {
+    "state": "ACTIONABLE",
+    "id": "6692033f-1d10-4cc5-a058-f2d012ce6af5",
+    "actionPlanId": "c10e98d8-88a3-4fc7-a990-22a7a926f214",
+    "collectionInstrumentId": "e963b049-8317-4d52-87d0-01bebb31d4ac",
+    "partyId": "be3483c3-f5c9-4b13-bdd7-244db78ff687",
+    "iac": null,
+    "caseRef": "1000000000000025",
+    "createdBy": "SYSTEM",
+    "sampleUnitType": "B",
+    "createdDateTime": "2018-07-12T08:59:46.866Z",
+    "caseGroup": {
+      "collectionExerciseId": "4ec73b0c-c9cf-438e-a8b5-0c4bc2cf922d",
+      "id": "40d034cf-5875-4022-b160-506e094b157a",
+      "partyId": "be3483c3-f5c9-4b13-bdd7-244db78ff687",
+      "sampleUnitRef": "49900000001",
+      "sampleUnitType": "B",
+      "caseGroupStatus": "NOTSTARTED"
+    },
+    "responses": [],
+    "caseEvents": {
+      "createdDateTime": 1460736159699,
+      "caseEventPK": 1,
+      "caseFK": 1,
+      "category": "ONLINE_QUESTIONNAIRE_RESPONSE",
+      "subCategory": "subcat 1",
+      "createdBy": "me 1",
+      "description": "desc 1",
+      "metadata": {
+        "partyId": "3b136c4b-7a14-4904-9e01-13364dd7b972"
+      }
+    }
+  },
+  {
+    "state": "INACTIONABLE",
+    "id": "9d5ff134-79ae-4107-9441-374765399cb5",
+    "actionPlanId": "c0d5a501-de2a-4b8c-90c8-e00aa5956fed",
+    "collectionInstrumentId": "3e196ba5-a0dd-4c3d-a105-e0c1085ff882",
+    "partyId": "be3483c3-f5c9-4b13-bdd7-244db78ff687",
+    "iac": null,
+    "caseRef": "1000000000000001",
+    "createdBy": "SYSTEM",
+    "sampleUnitType": "B",
+    "createdDateTime": "2018-07-12T08:59:31.647Z",
+    "caseGroup": {
+      "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+      "id": "32fc3b86-b696-42ee-b905-a5712648711b",
+      "partyId": "be3483c3-f5c9-4b13-bdd7-244db78ff687",
+      "sampleUnitRef": "49900000001",
+      "sampleUnitType": "B",
+      "caseGroupStatus": "NOTSTARTED"
+    },
+    "responses": [],
+    "caseEvents": {
+      "createdDateTime": 1460736159699,
+      "caseEventPK": 1,
+      "caseFK": 1,
+      "category": "ONLINE_QUESTIONNAIRE_RESPONSE",
+      "subCategory": "subcat 1",
+      "createdBy": "me 1",
+      "description": "desc 1",
+      "metadata": {
+        "partyId": "3b136c4b-7a14-4904-9e01-13364dd7b972"
+      }
+    }
+  },
+  {
+    "state": "INACTIONABLE",
+    "id": "f8a5d864-76af-45bd-a701-cc35bbd13a89",
+    "actionPlanId": "288fcc63-b8b1-4812-bb47-3dfefd5f164f",
+    "collectionInstrumentId": "3e196ba5-a0dd-4c3d-a105-e0c1085ff882",
+    "partyId": "0008279d-9425-4e28-897d-bfd876aa7f3f",
+    "iac": null,
+    "caseRef": "1000000000000009",
+    "createdBy": "SYSTEM",
+    "sampleUnitType": "B",
+    "createdDateTime": "2018-07-12T08:59:36.720Z",
+    "caseGroup": {
+      "collectionExerciseId": "ed5972f6-d17d-4408-bb9a-7af54f13c88b",
+      "id": "e3f86bac-e6c3-4a65-82ee-a2217096b283",
+      "partyId": "0008279d-9425-4e28-897d-bfd876aa7f3f",
+      "sampleUnitRef": "49900000001",
+      "sampleUnitType": "B",
+      "caseGroupStatus": "COMPLETE"
+    },
+    "responses": [],
+    "caseEvents": {
+      "createdDateTime": 1460736159699,
+      "caseEventPK": 1,
+      "caseFK": 1,
+      "category": "ONLINE_QUESTIONNAIRE_RESPONSE",
+      "subCategory": "subcat 1",
+      "createdBy": "me 1",
+      "description": "desc 1",
+      "metadata": {
+        "partyId": "3b136c4b-7a14-4904-9e01-13364dd7b972"
+      }
+    }
+  }
+]

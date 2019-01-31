@@ -4,6 +4,7 @@ import requests
 from flask import current_app as app
 from structlog import wrap_logger
 
+from frontstage.common.thread_wrapper import ThreadWrapper
 from frontstage.controllers import case_controller, collection_exercise_controller, collection_instrument_controller, \
     survey_controller
 from frontstage.exceptions.exceptions import ApiError, UserDoesNotExist
@@ -90,13 +91,13 @@ def create_account(registration_data):
     logger.debug('Successfully created account')
 
 
-def get_party_by_business_id(party_id, collection_exercise_id=None):
+def get_party_by_business_id(party_id, party_url, party_auth, collection_exercise_id=None):
     logger.debug('Attempting to retrieve party by business', party_id=party_id)
 
-    url = f"{app.config['PARTY_URL']}/party-api/v1/businesses/id/{party_id}"
+    url = f"{party_url}/party-api/v1/businesses/id/{party_id}"
     if collection_exercise_id:
         url += f"?collection_exercise_id={collection_exercise_id}&verbose=True"
-    response = requests.get(url, auth=app.config['PARTY_AUTH'])
+    response = requests.get(url, auth=party_auth)
 
     try:
         response.raise_for_status()
@@ -229,32 +230,119 @@ def get_respondent_enrolments(party_id):
                 }
 
 
+def set_enrolment_data(enrolment_data):
+    # In this function, we're getting all the unique set of partys and surveys, so that we don't get the data more
+    # than once.
+
+    surveys_ids = set()
+    business_ids = set()
+    for enrolment in enrolment_data:
+        surveys_ids.add(enrolment['survey_id'])
+        business_ids.add(enrolment['business_id'])
+    return surveys_ids, business_ids
+
+
+def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
+    # Creates a list of threads which will call functions to set the survey, case, party and collex responses
+    # in the cache_data.
+
+    threads = []
+
+    for survey_id in surveys_ids:
+        threads.append(ThreadWrapper(get_survey, cache_data, survey_id, app.config['SURVEY_URL'],
+                                     app.config['SURVEY_AUTH']))
+        threads.append(ThreadWrapper(get_collex, cache_data, survey_id, app.config['COLLECTION_EXERCISE_URL'],
+                                     app.config['COLLECTION_EXERCISE_AUTH']))
+
+    for business_id in business_ids:
+        threads.append(ThreadWrapper(get_case, cache_data, business_id, app.config['CASE_URL'],
+                                     app.config['CASE_AUTH'], tag))
+        threads.append(ThreadWrapper(get_party, cache_data, business_id, app.config['PARTY_URL'],
+                                     app.config['PARTY_AUTH']))
+
+    for thread in threads:
+        thread.start()
+
+    # We do a thread join to make sure that the threads have all terminated before it carries on
+    for thread in threads:
+        thread.join()
+
+
+def caching_data_for_collection_instrument(cache_data):
+    # This function creates a list of threads from the collection instrument id in the cache_data of the cases.
+    collection_instrument_ids = set()
+    threads = []
+    for business_id, cases in cache_data['cases'].items():
+        for case in cases:
+            collection_instrument_ids.add(case['collectionInstrumentId'])
+    for collection_instrument_id in collection_instrument_ids:
+        threads.append(ThreadWrapper(get_collection_instrument, cache_data, collection_instrument_id,
+                                     app.config['COLLECTION_INSTRUMENT_URL'], app.config['COLLECTION_INSTRUMENT_AUTH']))
+
+    for thread in threads:
+        thread.start()
+
+    # We do a thread join to make sure that the threads have all terminated before it carries on
+    for thread in threads:
+        thread.join()
+
+
 def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_id):
 
+    """
+    This function uses threads to get responses from Case, Party, Collection exercise, Survey and
+    Collection Instrument services. Some respondents to-do pages can have so many Surveys/Collection exercises
+    that it'll cause the page to timeout before finishing the load. Doing this in threads speeds it up and using
+    sets makes sure we're not using repeating calls to the services.
+
+    :party_id: This is the respondents uuid
+    :tag: This is the page that is being called e.g. to-do, history
+    :business_party_id: This is the businesses uuid
+    :survey_id: This is the surveys uuid
+
+    """
+    enrolment_data = get_respondent_enrolments(party_id)
+
+    # Gets the survey ids and business ids from the enrolment data that has been generated.
+
+    surveys_ids, business_ids = set_enrolment_data(enrolment_data)
+
+    # This is a dictionary that will store all of the data that is going to be cached instead of making multiple calls
+    # inside of the for loop for get_respondent_enrolments.
+
+    cache_data = {'surveys': dict(),
+                  'businesses': dict(),
+                  'collexes': dict(),
+                  'cases': dict(),
+                  'instrument': dict()}
+
+    # These two will call the services to get responses and cache the data for later use.
+
+    caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag)
+    caching_data_for_collection_instrument(cache_data)
+
     for enrolment in get_respondent_enrolments(party_id):
-        business_party = get_party_by_business_id(enrolment['business_id'])
-        survey = survey_controller.get_survey(enrolment['survey_id'])
 
-        live_collection_exercises = collection_exercise_controller.get_live_collection_exercises_for_survey(survey['id'])
+        business_party = cache_data['businesses'][enrolment['business_id']]
+        survey = cache_data['surveys'][enrolment['survey_id']]
+        live_collection_exercises = cache_data['collexes'][survey['id']]
         collection_exercises_by_id = dict((ce['id'], ce) for ce in live_collection_exercises)
-
-        cases = case_controller.get_cases_for_list_type_by_party_id(business_party['id'], tag)
+        cases = cache_data['cases'][business_party['id']]
         enrolled_cases = [case for case in cases if case['caseGroup']['collectionExerciseId'] in collection_exercises_by_id.keys()]
 
         for case in enrolled_cases:
-            collection_instrument = collection_instrument_controller.get_collection_instrument(
-                case['collectionInstrumentId']
-            )
             collection_exercise = collection_exercises_by_id[case['caseGroup']['collectionExerciseId']]
             added_survey = True if business_party_id == business_party['id'] and survey_id == survey['id'] else None
-            display_access_button = display_button(case['caseGroup']['caseGroupStatus'], collection_instrument['type'])
+            display_access_button = display_button(case['caseGroup']['caseGroupStatus'], cache_data['instrument']
+                                                                    [case['collectionInstrumentId']]['type'])
 
             yield {
 
                 'case_id': case['id'],
                 'status': case_controller.calculate_case_status(case['caseGroup']['caseGroupStatus'],
-                                                                collection_instrument['type']),
-                'collection_instrument_type': collection_instrument['type'],
+                                                                cache_data['instrument']
+                                                                [case['collectionInstrumentId']]['type']),
+                'collection_instrument_type': cache_data['instrument'][case['collectionInstrumentId']]['type'],
                 'survey_id': survey['id'],
                 'survey_long_name': survey['longName'],
                 'survey_short_name': survey['shortName'],
@@ -269,6 +357,30 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
                 'added_survey': added_survey,
                 'display_button': display_access_button
             }
+
+
+def get_survey(cache_data, survey_id, survey_url, survey_auth):
+    cache_data['surveys'][survey_id] = survey_controller.get_survey(survey_url, survey_auth, survey_id)
+
+
+def get_collex(cache_data, survey_id, collex_url, collex_auth):
+    cache_data['collexes'][survey_id] = collection_exercise_controller.\
+        get_live_collection_exercises_for_survey(survey_id, collex_url, collex_auth)
+
+
+def get_case(cache_data, business_id, case_url, case_auth, tag):
+    cache_data['cases'][business_id] = case_controller.get_cases_for_list_type_by_party_id(business_id, case_url,
+                                                                                           case_auth, tag)
+
+
+def get_party(cache_data, business_id, party_url, party_auth):
+    cache_data['businesses'][business_id] = get_party_by_business_id(business_id, party_url, party_auth)
+
+
+def get_collection_instrument(cache_data, collection_instrument_id, collection_instrument_url,
+                              collection_instrument_auth):
+    cache_data['instrument'][collection_instrument_id] = collection_instrument_controller. \
+        get_collection_instrument(collection_instrument_id, collection_instrument_url, collection_instrument_auth)
 
 
 def display_button(status, ci_type):

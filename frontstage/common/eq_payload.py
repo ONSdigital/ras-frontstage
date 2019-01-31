@@ -29,7 +29,10 @@ class EqPayload(object):
 
         # Collection Instrument
         ci_id = case['collectionInstrumentId']
-        ci = collection_instrument_controller.get_collection_instrument(ci_id)
+        ci = collection_instrument_controller.get_collection_instrument(ci_id,
+                                                                        current_app.config['COLLECTION_INSTRUMENT_URL'],
+                                                                        current_app.config[
+                                                                            'COLLECTION_INSTRUMENT_AUTH'])
         if ci['type'] != 'EQ':
             raise InvalidEqPayLoad(f'Collection instrument {ci_id} type is not EQ')
 
@@ -46,7 +49,9 @@ class EqPayload(object):
         collex_event_dates = self._get_collex_event_dates(collex_id)
 
         # Party
-        party = party_controller.get_party_by_business_id(business_party_id, collection_exercise_id=collex_id)
+        party = party_controller.get_party_by_business_id(business_party_id, current_app.config['PARTY_URL'],
+                                                          current_app.config['PARTY_AUTH'],
+                                                          collection_exercise_id=collex_id)
 
         account_service_url = current_app.config['ACCOUNT_SERVICE_URL']
         account_service_log_out_url = current_app.config['ACCOUNT_SERVICE_LOG_OUT_URL']

@@ -2,7 +2,7 @@
 
 {% extends "layouts/_onecol.html" %}
 
-{% block page_title %}Surveys to complete - ONS Business Surveys{% endblock page_title %}
+{% block page_title %}Surveys to complete - ONS Business Surveys{% endblock %}
 
 {% block main %}
 {% include "partials/tab_list.html" %}
@@ -12,15 +12,6 @@
     <div class="panel__body">
         <div>Your <a id="NEW_SURVEY_NOTIF" href="#new-survey">new survey</a> has been added</div>
 
-    </div>
-</div>
-{% endif %}
-
-
-{% if already_enrolled %}
-<div class="panel panel--simple panel--info panel--spacious">
-    <div class="panel__body">
-        <div id="ALREADY_ADDED_NOTIF">You have already added that <a href="#new-survey">survey</a> </div>
     </div>
 </div>
 {% endif %}

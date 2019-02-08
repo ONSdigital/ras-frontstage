@@ -20,6 +20,9 @@ with open('tests/test_data/case/case.json') as fp:
 with open('tests/test_data/case/case_list.json') as fp:
     case_list = json.load(fp)
 
+with open('tests/test_data/case/case_list_without_iac_and_with_case_events.json') as fp:
+    case_list_with_iac_and_case_events = json.load(fp)
+
 with open('tests/test_data/case/categories.json') as fp:
     categories = json.load(fp)
 

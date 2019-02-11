@@ -2,9 +2,11 @@ import logging
 from datetime import datetime
 from functools import wraps
 
+from flask import url_for
 from jose import JWTError
 from jose.jwt import decode
 from structlog import wrap_logger
+from werkzeug.utils import redirect
 
 from frontstage import app
 from frontstage.common.session import SessionHandler
@@ -51,7 +53,7 @@ def jwt_authorization(request):
                     raise JWTValidationError
             else:
                 logger.warning('No authorization token provided')
-                raise JWTValidationError
+                return redirect(url_for('sign_in_bp.login', next=request.url))
 
             if app.config['VALIDATE_JWT']:
                 if validate(jwt):

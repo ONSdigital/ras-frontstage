@@ -11,7 +11,8 @@ from frontstage.exceptions.exceptions import ApiError, InvalidCaseCategory, NoSu
 from tests.app.mocked_services import (business_party, case, case_list, categories, collection_exercise,
                                        collection_instrument_seft, eq_payload, respondent_party, survey,
                                        survey_eq, url_get_case, url_get_case_by_enrolment_code,
-                                       url_get_cases_by_party, url_get_case_categories, url_post_case_event_uuid)
+                                       url_get_cases_by_party, url_get_case_categories, url_post_case_event_uuid,
+                                       case_list_with_iac_and_case_events)
 
 
 class TestCaseControllers(unittest.TestCase):
@@ -20,6 +21,7 @@ class TestCaseControllers(unittest.TestCase):
         app_config = TestingConfig()
         app.config.from_object(app_config)
         self.app = app.test_client()
+        self.app_config = self.app.application.config
 
     def test_calculate_case_status_returns_correct_status_for_complete_for_eq_and_seft(self):
 
@@ -209,8 +211,9 @@ class TestCaseControllers(unittest.TestCase):
     def test_get_cases_for_list_type_by_party_id_todo(self, get_cases_by_party_id):
         get_cases_by_party_id.return_value = case_list
 
-        cases = case_controller.get_cases_for_list_type_by_party_id(respondent_party['id'])
-
+        cases = case_controller.get_cases_for_list_type_by_party_id(respondent_party['id'],
+                                                                    self.app_config['CASE_URL'],
+                                                                    self.app_config['CASE_AUTH'])
         for business_case in cases:
             for status in ['COMPLETE', 'COMPLETEDBYPHONE', 'NOLONGERREQUIRED']:
                 self.assertNotIn(business_case['caseGroup']['caseGroupStatus'], status)
@@ -219,7 +222,10 @@ class TestCaseControllers(unittest.TestCase):
     def test_get_cases_for_list_type_by_party_id_history(self, get_cases_by_party_id):
         get_cases_by_party_id.return_value = case_list
 
-        cases = case_controller.get_cases_for_list_type_by_party_id(respondent_party['id'], list_type='history')
+        cases = case_controller.get_cases_for_list_type_by_party_id(respondent_party['id'],
+                                                                    self.app_config['CASE_URL'],
+                                                                    self.app_config['CASE_AUTH'],
+                                                                    list_type='history')
 
         for business_case in cases:
             for status in ['INPROGRESS', 'NOTSTARTED', 'REOPENED']:
@@ -263,7 +269,8 @@ class TestCaseControllers(unittest.TestCase):
             url = f"{url_get_cases_by_party}?caseevents=true"
             rsps.add(rsps.GET, url, json=case_list, status=200)
             with app.app_context():
-                returned_cases = case_controller.get_cases_by_party_id(case['partyId'], case_events=True)
+                returned_cases = case_controller.get_cases_by_party_id(case['partyId'], self.app_config['CASE_URL'],
+                                                                       self.app_config['CASE_AUTH'], case_events=True)
 
                 self.assertNotEqual(len(returned_cases), 0)
 
@@ -271,13 +278,37 @@ class TestCaseControllers(unittest.TestCase):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_cases_by_party, json=case_list, status=200)
             with app.app_context():
-                returned_cases = case_controller.get_cases_by_party_id(case['partyId'])
+                returned_cases = case_controller.get_cases_by_party_id(case['partyId'], self.app_config['CASE_URL'],
+                                                                       self.app_config['CASE_AUTH'])
 
                 self.assertNotEqual(len(returned_cases), 0)
+
+    def test_get_cases_by_party_id_without_iac(self):
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.GET, url_get_cases_by_party, json=case_list, status=200)
+            with app.app_context():
+                returned_cases = case_controller.get_cases_by_party_id(case['partyId'], self.app_config['CASE_URL'],
+                                                                       self.app_config['CASE_AUTH'], iac=False)
+
+                self.assertNotEqual(len(returned_cases), 0)
+                self.assertIsNone(returned_cases[0]['iac'])
+
+    def test_get_cases_by_party_id_without_iac_and_with_case_events(self):
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.GET, url_get_cases_by_party, json=case_list_with_iac_and_case_events, status=200)
+            with app.app_context():
+                returned_cases = case_controller.get_cases_by_party_id(case['partyId'], self.app_config['CASE_URL'],
+                                                                       self.app_config['CASE_AUTH'], iac=False,
+                                                                       case_events=True)
+
+                self.assertNotEqual(len(returned_cases), 0)
+                self.assertIsNone(returned_cases[0]['iac'])
+                self.assertIsNotNone(returned_cases[0]['caseEvents'][0])
 
     def test_get_cases_by_party_id_fail(self):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_cases_by_party, status=400)
             with app.app_context():
                 with self.assertRaises(ApiError):
-                    case_controller.get_cases_by_party_id(case['partyId'])
+                    case_controller.get_cases_by_party_id(case['partyId'], self.app_config['CASE_URL'],
+                                                          self.app_config['CASE_AUTH'])

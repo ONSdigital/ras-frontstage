@@ -97,11 +97,15 @@ class TestAddSurveySubmit(unittest.TestCase):
             data = json.load(j)
         survey = 'cb8accda-6118-4d3b-85a3-149e28960c54'
 
-        self.assertTrue(is_business_enrolled(data['associations'], survey))
+        party_id = 'f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b'
+
+        self.assertTrue(is_business_enrolled(data['associations'], survey, party_id))
 
     def test_not_already_enrolled(self, ):
         with open('tests/test_data/party/business_party.json') as j:
             data = json.load(j)
         survey = '64ad4018-2ddd-4894-89e7-33f0135887a2'
 
-        self.assertFalse(is_business_enrolled(data['associations'], survey))
+        party_id = '40ed60a3-2bbb-4f94-8f0d-56890f70865d'
+
+        self.assertFalse(is_business_enrolled(data['associations'], survey, party_id))

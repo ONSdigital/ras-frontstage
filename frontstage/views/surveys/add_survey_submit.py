@@ -39,7 +39,7 @@ def add_survey_submit(session):
         info = party_controller.get_party_by_business_id(business_party_id, collection_exercise_id)
 
         already_enrolled = None
-        if is_business_enrolled(info['associations'], case['caseGroup']['surveyId']):
+        if is_business_enrolled(info['associations'], case['caseGroup']['surveyId'], party_id):
             logger.info('User tried to enrol onto a survey they are already enrolled on',
                         case_id=case_id, party_id=party_id)
             already_enrolled = True
@@ -62,7 +62,19 @@ def add_survey_submit(session):
                             survey_id=added_survey_id, tag='todo', already_enrolled=already_enrolled))
 
 
-def is_business_enrolled(associations, survey_id):
-    return any(survey for info in associations
-               for survey in info['enrolments']
-               if survey['surveyId'] == survey_id)
+def is_business_enrolled(associations, survey_id, party_id):
+    """
+    Makes two checks as a business can be enrolled  on a survey but not the respondent, which would causes a single
+    check to break if another respondent from the business had previously enrolled on that survey
+
+    :param associations: List of respondents and their enrolled surveys
+    :param survey_id: id of the added survey
+    :param party_id: id of the respondent
+    :return: True if respondent and the business is enrolled on the survey and false otherwise
+    """
+    for info in associations:
+        if info['partyId'] == party_id:
+            for survey in info['enrolments']:
+                if survey['surveyId'] == survey_id:
+                    return True
+    return False

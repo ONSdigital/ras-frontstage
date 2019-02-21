@@ -9,6 +9,7 @@ from frontstage import app
 from frontstage.exceptions.exceptions import ApiError
 from tests.app.mocked_services import active_iac, encrypted_enrolment_code, enrolment_code, inactive_iac, \
     url_validate_enrolment
+from frontstage.views.surveys.add_survey_submit import is_business_enrolled
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -98,3 +99,21 @@ class TestAddSurvey(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Enrolment code not valid'.encode() in response.data)
         self.assertTrue('Please re-enter the code and try again'.encode() in response.data)
+
+    def test_is_business_enrolled_true(self):
+        associations = [{'businessRespondentStatus': 'ACTIVE',
+                        'enrolments': [{'enrolmentStatus': 'ENABLED',
+                                        'surveyId': 'cb8accda-6118-4d3b-85a3-149e28960c54'}],
+                        'partyId': 'f26cc19e-a8c0-4b0c-ba38-b6d36a271166'}]
+        survey_id = 'cb8accda-6118-4d3b-85a3-149e28960c54'
+        party_id = 'f26cc19e-a8c0-4b0c-ba38-b6d36a271166'
+        assert is_business_enrolled(associations, survey_id, party_id) is True
+
+    def test_is_business_enrolled_false(self):
+        associations = [{'businessRespondentStatus': 'ACTIVE',
+                         'enrolments': [{'enrolmentStatus': 'ENABLED',
+                                         'surveyId': 'cb8accda-6118-4d3b-85a3-149e28960c54'}],
+                         'partyId': 'f26cc19e-a8c0-4b0c-ba38-b6d36a271166'}]
+        survey_id = '02b9c366-7397-42f7-942a-76dc5876d86d'
+        party_id = 'f26cc19e-a8c0-4b0c-ba38-b6d36a271166'
+        assert is_business_enrolled(associations, survey_id, party_id) is False

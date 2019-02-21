@@ -1,9 +1,8 @@
 
 import logging
 
-from flask import redirect, request, url_for
+from flask import redirect, request, url_for, current_app as app
 from structlog import wrap_logger
-
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.common.cryptographer import Cryptographer
 from frontstage.controllers import case_controller, collection_exercise_controller, iac_controller, party_controller
@@ -36,7 +35,8 @@ def add_survey_submit(session):
         added_survey_id = collection_exercise_controller.get_collection_exercise(
             case['caseGroup']['collectionExerciseId']).get('surveyId')
 
-        info = party_controller.get_party_by_business_id(business_party_id, collection_exercise_id)
+        info = party_controller.get_party_by_business_id(business_party_id, app.config['PARTY_URL'],
+                                                                   app.config['PARTY_AUTH'], collection_exercise_id)
 
         already_enrolled = None
         if is_business_enrolled(info['associations'], case['caseGroup']['surveyId'], party_id):

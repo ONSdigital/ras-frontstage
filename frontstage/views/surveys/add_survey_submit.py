@@ -72,9 +72,9 @@ def is_business_enrolled(associations, survey_id, party_id):
     :param party_id: id of the respondent
     :return: True if respondent and the business is enrolled on the survey and false otherwise
     """
-    for info in associations:
-        if info['partyId'] == party_id:
-            for survey in info['enrolments']:
+    for association in associations:
+        if association['partyId'] == party_id:
+            for survey in association['enrolments']:
                 if survey['surveyId'] == survey_id:
                     return True
     return False

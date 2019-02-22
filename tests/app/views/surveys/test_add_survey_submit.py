@@ -11,7 +11,7 @@ from frontstage.exceptions.exceptions import ApiError
 from tests.app.mocked_services import active_iac, case, collection_exercise, encoded_jwt_token, \
     encrypted_enrolment_code, \
     enrolment_code, url_validate_enrolment, business_party, case_diff_surveyId
-from frontstage.views.surveys.add_survey_submit import is_business_enrolled
+from frontstage.views.surveys.add_survey_submit import is_respondent_and_business_enrolled
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -99,7 +99,7 @@ class TestAddSurveySubmit(unittest.TestCase):
 
         party_id = 'f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b'
 
-        self.assertTrue(is_business_enrolled(data['associations'], survey, party_id))
+        self.assertTrue(is_respondent_and_business_enrolled(data['associations'], survey, party_id))
 
     def test_not_already_enrolled(self):
         with open('tests/test_data/party/business_party.json') as business_json_data:
@@ -108,4 +108,4 @@ class TestAddSurveySubmit(unittest.TestCase):
 
         party_id = '40ed60a3-2bbb-4f94-8f0d-56890f70865d'
 
-        self.assertFalse(is_business_enrolled(data['associations'], survey, party_id))
+        self.assertFalse(is_respondent_and_business_enrolled(data['associations'], survey, party_id))

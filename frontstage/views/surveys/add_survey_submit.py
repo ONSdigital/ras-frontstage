@@ -39,7 +39,7 @@ def add_survey_submit(session):
                                                                    app.config['PARTY_AUTH'], collection_exercise_id)
 
         already_enrolled = None
-        if is_business_enrolled(info['associations'], case['caseGroup']['surveyId'], party_id):
+        if is_respondent_and_business_enrolled(info['associations'], case['caseGroup']['surveyId'], party_id):
             logger.info('User tried to enrol onto a survey they are already enrolled on',
                         case_id=case_id, party_id=party_id)
             already_enrolled = True
@@ -62,10 +62,13 @@ def add_survey_submit(session):
                             survey_id=added_survey_id, tag='todo', already_enrolled=already_enrolled))
 
 
-def is_business_enrolled(associations, survey_id, party_id):
+def is_respondent_and_business_enrolled(associations, survey_id, party_id):
     """
-    Makes two checks as a business can be enrolled  on a survey but not the respondent, which would causes a single
-    check to break if another respondent from the business had previously enrolled on that survey
+    This function checks that the business AND the respondent are enrolled in a survey. We first check if the respondent
+    is enrolled, then if not, we check that the business is enrolled on the survey. A business can have multiple
+    respondents enrolled for a survey, and a respondent can be enrolled for multiple surveys. If we only checked if the
+    business was enrolled, then there could only ever be one respondent that could be able to answer the survey, which
+    isn't the desired functionality.
 
     :param associations: List of respondents and their enrolled surveys
     :param survey_id: id of the added survey

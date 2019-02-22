@@ -58,17 +58,17 @@ def add_survey_submit(session):
 
     logger.info('Successfully retrieved data for confirm add organisation/survey page',
                 case_id=case_id, party_id=party_id)
-    return redirect(url_for('surveys_bp.get_survey_list', _anchor=(business_party_id, added_survey_id), _external=True, business_party_id=business_party_id,
+    return redirect(url_for('surveys_bp.get_survey_list', _anchor=(business_party_id, added_survey_id), _external=True,
+                            business_party_id=business_party_id,
                             survey_id=added_survey_id, tag='todo', already_enrolled=already_enrolled))
 
 
 def is_respondent_and_business_enrolled(associations, survey_id, party_id):
     """
-    This function checks that the business AND the respondent are enrolled in a survey. We first check if the respondent
-    is enrolled, then if not, we check that the business is enrolled on the survey. A business can have multiple
-    respondents enrolled for a survey, and a respondent can be enrolled for multiple surveys. If we only checked if the
-    business was enrolled, then there could only ever be one respondent that could be able to answer the survey, which
-    isn't the desired functionality.
+    This function checks whether or not a respondent's associated party is associated with the survey. If yes,
+    we then check if the survey_id of the survey we are trying to add is found within the enrolments of the respondent.
+    We do this because a respondent can be responding on behalf of several businesses, and a business can have several
+    people enrolled on the same survey.
 
     :param associations: List of respondents and their enrolled surveys
     :param survey_id: id of the added survey
@@ -81,3 +81,4 @@ def is_respondent_and_business_enrolled(associations, survey_id, party_id):
                 if survey['surveyId'] == survey_id:
                     return True
     return False
+

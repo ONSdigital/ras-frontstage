@@ -81,4 +81,3 @@ def is_respondent_and_business_enrolled(associations, survey_id, party_id):
                 if survey['surveyId'] == survey_id:
                     return True
     return False
-

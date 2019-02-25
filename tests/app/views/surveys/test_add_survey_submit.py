@@ -1,4 +1,5 @@
 import logging
+import json
 import unittest
 from unittest.mock import patch
 
@@ -9,8 +10,8 @@ from frontstage import app
 from frontstage.exceptions.exceptions import ApiError
 from tests.app.mocked_services import active_iac, case, collection_exercise, encoded_jwt_token, \
     encrypted_enrolment_code, \
-    enrolment_code, url_validate_enrolment
-
+    enrolment_code, url_validate_enrolment, business_party, case_diff_surveyId
+from frontstage.views.surveys.add_survey_submit import is_respondent_and_business_enrolled
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -32,16 +33,40 @@ class TestAddSurveySubmit(unittest.TestCase):
 
     @patch('frontstage.controllers.party_controller.add_survey')
     @patch('frontstage.controllers.case_controller.post_case_event')
+    @patch('frontstage.controllers.party_controller.get_party_by_business_id')
     @patch('frontstage.controllers.collection_exercise_controller.get_collection_exercise')
     @patch('frontstage.controllers.case_controller.get_case_by_enrolment_code')
     @patch('frontstage.controllers.iac_controller.get_iac_from_enrolment')
     @patch('frontstage.common.cryptographer.Cryptographer.decrypt')
     def test_add_survey_submit_success_redirect_to_survey_todo_list(self, decrypt_enrolment_code, get_iac_by_enrolment_code,
-                                                                    get_case_by_enrolment, get_collection_exercise, *_):
+                                                                    get_case_by_enrolment, get_collection_exercise, get_party_by_business_id, *_):
         decrypt_enrolment_code.return_value = enrolment_code.encode()
         get_iac_by_enrolment_code.return_value = active_iac
         get_case_by_enrolment.return_value = case
         get_collection_exercise.return_value = collection_exercise
+        get_party_by_business_id.return_value = business_party
+
+        response = self.app.get(f'/surveys/add-survey/add-survey-submit?encrypted_enrolment_code={encrypted_enrolment_code}')
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue('/surveys/todo'.encode() in response.data)
+        self.assertTrue(case['partyId'].encode() in response.data)
+        self.assertTrue(collection_exercise['surveyId'].encode() in response.data)
+
+    @patch('frontstage.controllers.party_controller.add_survey')
+    @patch('frontstage.controllers.case_controller.post_case_event')
+    @patch('frontstage.controllers.party_controller.get_party_by_business_id')
+    @patch('frontstage.controllers.collection_exercise_controller.get_collection_exercise')
+    @patch('frontstage.controllers.case_controller.get_case_by_enrolment_code')
+    @patch('frontstage.controllers.iac_controller.get_iac_from_enrolment')
+    @patch('frontstage.common.cryptographer.Cryptographer.decrypt')
+    def test_add_survey_submit_already_enrolled(self, decrypt_enrolment_code, get_iac_by_enrolment_code,
+                                                get_case_by_enrolment, get_collection_exercise, get_party_by_business_id, *_):
+        decrypt_enrolment_code.return_value = enrolment_code.encode()
+        get_iac_by_enrolment_code.return_value = active_iac
+        get_case_by_enrolment.return_value = case_diff_surveyId
+        get_collection_exercise.return_value = collection_exercise
+        get_party_by_business_id.return_value = business_party
 
         response = self.app.get(f'/surveys/add-survey/add-survey-submit?encrypted_enrolment_code={encrypted_enrolment_code}')
 
@@ -66,3 +91,21 @@ class TestAddSurveySubmit(unittest.TestCase):
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Error 500 - Server error'.encode() in response.data)
+
+    def test_already_enrolled(self):
+        with open('tests/test_data/party/business_party.json') as business_json_data:
+            data = json.load(business_json_data)
+        survey = 'cb8accda-6118-4d3b-85a3-149e28960c54'
+
+        party_id = 'f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b'
+
+        self.assertTrue(is_respondent_and_business_enrolled(data['associations'], survey, party_id))
+
+    def test_not_already_enrolled(self):
+        with open('tests/test_data/party/business_party.json') as business_json_data:
+            data = json.load(business_json_data)
+        survey = '64ad4018-2ddd-4894-89e7-33f0135887a2'
+
+        party_id = '40ed60a3-2bbb-4f94-8f0d-56890f70865d'
+
+        self.assertFalse(is_respondent_and_business_enrolled(data['associations'], survey, party_id))

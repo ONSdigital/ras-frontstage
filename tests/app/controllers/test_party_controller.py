@@ -88,18 +88,19 @@ class TestPartyController(unittest.TestCase):
                     party_controller.add_survey(respondent_party['id'], case['iac'])
 
     def test_get_party_by_business_id_success_without_collection_exercise_id(self):
+        """Tests the function is successful when we only supply the mandatory party_id"""
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_business_party, json=business_party, status=200)
             with app.app_context():
                 business = party_controller.get_party_by_business_id(business_party['id'],
                                                                      self.app_config['PARTY_URL'],
-                                                                     self.app_config['PARTY_AUTH'],
-                                                                     )
+                                                                     self.app_config['PARTY_AUTH'])
 
                 self.assertEqual(business['id'], business_party['id'])
                 self.assertEqual(business['name'], business_party['name'])
 
     def test_get_party_by_business_id_success_with_collection_exercise_id(self):
+        """Tests the function is successful when we supply the optional collection_excercise_id"""
         with responses.RequestsMock() as rsps:
             url = f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True"
             rsps.add(rsps.GET, url, json=business_party, status=200)
@@ -108,11 +109,30 @@ class TestPartyController(unittest.TestCase):
                                                                      self.app_config['PARTY_URL'],
                                                                      self.app_config['PARTY_AUTH'],
                                                                      collection_exercise['id'])
-
                 self.assertEqual(business['id'], business_party['id'])
                 self.assertEqual(business['name'], business_party['name'])
 
+    def test_get_party_by_business_id_success_with_collection_exercise_id_non_verbose(self):
+        """Tests the function calls the expected url when we turn verbose off"""
+        called_url = ("http://localhost:8081/party-api/v1/businesses/id/be3483c3-f5c9-4b13-bdd7-244db78ff687"
+                      "?collection_exercise_id=8d990a74-5f07-4765-ac66-df7e1a96505b")
+
+        with responses.RequestsMock() as rsps:
+            url = f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}"
+            rsps.add(rsps.GET, url, json=business_party, status=200)
+            with app.app_context():
+                business = party_controller.get_party_by_business_id(business_party['id'],
+                                                                     self.app_config['PARTY_URL'],
+                                                                     self.app_config['PARTY_AUTH'],
+                                                                     collection_exercise['id'],
+                                                                     verbose=False)
+                self.assertEqual(business['id'], business_party['id'])
+                self.assertEqual(business['name'], business_party['name'])
+                self.assertEqual(len(rsps.calls), 1)
+                self.assertEqual(rsps.calls[0].request.url, called_url)
+
     def test_get_party_by_business_id_fail(self):
+        called_url = "http://localhost:8081/party-api/v1/businesses/id/be3483c3-f5c9-4b13-bdd7-244db78ff687?verbose=True"
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_business_party, status=400)
             with app.app_context():
@@ -120,6 +140,8 @@ class TestPartyController(unittest.TestCase):
                     party_controller.get_party_by_business_id(business_party['id'],
                                                               self.app_config['PARTY_URL'],
                                                               self.app_config['PARTY_AUTH'])
+                self.assertEqual(len(rsps.calls), 1)
+                self.assertEqual(rsps.calls[0].request.url, called_url)
 
     def test_get_respondent_by_email_success(self):
         with responses.RequestsMock() as rsps:

@@ -95,11 +95,12 @@ def get_party_by_business_id(party_id, party_url, party_auth, collection_exercis
     logger.debug('Attempting to retrieve party by business', party_id=party_id)
 
     url = f"{party_url}/party-api/v1/businesses/id/{party_id}"
+    params = {}
     if collection_exercise_id:
-        url += f"?collection_exercise_id={collection_exercise_id}"
+        params['collection_exercise_id'] = collection_exercise_id
     if verbose:
-        url += "&verbose=True"
-    response = requests.get(url, auth=party_auth)
+        params['verbose'] = True
+    response = requests.get(url, params=params, auth=party_auth)
 
     try:
         response.raise_for_status()

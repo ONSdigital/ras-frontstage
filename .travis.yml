@@ -3,10 +3,12 @@ sudo: required
 dist: trusty
 python: '3.6'
 
-# before_install:
-
 cache:
   - pip
+
+env:
+   global:
+     - PIPENV_IGNORE_VIRTUALENVS=1
 
 services:
     - redis-server

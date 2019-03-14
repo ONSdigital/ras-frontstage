@@ -24,6 +24,9 @@ class SessionHandler(object):
         redis.delete(self.session_key)
 
     def get_encoded_jwt(self, session_key):
+        if session_key is None:
+            # TODO: Do we need to set the encoded_jwt to None incase it's contaminated?
+            return None
         self.session_key = session_key
         self.encoded_jwt = redis.get(self.session_key)
         return self.encoded_jwt

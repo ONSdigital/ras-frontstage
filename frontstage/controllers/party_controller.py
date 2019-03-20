@@ -233,6 +233,17 @@ def get_respondent_enrolments(party_id):
                 }
 
 
+def get_respondent_enrolments_for_known_collex(enrolment_data, cache_collex):
+    """remove any enrolments that are for surveys not in collex
+    needed because a user may be enrolled on a not started collex
+    """
+    enrolments = []
+    for enrolment in enrolment_data:
+        if enrolment['survey_id'] in cache_collex:
+            enrolments.append(enrolment)
+    return enrolments
+
+
 def set_enrolment_data(enrolment_data):
     # In this function, we're getting all the unique set of partys and surveys, so that we don't get the data more
     # than once.
@@ -304,8 +315,7 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
     :survey_id: This is the surveys uuid
 
     """
-    enrolment_data = get_respondent_enrolments(party_id)
-
+    enrolment_data = list(get_respondent_enrolments(party_id))
     # Gets the survey ids and business ids from the enrolment data that has been generated.
 
     surveys_ids, business_ids = set_enrolment_data(enrolment_data)
@@ -324,8 +334,7 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
     caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag)
     caching_data_for_collection_instrument(cache_data)
 
-    for enrolment in get_respondent_enrolments(party_id):
-
+    for enrolment in get_respondent_enrolments_for_known_collex(enrolment_data, cache_data['collexes']):
         business_party = cache_data['businesses'][enrolment['business_id']]
         survey = cache_data['surveys'][enrolment['survey_id']]
         live_collection_exercises = cache_data['collexes'][survey['id']]

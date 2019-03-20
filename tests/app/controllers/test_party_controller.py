@@ -198,11 +198,11 @@ class TestPartyController(unittest.TestCase):
         """test that get_respondent_enrolments_for_known_collex will only return enrolment data
         if we have a corresponding collex."""
 
-        collex={"survey1": "collex1", "survey3": "collex3"}
+        collex = {"survey1": "collex1", "survey3": "collex3"}
 
         enrolment_data = [{"survey_id": "survey1", "enrolment_data": "enrolment1"},
-                        {"survey_id": "survey2", "enrolment_data": "enrolment2"},
-                        {"survey_id": "survey3", "enrolment_data": "enrolment3"}]
+                          {"survey_id": "survey2", "enrolment_data": "enrolment2"},
+                          {"survey_id": "survey3", "enrolment_data": "enrolment3"}]
 
         result = get_respondent_enrolments_for_known_collex(enrolment_data, collex)
         self.assertEquals(len(result), 2)

@@ -205,7 +205,7 @@ class TestPartyController(unittest.TestCase):
                           {"survey_id": "survey3", "enrolment_data": "enrolment3"}]
 
         result = get_respondent_enrolments_for_known_collex(enrolment_data, collex)
-        self.assertEquals(len(result), 2)
+        self.assertEqual(len(result), 2)
         self.assertDictEqual({"survey_id": "survey1", "enrolment_data": "enrolment1"}, result[0])
         self.assertDictEqual({"survey_id": "survey3", "enrolment_data": "enrolment3"}, result[1])
 

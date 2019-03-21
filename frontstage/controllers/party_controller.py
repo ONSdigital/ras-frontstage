@@ -234,9 +234,7 @@ def get_respondent_enrolments(party_id):
 
 
 def get_respondent_enrolments_for_known_collex(enrolment_data, cache_collex):
-    """remove any enrolments that are for surveys not in collex
-    needed because a user may be enrolled on a not started collex
-    """
+    """remove any enrolments that are for surveys not in already started collex."""
     enrolments = []
     for enrolment in enrolment_data:
         if enrolment['survey_id'] in cache_collex:
@@ -317,6 +315,7 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
     """
     enrolment_data = list(get_respondent_enrolments(party_id))
     # Gets the survey ids and business ids from the enrolment data that has been generated.
+    # Converted to list to avoid multiple calls to party (and the list size is small).
 
     surveys_ids, business_ids = set_enrolment_data(enrolment_data)
 

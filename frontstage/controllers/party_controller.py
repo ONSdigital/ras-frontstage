@@ -234,7 +234,14 @@ def get_respondent_enrolments(party_id):
 
 
 def get_respondent_enrolments_for_known_collex(enrolment_data, cache_collex):
-    """remove any enrolments that are for surveys not in already started collex."""
+    """ Needed because enrolment_data includes not started enrolments ,
+    but cache_collex only contains started collex. Hence indexing collex by enrolment[survey] causes a 500
+
+    :param enrolment_data: A list of enrolments.
+    :param cache_collex: A list of not started collection exercises.
+    :return: list of enrolments corresponding to the known collection exercises
+    """
+
     enrolments = []
     for enrolment in enrolment_data:
         if enrolment['survey_id'] in cache_collex:
@@ -329,7 +336,6 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
                   'instrument': dict()}
 
     # These two will call the services to get responses and cache the data for later use.
-
     caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag)
     caching_data_for_collection_instrument(cache_data)
 

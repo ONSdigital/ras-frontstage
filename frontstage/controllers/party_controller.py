@@ -233,6 +233,22 @@ def get_respondent_enrolments(party_id):
                 }
 
 
+def get_respondent_enrolments_for_known_collex(enrolment_data, cache_collex):
+    """ Needed because enrolment_data includes not started enrolments ,
+    but cache_collex only contains started collex. Hence indexing collex by enrolment[survey] causes a 500
+
+    :param enrolment_data: A list of enrolments.
+    :param cache_collex: A list of not started collection exercises.
+    :return: list of enrolments corresponding to the known collection exercises
+    """
+
+    enrolments = []
+    for enrolment in enrolment_data:
+        if enrolment['survey_id'] in cache_collex:
+            enrolments.append(enrolment)
+    return enrolments
+
+
 def set_enrolment_data(enrolment_data):
     # In this function, we're getting all the unique set of partys and surveys, so that we don't get the data more
     # than once.
@@ -304,9 +320,9 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
     :survey_id: This is the surveys uuid
 
     """
-    enrolment_data = get_respondent_enrolments(party_id)
-
+    enrolment_data = list(get_respondent_enrolments(party_id))
     # Gets the survey ids and business ids from the enrolment data that has been generated.
+    # Converted to list to avoid multiple calls to party (and the list size is small).
 
     surveys_ids, business_ids = set_enrolment_data(enrolment_data)
 
@@ -320,12 +336,10 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
                   'instrument': dict()}
 
     # These two will call the services to get responses and cache the data for later use.
-
     caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag)
     caching_data_for_collection_instrument(cache_data)
 
-    for enrolment in get_respondent_enrolments(party_id):
-
+    for enrolment in get_respondent_enrolments_for_known_collex(enrolment_data, cache_data['collexes']):
         business_party = cache_data['businesses'][enrolment['business_id']]
         survey = cache_data['surveys'][enrolment['survey_id']]
         live_collection_exercises = cache_data['collexes'][survey['id']]

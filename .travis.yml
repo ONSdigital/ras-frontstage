@@ -1,6 +1,5 @@
 language: python
 sudo: required
-dist: trusty
 python: '3.6'
 
 # before_install:
@@ -12,7 +11,7 @@ services:
     - redis-server
 
 install:
-  - pip install pipenv==8.3.2
+  - pip install pipenv
   - pipenv install --dev --deploy
 
 script:
@@ -20,6 +19,10 @@ script:
   - make lint
   - APP_SETTINGS=TestingConfig pipenv run pytest --cov=frontstage --cov-report xml --ignore=node_modules
   - pipenv run coverage report
+
+env:
+  global:
+    - PIPENV_IGNORE_VIRTUALENVS=1
 
 after_success:
   - pipenv run codecov

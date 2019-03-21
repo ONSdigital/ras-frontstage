@@ -196,7 +196,7 @@ class TestPartyController(unittest.TestCase):
 
     def test_get_respondent_enrolments_for_known_collex(self):
         """test that get_respondent_enrolments_for_known_collex will only return enrolment data
-        if we have a corresponding collex."""
+        if we have a corresponding collex"""
 
         collex = {"survey1": "collex1", "survey3": "collex3"}
 

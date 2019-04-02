@@ -1,0 +1,11 @@
+{% import 'partials/section.html' as section %}
+{% extends "layouts/_twocol.html" %}
+
+{% block page_title %}Not signed in - ONS Business Surveys{% endblock %}
+
+{% block main %}
+    <h1 class="saturn">Not signed in</h1>
+    <div class="panel panel--simple panel--info">
+    <p><a href="{{ url_for('sign_in_bp.login') }}">sign in </a> to see this page.</p>
+    </div>
+{% endblock main %}

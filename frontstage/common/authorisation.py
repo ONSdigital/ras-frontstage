@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from functools import wraps
 
-from flask import url_for
+from flask import url_for, flash
 from jose import JWTError
 from jose.jwt import decode
 from structlog import wrap_logger
@@ -53,6 +53,7 @@ def jwt_authorization(request):
                     raise JWTValidationError
             else:
                 logger.warning('No authorization token provided')
+                flash('To help protect your information we have signed you out.', 'info')
                 return redirect(url_for('sign_in_bp.login', next=request.url))
 
             if app.config['VALIDATE_JWT']:

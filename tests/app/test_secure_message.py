@@ -85,7 +85,7 @@ class TestSecureMessage(unittest.TestCase):
                                  data=self.message_form, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_message_post_bad_gateway(self, mock_request):
@@ -95,7 +95,7 @@ class TestSecureMessage(unittest.TestCase):
                                  data=self.message_form, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     def test_create_message_post_no_body(self):
         del self.message_form['body']

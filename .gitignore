@@ -3,6 +3,7 @@ node_modules/
 allure-results
 coverage
 docs
+.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,6 +1,5 @@
 import unittest
 from unittest.mock import MagicMock
-
 import requests_mock
 from requests.exceptions import ConnectionError
 
@@ -64,4 +63,4 @@ class TestErrorHandlers(unittest.TestCase):
         response = self.app.post('sign-in', data=self.sign_in_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 403)
-        self.assertTrue('Your session has expired'.encode() in response.data)
+        self.assertTrue('Not signed in'.encode() in response.data)

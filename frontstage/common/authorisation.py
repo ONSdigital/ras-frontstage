@@ -23,6 +23,7 @@ def validate(token):
     expires_at = token.get('expires_at')
     if expires_at:
         if now >= expires_at:
+            flash('To help protect your information we have signed you out.', 'info')
             logger.warning('Token has expired', expires_at=expires_at)
             return False
     else:

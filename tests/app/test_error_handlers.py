@@ -56,6 +56,12 @@ class TestErrorHandlers(unittest.TestCase):
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
 
+    def test_csrf_token_expired(self):
+        app.config['WTF_CSRF_ENABLED'] = True
+        response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
+        self.assertEqual(response.status_code, 400)
+        app.config['WTF_CSRF_ENABLED'] = False
+
     @requests_mock.mock()
     def test_jwt_validation_error(self, mock_request):
         mock_request.get(url_get_respondent_email, json=party)

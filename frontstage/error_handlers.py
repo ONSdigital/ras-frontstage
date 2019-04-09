@@ -1,6 +1,7 @@
 import logging
 
 from flask import render_template, request
+from flask_wtf.csrf import CSRFError
 from requests.exceptions import ConnectionError
 from structlog import wrap_logger
 
@@ -15,6 +16,12 @@ logger = wrap_logger(logging.getLogger(__name__))
 def not_found_error(error):
     logger.info('Not found error', url=request.url, status_code=error.code)
     return render_template('errors/404-error.html'), 404
+
+
+@app.errorhandler(CSRFError)
+def handle_csrf_error(error):
+    logger.warning('CSRF token has expired', error_message=error.description, status_code=error.code)
+    return render_template('errors/400-error.html'), 400
 
 
 @app.errorhandler(ApiError)

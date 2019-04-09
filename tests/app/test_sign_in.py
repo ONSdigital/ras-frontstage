@@ -128,6 +128,7 @@ class TestSignIn(unittest.TestCase):
 
         response = self.app.get('/surveys/todo',  follow_redirects=True)
         self.assertEqual(response.status_code, 200)
+        self.assertTrue('To help protect your information we have signed you out'.encode() in response.data)
         self.assertIn(b'Sign in', response.data)
 
     @requests_mock.mock()

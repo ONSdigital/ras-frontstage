@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import patch
 
 import requests_mock
+
 from config import server_error
 from frontstage import app
 from tests.app.mocked_services import (conversation_json, conversation_list_json,

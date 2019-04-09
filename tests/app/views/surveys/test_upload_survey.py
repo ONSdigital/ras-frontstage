@@ -10,7 +10,6 @@ from frontstage import app
 from frontstage.exceptions.exceptions import CiUploadError
 from tests.app.mocked_services import business_party, case, encoded_jwt_token, survey, url_upload_ci
 
-
 logger = wrap_logger(logging.getLogger(__name__))
 
 

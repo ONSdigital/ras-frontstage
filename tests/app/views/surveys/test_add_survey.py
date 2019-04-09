@@ -5,12 +5,11 @@ from unittest.mock import patch
 from requests.models import Response
 from structlog import wrap_logger
 
+from config import server_error
 from frontstage import app
 from frontstage.exceptions.exceptions import ApiError
 from tests.app.mocked_services import active_iac, encrypted_enrolment_code, enrolment_code, inactive_iac, \
     url_validate_enrolment
-from config import server_error
-
 
 logger = wrap_logger(logging.getLogger(__name__))
 

@@ -7,7 +7,6 @@ from frontstage import app
 from tests.app.mocked_services import token, url_password_change, url_reset_password_request, \
     url_verify_token
 
-
 encoded_valid_email = 'ImV4YW1wbGVAZXhhbXBsZS5jb20i.vMOqeMafWQpuxbUBRyRs29T0vDI'
 encoded_invalid_email = 'abcd'
 

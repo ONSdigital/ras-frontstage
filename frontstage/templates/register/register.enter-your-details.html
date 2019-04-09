@@ -30,7 +30,8 @@
         <form
             method="post"
             class="form"
-            role="form">
+            role="form"
+            onsubmit="formSubmitted(event);">
             {{ form.csrf_token }}
 
         <h1 class="saturn">Enter your account details</h1>
@@ -130,4 +131,15 @@
         <button class="btn venus" id="continue_button" type="submit">Continue</button>
 
     </form>
+
+    <script>
+    var submitted = false;
+    function formSubmitted(event) {
+        if (submitted) {
+            event.preventDefault();
+            return false;
+        }
+        submitted = true;
+    }
+    </script>
 {% endblock main %}

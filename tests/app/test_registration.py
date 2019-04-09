@@ -9,6 +9,7 @@ from tests.app.mocked_services import (business_party, case, categories, collect
                                        url_get_case_categories, url_get_collection_exercise,
                                        url_get_survey, url_post_case_event_uuid, url_create_account,
                                        url_validate_enrolment, url_verify_email)
+from config import server_error
 
 
 class TestRegistration(unittest.TestCase):
@@ -96,7 +97,7 @@ class TestRegistration(unittest.TestCase):
         response = self.app.post('/register/create-account', data={'enrolment_code': enrolment_code}, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('An error has occurred'.encode() in response.data)
+        self.assertTrue(server_error().encode() in response.data)
 
     # ============== CONFIRM ORG AND SURVEY ===============
     @requests_mock.mock()
@@ -125,7 +126,7 @@ class TestRegistration(unittest.TestCase):
                                 follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('An error has occurred'.encode() in response.data)
+        self.assertTrue(server_error().encode() in response.data)
 
     @requests_mock.mock()
     def test_confirm_org_page_case_fail(self, mock_object):
@@ -138,7 +139,7 @@ class TestRegistration(unittest.TestCase):
                                 follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('An error has occurred'.encode() in response.data)
+        self.assertTrue(server_error().encode() in response.data)
 
     @requests_mock.mock()
     def test_confirm_org_page_case_empty(self, mock_object):
@@ -151,7 +152,7 @@ class TestRegistration(unittest.TestCase):
                                 follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('An error has occurred'.encode() in response.data)
+        self.assertTrue(server_error().encode() in response.data)
 
     @requests_mock.mock()
     def test_confirm_org_page_party_fail(self, mock_object):
@@ -165,7 +166,7 @@ class TestRegistration(unittest.TestCase):
                                 follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('An error has occurred'.encode() in response.data)
+        self.assertTrue(server_error().encode() in response.data)
 
     @requests_mock.mock()
     def test_confirm_org_page_collex_fail(self, mock_object):
@@ -180,7 +181,7 @@ class TestRegistration(unittest.TestCase):
                                 follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('An error has occurred'.encode() in response.data)
+        self.assertTrue(server_error().encode() in response.data)
 
     @requests_mock.mock()
     def test_confirm_org_page_collex_empty(self, mock_object):
@@ -195,7 +196,7 @@ class TestRegistration(unittest.TestCase):
                                 follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('An error has occurred'.encode() in response.data)
+        self.assertTrue(server_error().encode() in response.data)
 
     @requests_mock.mock()
     def test_confirm_org_page_survey_fail(self, mock_object):
@@ -211,7 +212,7 @@ class TestRegistration(unittest.TestCase):
                                 follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('An error has occurred'.encode() in response.data)
+        self.assertTrue(server_error().encode() in response.data)
 
     @requests_mock.mock()
     def test_confirm_org_page_survey_empty(self, mock_object):
@@ -252,7 +253,7 @@ class TestRegistration(unittest.TestCase):
                                 follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('An error has occurred'.encode() in response.data)
+        self.assertTrue(server_error().encode() in response.data)
 
     @requests_mock.mock()
     def test_create_account_register_no_email_address(self, mock_object):
@@ -407,7 +408,7 @@ class TestRegistration(unittest.TestCase):
                                  follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('An error has occurred'.encode() in response.data)
+        self.assertTrue(server_error().encode() in response.data)
 
     def test_check_email_page(self):
         response = self.app.get('register/create-account/check-email', follow_redirects=True)
@@ -450,7 +451,7 @@ class TestRegistration(unittest.TestCase):
         response = self.app.get(f'/register/activate-account/{token}', headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('An error has occurred'.encode() in response.data)
+        self.assertTrue(server_error().encode() in response.data)
 
     def test_can_access_email_confirmation_when_email_param_passed(self):
         response = self.app.get('/register/create-account/check-your-email', query_string='email_address=steve')

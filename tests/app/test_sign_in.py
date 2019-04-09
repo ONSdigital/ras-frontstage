@@ -2,7 +2,7 @@ import unittest
 
 import requests_mock
 
-from config import TestingConfig
+from config import TestingConfig, server_error
 from frontstage import app, create_app_object
 from frontstage.controllers.party_controller import notify_party_and_respondent_account_locked
 from frontstage.exceptions.exceptions import ApiError
@@ -138,7 +138,7 @@ class TestSignIn(unittest.TestCase):
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('An error has occurred'.encode() in response.data)
+        self.assertTrue(server_error().encode() in response.data)
 
     @requests_mock.mock()
     def test_sign_in_party_fail(self, mock_object):
@@ -148,7 +148,7 @@ class TestSignIn(unittest.TestCase):
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('An error has occurred'.encode() in response.data)
+        self.assertTrue(server_error().encode() in response.data)
 
     @requests_mock.mock()
     def test_sign_in_party_404(self, mock_object):
@@ -214,7 +214,7 @@ class TestSignIn(unittest.TestCase):
         response = self.app.get(f"sign-in/resend_verification/{respondent_party_id}",
                                 follow_redirects=True)
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('An error has occurred'.encode() in response.data)
+        self.assertTrue(server_error().encode() in response.data)
 
     @requests_mock.mock()
     def test_sign_in_account_locked(self, mock_object):
@@ -259,4 +259,4 @@ class TestSignIn(unittest.TestCase):
                                 follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('An error has occurred'.encode() in response.data)
+        self.assertTrue(server_error().encode() in response.data)

@@ -12,6 +12,7 @@ from tests.app.mocked_services import active_iac, case, collection_exercise, enc
     encrypted_enrolment_code, \
     enrolment_code, url_validate_enrolment, business_party, case_diff_surveyId
 from frontstage.views.surveys.add_survey_submit import is_respondent_and_business_enrolled
+from config import server_error
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -90,7 +91,7 @@ class TestAddSurveySubmit(unittest.TestCase):
         response = self.app.get(f'/surveys/add-survey/add-survey-submit?encrypted_enrolment_code={encrypted_enrolment_code}')
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('An error has occurred'.encode() in response.data)
+        self.assertTrue(server_error().encode() in response.data)
 
     def test_already_enrolled(self):
         with open('tests/test_data/party/business_party.json') as business_json_data:

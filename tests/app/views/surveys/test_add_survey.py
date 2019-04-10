@@ -5,11 +5,11 @@ from unittest.mock import patch
 from requests.models import Response
 from structlog import wrap_logger
 
-from config import server_error
 from frontstage import app
 from frontstage.exceptions.exceptions import ApiError
 from tests.app.mocked_services import active_iac, encrypted_enrolment_code, enrolment_code, inactive_iac, \
     url_validate_enrolment
+
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -89,7 +89,7 @@ class TestAddSurvey(unittest.TestCase):
         response = self.app.post('/surveys/add-survey', data={'enrolment_code': enrolment_code})
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue(server_error().encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     def test_add_survey_invalid_enrolment_code_length(self):
 

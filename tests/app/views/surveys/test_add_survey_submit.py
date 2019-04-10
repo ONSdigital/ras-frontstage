@@ -1,18 +1,17 @@
-import json
 import logging
+import json
 import unittest
 from unittest.mock import patch
 
 from requests.models import Response
 from structlog import wrap_logger
 
-from config import server_error
 from frontstage import app
 from frontstage.exceptions.exceptions import ApiError
-from frontstage.views.surveys.add_survey_submit import is_respondent_and_business_enrolled
 from tests.app.mocked_services import active_iac, case, collection_exercise, encoded_jwt_token, \
     encrypted_enrolment_code, \
     enrolment_code, url_validate_enrolment, business_party, case_diff_surveyId
+from frontstage.views.surveys.add_survey_submit import is_respondent_and_business_enrolled
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -91,7 +90,7 @@ class TestAddSurveySubmit(unittest.TestCase):
         response = self.app.get(f'/surveys/add-survey/add-survey-submit?encrypted_enrolment_code={encrypted_enrolment_code}')
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue(server_error().encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     def test_already_enrolled(self):
         with open('tests/test_data/party/business_party.json') as business_json_data:

@@ -34,7 +34,7 @@ class TestErrorHandlers(unittest.TestCase):
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue(server_error().encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     @requests_mock.mock()
     def test_api_error(self, mock_request):
@@ -45,7 +45,7 @@ class TestErrorHandlers(unittest.TestCase):
         response = self.app.post('sign-in', data=self.sign_in_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue(server_error().encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     @requests_mock.mock()
     def test_connection_error(self, mock_request):
@@ -55,7 +55,7 @@ class TestErrorHandlers(unittest.TestCase):
         response = self.app.post('sign-in', data=self.sign_in_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue(server_error().encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     @requests_mock.mock()
     def test_jwt_validation_error(self, mock_request):

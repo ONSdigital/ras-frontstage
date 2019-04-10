@@ -3,7 +3,6 @@ from unittest.mock import patch
 
 import requests_mock
 
-from config import server_error
 from frontstage import app
 from tests.app.mocked_services import (conversation_json, conversation_list_json,
                                        encoded_jwt_token, url_get_thread, url_get_threads, url_send_message)
@@ -86,7 +85,7 @@ class TestSecureMessage(unittest.TestCase):
                                  data=self.message_form, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue(server_error().encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_message_post_bad_gateway(self, mock_request):
@@ -96,7 +95,7 @@ class TestSecureMessage(unittest.TestCase):
                                  data=self.message_form, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue(server_error().encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     def test_create_message_post_no_body(self):
         del self.message_form['body']

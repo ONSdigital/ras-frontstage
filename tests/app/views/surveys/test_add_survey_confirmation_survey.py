@@ -5,12 +5,12 @@ from unittest.mock import patch
 from requests.models import Response
 from structlog import wrap_logger
 
-from config import server_error
 from frontstage import app
 from frontstage.exceptions.exceptions import ApiError
 from tests.app.mocked_services import business_party, case, collection_exercise, encoded_jwt_token, \
     encrypted_enrolment_code, \
     enrolment_code, survey, url_get_case
+
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -68,4 +68,4 @@ class TestAddSurveyConfirmation(unittest.TestCase):
         response = self.app.get(url)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue(server_error().encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)

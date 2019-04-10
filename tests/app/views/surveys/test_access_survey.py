@@ -62,7 +62,7 @@ class TestAccessSurvey(unittest.TestCase):
                                 'survey_short_name=Bricks&ci_type=SEFT', headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue(server_error().encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     @patch('frontstage.controllers.case_controller.get_case_data')
     def test_access_survey_missing_collection_exercise_from_case_data(self, get_case_data):
@@ -77,7 +77,7 @@ class TestAccessSurvey(unittest.TestCase):
                                 'survey_short_name=Bricks&ci_type=SEFT', headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue(server_error().encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     @patch('frontstage.controllers.case_controller.get_case_data')
     def test_access_survey_missing_survey_from_case_data(self, get_case_data):
@@ -92,7 +92,7 @@ class TestAccessSurvey(unittest.TestCase):
                                 'survey_short_name=Bricks&ci_type=SEFT', headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue(server_error().encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     @patch('frontstage.controllers.case_controller.get_case_data')
     def test_access_survey_missing_business_party_from_case_data(self, get_case_data):
@@ -107,7 +107,7 @@ class TestAccessSurvey(unittest.TestCase):
                                 'survey_short_name=Bricks&ci_type=SEFT', headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue(server_error().encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     def test_access_survey_without_request_arg_case_id(self):
 
@@ -115,25 +115,25 @@ class TestAccessSurvey(unittest.TestCase):
                                 'survey_short_name=Bricks&ci_type=SEFT', headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 400)
-        self.assertTrue(server_error().encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     def test_access_survey_missing_request_arg_business_party_id(self):
         response = self.app.get('/surveys/access_survey?case_id=8cdc01f9-656a-4715-a148-ffed0dbe1b04&'
                                 'survey_short_name=Bricks&ci_type=SEFT', headers=self.headers)
 
         self.assertEqual(response.status_code, 400)
-        self.assertTrue(server_error().encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     def test_access_survey_missing_request_arg_survey_short_name(self):
         response = self.app.get('/surveys/access_survey?case_id=8cdc01f9-656a-4715-a148-ffed0dbe1b04&business_party_id=0008279d-9425-4e28-897d-bfd876aa7f3f&'
                                 'ci_type=SEFT', headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 400)
-        self.assertTrue(server_error().encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     def test_access_survey_missing_request_arg_ci_type(self):
         response = self.app.get('/surveys/access_survey?case_id=8cdc01f9-656a-4715-a148-ffed0dbe1b04&business_party_id=0008279d-9425-4e28-897d-bfd876aa7f3f&'
                                 'survey_short_name=Bricks', headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 400)
-        self.assertTrue(server_error().encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)

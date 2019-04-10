@@ -32,6 +32,21 @@
     </div>
     <br />
     {% endif %}
+ {%- with messages = get_flashed_messages(category_filter=["info"]) -%}
+    {%- if messages -%}
+    <div class="panel panel--simple panel--info u-mb-l">
+      <div class="panel__body" id="session-expired">
+        <div id='info-text'>
+            <h2>Your session has expired</h2>
+          {%- for message in messages -%}
+          <p>{{ message }}</p>
+          {%- endfor -%}
+        </div>
+      </div>
+    </div>
+      {%- endif -%}
+      {%- endwith -%}
+
     <form method="post" class="form" action="{{ url_for('sign_in_bp.login', next=next) }}" role="form">
         {{ form.csrf_token }}
 

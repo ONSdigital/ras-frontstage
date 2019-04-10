@@ -1,13 +1,13 @@
 import logging
 
-from flask import render_template, request
+from flask import render_template, request, url_for
 from flask_wtf.csrf import CSRFError
 from requests.exceptions import ConnectionError
 from structlog import wrap_logger
+from werkzeug.utils import redirect
 
 from frontstage import app
 from frontstage.exceptions.exceptions import ApiError, InvalidEqPayLoad, JWTValidationError
-
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -21,7 +21,10 @@ def not_found_error(error):
 @app.errorhandler(CSRFError)
 def handle_csrf_error(error):
     logger.warning('CSRF token has expired', error_message=error.description, status_code=error.code)
-    return render_template('errors/400-error.html'), 400
+    if 'sign-in' in request.url or 'register' in request.url or 'passwords' in request.url:
+        return render_template('errors/400-error.html'), 400
+    else:
+        return redirect(url_for('sign_in_bp.logout', csrf_error=True, next=request.url))
 
 
 @app.errorhandler(ApiError)

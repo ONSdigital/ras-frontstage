@@ -18,6 +18,9 @@ class TestErrorHandlers(unittest.TestCase):
             "username": "testuser@email.com",
             "password": "password"
         }
+        self.headers = {
+            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"# NOQA
+        }
 
     def test_not_found_error(self):
         response = self.app.get('/not-a-url', follow_redirects=True)
@@ -56,12 +59,6 @@ class TestErrorHandlers(unittest.TestCase):
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
 
-    def test_csrf_token_expired(self):
-        app.config['WTF_CSRF_ENABLED'] = True
-        response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
-        self.assertEqual(response.status_code, 400)
-        app.config['WTF_CSRF_ENABLED'] = False
-
     @requests_mock.mock()
     def test_jwt_validation_error(self, mock_request):
         mock_request.get(url_get_respondent_email, json=party)
@@ -71,3 +68,19 @@ class TestErrorHandlers(unittest.TestCase):
 
         self.assertEqual(response.status_code, 403)
         self.assertTrue('Error - Not signed in'.encode() in response.data)
+
+    def test_csrf_token_expired(self):
+        app.config['WTF_CSRF_ENABLED'] = True
+        response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
+        self.assertEqual(response.status_code, 400)
+        app.config['WTF_CSRF_ENABLED'] = False
+
+    def test_create_message_post_success_csrf(self):
+        app.config['WTF_CSRF_ENABLED'] = True
+
+        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789",
+                                 data='{"test":"test"}', headers=self.headers, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('To help protect your information we have signed you out.'.encode() in response.data)
+        app.config['WTF_CSRF_ENABLED'] = False

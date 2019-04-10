@@ -1,10 +1,9 @@
 import unittest
 
-from frontstage.common.validators import remove_required
+from frontstage.common.validators import remove_required, InputRequired, DataRequired
 
 
 class TestRemoveRequiredFunction(unittest.TestCase):
-
     """
     remove_required function tests
     """
@@ -20,3 +19,23 @@ class TestRemoveRequiredFunction(unittest.TestCase):
         output = remove_required(test_tuple)
 
         self.assertEqual(output, test_tuple)
+
+
+class TestInputRequired(unittest.TestCase):
+    """
+    Tests for the InputRequired class
+    """
+
+    def test_instantiated_field_should_have_no_required_attribute(self):
+        inputReq = InputRequired()
+        self.assertFalse('required' in inputReq.field_flags)
+
+
+class TestDataRequired(unittest.TestCase):
+    """
+    Tests for the DataRequired class
+    """
+
+    def test_instantiated_field_should_have_no_required_attribute(self):
+        inputReq = DataRequired()
+        self.assertFalse('required' in inputReq.field_flags)

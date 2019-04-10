@@ -2,7 +2,6 @@ import io
 import unittest
 from unittest.mock import patch
 
-from config import server_error
 from frontstage import app
 from tests.app.mocked_services import (collection_exercise, collection_instrument_seft, survey, business_party,
                                        encoded_jwt_token, encrypted_enrolment_code)

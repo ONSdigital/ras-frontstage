@@ -2,7 +2,6 @@ import unittest
 
 import requests_mock
 
-from config import server_error
 from frontstage import app
 from tests.app.mocked_services import (business_party, case, categories, collection_exercise,
                                        encrypted_enrolment_code, enrolment_code, survey, token,

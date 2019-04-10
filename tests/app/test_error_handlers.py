@@ -4,7 +4,6 @@ from unittest.mock import MagicMock
 import requests_mock
 from requests.exceptions import ConnectionError
 
-from config import server_error
 from frontstage import app
 from frontstage.exceptions.exceptions import ApiError, JWTValidationError
 from tests.app.mocked_services import url_get_respondent_email, url_oauth_token, party

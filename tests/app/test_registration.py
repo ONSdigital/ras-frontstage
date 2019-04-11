@@ -451,3 +451,18 @@ class TestRegistration(unittest.TestCase):
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue('Server error'.encode() in response.data)
+
+    def test_can_access_email_confirmation_when_email_param_passed(self):
+        response = self.app.get('/register/create-account/check-your-email', query_string='email_address=steve')
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_contains_email_confirmation_when_email_param_passed(self):
+        response = self.app.get('/register/create-account/check-your-email', query_string='email_address=steve')
+
+        self.assertTrue(b'steve' in response.data)
+
+    def test_cant_access_email_confirmation_when_email_param_passed(self):
+        response = self.app.get('/register/create-account/check-your-email')
+
+        self.assertEqual(response.status_code, 500)

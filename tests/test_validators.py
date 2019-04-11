@@ -14,6 +14,24 @@ class TestRemoveRequiredFunction(unittest.TestCase):
 
         self.assertFalse('required' in output)
 
+    def test_should_remove_a_required_if_its_the_only_item_in_list(self):
+        test_tuple = ('required')
+        output = remove_required(test_tuple)
+
+        self.assertFalse('required' in output)
+
+    def test_should_remove_a_required_member_if_its_in_the_middle_of_the_list(self):
+        test_tuple = ('otheritem', 'required', 'other', 'somethingelse')
+        output = remove_required(test_tuple)
+
+        self.assertFalse('required' in output)
+    
+    def test_should_remove_a_required_member_if_its_the_last_item_in_the_list(self):
+        test_tuple = ('item', 'otheritem', 'required')
+        output = remove_required(test_tuple)
+
+        self.assertFalse('required' in output)
+
     def test_should_leave_tuple_unaffected_if_there_is_no_required_entry(self):
         test_tuple = ('foo', 'other', 'somethingelse')
         output = remove_required(test_tuple)

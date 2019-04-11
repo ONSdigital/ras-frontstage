@@ -75,9 +75,9 @@ class TestErrorHandlers(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         app.config['WTF_CSRF_ENABLED'] = False
 
-    def test_create_message_post_success_csrf(self):
+    def test_csrf_token_expired_on_sending_message(self):
         app.config['WTF_CSRF_ENABLED'] = True
-
+        self.app.set_cookie('localhost', 'authorization', 'session_key')
         response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789",
                                  data='{"test":"test"}', headers=self.headers, follow_redirects=True)
 

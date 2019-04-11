@@ -13,7 +13,7 @@ class InputRequired(IR):
     Example sage: element = StringField('name', [ FrontstageInputRequired(message="Error message to show") ]
     """
     def __init__(self, message=None):
-        super(IR, self).__init__()
+        super().__init__()
         self.field_flags = remove_required(self.field_flags)
 
 
@@ -22,7 +22,7 @@ class DataRequired(DR):
     WTForms validator replacement that requires data, but doesn't add 'required' attribute to rendered html
     """
     def __init__(self, message=None):
-        super(DR, self).__init__()
+        super().__init__()
         self.field_flags = remove_required(self.field_flags)
 
 

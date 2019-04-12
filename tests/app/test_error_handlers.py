@@ -72,15 +72,15 @@ class TestErrorHandlers(unittest.TestCase):
     def test_csrf_token_expired(self):
         app.config['WTF_CSRF_ENABLED'] = True
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
-        self.assertEqual(response.status_code, 400)
         app.config['WTF_CSRF_ENABLED'] = False
+
+        self.assertEqual(response.status_code, 400)
 
     def test_csrf_token_expired_on_sending_message(self):
         app.config['WTF_CSRF_ENABLED'] = True
         self.app.set_cookie('localhost', 'authorization', 'session_key')
         response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789",
                                  data='{"test":"test"}', headers=self.headers, follow_redirects=True)
-
+        app.config['WTF_CSRF_ENABLED'] = False
         self.assertEqual(response.status_code, 200)
         self.assertTrue('To help protect your information we have signed you out.'.encode() in response.data)
-        app.config['WTF_CSRF_ENABLED'] = False

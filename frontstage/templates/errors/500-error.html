@@ -1,16 +1,10 @@
 {% import 'partials/section.html' as section %}
 {% extends "layouts/_twocol.html" %}
 
-{% block page_title %}Server error (Error 500) - ONS Business Surveys{% endblock %}
+{% block page_title %}An error has occurred - ONS Business Surveys{% endblock %}
 
 {% block main %}
-        <h1 class="saturn">Error 500 - Server error</h1>
-
-        <div class="panel panel--simple panel--error">
-
-            <p>Something has gone wrong with the website.</p>
-            <p>You may want to visit the <a href="/">homepage</a></p>
-            <p>If you still encounter problems please <a href="/contact-us">contact us</a>. We apologise for any inconvenience this may have caused.</p>
-
-        </div>
+    <h1 class="saturn">An error has occurred</h1>
+    <p>Sorry, something has gone wrong.</p>
+    <p>If the problem continues, <a href="https://www.ons.gov.uk/aboutus/contactus/surveyenquiries">contact the survey enquiries helpline</a>.</p>
 {% endblock main %}

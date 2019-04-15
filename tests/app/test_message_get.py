@@ -1,5 +1,6 @@
 import copy
 import unittest
+
 from frontstage.views.secure_messaging.message_get import get_msg_to
 
 

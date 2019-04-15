@@ -3,7 +3,6 @@ import json
 
 from frontstage import app
 
-
 survey_file = dict(file=(io.BytesIO(b'my file contents'), "testfile.xlsx"))
 with open('tests/test_data/party/business_party.json') as fp:
     business_party = json.load(fp)

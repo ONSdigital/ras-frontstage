@@ -10,6 +10,11 @@ from wtforms.validators import EqualTo, Length, Email, ValidationError
 from frontstage.common.validators import InputRequired, DataRequired
 
 from frontstage import app
+from frontstage.i18n.translations import Translate
+
+
+translations = Translate('form_messages')
+_ = translations.translate
 
 
 logger = wrap_logger(logging.getLogger(__name__))

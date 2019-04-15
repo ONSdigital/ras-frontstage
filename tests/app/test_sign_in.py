@@ -128,6 +128,7 @@ class TestSignIn(unittest.TestCase):
 
         response = self.app.get('/surveys/todo',  follow_redirects=True)
         self.assertEqual(response.status_code, 200)
+        self.assertTrue('To help protect your information we have signed you out'.encode() in response.data)
         self.assertIn(b'Sign in', response.data)
 
     @requests_mock.mock()
@@ -138,7 +139,7 @@ class TestSignIn(unittest.TestCase):
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     @requests_mock.mock()
     def test_sign_in_party_fail(self, mock_object):
@@ -148,7 +149,7 @@ class TestSignIn(unittest.TestCase):
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     @requests_mock.mock()
     def test_sign_in_party_404(self, mock_object):
@@ -214,7 +215,7 @@ class TestSignIn(unittest.TestCase):
         response = self.app.get(f"sign-in/resend_verification/{respondent_party_id}",
                                 follow_redirects=True)
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     @requests_mock.mock()
     def test_sign_in_account_locked(self, mock_object):
@@ -259,4 +260,4 @@ class TestSignIn(unittest.TestCase):
                                 follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)

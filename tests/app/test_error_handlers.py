@@ -14,7 +14,6 @@ class TestErrorHandlers(unittest.TestCase):
     def setUp(self):
         app.testing = True
         self.app = app.test_client()
-        self.app.set_cookie('localhost', 'Authorization', 'session_key')
         self.sign_in_form = {
             "username": "testuser@email.com",
             "password": "password"
@@ -37,7 +36,7 @@ class TestErrorHandlers(unittest.TestCase):
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     @requests_mock.mock()
     def test_api_error(self, mock_request):
@@ -48,7 +47,7 @@ class TestErrorHandlers(unittest.TestCase):
         response = self.app.post('sign-in', data=self.sign_in_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     @requests_mock.mock()
     def test_connection_error(self, mock_request):
@@ -58,7 +57,7 @@ class TestErrorHandlers(unittest.TestCase):
         response = self.app.post('sign-in', data=self.sign_in_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     @requests_mock.mock()
     def test_jwt_validation_error(self, mock_request):
@@ -68,7 +67,7 @@ class TestErrorHandlers(unittest.TestCase):
         response = self.app.post('sign-in', data=self.sign_in_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 403)
-        self.assertTrue('Error - Not signed in'.encode() in response.data)
+        self.assertTrue('Not signed in'.encode() in response.data)
 
     def test_csrf_token_expired(self):
         app.config['WTF_CSRF_ENABLED'] = True

@@ -52,7 +52,7 @@ def connection_error(error):
 @app.errorhandler(JWTValidationError)
 def jwt_validation_error(error):  # pylint: disable=unused-argument
     logger.error('JWT validation error', url=request.url, status_code=403)
-    return render_template('errors/not-signed-in.html'), 403
+    return render_template('errors/403-error.html'), 403
 
 
 @app.errorhandler(Exception)

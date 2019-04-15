@@ -5,7 +5,6 @@ from werkzeug.datastructures import ImmutableMultiDict
 from frontstage import app
 from frontstage.models import LoginForm, ForgotPasswordForm, RegistrationForm
 
-
 invalid_emails = ['email@123.123.123.123',
                   'email@[123.123.123.123]',
                   'plainaddress',

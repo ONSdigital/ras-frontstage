@@ -32,7 +32,8 @@
     </div>
     <br />
     {% endif %}
- {%- with messages = get_flashed_messages(category_filter=["info"]) -%}
+
+    {%- with messages = get_flashed_messages(category_filter=["info"]) -%}
     {%- if messages -%}
     <div class="panel panel--simple panel--info u-mb-l">
       <div class="panel__body" id="session-expired">

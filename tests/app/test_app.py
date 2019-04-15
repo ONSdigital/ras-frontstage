@@ -3,7 +3,6 @@ import unittest
 from frontstage import app
 from frontstage.jwt import encode, decode
 
-
 data_dict_for_jwt_token = {
     'refresh_token': 'e6bde0f6-e123-4dcf-9567-74f4d072fc71',
     'access_token': 'f418d491-eeda-47cb-b3e3-0d5d7b97ee6d',

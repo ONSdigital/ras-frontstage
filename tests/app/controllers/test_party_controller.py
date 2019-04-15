@@ -16,7 +16,6 @@ from tests.app.mocked_services import (business_party, case, case_list, collecti
                                        url_get_respondent_email, url_get_respondent_party, url_post_add_survey,
                                        url_reset_password_request, url_notify_party_and_respondent_account_locked)
 
-
 registration_data = {
                 'emailAddress': respondent_party['emailAddress'],
                 'firstName': respondent_party['firstName'],

@@ -1,12 +1,12 @@
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import requests_mock
 from requests.exceptions import ConnectionError
 
 from frontstage import app
 from frontstage.exceptions.exceptions import ApiError, JWTValidationError
-from tests.app.mocked_services import url_get_respondent_email, url_oauth_token, party
+from tests.app.mocked_services import url_get_respondent_email, url_oauth_token, party, encoded_jwt_token
 
 
 class TestErrorHandlers(unittest.TestCase):
@@ -17,6 +17,9 @@ class TestErrorHandlers(unittest.TestCase):
         self.sign_in_form = {
             "username": "testuser@email.com",
             "password": "password"
+        }
+        self.headers = {
+            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"# NOQA
         }
 
     def test_not_found_error(self):
@@ -65,3 +68,22 @@ class TestErrorHandlers(unittest.TestCase):
 
         self.assertEqual(response.status_code, 403)
         self.assertTrue('Not signed in'.encode() in response.data)
+
+    def test_csrf_token_expired(self):
+        app.config['WTF_CSRF_ENABLED'] = True
+        response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
+        app.config['WTF_CSRF_ENABLED'] = False
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_csrf_token_expired_on_sending_message(self):
+        app.config['WTF_CSRF_ENABLED'] = True
+        self.app.set_cookie('localhost', 'authorization', 'session_key')
+        self.patcher = patch('redis.StrictRedis.get', return_value=encoded_jwt_token)
+        self.patcher.start()
+        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789",
+                                 data='{"test":"test"}', headers=self.headers, follow_redirects=True)
+        app.config['WTF_CSRF_ENABLED'] = False
+        self.patcher.stop()
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('To help protect your information we have signed you out.'.encode() in response.data)

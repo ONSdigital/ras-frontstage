@@ -29,12 +29,12 @@ class Translate:
             logger.error(f'An error occurred loading JSON from file {file_name}')
             raise exc
 
-    def translate(self, msgid, locale):
+    def translate(self, msgid, locale=None):
 
-        active_locale = locale if locale in self.translations else self.default_locale
+        active_locale = locale if locale else self.locale
 
         if active_locale not in self.translations:
-            logger.debug(f'Defaulted to default locale for {msgid} because locale {locale} had message with that Id')
+            logger.debug(f'Did not find locale {locale}, returning message id')
             return msgid
 
         translations = self.translations[active_locale]

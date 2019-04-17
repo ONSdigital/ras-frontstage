@@ -67,7 +67,7 @@ class TestTranslations(TestCase):
                 app.config['TRANSLATIONS_PATH'] = old_config
 
     def test_loads_json_and_assigns_to_instance(self):
-        with patch('builtins.open', new_callable=mock_open()) as m_open:
+        with patch('builtins.open', new_callable=mock_open()):
             with patch('frontstage.i18n.translations.load', MagicMock()) as m_load:
                 m_load.return_value = 'TEST VALUE'
 
@@ -94,7 +94,7 @@ class TestTranslations(TestCase):
 
 # Translate function tests
     def test_should_assume_default_locale_if_no_locale_passed(self):
-        with patch('builtins.open', new_callable=mock_open()) as m_open:
+        with patch('builtins.open', new_callable=mock_open()):
             with patch('frontstage.i18n.translations.load', MagicMock()) as m_load:
                 m_load.return_value = self.example_translations
                 instance = Translate('filename')
@@ -103,7 +103,7 @@ class TestTranslations(TestCase):
                 self.assertEqual(output, 'message_1_return')
 
     def test_should_use_passed_locale(self):
-        with patch('builtins.open', new_callable=mock_open()) as m_open:
+        with patch('builtins.open', new_callable=mock_open()):
             with patch('frontstage.i18n.translations.load', MagicMock()) as m_load:
                 m_load.return_value = self.example_translations
                 instance = Translate('filename')
@@ -112,7 +112,7 @@ class TestTranslations(TestCase):
                 self.assertEqual(output, 'message_1_revenir')
 
     def test_should_return_message_id_if_passed_locale_is_not_in_translations(self):
-        with patch('builtins.open', new_callable=mock_open()) as m_open:
+        with patch('builtins.open', new_callable=mock_open()):
             with patch('frontstage.i18n.translations.load', MagicMock()) as m_load:
                 m_load.return_value = self.example_translations
                 instance = Translate('filename')
@@ -121,7 +121,7 @@ class TestTranslations(TestCase):
                 self.assertEqual(output, 'message1')
 
     def test_should_message_id_if_passed_locale_exists_but_doesnt_contain_message_id(self):
-        with patch('builtins.open', new_callable=mock_open()) as m_open:
+        with patch('builtins.open', new_callable=mock_open()):
             with patch('frontstage.i18n.translations.load', MagicMock()) as m_load:
                 m_load.return_value = self.example_translations
                 instance = Translate('filename')

@@ -44,4 +44,3 @@ class Translate:
             return msgid
 
         return translations[msgid]
-

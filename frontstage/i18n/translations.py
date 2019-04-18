@@ -23,10 +23,10 @@ class Translate:
             with open(file_name) as f:
                 self.translations = load(f)
         except FileNotFoundError as exc:
-            logger.error(f'Instantiating translation with file {file_name}')
+            logger.error(f'Instantiating translation with file "{file_name}"')
             raise exc
         except Exception as exc:
-            logger.error(f'An error occurred loading JSON from file {file_name}')
+            logger.error(f'An error occurred loading JSON from file "{file_name}"')
             raise exc
 
     def translate(self, msgid, locale=None):
@@ -40,7 +40,7 @@ class Translate:
         translations = self.translations[active_locale]
 
         if msgid not in translations:
-            logger.debug(f'Found no string for message ID {msgid} in locale {locale}')
+            logger.debug(f'Found no string for message ID "{msgid}" in locale "{active_locale}"')
             return msgid
 
         return translations[msgid]

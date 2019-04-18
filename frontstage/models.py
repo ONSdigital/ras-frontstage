@@ -27,11 +27,9 @@ class EnrolmentCodeForm(FlaskForm):
 
 
 class RegistrationForm(FlaskForm):
-    first_name = StringField(_('First name')),
-                             validators=[InputRequired(_('First name is required')),
-                                         Length(max=254,
-                                                message=_('Your first name must be less than 254 characters'))])
-    last_name = StringField(_('Last name')),
+    first_name = StringField(_('First name'), validators=[InputRequired(_('First name is required')),
+                                                          Length(max=254, message=_('Your first name must be less than 254 characters'))])
+    last_name = StringField(_('Last name'),
                             validators=[InputRequired(_('Last name is required')),
                                         Length(max=254, message=_('Your last name must be less than 254 characters'))])
     email_address = StringField(_('Enter your email address'),
@@ -83,7 +81,7 @@ class RegistrationForm(FlaskForm):
 
 class LoginForm(FlaskForm):
     username = StringField(_('Email Address'), [InputRequired(_('Email Address is required')),
-                                             Email(_('Invalid email address'))])
+                                                Email(_('Invalid email address'))])
     password = PasswordField(_('Password'), [InputRequired(_('Password is required'))])
 
     @staticmethod

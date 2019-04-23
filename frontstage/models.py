@@ -21,14 +21,17 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 class EnrolmentCodeForm(FlaskForm):
-    enrolment_code = StringField('Enrolment Code', [InputRequired(), Length(min=12,
-                                                                            max=12,
-                                                                            message=_('Re-enter the code and try again'))])
+    enrolment_code = StringField(_('Enrolment Code'), [InputRequired(), Length(min=12,
+                                                                               max=12,
+                                                                               message=_('Re-enter the code and '
+                                                                                         'try again'))])
 
 
 class RegistrationForm(FlaskForm):
     first_name = StringField(_('First name'), validators=[InputRequired(_('First name is required')),
-                                                          Length(max=254, message=_('Your first name must be less than 254 characters'))])
+                                                          Length(max=254,
+                                                                 message=_('Your first name must be less than 254 '
+                                                                           'characters'))])
     last_name = StringField(_('Last name'),
                             validators=[InputRequired(_('Last name is required')),
                                         Length(max=254, message=_('Your last name must be less than 254 characters'))])
@@ -48,7 +51,8 @@ class RegistrationForm(FlaskForm):
                                validators=[DataRequired(_('Phone number is required')),
                                            Length(min=9,
                                                   max=15,
-                                                  message=_('This should be a valid phone number between 9 and 15 digits'))],
+                                                  message=_('This should be a valid phone number between 9 and 15 '
+                                                            'digits'))],
                                default=None)
     enrolment_code = HiddenField('Enrolment Code')
 
@@ -68,12 +72,12 @@ class RegistrationForm(FlaskForm):
             raise ValidationError(_('This should be a valid UK number e.g. 01632 496 0018. '))
 
     @staticmethod
-    def validate_email_address(form, field):
+    def validate_email_address(_, field):
         email = field.data
         return _validate_email_address(email)
 
     @staticmethod
-    def validate_password(form, field):
+    def validate_password(_, field):
         password = field.data
         if password.isalnum() or not any(char.isupper() for char in password) or not any(char.isdigit() for char in password):
             raise ValidationError(app.config['PASSWORD_CRITERIA_ERROR_TEXT'])
@@ -116,7 +120,7 @@ class ForgotPasswordForm(FlaskForm):
                                                    message=_('Your email must be less than 254 characters'))])
 
     @staticmethod
-    def validate_email_address(form, field):
+    def validate_email_address(_, field):
         email = field.data
         return _validate_email_address(email)
 
@@ -133,7 +137,8 @@ class ResetPasswordForm(FlaskForm):
     @staticmethod
     def validate_password(form, field):
         password = field.data
-        if password.isalnum() or not any(char.isupper() for char in password) or not any(char.isdigit() for char in password):
+        if password.isalnum() or not any(char.isupper() for char in password) or not any(char.isdigit() for char in
+                                                                                         password):
             raise ValidationError(app.config['PASSWORD_CRITERIA_ERROR_TEXT'])
 
 

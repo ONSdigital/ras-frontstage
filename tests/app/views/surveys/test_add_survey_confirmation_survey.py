@@ -68,4 +68,4 @@ class TestAddSurveyConfirmation(unittest.TestCase):
         response = self.app.get(url)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('Error 500 - Server error'.encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)

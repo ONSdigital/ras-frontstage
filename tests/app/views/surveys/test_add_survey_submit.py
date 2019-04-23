@@ -90,7 +90,7 @@ class TestAddSurveySubmit(unittest.TestCase):
         response = self.app.get(f'/surveys/add-survey/add-survey-submit?encrypted_enrolment_code={encrypted_enrolment_code}')
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('Error 500 - Server error'.encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     def test_already_enrolled(self):
         with open('tests/test_data/party/business_party.json') as business_json_data:

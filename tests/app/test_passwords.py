@@ -7,7 +7,6 @@ from frontstage import app
 from tests.app.mocked_services import token, url_password_change, url_reset_password_request, \
     url_verify_token
 
-
 encoded_valid_email = 'ImV4YW1wbGVAZXhhbXBsZS5jb20i.vMOqeMafWQpuxbUBRyRs29T0vDI'
 encoded_invalid_email = 'abcd'
 
@@ -80,7 +79,7 @@ class TestPasswords(unittest.TestCase):
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     def test_check_valid_email_token(self):
         response = self.app.get(f"passwords/forgot-password/check-email?email={encoded_valid_email}",
@@ -136,7 +135,7 @@ class TestPasswords(unittest.TestCase):
         response = self.app.get(f"passwords/reset-password/{token}", follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     @requests_mock.mock()
     def test_reset_password_post_success(self, mock_object):
@@ -206,7 +205,7 @@ class TestPasswords(unittest.TestCase):
         response = self.app.post(f"passwords/reset-password/{token}", data=password_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 500)
-        self.assertTrue("Server error".encode() in response.data)
+        self.assertTrue("An error has occurred".encode() in response.data)
 
     @requests_mock.mock()
     def test_resend_verification_email_using_expired_token(self, mock_object):
@@ -222,4 +221,4 @@ class TestPasswords(unittest.TestCase):
         response = self.app.get(f'passwords/resend-password-email-expired-token/{token}',
                                 follow_redirects=True)
         self.assertEqual(response.status_code, 500)
-        self.assertTrue('Server error'.encode() in response.data)
+        self.assertTrue('An error has occurred'.encode() in response.data)

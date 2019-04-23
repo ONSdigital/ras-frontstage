@@ -30,7 +30,6 @@ if not filename.endswith('.py'):
     exit(1)
 
 # Args are now valid - on with the show
-outputdict = {}
 translation_regex = r"_\('([A-z0-9 ,.]+)'\)" # _( followed by 1 or more typeable characters, followed by ')
 
 try:

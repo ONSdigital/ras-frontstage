@@ -43,4 +43,7 @@ class Translate:
             logger.debug(f'Found no string for message ID "{msgid}" in locale "{active_locale}"')
             return msgid
 
+        if translations[msgid] is False:
+            return msgid
+
         return translations[msgid]

@@ -13,7 +13,8 @@ class TestTranslations(TestCase):
         self.app.testing = True
         self.example_translations = {
                     "en_GB": {
-                        "message1": "message_1_return"
+                        "message1": "message_1_return",
+                        "message2": False
                     },
                     "fr_FR": {
                         "message1": "message_1_revenir"
@@ -119,6 +120,15 @@ class TestTranslations(TestCase):
                 output = instance.translate('message1', 'de')
 
                 self.assertEqual(output, 'message1')
+
+    def test_should_return_message_id_if_translation_is_false(self):
+        with patch('builtins.open', new_callable=mock_open()):
+            with patch('frontstage.i18n.translations.load', MagicMock()) as m_load:
+                m_load.return_value = self.example_translations
+                instance = Translate('filename')
+                output = instance.translate('message2', 'en')
+
+                self.assertEqual(output, 'message2')
 
     def test_should_message_id_if_passed_locale_exists_but_doesnt_contain_message_id(self):
         with patch('builtins.open', new_callable=mock_open()):

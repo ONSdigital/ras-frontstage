@@ -31,8 +31,8 @@ class TestSurveyController(unittest.TestCase):
             rsps.add(rsps.GET, url_get_survey, status=400)
             with app.app_context():
                 with self.assertRaises(ApiError):
-                        survey_controller.get_survey(self.app_config['SURVEY_URL'], self.app_config['SURVEY_AUTH'],
-                                                     survey['id'])
+                    survey_controller.get_survey(self.app_config['SURVEY_URL'], self.app_config['SURVEY_AUTH'],
+                                                 survey['id'])
 
     def test_get_survey_by_short_name_success(self):
         with responses.RequestsMock() as rsps:

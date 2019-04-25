@@ -36,7 +36,7 @@ class Config(object):
     JSON_SECRET_KEYS = os.getenv('JSON_SECRET_KEYS')
 
     REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
-    REDIS_PORT = os.getenv('REDIS_PORT', 6379)
+    REDIS_PORT = os.getenv('REDIS_PORT', 7379)
     REDIS_DB = os.getenv('REDIS_DB', 1)
 
     PASSWORD_MATCH_ERROR_TEXT = 'Your passwords do not match'
@@ -58,6 +58,8 @@ class Config(object):
     COLLECTION_INSTRUMENT_USERNAME = os.getenv('COLLECTION_INSTRUMENT_USERNAME')
     COLLECTION_INSTRUMENT_PASSWORD = os.getenv('COLLECTION_INSTRUMENT_PASSWORD')
     COLLECTION_INSTRUMENT_AUTH = (COLLECTION_INSTRUMENT_USERNAME, COLLECTION_INSTRUMENT_PASSWORD)
+
+    EMAIL_MATCH_ERROR_TEXT = 'Your email addresses do not match'
 
     IAC_URL = os.getenv('IAC_URL')
     IAC_USERNAME = os.getenv('IAC_USERNAME')

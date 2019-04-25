@@ -34,7 +34,13 @@ class RegistrationForm(FlaskForm):
                                 validators=[InputRequired('Email address is required'),
                                             Email(message='Invalid email address'),
                                             Length(max=254,
-                                                   message='Your email must be less than 254 characters')])
+                                                   message='Your email must be less than 254 characters'),
+                                            EqualTo('email_address_confirm',
+                                                     message=app.config['EMAIL_MATCH_ERROR_TEXT'])
+                                            ])
+
+    email_address_confirm = StringField('Re-type your email address')
+
     password = PasswordField('Create a password',
                              validators=[DataRequired('Password is required'),
                                          EqualTo('password_confirm', message=app.config['PASSWORD_MATCH_ERROR_TEXT']),

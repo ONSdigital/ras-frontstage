@@ -8,7 +8,7 @@ from werkzeug.utils import redirect
 
 from frontstage import app
 from frontstage.common.session import SessionHandler
-from frontstage.exceptions.exceptions import ApiError, InvalidEqPayLoad, JWTValidationError
+from frontstage.exceptions.exceptions import ApiError, InvalidEqPayLoad, JWTValidationError, IncorrectAccountAccessError
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -65,3 +65,9 @@ def server_error(error):
 def eq_error(error):
     logger.error('Failed to generate EQ URL', error=error.message, url=request.url, status_code=500)
     return render_template('errors/500-error.html'), 500
+
+
+@app.errorhandler(IncorrectAccountAccessError)
+def secure_message_forbidden_error(error):
+    logger.error('Attempt to access secure message without correct session permission')
+    return render_template('errors/403-incorrect-account-error.html')

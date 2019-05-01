@@ -1,17 +1,12 @@
 [[source]]
-
 name = "pypi"
 verify_ssl = true
 url = "https://pypi.python.org/simple"
 
-
 [requires]
-
 python_version = "3.6"
 
-
 [packages]
-
 cfenv = "*"
 flask = "*"
 flask-wtf = "*"
@@ -20,7 +15,7 @@ gunicorn = "*"
 gevent = "*"
 phonenumbers = "*"
 python-jose = "*"
-redis = "*"
+redis = "~=2.10"
 requests = "*"
 structlog = "*"
 "iso8601" = "*"
@@ -31,9 +26,7 @@ requestsdefaulter = "*"
 flask-zipkin = "*"
 pycryptodome = "*"
 
-
 [dev-packages]
-
 codecov = "*"
 coverage = "*"
 "flake8" = "*"

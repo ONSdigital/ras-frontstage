@@ -10,49 +10,54 @@ from wtforms.validators import EqualTo, Length, Email, ValidationError
 from frontstage.common.validators import InputRequired, DataRequired
 
 from frontstage import app
+from frontstage.i18n.translations import Translate
+
+
+translations = Translate('form_messages')
+_ = translations.translate
 
 
 logger = wrap_logger(logging.getLogger(__name__))
 
 
 class EnrolmentCodeForm(FlaskForm):
-    enrolment_code = StringField('Enrolment Code', [InputRequired(), Length(min=12,
-                                                                            max=12,
-                                                                            message='Please re-enter '
-                                                                                    'the code and try again')])
+    enrolment_code = StringField(_('Enrolment Code'), [InputRequired(), Length(min=12,
+                                                                               max=12,
+                                                                               message=_('Re-enter the code and '
+                                                                                         'try again'))])
 
 
 class RegistrationForm(FlaskForm):
-    first_name = StringField('First name',
-                             validators=[InputRequired('First name is required'),
-                                         Length(max=254,
-                                                message='Your first name must be less than 254 characters')])
-    last_name = StringField('Last name',
-                            validators=[InputRequired('Last name is required'),
-                                        Length(max=254, message='Your last name must be less than 254 characters')])
-    email_address = StringField('Enter your email address',
-                                validators=[InputRequired('Email address is required'),
-                                            Email(message='Invalid email address'),
+    first_name = StringField(_('First name'), validators=[InputRequired(_('First name is required')),
+                                                          Length(max=254,
+                                                                 message=_('Your first name must be less than 254 '
+                                                                           'characters'))])
+    last_name = StringField(_('Last name'),
+                            validators=[InputRequired(_('Last name is required')),
+                                        Length(max=254, message=_('Your last name must be less than 254 characters'))])
+    email_address = StringField(_('Enter your email address'),
+                                validators=[InputRequired(_('Email address is required')),
+                                            Email(message=_('Invalid email address')),
                                             Length(max=254,
-                                                   message='Your email must be less than 254 characters'),
+                                                   message=_('Your email must be less than 254 characters')),
                                             EqualTo('email_address_confirm',
-                                                     message=app.config['EMAIL_MATCH_ERROR_TEXT'])
-                                            ])
+                                                     message=app.config['EMAIL_MATCH_ERROR_TEXT'])])
 
-    email_address_confirm = StringField('Re-type your email address')
+    email_address_confirm = StringField(_('Re-type your email address'))
 
-    password = PasswordField('Create a password',
+    password = PasswordField(_('Create a password'),
                              validators=[DataRequired('Password is required'),
                                          EqualTo('password_confirm', message=app.config['PASSWORD_MATCH_ERROR_TEXT']),
                                          Length(min=app.config['PASSWORD_MIN_LENGTH'],
                                                 max=app.config['PASSWORD_MAX_LENGTH'],
                                                 message=app.config['PASSWORD_CRITERIA_ERROR_TEXT'])])
-    password_confirm = PasswordField('Re-type your password')
-    phone_number = StringField('Enter your phone number',
-                               validators=[DataRequired('Phone number is required'),
+    password_confirm = PasswordField(_('Re-type your password'))
+    phone_number = StringField(_('Enter your phone number'),
+                               validators=[DataRequired(_('Phone number is required')),
                                            Length(min=9,
                                                   max=15,
-                                                  message='This should be a valid phone number between 9 and 15 digits')],
+                                                  message=_('This should be a valid phone number between 9 and 15 '
+                                                            'digits'))],
                                default=None)
     enrolment_code = HiddenField('Enrolment Code')
 
@@ -63,30 +68,30 @@ class RegistrationForm(FlaskForm):
             input_number = phonenumbers.parse(field.data, 'GB')  # Tell the parser we are looking for a GB number
 
             if not phonenumbers.is_possible_number(input_number):
-                raise ValidationError('This should be a valid phone number between 9 and 15 digits')
+                raise ValidationError(_('This should be a valid phone number between 9 and 15 digits'))
 
             if not phonenumbers.is_valid_number(input_number):
-                raise ValidationError('Please use a valid UK number e.g. 01632 496 0018.')
+                raise ValidationError(_('Please use a valid UK number e.g. 01632 496 0018.'))
         except NumberParseException:
             logger.debug('There is a number parse exception in the phonenumber field')
-            raise ValidationError('This should be a valid UK number e.g. 01632 496 0018. ')
+            raise ValidationError(_('This should be a valid UK number e.g. 01632 496 0018. '))
 
     @staticmethod
-    def validate_email_address(form, field):
+    def validate_email_address(_, field):
         email = field.data
         return _validate_email_address(email)
 
     @staticmethod
-    def validate_password(form, field):
+    def validate_password(_, field):
         password = field.data
         if password.isalnum() or not any(char.isupper() for char in password) or not any(char.isdigit() for char in password):
             raise ValidationError(app.config['PASSWORD_CRITERIA_ERROR_TEXT'])
 
 
 class LoginForm(FlaskForm):
-    username = StringField('Email Address', [InputRequired('Email Address is required'),
-                                             Email('Invalid email address')])
-    password = PasswordField('Password', [InputRequired('Password is required')])
+    username = StringField(_('Email Address'), [InputRequired(_('Email Address is required')),
+                                                Email(_('Invalid email address'))])
+    password = PasswordField(_('Password'), [InputRequired(_('Password is required'))])
 
     @staticmethod
     def validate_username(form, field):
@@ -106,45 +111,46 @@ def _validate_email_address(email):
     # this extends the email validator to check if there is whitespace in the email or quotes surrounding local part
     if ' ' in email:
         logger.debug('Space found in email address')
-        raise ValidationError('Invalid email address')
+        raise ValidationError(_('Invalid email address'))
     if local_part.startswith('"') and local_part.endswith('"'):
         logger.debug('Quotes found in local part of email')
-        raise ValidationError('Invalid email address')
+        raise ValidationError(_('Invalid email address'))
 
 
 class ForgotPasswordForm(FlaskForm):
-    email_address = StringField('Enter your email address',
-                                validators=[InputRequired('Email address is required'),
-                                            Email(message='Invalid email address'),
+    email_address = StringField(_('Enter your email address'),
+                                validators=[InputRequired(_('Email address is required')),
+                                            Email(message=_('Invalid email address')),
                                             Length(max=254,
-                                                   message='Your email must be less than 254 characters')])
+                                                   message=_('Your email must be less than 254 characters'))])
 
     @staticmethod
-    def validate_email_address(form, field):
+    def validate_email_address(_, field):
         email = field.data
         return _validate_email_address(email)
 
 
 class ResetPasswordForm(FlaskForm):
-    password = PasswordField('New password',
-                             validators=[DataRequired('Password is required'),
+    password = PasswordField(_('New password'),
+                             validators=[DataRequired(_('Password is required')),
                                          EqualTo('password_confirm', message=app.config['PASSWORD_MATCH_ERROR_TEXT']),
                                          Length(min=app.config['PASSWORD_MIN_LENGTH'],
                                                 max=app.config['PASSWORD_MAX_LENGTH'],
                                                 message=app.config['PASSWORD_CRITERIA_ERROR_TEXT'])])
-    password_confirm = PasswordField('Re-type new password')
+    password_confirm = PasswordField(_('Re-type new password'))
 
     @staticmethod
     def validate_password(form, field):
         password = field.data
-        if password.isalnum() or not any(char.isupper() for char in password) or not any(char.isdigit() for char in password):
+        if password.isalnum() or not any(char.isupper() for char in password) or not any(char.isdigit() for char in
+                                                                                         password):
             raise ValidationError(app.config['PASSWORD_CRITERIA_ERROR_TEXT'])
 
 
 class SecureMessagingForm(FlaskForm):
-    send = SubmitField(label='Send', id='send-message-btn')
-    subject = StringField('Subject')
-    body = TextAreaField('Message')
+    send = SubmitField(label=_('Send'), id='send-message-btn')
+    subject = StringField(_('Subject'))
+    body = TextAreaField(_('Message'))
     msg_id = HiddenField('Message id')
     thread_id = HiddenField('Thread id')
     hidden_subject = HiddenField('Hidden Subject')
@@ -154,17 +160,17 @@ class SecureMessagingForm(FlaskForm):
         subject = form['hidden_subject'].data if form['hidden_subject'].data else field.data
 
         if len(subject) > 96:
-            raise ValidationError('Subject field length must not be greater than 100')
+            raise ValidationError(_('Subject field length must not be greater than 100'))
         if form.send.data and not subject or subject.isspace():
-            raise ValidationError('Please enter a subject')
+            raise ValidationError(_('Please enter a subject'))
 
     @staticmethod
     def validate_body(form, field):
         body = field.data
         if len(body) > 10000:
-            raise ValidationError('Body field length must not be greater than 10000')
+            raise ValidationError(_('Body field length must not be greater than 10000'))
         if form.send.data and not body:
-            raise ValidationError('Please enter a message')
+            raise ValidationError(_('Please enter a message'))
 
 
 class RespondentStatus(enum.IntEnum):

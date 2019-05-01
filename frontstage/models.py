@@ -41,7 +41,7 @@ class RegistrationForm(FlaskForm):
                                             Length(max=254,
                                                    message=_('Your email must be less than 254 characters')),
                                             EqualTo('email_address_confirm',
-                                                     message=app.config['EMAIL_MATCH_ERROR_TEXT'])])
+                                                    message=app.config['EMAIL_MATCH_ERROR_TEXT'])])
 
     email_address_confirm = StringField(_('Re-type your email address'))
 

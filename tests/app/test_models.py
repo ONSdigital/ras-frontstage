@@ -60,8 +60,8 @@ class TestModels(unittest.TestCase):
         with app.app_context():
             for email in invalid_emails:
                 form = RegistrationForm(ImmutableMultiDict([('first_name', 'Stephen'), ('last_name', 'Avery'),
-                                                            ('email_address', email), ('password', 'password'),
-                                                            ('password_confirm', 'password'),
+                                                            ('email_address', email), ('email_address_confirm', email),
+                                                            ('password', 'password'), ('password_confirm', 'password'),
                                                             ('phone_number', '01792 911911')]))
                 form.validate()
 

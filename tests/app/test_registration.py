@@ -23,6 +23,7 @@ class TestRegistration(unittest.TestCase):
             'first_name': 'john',
             'last_name': 'doe',
             'email_address': 'testuser2@email.com',
+            'email_address_confirm': 'testuser2@email.com',
             'password': 'Password123!',
             'password_confirm': 'Password123!',
             'phone_number': '07717275049'
@@ -281,6 +282,20 @@ class TestRegistration(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Invalid email address'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_create_account_register_wrong_email(self, mock_object):
+        mock_object.get(url_validate_enrolment, json={'active': True, 'caseId': case['id']})
+        self.test_user['email_address_confirm'] = 'wrongemail@email.com'
+
+        response = self.app.post('register/create-account/enter-account-details',
+                                 query_string=self.params,
+                                 data=self.test_user,
+                                 headers=self.headers,
+                                 follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Your email addresses do not match'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_account_register_no_password(self, mock_object):

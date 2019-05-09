@@ -11,31 +11,31 @@ To reset a password
 * `token` is used to be able to access the reset page
 
 `passwords/reset-password/check-email`
-* This endpoint is used to render a check e-mail template.
+* GET request to this endpoint is used to render a check e-mail template.
 * Don't think this endpoint is used.
 
 `passwords/reset-password/confirmation`
-* Renders confirmation page that password's been changed.
+* GET request to this endpoint renders confirmation page that password's been changed.
 
 `passwords/resend-password-email-expired-token/<token>`
-* This endpoint is used to resend an e-mail to a user if their token has expired.
+* GET request to this endpoint is used to resend an e-mail to a user if their token has expired.
 
 `passwords/forgot-password`
 * GET request to this endpoint will return the forgot password page.
 * POST request to this endpoint will send a reset password request to the party service.
 
 `passwords/forgot-password/check-email`
-* This endpoint is used to render the check e-mail template for forgot-password.
+* GET request to this endpoint is used to render the check e-mail template for forgot-password.
 
 ---
 
 ## Register endpoints
 
 `register/activate-account/<token>`
-* This endpoint is used to verify the e-mail address for the respondent.
+* GET request to this endpoint is used to verify the e-mail address for the respondent.
 
 `register/create-account/confirm-organisation-survey`
-* This endpoint is used to confirm the organisation and survey details that the respondent is enrolling for.
+* GET request to this endpoint is used to confirm the organisation and survey details that the respondent is enrolling for.
 
 `register/create-account`
 * GET request to this endpoint will render a page to enter an enrolment code.
@@ -46,10 +46,10 @@ To reset a password
 * POST request to this endpoint will attempt to create an account for this respondent.
 
 `register/create-account/check-your-email`
-* This endpoint will render a page that will tell the user to verify their account via e-mail.
+* GET request to this endpoint will render a page that will tell the user to verify their account via e-mail.
 
 `register/create-account/check-email`
-* This endpoint will display to the user that they've almost created their account.
+* GET request to this endpoint will display to the user that they've almost created their account.
 
 ---
 
@@ -65,7 +65,7 @@ To reset a password
 * The `thread-id` is the ID of the conversation between the respondent and the internal user.
 
 `secure-message/threads`
-* This endpoint will display the list of conversations that the user currently has.
+* GET request to this endpoint will display the list of conversations that the user currently has.
 
 ---
 
@@ -76,42 +76,42 @@ To reset a password
 * POST request to this endpoint will log-in the user to be to see their survey list.
 
 `sign-in/resend_verification/<party_id>`
-* This endpoint will resend a verification e-mail to the respondent.
+* GET request to this endpoint will resend a verification e-mail to the respondent.
 * `party_id` is the ID of the respondent.
 
 `sign-in/resend-verification-expired-token/<token>`
-* This endpoint will resend a verification e-mail if the verification token has expired.
+* GET request to this endpoint will resend a verification e-mail if the verification token has expired.
 
 `sign-in/logout`
-* This endpoint will sign-out the user from their session.
+* GET request to this endpoint will sign-out the user from their session.
 
 ---
 
 ## Surveys endpoints
 
 `surveys/access_survey`
-* This endpoint will allow the respondent to upload and download a survey.
+* GET request to this endpoint will allow the respondent to upload and download a survey.
 
 `surveys/add-survey`
-* This endpoint will allow the respondent to add another survey to their account.
+* POST request to this endpoint will allow the respondent to add another survey to their account.
 
 `surveys/add-survey/confirm-organisation-survey`
-* This endpoint will display to the user the survey they are adding to their account.
+* GET request to this endpoint will display to the user the survey they are adding to their account.
 
 `surveys/add-survey/add-survey-submit`
-* This endpoint will assign the new survey to the respondent.
+* GET request to this endpoint will assign the new survey to the respondent.
 
 `surveys/download_survey`
-* This endpoint will download a survey that the respondent will need to complete.
+* GET request to this endpoint will download a survey that the respondent will need to complete.
 
 `surveys/upload_survey`
-* This endpoint will upload a collection instrument to the collection instrument service.
+* POST request to this endpoint will upload a collection instrument to the collection instrument service.
 
 `surveys/upload_failed`
-* This endpoint will render an error page if it fails to upload the collection instrument.
+* GET request to this endpoint will render an error page if it fails to upload the collection instrument.
 
 `surveys/<tag>`
-* This endpoint will display to the respondent the surveys that they need to complete.
+* GET request to this endpoint will display to the respondent the surveys that they need to complete.
 * `tag` can be either to-do or history.
 
 ---
@@ -119,18 +119,18 @@ To reset a password
 ## Contact us endpoints
 
 `/contact-us`
-* This endpoint will display contact details for the ONS.
+* GET request to this endpoint will display contact details for the ONS.
 
 ---
 
 ## Cookies privacy endpoints
 
 `/cookies-privacy`
-* This endpoint will display cookies and privacy details that ONS collects on frontstage.
+* GET request to this endpoint will display cookies and privacy details that ONS collects on frontstage.
 
 ---
 
 ## Info endpoint
 
 `/info`
-* This endpoint displays the current version of ras-frontstage.
+* GET request to this endpoint displays the current version of ras-frontstage.

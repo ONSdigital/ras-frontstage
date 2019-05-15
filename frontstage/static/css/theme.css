@@ -217,3 +217,7 @@ font-weight: 400;
   border-color: #555;
   border-bottom: 1px solid #fff;
 }
+
+.no-js .hide-if-no-js {
+  display: none;
+}

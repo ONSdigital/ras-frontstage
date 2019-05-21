@@ -68,6 +68,6 @@ def eq_error(error):
 
 
 @app.errorhandler(IncorrectAccountAccessError)
-def secure_message_forbidden_error(error):
+def secure_message_forbidden_error(message, thread_id):
     logger.info('Attempt to access secure message without correct session permission', url=request.url)
     return render_template('errors/403-incorrect-account-error.html')

@@ -35,8 +35,8 @@ def get_conversation(thread_id):
         try:
             response.raise_for_status()
         except HTTPError as exception:
-            if exception.response.status_code == 404:
-                raise IncorrectAccountAccessError()
+            if exception.response.status_code == 403:
+                raise IncorrectAccountAccessError(message='Access not granted for thread', thread_id=thread_id)
             else:
                 raise ApiError(logger, response,
                                log_level='error',

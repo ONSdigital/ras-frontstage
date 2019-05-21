@@ -96,4 +96,7 @@ class UserDoesNotExist(Exception):
 
 
 class IncorrectAccountAccessError(Exception):
-        pass
+    def __init__(self, message, thread_id):
+        super().__init__()
+        self.message = message
+        self.thread = thread_id

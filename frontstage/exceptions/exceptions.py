@@ -93,3 +93,10 @@ class UserDoesNotExist(Exception):
     def __init__(self, message):
         super().__init__()
         self.message = message
+
+
+class IncorrectAccountAccessError(Exception):
+    def __init__(self, message, thread_id):
+        super().__init__()
+        self.message = message
+        self.thread = thread_id

@@ -10,7 +10,7 @@ from structlog import wrap_logger
 from urllib3 import Retry
 
 from frontstage.common.session import SessionHandler
-from frontstage.exceptions.exceptions import ApiError, AuthorizationTokenMissing, NoMessagesError
+from frontstage.exceptions.exceptions import ApiError, AuthorizationTokenMissing, NoMessagesError, IncorrectAccountAccessError
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -34,11 +34,14 @@ def get_conversation(thread_id):
         response = session.get(url, headers=headers)
         try:
             response.raise_for_status()
-        except HTTPError:
-            raise ApiError(logger, response,
-                           log_level='error',
-                           message='Thread retrieval failed',
-                           thread_id=thread_id)
+        except HTTPError as exception:
+            if exception.response.status_code == 403:
+                raise IncorrectAccountAccessError(message='Access not granted for thread', thread_id=thread_id)
+            else:
+                raise ApiError(logger, response,
+                               log_level='error',
+                               message='Thread retrieval failed',
+                               thread_id=thread_id)
 
     logger.debug('Thread retrieval successful', thread_id=thread_id)
 

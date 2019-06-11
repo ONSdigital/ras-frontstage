@@ -174,8 +174,13 @@ class TestSecureMessage(unittest.TestCase):
 
         self.assertRaises(IncorrectAccountAccessError)
 
-    def test_secure_message_unauthorized_return(self):
-        self.headers = {"Authorization": "wrong authorization"}
+    @requests_mock.mock()
+    @patch('frontstage.controllers.conversation_controller._create_get_conversation_headers')
+    def test_secure_message_unauthorized_return(self, mock_request, authorization):
+
+        authorization.return_value = {"Authorization": "wrong authorization"}
+
+        mock_request.get(url_get_thread, status_code=403)
 
         response = self.app.get("secure-message/thread/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers,
                                 follow_redirects=True)

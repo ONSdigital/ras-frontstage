@@ -1,10 +1,10 @@
 {
   "_links": {
     "first": {
-      "href": "http://ras-secure-messaging-int.apps.devtest.onsclofo.uk/thread/75f6dda1-feb8-4350-8c39-35567bc7fa6a"
+      "href": "http://ras-secure-messaging-int.apps.devtest.onsclofo.uk/threads/75f6dda1-feb8-4350-8c39-35567bc7fa6a"
     },
     "self": {
-      "href": "http://ras-secure-messaging-int.apps.devtest.onsclofo.uk/thread/75f6dda1-feb8-4350-8c39-35567bc7fa6a?page=1&limit=20"
+      "href": "http://ras-secure-messaging-int.apps.devtest.onsclofo.uk/threads/75f6dda1-feb8-4350-8c39-35567bc7fa6a?page=1&limit=20"
     }
   },
   "messages": [

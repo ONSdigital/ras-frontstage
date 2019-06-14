@@ -15,7 +15,7 @@ from frontstage.views.secure_messaging import secure_message_bp
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-@secure_message_bp.route('/thread/<thread_id>', methods=['GET', 'POST'])
+@secure_message_bp.route('/threads/<thread_id>', methods=['GET', 'POST'])
 @jwt_authorization(request)
 def view_conversation(session, thread_id):
     party_id = session.get('party_id')

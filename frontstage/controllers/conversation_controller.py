@@ -28,7 +28,7 @@ def get_conversation(thread_id):
     logger.debug('Attempting to retrieve thread', thread_id=thread_id)
 
     headers = _create_get_conversation_headers()
-    url = f"{current_app.config['SECURE_MESSAGE_URL']}/v2/threads/{thread_id}"
+    url = f"{current_app.config['SECURE_MESSAGE_URL']}/threads/{thread_id}"
 
     with _get_session() as session:
         response = session.get(url, headers=headers)
@@ -86,7 +86,7 @@ def send_message(message_json):
     party_id = json.loads(message_json).get('msg_from')
     logger.debug('Attempting to send message', party_id=party_id)
 
-    url = f"{current_app.config['SECURE_MESSAGE_URL']}/v2/messages"
+    url = f"{current_app.config['SECURE_MESSAGE_URL']}/messages"
     headers = _create_send_message_headers()
 
     with _get_session() as session:
@@ -124,7 +124,7 @@ def _create_send_message_headers():
 def remove_unread_label(message_id):
     logger.debug('Attempting to remove message unread label', message_id=message_id)
 
-    url = f"{current_app.config['SECURE_MESSAGE_URL']}/v2/messages/modify/{message_id}"
+    url = f"{current_app.config['SECURE_MESSAGE_URL']}/messages/modify/{message_id}"
     data = '{"label": "UNREAD", "action": "remove"}'
     headers = _create_send_message_headers()
 

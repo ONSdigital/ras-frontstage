@@ -2,6 +2,7 @@
 <form
         method="post"
         action="{{ url_for('surveys_bp.upload_survey', case_id=case_id, business_party_id=business_info.id, survey_short_name=survey_info.shortName) }}"
+        id="surveys_upload_form"
         class="form"
         role="form"
         enctype="multipart/form-data">
@@ -12,8 +13,22 @@
         accept=".xls,.xlsx" />
     </div>
 
+    <script>
+        function clickEvent(button){
+            button.disabled=true;
+            button.innerHTML='Uploading...';
+            try {
+                ga('send', 'event', 'survey', 'upload', 'survey_ref = {{ survey_info.surveyRef }} collection_exercise_ref = {{ collection_exercise_info.exerciseRef }}');
+            } catch {}
+
+            let form = document.getElementById("surveys_upload_form");
+            form.submit();
+        }
+    </script>
     <button class="btn btn--secondary u-mt-s" id="upload_survey_button"
-            onclick="ga('send', 'event', 'survey', 'upload','survey_ref = {{ survey_info.surveyRef }} collection_exercise_ref = {{ collection_exercise_info.exerciseRef }}');"
+            onclick="clickEvent(this)"
             type="submit">Upload</button>
+
+
 
 </form>

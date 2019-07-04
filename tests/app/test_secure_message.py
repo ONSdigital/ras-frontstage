@@ -44,7 +44,7 @@ class TestSecureMessage(unittest.TestCase):
     def test_get_thread_success(self, mock_request):
         mock_request.get(url_get_thread, json={'messages': [conversation_json], 'is_closed': False})
 
-        response = self.app.get("secure-message/thread/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers, follow_redirects=True)
+        response = self.app.get("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers, follow_redirects=True)
         self.assertTrue(response.status_code, 200)
         self.assertTrue('Peter Griffin'.encode() in response.data)
         self.assertTrue('testy2'.encode() in response.data)
@@ -56,7 +56,7 @@ class TestSecureMessage(unittest.TestCase):
         del conversation_json_copy['@ru_id']
         mock_request.get(url_get_thread, json={'messages': [conversation_json_copy]})
 
-        response = self.app.get("secure-message/thread/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers, follow_redirects=True)
+        response = self.app.get("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers, follow_redirects=True)
         self.assertTrue(response.status_code, 500)
 
     def test_create_message_get(self):
@@ -174,9 +174,14 @@ class TestSecureMessage(unittest.TestCase):
 
         self.assertRaises(IncorrectAccountAccessError)
 
-    def test_secure_message_unauthorized_return(self):
-        self.headers = {"Authorization": "wrong authorization"}
+    @requests_mock.mock()
+    @patch('frontstage.controllers.conversation_controller._create_get_conversation_headers')
+    def test_secure_message_unauthorized_return(self, mock_request, authorization):
 
-        response = self.app.get("secure-message/thread/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers,
+        authorization.return_value = {"Authorization": "wrong authorization"}
+
+        mock_request.get(url_get_thread, status_code=403)
+
+        response = self.app.get("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers,
                                 follow_redirects=True)
         self.assertTrue('The page you are trying to view is not for this account.'.encode() in response.data)

@@ -1,10 +1,14 @@
 FROM python:3.6-slim
 
-WORKDIR /app
-COPY . /app
-EXPOSE 8082
-RUN apt-get update -y && apt-get install -y python-pip && apt-get install -y curl
-RUN pip3 install pipenv==8.3.2 && pipenv install --system --deploy
+RUN apt update && apt install -y build-essential curl
+RUN pip install pipenv
 
-ENTRYPOINT ["python3"]
-CMD ["run.py"]
+WORKDIR /app
+EXPOSE 8082
+CMD ["python", "run.py"]
+
+HEALTHCHECK --interval=1m30s --timeout=10s --retries=3 \
+  CMD curl -f http://localhost:8082/info || exit 1
+
+COPY . /app
+RUN pipenv install --deploy --system

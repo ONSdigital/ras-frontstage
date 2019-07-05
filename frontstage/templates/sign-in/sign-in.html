@@ -56,7 +56,7 @@
         <p>You may now sign in.</p>
         {% else %}
 
-        {% if config.AVAILABILITY_BANNER %}
+        {% if config.AVAILABILITY_BANNER and config.AVAILABILITY_BANNER != 'False' %}
         <div class="panel panel--simple panel--info">
             <div class="panel__body">
                 <strong class="u-d-b">Service Availability</strong>

@@ -12,10 +12,9 @@ def timestamp_token(token):
     """Time stamp the expires_in argument of the OAuth2 token. And replace with an expires_in UTC timestamp"""
 
     current_time = datetime.now()
-    expires_in = current_time + timedelta(seconds=token['expires_in'])
+    # The seconds were hardcoded ras-rm-auth-service and django-oauth2-test so we replicate this behaviour here.
+    expires_in = current_time + timedelta(seconds=3600)
     data_dict_for_jwt_token = {
-        "refresh_token": token['refresh_token'],
-        "access_token": token['access_token'],
         "expires_at": expires_in.timestamp(),
         "role": "respondent",
         "party_id": token['party_id']

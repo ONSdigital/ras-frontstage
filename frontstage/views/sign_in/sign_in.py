@@ -16,7 +16,7 @@ from frontstage.views.sign_in import sign_in_bp
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-
+UNKNOWN_ACCOUNT_ERROR = 'Authentication error in OAuth2 service'
 BAD_AUTH_ERROR = 'Unauthorized user credentials'
 NOT_VERIFIED_ERROR = 'User account not verified'
 USER_ACCOUNT_LOCKED = 'User account locked'
@@ -51,7 +51,7 @@ def get_oauth_token(username, password, party_id, party_json, form, next):
             return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
 
 
-@sign_in_bp.route('/', methods=['GET', 'POST'])
+@sign_in_bp.route('/', methods=['GET', 'POST'])  # noqa: C901
 def login():
     form = LoginForm(request.form)
     form.username.data = form.username.data.strip()
@@ -66,11 +66,29 @@ def login():
             logger.info('Respondent not able to sign in as they don\'t have an active account in the system.')
             return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
         party_id = party_json['id']
+        bound_logger = logger.bind(party_id=party_id)
+        try:
+            oauth2_token = oauth_controller.sign_in(username, password)
+        except OAuth2Error as exc:
+            error_message = exc.oauth2_error
+            if USER_ACCOUNT_LOCKED in error_message:  # pylint: disable=no-else-return
+                bound_logger.info('User account is locked on the OAuth2 server', status=party_json['status'])
+                if party_json['status'] == 'ACTIVE' or party_json['status'] == 'CREATED':
+                    notify_party_and_respondent_account_locked(respondent_id=party_id,
+                                                               email_address=username,
+                                                               status='SUSPENDED')
+                return render_template('sign-in/sign-in.account-locked.html', form=form)
+            elif NOT_VERIFIED_ERROR in error_message:
+                bound_logger.info('User account is not verified on the OAuth2 server')
+                return render_template('sign-in/sign-in.account-not-verified.html', party_id=party_id, email=username)
+            elif BAD_AUTH_ERROR in error_message:
+                bound_logger.info('Bad credentials provided')
+            elif UNKNOWN_ACCOUNT_ERROR in error_message:
+                bound_logger.info('User account does not exist in auth service')
+            else:
+                bound_logger.error('Unexpected error was returned from oauth service', oauth2_error=error_message)
 
-        oauth2_token = get_oauth_token(username, password, party_id, party_json, form, request.args.get('next'))
-
-        if not isinstance(oauth2_token, dict):
-            return oauth2_token
+            return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}}, next=request.args.get('next'))
 
         # Take our raw token and add a UTC timestamp to the expires_at attribute
         data_dict = {**oauth2_token, 'party_id': party_id}
@@ -83,12 +101,12 @@ def login():
                                                       _scheme=getenv('SCHEME', 'http'))))
 
         session = SessionHandler()
-        logger.info('Creating session', party_id=party_id)
+        bound_logger.info('Creating session')
         session.create_session(encoded_jwt_token)
         response.set_cookie('authorization',
                             value=session.session_key,
                             expires=data_dict_for_jwt_token['expires_at'])
-        logger.info('Successfully created session', party_id=party_id, session_key=session.session_key)
+        bound_logger.info('Successfully created session', session_key=session.session_key)
         return response
 
     template_data = {

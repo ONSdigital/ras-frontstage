@@ -29,6 +29,12 @@ def sign_in(username, password):
 
     try:
         response.raise_for_status()
+        # This if statement will only be true if the 'oauth' service is the ras-rm-auth-service.  This is only
+        # meant to be a temporary measure until the switch is made and the new auth service is used.  Once
+        # the oauth2 service is switched off, we should look to tidy up the api of the auth service (As the service
+        # doesn't need a /tokens endpoint if there are no tokens) and tidy up this services interaction with it.
+        if response.status_code == 204:
+            return {}
     except requests.exceptions.HTTPError:
         if response.status_code == 401:
             oauth2_error = response.json().get('detail', '')

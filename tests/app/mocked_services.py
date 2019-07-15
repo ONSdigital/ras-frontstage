@@ -122,6 +122,7 @@ url_get_survey_by_short_name_eq = f"{app.config['SURVEY_URL']}/surveys/shortname
 url_get_survey_by_short_name_rsi = f"{app.config['SURVEY_URL']}/surveys/shortname/{survey_rsi['shortName']}"
 url_get_token = f"{app.config['OAUTH_URL']}/api/v1/tokens/"
 url_get_thread = app.config['SECURE_MESSAGE_URL'] + '/threads/9e3465c0-9172-4974-a7d1-3a01592d1594'
+url_get_thread_old = app.config['SECURE_MESSAGE_URL'] + '/thread/9e3465c0-9172-4974-a7d1-3a01592d1594'
 url_get_threads = app.config['SECURE_MESSAGE_URL'] + '/threads'
 url_oauth_token = f"{app.config['OAUTH_URL']}/api/v1/tokens/"
 url_password_change = f"{app.config['PARTY_URL']}/party-api/v1/respondents/change_password/{token}"

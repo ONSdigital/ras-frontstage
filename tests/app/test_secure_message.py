@@ -6,7 +6,8 @@ import requests_mock
 from frontstage import app
 from frontstage.exceptions.exceptions import IncorrectAccountAccessError
 from tests.app.mocked_services import (conversation_json, conversation_list_json,
-                                       encoded_jwt_token, url_get_thread, url_get_threads, url_send_message)
+                                       encoded_jwt_token, url_get_thread, url_get_threads,
+                                       url_get_thread_old, url_send_message)
 
 
 def create_api_error(status_code, data=None):
@@ -43,9 +44,16 @@ class TestSecureMessage(unittest.TestCase):
     @requests_mock.mock()
     def test_get_thread_success(self, mock_request):
         mock_request.get(url_get_thread, json={'messages': [conversation_json], 'is_closed': False})
+        mock_request.get(url_get_thread_old, json={'messages': [conversation_json], 'is_closed': False})
 
         response = self.app.get("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers, follow_redirects=True)
-        self.assertTrue(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Peter Griffin'.encode() in response.data)
+        self.assertTrue('testy2'.encode() in response.data)
+        self.assertTrue('something else'.encode() in response.data)
+
+        response = self.app.get("secure-message/thread/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue('Peter Griffin'.encode() in response.data)
         self.assertTrue('testy2'.encode() in response.data)
         self.assertTrue('something else'.encode() in response.data)
@@ -57,7 +65,7 @@ class TestSecureMessage(unittest.TestCase):
         mock_request.get(url_get_thread, json={'messages': [conversation_json_copy]})
 
         response = self.app.get("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers, follow_redirects=True)
-        self.assertTrue(response.status_code, 500)
+        self.assertEqual(response.status_code, 500)
 
     def test_create_message_get(self):
         response = self.app.get("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789", headers=self.headers, follow_redirects=True)

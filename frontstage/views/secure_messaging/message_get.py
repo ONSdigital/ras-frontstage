@@ -15,9 +15,16 @@ from frontstage.views.secure_messaging import secure_message_bp
 logger = wrap_logger(logging.getLogger(__name__))
 
 
+@secure_message_bp.route('/thread/<thread_id>', methods=['GET', 'POST'])
 @secure_message_bp.route('/threads/<thread_id>', methods=['GET', 'POST'])
 @jwt_authorization(request)
 def view_conversation(session, thread_id):
+    """Endpoint to view conversations by thread_id
+
+    NOTE: /thread/<thread_id> endpoint is there for compatability reasons.  All new emails use /threads/<thread_id>.
+    From September 2019 onwards, it should be safe to remove the /thread endpoint (just check the analytics to make
+    sure that it's a very small number of people trying to hit it first!).
+    """
     party_id = session.get('party_id')
     logger.info("Getting conversation", thread_id=thread_id, party_id=party_id)
     # TODO, do we really want to do a GET every time, even if we're POSTing? Rops does it this

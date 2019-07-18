@@ -29,7 +29,7 @@
             role="form">
         {{ form.csrf_token }}
 
-        <h1 class="saturn">Create an account</h1>
+        <h1 class="u-fs-l">Create an account</h1>
 
         {% if errorType == "failed" or errors|length > 0 %}
         <div class="panel panel--simple panel--error panel--spacious">
@@ -40,7 +40,7 @@
 
                 {{ form.enrolment_code.label(class_='label') }}
 
-                <span class="label__description label__inner pluto">You'll find this in the letter we sent you</span>
+                <span class="label__description label__inner u-fs-s">You'll find this in the letter we sent you</span>
                 {{ form.enrolment_code(class_='input input--text input-type__input') }}
             </div>
 
@@ -50,7 +50,7 @@
 
         <br/>
 
-        <button class="btn venus" type="submit" id="continue_button">Continue</button>
+        <button class="btn u-fs-r--b" type="submit" id="continue_button">Continue</button>
 
     </form>
 

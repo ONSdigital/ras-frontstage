@@ -2,9 +2,9 @@
     <div class="panel panel--error">
         <div class="panel__header">
         {% if errors|length == 1 %}
-            <h1 class="panel__title venus">This page has 1 error</h1>
+            <h1 class="panel__title u-fs-r--b">This page has 1 error</h1>
         {% elif errors|length > 1 %}
-            <h1 class="panel__title venus">This page has {{ errors|length }} errors</h1>
+            <h1 class="panel__title u-fs-r--b">This page has {{ errors|length }} errors</h1>
         {% endif %}
         </div>
         <div class="panel__body" data-qa="error-body">
@@ -15,7 +15,7 @@
         {% endif %}
 
         {% for error in errors %}
-            <p class=“mars”>{{ loop.index0 + 1 }}) <a class="js-inpagelink" href="#{{error}}-error">{{ errors[error][0] }}</a></p>
+            <p class=“u-fs-r”>{{ loop.index0 + 1 }}) <a class="js-inpagelink" href="#{{error}}-error">{{ errors[error][0] }}</a></p>
         {% endfor %}
         </div>
     </div>

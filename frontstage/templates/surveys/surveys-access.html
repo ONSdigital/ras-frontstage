@@ -16,7 +16,7 @@
 
 <br/>
 
-<h1 class="saturn">{{ survey_info.longName }}</h1>
+<h1 class="u-fs-l">{{ survey_info.longName }}</h1>
 
 <h2 class="neptune">Download</h2>
 
@@ -37,7 +37,7 @@
         <span class="download__text">Download spreadsheet&nbsp;&nbsp;&nbsp;</span>
         <span class="download__text"><i class="fa fa-download fa-lg" aria-hidden="true"></i></span>
     </div>
-    <div class="download__text pluto">({{ collection_instrument_size | file_size_filter }} kb XLS)</div>
+    <div class="download__text u-fs-s">({{ collection_instrument_size | file_size_filter }} kb XLS)</div>
 </a>
 
 <br/>
@@ -54,7 +54,7 @@
      data-hide-label="Hide guidance for uploading"
      data-show-label="Show guidance for uploading">
 
-    <a class="guidance__link js-details-trigger js-details-label icon--details mars"
+    <a class="guidance__link js-details-trigger js-details-label icon--details u-fs-r"
        id="guidance-for-uploading"
        data-guidance-trigger="true"
        aria-expanded="false"
@@ -62,7 +62,7 @@
        aria-controls="guidance-for-uploading-body">Show guidance for uploading</a>
 
     <div class="guidance__main js-details-body" id="guidance-for-uploading-body" aria-hidden="true">
-        <div class="guidance__content mars">
+        <div class="guidance__content u-fs-r">
             <div>
                 <p>Your file needs to be:</p>
                 <ul>
@@ -76,7 +76,7 @@
 </div>
 <br/>
 
-<p class="venus icon--lock">We will treat your data securely and confidentially</p>
+<p class="u-fs-r--b icon--lock">We will treat your data securely and confidentially</p>
 
 {% include "surveys/surveys-upload-file-picker.html" %}
 

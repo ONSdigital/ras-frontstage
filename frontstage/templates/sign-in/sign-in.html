@@ -17,17 +17,17 @@
     <div class="panel panel--error">
         <div class="panel__header">
             {% if errorType == "failed" %}
-            <h1 class="panel__title venus">Incorrect email or password</h1>
+            <h1 class="panel__title u-fs-r--b">Incorrect email or password</h1>
             {% elif errorType|length > 1 %}
-            <h1 class="panel__title venus">There are {{ errorType|length }} errors on this page</h1>
+            <h1 class="panel__title u-fs-r--b">There are {{ errorType|length }} errors on this page</h1>
             {% else %}
             {% for error in errorType %}
-            <h1 class="panel__title venus">{{ errorType[error][0] }}</h1>
+            <h1 class="panel__title u-fs-r--b">{{ errorType[error][0] }}</h1>
             {% endfor %}
             {% endif %}
         </div>
         <div class="panel__body" data-qa="error-body">
-            <p class="mars"><a href="#sign-in-details" id="try-again-link" class="js-inpagelink">Please try again</a></p>
+            <p class="u-fs-r"><a href="#sign-in-details" id="try-again-link" class="js-inpagelink">Please try again</a></p>
         </div>
     </div>
     <br />
@@ -52,7 +52,7 @@
         {{ form.csrf_token }}
 
         {% if data['account_activated'] %}
-        <h1 class="saturn">You've activated your account</h1>
+        <h1 class="u-fs-l">You've activated your account</h1>
         <p>You may now sign in.</p>
         {% else %}
 
@@ -61,7 +61,7 @@
             <div class="panel__body">
                 <strong class="u-d-b">Service Availability</strong>
             </div>
-            <p class="mars u-mt-xs">Thank you for visiting the Office for National Statistics Secure Data Collection website.</p>
+            <p class="u-fs-r u-mt-xs">Thank you for visiting the Office for National Statistics Secure Data Collection website.</p>
 	    <p>We are carrying out essential maintenance on our internal systems.</p>
 	    <p>You are able to use the system and submit data during this period however your response status may not display as completed until after the maintenance has been completed.</p>
         </div>
@@ -71,7 +71,7 @@
         <p>New to this service?
            <a id="create-account" href="/register/create-account/">Create an account</a>
         </p>
-        <h1 class="saturn">Sign in</h1>
+        <h1 class="u-fs-l">Sign in</h1>
         {% endif %}
 
         <fieldset id="sign-in-details">
@@ -98,7 +98,7 @@
                     {% endif %}
                         {{ form.password.label(class_='label') }}
                         <div class="hide-if-no-js field--toggle">
-                            <label class="label label--inline venus field__label" for="showPasswordToggle">Show password</label>
+                            <label class="label label--inline u-fs-r--b field__label" for="showPasswordToggle">Show password</label>
                             <input id="showPasswordToggle" class="field__input input input--checkbox" type="checkbox">
                           </div>
                         {{ form.password(id='inputPassword', class_='input input--text input-type__input', autocomplete="off", **{'aria-describedby':'inputPasswordLabel'}) }}
@@ -110,7 +110,7 @@
                 </div>
                 <br />
 
-                <button class="btn venus" type="submit" id="sign_in_button">Sign in</button>
+                <button class="btn u-fs-r--b" type="submit" id="sign_in_button">Sign in</button>
             {% if errorType == "failed" %}
             </div>
             {% endif %}

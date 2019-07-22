@@ -10,7 +10,7 @@
     <div class="grid__col col-12@m">
         <div class="panel panel--simple panel--success upload--success">
             <div class="panel__body">
-                <h1 class="venus">File uploaded successfully</h1>
+                <h1 class="u-fs-r--b">File uploaded successfully</h1>
                 <p>{{ upload_filename }} has been uploaded.</p>
                 <p>This survey has now moved into your <a href="{{ url_for('surveys_bp.get_survey_list', tag='history') }}">history</a>.</p>
                 <p><a id='return-survey-list' href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}">Return to my 'To do' list</a></p>

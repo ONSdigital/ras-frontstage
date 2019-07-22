@@ -16,10 +16,9 @@
 
 <br/>
 
-<h1 class="saturn">{{ survey_info.longName }}</h1>
+<h1 class="u-fs-l">{{ survey_info.longName }}</h1>
 
 <h2 class="neptune">Download</h2>
-
 
 <p>
     {{ survey_info.shortName }} spreadsheet for <strong>{{ business_info.name }}</strong>
@@ -37,7 +36,7 @@
         <span class="download__text">Download spreadsheet&nbsp;&nbsp;&nbsp;</span>
         <span class="download__text"><i class="fa fa-download fa-lg" aria-hidden="true"></i></span>
     </div>
-    <div class="download__text pluto">({{ collection_instrument_size | file_size_filter }} kb XLS)</div>
+    <div class="download__text u-fs-s">({{ collection_instrument_size | file_size_filter }} kb XLS)</div>
 </a>
 
 <br/>
@@ -48,37 +47,24 @@
 <p>Please upload by <strong>{{ collection_exercise_info.scheduledReturnDateTimeFormatted }}</strong></p>
 {% endif %}
 
-<div class="guidance js-details upload-guidance"
-     data-guidance-label="Guidance for uploading"
-     data-guidance="Guidance for uploading"
-     data-hide-label="Hide guidance for uploading"
-     data-show-label="Show guidance for uploading">
-
-    <a class="guidance__link js-details-trigger js-details-label icon--details mars"
-       id="guidance-for-uploading"
-       data-guidance-trigger="true"
-       aria-expanded="false"
-       href="#guidance-for-uploading"
-       aria-controls="guidance-for-uploading-body">Show guidance for uploading</a>
-
-    <div class="guidance__main js-details-body" id="guidance-for-uploading-body" aria-hidden="true">
-        <div class="guidance__content mars">
-            <div>
-                <p>Your file needs to be:</p>
-                <ul>
-                    <li>.xls or .xlsx format</li>
-                    <li>smaller than 20MB</li>
-                </ul>
-            </div>
+<div class="collapsible collapsible--simple js-collapsible js-collapsible-simple">
+    <div class="js-collapsible-content">
+        <h3 class="collapsible__title js-collapsible-title icon--collapsible-simple u-fs-r--b" data-ga="click" data-ga-category="definition" data-ga-action="Open panel" data-ga-label="Guidance for uploading">Guidance for uploading</h3>
+        <div class="collapsible__body js-collapsible-body">
+            <h4 class="u-mb-s">Your file needs to be:</h4>
+            <ul>
+                <li>.xls or .xlsx format</li>
+                <li>smaller than 20MB</li>
+            </ul>
+            <button class="btn--secondary btn--small js-collapsible-close u-no-js-hide" data-ga="click" data-ga-category="definition" data-ga-action="Close panel" data-ga-label="Guidance for uploading">Hide this</button>
         </div>
     </div>
-
 </div>
+
 <br/>
 
-<p class="venus icon--lock">We will treat your data securely and confidentially</p>
+<p class="u-fs-r--b icon--lock">We will treat your data securely and confidentially</p>
 
 {% include "surveys/surveys-upload-file-picker.html" %}
-
 
 {% endblock main %}

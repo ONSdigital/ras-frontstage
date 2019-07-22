@@ -21,9 +21,9 @@
     <li class="grid card" name="survey-card">
     {% endif %}
         <div class="grid__col col-4@m u-pl-xs">
-            <span class="survey-list-item__label mercury">SURVEY: </span>
+            <span class="survey-list-item__label u-fs-s--b">SURVEY: </span>
             <span id="SURVEY_NAME" >{{ survey.survey_long_name }}</span><br/>
-            <span id="REPORTING_UNIT_DETAILS_{{ survey.business_ref }}" name="reporting-unit-details" class="survey-list-item pluto">
+            <span id="REPORTING_UNIT_DETAILS_{{ survey.business_ref }}" name="reporting-unit-details" class="survey-list-item u-fs-s">
                 Business: {{ survey.business_name }}<br/>
                 {% if survey.trading_as %}
                 Trading as: {{ survey.trading_as }}<br/>
@@ -33,19 +33,19 @@
         </div>
 
         <div class="grid__col col-2@m">
-            <span class="survey-list-item__label mercury">PERIOD COVERED: </span>
+            <span class="survey-list-item__label u-fs-s--b">PERIOD COVERED: </span>
             <span id="period-{{ loop.index }}" name="period">{{ survey.period}}</span>
         </div>
 
         <div class="grid__col col-2@m">
             {% if not history %}
-            <span class="survey-list-item__label mercury">SUBMIT BY: </span>
+            <span class="survey-list-item__label u-fs-s--b">SUBMIT BY: </span>
             <span id="SUBMIT_BY_{{ loop.index }}" name="submit-by">{{ survey.submit_by}}</span>
             {% endif %}
         </div>
 
         <div class="grid__col col-2@m">
-            <span class="survey-list-item__label mercury">STATUS: </span>
+            <span class="survey-list-item__label u-fs-s--b">STATUS: </span>
             <span id="status-{{ loop.index }}" name="status">{{ survey.status }}</span>
         </div>
         <div class="grid__col col-2@m">
@@ -59,7 +59,7 @@
                 </button>
             </a>
             {% endif %}
-            <a id="create-message-link-{{loop.index}}" href="/secure-message/create-message/?survey={{survey.survey_id}}&ru_ref={{survey.business_party_id}}" class="pluto survey-message history__message">Send a message </span></a>
+            <a id="create-message-link-{{loop.index}}" href="/secure-message/create-message/?survey={{survey.survey_id}}&ru_ref={{survey.business_party_id}}" class="u-fs-s survey-message history__message">Send a message </span></a>
         </div>
     </li>
     {% endfor %}

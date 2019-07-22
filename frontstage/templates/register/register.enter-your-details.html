@@ -10,16 +10,16 @@
             <div class="panel__header">
                 {% if errors|length == 1 %}
                 {% for error in errors %}
-                <h1 class="panel__title venus">{{ errors[error][0] }}</h1>
+                <h1 class="panel__title u-fs-r--b">{{ errors[error][0] }}</h1>
                 {% endfor %}
                 {% elif errors|length > 1 %}
-                <h1 class="panel__title venus">There are {{ errors|length }} errors on this page</h1>
+                <h1 class="panel__title u-fs-r--b">There are {{ errors|length }} errors on this page</h1>
                 {% endif %}
             </div>
             <div class="panel__body" data-qa="error-body">
                 {% for error in errors %}
                     {% set error_text = 'passwords' if error == 'password' else error %}
-                    <p class="mars"><a class="js-inpagelink" href="#{{error}}_field">Please check the {{error_text.replace('_', ' ')}} and try again</a></p>
+                    <p class="u-fs-r"><a class="js-inpagelink" href="#{{error}}_field">Please check the {{error_text.replace('_', ' ')}} and try again</a></p>
                 {% endfor %}
             </div>
         </div>
@@ -34,7 +34,7 @@
             onsubmit="formSubmitted(event);">
             {{ form.csrf_token }}
 
-        <h1 class="saturn">Enter your account details</h1>
+        <h1 class="u-fs-l">Enter your account details</h1>
         {{ form.enrolment_code }}
 
         <div class="section">
@@ -66,7 +66,7 @@
 
         <div class="section">
             <h2 class="section__title neptune u-mt-m">Email address</h2>
-            <p class="section__description mars">We'll send you an email so you can activate your account</p>
+            <p class="section__description u-fs-r">We'll send you an email so you can activate your account</p>
             {% if errors.email_address %}
             <div class="panel panel--simple panel--error">
                 <p class="error-message">{{ errors['email_address'][0] }}</p>
@@ -87,7 +87,7 @@
 
         <div class="section">
             <h2 class="section__title neptune u-mt-m">Create a password</h2>
-            <p class="section__description mars">Your password must have:</p>
+            <p class="section__description u-fs-r">Your password must have:</p>
             <ul>
                 <li>at least 8 characters </li>
                 <li>at least one symbol (eg ?!£%) </li>
@@ -117,7 +117,7 @@
 
         <div class="section">
             <h2 class="section__title neptune u-mt-m">Phone number</h2>
-            <p class="section__description mars">We may sometimes need to call you to discuss information you have provided</p>
+            <p class="section__description u-fs-r">We may sometimes need to call you to discuss information you have provided</p>
             {% if errors.phone_number %}
             <div class="panel panel--simple panel--error">
                 <p class="error-message">{{ errors['phone_number'][0] }}</p>
@@ -133,7 +133,7 @@
 
         <br />
 
-        <button class="btn venus" id="continue_button" type="submit">Continue</button>
+        <button class="btn u-fs-r--b" id="continue_button" type="submit">Continue</button>
 
     </form>
 

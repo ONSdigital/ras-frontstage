@@ -10,10 +10,10 @@
 {% if errorType == "failed" %}
 <div class="panel panel--error">
     <div class="panel__header">
-        <h1 id="error_notification" class="panel__title venus">Enrolment code not valid</h1>
+        <h1 id="error_notification" class="panel__title u-fs-r--b">Enrolment code not valid</h1>
     </div>
     <div class="panel__body" data-qa="error-body">
-        <p class="mars"><a onclick="focusOn('enrolment_code');" href="#enrolment_code">Please re-enter the code and try again</a></p>
+        <p class="u-fs-r"><a onclick="focusOn('enrolment_code');" href="#enrolment_code">Please re-enter the code and try again</a></p>
     </div>
 </div>
 <br/>
@@ -26,7 +26,7 @@
           class="form">
         {{ form.csrf_token }}
 
-        <h1 class="saturn">Add a survey</h1>
+        <h1 class="u-fs-l">Add a survey</h1>
 
         {% if errorType == "failed" %}
         <div class="panel panel--simple panel--error panel--spacious">
@@ -37,7 +37,7 @@
 
                 {{ form.enrolment_code.label(class_='label') }}
 
-                <span class="label__description label__inner pluto">You'll find this in the letter we sent you</span>
+                <span class="label__description label__inner u-fs-s">You'll find this in the letter we sent you</span>
                 {{ form.enrolment_code(id="ENROLEMENT_CODE_FIELD", class='input input--text input-type__input') }}
             </div>
 
@@ -45,7 +45,7 @@
         </div>
         {% endif %}
 
-        <button id="continue_button" class="btn venus u-mt-s u-mb-s" type="submit">Continue</button>
+        <button id="continue_button" class="btn u-fs-r--b u-mt-s u-mb-s" type="submit">Continue</button>
 
         <p>
             <a id="cancel_button" href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}">Cancel</a>

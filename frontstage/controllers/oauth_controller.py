@@ -37,9 +37,10 @@ def sign_in(username, password):
             return {}
     except requests.exceptions.HTTPError:
         if response.status_code == 401:
-            oauth2_error = response.json().get('detail', '')
-            message = 'Authentication error in OAuth2 service'
-            raise OAuth2Error(logger, response, log_level='warning', message=message, oauth2_error=oauth2_error)
+            auth_error = response.json().get('detail', '')
+            message = response.json().get('title', '')
+
+            raise OAuth2Error(logger, response, log_level='warning', message=message, oauth2_error=auth_error)
         else:
             message = 'Failed to retrieve OAuth2 token'
             raise ApiError(logger, response, log_level='exception', message=message)

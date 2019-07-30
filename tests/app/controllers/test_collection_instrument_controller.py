@@ -20,7 +20,7 @@ class TestCollectionInstrumentController(unittest.TestCase):
         app.config.from_object(app_config)
         self.app = app.test_client()
         self.app_config = self.app.application.config
-        self.survey_file = dict(file=(io.BytesIO(b'my file contents'), "testfile.xlsx"))
+        self.survey_file = {"file": ["testfile.xlsx", io.BytesIO(b'my file contents')]}
 
     @patch('frontstage.controllers.case_controller.post_case_event')
     def test_download_collection_instrument_success(self, _):

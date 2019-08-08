@@ -25,7 +25,7 @@ def _get_session():
 
 
 def get_conversation(thread_id):
-    logger.debug('Attempting to retrieve thread', thread_id=thread_id)
+    logger.info('Attempting to retrieve thread', thread_id=thread_id)
 
     headers = _create_get_conversation_headers()
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/threads/{thread_id}"
@@ -43,7 +43,7 @@ def get_conversation(thread_id):
                                message='Thread retrieval failed',
                                thread_id=thread_id)
 
-    logger.debug('Thread retrieval successful', thread_id=thread_id)
+    logger.info('Thread retrieval successful', thread_id=thread_id)
 
     try:
         return response.json()
@@ -55,7 +55,7 @@ def get_conversation(thread_id):
 
 
 def get_conversation_list(params):
-    logger.debug('Attempting to retrieve threads list')
+    logger.info('Attempting to retrieve threads list')
 
     headers = _create_get_conversation_headers()
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/threads"
@@ -69,7 +69,7 @@ def get_conversation_list(params):
                            log_level='error',
                            message='Threads retrieval failed')
 
-    logger.debug('Threads retrieval successful')
+    logger.info('Threads retrieval successful')
 
     try:
         return response.json()['messages']
@@ -84,7 +84,7 @@ def get_conversation_list(params):
 
 def send_message(message_json):
     party_id = json.loads(message_json).get('msg_from')
-    logger.debug('Attempting to send message', party_id=party_id)
+    logger.info('Attempting to send message', party_id=party_id)
 
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/messages"
     headers = _create_send_message_headers()
@@ -99,7 +99,7 @@ def send_message(message_json):
                            message='Message sending failed due to API Error',
                            party_id=party_id)
 
-    logger.debug('Successfully sent message', party_id=party_id)
+    logger.info('Successfully sent message', party_id=party_id)
     return response.json()
 
 
@@ -122,7 +122,7 @@ def _create_send_message_headers():
 
 
 def remove_unread_label(message_id):
-    logger.debug('Attempting to remove message unread label', message_id=message_id)
+    logger.info('Attempting to remove message unread label', message_id=message_id)
 
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/messages/modify/{message_id}"
     data = '{"label": "UNREAD", "action": "remove"}'
@@ -135,4 +135,4 @@ def remove_unread_label(message_id):
         except HTTPError:
             logger.error('Failed to remove unread label', message_id=message_id, status=response.status_code)
 
-    logger.debug('Successfully removed unread label', message_id=message_id)
+    logger.info('Successfully removed unread label', message_id=message_id)

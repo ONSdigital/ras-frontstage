@@ -12,7 +12,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def get_iac_from_enrolment(enrolment_code):
-    logger.debug('Attempting to retrieve IAC')
+    logger.info('Attempting to retrieve IAC')
     url = f"{app.config['IAC_URL']}/iacs/{enrolment_code}"
     response = requests.get(url, auth=app.config['IAC_AUTH'])
 

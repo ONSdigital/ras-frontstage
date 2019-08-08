@@ -64,7 +64,7 @@ class RegistrationForm(FlaskForm):
     @staticmethod
     def validate_phone_number(form, field):
         try:
-            logger.debug('Checking this is a valid GB phone number')
+            logger.info('Checking this is a valid GB phone number')
             input_number = phonenumbers.parse(field.data, 'GB')  # Tell the parser we are looking for a GB number
 
             if not phonenumbers.is_possible_number(input_number):
@@ -73,7 +73,7 @@ class RegistrationForm(FlaskForm):
             if not phonenumbers.is_valid_number(input_number):
                 raise ValidationError(_('Please use a valid UK number e.g. 01632 496 0018.'))
         except NumberParseException:
-            logger.debug('There is a number parse exception in the phonenumber field')
+            logger.info('There is a number parse exception in the phonenumber field')
             raise ValidationError(_('This should be a valid UK number e.g. 01632 496 0018. '))
 
     @staticmethod
@@ -107,13 +107,13 @@ def _validate_email_address(email):
         Field containing email address for validation.
     """
     local_part, domain_part = email.rsplit('@', 1)
-    logger.debug('Checking if the email address contains a space or quotes in the local part')
+    logger.info('Checking if the email address contains a space or quotes in the local part')
     # this extends the email validator to check if there is whitespace in the email or quotes surrounding local part
     if ' ' in email:
-        logger.debug('Space found in email address')
+        logger.info('Space found in email address')
         raise ValidationError(_('Invalid email address'))
     if local_part.startswith('"') and local_part.endswith('"'):
-        logger.debug('Quotes found in local part of email')
+        logger.info('Quotes found in local part of email')
         raise ValidationError(_('Invalid email address'))
 
 

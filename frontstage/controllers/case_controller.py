@@ -15,8 +15,8 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def calculate_case_status(case_group_status, collection_instrument_type):
-    logger.debug('Getting the status of caseGroup', case_group_status=case_group_status,
-                 collection_instrument_type=collection_instrument_type)
+    logger.info('Getting the status of caseGroup', case_group_status=case_group_status,
+                collection_instrument_type=collection_instrument_type)
 
     status = 'Not started'
 
@@ -31,13 +31,13 @@ def calculate_case_status(case_group_status, collection_instrument_type):
     elif case_group_status == 'INPROGRESS' and collection_instrument_type == 'SEFT':
         status = 'Downloaded'
 
-    logger.debug('Retrieved the status of case', collection_instrument_type=collection_instrument_type,
-                 status=status)
+    logger.info('Retrieved the status of case', collection_instrument_type=collection_instrument_type,
+                status=status)
     return status
 
 
 def get_case_by_case_id(case_id):
-    logger.debug('Attempting to retrieve case by case id', case_id=case_id)
+    logger.info('Attempting to retrieve case by case id', case_id=case_id)
 
     url = f"{app.config['CASE_URL']}/cases/{case_id}"
     response = requests.get(url, auth=app.config['CASE_AUTH'])
@@ -50,12 +50,12 @@ def get_case_by_case_id(case_id):
                        log_level='warning' if response.status_code == 404 else 'exception',
                        message='Failed to retrieve case by case id')
 
-    logger.debug('Successfully retrieved case by case id', case_id=case_id)
+    logger.info('Successfully retrieved case by case id', case_id=case_id)
     return response.json()
 
 
 def get_case_by_enrolment_code(enrolment_code):
-    logger.debug('Attempting to retrieve case by enrolment code')
+    logger.info('Attempting to retrieve case by enrolment code')
 
     url = f"{app.config['CASE_URL']}/cases/iac/{enrolment_code}"
     response = requests.get(url, auth=app.config['CASE_AUTH'])
@@ -67,12 +67,12 @@ def get_case_by_enrolment_code(enrolment_code):
                        log_level='warning' if response.status_code == 404 else 'exception',
                        message='Failed to retrieve case by enrolment code')
 
-    logger.debug('Successfully retrieved case by enrolment code')
+    logger.info('Successfully retrieved case by enrolment code')
     return response.json()
 
 
 def get_case_categories():
-    logger.debug('Attempting to retrieve case categories')
+    logger.info('Attempting to retrieve case categories')
 
     url = f"{app.config['CASE_URL']}/categories"
     response = requests.get(url, auth=app.config['CASE_AUTH'])
@@ -84,12 +84,12 @@ def get_case_categories():
                        log_level='warning' if response.status_code == 404 else 'exception',
                        message='Failed to get case categories')
 
-    logger.debug('Successfully retrieved case categories')
+    logger.info('Successfully retrieved case categories')
     return response.json()
 
 
 def get_case_data(case_id, party_id, business_party_id, survey_short_name):
-    logger.debug('Attempting to retrieve detailed case data', case_id=case_id, party_id=party_id)
+    logger.info('Attempting to retrieve detailed case data', case_id=case_id, party_id=party_id)
 
     # Check if respondent has permission to see case data
     case = get_case_by_case_id(case_id)
@@ -106,12 +106,12 @@ def get_case_data(case_id, party_id, business_party_id, survey_short_name):
                                                                     app.config['PARTY_AUTH'])
     }
 
-    logger.debug('Successfully retrieved all data relating to case', case_id=case_id, party_id=party_id)
+    logger.info('Successfully retrieved all data relating to case', case_id=case_id, party_id=party_id)
     return case_data
 
 
 def get_cases_by_party_id(party_id, case_url, case_auth, case_events=False, iac=True):
-    logger.debug('Attempting to retrieve cases by party id', party_id=party_id)
+    logger.info('Attempting to retrieve cases by party id', party_id=party_id)
 
     url = f"{case_url}/cases/partyid/{party_id}"
     if case_events:
@@ -132,12 +132,12 @@ def get_cases_by_party_id(party_id, case_url, case_auth, case_events=False, iac=
                        message='Failed to retrieve cases by party id',
                        party_id=party_id)
 
-    logger.debug('Successfully retrieved cases by party id', party_id=party_id)
+    logger.info('Successfully retrieved cases by party id', party_id=party_id)
     return response.json()
 
 
 def get_eq_url(case_id, party_id, business_party_id, survey_short_name):
-    logger.debug('Attempting to generate EQ URL', case_id=case_id, party_id=party_id)
+    logger.info('Attempting to generate EQ URL', case_id=case_id, party_id=party_id)
 
     case = get_case_by_case_id(case_id)
 
@@ -171,7 +171,7 @@ def get_eq_url(case_id, party_id, business_party_id, survey_short_name):
 
 
 def post_case_event(case_id, party_id, category, description):
-    logger.debug('Posting case event', case_id=case_id)
+    logger.info('Posting case event', case_id=case_id)
 
     validate_case_category(category)
     url = f"{app.config['CASE_URL']}/cases/{case_id}/events"
@@ -191,22 +191,22 @@ def post_case_event(case_id, party_id, category, description):
                        log_level='warning' if response.status_code == 404 else 'exception',
                        message='Failed to post case event')
 
-    logger.debug('Successfully posted case event', case_id=case_id)
+    logger.info('Successfully posted case event', case_id=case_id)
 
 
 def validate_case_category(category):
-    logger.debug('Validating case category', category=category)
+    logger.info('Validating case category', category=category)
 
     categories = get_case_categories()
     category_names = [cat['name'] for cat in categories]
     if category not in category_names:
         raise InvalidCaseCategory(category)
 
-    logger.debug('Successfully validated case category', category=category)
+    logger.info('Successfully validated case category', category=category)
 
 
 def get_cases_for_list_type_by_party_id(party_id, case_url, case_auth, list_type='todo'):
-    logger.debug('Get cases for party for list', party_id=party_id, list_type=list_type)
+    logger.info('Get cases for party for list', party_id=party_id, list_type=list_type)
 
     cases = get_cases_by_party_id(party_id, case_url, case_auth, iac=False)
     history_statuses = ['COMPLETE', 'COMPLETEDBYPHONE', 'NOLONGERREQUIRED']
@@ -219,5 +219,5 @@ def get_cases_for_list_type_by_party_id(party_id, case_url, case_auth, list_type
                           for business_case in cases
                           if business_case['caseGroup']['caseGroupStatus'] not in history_statuses]
 
-    logger.debug("Successfully retrieved cases for party survey list", party_id=party_id, list_type=list_type)
+    logger.info("Successfully retrieved cases for party survey list", party_id=party_id, list_type=list_type)
     return filtered_cases

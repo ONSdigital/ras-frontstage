@@ -12,9 +12,9 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def download_collection_instrument(collection_instrument_id, case_id, party_id):
-    logger.debug('Attempting to download collection instrument',
-                 collection_instrument_id=collection_instrument_id,
-                 party_id=party_id)
+    logger.info('Attempting to download collection instrument',
+                collection_instrument_id=collection_instrument_id,
+                party_id=party_id)
 
     url = f"{app.config['COLLECTION_INSTRUMENT_URL']}/collection-instrument-api/1.0.2/download/{collection_instrument_id}"
     response = requests.get(url, auth=app.config['COLLECTION_INSTRUMENT_AUTH'])
@@ -35,15 +35,15 @@ def download_collection_instrument(collection_instrument_id, case_id, party_id):
                        message='Failed to download collection instrument',
                        party_id=party_id)
 
-    logger.debug('Successfully downloaded collection instrument',
-                 collection_instrument_id=collection_instrument_id,
-                 party_id=party_id)
+    logger.info('Successfully downloaded collection instrument',
+                collection_instrument_id=collection_instrument_id,
+                party_id=party_id)
     return response.content, response.headers.items()
 
 
 def get_collection_instrument(collection_instrument_id, collection_instrument_url, collection_instrument_auth):
-    logger.debug('Attempting to retrieve collection instrument',
-                 collection_instrument_id=collection_instrument_id)
+    logger.info('Attempting to retrieve collection instrument',
+                collection_instrument_id=collection_instrument_id)
 
     url = f"{collection_instrument_url}/collection-instrument-api/1.0.2/collectioninstrument/id/{collection_instrument_id}"
     response = requests.get(url, auth=collection_instrument_auth)
@@ -56,13 +56,13 @@ def get_collection_instrument(collection_instrument_id, collection_instrument_ur
                        log_level='warning' if response.status_code == 404 else 'exception',
                        message='Failed to get collection instrument')
 
-    logger.debug('Successfully retrieved collection instrument',
-                 collection_instrument_id=collection_instrument_id)
+    logger.info('Successfully retrieved collection instrument',
+                collection_instrument_id=collection_instrument_id)
     return response.json()
 
 
 def upload_collection_instrument(upload_file, case_id, party_id):
-    logger.debug('Attempting to upload collection instrument', case_id=case_id, party_id=party_id)
+    logger.info('Attempting to upload collection instrument', case_id=case_id, party_id=party_id)
 
     url = f"{app.config['COLLECTION_INSTRUMENT_URL']}/survey_response-api/v1/survey_responses/{case_id}"
     response = requests.post(url, auth=app.config['COLLECTION_INSTRUMENT_AUTH'], files=upload_file)
@@ -86,4 +86,4 @@ def upload_collection_instrument(upload_file, case_id, party_id):
                        message='Failed to upload collection instrument',
                        party_id=party_id)
 
-    logger.debug('Successfully uploaded collection instrument', case_id=case_id, party_id=party_id)
+    logger.info('Successfully uploaded collection instrument', case_id=case_id, party_id=party_id)

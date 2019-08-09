@@ -25,7 +25,7 @@ def _get_session():
 
 
 def get_conversation(thread_id):
-    logger.info('Attempting to retrieve thread', thread_id=thread_id)
+    logger.info('Retrieving conversation thread', thread_id=thread_id)
 
     headers = _create_get_conversation_headers()
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/threads/{thread_id}"
@@ -43,7 +43,7 @@ def get_conversation(thread_id):
                                message='Thread retrieval failed',
                                thread_id=thread_id)
 
-    logger.info('Thread retrieval successful', thread_id=thread_id)
+    logger.info('Successfully retrieved conversation thread', thread_id=thread_id)
 
     try:
         return response.json()
@@ -55,7 +55,7 @@ def get_conversation(thread_id):
 
 
 def get_conversation_list(params):
-    logger.info('Attempting to retrieve threads list')
+    logger.info('Retrieving threads list')
 
     headers = _create_get_conversation_headers()
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/threads"
@@ -69,7 +69,7 @@ def get_conversation_list(params):
                            log_level='error',
                            message='Threads retrieval failed')
 
-    logger.info('Threads retrieval successful')
+    logger.info('Successfully retrieved threads list')
 
     try:
         return response.json()['messages']
@@ -78,13 +78,13 @@ def get_conversation_list(params):
                        log_level='error',
                        message='The threads response could not be decoded')
     except KeyError:
-        logger.error("Response was successful but didn't contain a 'messages' key")
+        logger.error("Request was successful but didn't contain a 'messages' key")
         raise NoMessagesError
 
 
 def send_message(message_json):
     party_id = json.loads(message_json).get('msg_from')
-    logger.info('Attempting to send message', party_id=party_id)
+    logger.info('Sending message', party_id=party_id)
 
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/messages"
     headers = _create_send_message_headers()
@@ -122,7 +122,7 @@ def _create_send_message_headers():
 
 
 def remove_unread_label(message_id):
-    logger.info('Attempting to remove message unread label', message_id=message_id)
+    logger.info('Removing message unread label', message_id=message_id)
 
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/messages/modify/{message_id}"
     data = '{"label": "UNREAD", "action": "remove"}'

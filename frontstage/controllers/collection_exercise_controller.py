@@ -13,7 +13,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def get_collection_exercise(collection_exercise_id):
-    logger.debug('Attempting to retrieve collection exercise', collection_exercise_id=collection_exercise_id)
+    logger.info('Attempting to retrieve collection exercise', collection_exercise_id=collection_exercise_id)
     url = f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/{collection_exercise_id}"
 
     response = requests.get(url, auth=app.config['COLLECTION_EXERCISE_AUTH'])
@@ -26,7 +26,7 @@ def get_collection_exercise(collection_exercise_id):
                        log_level='warning' if response.status_code == 404 else 'exception',
                        message='Failed to retrieve collection exercise')
 
-    logger.debug('Successfully retrieved collection exercise', collection_exercise_id=collection_exercise_id)
+    logger.info('Successfully retrieved collection exercise', collection_exercise_id=collection_exercise_id)
     collection_exercise = response.json()
 
     if collection_exercise['events']:
@@ -36,7 +36,7 @@ def get_collection_exercise(collection_exercise_id):
 
 
 def get_collection_exercise_events(collection_exercise_id):
-    logger.debug('Attempting to retrieve collection exercise events', collection_exercise_id=collection_exercise_id)
+    logger.info('Attempting to retrieve collection exercise events', collection_exercise_id=collection_exercise_id)
     url = f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/{collection_exercise_id}/events"
 
     response = requests.get(url, auth=app.config['COLLECTION_EXERCISE_AUTH'])
@@ -49,12 +49,12 @@ def get_collection_exercise_events(collection_exercise_id):
                        log_level='warning' if response.status_code == 404 else 'exception',
                        message='Failed to retrieve collection exercise events')
 
-    logger.debug('Successfully retrieved collection exercise events', collection_exercise_id=collection_exercise_id)
+    logger.info('Successfully retrieved collection exercise events', collection_exercise_id=collection_exercise_id)
     return response.json()
 
 
 def get_collection_exercises_for_survey(survey_id, collex_url, collex_auth,  live_only=None):
-    logger.debug('Retrieving collection exercises for survey', survey_id=survey_id)
+    logger.info('Retrieving collection exercises for survey', survey_id=survey_id)
 
     if live_only is True:
         url = f"{collex_url}/collectionexercises/survey/{survey_id}?liveOnly=true"
@@ -71,7 +71,7 @@ def get_collection_exercises_for_survey(survey_id, collex_url, collex_auth,  liv
                        log_level='warning' if response.status_code == 404 else 'exception',
                        message='Failed to retrieve collection exercises for survey')
 
-    logger.debug("Successfully retrieved collection exercises for survey", survey_id=survey_id)
+    logger.info("Successfully retrieved collection exercises for survey", survey_id=survey_id)
     collection_exercises = response.json()
 
     for collection_exercise in collection_exercises:

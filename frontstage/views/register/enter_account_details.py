@@ -49,7 +49,7 @@ def register_enter_your_details():
             party_controller.create_account(registration_data)
         except ApiError as exc:
             if exc.status_code == 400:
-                logger.debug('Email already used')
+                logger.info('Email already used')
                 error = {"email_address": ["This email has already been used to register an account"]}
                 return render_template('register/register.enter-your-details.html', form=form, errors=error)
             else:

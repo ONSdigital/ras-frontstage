@@ -34,13 +34,13 @@ class Translate:
         active_locale = locale if locale else self.locale
 
         if active_locale not in self.translations:
-            logger.debug('Did not find locale, returning message id', locale=active_locale, msgid=msgid)
+            logger.info('Did not find locale, returning message id', locale=active_locale, msgid=msgid)
             return msgid
 
         translations = self.translations[active_locale]
 
         if msgid not in translations:
-            logger.debug('Found no string for message ID in locale', msgid=msgid, locale=active_locale)
+            logger.info('Found no string for message ID in locale', msgid=msgid, locale=active_locale)
             return msgid
 
         if translations[msgid] is False:

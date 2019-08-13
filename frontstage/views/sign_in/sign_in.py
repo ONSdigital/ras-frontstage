@@ -27,30 +27,6 @@ def home():
     return redirect(url_for('sign_in_bp.login', _external=True, _scheme=getenv('SCHEME', 'http')))
 
 
-def get_oauth_token(username, password, party_id, party_json, form, next):
-    try:
-        oauth2_token = oauth_controller.sign_in(username, password)
-        return oauth2_token
-    except OAuth2Error as exc:
-        error_message = exc.oauth2_error
-        if USER_ACCOUNT_LOCKED in error_message:
-            logger.info('User account is locked on the OAuth2 server', party_id=party_id)
-            if party_json['status'] == 'ACTIVE' or party_json['status'] == 'CREATED':
-                notify_party_and_respondent_account_locked(respondent_id=party_id,
-                                                           email_address=username,
-                                                           status='SUSPENDED')
-            return render_template('sign-in/sign-in.account-locked.html', form=form)
-        elif BAD_AUTH_ERROR in error_message:
-            return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}}, next=next)
-        elif NOT_VERIFIED_ERROR in error_message:
-            logger.info('User account is not verified on the OAuth2 server')
-            return render_template('sign-in/sign-in.account-not-verified.html', party_id=party_id,
-                                   email=username)
-        else:
-            logger.info('OAuth 2 server generated 401 which is not understood', oauth2_error=error_message)
-            return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
-
-
 @sign_in_bp.route('/', methods=['GET', 'POST'])  # noqa: C901
 def login():
     form = LoginForm(request.form)

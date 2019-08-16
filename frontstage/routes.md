@@ -12,7 +12,7 @@ To reset a password
 
 `passwords/reset-password/check-email`
 * GET request to this endpoint is used to render a check e-mail template.
-* Don't think this endpoint is used.
+* Used primarily in the `resend-passowrd-email-expired-token` process
 
 `passwords/reset-password/confirmation`
 * GET request to this endpoint renders confirmation page that password's been changed.

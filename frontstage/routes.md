@@ -10,10 +10,6 @@ To reset a password
 * GET request to this endpoint allows you to get the password reset form
 * `token` is used to be able to access the reset page
 
-`passwords/reset-password/check-email`
-* GET request to this endpoint is used to render a check e-mail template.
-* Don't think this endpoint is used.
-
 `passwords/reset-password/confirmation`
 * GET request to this endpoint renders confirmation page that password's been changed.
 

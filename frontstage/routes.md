@@ -75,11 +75,11 @@ To reset a password
 * GET request to this endpoint will return the log-in page for ras-frontstage.
 * POST request to this endpoint will log-in the user to be to see their survey list.
 
-`sign-in/resend-verification/<party_id>`    DEPRECATED. will be removed in a future release
+`sign-in/resend_verification/<party_id>`    DEPRECATED. will be removed in a future release
 * GET request to this endpoint will resend a verification e-mail to the respondent.
 * `party_id` is the ID of the respondent.
 
-`sign-in/resend_verification/<party_id>`       Replaces resend_verification 
+`sign-in/resend-verification/<party_id>`       Replaces resend_verification 
 * GET request to this endpoint will resend a verification e-mail to the respondent.
 * `party_id` is the ID of the respondent.
 

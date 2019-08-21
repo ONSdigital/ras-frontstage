@@ -202,20 +202,26 @@ class TestSignIn(unittest.TestCase):
         self.assertFalse('Sign out'.encode() in response.data)
 
     @requests_mock.mock()
-    def test_resend_verification_email(self, mock_object):
-        mock_object.get(get_respondent_by_id_url, json=party)
-        mock_object.post(url_resend_verification_email, status_code=200)
-        response = self.app.get(f"/sign-in/resend_verification/{respondent_party_id}", follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('Check your email'.encode() in response.data)
+    def test_resend_verification_email(self, mock_request):
+        urls = ['resend_verification', 'resend-verification']
+        for url in urls:
+            with self.subTest(url=url):
+                mock_request.get(get_respondent_by_id_url, json=party)
+                mock_request.post(url_resend_verification_email, status_code=200)
+                response = self.app.get(f"/sign-in/{url}/{respondent_party_id}", follow_redirects=True)
+                self.assertEqual(response.status_code, 200)
+                self.assertTrue('Check your email'.encode() in response.data)
 
     @requests_mock.mock()
     def test_fail_resent_verification_email(self, mock_request):
-        mock_request.post(url_resend_verification_email, status_code=500)
-        response = self.app.get(f"sign-in/resend_verification/{respondent_party_id}",
-                                follow_redirects=True)
-        self.assertEqual(response.status_code, 500)
-        self.assertTrue('An error has occurred'.encode() in response.data)
+        urls = ['resend_verification', 'resend-verification']
+        for url in urls:
+            with self.subTest(url=url):
+                mock_request.post(url_resend_verification_email, status_code=500)
+                response = self.app.get(f"sign-in/{url}/{respondent_party_id}",
+                                        follow_redirects=True)
+                self.assertEqual(response.status_code, 500)
+                self.assertTrue('An error has occurred'.encode() in response.data)
 
     @requests_mock.mock()
     def test_sign_in_account_locked(self, mock_object):

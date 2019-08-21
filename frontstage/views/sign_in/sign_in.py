@@ -98,7 +98,8 @@ def login():
     return render_template('sign-in/sign-in.html', form=form, data=template_data)
 
 
-@sign_in_bp.route('/resend_verification/<party_id>', methods=['GET'])
+@sign_in_bp.route('/resend_verification/<party_id>', methods=['GET'])       # Deprecated: to be removed when not in use
+@sign_in_bp.route('/resend-verification/<party_id>', methods=['GET'])
 def resend_verification(party_id):
     party_controller.resend_verification_email(party_id)
     logger.info('Re-sent verification email.', party_id=party_id)

@@ -13,7 +13,8 @@ from frontstage.views.surveys import surveys_bp
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-@surveys_bp.route('/upload_survey', methods=['POST'])
+@surveys_bp.route('/upload_survey', methods=['POST'])   # Deprecated. Will be removed when no longer in use
+@surveys_bp.route('/upload-survey', methods=['POST'])
 @jwt_authorization(request)
 def upload_survey(session):
     party_id = session['party_id']

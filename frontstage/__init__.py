@@ -13,8 +13,10 @@ csrf = CSRFProtect(app)
 @app.context_processor
 def inject_availability_message():
     if len(redis.keys('AVAILABILITY_MESSAGE')) == 1:
-        return dict(availability_message=redis.get('AVAILABILITY_MESSAGE').decode('utf-8'))
-    return dict()
+        return {
+            "availability_message": redis.get('AVAILABILITY_MESSAGE').decode('utf-8')
+            }
+    return {}
 
 # Bind routes to app
 import frontstage.views  # NOQA  # pylint: disable=wrong-import-position

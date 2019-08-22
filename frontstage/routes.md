@@ -75,7 +75,11 @@ To reset a password
 * GET request to this endpoint will return the log-in page for ras-frontstage.
 * POST request to this endpoint will log-in the user to be to see their survey list.
 
-`sign-in/resend_verification/<party_id>`
+`sign-in/resend_verification/<party_id>`    DEPRECATED. will be removed in a future release
+* GET request to this endpoint will resend a verification e-mail to the respondent.
+* `party_id` is the ID of the respondent.
+
+`sign-in/resend-verification/<party_id>`       Replaces resend_verification 
 * GET request to this endpoint will resend a verification e-mail to the respondent.
 * `party_id` is the ID of the respondent.
 
@@ -89,7 +93,10 @@ To reset a password
 
 ## Surveys endpoints
 
-`surveys/access_survey`
+`surveys/access_survey`    DEPRECATED. Will be removed in a future release
+* GET request to this endpoint will allow the respondent to upload and download a survey.
+
+`surveys/access-survey`    Replaces access_survey
 * GET request to this endpoint will allow the respondent to upload and download a survey.
 
 `surveys/add-survey`
@@ -101,13 +108,22 @@ To reset a password
 `surveys/add-survey/add-survey-submit`
 * GET request to this endpoint will assign the new survey to the respondent.
 
-`surveys/download_survey`
+`surveys/download_survey`   DEPRECATED. Will be removed in a future release
 * GET request to this endpoint will download a survey that the respondent will need to complete.
 
-`surveys/upload_survey`
+`surveys/download-survey`   Replaces download_survey
+* GET request to this endpoint will download a survey that the respondent will need to complete.
+
+`surveys/upload_survey`     DEPRECATED. Will be removed in a future release.
 * POST request to this endpoint will upload a collection instrument to the collection instrument service.
 
-`surveys/upload_failed`
+`surveys/upload-survey`     Replaces upload_survey
+* POST request to this endpoint will upload a collection instrument to the collection instrument service.
+
+`surveys/upload_failed`     DEPRECATED. Will be removed in a future release.
+* GET request to this endpoint will render an error page if it fails to upload the collection instrument.
+
+`surveys/upload-failed`     Replaces upload_failed
 * GET request to this endpoint will render an error page if it fails to upload the collection instrument.
 
 `surveys/<tag>`

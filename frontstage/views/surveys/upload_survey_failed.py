@@ -11,7 +11,8 @@ from frontstage.views.surveys import surveys_bp
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-@surveys_bp.route('/upload_failed', methods=['GET'])
+@surveys_bp.route('/upload_failed', methods=['GET'])  # Deprecated. Will be removed when nolonger used
+@surveys_bp.route('/upload-failed', methods=['GET'])
 @jwt_authorization(request)
 def upload_failed(session):
     case_id = request.args.get('case_id')

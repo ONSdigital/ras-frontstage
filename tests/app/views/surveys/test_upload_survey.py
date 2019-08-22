@@ -31,10 +31,14 @@ class TestUploadSurvey(unittest.TestCase):
     @patch('frontstage.controllers.collection_instrument_controller.upload_collection_instrument')
     @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
     def test_upload_survey_success(self, *_):
-        response = self.app.post(f'/surveys/upload_survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-                                 f'&survey_short_name={survey["shortName"]}', data=self.survey_file)
+        urls = ['upload_survey', 'upload-survey']
+        for url in urls:
+            with self.subTest(url=url):
+                self.survey_file = dict(file=(io.BytesIO(b'my file contents'), "testfile.xlsx"))
+                response = self.app.post(f'/surveys/{url}?case_id={case["id"]}&business_party_id={business_party["id"]}'
+                                         f'&survey_short_name={survey["shortName"]}', data=self.survey_file)
 
-        self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.status_code, 200)
 
     @patch('frontstage.controllers.collection_instrument_controller.upload_collection_instrument')
     @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
@@ -45,12 +49,15 @@ class TestUploadSurvey(unittest.TestCase):
         error_message = "fail"
         error = CiUploadError(logger, error_response, error_message)
         upload_ci.side_effect = error
+        urls = ['upload_survey', 'upload-survey']
+        for url in urls:
+            with self.subTest(url=url):
+                self.survey_file = dict(file=(io.BytesIO(b'my file contents'), "testfile.xlsx"))
+                response = self.app.post(f'/surveys/{url}?case_id={case["id"]}&business_party_id={business_party["id"]}'
+                                         f'&survey_short_name={survey["shortName"]}', data=self.survey_file)
 
-        response = self.app.post(f'/surveys/upload_survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-                                 f'&survey_short_name={survey["shortName"]}', data=self.survey_file)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue('/surveys/upload_failed'.encode() in response.data)
+                self.assertEqual(response.status_code, 302)
+                self.assertTrue('/surveys/upload-failed'.encode() in response.data)
 
     @patch('frontstage.controllers.collection_instrument_controller.upload_collection_instrument')
     @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
@@ -61,12 +68,15 @@ class TestUploadSurvey(unittest.TestCase):
         error_message = ".xlsx format"
         error = CiUploadError(logger, error_response, error_message)
         upload_ci.side_effect = error
+        urls = ['upload_survey', 'upload-survey']
+        for url in urls:
+            with self.subTest(url=url):
+                self.survey_file = dict(file=(io.BytesIO(b'my file contents'), "testfile.xlsx"))
+                response = self.app.post(f'/surveys/{url}?case_id={case["id"]}&business_party_id={business_party["id"]}'
+                                         f'&survey_short_name={survey["shortName"]}', data=self.survey_file)
 
-        response = self.app.post(f'/surveys/upload_survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-                                 f'&survey_short_name={survey["shortName"]}', data=self.survey_file)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue('/surveys/upload_failed'.encode() in response.data)
+                self.assertEqual(response.status_code, 302)
+                self.assertTrue('/surveys/upload-failed'.encode() in response.data)
 
     @patch('frontstage.controllers.collection_instrument_controller.upload_collection_instrument')
     @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
@@ -77,12 +87,15 @@ class TestUploadSurvey(unittest.TestCase):
         error_message = "50 characters"
         error = CiUploadError(logger, error_response, error_message)
         upload_ci.side_effect = error
+        urls = ['upload_survey', 'upload-survey']
+        for url in urls:
+            with self.subTest(url=url):
+                self.survey_file = dict(file=(io.BytesIO(b'my file contents'), "testfile.xlsx"))
+                response = self.app.post(f'/surveys/{url}?case_id={case["id"]}&business_party_id={business_party["id"]}'
+                                         f'&survey_short_name={survey["shortName"]}', data=self.survey_file)
 
-        response = self.app.post(f'/surveys/upload_survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-                                 f'&survey_short_name={survey["shortName"]}', data=self.survey_file)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue('/surveys/upload_failed'.encode() in response.data)
+                self.assertEqual(response.status_code, 302)
+                self.assertTrue('/surveys/upload-failed'.encode() in response.data)
 
     @patch('frontstage.controllers.collection_instrument_controller.upload_collection_instrument')
     @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
@@ -94,17 +107,24 @@ class TestUploadSurvey(unittest.TestCase):
         error = CiUploadError(logger, error_response, error_message)
         upload_ci.side_effect = error
 
-        response = self.app.post(f'/surveys/upload_survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-                                 f'&survey_short_name={survey["shortName"]}', data=self.survey_file)
+        urls = ['upload-survey', 'upload_survey']
+        for url in urls:
+            with self.subTest(url=url):
+                self.survey_file = dict(file=(io.BytesIO(b'my file contents'), "testfile.xlsx"))
+                response = self.app.post(f'/surveys/{url}?case_id={case["id"]}&business_party_id={business_party["id"]}'
+                                         f'&survey_short_name={survey["shortName"]}', data=self.survey_file)
 
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue('/surveys/upload_failed'.encode() in response.data)
+                self.assertEqual(response.status_code, 302)
+                self.assertTrue('/surveys/upload-failed'.encode() in response.data)
 
     def test_upload_survey_content_too_long(self):
         file_data = 'a' * 21 * 1024 * 1024
-        over_size_file = dict(file=(io.BytesIO(file_data.encode()), "testfile.xlsx"))
-        response = self.app.post(f'/surveys/upload_survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-                                 f'&survey_short_name={survey["shortName"]}', data=over_size_file)
+        urls = ['upload_survey', 'upload-survey']
+        for url in urls:
+            with self.subTest(url=url):
+                over_size_file = dict(file=(io.BytesIO(file_data.encode()), "testfile.xlsx"))
+                response = self.app.post(f'/surveys/{url}?case_id={case["id"]}&business_party_id={business_party["id"]}'
+                                         f'&survey_short_name={survey["shortName"]}', data=over_size_file)
 
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue('/surveys/upload_failed'.encode() in response.data)
+                self.assertEqual(response.status_code, 302)
+                self.assertTrue('/surveys/upload-failed'.encode() in response.data)

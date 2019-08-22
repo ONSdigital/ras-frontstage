@@ -11,7 +11,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def sign_in(username, password):
-    logger.debug('Attempting to retrieve OAuth2 token for sign-in')
+    logger.info('Attempting to retrieve OAuth2 token for sign-in')
 
     url = f"{app.config['OAUTH_URL']}/api/v1/tokens/"
     data = {
@@ -45,5 +45,5 @@ def sign_in(username, password):
             message = 'Failed to retrieve OAuth2 token'
             raise ApiError(logger, response, log_level='exception', message=message)
 
-    logger.debug('Successfully retrieved OAuth2 token')
+    logger.info('Successfully retrieved OAuth2 token')
     return response.json()

@@ -31,7 +31,10 @@ class TestDownloadSurvey(unittest.TestCase):
         headers = {'Content-type': 'application/json', 'Content-Length': '5962'}
         download_collection_instrument.return_value = binary, headers
 
-        response = self.app.get(f'/surveys/download_survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-                                f'&survey_short_name={survey["shortName"]}')
+        urls = ['download_survey', 'download-survey']
+        for url in urls:
+            with self.subTest(url=url):
+                response = self.app.get(f'/surveys/{url}?case_id={case["id"]}&business_party_id={business_party["id"]}'
+                                        f'&survey_short_name={survey["shortName"]}')
 
-        self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.status_code, 200)

@@ -21,6 +21,3 @@ env:
     - PIPENV_IGNORE_VIRTUALENVS=1
 after_success:
   - pipenv run codecov
-branches:
-  only:
-    - master

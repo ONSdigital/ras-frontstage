@@ -36,7 +36,7 @@ class Config(object):
     JSON_SECRET_KEYS = os.getenv('JSON_SECRET_KEYS')
 
     REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
-    REDIS_PORT = os.getenv('REDIS_PORT', 6379)
+    REDIS_PORT = os.getenv('REDIS_PORT', 7379)
     REDIS_DB = os.getenv('REDIS_DB', 1)
 
     PASSWORD_MATCH_ERROR_TEXT = 'Your passwords do not match'

@@ -9,7 +9,7 @@ start:
 
 TEST_TARGET=tests
 
-docker-test: REDIS_PORT=7379
+docker-test: REDIS_PORT=6379
 docker-test: test
 
 check:

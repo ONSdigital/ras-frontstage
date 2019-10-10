@@ -24,7 +24,8 @@ def get_iac_from_enrolment(enrolment_code):
             return
         # 401s may include error context in the JSON response
         elif response.status_code != 401:
-            raise ApiError(logger, response, message='Failed to retrieve IAC')
+            logger.error('Failed to retrieve IAC')
+            raise ApiError(response)
 
     if response.json().get('active') is False:
         logger.info("Invalid IAC used")

@@ -29,11 +29,10 @@ def download_collection_instrument(collection_instrument_id, case_id, party_id):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        raise ApiError(logger, response,
-                       collection_instrument_id=collection_instrument_id,
-                       log_level='warning' if response.status_code == 404 else 'exception',
-                       message='Failed to download collection instrument',
-                       party_id=party_id)
+        logger.error('Failed to download collection instrument',
+                     collection_instrument_id=collection_instrument_id,
+                     party_id=party_id)
+        raise ApiError(response)
 
     logger.info('Successfully downloaded collection instrument',
                 collection_instrument_id=collection_instrument_id,
@@ -51,10 +50,8 @@ def get_collection_instrument(collection_instrument_id, collection_instrument_ur
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        raise ApiError(logger, response,
-                       collection_instrument_id=collection_instrument_id,
-                       log_level='warning' if response.status_code == 404 else 'exception',
-                       message='Failed to get collection instrument')
+        logger.error('Failed to get collection instrument', collection_instrument_id=collection_instrument_id)
+        raise ApiError(response)
 
     logger.info('Successfully retrieved collection instrument',
                 collection_instrument_id=collection_instrument_id)
@@ -80,10 +77,7 @@ def upload_collection_instrument(upload_file, case_id, party_id):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        raise ApiError(logger, response,
-                       case_id=case_id,
-                       log_level='warning' if response.status_code == 404 else 'exception',
-                       message='Failed to upload collection instrument',
-                       party_id=party_id)
+        logger.error('Failed to upload collection instrument', case_id=case_id, party_id=party_id)
+        raise ApiError(response)
 
     logger.info('Successfully uploaded collection instrument', case_id=case_id, party_id=party_id)

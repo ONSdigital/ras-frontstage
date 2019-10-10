@@ -21,10 +21,8 @@ def get_collection_exercise(collection_exercise_id):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        raise ApiError(logger, response,
-                       collection_exercise_id=collection_exercise_id,
-                       log_level='warning' if response.status_code == 404 else 'exception',
-                       message='Failed to retrieve collection exercise')
+        logger.error('Failed to retrieve collection exercise', collection_exercise_id=collection_exercise_id)
+        raise ApiError(response)
 
     logger.info('Successfully retrieved collection exercise', collection_exercise_id=collection_exercise_id)
     collection_exercise = response.json()
@@ -44,10 +42,8 @@ def get_collection_exercise_events(collection_exercise_id):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        raise ApiError(logger, response,
-                       collection_exercise_id=collection_exercise_id,
-                       log_level='warning' if response.status_code == 404 else 'exception',
-                       message='Failed to retrieve collection exercise events')
+        logger.error('Failed to retrieve collection exercise events', collection_exercise_id=collection_exercise_id)
+        raise ApiError(response)
 
     logger.info('Successfully retrieved collection exercise events', collection_exercise_id=collection_exercise_id)
     return response.json()
@@ -66,10 +62,8 @@ def get_collection_exercises_for_survey(survey_id, collex_url, collex_auth,  liv
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        raise ApiError(logger, response,
-                       survey_id=survey_id,
-                       log_level='warning' if response.status_code == 404 else 'exception',
-                       message='Failed to retrieve collection exercises for survey')
+        logger.error('Failed to retrieve collection exercises for survey', survey_id=survey_id)
+        raise ApiError(response)
 
     logger.info("Successfully retrieved collection exercises for survey", survey_id=survey_id)
     collection_exercises = response.json()

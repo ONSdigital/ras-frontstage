@@ -19,7 +19,7 @@ def get_survey(survey_url, survey_auth, survey_id):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Failed to retrieve survey', survey_id=survey_id)
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully retrieved survey', survey_id=survey_id)
     return response.json()
@@ -34,7 +34,7 @@ def get_survey_by_short_name(survey_short_name):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Failed to retrieve survey by its short name', survey_short_name=survey_short_name)
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully retrieved survey by its short name', survey_short_name=survey_short_name)
     return response.json()

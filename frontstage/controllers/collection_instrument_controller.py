@@ -32,7 +32,7 @@ def download_collection_instrument(collection_instrument_id, case_id, party_id):
         logger.error('Failed to download collection instrument',
                      collection_instrument_id=collection_instrument_id,
                      party_id=party_id)
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully downloaded collection instrument',
                 collection_instrument_id=collection_instrument_id,
@@ -51,7 +51,7 @@ def get_collection_instrument(collection_instrument_id, collection_instrument_ur
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Failed to get collection instrument', collection_instrument_id=collection_instrument_id)
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully retrieved collection instrument',
                 collection_instrument_id=collection_instrument_id)
@@ -78,6 +78,6 @@ def upload_collection_instrument(upload_file, case_id, party_id):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Failed to upload collection instrument', case_id=case_id, party_id=party_id)
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully uploaded collection instrument', case_id=case_id, party_id=party_id)

@@ -46,7 +46,7 @@ def get_case_by_case_id(case_id):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Failed to retrieve case by case id', case_id=case_id, )
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully retrieved case by case id', case_id=case_id)
     return response.json()
@@ -62,7 +62,7 @@ def get_case_by_enrolment_code(enrolment_code):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Failed to retrieve case by enrolment code')
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully retrieved case by enrolment code')
     return response.json()
@@ -78,7 +78,7 @@ def get_case_categories():
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Failed to get case categories')
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully retrieved case categories')
     return response.json()
@@ -124,7 +124,7 @@ def get_cases_by_party_id(party_id, case_url, case_auth, case_events=False, iac=
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Failed to retrieve cases by party id', party_id=party_id)
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully retrieved cases by party id', party_id=party_id)
     return response.json()
@@ -181,7 +181,7 @@ def post_case_event(case_id, party_id, category, description):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Failed to post case event', case_id=case_id)
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully posted case event', case_id=case_id)
 

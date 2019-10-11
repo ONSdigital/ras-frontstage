@@ -22,7 +22,7 @@ def get_collection_exercise(collection_exercise_id):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Failed to retrieve collection exercise', collection_exercise_id=collection_exercise_id)
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully retrieved collection exercise', collection_exercise_id=collection_exercise_id)
     collection_exercise = response.json()
@@ -43,7 +43,7 @@ def get_collection_exercise_events(collection_exercise_id):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Failed to retrieve collection exercise events', collection_exercise_id=collection_exercise_id)
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully retrieved collection exercise events', collection_exercise_id=collection_exercise_id)
     return response.json()
@@ -63,7 +63,7 @@ def get_collection_exercises_for_survey(survey_id, collex_url, collex_auth,  liv
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Failed to retrieve collection exercises for survey', survey_id=survey_id)
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info("Successfully retrieved collection exercises for survey", survey_id=survey_id)
     collection_exercises = response.json()

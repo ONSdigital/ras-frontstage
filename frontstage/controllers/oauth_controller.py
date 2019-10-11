@@ -43,7 +43,7 @@ def sign_in(username, password):
             raise OAuth2Error(logger, response, log_level='warning', message=message, oauth2_error=auth_error)
         else:
             logger.error('Failed to retrieve OAuth2 token')
-            raise ApiError(response)
+            raise ApiError(logger, response)
 
     logger.info('Successfully retrieved OAuth2 token')
     return response.json()

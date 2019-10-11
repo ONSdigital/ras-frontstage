@@ -27,7 +27,7 @@ def get_respondent_party_by_id(party_id):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Failed to find respondent', party_id=party_id)
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully retrieved party details', party_id=party_id)
     return response.json()
@@ -44,7 +44,7 @@ def add_survey(party_id, enrolment_code):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Failed to add a survey', party_id=party_id)
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully added a survey', party_id=party_id)
 
@@ -60,7 +60,7 @@ def change_password(password, token):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Failed to send change password request to party service', token=token)
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully changed password through the party service')
 
@@ -80,7 +80,7 @@ def create_account(registration_data):
         else:
             message = 'Failed to create account'
         logger.error(message)
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully created account')
 
@@ -102,7 +102,7 @@ def get_party_by_business_id(party_id, party_url, party_auth, collection_exercis
         logger.error('Failed to retrieve party by business',
                      collection_exercise_id=collection_exercise_id,
                      party_id=party_id)
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully retrieved party by business',
                 collection_exercise_id=collection_exercise_id,
@@ -124,7 +124,7 @@ def get_respondent_by_email(email):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Error retrieving respondent by email')
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully retrieved respondent by email')
     return response.json()
@@ -140,7 +140,7 @@ def resend_verification_email(party_id):
     except requests.exceptions.HTTPError:
         logger.exception('Re-sending of verification email failed', party_id=party_id)
         logger.error('Re-sending of verification email failed')
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully re-sent verification email', party_id=party_id)
 
@@ -154,7 +154,7 @@ def resend_verification_email_expired_token(token):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Re-sending of verification email for expired token failed')
-        raise ApiError(response)
+        raise ApiError(logger, response)
     logger.info('Successfully re-sent verification email', token=token)
 
 
@@ -171,7 +171,7 @@ def reset_password_request(username):
         if response.status_code == 404:
             raise UserDoesNotExist("User does not exist in party service")
         logger.error('Failed to send reset password request to party service')
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully sent reset password request to party service')
 
@@ -185,7 +185,7 @@ def resend_password_email_expired_token(token):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Re-sending of password email for expired token failed')
-        raise ApiError(response)
+        raise ApiError(logger, response)
     logger.info('Sucessfully re-sent password email', token=token)
 
 
@@ -199,7 +199,7 @@ def verify_email(token):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Failed to verify email', token=token)
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully verified email address', token=token)
 
@@ -214,7 +214,7 @@ def verify_token(token):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Failed to verify token', token=token)
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully verified token', token=token)
 
@@ -426,6 +426,6 @@ def notify_party_and_respondent_account_locked(respondent_id, email_address, sta
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Failed to notify party', respondent_id=respondent_id, status=status)
-        raise ApiError(response)
+        raise ApiError(logger, response)
 
     logger.info('Successfully notified respondent and party service that account is locked', respondent_id=respondent_id, status=status)

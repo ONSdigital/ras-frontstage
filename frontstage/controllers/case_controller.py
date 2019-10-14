@@ -45,7 +45,7 @@ def get_case_by_case_id(case_id):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error('Failed to retrieve case by case id', case_id=case_id, )
+        logger.error('Failed to retrieve case by case id', case_id=case_id)
         raise ApiError(logger, response)
 
     logger.info('Successfully retrieved case by case id', case_id=case_id)

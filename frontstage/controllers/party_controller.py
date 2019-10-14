@@ -139,9 +139,7 @@ def resend_verification_email(party_id):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.exception('Re-sending of verification email failed', party_id=party_id)
-        logger.error('Re-sending of verification email failed')
         raise ApiError(logger, response)
-
     logger.info('Successfully re-sent verification email', party_id=party_id)
 
 

@@ -26,9 +26,8 @@ def get_respondent_party_by_id(party_id):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        raise ApiError(logger, response,
-                       message='Failed to find respondent',
-                       party_id=party_id)
+        logger.error('Failed to find respondent', party_id=party_id)
+        raise ApiError(logger, response)
 
     logger.info('Successfully retrieved party details', party_id=party_id)
     return response.json()
@@ -44,10 +43,8 @@ def add_survey(party_id, enrolment_code):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        raise ApiError(logger, response,
-                       log_level='warning' if response.status_code == 404 else 'error',
-                       message='Failed to add a survey',
-                       party_id=party_id)
+        logger.error('Failed to add a survey', party_id=party_id)
+        raise ApiError(logger, response)
 
     logger.info('Successfully added a survey', party_id=party_id)
 
@@ -62,10 +59,8 @@ def change_password(password, token):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        raise ApiError(logger, response,
-                       log_level='warning' if response.status_code == 404 else 'exception',
-                       message='Failed to send change password request to party service',
-                       token=token)
+        logger.error('Failed to send change password request to party service', token=token)
+        raise ApiError(logger, response)
 
     logger.info('Successfully changed password through the party service')
 
@@ -84,9 +79,8 @@ def create_account(registration_data):
             message = 'Email has already been used'
         else:
             message = 'Failed to create account'
-        raise ApiError(logger, response,
-                       log_level='debug' if response.status_code == 400 else 'error',
-                       message=message)
+        logger.error(message)
+        raise ApiError(logger, response)
 
     logger.info('Successfully created account')
 
@@ -105,11 +99,10 @@ def get_party_by_business_id(party_id, party_url, party_auth, collection_exercis
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        raise ApiError(logger, response,
-                       collection_exercise_id=collection_exercise_id,
-                       log_level='warning' if response.status_code == 404 else 'exception',
-                       message='Failed to retrieve party by business',
-                       party_id=party_id)
+        logger.error('Failed to retrieve party by business',
+                     collection_exercise_id=collection_exercise_id,
+                     party_id=party_id)
+        raise ApiError(logger, response)
 
     logger.info('Successfully retrieved party by business',
                 collection_exercise_id=collection_exercise_id,
@@ -130,7 +123,8 @@ def get_respondent_by_email(email):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        raise ApiError(logger, response, message='Error retrieving respondent by email')
+        logger.error('Error retrieving respondent by email')
+        raise ApiError(logger, response)
 
     logger.info('Successfully retrieved respondent by email')
     return response.json()
@@ -145,8 +139,7 @@ def resend_verification_email(party_id):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.exception('Re-sending of verification email failed', party_id=party_id)
-        raise ApiError(logger, response, log_level='exception', message='Re-sending of verification email failed')
-
+        raise ApiError(logger, response)
     logger.info('Successfully re-sent verification email', party_id=party_id)
 
 
@@ -158,8 +151,8 @@ def resend_verification_email_expired_token(token):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        raise ApiError(logger, response, log_level='exception',
-                       message='Re-sending of verification email for expired token failed')
+        logger.error('Re-sending of verification email for expired token failed')
+        raise ApiError(logger, response)
     logger.info('Successfully re-sent verification email', token=token)
 
 
@@ -175,8 +168,8 @@ def reset_password_request(username):
     except requests.exceptions.HTTPError:
         if response.status_code == 404:
             raise UserDoesNotExist("User does not exist in party service")
-        message = 'Failed to send reset password request to party service'
-        raise ApiError(logger, response, log_level='exception', message=message)
+        logger.error('Failed to send reset password request to party service')
+        raise ApiError(logger, response)
 
     logger.info('Successfully sent reset password request to party service')
 
@@ -189,8 +182,8 @@ def resend_password_email_expired_token(token):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        raise ApiError(logger, response, log_level='exception',
-                       message='Re-sending of password email for expired token failed')
+        logger.error('Re-sending of password email for expired token failed')
+        raise ApiError(logger, response)
     logger.info('Sucessfully re-sent password email', token=token)
 
 
@@ -203,8 +196,8 @@ def verify_email(token):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        log_level = 'warning' if response.status_code == 404 else 'error'
-        raise ApiError(logger, response, log_level=log_level, message='Failed to verify email', token=token)
+        logger.error('Failed to verify email', token=token)
+        raise ApiError(logger, response)
 
     logger.info('Successfully verified email address', token=token)
 
@@ -218,8 +211,8 @@ def verify_token(token):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        log_level = 'warning' if response.status_code == 404 else 'error'
-        raise ApiError(logger, response, log_level=log_level, message='Failed to verify token', token=token)
+        logger.error('Failed to verify token', token=token)
+        raise ApiError(logger, response)
 
     logger.info('Successfully verified token', token=token)
 

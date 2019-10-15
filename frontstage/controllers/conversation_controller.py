@@ -38,20 +38,16 @@ def get_conversation(thread_id):
             if exception.response.status_code == 403:
                 raise IncorrectAccountAccessError(message='Access not granted for thread', thread_id=thread_id)
             else:
-                raise ApiError(logger, response,
-                               log_level='error',
-                               message='Thread retrieval failed',
-                               thread_id=thread_id)
+                logger.error('Thread retrieval failed', thread_id=thread_id)
+                raise ApiError(response)
 
     logger.info('Successfully retrieved conversation thread', thread_id=thread_id)
 
     try:
         return response.json()
     except JSONDecodeError:
-        raise ApiError(logger, response,
-                       log_level='error',
-                       message='The thread response could not be decoded',
-                       thread_id=thread_id)
+        logger.error('The thread response could not be decoded', thread_id=thread_id)
+        raise ApiError(response)
 
 
 def get_conversation_list(params):
@@ -65,18 +61,16 @@ def get_conversation_list(params):
         try:
             response.raise_for_status()
         except HTTPError:
-            raise ApiError(logger, response,
-                           log_level='error',
-                           message='Threads retrieval failed')
+            logger.error('Threads retrieval failed')
+            raise ApiError(response)
 
     logger.info('Successfully retrieved threads list')
 
     try:
         return response.json()['messages']
     except JSONDecodeError:
-        raise ApiError(logger, response,
-                       log_level='error',
-                       message='The threads response could not be decoded')
+        logger.error('The threads response could not be decoded')
+        raise ApiError(response)
     except KeyError:
         logger.error("Request was successful but didn't contain a 'messages' key")
         raise NoMessagesError
@@ -94,10 +88,8 @@ def send_message(message_json):
         try:
             response.raise_for_status()
         except HTTPError:
-            raise ApiError(logger, response,
-                           log_level='error',
-                           message='Message sending failed due to API Error',
-                           party_id=party_id)
+            logger.error('Message sending failed due to API Error', party_id=party_id)
+            raise ApiError(response)
 
     logger.info('Successfully sent message', party_id=party_id)
     return response.json()

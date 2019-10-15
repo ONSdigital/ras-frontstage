@@ -18,10 +18,8 @@ def get_survey(survey_url, survey_auth, survey_id):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        raise ApiError(logger, response,
-                       log_level='warning' if response.status_code == 404 else 'exception',
-                       message='Failed to retrieve survey',
-                       survey_id=survey_id)
+        logger.error('Failed to retrieve survey', survey_id=survey_id)
+        raise ApiError(logger, response)
 
     logger.info('Successfully retrieved survey', survey_id=survey_id)
     return response.json()
@@ -35,10 +33,8 @@ def get_survey_by_short_name(survey_short_name):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        raise ApiError(logger, response,
-                       log_level='warning' if response.status_code == 404 else 'exception',
-                       message='Failed to retrieve survey by its short name',
-                       survey_short_name=survey_short_name)
+        logger.error('Failed to retrieve survey by its short name', survey_short_name=survey_short_name)
+        raise ApiError(logger, response)
 
     logger.info('Successfully retrieved survey by its short name', survey_short_name=survey_short_name)
     return response.json()

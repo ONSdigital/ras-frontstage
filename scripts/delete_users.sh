@@ -11,14 +11,12 @@ done
 
 # Then read all the lines in the file and delete them by hitting the endpoints
 while read email; do
-    
-    # Ugly, but necessary with variables inside of json
     PARTY_JSON='{"email":"'"$email"'"}'
     echo "========== Beginning deletion of  $email =========="
-    echo "Deleting $email from party"
+    echo "-- Deleting $email from party --"
     curl -v -d $PARTY_JSON -H "Content-Type: application/json" --user ${SECURITY_USER_NAME}:${SECURITY_USER_PASSWORD} -X DELETE ${PARTY_URL}/party-api/v1/respondents/email
 
-    echo "Deleting $email from auth"
+    echo "-- Deleting $email from auth --"
     curl -v -F "username=$email" --user ${SECURITY_USER_NAME}:${SECURITY_USER_PASSWORD} -X DELETE ${OAUTH_URL}/api/account/user
 
     echo "========== Finished deleting $email =========="

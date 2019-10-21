@@ -1,0 +1,1 @@
+# Delete this line and add email addresses (1 per line) to have them be deleted by the delete users script

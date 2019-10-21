@@ -16,7 +16,6 @@ while read email; do
     PARTY_JSON='{"email":"'"$email"'"}'
     echo "========== Beginning deletion of  $email =========="
     echo "Deleting $email from party"
-    echo $PARTY_JSON
     curl -v -d $PARTY_JSON -H "Content-Type: application/json" --user ${SECURITY_USER_NAME}:${SECURITY_USER_PASSWORD} -X DELETE ${PARTY_URL}/party-api/v1/respondents/email
 
     echo "Deleting $email from auth"

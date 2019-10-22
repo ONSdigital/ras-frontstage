@@ -6,8 +6,8 @@ Shell scripts that you may find useful for development on Frontstage:
 
 Usage:
 
-```
-$ python get_strings.py [filename]
+```bash
+python get_strings.py [filename]
 ```
 
 Searches the file for strings wrapped with the substitution function `_([string])`, and returns JSON that can be copied into a language file.

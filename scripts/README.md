@@ -71,9 +71,9 @@ In the above:
 
 Locales use the Python locale setting, which we will have to introduce mechanisms to change if this feature is used.  **Translation is not the intended purpose of this system, but it was easy to make a step toward allowing it within this string extraction mechanism**
 
-## Delete users - delete_users.sh
+## Delete users - delete_users.sh [filemame]
 
-This script can be used to call the various delete endpoints to delete a respondent.  All that is required to delete a user is the email address. The script can delete multiple respondents at the same time.  In order to do this, the emails need to be put into the accompanying `accounts-to-be-deleted.txt` file, with 1 per line.
+This script can be used to call the various delete endpoints to delete a respondent.  All that is required to delete a user is the email address. The script can delete multiple respondents at the same time.  In order to do this, the emails need to be put into a text file. , with 1 per line.  The name of this file needs to be passed into the script (e.g., ./delete_users.sh filename.txt)
 
 In order to use it, you need the following environment variables to be set:
 
@@ -91,5 +91,5 @@ export SECURITY_USER_NAME=admin
 To invoke the script:
 
 ```bash
-./delete_users.sh
+./delete_users.sh [filename]
 ```

@@ -1,4 +1,5 @@
 #/bin/bash
+# usage: ./delete_users.sh [filename]
 
 # First check all the required environment variables are set
 for env_var in SECURITY_USER_NAME SECURITY_USER_PASSWORD PARTY_URL OAUTH_URL; do
@@ -8,6 +9,13 @@ for env_var in SECURITY_USER_NAME SECURITY_USER_PASSWORD PARTY_URL OAUTH_URL; do
         exit 1
     fi
 done
+
+# Next check the filename has been passed in
+if [ -z $1 ]
+then
+    echo "File name needs to be provided e.g., ./delete_users.sh accounts.txt"
+    exit 1
+fi
 
 # Then read all the lines in the file and delete them by hitting the endpoints
 while read email; do
@@ -20,4 +28,4 @@ while read email; do
     curl -v -F "username=$email" --user ${SECURITY_USER_NAME}:${SECURITY_USER_PASSWORD} -X DELETE ${OAUTH_URL}/api/account/user
 
     echo "========== Finished deleting $email =========="
-done < accounts-to-be-deleted.txt
+done < $1

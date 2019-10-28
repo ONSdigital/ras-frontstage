@@ -91,5 +91,5 @@ export SECURITY_USER_NAME=admin
 To invoke the script:
 
 ```bash
-./delete_users.sh [filename]
+./delete_users.sh <filename>
 ```

@@ -6,8 +6,8 @@ Shell scripts that you may find useful for development on Frontstage:
 
 Usage:
 
-```
-$ python get_strings.py [filename]
+```bash
+python get_strings.py [filename]
 ```
 
 Searches the file for strings wrapped with the substitution function `_([string])`, and returns JSON that can be copied into a language file.
@@ -65,7 +65,31 @@ As a final example, the below shows a JSON language file that contains the same 
 ```
 
 In the above:
+
 * The British English strings remain as specified in source code
 * The American English strings are overridden with American English terms and spellings.
 
 Locales use the Python locale setting, which we will have to introduce mechanisms to change if this feature is used.  **Translation is not the intended purpose of this system, but it was easy to make a step toward allowing it within this string extraction mechanism**
+
+## Delete users - delete_users.sh [filemame]
+
+This script can be used to call the various delete endpoints to delete a respondent.  All that is required to delete a user is the email address. The script can delete multiple respondents at the same time.  In order to do this, the emails need to be put into a text file. , with 1 per line.  The name of this file needs to be passed into the script (e.g., ./delete_users.sh filename.txt)
+
+In order to use it, you need the following environment variables to be set:
+
+* SECURITY_USER_NAME
+* SECURITY_USER_PASSWORD
+* PARTY_URL
+* OAUTH_URL
+
+On a Mac, if you need to set these, you can do the following:
+
+```bash
+export SECURITY_USER_NAME=admin
+```
+
+To invoke the script:
+
+```bash
+./delete_users.sh <filename>
+```

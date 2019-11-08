@@ -15,6 +15,10 @@ logger = wrap_logger(logging.getLogger(__name__))
 @surveys_bp.route('/<tag>', methods=['GET'])
 @jwt_authorization(request)
 def get_survey_list(session, tag):
+    """
+    Displays the list of surveys for the respondent by tag.  A tag represents the state the
+    survey is in (e.g., todo, history, etc)
+    """
     logger.info("Retrieving survey todo list")
     party_id = session.get('party_id')
     business_id = request.args.get('business_party_id')

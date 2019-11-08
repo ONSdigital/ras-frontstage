@@ -24,7 +24,7 @@ def get_survey_list(session, tag):
     survey_list = party_controller.get_survey_list_details_for_party(party_id, tag, business_party_id=business_id,
                                                                      survey_id=survey_id)
 
-    sorted_survey_list = sorted(survey_list, key=lambda k: datetime.strptime(k['submit_by'], '%d %b %Y'))
+    sorted_survey_list = sorted(survey_list, key=lambda k: datetime.strptime(k['submit_by'], '%d %b %Y'), reverse=True)
 
     if tag == 'todo':
         added_survey = True if business_id and survey_id and not already_enrolled else None

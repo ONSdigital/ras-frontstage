@@ -61,7 +61,7 @@ class TestSecureMessage(unittest.TestCase):
     @requests_mock.mock()
     def test_get_thread_failure(self, mock_request):
         conversation_json_copy = conversation_json.copy()
-        del conversation_json_copy['@ru_id']
+        del conversation_json_copy['@business_details']
         mock_request.get(url_get_thread, json={'messages': [conversation_json_copy]})
 
         response = self.app.get("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers, follow_redirects=True)

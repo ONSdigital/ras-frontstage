@@ -153,8 +153,8 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_sign_in_party_404(self, mock_object):
+        mock_object.post(url_oauth_token, status_code=204)
         mock_object.get(url_get_respondent_email, status_code=404)
-
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
         self.assertTrue('Error signing in'.encode() in response.data)

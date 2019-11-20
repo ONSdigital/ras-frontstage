@@ -121,12 +121,12 @@ class TestPasswords(unittest.TestCase):
 
     @requests_mock.mock()
     def test_reset_password_get_invalid_token(self, mock_object):
-        mock_object.get(url_verify_token, status_code=404)
+        mock_object.get(url_verify_token, status_code=500)
 
         response = self.app.get(f"passwords/reset-password/{token}", follow_redirects=True)
 
-        self.assertEqual(response.status_code, 404)
-        self.assertTrue('Page not found'.encode() in response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Your link has expired'.encode() in response.data)
 
     @requests_mock.mock()
     def test_reset_password_get_party_fail(self, mock_object):
@@ -185,6 +185,7 @@ class TestPasswords(unittest.TestCase):
         response = self.app.post(f"passwords/reset-password/{token}", data=password_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
+        print(response.data)
         self.assertTrue("Your password doesn&#39;t meet the requirements".encode() in response.data)
 
     @requests_mock.mock()

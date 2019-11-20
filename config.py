@@ -13,6 +13,9 @@ class Config(object):
     PORT = os.getenv('PORT', 8082)
     MAX_UPLOAD_LENGTH = os.getenv('MAX_UPLOAD_LENGTH', 20 * 1024 * 1024)
 
+    EMAIL_TOKEN_SALT = os.getenv('EMAIL_TOKEN_SALT', 'aardvark')
+    EMAIL_TOKEN_EXPIRY = int(os.getenv('EMAIL_TOKEN_EXPIRY', '306000'))
+
     SECRET_KEY = os.getenv('SECRET_KEY')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD')
@@ -142,6 +145,7 @@ class TestingConfig(DevelopmentConfig):
     TESTING = True
     DEVELOPMENT = False
     WTF_CSRF_ENABLED = False
+    EMAIL_TOKEN_SALT = 'bulbous'
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     JWT_SECRET = 'testsecret'
     REDIS_DB = os.getenv('REDIS_DB', 13)

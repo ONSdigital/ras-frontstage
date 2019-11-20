@@ -1,7 +1,7 @@
 
 import logging
 
-from flask import redirect, request, url_for, current_app as app
+from flask import abort, redirect, request, url_for, current_app as app
 from structlog import wrap_logger
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.common.cryptographer import Cryptographer
@@ -25,6 +25,12 @@ def add_survey_submit(session):
     try:
         # Verify enrolment code is active
         iac = iac_controller.get_iac_from_enrolment(enrolment_code)
+        if iac is None:
+            # Showing the client an error screen if the enrolment code is either not found or inactive isn't great
+            # but it's better then what used to happen, which was raise TypeError and show them the generic exception
+            # page.  This lets us more easily debug the issue.  Ideally we'd redirect the user to the surveys_list
+            # page with a 'Something went wrong when signing you up for the survey, try again or call us' error.
+            abort(400)
 
         # Add enrolment for user in party
         case_id = iac['caseId']

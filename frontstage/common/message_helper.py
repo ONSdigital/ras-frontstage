@@ -60,7 +60,7 @@ def get_from_name(message):
 
 def get_ru_ref_from_message(message):
     try:
-        return message['@ru_id']['id']
+        return message['@business_details']['id']
     except (KeyError, TypeError):
         logger.error('Failed to retrieve RU ref from message', message_id=message.get('msg_id'))
         raise

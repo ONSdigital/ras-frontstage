@@ -125,6 +125,11 @@ def obfuscate_email(email):
     For example: test@example.com would turn into t**t@e*********m
     """
     m = email.split('@')
-    prefix = f'{m[0][0]}{"*"*(len(m[0])-2)}{m[0][-1]}'
+
+    # If the prefix is 1 character, then we can't obfuscate it
+    if len(m[0]) > 1:
+        prefix = f'{m[0][0]}{"*"*(len(m[0])-2)}{m[0][-1]}'
+    else:
+        prefix = m[0]
     domain = f'{m[1][0]}{"*"*(len(m[1])-2)}{m[1][-1]}'
     return f'{prefix}@{domain}'

@@ -42,7 +42,7 @@
           "telephone": ""
         }
       ], 
-      "@ru_id": {
+      "@business_details": {
         "associations": [
           {
             "enrolments": [
@@ -113,7 +113,7 @@
           "telephone": "01636 265626"
         }
       ],
-      "@ru_id": {
+      "@business_details": {
         "associations": [
           {
             "enrolments": [

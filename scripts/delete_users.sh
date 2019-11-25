@@ -21,6 +21,9 @@ fi
 while read email; do
     PARTY_JSON='{"email":"'"$email"'"}'
     echo "========== Beginning deletion of  $email =========="
+    echo "-- Disabling all enrolments for $email --"
+    curl -v -d $PARTY_JSON -H "Content-Type: application/json" --user ${SECURITY_USER_NAME}:${SECURITY_USER_PASSWORD} -X PATCH ${PARTY_URL}/party-api/v1/respondents/disable-user-enrolments
+
     echo "-- Deleting $email from party --"
     curl -v -d $PARTY_JSON -H "Content-Type: application/json" --user ${SECURITY_USER_NAME}:${SECURITY_USER_PASSWORD} -X DELETE ${PARTY_URL}/party-api/v1/respondents/email
 

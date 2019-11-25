@@ -86,7 +86,7 @@ class TestMessageHelper(unittest.TestCase):
         with self.assertRaises(KeyError):
             refine(test_copy)
 
-    def test_missing_ru_id(self):
+    def test_missing_business_id(self):
         test_copy = test_conversation_data.copy()
         del test_copy['@business_details']
         with self.assertRaises(KeyError):

@@ -10,7 +10,7 @@
     }
   ],
   "msg_from": "0282d2f8-d96d-4fd9-bb7a-c1d781c0978f",
-  "ru_id": "e359b838-0d89-43e8-b5d0-68079916de80",
+  "business_id": "e359b838-0d89-43e8-b5d0-68079916de80",
   "@msg_from": {
     "sampleUnitType": "BI",
     "emailAddress": "peter.griffin@ons.gov.uk",

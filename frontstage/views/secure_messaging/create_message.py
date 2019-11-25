@@ -35,8 +35,8 @@ def create_message(session):
                                form=form, errors=form.errors, message={})
 
 
-def _send_new_message(party_id, survey, ru_ref):
-    logger.info('Attempting to send message', party_id=party_id, ru_ref=ru_ref)
+def _send_new_message(party_id, survey, business_id):
+    logger.info('Attempting to send message', party_id=party_id, business_id=business_id)
     form = SecureMessagingForm(request.form)
 
     subject = form['subject'].data if form['subject'].data else form['hidden_subject'].data
@@ -46,12 +46,12 @@ def _send_new_message(party_id, survey, ru_ref):
         "subject": subject,
         "body": form['body'].data,
         "thread_id": form['thread_id'].data,
-        "ru_id": ru_ref,
+        "business_id": business_id,
         "survey": survey,
     }
 
     response = conversation_controller.send_message(json.dumps(message_json))
 
     logger.info('Secure message sent successfully',
-                message_id=response['msg_id'], party_id=party_id, ru_ref=ru_ref)
+                message_id=response['msg_id'], party_id=party_id, business_id=business_id)
     return response

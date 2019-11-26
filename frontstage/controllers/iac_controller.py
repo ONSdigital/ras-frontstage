@@ -12,7 +12,8 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def get_iac_from_enrolment(enrolment_code):
-    logger.info('Attempting to retrieve IAC')
+    bound_logger = logger.bind(enrolment_code=enrolment_code)
+    bound_logger.info('Attempting to retrieve IAC')
     url = f"{app.config['IAC_URL']}/iacs/{enrolment_code}"
     response = requests.get(url, auth=app.config['IAC_AUTH'])
 
@@ -20,18 +21,18 @@ def get_iac_from_enrolment(enrolment_code):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         if response.status_code == 404:
-            logger.info('IAC not found', status_code=response.status_code)
+            bound_logger.info('IAC not found', status_code=response.status_code)
             return
         # 401s may include error context in the JSON response
-        elif response.status_code != 401:
-            logger.error('Failed to retrieve IAC')
+        if response.status_code != 401:
+            bound_logger.error('Failed to retrieve IAC')
             raise ApiError(logger, response)
 
     if response.json().get('active') is False:
-        logger.info("Invalid IAC used")
+        bound_logger.info("IAC is not active")
         return
 
-    logger.info('Successfully retrieved IAC')
+    bound_logger.info('Successfully retrieved IAC')
     return response.json()
 
 

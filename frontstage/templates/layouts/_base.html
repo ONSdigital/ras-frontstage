@@ -114,6 +114,9 @@
       <!-- ToDo! Point to bundle.min.js -->
       {% set scripts_cdn = cdn_url_prefix~"/scripts/bundle.js" %}
       <script src="{{ scripts_cdn }}"></script>
+
+      {% set js_script = "js/script.js" %}
+      <script src="{{ url_for('static', filename=js_script) }}"></script>
     {% endblock scripts %}
   	  <!--<![endif]-->
 

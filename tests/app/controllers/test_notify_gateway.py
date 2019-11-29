@@ -34,24 +34,27 @@ class TestNotifyController(unittest.TestCase):
     def test_an_invalid_template_id(self):
         with app.app_context():
             with self.assertRaises(KeyError):
-                NotifyGateway(self.app_config).request_to_notify(email='test@test.test', template_name='fake-template-name')
+                NotifyGateway(self.app_config).request_to_notify(email='test@test.test',
+                                                                 template_name='fake-template-name')
 
     def test_a_successful_send(self):
         with responses.RequestsMock() as rsps:
             with app.app_context():
-                rsps.add(rsps.POST, url_send_notify, json={'emailAddress': 'test@test.test'}, status=201)
+                rsps.add(rsps.POST, url_send_notify, json={'emailAddress': 'test@test.test', 'id': '1234'}, status=201)
                 try:
                     NotifyGateway(self.app_config).request_to_notify(email='test@test.test',
-                                                      template_name='request_password_change')
+                                                                     template_name='request_password_change')
                 except RasNotifyError:
                     self.fail('NotifyController didnt properly handle a 201')
                 except KeyError:
                     self.fail('NotifyController couldnt find the template ID request_password_change')
+            assert rsps.assert_all_requests_are_fired
+            assert rsps.calls[0].request.url == 'http://notify-gateway-service/emails/request_password_change_id'
 
     def test_an_unsuccessful_send(self):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.POST, url_send_notify, json={'emailAddress': 'test@test.test'}, status=500)
             with app.app_context():
                 with self.assertRaises(RasNotifyError):
-                    NotifyGateway().request_to_notify(email='test@test.test',
+                    NotifyGateway(self.app_config).request_to_notify(email='test@test.test',
                                                       template_name='request_password_change')

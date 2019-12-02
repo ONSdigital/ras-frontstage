@@ -1,5 +1,8 @@
+
+import json
 import unittest
 from collections import namedtuple
+from datetime import datetime, timedelta
 from unittest.mock import patch
 
 import responses
@@ -8,7 +11,8 @@ from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import party_controller
 from frontstage.controllers.collection_exercise_controller import convert_events_to_new_format
-from frontstage.controllers.party_controller import display_button, get_respondent_enrolments_for_known_collex
+from frontstage.controllers.party_controller import (display_button, get_respondent_enrolments_for_known_collex,
+                                                     filter_ended_collection_exercises)
 from frontstage.exceptions.exceptions import ApiError
 from tests.app.mocked_services import (business_party, case, case_list, collection_exercise,
                                        collection_exercise_by_survey,
@@ -275,3 +279,29 @@ class TestPartyController(unittest.TestCase):
         ]
         for combination in combinations:
             self.assertEqual(display_button(combination.status, combination.ci_type), combination.expected)
+
+    def test_filter_ended_collection_exercises(self):
+        """Tests the functionality of the 'filter_ended_collection_exercises' function"""
+        with open('tests/test_data/party/collection_exercises.json') as business_json_data:
+            data = json.load(business_json_data)
+
+        # Enddates set for tomorrow. Millseconds are set up this way because datetime generates 6 digits
+        # where we receive 3 digits.
+        date = datetime.now() + timedelta(days=1)
+        data[0]['scheduledEndDateTime'] = date.strftime("%Y-%m-%dT%H:%M:%S") + ".000Z"
+        data[1]['scheduledEndDateTime'] = date.strftime("%Y-%m-%dT%H:%M:%S") + ".111Z"
+        self.assertEqual(len(data), 2)
+        filter_ended_collection_exercises(data)
+        self.assertEqual(len(data), 2)
+
+        # Change one of the end dates to a past date.  It should successfully filter the collection exercise
+        # out of the list.
+        data[0]['scheduledEndDateTime'] = "2019-01-31T00:00:00.000Z"
+        self.assertEqual(len(data), 2)
+        filter_ended_collection_exercises(data)
+        self.assertEqual(len(data), 1)
+
+        # The key missing will throw a keyError
+        del data[0]['scheduledEndDateTime']
+        with self.assertRaises(KeyError):
+            filter_ended_collection_exercises(data)

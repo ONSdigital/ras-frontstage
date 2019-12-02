@@ -2,6 +2,7 @@
 import json
 import unittest
 from collections import namedtuple
+from datetime import datetime, timedelta
 from unittest.mock import patch
 
 import responses
@@ -284,7 +285,11 @@ class TestPartyController(unittest.TestCase):
         with open('tests/test_data/party/collection_exercises.json') as business_json_data:
             data = json.load(business_json_data)
 
-        # Data has 2 collection exercises in the far future, nothing should be removed
+        # Enddates set for tomorrow. Millseconds are set up this way because datetime generates 6 digits
+        # where we receive 3 digits.
+        date = datetime.now() + timedelta(days=1)
+        data[0]['scheduledEndDateTime'] = date.strftime("%Y-%m-%dT%H:%M:%S") + ".000Z"
+        data[1]['scheduledEndDateTime'] = date.strftime("%Y-%m-%dT%H:%M:%S") + ".111Z"
         self.assertEqual(len(data), 2)
         filter_ended_collection_exercises(data)
         self.assertEqual(len(data), 2)

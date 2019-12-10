@@ -17,7 +17,7 @@
             {{ form.csrf_token}}
             <div class="form-group">{{ form.username.label }}: {{ form.username() }}</div>
             <div class="form-group">{{ form.password.label }}: {{ form.password() }}</div>
-            <button type="submit" class="btn btn-default" id="login_button">Sign in</button>
+            <button type="submit" class="btn btn-default js-timer js-submit-btn" id="login_button">Sign in</button>
         </form>
     </div>
 {% endblock main %}

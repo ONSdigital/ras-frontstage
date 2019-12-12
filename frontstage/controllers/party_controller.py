@@ -49,11 +49,11 @@ def add_survey(party_id, enrolment_code):
     logger.info('Successfully added a survey', party_id=party_id)
 
 
-def change_password(password, token):
+def change_password(email, password, token):
     logger.info('Attempting to change password through the party service')
 
-    data = {'new_password': password}
-    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/change_password/{token}"
+    data = {'email_address': email, 'new_password': password}
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/change_password"
     response = requests.put(url, auth=app.config['PARTY_AUTH'], json=data)
 
     try:

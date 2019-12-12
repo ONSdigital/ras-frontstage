@@ -21,15 +21,6 @@ class TestNotifyController(unittest.TestCase):
         self.app = app.test_client()
         self.app_config = self.app.application.config
         self.email_form = {"email_address": "test@email.com"}
-        # self.oauth2_response = {
-        #     'id': 1,
-        #     'access_token': '99a81f9c-e827-448b-8fa7-d563b76137ca',
-        #     'expires_in': 3600,
-        #     'token_type': 'Bearer',
-        #     'scope': '',
-        #     'refresh_token': 'a74fd471-6981-4503-9f59-00d45d339a15'
-        # }
-        # self.password_form = {"password": "Gizmo007!", "password_confirm": "Gizmo007!"}
 
     def test_an_invalid_template_id(self):
         with app.app_context():
@@ -40,7 +31,9 @@ class TestNotifyController(unittest.TestCase):
     def test_a_successful_send(self):
         with responses.RequestsMock() as rsps:
             with app.app_context():
-                rsps.add(rsps.POST, url_send_notify, json={'emailAddress': 'test@test.test', 'id': '1234'}, status=201)
+                rsps.add(rsps.POST, url_send_notify, json={'emailAddress': 'test@test.test', 'id': '1234',
+                                                           "personalisation": "personalisation",
+                                                           "reference": "reference"}, status=201)
                 try:
                     NotifyGateway(self.app_config).request_to_notify(email='test@test.test',
                                                                      template_name='request_password_change')
@@ -57,4 +50,4 @@ class TestNotifyController(unittest.TestCase):
             with app.app_context():
                 with self.assertRaises(RasNotifyError):
                     NotifyGateway(self.app_config).request_to_notify(email='test@test.test',
-                                                      template_name='request_password_change')
+                                                                     template_name='request_password_change')

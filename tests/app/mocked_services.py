@@ -104,6 +104,7 @@ token = 'test_token'
 
 url_create_account = f"{app.config['PARTY_URL']}/party-api/v1/respondents"
 url_download_ci = f"{app.config['COLLECTION_INSTRUMENT_URL']}/collection-instrument-api/1.0.2/download/{case['collectionInstrumentId']}"
+url_get_respondent_by_email = f"{app.config['PARTY_URL']}/party-api/v1/respondents/email"
 url_get_business_party = f"{app.config['PARTY_URL']}/party-api/v1/businesses/id/{business_party['id']}"
 url_get_respondent_party = f"{app.config['PARTY_URL']}/party-api/v1/respondents/id/{party['id']}"
 url_get_case = f"{app.config['CASE_URL']}/cases/{case['id']}"

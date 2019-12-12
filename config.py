@@ -96,6 +96,7 @@ class Config(object):
     RAS_NOTIFY_ACCOUNT_LOCKED_TEMPLATE = os.getenv('RAS_NOTIFY_ACCOUNT_LOCKED_TEMPLATE', 'account_locked_id')
     SEND_EMAIL_TO_GOV_NOTIFY = os.getenv('SEND_EMAIL_TO_GOV_NOTIFY', False)
 
+
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True

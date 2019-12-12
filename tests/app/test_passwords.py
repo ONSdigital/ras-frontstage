@@ -7,7 +7,7 @@ from frontstage.common import verification
 from config import TestingConfig
 from frontstage import app
 from tests.app.mocked_services import token, url_password_change, url_reset_password_request, \
-    url_verify_token
+    url_verify_token, url_get_respondent_by_email
 
 encoded_valid_email = 'ImV4YW1wbGVAZXhhbXBsZS5jb20i.vMOqeMafWQpuxbUBRyRs29T0vDI'
 encoded_invalid_email = 'abcd'
@@ -41,6 +41,7 @@ class TestPasswords(unittest.TestCase):
     @requests_mock.mock()
     def test_forgot_password_post_success(self, mock_object):
         mock_object.post(url_reset_password_request, status_code=200)
+        mock_object.get(url_get_respondent_by_email, status_code=200, json={"firstName": "Bob", "id": "123456"})
 
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
 
@@ -66,6 +67,7 @@ class TestPasswords(unittest.TestCase):
     @requests_mock.mock()
     def test_forgot_password_post_unrecognised_email_party(self, mock_object):
         mock_object.post(url_reset_password_request, status_code=404)
+        mock_object.get(url_get_respondent_by_email, status_code=200, json={"firstName": "Bob", "id": "123456"})
 
         self.email_form['email_address'] = "test@email.com"
 

@@ -3,6 +3,7 @@ import logging
 from flask import abort, redirect, render_template, request, url_for
 from itsdangerous import URLSafeSerializer, BadSignature
 from structlog import wrap_logger
+# from werkzeug.exceptions import NotFound
 
 from frontstage import app
 from frontstage.views.passwords import reset_password
@@ -13,6 +14,10 @@ from frontstage.views.passwords import passwords_bp
 # from frontstage.common import verification
 # from frontstage.exceptions.exceptions import NotifyError
 # from frontstage.controllers.notify_controller import NotifyController
+# from frontstage.controllers import party_controller
+# from frontstage.common import verification
+# from frontstage.exceptions.exceptions import RasNotifyError
+# from frontstage.controllers.notify_controller import NotifyGateway
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -31,8 +36,7 @@ def get_forgot_password():
 @passwords_bp.route('/forgot-password', methods=['POST'])
 def post_forgot_password():
     form = ForgotPasswordForm(request.form)
-    form.email_address.data = form.email_address.data.strip()
-    email = form.data.get('email_address')
+    email = form.data.get('email_address').strip()
 
     if form.validate():
         return reset_password.request_password_change(email)
@@ -60,11 +64,6 @@ def post_forgot_password():
 #         return redirect(url_for('passwords_bp.forgot_password_check_email', email=encoded_email))
 #
 #     return render_template('passwords/forgot-password.html', form=form, email=email)
-
-# def post_respondent_reset_password_by_email():
-#     payload = request.get_json() or {}
-#     response = account_controller.request_password_change(payload)
-#     return make_response(jsonify(response), 200)
 
 
 @passwords_bp.route('/forgot-password/check-email', methods=['GET'])

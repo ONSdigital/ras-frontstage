@@ -18,3 +18,6 @@ check:
 test: check lint
 	APP_SETTINGS=TestingConfig pipenv run pytest $(TEST_TARGET) --cov frontstage --cov-report term-missing	
 
+docker: test
+	docker build -t sdcplatform/ras-frontstage:latest .
+

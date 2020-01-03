@@ -14,7 +14,6 @@ from tests.app.mocked_services import (business_party, case, categories, collect
 class TestRegistration(unittest.TestCase):
 
     def setUp(self):
-
         self.app = app.test_client()
         self.headers = {
             "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"  # NOQA
@@ -466,18 +465,3 @@ class TestRegistration(unittest.TestCase):
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue('An error has occurred'.encode() in response.data)
-
-    def test_can_access_email_confirmation_when_email_param_passed(self):
-        response = self.app.get('/register/create-account/check-your-email', query_string='email_address=steve')
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_contains_email_confirmation_when_email_param_passed(self):
-        response = self.app.get('/register/create-account/check-your-email', query_string='email_address=steve')
-
-        self.assertTrue(b'steve' in response.data)
-
-    def test_cant_access_email_confirmation_when_email_param_passed(self):
-        response = self.app.get('/register/create-account/check-your-email')
-
-        self.assertEqual(response.status_code, 500)

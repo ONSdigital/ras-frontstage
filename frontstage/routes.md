@@ -55,14 +55,6 @@ To reset a password
 * GET request to this endpoint will display a form to enter in account details.
 * POST request to this endpoint will attempt to create an account for this respondent.
 
-`register/create-account/check-your-email`
-
-* GET request to this endpoint will render a page that will tell the user to verify their account via e-mail.
-
-`register/create-account/check-email`
-
-* GET request to this endpoint will display to the user that they've almost created their account.
-
 ---
 
 ## Secure messaging endpoints

@@ -1,6 +1,6 @@
 import logging
 
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request
 from structlog import wrap_logger
 
 from frontstage.common.cryptographer import Cryptographer
@@ -12,14 +12,6 @@ from frontstage.views.register import register_bp
 
 logger = wrap_logger(logging.getLogger(__name__))
 cryptographer = Cryptographer()
-
-
-@register_bp.route('/create-account/check-your-email', methods=['GET'])
-def confirm_enter_your_details():
-    email_address = request.args.get('email_address')
-    if not email_address:
-        raise Exception('Attempted to render check-your-email view without passing an email address')
-    return render_template('register/register.almost-done.html', email=email_address)
 
 
 @register_bp.route('/create-account/enter-account-details', methods=['GET', 'POST'])
@@ -57,7 +49,7 @@ def register_enter_your_details():
                 raise exc
 
         logger.info('Successfully created account')
-        return redirect(url_for('register_bp.confirm_enter_your_details', email_address=email_address))
+        return render_template('register/register.almost-done.html', email=email_address)
 
     else:
         return render_template('register/register.enter-your-details.html', form=form, errors=form.errors)

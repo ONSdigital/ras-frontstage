@@ -54,7 +54,7 @@
                {% if survey.collection_instrument_type == 'EQ' %}
                 onclick="ga('send', 'event', 'survey', 'launcheq', 'survey_ref = {{ survey.survey_ref }} collection_exercise_ref = {{ survey.collection_exercise_ref }}');"
                {% endif %}>
-                <button id="access_survey_button_{{loop.index}}" class="btn u-mb-s action-button" type="submit">
+                <button id="access_survey_button_{{loop.index}}" class="btn u-mb-s action-button js-timer js-submit-btn" type="submit">
                     Access <span class="u-vh">{{ survey.survey_long_name|replace("Survey", " ") }}</span> survey
                 </button>
             </a>

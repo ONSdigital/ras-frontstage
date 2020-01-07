@@ -1,6 +1,8 @@
+import datetime
 import logging
 
 import requests
+from dateutil.parser import parse
 from flask import current_app as app
 from structlog import wrap_logger
 
@@ -286,7 +288,7 @@ def caching_data_for_collection_instrument(cache_data):
     # This function creates a list of threads from the collection instrument id in the cache_data of the cases.
     collection_instrument_ids = set()
     threads = []
-    for business_id, cases in cache_data['cases'].items():
+    for _, cases in cache_data['cases'].items():
         for case in cases:
             collection_instrument_ids.add(case['collectionInstrumentId'])
     for collection_instrument_id in collection_instrument_ids:
@@ -337,7 +339,12 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
     for enrolment in get_respondent_enrolments_for_known_collex(enrolment_data, cache_data['collexes']):
         business_party = cache_data['businesses'][enrolment['business_id']]
         survey = cache_data['surveys'][enrolment['survey_id']]
-        live_collection_exercises = cache_data['collexes'][survey['id']]
+
+        # Note: If it ever becomes possible to get only live-but-not-ended collection exercises from the
+        # collection exercise service, the filter_ended_collection_exercises function will no longer
+        # be needed as we can request what we want instead of having to filter what we get.
+        live_collection_exercises = filter_ended_collection_exercises(cache_data['collexes'][survey['id']])
+
         collection_exercises_by_id = dict((ce['id'], ce) for ce in live_collection_exercises)
         cases = cache_data['cases'][business_party['id']]
         enrolled_cases = [case for case in cases if case['caseGroup']['collectionExerciseId'] in collection_exercises_by_id.keys()]
@@ -346,7 +353,7 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
             collection_exercise = collection_exercises_by_id[case['caseGroup']['collectionExerciseId']]
             added_survey = True if business_party_id == business_party['id'] and survey_id == survey['id'] else None
             display_access_button = display_button(case['caseGroup']['caseGroupStatus'], cache_data['instrument']
-                                                                    [case['collectionInstrumentId']]['type'])
+                                                   [case['collectionInstrumentId']]['type'])
 
             yield {
 
@@ -369,6 +376,25 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
                 'added_survey': added_survey,
                 'display_button': display_access_button
             }
+
+
+def filter_ended_collection_exercises(collection_exercises):
+    """
+    Takes the list of collection exercises and returns a list with all the ones that don't have a
+    scheduledEndDateTime that is in the past.
+
+    :param collection_exercises: A list of dictionaries containing collection exercises
+    :raises KeyError:  Raised when scheduledEndDateTime isn't present in the collection exercise data
+    """
+    try:
+        for collection_exercise in collection_exercises:
+            if parse(collection_exercise['scheduledEndDateTime']) <= datetime.datetime.now(datetime.timezone.utc):
+                collection_exercises.remove(collection_exercise)
+        return collection_exercises
+    except KeyError:
+        logger.error("Collection exercise doesn't contain a scheduledEndDateTime",
+                     collection_exercise=collection_exercise)
+        raise
 
 
 def get_survey(cache_data, survey_id, survey_url, survey_auth):

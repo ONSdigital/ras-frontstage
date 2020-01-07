@@ -6,6 +6,7 @@ from config import TestingConfig
 from frontstage import app, create_app_object
 from frontstage.controllers.party_controller import notify_party_and_respondent_account_locked
 from frontstage.exceptions.exceptions import ApiError
+from frontstage.views.sign_in.sign_in import obfuscate_email
 from tests.app.mocked_services import url_get_respondent_email, url_oauth_token, party, \
     url_notify_party_and_respondent_account_locked, token
 
@@ -153,8 +154,8 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_sign_in_party_404(self, mock_object):
+        mock_object.post(url_oauth_token, status_code=204)
         mock_object.get(url_get_respondent_email, status_code=404)
-
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
         self.assertTrue('Error signing in'.encode() in response.data)
@@ -267,3 +268,17 @@ class TestSignIn(unittest.TestCase):
 
         self.assertEqual(response.status_code, 500)
         self.assertTrue('An error has occurred'.encode() in response.data)
+
+    def test_obfuscate_email(self):
+        """Tests the output of obfuscate email with both valid and invalid strings"""
+        valid_tests = {
+            "person@place.com": "p****n@p*******m",
+            "123abcwow@ons.gov.uk": "1*******w@o******k",
+            "a@b.in": "a@b**n"
+        }
+
+        for email in valid_tests:
+            self.assertEqual(obfuscate_email(valid_tests[email]), valid_tests[email])
+
+        with self.assertRaises(IndexError):
+            obfuscate_email("this-has-no-at-symbol-to-split-on")

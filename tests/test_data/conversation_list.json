@@ -7,7 +7,7 @@
       "e7940d1d-5e4c-4985-acec-36ea1ae1cea7"
     ],
     "collection_exercise": "",
-    "@ru_id": {
+    "@business_details": {
       "sampleUnitType": "B",
       "associations": [
         {
@@ -84,6 +84,6 @@
       }
     },
     "survey": "cb8accda-6118-4d3b-85a3-149e28960c54",
-    "ru_id": "b868a847-db51-413c-9a04-b05eb3103bb1"
+    "business_id": "b868a847-db51-413c-9a04-b05eb3103bb1"
   }
 ]}

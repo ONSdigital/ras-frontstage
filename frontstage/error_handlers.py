@@ -13,6 +13,12 @@ from frontstage.exceptions.exceptions import ApiError, InvalidEqPayLoad, JWTVali
 logger = wrap_logger(logging.getLogger(__name__))
 
 
+@app.errorhandler(400)
+def client_error(error):
+    logger.info('Client error', url=request.url, status_code=error.code)
+    return render_template('errors/400-error.html'), 400
+
+
 @app.errorhandler(404)
 def not_found_error(error):
     logger.info('Not found error', url=request.url, status_code=error.code)

@@ -49,7 +49,7 @@ def add_survey(party_id, enrolment_code):
     logger.info('Successfully added a survey', party_id=party_id)
 
 
-def change_password(email, password, token):
+def change_password(email, password):
     logger.info('Attempting to change password through the party service')
 
     data = {'email_address': email, 'new_password': password}
@@ -59,7 +59,7 @@ def change_password(email, password, token):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error('Failed to send change password request to party service', token=token)
+        logger.error('Failed to send change password request to party service')
         raise ApiError(logger, response)
 
     logger.info('Successfully changed password through the party service')

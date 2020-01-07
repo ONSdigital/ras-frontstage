@@ -3,21 +3,11 @@ import logging
 from flask import abort, redirect, render_template, request, url_for
 from itsdangerous import URLSafeSerializer, BadSignature
 from structlog import wrap_logger
-# from werkzeug.exceptions import NotFound
 
 from frontstage import app
 from frontstage.views.passwords import reset_password
-# from frontstage.controllers import party_controller
-# from frontstage.exceptions.exceptions import UserDoesNotExist
 from frontstage.models import ForgotPasswordForm
 from frontstage.views.passwords import passwords_bp
-# from frontstage.common import verification
-# from frontstage.exceptions.exceptions import NotifyError
-# from frontstage.controllers.notify_controller import NotifyController
-# from frontstage.controllers import party_controller
-# from frontstage.common import verification
-# from frontstage.exceptions.exceptions import RasNotifyError
-# from frontstage.controllers.notify_controller import NotifyGateway
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -42,28 +32,6 @@ def post_forgot_password():
         return reset_password.request_password_change(email)
 
     return render_template('passwords/forgot-password.html', form=form, email=email)
-
-
-# @passwords_bp.route('/forgot-password', methods=['POST'])
-# def post_forgot_password():
-#     form = ForgotPasswordForm(request.form)
-#     form.email_address.data = form.email_address.data.strip()
-#     email = form.data.get('email_address')
-#
-#     encoded_email = url_safe_serializer.dumps(email)
-#
-#     if form.validate():
-#
-#         try:
-#             party_controller.reset_password_request(email)
-#         except UserDoesNotExist:
-#             logger.info('Requesting password change for unregistered email in party service')
-#             return redirect(url_for('passwords_bp.forgot_password_check_email', email=encoded_email))
-#
-#         logger.info('Successfully sent password change request email')
-#         return redirect(url_for('passwords_bp.forgot_password_check_email', email=encoded_email))
-#
-#     return render_template('passwords/forgot-password.html', form=form, email=email)
 
 
 @passwords_bp.route('/forgot-password/check-email', methods=['GET'])

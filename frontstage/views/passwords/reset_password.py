@@ -3,7 +3,6 @@ import logging
 from flask import redirect, render_template, request, url_for, abort, current_app as app
 from itsdangerous import BadSignature, SignatureExpired, BadData
 from structlog import wrap_logger
-from werkzeug.exceptions import NotFound
 
 from frontstage.controllers import party_controller
 
@@ -24,7 +23,7 @@ def get_reset_password(token, form_errors=None):
 
     try:
         duration = app.config['EMAIL_TOKEN_EXPIRY']
-        email = verification.decode_email_token(token, duration)
+        _ = verification.decode_email_token(token, duration)
     except SignatureExpired:
         logger.warning('Token expired for frontstage reset', token=token)
         return render_template('passwords/password-expired.html', token=token)
@@ -51,7 +50,9 @@ def post_reset_password(token):
     password = request.form.get('password')
 
     try:
-        party_controller.change_password(password, token)
+        duration = app.config['EMAIL_TOKEN_EXPIRY']
+        email = verification.decode_email_token(token, duration)
+        party_controller.change_password(email, password)
     except ApiError as exc:
         if exc.status_code == 409:
             logger.warning('Token expired', api_url=exc.url, api_status_code=exc.status_code, token=token)
@@ -82,17 +83,13 @@ def resend_password_email_expired_token(token):
     email = verification.decode_email_token(token)
     return request_password_change(email)
 
-    # party_controller.resend_password_email_expired_token(token)
-    # logger.info('Re-sent password email for expired token.', token=token)
-    # return redirect(url_for('passwords_bp.reset_password_check_email'))
-
 
 def request_password_change(email):
     respondent = party_controller.get_respondent_by_email(email)
 
     if not respondent:
         logger.info("Respondent does not exist")
-        raise NotFound("Respondent does not exist")
+        return redirect(url_for('passwords_bp.reset_password_check_email'))
 
     party_id = str(respondent['id'])
 

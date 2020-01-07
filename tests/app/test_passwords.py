@@ -146,7 +146,8 @@ class TestPasswords(unittest.TestCase):
     def test_reset_password_post_success(self, mock_object):
         mock_object.put(url_password_change, status_code=200)
         password_form = {"password": "Gizmo007!", "password_confirm": "Gizmo007!"}
-
+        with app.app_context():
+            token = verification.generate_email_token("test.com")
         response = self.app.post(f"passwords/reset-password/{token}", data=password_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -156,7 +157,8 @@ class TestPasswords(unittest.TestCase):
     def test_reset_password_post_token_expired(self, mock_object):
         mock_object.put(url_password_change, status_code=409)
         password_form = {"password": "Gizmo007!", "password_confirm": "Gizmo007!"}
-
+        with app.app_context():
+            token = verification.generate_email_token("test.com")
         response = self.app.post(f"passwords/reset-password/{token}", data=password_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -166,7 +168,8 @@ class TestPasswords(unittest.TestCase):
     def test_reset_password_post_token_invalid(self, mock_object):
         mock_object.put(url_password_change, status_code=404)
         password_form = {"password": "Gizmo007!", "password_confirm": "Gizmo007!"}
-
+        with app.app_context():
+            token = verification.generate_email_token("test.com")
         response = self.app.post(f"passwords/reset-password/{token}", data=password_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 404)
@@ -210,6 +213,8 @@ class TestPasswords(unittest.TestCase):
     def test_reset_password_put_party_service_fail(self, mock_object):
         mock_object.put(url_password_change, status_code=500)
         password_form = {"password": "Gizmo007!", "password_confirm": "Gizmo007!"}
+        with app.app_context():
+            token = verification.generate_email_token("test.com")
 
         response = self.app.post(f"passwords/reset-password/{token}", data=password_form, follow_redirects=True)
 

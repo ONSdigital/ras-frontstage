@@ -166,5 +166,4 @@ class TestingConfig(DevelopmentConfig):
     JSON_SECRET_KEYS = open("./tests/test_data/jwt-test-keys/test_key.json").read()
     SECURITY_USER_NAME = 'username'
     SECURITY_USER_PASSWORD = 'password'
-    REQUESTS_GET_TIMEOUT = 99
     REQUESTS_POST_TIMEOUT = 99

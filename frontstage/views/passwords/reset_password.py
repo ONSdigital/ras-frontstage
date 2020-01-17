@@ -97,23 +97,23 @@ def request_password_change(email):
 
     token = verification.generate_email_token(email)
     verification_url = url_for('passwords_bp.post_reset_password', token=token)
-
     personalisation = {
         'RESET_PASSWORD_URL': verification_url,
         'FIRST_NAME': respondent['firstName']
     }
 
-    logger.info('Reset password url', url=verification_url, party_id=party_id)
+    # If we don't have a gov notify to send to, log it out so we can simulate following the url
+    if not app.config['SEND_EMAIL_TO_GOV_NOTIFY']:
+        logger.info('Reset password url', url=verification_url, party_id=party_id)
 
     try:
         NotifyGateway(app.config).request_to_notify(email=email,
                                                     template_name='request_password_change',
                                                     personalisation=personalisation,
                                                     reference=party_id)
+        logger.info('Password reset email successfully sent', party_id=party_id)
     except RasNotifyError:
         # Note: intentionally suppresses exception
-        logger.error('Error sending request to Notify Gateway', respondent_id=party_id)
-
-    logger.info('Password reset email successfully sent', party_id=party_id)
+        logger.error('Error sending request to Notify Gateway', respondent_id=party_id, exc_info=True)
 
     return redirect(url_for('passwords_bp.reset_password_check_email'))

@@ -1,0 +1,20 @@
+replicaCount: 1
+
+env: "dev"
+version: "v1.2"
+
+image:
+  tag: migration-sandbox
+  repository: eu.gcr.io/rm-ras-sandbox
+
+service:
+  port: 8087
+  type: NodePort
+
+resources:
+  requests:
+    cpu: "500m"
+    memory: "512Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1028Mi"

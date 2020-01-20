@@ -51,7 +51,6 @@ class NotifyGateway:
                 notification.update({"reference": reference})
 
             url = urlparse.urljoin(self.notify_url, str(template_id))
-
             auth = app.config['SECURITY_USER_NAME'], app.config['SECURITY_USER_PASSWORD']
             response = requests.post(url, json=notification, auth=auth,
                                      timeout=int(app.config['REQUESTS_POST_TIMEOUT']))

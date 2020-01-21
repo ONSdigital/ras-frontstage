@@ -96,7 +96,13 @@ def request_password_change(email):
     logger.info("Requesting password change", party_id=party_id)
 
     token = verification.generate_email_token(email)
-    verification_url = url_for('passwords_bp.post_reset_password', token=token)
+
+    url_root = request.url_root
+    # url_for comes with a leading slash, so strip off the trailing slash in url_root if there is one
+    if url_root.endswith('/'):
+        url_root = url_root[:-1]
+    verification_url = url_root + url_for('passwords_bp.post_reset_password', token=token)
+
     personalisation = {
         'RESET_PASSWORD_URL': verification_url,
         'FIRST_NAME': respondent['firstName']

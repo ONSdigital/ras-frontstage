@@ -97,8 +97,10 @@ def request_password_change(email):
 
     token = verification.generate_email_token(email)
 
-    # url_root comes with a trailing slash that we don't want.
-    url_root = request.url_root[:-1]
+    url_root = request.url_root
+    # url_for comes with a leading slash, so strip off the trailing slash in url_root if there is one
+    if url_root.endswith('/'):
+        url_root = url_root[:-1]
     verification_url = url_root + url_for('passwords_bp.post_reset_password', token=token)
 
     personalisation = {

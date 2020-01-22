@@ -6,5 +6,5 @@ metadata:
         kubernetes.io/ingress.global-static-ip-name: "frontstage"
 spec:
     backend:
-        serviceName: ras-frontstage
+        serviceName: {{ .Chart.Name }}
         servicePort: 80

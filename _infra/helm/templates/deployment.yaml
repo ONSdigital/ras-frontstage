@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ras-frontstage
+  name: {{ .Chart.Name }}
   labels:
-    run: ras-frontstage
+    run: {{ .Chart.Name }}
     helm.release: RELEASE-NAME
 spec:
   replicas: 1
@@ -14,19 +14,19 @@ spec:
     type: RollingUpdate
   selector:
     matchLabels:
-      app: ras-frontstage
-      env: dev
+      app: {{ .Chart.Name }}
+      env: "{{ .Values.env }}"
       version: "v1.2"
   template:
     metadata:
       labels:
-        app: ras-frontstage
-        env: dev
+        app: {{ .Chart.Name }}
+        env: "{{ .Values.env }}"
         version: "v1.2"
     spec:
       containers:
-        - name: ras-frontstage
-          image: "eu.gcr.io/rm-ras-sandbox/ras-frontstage:migration-sandbox"
+        - name: {{ .Chart.Name }}
+          image: "eu.gcr.io/rm-ras-sandbox/{{ .Values.image.repositoryName }}:{{ .Values.image.tag }}"
           imagePullPolicy:
           ports:
             - name: http-server

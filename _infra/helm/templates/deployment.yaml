@@ -2,9 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Chart.Name }}
-  labels:
-    run: {{ .Chart.Name }}
-    helm.release: RELEASE-NAME
 spec:
   replicas: 1
   strategy:

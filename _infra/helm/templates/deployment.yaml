@@ -1,0 +1,162 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge:
+      maxUnavailable:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+      env: "{{ .Values.env }}"
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+        env: "{{ .Values.env }}"
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "eu.gcr.io/ons-rasrmbs-management/{{ .Chart.Name }}:{{ .Chart.AppVersion }}"
+          imagePullPolicy:
+          ports:
+            - name: http-server
+              containerPort: 8087
+          readinessProbe:
+            httpGet:
+              path: /info
+              port: 8087
+            initialDelaySeconds: 1
+            periodSeconds: 20
+            failureThreshold: 5
+            successThreshold: 1
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /info
+              port: 8087
+            initialDelaySeconds: 1
+            periodSeconds: 20
+            failureThreshold: 5
+            successThreshold: 1
+            timeoutSeconds: 5
+          env:
+          - name: DB_HOST
+            value: $(POSTGRES_SERVICE_HOST)
+          - name: DB_PORT
+            valueFrom:
+              secretKeyRef:
+                name: db-config
+                key: db-port
+          - name: DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: db-config
+                key: db-name
+          - name: DB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: db-credentials
+                key: username
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: db-credentials
+                key: password
+          - name: SECURITY_USER_NAME
+            valueFrom:
+              secretKeyRef:
+                name: security-credentials
+                key: security-user
+          - name: SECURITY_USER_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: security-credentials
+                key: security-password
+          - name: JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: jwt-secret
+                key: jwt-secret
+          - name: CASE_URL
+            value: "http://$(CASESVC_SERVICE_HOST):$(CASESVC_SERVICE_PORT)"
+          - name: CASE_USERNAME
+            value: "$(SECURITY_USER_NAME)"
+          - name: CASE_PASSWORD
+            value: "$(SECURITY_USER_PASSWORD)"
+          - name: COLLECTION_EXERCISE_URL
+            value: "http://$(COLLECTIONEXERCISESVC_SERVICE_HOST):$(COLLECTIONEXERCISESVC_SERVICE_PORT)"
+          - name: COLLECTION_EXERCISE_USERNAME
+            value: "$(SECURITY_USER_NAME)"
+          - name: COLLECTION_EXERCISE_PASSWORD
+            value: "$(SECURITY_USER_PASSWORD)"
+          - name: COLLECTION_INSTRUMENT_URL
+            value: "http://$(RAS_COLLECTION_INSTRUMENT_SERVICE_HOST):$(RAS_COLLECTION_INSTRUMENT_SERVICE_PORT)"
+          - name: COLLECTION_INSTRUMENT_USERNAME
+            value: "$(SECURITY_USER_NAME)"
+          - name: COLLECTION_INSTRUMENT_PASSWORD
+            value: "$(SECURITY_USER_PASSWORD)"
+          - name: EQ_URL
+            value: "$(EQ_URL)"
+          - name: IAC_URL
+            value: "http://$(IACSVC_SERVICE_HOST):$(IACSVC_SERVICE_PORT)"
+          - name: IAC_USERNAME
+            value: "$(SECURITY_USER_NAME)"
+          - name: IAC_PASSWORD
+            value: "$(SECURITY_USER_PASSWORD)"
+          - name: JSON_SECRET_KEYS
+            valueFrom:
+              secretKeyRef:
+                name: json-secrets
+                key: json-secret-keys-frontstage
+          - name: OAUTHLIB_INSECURE_TRANSPORT
+            value: "1"
+          - name: OAUTH_URL
+            value: "http://$(RAS_RM_AUTH_SERVICE_SERVICE_HOST):$(RAS_RM_AUTH_SERVICE_SERVICE_PORT)"
+          - name: OAUTH_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: oauth-secret
+                key: oauth-client-id
+          - name: OAUTH_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: oauth-secret
+                key: oauth-client-secret
+          - name: PARTY_URL
+            value: "http://$(RAS_PARTY_SERVICE_HOST):$(RAS_PARTY_SERVICE_PORT)"
+          - name: PARTY_USERNAME
+            value: "$(SECURITY_USER_NAME)"
+          - name: PARTY_PASSWORD
+            value: "$(SECURITY_USER_PASSWORD)"
+          - name: PORT
+            value: "8087"
+          - name: REDIS_HOST
+            value: "$(REDIS_MASTER_SERVICE_HOST)"
+          - name: REDIS_PORT
+            value: "$(REDIS_MASTER_SERVICE_PORT)"
+          - name: REDIS_DB
+            value: "3"
+          - name: SECURE_MESSAGE_URL
+            value: "http://$(RAS_SECURE_MESSAGE_SERVICE_HOST):$(RAS_SECURE_MESSAGE_SERVICE_PORT)"
+          - name: SURVEY_URL
+            value: "http://$(SURVEYSVC_SERVICE_HOST):$(SURVEYSVC_SERVICE_PORT)"
+          - name: SURVEY_USERNAME
+            value: "$(SECURITY_USER_NAME)"
+          - name: SURVEY_PASSWORD
+            value: "$(SECURITY_USER_PASSWORD)"
+          - name: ZIPKIN_DSN
+            value: "http://$(ZIPKIN_SERVICE_HOST):$(ZIPKIN_SERVICE_PORT)/api/v1/spans"
+          - name: ZIPKIN_SAMPLE_RATE
+            value: "100"
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1028Mi
+            requests:
+              cpu: 500m
+              memory: 512Mi

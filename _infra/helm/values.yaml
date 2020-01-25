@@ -1,0 +1,19 @@
+replicaCount: 1
+
+env: "dev"
+
+service:
+  port: 8087
+  type: NodePort
+
+secret:
+  oauth-client-id: b25zQG9ucy5nb3Y=
+  oauth-client-secret: cGFzc3dvcmQ=
+
+resources:
+  requests:
+    cpu: "500m"
+    memory: "512Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1028Mi"

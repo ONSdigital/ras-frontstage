@@ -13,17 +13,15 @@ spec:
     matchLabels:
       app: {{ .Chart.Name }}
       env: "{{ .Values.env }}"
-      version: "v1.2"
   template:
     metadata:
       labels:
         app: {{ .Chart.Name }}
         env: "{{ .Values.env }}"
-        version: "v1.2"
     spec:
       containers:
         - name: {{ .Chart.Name }}
-          image: "eu.gcr.io/ons-rasrmbs-management/{{ .Values.image.repositoryName }}:{{ .Values.image.tag }}"
+          image: "eu.gcr.io/ons-rasrmbs-management/{{ .Chart.Name }}:{{ .Chart.AppVersion }}"
           imagePullPolicy:
           ports:
             - name: http-server

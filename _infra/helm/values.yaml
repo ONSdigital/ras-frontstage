@@ -1,15 +1,14 @@
 replicaCount: 1
 
 env: "dev"
-version: "v1.2"
-
-image:
-  tag: migration-sandbox
-  repository: eu.gcr.io/rm-ras-sandbox
 
 service:
   port: 8087
   type: NodePort
+
+secret:
+  oauth-client-id: b25zQG9ucy5nb3Y=
+  oauth-client-secret: cGFzc3dvcmQ=
 
 resources:
   requests:

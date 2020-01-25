@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: {{ .Chart.Name }}
 spec:
-    type: NodePort
-    ports:
-        - port: 80
-          targetPort: 8087
-          protocol: TCP
-    selector:
-        app: {{ .Chart.Name }}
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 8087
+      protocol: TCP
+  selector:
+    app: {{ .Chart.Name }}

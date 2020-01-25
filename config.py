@@ -9,9 +9,12 @@ from distutils.util import strtobool
 class Config(object):
     DEBUG = False
     TESTING = False
-    VERSION = '1.19.1'
+    VERSION = '1.20.0'
     PORT = os.getenv('PORT', 8082)
     MAX_UPLOAD_LENGTH = os.getenv('MAX_UPLOAD_LENGTH', 20 * 1024 * 1024)
+
+    EMAIL_TOKEN_SALT = os.getenv('EMAIL_TOKEN_SALT', 'aardvark')
+    EMAIL_TOKEN_EXPIRY = int(os.getenv('EMAIL_TOKEN_EXPIRY', '86400'))
 
     SECRET_KEY = os.getenv('SECRET_KEY')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME')
@@ -83,6 +86,17 @@ class Config(object):
     SURVEY_PASSWORD = os.getenv('SURVEY_PASSWORD')
     SURVEY_AUTH = (SURVEY_USERNAME, SURVEY_PASSWORD)
 
+    RAS_NOTIFY_SERVICE_URL = os.getenv('RAS_NOTIFY_SERVICE_URL', 'http://notify-gateway-service/emails/')
+    RAS_NOTIFY_EMAIL_VERIFICATION_TEMPLATE = os.getenv('RAS_NOTIFY_EMAIL_VERIFICATION_TEMPLATE',
+                                                       'email_verification_id')
+    RAS_NOTIFY_REQUEST_PASSWORD_CHANGE_TEMPLATE = os.getenv('RAS_NOTIFY_REQUEST_PASSWORD_CHANGE_TEMPLATE',
+                                                            'request_password_change_id')
+    RAS_NOTIFY_CONFIRM_PASSWORD_CHANGE_TEMPLATE = os.getenv('RAS_NOTIFY_CONFIRM_PASSWORD_CHANGE_TEMPLATE',
+                                                            'confirm_password_change_id')
+    RAS_NOTIFY_ACCOUNT_LOCKED_TEMPLATE = os.getenv('RAS_NOTIFY_ACCOUNT_LOCKED_TEMPLATE', 'account_locked_id')
+    SEND_EMAIL_TO_GOV_NOTIFY = os.getenv('SEND_EMAIL_TO_GOV_NOTIFY', False)
+    REQUESTS_POST_TIMEOUT = os.getenv('REQUESTS_POST_TIMEOUT', 20)
+
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
@@ -142,6 +156,8 @@ class TestingConfig(DevelopmentConfig):
     TESTING = True
     DEVELOPMENT = False
     WTF_CSRF_ENABLED = False
+    SEND_EMAIL_TO_GOV_NOTIFY = True
+    EMAIL_TOKEN_SALT = 'bulbous'
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     JWT_SECRET = 'testsecret'
     REDIS_DB = os.getenv('REDIS_DB', 13)
@@ -149,3 +165,6 @@ class TestingConfig(DevelopmentConfig):
     ACCOUNT_SERVICE_LOG_OUT_URL = 'http://frontstage-url/sign-in/logout'
     EQ_URL = 'https://eq-test/session?token='
     JSON_SECRET_KEYS = open("./tests/test_data/jwt-test-keys/test_key.json").read()
+    SECURITY_USER_NAME = 'username'
+    SECURITY_USER_PASSWORD = 'password'
+    REQUESTS_POST_TIMEOUT = 99

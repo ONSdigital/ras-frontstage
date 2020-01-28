@@ -83,19 +83,19 @@ spec:
                 name: jwt-secret
                 key: jwt-secret
           - name: CASE_URL
-            value: "http://$(CASESVC_SERVICE_HOST):$(CASESVC_SERVICE_PORT)"
+            value: "http://$(CASE_SERVICE_HOST):$(CASE_SERVICE_PORT)"
           - name: CASE_USERNAME
             value: "$(SECURITY_USER_NAME)"
           - name: CASE_PASSWORD
             value: "$(SECURITY_USER_PASSWORD)"
           - name: COLLECTION_EXERCISE_URL
-            value: "http://$(COLLECTIONEXERCISESVC_SERVICE_HOST):$(COLLECTIONEXERCISESVC_SERVICE_PORT)"
+            value: "http://$(COLLECTION_EXERCISE_SERVICE_HOST):$(COLLECTION_EXERCISE_SERVICE_PORT)"
           - name: COLLECTION_EXERCISE_USERNAME
             value: "$(SECURITY_USER_NAME)"
           - name: COLLECTION_EXERCISE_PASSWORD
             value: "$(SECURITY_USER_PASSWORD)"
           - name: COLLECTION_INSTRUMENT_URL
-            value: "http://$(RAS_COLLECTION_INSTRUMENT_SERVICE_HOST):$(RAS_COLLECTION_INSTRUMENT_SERVICE_PORT)"
+            value: "http://$(COLLECTION_INSTRUMENT_SERVICE_HOST):$(COLLECTION_INSTRUMENT_SERVICE_PORT)"
           - name: COLLECTION_INSTRUMENT_USERNAME
             value: "$(SECURITY_USER_NAME)"
           - name: COLLECTION_INSTRUMENT_PASSWORD
@@ -103,7 +103,7 @@ spec:
           - name: EQ_URL
             value: "$(EQ_URL)"
           - name: IAC_URL
-            value: "http://$(IACSVC_SERVICE_HOST):$(IACSVC_SERVICE_PORT)"
+            value: "http://$(IAC_SERVICE_HOST):$(IAC_SERVICE_PORT)"
           - name: IAC_USERNAME
             value: "$(SECURITY_USER_NAME)"
           - name: IAC_PASSWORD
@@ -116,7 +116,7 @@ spec:
           - name: OAUTHLIB_INSECURE_TRANSPORT
             value: "1"
           - name: OAUTH_URL
-            value: "http://$(RAS_RM_AUTH_SERVICE_SERVICE_HOST):$(RAS_RM_AUTH_SERVICE_SERVICE_PORT)"
+            value: "http://$(AUTH_SERVICE_HOST):$(AUTH_SERVICE_PORT)"
           - name: OAUTH_CLIENT_ID
             valueFrom:
               secretKeyRef:
@@ -142,9 +142,9 @@ spec:
           - name: REDIS_DB
             value: "3"
           - name: SECURE_MESSAGE_URL
-            value: "http://$(RAS_SECURE_MESSAGE_SERVICE_HOST):$(RAS_SECURE_MESSAGE_SERVICE_PORT)"
+            value: "http://$(SECURE_MESSAGE_SERVICE_HOST):$(SECURE_MESSAGE_SERVICE_PORT)"
           - name: SURVEY_URL
-            value: "http://$(SURVEYSVC_SERVICE_HOST):$(SURVEYSVC_SERVICE_PORT)"
+            value: "http://$(SURVEY_SERVICE_HOST):$(SURVEY_SERVICE_PORT)"
           - name: SURVEY_USERNAME
             value: "$(SECURITY_USER_NAME)"
           - name: SURVEY_PASSWORD
@@ -154,9 +154,4 @@ spec:
           - name: ZIPKIN_SAMPLE_RATE
             value: "100"
           resources:
-            limits:
-              cpu: 1000m
-              memory: 1028Mi
-            requests:
-              cpu: 500m
-              memory: 512Mi
+            {{ toYaml .Values.resources | nindent 12 }}

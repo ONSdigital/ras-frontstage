@@ -1,6 +1,6 @@
 replicaCount: 1
 
-env: "dev"
+env: "minikube"
 
 service:
   port: 8087

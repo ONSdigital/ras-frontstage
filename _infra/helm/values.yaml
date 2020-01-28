@@ -7,8 +7,8 @@ service:
   type: NodePort
 
 secret:
-  oauth-client-id: b25zQG9ucy5nb3Y=
-  oauth-client-secret: cGFzc3dvcmQ=
+  oauth_client_id: ons@ons.gov
+  oauth_client_secret: password
 
 resources:
   requests:

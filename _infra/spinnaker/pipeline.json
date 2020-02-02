@@ -1,0 +1,21 @@
+{
+  "schema": "v2",
+  "application": "frontstage",
+  "name": "frontstage",
+  "template": {
+    "artifactAccount": "front50ArtifactCredentials",
+    "reference": "spinnaker://rasrmApplicationTemplate",
+    "type": "front50/pipelineTemplate"
+  },
+  "variables": {
+    "name": "frontstage",
+    "defaultHelmChart": "frontstage-0.1.0.tgz",
+    "helmChartMatcher": "frontstage-.*\\.tgz"
+  },
+  "exclude": [],
+  "triggers": [],
+  "parameters": [],
+  "notifications": [],
+  "description": "",
+  "stages": []
+}

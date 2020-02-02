@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.pipelineMap }}
+data:
+{{ (.Files.Glob "pipeline.json").AsConfig | indent 2 }}
+{{ (.Files.Glob "application.json").AsConfig | indent 2 }}

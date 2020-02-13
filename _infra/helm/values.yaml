@@ -13,3 +13,12 @@ secret:
 resources:
   requests:
     memory: "256Mi"
+
+ingress:
+  enabled: false
+
+networkPolicy:
+  egress: |
+    - {}
+  ingress: |
+    - {}

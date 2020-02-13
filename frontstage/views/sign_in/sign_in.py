@@ -6,6 +6,7 @@ from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.common.session import SessionHandler
+from frontstage.common.utilities import obfuscate_email
 from frontstage.controllers import oauth_controller, party_controller
 from frontstage.controllers.party_controller import notify_party_and_respondent_account_locked
 from frontstage.exceptions.exceptions import OAuth2Error
@@ -36,7 +37,8 @@ def login():
     if request.method == 'POST' and form.validate():
         username = form.username.data
         password = request.form.get('password')
-
+        bound_logger = logger.bind(email=obfuscate_email(username))
+        bound_logger.info("Attempting to find user in auth service")
         try:
             oauth2_token = oauth_controller.sign_in(username, password)
         except OAuth2Error as exc:
@@ -44,11 +46,10 @@ def login():
             if USER_ACCOUNT_LOCKED in error_message:  # pylint: disable=no-else-return
                 party_json = party_controller.get_respondent_by_email(username)
                 if not party_json or 'id' not in party_json:
-                    logger.error("Respondent account locked in auth but doesn't exist in party",
-                                 obfuscate_email=obfuscate_email(username))
+                    bound_logger.error("Respondent account locked in auth but doesn't exist in party")
                     return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
                 party_id = party_json['id']
-                bound_logger = logger.bind(party_id=party_id)
+                bound_logger = bound_logger.bind(party_id=party_id)
                 bound_logger.info('User account is locked on the OAuth2 server', status=party_json['status'])
                 if party_json['status'] == 'ACTIVE' or party_json['status'] == 'CREATED':
                     notify_party_and_respondent_account_locked(respondent_id=party_id,
@@ -56,24 +57,26 @@ def login():
                                                                status='SUSPENDED')
                 return render_template('sign-in/sign-in.account-locked.html', form=form)
             elif NOT_VERIFIED_ERROR in error_message:
-                logger.info('User account is not verified on the OAuth2 server')
+                bound_logger.info('User account is not verified on the OAuth2 server')
                 return render_template('sign-in/sign-in.account-not-verified.html', email=username)
             elif BAD_AUTH_ERROR in error_message:
-                logger.info('Bad credentials provided')
+                bound_logger.info('Bad credentials provided')
             elif UNKNOWN_ACCOUNT_ERROR in error_message:
-                logger.info('User account does not exist in auth service')
+                bound_logger.info('User account does not exist in auth service')
             else:
-                logger.error('Unexpected error was returned from oauth service', oauth2_error=error_message)
+                bound_logger.error('Unexpected error was returned from oauth service', oauth2_error=error_message)
 
             return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}}, next=request.args.get('next'))
 
-        # Take our raw token and add a UTC timestamp to the expires_at attribute
+        bound_logger.info("Successfully found user in auth service.  Attempting to find user in party service")
         party_json = party_controller.get_respondent_by_email(username)
         if not party_json or 'id' not in party_json:
-            logger.error("Respondent has an account in auth but not in party", email=obfuscate_email(username))
+            bound_logger.error("Respondent has an account in auth but not in party")
             return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
         party_id = party_json['id']
-        bound_logger = logger.bind(party_id=party_id)
+        bound_logger = bound_logger.bind(party_id=party_id)
+
+        # Take our raw token and add a UTC timestamp to the expires_at attribute
         data_dict = {**oauth2_token, 'party_id': party_id}
         data_dict_for_jwt_token = timestamp_token(data_dict)
         encoded_jwt_token = encode(data_dict_for_jwt_token)
@@ -83,6 +86,7 @@ def login():
             response = make_response(redirect(url_for('surveys_bp.get_survey_list', tag='todo', _external=True,
                                                       _scheme=getenv('SCHEME', 'http'))))
 
+        bound_logger.info("Successfully found user in party service")
         session = SessionHandler()
         bound_logger.info('Creating session')
         session.create_session(encoded_jwt_token)
@@ -118,18 +122,3 @@ def resend_verification_expired_token(token):
     party_controller.resend_verification_email_expired_token(token)
     logger.info('Re-sent verification email for expired token.', token=token)
     return render_template('sign-in/sign-in.verification-email-sent.html')
-
-
-def obfuscate_email(email):
-    """Takes an email address and returns an obfuscated version of it.
-    For example: test@example.com would turn into t**t@e*********m
-    """
-    m = email.split('@')
-
-    # If the prefix is 1 character, then we can't obfuscate it
-    if len(m[0]) > 1:
-        prefix = f'{m[0][0]}{"*"*(len(m[0])-2)}{m[0][-1]}'
-    else:
-        prefix = m[0]
-    domain = f'{m[1][0]}{"*"*(len(m[1])-2)}{m[1][-1]}'
-    return f'{prefix}@{domain}'

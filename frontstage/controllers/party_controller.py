@@ -7,6 +7,7 @@ from flask import current_app as app
 from structlog import wrap_logger
 
 from frontstage.common.thread_wrapper import ThreadWrapper
+from frontstage.common.utilities import obfuscate_email
 from frontstage.controllers import case_controller, collection_exercise_controller, collection_instrument_controller, \
     survey_controller
 from frontstage.exceptions.exceptions import ApiError, UserDoesNotExist
@@ -52,7 +53,8 @@ def add_survey(party_id, enrolment_code):
 
 
 def change_password(email, password):
-    logger.info('Attempting to change password through the party service')
+    bound_logger = logger.bind(email=obfuscate_email(email))
+    bound_logger.info('Attempting to change password through the party service')
 
     data = {'email_address': email, 'new_password': password}
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/change_password"
@@ -61,10 +63,10 @@ def change_password(email, password):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error('Failed to send change password request to party service')
+        bound_logger.error('Failed to send change password request to party service')
         raise ApiError(logger, response)
 
-    logger.info('Successfully changed password through the party service')
+    bound_logger.info('Successfully changed password through the party service')
 
 
 def create_account(registration_data):
@@ -88,7 +90,9 @@ def create_account(registration_data):
 
 
 def get_party_by_business_id(party_id, party_url, party_auth, collection_exercise_id=None, verbose=True):
-    logger.info('Attempting to retrieve party by business', party_id=party_id)
+    logger.info('Attempting to retrieve party by business',
+                party_id=party_id,
+                collection_exercise_id=collection_exercise_id)
 
     url = f"{party_url}/party-api/v1/businesses/id/{party_id}"
     params = {}
@@ -102,33 +106,34 @@ def get_party_by_business_id(party_id, party_url, party_auth, collection_exercis
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Failed to retrieve party by business',
-                     collection_exercise_id=collection_exercise_id,
-                     party_id=party_id)
+                     party_id=party_id,
+                     collection_exercise_id=collection_exercise_id)
         raise ApiError(logger, response)
 
     logger.info('Successfully retrieved party by business',
-                collection_exercise_id=collection_exercise_id,
-                party_id=party_id)
+                party_id=party_id,
+                collection_exercise_id=collection_exercise_id)
     return response.json()
 
 
 def get_respondent_by_email(email):
-    logger.info('Attempting to find respondent party by email')
+    bound_logger = logger.bind(email=obfuscate_email(email))
+    bound_logger.info('Attempting to find respondent party by email')
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/email"
     response = requests.get(url, json={"email": email}, auth=app.config['PARTY_AUTH'])
 
     if response.status_code == 404:
-        logger.info('Failed to retrieve party by email')
+        bound_logger.info('Failed to retrieve party by email')
         return
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error('Error retrieving respondent by email')
+        bound_logger.error('Error retrieving respondent by email')
         raise ApiError(logger, response)
 
-    logger.info('Successfully retrieved respondent by email')
+    bound_logger.info('Successfully retrieved respondent by email')
     return response.json()
 
 
@@ -159,7 +164,8 @@ def resend_verification_email_expired_token(token):
 
 
 def reset_password_request(username):
-    logger.info('Attempting to send reset password request to party service')
+    bound_logger = logger.bind(email=obfuscate_email(username))
+    bound_logger.info('Attempting to send reset password request to party service')
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/request_password_change"
     data = {"email_address": username}
@@ -170,10 +176,10 @@ def reset_password_request(username):
     except requests.exceptions.HTTPError:
         if response.status_code == 404:
             raise UserDoesNotExist("User does not exist in party service")
-        logger.error('Failed to send reset password request to party service')
+        bound_logger.error('Failed to send reset password request to party service')
         raise ApiError(logger, response)
 
-    logger.info('Successfully sent reset password request to party service')
+    bound_logger.info('Successfully sent reset password request to party service')
 
 
 def resend_password_email_expired_token(token):
@@ -435,7 +441,10 @@ def is_respondent_enrolled(party_id, business_party_id, survey_short_name, retur
 
 
 def notify_party_and_respondent_account_locked(respondent_id, email_address, status=None):
-    logger.info('Notifying respondent and party service that account is locked')
+    bound_logger = logger.bind(respondent_id=respondent_id,
+                               email=obfuscate_email(email_address),
+                               status=status)
+    bound_logger.info('Notifying respondent and party service that account is locked')
     url = f'{app.config["PARTY_URL"]}/party-api/v1/respondents/edit-account-status/{respondent_id}'
 
     data = {
@@ -449,7 +458,7 @@ def notify_party_and_respondent_account_locked(respondent_id, email_address, sta
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error('Failed to notify party', respondent_id=respondent_id, status=status)
+        bound_logger.error('Failed to notify party')
         raise ApiError(logger, response)
 
-    logger.info('Successfully notified respondent and party service that account is locked', respondent_id=respondent_id, status=status)
+    bound_logger.info('Successfully notified respondent and party service that account is locked')

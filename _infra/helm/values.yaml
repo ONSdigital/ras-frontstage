@@ -1,24 +1,22 @@
 replicaCount: 1
 
-env: "minikube"
+namespace: minikube
 
 service:
   port: 8087
-  type: NodePort
-
-secret:
-  oauth_client_id: ons@ons.gov
-  oauth_client_secret: password
-
-resources:
-  requests:
-    memory: "256Mi"
+  type: ClusterIp
 
 ingress:
   enabled: false
+  host: surveys.example.com
+  certName: frontstage-cert
 
 networkPolicy:
   egress: |
     - {}
   ingress: |
     - {}
+
+resources:
+  requests:
+    memory: "256Mi"

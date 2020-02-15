@@ -4,7 +4,7 @@ namespace: minikube
 
 service:
   port: 8087
-  type: ClusterIp
+  type: ClusterIP
 
 ingress:
   enabled: false

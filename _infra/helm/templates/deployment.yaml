@@ -128,7 +128,7 @@ spec:
                 name: oauth-secret
                 key: oauth-client-secret
           - name: PARTY_URL
-            value: "http://$(RAS_PARTY_SERVICE_HOST):$(RAS_PARTY_SERVICE_PORT)"
+            value: "http://$(PARTY_SERVICE_HOST):$(PARTY_SERVICE_PORT)"
           - name: PARTY_USERNAME
             value: "$(SECURITY_USER_NAME)"
           - name: PARTY_PASSWORD

@@ -6,10 +6,6 @@ service:
   port: 8087
   type: NodePort
 
-secret:
-  oauth_client_id: ons@ons.gov
-  oauth_client_secret: password
-
 resources:
   requests:
     memory: "256Mi"

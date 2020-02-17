@@ -227,7 +227,7 @@ class TestPasswords(unittest.TestCase):
         mock_object.get('http://localhost:8081/party-api/v1/respondents/email', status_code=200,
                         json={"firstName": "Bob", "id": "123456"})
         with app.app_context():
-            token = verification.generate_email_token("test.com")
+            token = verification.generate_email_token("test@test.com")
         response = self.app.get(f'passwords/resend-password-email-expired-token/{token}',
                                 follow_redirects=True)
         self.assertEqual(response.status_code, 200)

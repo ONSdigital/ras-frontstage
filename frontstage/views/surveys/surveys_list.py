@@ -19,16 +19,22 @@ def get_survey_list(session, tag):
     Displays the list of surveys for the respondent by tag.  A tag represents the state the
     survey is in (e.g., todo, history, etc)
     """
-    logger.info("Retrieving survey todo list")
     party_id = session.get('party_id')
     business_id = request.args.get('business_party_id')
     survey_id = request.args.get('survey_id')
     already_enrolled = request.args.get('already_enrolled')
+    bound_logger = logger.bind(party_id=party_id,
+                               business_id=business_id,
+                               survey_id=survey_id,
+                               already_enrolled=already_enrolled,
+                               tag=tag)
+    bound_logger.info("Retrieving survey list")
 
     survey_list = party_controller.get_survey_list_details_for_party(party_id, tag, business_party_id=business_id,
                                                                      survey_id=survey_id)
 
     sorted_survey_list = sorted(survey_list, key=lambda k: datetime.strptime(k['submit_by'], '%d %b %Y'), reverse=True)
+    bound_logger.info("Successfully retreived survey list")
 
     if tag == 'todo':
         added_survey = True if business_id and survey_id and not already_enrolled else None

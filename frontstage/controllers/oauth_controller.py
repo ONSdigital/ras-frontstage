@@ -4,6 +4,7 @@ import requests
 from flask import current_app as app
 from structlog import wrap_logger
 
+from frontstage.common.utilities import obfuscate_email
 from frontstage.exceptions.exceptions import ApiError, OAuth2Error
 
 
@@ -11,7 +12,8 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def sign_in(username, password):
-    logger.info('Attempting to retrieve OAuth2 token for sign-in')
+    bound_logger = logger.bind(email=obfuscate_email(username))
+    bound_logger.info('Attempting to retrieve OAuth2 token for sign-in')
 
     url = f"{app.config['OAUTH_URL']}/api/v1/tokens/"
     data = {
@@ -42,8 +44,8 @@ def sign_in(username, password):
 
             raise OAuth2Error(logger, response, log_level='warning', message=message, oauth2_error=auth_error)
         else:
-            logger.error('Failed to retrieve OAuth2 token')
+            bound_logger.error('Failed to retrieve OAuth2 token')
             raise ApiError(logger, response)
 
-    logger.info('Successfully retrieved OAuth2 token')
+    bound_logger.info('Successfully retrieved OAuth2 token')
     return response.json()

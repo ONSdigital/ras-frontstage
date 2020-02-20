@@ -153,5 +153,10 @@ spec:
             value: "http://$(ZIPKIN_SERVICE_HOST):$(ZIPKIN_SERVICE_PORT)/api/v1/spans"
           - name: ZIPKIN_SAMPLE_RATE
             value: "100"
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Chart.Name }}
+                key: email-secret-key
           resources:
             {{ toYaml .Values.resources | nindent 12 }}

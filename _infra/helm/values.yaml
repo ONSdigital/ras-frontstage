@@ -1,10 +1,21 @@
 replicaCount: 1
 
-env: "minikube"
+namespace: minikube
 
 service:
   port: 8087
-  type: NodePort
+  type: ClusterIP
+
+ingress:
+  enabled: false
+  host: surveys.example.com
+  certName: frontstage-cert
+
+networkPolicy:
+  egress: |
+    - {}
+  ingress: |
+    - {}
 
 resources:
   requests:

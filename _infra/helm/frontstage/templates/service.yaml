@@ -5,8 +5,7 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: 80
-      targetPort: 8087
+    - port: {{ .Values.service.port }}
       protocol: TCP
   selector:
     app: {{ .Chart.Name }}

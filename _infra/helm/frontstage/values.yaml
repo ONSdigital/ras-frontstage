@@ -7,7 +7,7 @@ container:
   port: 80
 
 service:
-  port: 8087
+  port: 80
   type: ClusterIP
 
 rollingUpdate:

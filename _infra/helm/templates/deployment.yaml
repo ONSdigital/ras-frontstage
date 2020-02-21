@@ -6,30 +6,30 @@ spec:
   replicas: 1
   strategy:
     rollingUpdate:
-      maxSurge:
-      maxUnavailable:
+      maxSurge: {{ .Values.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.rollingUpdate.maxUnavailable }}
     type: RollingUpdate
   selector:
     matchLabels:
       app: {{ .Chart.Name }}
-      env: "{{ .Values.env }}"
+      env: {{ .Values.env }}
   template:
     metadata:
       labels:
         app: {{ .Chart.Name }}
-        env: "{{ .Values.env }}"
+        env: {{ .Values.env }}
     spec:
       containers:
         - name: {{ .Chart.Name }}
-          image: "eu.gcr.io/ons-rasrmbs-management/{{ .Chart.Name }}:{{ .Chart.AppVersion }}"
-          imagePullPolicy:
+          image: "{{ .Values.image.name}}/{{ .Chart.Name }}:{{ .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http-server
-              containerPort: 8087
+              containerPort: {{ .Values.service.port }}
           readinessProbe:
             httpGet:
               path: /info
-              port: 8087
+              port: {{ .Values.service.port }}
             initialDelaySeconds: 1
             periodSeconds: 20
             failureThreshold: 5
@@ -38,7 +38,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /info
-              port: 8087
+              port: {{ .Values.service.port }}
             initialDelaySeconds: 1
             periodSeconds: 20
             failureThreshold: 5

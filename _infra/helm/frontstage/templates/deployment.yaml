@@ -25,11 +25,11 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http-server
-              containerPort: {{ .Values.service.port }}
+              containerPort: {{ .Values.container.port }}
           readinessProbe:
             httpGet:
               path: /info
-              port: {{ .Values.service.port }}
+              port: {{ .Values.container.port }}
             initialDelaySeconds: 1
             periodSeconds: 20
             failureThreshold: 5
@@ -38,7 +38,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /info
-              port: {{ .Values.service.port }}
+              port: {{ .Values.container.port }}
             initialDelaySeconds: 1
             periodSeconds: 20
             failureThreshold: 5

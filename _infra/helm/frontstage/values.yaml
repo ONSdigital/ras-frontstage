@@ -3,6 +3,9 @@ replicaCount: 1
 namespace: minikube
 env: minikube
 
+container:
+  port: 80
+
 service:
   port: 8087
   type: ClusterIP

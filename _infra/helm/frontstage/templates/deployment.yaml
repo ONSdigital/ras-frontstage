@@ -134,7 +134,7 @@ spec:
           - name: PARTY_PASSWORD
             value: "$(SECURITY_USER_PASSWORD)"
           - name: PORT
-            value: "8087"
+            value: {{ .Values.service.port }}
           - name: REDIS_HOST
             value: "$(REDIS_MASTER_SERVICE_HOST)"
           - name: REDIS_PORT

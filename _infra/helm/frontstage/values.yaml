@@ -1,46 +1,31 @@
-replicaCount: 1
-
-namespace: minikube
 env: minikube
+namespace: minikube
 
-container:
-  port: 80
-
-service:
-  port: 80
-  type: ClusterIP
-
+replicas: 1
 rollingUpdate:
   maxSurge: 1
   maxUnavailable: 1
 
-databaseConfig: |
-  - name: DB_HOST
-    value: $(POSTGRES_SERVICE_HOST)
-  - name: DB_PORT
-    valueFrom:
-      secretKeyRef:
-        name: db-config
-        key: db-port
-  - name: DB_NAME
-    valueFrom:
-      secretKeyRef:
-        name: db-config
-        key: db-name
-  - name: DB_USERNAME
-    valueFrom:
-      secretKeyRef:
-        name: db-credentials
-        key: username
-  - name: DB_PASSWORD
-    valueFrom:
-      secretKeyRef:
-        name: db-credentials
-        key: password
-
 image:
   name: eu.gcr.io/ons-rasrmbs-management
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
+
+database:
+  managedPostgres: false
+  secrets:
+    usernameKey: username
+    passwordKey: password
+    nameKey: db-name
+
+container:
+  port: 80
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  requests:
+    memory: "256Mi"
 
 ingress:
   enabled: false
@@ -52,10 +37,6 @@ networkPolicy:
     - {}
   ingress: |
     - {}
-
-resources:
-  requests:
-    memory: "256Mi"
 
 email:
   secret:

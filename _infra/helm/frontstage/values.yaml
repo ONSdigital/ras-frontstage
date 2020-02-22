@@ -10,13 +10,6 @@ image:
   name: eu.gcr.io/ons-rasrmbs-management
   pullPolicy: Always
 
-database:
-  managedPostgres: false
-  secrets:
-    usernameKey: username
-    passwordKey: password
-    nameKey: db-name
-
 container:
   port: 80
 service:

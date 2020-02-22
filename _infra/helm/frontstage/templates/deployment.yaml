@@ -45,35 +45,6 @@ spec:
             successThreshold: 1
             timeoutSeconds: 5
           env:
-          - name: DB_HOST
-            {{- if .Values.database.managedPostgres }}
-            valueFrom:
-              secretKeyRef:
-                name: db-config
-                key: db-host
-            {{- else }}
-            value: $(POSTGRES_SERVICE_HOST)
-            {{- end }}
-          - name: DB_PORT
-            valueFrom:
-              secretKeyRef:
-                name: db-config
-                key: db-port
-          - name: DB_NAME
-            valueFrom:
-              secretKeyRef:
-                name: db-config
-                key: {{ .Values.database.secrets.nameKey }}
-          - name: DB_USERNAME
-            valueFrom:
-              secretKeyRef:
-                name: db-credentials
-                key: {{ .Values.database.secrets.usernameKey }}
-          - name: DB_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: db-credentials
-                key: {{ .Values.database.secrets.passwordKey }}
           - name: SECURITY_USER_NAME
             valueFrom:
               secretKeyRef:

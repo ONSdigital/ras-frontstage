@@ -14,7 +14,7 @@ spec:
     http:
       paths:
       - path: /*
-  backend:
-    serviceName: {{ .Chart.Name }}
-    servicePort: 80
+        backend:
+          serviceName: {{ .Chart.Name }}
+          servicePort: 80
 {{- end }}

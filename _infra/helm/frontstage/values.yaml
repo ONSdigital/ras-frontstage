@@ -29,6 +29,12 @@ ingress:
   host: surveys.example.com
   certName: frontstage-cert
 
+analytics:
+  enabled: false
+
 email:
+  enabled: false
+  expiry: "86400"
+  salt: aardvark
   secret:
     key: ONS_DUMMY_KEY

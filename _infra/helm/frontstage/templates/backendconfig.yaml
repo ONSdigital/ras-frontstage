@@ -1,3 +1,4 @@
+{{- if .Values.publicIP }}
 apiVersion: cloud.google.com/v1beta1
 kind: BackendConfig
 metadata:
@@ -5,3 +6,4 @@ metadata:
 spec:
   securityPolicy:
     name: "ras-cloud-armor-policy"
+{{- end }}

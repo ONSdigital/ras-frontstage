@@ -84,6 +84,14 @@ spec:
             value: {{ .Values.email.salt }}
           - name: EQ_URL
             value: "$(EQ_URL)"
+          {{ if .Values.analytics.enabled }}
+          - name: GOOGLE_ANALYTICS_ID
+            value: {{ .Values.analytics.id }}
+          - name: GOOGLE_TAG_MANAGER
+            value: {{ .Values.analytics.tagManager }}
+          - name: GOOGLE_TAG_MANAGER_PROP
+            value: {{ .Values.analytics.tagManagerProp }}
+          {{- end }}
           - name: IAC_URL
             value: "http://$(IAC_SERVICE_HOST):$(IAC_SERVICE_PORT)"
           - name: IAC_USERNAME

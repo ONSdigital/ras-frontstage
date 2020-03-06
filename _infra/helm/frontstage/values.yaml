@@ -34,6 +34,9 @@ networkPolicy:
   ingress: |
     - {}
 
+analytics:
+  enabled: false
+
 email:
   expiry: 86400
   salt: aardvark

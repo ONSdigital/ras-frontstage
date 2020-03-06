@@ -4,7 +4,7 @@ metadata:
   name: {{ .Chart.Name }}
   {{- if .Values.publicIP }}
   annotations:
-    beta.cloud.google.com/backend-config: '{\"ports\": {\"{{ .Values.service.port }}\":\"frontstage-backend-config\"}}'
+    beta.cloud.google.com/backend-config: '{"ports": {"{{ .Values.service.port }}":"frontstage-backend-config"}}'
   {{- end }}
 spec:
   type: {{ .Values.service.type }}

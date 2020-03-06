@@ -125,6 +125,16 @@ spec:
             value: "$(SECURITY_USER_PASSWORD)"
           - name: PORT
             value: "{{ .Values.container.port }}"
+          {{ if .Values.email.enabled }}
+          - name: RAS_NOTIFY_ACCOUNT_LOCKED_TEMPLATE
+            value: {{ .Values.email.templates.accountLocked }}
+          - name: RAS_NOTIFY_CONFIRM_PASSWORD_CHANGE_TEMPLATE
+            value: {{ .Values.email.templates.confirmPasswordChange }}
+          - name: RAS_NOTIFY_EMAIL_VERIFICATION_TEMPLATE
+            value: {{ .Values.email.templates.verification }}
+          - name: RAS_NOTIFY_REQUEST_PASSWORD_CHANGE_TEMPLATE
+            value: {{ .Values.email.templates.passwordChange }}
+          {{- end }}
           - name: REDIS_HOST
             {{- if .Values.database.managedRedis }}
             valueFrom:
@@ -147,6 +157,8 @@ spec:
             value: "3"
           - name: SECURE_MESSAGE_URL
             value: "http://$(SECURE_MESSAGE_SERVICE_HOST):$(SECURE_MESSAGE_SERVICE_PORT)"
+          - name: SEND_EMAIL_TO_GOV_NOTIFY
+            value: {{ .Values.email.enabled }}
           - name: SURVEY_URL
             value: "http://$(SURVEY_SERVICE_HOST):$(SURVEY_SERVICE_PORT)"
           - name: SURVEY_USERNAME

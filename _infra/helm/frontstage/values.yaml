@@ -38,6 +38,7 @@ analytics:
   enabled: false
 
 email:
+  enabled: false
   expiry: 86400
   salt: aardvark
   secret:

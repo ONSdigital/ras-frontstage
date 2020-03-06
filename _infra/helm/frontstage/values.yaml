@@ -1,5 +1,6 @@
 env: minikube
 namespace: minikube
+publicIP: false
 
 replicas: 1
 rollingUpdate:
@@ -27,12 +28,6 @@ ingress:
   enabled: false
   host: surveys.example.com
   certName: frontstage-cert
-
-networkPolicy:
-  egress: |
-    - {}
-  ingress: |
-    - {}
 
 email:
   secret:

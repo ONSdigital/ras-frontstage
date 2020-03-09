@@ -6,4 +6,6 @@ metadata:
 spec:
   securityPolicy:
     name: "ras-cloud-armor-policy"
+  customRequestHeaders:
+    X-Forwarded-Proto: https
 {{- end }}

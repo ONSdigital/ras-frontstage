@@ -10,6 +10,7 @@ class Config(object):
     DEBUG = False
     TESTING = False
     VERSION = '1.21.0'
+    PREFERRED_URL_SCHEME = 'https'
     PORT = os.getenv('PORT', 8082)
     MAX_UPLOAD_LENGTH = os.getenv('MAX_UPLOAD_LENGTH', 20 * 1024 * 1024)
 
@@ -102,6 +103,7 @@ class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
     TEMPLATES_AUTO_RELOAD = True
+    PREFERRED_URL_SCHEME = 'http'
     SECRET_KEY = os.getenv('SECRET_KEY', 'ONS_DUMMY_KEY')
     JWT_SECRET = os.getenv('JWT_SECRET', 'testsecret')
 

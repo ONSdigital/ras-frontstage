@@ -12,6 +12,7 @@ from frontstage.filters.file_size_filter import file_size_filter
 from frontstage.filters.subject_filter import subject_filter
 from frontstage.logger_config import logger_initial_config
 
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 cf = ONSCloudFoundry()
 
@@ -23,11 +24,16 @@ CACHE_HEADERS = {
 
 def create_app_object():
     app = Flask(__name__)
+
     app.name = "ras-frontstage"
 
     # Load app config
     app_config = 'config.{}'.format(os.environ.get('APP_SETTINGS', 'Config'))
     app.config.from_object(app_config)
+
+    if not app.config['DEBUG'] and not app.config['TESTING']:
+        # App is behind one proxy that sets the -For header.
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1)
 
     # Zipkin
     zipkin = Zipkin(app=app, sample_rate=app.config.get("ZIPKIN_SAMPLE_RATE"))

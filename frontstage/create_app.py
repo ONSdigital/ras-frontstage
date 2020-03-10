@@ -12,7 +12,6 @@ from frontstage.filters.file_size_filter import file_size_filter
 from frontstage.filters.subject_filter import subject_filter
 from frontstage.logger_config import logger_initial_config
 
-
 cf = ONSCloudFoundry()
 
 CACHE_HEADERS = {
@@ -21,13 +20,28 @@ CACHE_HEADERS = {
 }
 
 
+class GCPLoadBalancer:
+    def __init__(self, app):
+        self.app = app
+
+    def __call__(self, environ, start_response):
+        scheme = environ.get("HTTP_X_FORWARDED_PROTO", "http")
+        if scheme:
+            environ["wsgi.url_scheme"] = scheme
+        return self.app(environ, start_response)
+
+
 def create_app_object():
     app = Flask(__name__)
+
     app.name = "ras-frontstage"
 
     # Load app config
     app_config = 'config.{}'.format(os.environ.get('APP_SETTINGS', 'Config'))
     app.config.from_object(app_config)
+
+    if not app.config['DEBUG'] and not cf.detected:
+        app.wsgi_app = GCPLoadBalancer(app.wsgi_app)
 
     # Zipkin
     zipkin = Zipkin(app=app, sample_rate=app.config.get("ZIPKIN_SAMPLE_RATE"))

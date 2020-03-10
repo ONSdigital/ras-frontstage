@@ -19,9 +19,9 @@ docker-test: REDIS_PORT=6379
 docker-test: test
 
 check:
-	pipenv check
+# TEMPORARILY disable pipenv check, pending resolution of pipenv bugs 2412 and 4147
+# TODO: re-enable as soon as possible.
+#	pipenv check
 
 test: check lint
 	APP_SETTINGS=TestingConfig pipenv run pytest $(TEST_TARGET) --cov frontstage --cov-report term-missing	
-
-

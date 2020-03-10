@@ -38,3 +38,5 @@ email:
   salt: aardvark
   secret:
     key: ONS_DUMMY_KEY
+
+scheme: http

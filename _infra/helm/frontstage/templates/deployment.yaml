@@ -60,6 +60,8 @@ spec:
               secretKeyRef:
                 name: jwt-secret
                 key: jwt-secret
+          - name: SCHEME
+            value: {{ .Values.scheme }}
           - name: CASE_URL
             value: "http://$(CASE_SERVICE_HOST):$(CASE_SERVICE_PORT)"
           - name: CASE_USERNAME

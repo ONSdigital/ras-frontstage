@@ -85,7 +85,7 @@ spec:
           - name: EMAIL_TOKEN_SALT
             value: "{{ .Values.email.salt }}"
           - name: EQ_URL
-            value: "$(EQ_URL)"
+            value: "{{ .Values.eq.url }}"
           {{ if .Values.analytics.enabled }}
           - name: GOOGLE_ANALYTICS_ID
             value: "{{ .Values.analytics.id }}"

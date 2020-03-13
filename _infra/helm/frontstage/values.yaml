@@ -40,3 +40,6 @@ email:
     key: ONS_DUMMY_KEY
 
 scheme: http
+
+eq:
+  url: "http://localhost/session?token="

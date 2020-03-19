@@ -25,6 +25,7 @@ dateutils = "*"
 requestsdefaulter = "*"
 flask-zipkin = "*"
 pycryptodome = "*"
+flask-talisman = "*"
 
 [dev-packages]
 codecov = "*"

@@ -9,5 +9,5 @@ spec:
   customRequestHeaders:
     X-Forwarded-Proto: https
   sessionAffinity: 
-    affinityType: ClientIP
+    affinityType: CLIENT_IP
 {{- end }}

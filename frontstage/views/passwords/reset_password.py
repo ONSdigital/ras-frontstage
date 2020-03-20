@@ -25,10 +25,10 @@ def get_reset_password(token, form_errors=None):
         duration = app.config['EMAIL_TOKEN_EXPIRY']
         _ = verification.decode_email_token(token, duration)
     except SignatureExpired:
-        logger.warning('Token expired for frontstage reset', token=token)
+        logger.warning('Token expired for frontstage reset', token=token, exc_info=True)
         return render_template('passwords/password-expired.html', token=token)
     except (BadSignature, BadData):
-        logger.warning('Invalid token sent to frontstage password reset', token=token)
+        logger.warning('Invalid token sent to frontstage password reset', token=token, exc_info=True)
         return render_template('passwords/password-expired.html', token=token)
 
     template_data = {

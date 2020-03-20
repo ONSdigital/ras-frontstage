@@ -8,4 +8,6 @@ spec:
     name: "ras-cloud-armor-policy"
   customRequestHeaders:
     X-Forwarded-Proto: https
+  sessionAffinity: 
+    affinityType: CLIENT_IP
 {{- end }}

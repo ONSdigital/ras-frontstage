@@ -43,3 +43,7 @@ scheme: http
 
 eq:
   url: "http://localhost/session?token="
+
+dns:
+  enabled: false
+  wellKnownPort: 8080

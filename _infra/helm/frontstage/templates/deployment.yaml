@@ -74,7 +74,7 @@ spec:
             value: "$(SECURITY_USER_PASSWORD)"
           - name: COLLECTION_EXERCISE_URL
             {{- if .Values.dns.enabled }}
-            value: "http://collection-exericse.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"
+            value: "http://collection-exercise.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"
             {{- else }}
             value: "http://$(COLLECTION_EXERCISE_SERVICE_HOST):$(COLLECTION_EXERCISE_SERVICE_PORT)"
             {{- end }}

@@ -1,0 +1,20 @@
+{
+  "schema": "v2",
+  "application": "frontstage",
+  "name": "deployment",
+  "template": {
+    "artifactAccount": "front50ArtifactCredentials",
+    "reference": "spinnaker://fullDeploymentTemplate",
+    "type": "front50/pipelineTemplate"
+  },
+  "variables": {
+    "service": "frontstage",
+    "defaultVersion": "1.0.0"
+  },
+  "exclude": [],
+  "triggers": [],
+  "parameters": [],
+  "notifications": [],
+  "description": "",
+  "stages": []
+}

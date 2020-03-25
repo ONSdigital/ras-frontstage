@@ -63,19 +63,31 @@ spec:
           - name: SCHEME
             value: {{ .Values.scheme }}
           - name: CASE_URL
+            {{- if .Values.dns.enabled }}
+            value: "http://case.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"
+            {{- else }}
             value: "http://$(CASE_SERVICE_HOST):$(CASE_SERVICE_PORT)"
+            {{- end }}
           - name: CASE_USERNAME
             value: "$(SECURITY_USER_NAME)"
           - name: CASE_PASSWORD
             value: "$(SECURITY_USER_PASSWORD)"
           - name: COLLECTION_EXERCISE_URL
+            {{- if .Values.dns.enabled }}
+            value: "http://collection-exercise.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"
+            {{- else }}
             value: "http://$(COLLECTION_EXERCISE_SERVICE_HOST):$(COLLECTION_EXERCISE_SERVICE_PORT)"
+            {{- end }}
           - name: COLLECTION_EXERCISE_USERNAME
             value: "$(SECURITY_USER_NAME)"
           - name: COLLECTION_EXERCISE_PASSWORD
             value: "$(SECURITY_USER_PASSWORD)"
           - name: COLLECTION_INSTRUMENT_URL
+            {{- if .Values.dns.enabled }}
+            value: "http://collection-instrument.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"
+            {{- else }}
             value: "http://$(COLLECTION_INSTRUMENT_SERVICE_HOST):$(COLLECTION_INSTRUMENT_SERVICE_PORT)"
+            {{- end }}
           - name: COLLECTION_INSTRUMENT_USERNAME
             value: "$(SECURITY_USER_NAME)"
           - name: COLLECTION_INSTRUMENT_PASSWORD
@@ -95,7 +107,11 @@ spec:
             value: "{{ .Values.analytics.tagManagerProp }}"
           {{- end }}
           - name: IAC_URL
+            {{- if .Values.dns.enabled }}
+            value: "http://iac.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"
+            {{- else }}
             value: "http://$(IAC_SERVICE_HOST):$(IAC_SERVICE_PORT)"
+            {{- end }}
           - name: IAC_USERNAME
             value: "$(SECURITY_USER_NAME)"
           - name: IAC_PASSWORD
@@ -108,7 +124,11 @@ spec:
           - name: OAUTHLIB_INSECURE_TRANSPORT
             value: "1"
           - name: OAUTH_URL
+            {{- if .Values.dns.enabled }}
+            value: "http://auth.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"
+            {{- else }}
             value: "http://$(AUTH_SERVICE_HOST):$(AUTH_SERVICE_PORT)"
+            {{- end }}
           - name: OAUTH_CLIENT_ID
             valueFrom:
               secretKeyRef:
@@ -120,7 +140,11 @@ spec:
                 name: oauth-secret
                 key: oauth-client-secret
           - name: PARTY_URL
+            {{- if .Values.dns.enabled }}
+            value: "http://party.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"
+            {{- else }}
             value: "http://$(PARTY_SERVICE_HOST):$(PARTY_SERVICE_PORT)"
+            {{- end }}
           - name: PARTY_USERNAME
             value: "$(SECURITY_USER_NAME)"
           - name: PARTY_PASSWORD
@@ -158,11 +182,19 @@ spec:
           - name: REDIS_DB
             value: "3"
           - name: SECURE_MESSAGE_URL
+            {{- if .Values.dns.enabled }}
+            value: "http://secure-message.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"
+            {{- else }}
             value: "http://$(SECURE_MESSAGE_SERVICE_HOST):$(SECURE_MESSAGE_SERVICE_PORT)"
+            {{- end }}
           - name: SEND_EMAIL_TO_GOV_NOTIFY
             value: "{{ .Values.email.enabled }}"
           - name: SURVEY_URL
+            {{- if .Values.dns.enabled }}
+            value: "http://survey.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"
+            {{- else }}
             value: "http://$(SURVEY_SERVICE_HOST):$(SURVEY_SERVICE_PORT)"
+            {{- end }}
           - name: SURVEY_USERNAME
             value: "$(SECURITY_USER_NAME)"
           - name: SURVEY_PASSWORD

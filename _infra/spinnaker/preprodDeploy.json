@@ -1,0 +1,21 @@
+{
+  "schema": "v2",
+  "application": "frontstage",
+  "name": "deploy preprod",
+  "template": {
+    "artifactAccount": "front50ArtifactCredentials",
+    "reference": "spinnaker://individualDeploymentTemplate",
+    "type": "front50/pipelineTemplate"
+  },
+  "variables": {
+    "namespace": "preprod",
+    "environment": "preprod",
+    "service": "frontstage"
+  },
+  "exclude": [],
+  "triggers": [],
+  "parameters": [],
+  "notifications": [],
+  "description": "",
+  "stages": []
+}

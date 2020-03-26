@@ -9,7 +9,7 @@ rollingUpdate:
 
 image:
   name: eu.gcr.io/ons-rasrmbs-management
-  image: tag
+  tag: latest
   pullPolicy: Always
 
 container:

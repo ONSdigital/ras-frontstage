@@ -9,8 +9,10 @@
   },
   "variables": {
     "namespace": "dev",
+    "configNamespace": "dev",
     "environment": "dev",
-    "service": "frontstage"
+    "service": "frontstage",
+    "bucket": "ras-rm-configuration"
   },
   "exclude": [],
   "triggers": [],

@@ -10,7 +10,8 @@
   "variables": {
     "namespace": "preprod",
     "environment": "preprod",
-    "service": "frontstage"
+    "service": "frontstage",
+    "bucket": "ras-rm-preprod-configuration"
   },
   "exclude": [],
   "triggers": [],

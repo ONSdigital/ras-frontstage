@@ -1,18 +1,17 @@
 {
   "schema": "v2",
-  "application": "frontstage",
-  "name": "deploy staging",
+  "application": "fronststage",
+  "name": "deploy prod",
   "template": {
     "artifactAccount": "front50ArtifactCredentials",
     "reference": "spinnaker://individualDeploymentTemplate",
     "type": "front50/pipelineTemplate"
   },
   "variables": {
-    "namespace": "staging",
-    "configNamespace": "staging",
-    "environment": "dev",
-    "service": "frontstage",
-    "bucket": "ras-rm-configuration"
+    "namespace": "prod",
+    "environment": "prod",
+    "service": "action",
+    "bucket": "ras-rm-prod-configuration"
   },
   "exclude": [],
   "triggers": [],

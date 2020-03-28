@@ -1,10 +1,10 @@
 {
   "schema": "v2",
   "application": "frontstage",
-  "name": "deploy dev",
+  "name": "deploy baseline",
   "template": {
     "artifactAccount": "front50ArtifactCredentials",
-    "reference": "spinnaker://deployBaselineTailored",
+    "reference": "spinnaker://deployBaselineTailored:latest",
     "type": "front50/pipelineTemplate"
   },
   "variables": {

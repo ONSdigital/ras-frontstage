@@ -4,7 +4,7 @@
   "name": "deploy dev",
   "template": {
     "artifactAccount": "front50ArtifactCredentials",
-    "reference": "spinnaker://individualDeploymentTemplate",
+    "reference": "spinnaker://deployBaseline",
     "type": "front50/pipelineTemplate"
   },
   "variables": {

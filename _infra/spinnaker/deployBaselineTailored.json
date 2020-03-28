@@ -1,16 +1,14 @@
 {
   "schema": "v2",
   "application": "frontstage",
-  "name": "deploy staging",
+  "name": "deploy dev",
   "template": {
     "artifactAccount": "front50ArtifactCredentials",
-    "reference": "spinnaker://deployBaseline",
+    "reference": "spinnaker://deployBaselineTailored",
     "type": "front50/pipelineTemplate"
   },
   "variables": {
-    "namespace": "staging",
-    "environment": "dev",
-    "service": "frontstage"
+    "application": "frontstage"
   },
   "exclude": [],
   "triggers": [],

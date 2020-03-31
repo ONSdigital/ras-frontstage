@@ -6,6 +6,7 @@ metadata:
 spec:
   domains:
     - {{ .Values.ingress.frontstageHost }}
+---
 apiVersion: networking.gke.io/v1beta1
 kind: ManagedCertificate
 metadata:

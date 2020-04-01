@@ -27,8 +27,6 @@ database:
 
 ingress:
   enabled: false
-  frontstageHost: frontstage.example.com
-  certNameFrontstage: frontstage-cert
   surveysHost: surveys.example.com
   certNameSurveys: surveys-cert
 

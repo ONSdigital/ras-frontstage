@@ -26,6 +26,7 @@ requestsdefaulter = "*"
 flask-zipkin = "*"
 pycryptodome = "*"
 flask-talisman = "*"
+werkzeug = "~=0.16"
 
 [dev-packages]
 codecov = "*"

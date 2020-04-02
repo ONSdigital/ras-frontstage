@@ -4,7 +4,7 @@
   "name": "deploy preprod",
   "template": {
     "artifactAccount": "front50ArtifactCredentials",
-    "reference": "spinnaker://individualDeploymentTemplate",
+    "reference": "spinnaker://protectedEnvTemplate@sha256:da176658820e4d95d90d9b61c6355a5743a5dbdf63984b23f912aa226279b7ef",
     "type": "front50/pipelineTemplate"
   },
   "variables": {

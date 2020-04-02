@@ -9,6 +9,7 @@ rollingUpdate:
 
 image:
   name: eu.gcr.io/ons-rasrmbs-management
+  tag: latest
   pullPolicy: Always
 
 container:
@@ -26,8 +27,10 @@ database:
 
 ingress:
   enabled: false
-  host: surveys.example.com
-  certName: frontstage-cert
+  frontstageHost: frontstage.example.com
+  certNameFrontstage: frontstage-cert
+  surveysHost: surveys.example.com
+  certNameSurveys: surveys-cert
 
 analytics:
   enabled: false

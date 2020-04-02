@@ -2,8 +2,16 @@
 apiVersion: networking.gke.io/v1beta1
 kind: ManagedCertificate
 metadata:
-  name: {{ .Values.ingress.certName }}
+  name: {{ .Values.ingress.certNameFrontstage }}
 spec:
   domains:
-    - {{ .Values.ingress.host }}
+    - {{ .Values.ingress.frontstageHost }}
+---
+apiVersion: networking.gke.io/v1beta1
+kind: ManagedCertificate
+metadata:
+  name: {{ .Values.ingress.certNameSurveys }}
+spec:
+  domains:
+    - {{ .Values.ingress.surveysHost }}
 {{- end }}

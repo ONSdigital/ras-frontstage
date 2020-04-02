@@ -1,10 +1,12 @@
 import logging
 import os
 import requestsdefaulter
+import copy
 
 from flask import Flask, request
 from flask_zipkin import Zipkin
 from structlog import wrap_logger
+from flask_talisman import Talisman
 
 from frontstage.cloud.cloudfoundry import ONSCloudFoundry
 from frontstage.exceptions.exceptions import MissingEnvironmentVariable
@@ -17,6 +19,17 @@ cf = ONSCloudFoundry()
 CACHE_HEADERS = {
     'Cache-Control': 'no-cache, no-store, must-revalidate',
     'Pragma': 'no-cache',
+}
+
+# TODO: review https://content-security-policy.com/, remove this comment if we're covered.
+CSP_POLICY = {
+    'default-src': ["'self'", 'https://cdn.ons.gov.uk'],
+    'font-src': ["'self'", 'data:', 'https://fonts.gstatic.com', 'https://cdn.ons.gov.uk'],
+    'script-src': ["'self'", 'https://www.googletagmanager.com', 'https://cdn.ons.gov.uk'],
+    'connect-src': ["'self'", 'https://www.googletagmanager.com', 'https://tagmanager.google.com', 'https://cdn.ons.gov.uk'],
+    'img-src': ["'self'", 'data:', 'https://www.gstatic.com', 'https://www.google-analytics.com',
+                'https://www.googletagmanager.com', 'https://ssl.gstatic.com', 'https://cdn.ons.gov.uk'],
+    'style-src': ["'self'", 'https://cdn.ons.gov.uk', "'unsafe-inline'", 'https://tagmanager.google.com', 'https://fonts.googleapis.com'],
 }
 
 
@@ -32,8 +45,16 @@ class GCPLoadBalancer:
 
 
 def create_app_object():
+    csp_policy = copy.deepcopy(CSP_POLICY)
     app = Flask(__name__)
-
+    Talisman(
+        app,
+        content_security_policy=csp_policy,
+        content_security_policy_nonce_in=['script-src'],
+        force_https=False,  # this is handled at the firewall
+        strict_transport_security=True,
+        strict_transport_security_max_age=31536000,
+        frame_options='DENY')
     app.name = "ras-frontstage"
 
     # Load app config

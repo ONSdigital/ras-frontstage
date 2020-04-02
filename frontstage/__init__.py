@@ -8,6 +8,7 @@ redis = redis.StrictRedis(host=app.config['REDIS_HOST'],
                           port=app.config['REDIS_PORT'],
                           db=app.config['REDIS_DB'])
 csrf = CSRFProtect(app)
+csrf.init_app(app)
 
 
 @app.context_processor

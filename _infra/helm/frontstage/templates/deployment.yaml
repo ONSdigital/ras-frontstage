@@ -209,6 +209,8 @@ spec:
             value: "http://$(ZIPKIN_SERVICE_HOST):$(ZIPKIN_SERVICE_PORT)/api/v1/spans"
           - name: ZIPKIN_SAMPLE_RATE
             value: "100"
+          - name: WTF_CSRF_CHECK_DEFAULT
+            value: "{{ .Values.csrfProtected }}"
           - name: SECRET_KEY
             valueFrom:
               secretKeyRef:

@@ -97,6 +97,7 @@ class Config(object):
     RAS_NOTIFY_ACCOUNT_LOCKED_TEMPLATE = os.getenv('RAS_NOTIFY_ACCOUNT_LOCKED_TEMPLATE', 'account_locked_id')
     SEND_EMAIL_TO_GOV_NOTIFY = os.getenv('SEND_EMAIL_TO_GOV_NOTIFY', False)
     REQUESTS_POST_TIMEOUT = os.getenv('REQUESTS_POST_TIMEOUT', 20)
+    WTF_CSRF_ENABLED = os.getenv('WTF_CSRF_ENABLED', False)
 
 
 class DevelopmentConfig(Config):

@@ -1,4 +1,5 @@
 import redis
+from frontstage.create_app import create_app_object
 
 app = create_app_object()
 redis = redis.StrictRedis(host=app.config['REDIS_HOST'],

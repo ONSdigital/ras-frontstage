@@ -25,6 +25,7 @@ dateutils = "*"
 requestsdefaulter = "*"
 flask-zipkin = "*"
 pycryptodome = "*"
+flask-seasurf = "*"
 flask-talisman = "*"
 werkzeug = "~=0.16"
 

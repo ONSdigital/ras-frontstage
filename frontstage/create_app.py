@@ -7,7 +7,7 @@ from flask import Flask, request
 from flask_zipkin import Zipkin
 from structlog import wrap_logger
 from flask_talisman import Talisman
-from flask_wtf.csrf import CSRFProtect
+from flask_seasurf import SeaSurf
 
 from frontstage.cloud.cloudfoundry import ONSCloudFoundry
 from frontstage.exceptions.exceptions import MissingEnvironmentVariable
@@ -48,7 +48,7 @@ class GCPLoadBalancer:
 def create_app_object():
     csp_policy = copy.deepcopy(CSP_POLICY)
     app = Flask(__name__)
-    csrf = CSRFProtect()
+    csrf = SeaSurf(app)
     csrf.init_app(app)
     Talisman(
         app,

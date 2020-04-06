@@ -48,7 +48,7 @@ class GCPLoadBalancer:
 def create_app_object():
     csp_policy = copy.deepcopy(CSP_POLICY)
     app = Flask(__name__)
-    csrf = CSRFProtect(app)
+    csrf = CSRFProtect()
     csrf.init_app(app)
     Talisman(
         app,

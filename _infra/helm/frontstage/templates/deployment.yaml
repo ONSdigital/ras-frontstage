@@ -157,6 +157,12 @@ spec:
             value: "$(SECURITY_USER_PASSWORD)"
           - name: PORT
             value: "{{ .Values.container.port }}"
+          - name: RAS_NOTIFY_SERVICE_URL
+            {{- if .Values.dns.enabled }}
+            value: "http://notify-gateway.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}/emails/"
+            {{- else }}
+            value: "http://$(NOTIFY_GATEWAY_SERVICE_HOST):$(NOTIFY_GATEWAY_SERVICE_PORT)/emails/"
+            {{- end }}
           {{ if .Values.email.enabled }}
           - name: RAS_NOTIFY_ACCOUNT_LOCKED_TEMPLATE
             value: "{{ .Values.email.templates.accountLocked }}"

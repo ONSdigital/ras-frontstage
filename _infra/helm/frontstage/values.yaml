@@ -32,7 +32,7 @@ ingress:
   certNameSurveys: surveys-cert
 
 analytics:
-  enabled: False
+  enabled: false
 
 email:
   enabled: false
@@ -42,7 +42,8 @@ email:
     key: ONS_DUMMY_KEY
 
 scheme: http
-csrfProtected: false
+
+csrfProtected: False
 eq:
   url: "http://localhost/session?token="
 

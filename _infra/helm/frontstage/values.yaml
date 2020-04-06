@@ -32,7 +32,7 @@ ingress:
   certNameSurveys: surveys-cert
 
 analytics:
-  enabled: false
+  enabled: False
 
 email:
   enabled: false

@@ -43,7 +43,7 @@ email:
 
 scheme: http
 csrf:
-  protected: "True"
+  protected: True
   timeLimit: 7200
 eq:
   url: "http://localhost/session?token="

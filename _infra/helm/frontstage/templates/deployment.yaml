@@ -216,7 +216,9 @@ spec:
           - name: ZIPKIN_SAMPLE_RATE
             value: "100"
           - name: WTF_CSRF_ENABLED
-            value: "{{ .Values.csrfProtected }}"
+            value: "{{ .Values.csrf.protected }}"
+          - name: WTF_CSRF_TIME_LIMIT
+            value: "{{ .Values.csrf.timeLimit }}"
           - name: SECRET_KEY
             valueFrom:
               secretKeyRef:

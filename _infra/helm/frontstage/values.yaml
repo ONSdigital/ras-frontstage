@@ -42,7 +42,9 @@ email:
     key: ONS_DUMMY_KEY
 
 scheme: http
-csrfProtected: false
+csrf:
+  protected: "True"
+  timeLimit: 7200
 eq:
   url: "http://localhost/session?token="
 

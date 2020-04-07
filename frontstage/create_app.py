@@ -48,8 +48,11 @@ class GCPLoadBalancer:
 def create_app_object():
     csp_policy = copy.deepcopy(CSP_POLICY)
     app = Flask(__name__)
-    csrf = CSRFProtect(app)
-    csrf.init_app(app)
+
+    # Load app config
+    app_config = 'config.{}'.format(os.environ.get('APP_SETTINGS', 'Config'))
+    app.config.from_object(app_config)
+
     Talisman(
         app,
         content_security_policy=csp_policy,
@@ -59,10 +62,6 @@ def create_app_object():
         strict_transport_security_max_age=31536000,
         frame_options='DENY')
     app.name = "ras-frontstage"
-
-    # Load app config
-    app_config = 'config.{}'.format(os.environ.get('APP_SETTINGS', 'Config'))
-    app.config.from_object(app_config)
 
     if not app.config['DEBUG'] and not cf.detected:
         app.wsgi_app = GCPLoadBalancer(app.wsgi_app)
@@ -92,6 +91,8 @@ def create_app_object():
 
     app.jinja_env.filters['file_size_filter'] = file_size_filter
     app.jinja_env.filters['subject_filter'] = subject_filter
+
+    CSRFProtect(app)
 
     @app.after_request
     def apply_headers(response):

@@ -49,6 +49,8 @@ spec:
             successThreshold: 1
             timeoutSeconds: 5
           env:
+          - name: ACCOUNT_SERVICE_URL
+            value: "{{ .Values.ingress.host }}/surveys/todo"
           - name: ACCOUNT_SERVICE_LOG_OUT_URL
             value: "{{ .Values.ingress.host }}/logout"
           - name: SECURITY_USER_NAME

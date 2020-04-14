@@ -92,7 +92,9 @@ def login():
         session.create_session(encoded_jwt_token)
         response.set_cookie('authorization',
                             value=session.session_key,
-                            expires=data_dict_for_jwt_token['expires_at'])
+                            expires=data_dict_for_jwt_token['expires_at'],
+                            secure=True,
+                            httponly=True)
         bound_logger.info('Successfully created session', session_key=session.session_key)
         return response
 

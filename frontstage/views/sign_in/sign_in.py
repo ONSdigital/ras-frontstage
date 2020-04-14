@@ -13,6 +13,7 @@ from frontstage.exceptions.exceptions import OAuth2Error
 from frontstage.jwt import encode, timestamp_token
 from frontstage.models import LoginForm
 from frontstage.views.sign_in import sign_in_bp
+from config import Config
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -34,7 +35,7 @@ def login():
     form.username.data = form.username.data.strip()
     account_activated = request.args.get('account_activated', None)
 
-    if request.method == 'POST' and form.validate():
+    if request.method == 'POST' and (form.validate() or not Config.WTF_CSRF_ENABLED):
         username = form.username.data
         password = request.form.get('password')
         bound_logger = logger.bind(email=obfuscate_email(username))

@@ -34,6 +34,8 @@ def login():
     form.username.data = form.username.data.strip()
     account_activated = request.args.get('account_activated', None)
 
+    secure = app.config['WTF_CSRF_ENABLED']
+
     if request.method == 'POST' and form.validate():
         username = form.username.data
         password = request.form.get('password')
@@ -93,8 +95,8 @@ def login():
         response.set_cookie('authorization',
                             value=session.session_key,
                             expires=data_dict_for_jwt_token['expires_at'],
-                            secure=True,
-                            httponly=True)
+                            secure=secure,
+                            httponly=secure)
         bound_logger.info('Successfully created session', session_key=session.session_key)
         return response
 

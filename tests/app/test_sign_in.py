@@ -181,6 +181,7 @@ class TestSignIn(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Please follow the link the email to confirm your email address'.encode() in response.data)
+        self.assertTrue('<a href="/sign-in/resend-verification/f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b">'.encode() in response.data)
 
     @requests_mock.mock()
     def test_sign_in_unknown_response(self, mock_object):

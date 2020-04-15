@@ -45,12 +45,12 @@ def login():
             oauth2_token = oauth_controller.sign_in(username, password)
         except OAuth2Error as exc:
             error_message = exc.oauth2_error
+            party_json = party_controller.get_respondent_by_email(username)
+            party_id = party_json.get('id')
             if USER_ACCOUNT_LOCKED in error_message:  # pylint: disable=no-else-return
-                party_json = party_controller.get_respondent_by_email(username)
                 if not party_json or 'id' not in party_json:
                     bound_logger.error("Respondent account locked in auth but doesn't exist in party")
                     return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
-                party_id = party_json['id']
                 bound_logger = bound_logger.bind(party_id=party_id)
                 bound_logger.info('User account is locked on the OAuth2 server', status=party_json['status'])
                 if party_json['status'] == 'ACTIVE' or party_json['status'] == 'CREATED':
@@ -60,7 +60,7 @@ def login():
                 return render_template('sign-in/sign-in.account-locked.html', form=form)
             elif NOT_VERIFIED_ERROR in error_message:
                 bound_logger.info('User account is not verified on the OAuth2 server')
-                return render_template('sign-in/sign-in.account-not-verified.html', email=username)
+                return render_template('sign-in/sign-in.account-not-verified.html', party_id=party_id)
             elif BAD_AUTH_ERROR in error_message:
                 bound_logger.info('Bad credentials provided')
             elif UNKNOWN_ACCOUNT_ERROR in error_message:

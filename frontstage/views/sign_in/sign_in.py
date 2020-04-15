@@ -46,12 +46,13 @@ def login():
         except OAuth2Error as exc:
             error_message = exc.oauth2_error
             party_json = party_controller.get_respondent_by_email(username)
-            party_id = party_json.get('id')
+            party_id = party_json.get('id') if party_json else None
+            bound_logger = bound_logger.bind(party_id=party_id)
+
             if USER_ACCOUNT_LOCKED in error_message:  # pylint: disable=no-else-return
-                if not party_json or 'id' not in party_json:
+                if not party_id:
                     bound_logger.error("Respondent account locked in auth but doesn't exist in party")
                     return render_template('sign-in/sign-in.html', form=form, data={"error": {"type": "failed"}})
-                bound_logger = bound_logger.bind(party_id=party_id)
                 bound_logger.info('User account is locked on the OAuth2 server', status=party_json['status'])
                 if party_json['status'] == 'ACTIVE' or party_json['status'] == 'CREATED':
                     notify_party_and_respondent_account_locked(respondent_id=party_id,

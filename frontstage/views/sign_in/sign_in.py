@@ -36,7 +36,7 @@ def login():
 
     secure = app.config['WTF_CSRF_ENABLED']
 
-    if request.method == 'POST' and (form.validate() or not secure):
+    if request.method == 'POST' and form.validate():
         username = form.username.data
         password = request.form.get('password')
         bound_logger = logger.bind(email=obfuscate_email(username))

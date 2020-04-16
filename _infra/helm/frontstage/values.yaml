@@ -3,7 +3,6 @@ namespace: minikube
 publicIP: false
 
 replicas: 1
-maxReplicas: 1
 rollingUpdate:
   maxSurge: 1
   maxUnavailable: 1

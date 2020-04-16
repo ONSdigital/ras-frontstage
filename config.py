@@ -156,6 +156,8 @@ class DevelopmentConfig(Config):
     SURVEY_PASSWORD = os.getenv('SURVEY_PASSWORD', 'secret')
     SURVEY_AUTH = (SURVEY_USERNAME, SURVEY_PASSWORD)
     WTF_CSRF_TIME_LIMIT = int(os.getenv('WTF_CSRF_TIME_LIMIT', '3200'))
+    SECURE_APP = bool(strtobool(os.getenv('SECURE_APP', "False")))
+    WTF_CSRF_ENABLED = bool(strtobool(os.getenv('WTF_CSRF_ENABLED', "False")))
 
 
 class TestingConfig(DevelopmentConfig):
@@ -175,3 +177,5 @@ class TestingConfig(DevelopmentConfig):
     SECURITY_USER_PASSWORD = 'password'
     REQUESTS_POST_TIMEOUT = 99
     WTF_CSRF_TIME_LIMIT = int(os.getenv('WTF_CSRF_TIME_LIMIT', '3200'))
+    SECURE_APP = bool(strtobool(os.getenv('SECURE_APP', "False")))
+    WTF_CSRF_ENABLED = bool(strtobool(os.getenv('WTF_CSRF_ENABLED', "False")))

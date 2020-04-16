@@ -1,7 +1,6 @@
 import logging
 import os
 import requestsdefaulter
-import copy
 
 from flask import Flask, request
 from flask_zipkin import Zipkin

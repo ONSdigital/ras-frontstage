@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import patch
 from flask import request
 
-from frontstage import app, create_app_object
+from frontstage import app
 from tests.app.mocked_services import business_party, case, collection_instrument_seft, encoded_jwt_token, survey
 
 

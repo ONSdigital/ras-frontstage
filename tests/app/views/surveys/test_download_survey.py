@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import patch
 from flask import request
 
-from frontstage import app, create_app_object
+from frontstage import app
 from tests.app.mocked_services import business_party, case, collection_instrument_seft, encoded_jwt_token, survey
 
 
@@ -41,7 +41,7 @@ class TestDownloadSurvey(unittest.TestCase):
                 self.assertEqual(response.status_code, 200)
 
     def test_enforces_secure_headers(self):
-        with create_app_object().test_client() as client:
+        with app.test_client() as client:
             headers = client.get(
                 '/',
                 headers={'X-Forwarded-Proto': 'https'}  # set protocol so that talisman sets HSTS headers

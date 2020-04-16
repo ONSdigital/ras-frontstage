@@ -5,7 +5,7 @@ from pathlib import Path
 from flask import Blueprint, jsonify, make_response
 from structlog import wrap_logger
 
-from frontstage import app
+from frontstage import app, talisman
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -19,6 +19,7 @@ if Path('git_info').exists():
 
 
 @info_bp.route('/', methods=['GET'])
+@talisman(force_https=False)
 def get_info():
     info = {
         "name": 'ras-frontstage',

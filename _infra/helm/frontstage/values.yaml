@@ -1,6 +1,6 @@
 env: minikube
 namespace: minikube
-publicIP: false
+public: false
 
 replicas: 1
 rollingUpdate:

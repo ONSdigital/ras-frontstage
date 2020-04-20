@@ -1,4 +1,5 @@
 {{- if .Values.ingress.enabled }}
+{{- if not .Values.public }}
 apiVersion: networking.gke.io/v1beta1
 kind: ManagedCertificate
 metadata:
@@ -6,4 +7,5 @@ metadata:
 spec:
   domains:
     - {{ .Values.ingress.surveysHost }}
+{{- end }}
 {{- end }}

@@ -55,7 +55,7 @@ class NotifyGateway:
                                  timeout=int(app.config['REQUESTS_POST_TIMEOUT']))
         status_code = response.status_code
 
-        if status_code == 201:
+        if 201 <= status_code <= 399:
             logger.info('Notification id sent via Notify-Gateway to GOV.UK Notify.', id=response.json()["id"])
         else:
             ref = reference if reference else 'reference_unknown'

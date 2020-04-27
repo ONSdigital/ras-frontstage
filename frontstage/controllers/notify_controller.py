@@ -5,7 +5,9 @@ import structlog
 import requests
 
 from frontstage.exceptions import exceptions
+from fronstage.exceptions.exceptions import RasNotifyError
 from flask import current_app as app
+from requests.exceptions import HTTPError
 
 logger = structlog.wrap_logger(logging.getLogger(__name__))
 
@@ -41,26 +43,27 @@ class NotifyGateway:
             logger.info("Notification not sent. Notify is disabled.")
             return
 
+        notification = {
+            "emailAddress": email,
+        }
+        if personalisation:
+            notification.update({"personalisation": personalisation})
+        if reference:
+            notification.update({"reference": reference})
+
+        url = urlparse.urljoin(self.notify_url, str(template_id))
+        auth = app.config['SECURITY_USER_NAME'], app.config['SECURITY_USER_PASSWORD']
+        response = requests.post(url, json=notification, auth=auth,
+                                 timeout=int(app.config['REQUESTS_POST_TIMEOUT']))
         try:
-            notification = {
-                "emailAddress": email,
-            }
-            if personalisation:
-                notification.update({"personalisation": personalisation})
-            if reference:
-                notification.update({"reference": reference})
-
-            url = urlparse.urljoin(self.notify_url, str(template_id))
-            auth = app.config['SECURITY_USER_NAME'], app.config['SECURITY_USER_PASSWORD']
-            response = requests.post(url, json=notification, auth=auth,
-                                     timeout=int(app.config['REQUESTS_POST_TIMEOUT']))
-
+            response.raise_for_status()
             logger.info('Notification id sent via Notify-Gateway to GOV.UK Notify.', id=response.json()["id"])
 
-        except Exception as e:
+        except HTTPError as e:
             ref = reference if reference else 'reference_unknown'
-            raise exceptions.RasNotifyError("There was a problem sending a notification to Notify-Gateway "
-                                            "to GOV.UK Notify", error=e, reference=ref)
+            raise RasNotifyError("There was a problem sending a notification via Notify-Gateway to GOV.UK Notify.",
+                                 url=url, status_code=response.status_code,
+                                 message=response.text, reference=ref, error=e)
 
     def request_to_notify(self, email, template_name, personalisation=None, reference=None):
         try:

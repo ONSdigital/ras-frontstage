@@ -34,6 +34,7 @@ class Config(object):
     ZIPKIN_DSN = os.getenv("ZIPKIN_DSN", None)
     ZIPKIN_SAMPLE_RATE = int(os.getenv("ZIPKIN_SAMPLE_RATE", 0))
 
+    ACCESS_CONTROL_ALLOW_ORIGIN = os.getenv("ACCESS_CONTROL_ALLOW_ORIGIN", "*")
     ACCOUNT_SERVICE_URL = os.getenv('ACCOUNT_SERVICE_URL')
     ACCOUNT_SERVICE_LOG_OUT_URL = os.getenv('ACCOUNT_SERVICE_LOG_OUT_URL')
     EQ_URL = os.getenv('EQ_URL')
@@ -177,3 +178,4 @@ class TestingConfig(DevelopmentConfig):
     REQUESTS_POST_TIMEOUT = 99
     WTF_CSRF_TIME_LIMIT = int(os.getenv('WTF_CSRF_TIME_LIMIT', '3200'))
     SECURE_APP = bool(strtobool(os.getenv('SECURE_APP', "False")))
+    ACCESS_CONTROL_ALLOW_ORIGIN = os.getenv("ACCESS_CONTROL_ALLOW_ORIGIN", "http://localhost")

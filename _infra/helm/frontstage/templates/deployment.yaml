@@ -114,6 +114,12 @@ spec:
           - name: GOOGLE_TAG_MANAGER_PROP
             value: "{{ .Values.analytics.tagManagerProp }}"
           {{- end }}
+          - name: ACCESS_CONTROL_ALLOW_ORIGIN
+            {{- if .Values.ingress.enabled }}
+            value: "https://{{ .Values.ingress.surveysHost }}"
+            {{- else }}
+            value: "*"
+            {{- end }}
           - name: IAC_URL
             {{- if .Values.dns.enabled }}
             value: "http://iac.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"

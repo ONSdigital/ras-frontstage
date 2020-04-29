@@ -37,7 +37,12 @@ def download_collection_instrument(collection_instrument_id, case_id, party_id):
     logger.info('Successfully downloaded collection instrument',
                 collection_instrument_id=collection_instrument_id,
                 party_id=party_id)
-    return response.content, response.headers.items()
+
+    headers = response.headers
+    acao = app.config['ACCESS_CONTROL_ALLOW_ORIGIN']
+    logger.debug(f"Setting Access-Control-Allow-Origin header to {acao}")
+    headers['Access-Control-Allow-Origin'] = acao
+    return response.content, headers.items()
 
 
 def get_collection_instrument(collection_instrument_id, collection_instrument_url, collection_instrument_auth):

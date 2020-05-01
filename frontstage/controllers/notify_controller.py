@@ -5,7 +5,6 @@ import structlog
 import requests
 
 from frontstage.exceptions import exceptions
-from frontstage.exceptions.exceptions import RasNotifyError
 from flask import current_app as app
 from requests.exceptions import HTTPError
 
@@ -61,9 +60,10 @@ class NotifyGateway:
             response.raise_for_status()
         except HTTPError as e:
             ref = reference if reference else 'reference_unknown'
-            raise RasNotifyError("There was a problem sending a notification via Notify-Gateway to GOV.UK Notify.",
-                                             url=url, status_code=response.status_code,
-                                             message=response.text, reference=ref, error=e)
+            raise exceptions.RasNotifyError("There was a problem sending a notification "
+                                            "via Notify-Gateway to GOV.UK Notify.",
+                                            url=url, status_code=response.status_code,
+                                            message=response.text, reference=ref, error=e)
 
     def request_to_notify(self, email, template_name, personalisation=None, reference=None):
         try:

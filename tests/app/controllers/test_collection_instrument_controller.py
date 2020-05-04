@@ -33,6 +33,16 @@ class TestCollectionInstrumentController(unittest.TestCase):
                 self.assertEqual(downloaded_ci['id'], collection_instrument_seft['id'])
 
     @patch('frontstage.controllers.case_controller.post_case_event')
+    def test_download_collection_instrument_access_control_header_set(self, _):
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.GET, url_download_ci, json=collection_instrument_seft, status=200)
+            with app.app_context():
+                _, headers = collection_instrument_controller.download_collection_instrument(collection_instrument_seft['id'], case['id'], business_party['id'])
+
+                acao = dict(headers)['Access-Control-Allow-Origin']
+                self.assertEqual("http://localhost", acao)
+
+    @patch('frontstage.controllers.case_controller.post_case_event')
     def test_download_collection_instrument_fail(self, _):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_download_ci, status=400)

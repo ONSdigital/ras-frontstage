@@ -57,10 +57,14 @@ class NotifyGateway:
             logger.info('Notification id sent via Notify-Gateway to GOV.UK Notify.', id=response.json()["id"])
         except HTTPError as e:
             ref = reference if reference else 'reference_unknown'
+            resp = response if response else {
+                'status_code' : 'Unknown',
+                'text' : 'Exception thrown before request was made'
+            }
             raise exceptions.RasNotifyError("There was a problem sending a notification "
                                             "via Notify-Gateway to GOV.UK Notify.",
-                                            url=url, status_code=response.status_code,
-                                            message=response.text, reference=ref, error=e)
+                                            url=url, status_code=resp.status_code,
+                                            message=resp.text, reference=ref, error=e)
 
     def request_to_notify(self, email, template_name, personalisation=None, reference=None):
         try:

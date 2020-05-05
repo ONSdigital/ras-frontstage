@@ -14,10 +14,10 @@ image:
   pullPolicy: Always
 
 container:
-  port: 8080
+  port: 9000
 service:
   type: ClusterIP
-  port: 80
+  port: 9000
 
 resources:
   requests:

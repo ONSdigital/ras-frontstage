@@ -5,9 +5,7 @@ import structlog
 import requests
 
 from frontstage.exceptions import exceptions
-from fronstage.exceptions.exceptions import RasNotifyError
 from flask import current_app as app
-from requests.exceptions import HTTPError
 
 logger = structlog.wrap_logger(logging.getLogger(__name__))
 
@@ -59,8 +57,8 @@ class NotifyGateway:
         except Exception as e:
             ref = reference if reference else 'reference_unknown'
             resp = response if response else {
-                'status_code' : 'Unknown',
-                'text' : 'Exception thrown before request was made'
+                'status_code': 'Unknown',
+                'text': 'Exception thrown before request was made'
             }
             raise exceptions.RasNotifyError("There was a problem sending a notification "
                                             "via Notify-Gateway to GOV.UK Notify.",

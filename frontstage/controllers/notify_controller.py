@@ -6,7 +6,6 @@ import requests
 
 from frontstage.exceptions import exceptions
 from flask import current_app as app
-from requests.exceptions import HTTPError
 
 logger = structlog.wrap_logger(logging.getLogger(__name__))
 
@@ -55,7 +54,7 @@ class NotifyGateway:
             response = requests.post(url, json=notification, auth=auth,
                                      timeout=int(app.config['REQUESTS_POST_TIMEOUT']))
             logger.info('Notification id sent via Notify-Gateway to GOV.UK Notify.', id=response.json()["id"])
-        except HTTPError as e:
+        except Exception as e:
             ref = reference if reference else 'reference_unknown'
             resp = response if response else {
                 'status_code' : 'Unknown',

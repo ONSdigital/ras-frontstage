@@ -41,23 +41,20 @@ class NotifyGateway:
         if not self.send_email_to_notify:
             logger.info("Notification not sent. Notify is disabled.")
             return
-
-        notification = {
-            "emailAddress": email,
-        }
-        if personalisation:
-            notification.update({"personalisation": personalisation})
-        if reference:
-            notification.update({"reference": reference})
-
-        url = urlparse.urljoin(self.notify_url, str(template_id))
-        auth = app.config['SECURITY_USER_NAME'], app.config['SECURITY_USER_PASSWORD']
-        response = requests.post(url, json=notification, auth=auth,
-                                 timeout=int(app.config['REQUESTS_POST_TIMEOUT']))
-
         try:
+            notification = {
+                "emailAddress": email,
+            }
+            if personalisation:
+                notification.update({"personalisation": personalisation})
+            if reference:
+                notification.update({"reference": reference})
+
+            url = urlparse.urljoin(self.notify_url, str(template_id))
+            auth = app.config['SECURITY_USER_NAME'], app.config['SECURITY_USER_PASSWORD']
+            response = requests.post(url, json=notification, auth=auth,
+                                     timeout=int(app.config['REQUESTS_POST_TIMEOUT']))
             logger.info('Notification id sent via Notify-Gateway to GOV.UK Notify.', id=response.json()["id"])
-            response.raise_for_status()
         except HTTPError as e:
             ref = reference if reference else 'reference_unknown'
             raise exceptions.RasNotifyError("There was a problem sending a notification "

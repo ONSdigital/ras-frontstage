@@ -5,7 +5,9 @@ import structlog
 import requests
 
 from frontstage.exceptions import exceptions
+from fronstage.exceptions.exceptions import RasNotifyError
 from flask import current_app as app
+from requests.exceptions import HTTPError
 
 logger = structlog.wrap_logger(logging.getLogger(__name__))
 

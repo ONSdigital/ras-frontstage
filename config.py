@@ -88,7 +88,7 @@ class Config(object):
     SURVEY_PASSWORD = os.getenv('SURVEY_PASSWORD')
     SURVEY_AUTH = (SURVEY_USERNAME, SURVEY_PASSWORD)
 
-    RAS_NOTIFY_SERVICE_URL = os.getenv('RAS_NOTIFY_SERVICE_URL', 'http://localhost:8181/emails/')
+    RAS_NOTIFY_SERVICE_URL = os.getenv('RAS_NOTIFY_SERVICE_URL', 'http://notify-gateway-service/emails/')
     RAS_NOTIFY_EMAIL_VERIFICATION_TEMPLATE = os.getenv('RAS_NOTIFY_EMAIL_VERIFICATION_TEMPLATE',
                                                        'email_verification_id')
     RAS_NOTIFY_REQUEST_PASSWORD_CHANGE_TEMPLATE = os.getenv('RAS_NOTIFY_REQUEST_PASSWORD_CHANGE_TEMPLATE',

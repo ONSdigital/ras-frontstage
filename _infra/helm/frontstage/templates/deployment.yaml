@@ -135,8 +135,6 @@ spec:
               secretKeyRef:
                 name: json-secrets
                 key: json-secret-keys-frontstage
-          - name: OAUTHLIB_INSECURE_TRANSPORT
-            value: "1"
           - name: OAUTH_URL
             {{- if .Values.dns.enabled }}
             value: "http://auth.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"

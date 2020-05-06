@@ -82,8 +82,5 @@ Environment variables available for configuration are listed below:
 | RAS_FRONTSTAGE_API_PROTOCOL     | Protocol used for frontstage-api uri                          | 'http' 
 | RAS_FRONTSTAGE_API_HOST         | Host address used for frontstage-api uri                      | 'localhost'
 | RAS_FRONTSTAGE_API_PORT         | Port used for frontstage-api uri                              | 8083
-| ZIPKIN_DISABLE                  | Totally disable Zipkin (including tracing headers)            | False
-| ZIPKIN_DSN                      | Zipkin Sample API URL (e.g. http://zipkin:9411/api/v1/spans)  | None
-| ZIPKIN_SAMPLE_RATE              | Percentage of requests to send to zipkin span API             | 0
 
 These are set in [config.py](config.py)

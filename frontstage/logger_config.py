@@ -41,18 +41,6 @@ def logger_initial_config(service_name=None,  # noqa: C901  pylint: disable=too-
     oauth_log.addHandler(logging.NullHandler())
     oauth_log.propagate = False
 
-    def zipkin_ids(logger, method_name, event_dict):
-        event_dict['trace'] = ''
-        event_dict['span'] = ''
-        event_dict['parent'] = ''
-        if not flask.has_app_context():
-            return event_dict
-        if '_zipkin_span' not in g:
-            return event_dict
-        event_dict['span'] = g._zipkin_span.zipkin_attrs.span_id
-        event_dict['trace'] = g._zipkin_span.zipkin_attrs.trace_id
-        event_dict['parent'] = g._zipkin_span.zipkin_attrs.parent_span_id
-        return event_dict
 
     def parse_exception(_, __, event_dict):
         exception = event_dict.get('exception')
@@ -62,7 +50,7 @@ def logger_initial_config(service_name=None,  # noqa: C901  pylint: disable=too-
 
     # setup file logging
     renderer_processor = JSONRenderer(indent=indent)
-    processors = [zipkin_ids, add_log_level, filter_by_level, add_service, format_exc_info,
+    processors = [add_log_level, filter_by_level, add_service, format_exc_info,
                   TimeStamper(fmt=logger_date_format, utc=True, key='created_at'), parse_exception, renderer_processor]
     configure(context_class=wrap_dict(dict), logger_factory=LoggerFactory(), processors=processors,
               cache_logger_on_first_use=True)

@@ -36,7 +36,7 @@ def validate(token):
 
 def jwt_authorization(request):
     jwt_secret = app.config['JWT_SECRET']
-    jwt_algorithm = app.config['JWT_ALGORITHM']
+    jwt_algorithm = 'HS256'
 
     def extract_session(original_function):
         @wraps(original_function)

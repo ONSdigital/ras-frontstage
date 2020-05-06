@@ -62,6 +62,7 @@ class NotifyGateway:
                                             url=url, status_code=response.status_code,
                                             message=response.text, reference=ref, error=e)
         except Exception as e:
+            ref = reference if reference else 'reference_unknown'
             raise exceptions.RasNotifyError("An issue occured while preparing to send the"
                                             "notification to GOV.UK Notify.", error=e, reference=ref)
 

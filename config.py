@@ -165,7 +165,6 @@ class TestingConfig(DevelopmentConfig):
     WTF_CSRF_ENABLED = False
     SEND_EMAIL_TO_GOV_NOTIFY = True
     EMAIL_TOKEN_SALT = 'bulbous'
-    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     JWT_SECRET = 'testsecret'
     REDIS_DB = os.getenv('REDIS_DB', 13)
     ACCOUNT_SERVICE_URL = 'http://frontstage-url/surveys'

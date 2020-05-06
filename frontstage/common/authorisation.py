@@ -36,7 +36,6 @@ def validate(token):
 
 def jwt_authorization(request):
     jwt_secret = app.config['JWT_SECRET']
-    jwt_algorithm = 'HS256'
 
     def extract_session(original_function):
         @wraps(original_function)
@@ -47,7 +46,7 @@ def jwt_authorization(request):
             if encoded_jwt:
                 logger.debug('Attempting to authorize token')
                 try:
-                    jwt = decode(encoded_jwt, jwt_secret, algorithms=jwt_algorithm)
+                    jwt = decode(encoded_jwt, jwt_secret, algorithms='HS256')
                     logger.debug('Token decoded successfully')
                 except JWTError:
                     logger.warning('Unable to decode token')

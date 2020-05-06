@@ -6,6 +6,7 @@ import requests
 
 from frontstage.exceptions import exceptions
 from flask import current_app as app
+from requests.exceptions import HTTPError
 
 logger = structlog.wrap_logger(logging.getLogger(__name__))
 
@@ -54,16 +55,15 @@ class NotifyGateway:
             response = requests.post(url, json=notification, auth=auth,
                                      timeout=int(app.config['REQUESTS_POST_TIMEOUT']))
             logger.info('Notification id sent via Notify-Gateway to GOV.UK Notify.', id=response.json()["id"])
-        except Exception as e:
+        except HTTPError as e:
             ref = reference if reference else 'reference_unknown'
-            resp = response if response else {
-                'status_code': 'Unknown',
-                'text': 'Exception thrown before request was made'
-            }
             raise exceptions.RasNotifyError("There was a problem sending a notification "
                                             "via Notify-Gateway to GOV.UK Notify.",
-                                            url=url, status_code=resp.status_code,
-                                            message=resp.text, reference=ref, error=e)
+                                            url=url, status_code=response.status_code,
+                                            message=response.text, reference=ref, error=e)
+        except Exception as e:
+            raise exceptions.RasNotifyError("An issue occured while preparing to send the"
+                                            "notification to GOV.UK Notify.", error=e, reference=ref)
 
     def request_to_notify(self, email, template_name, personalisation=None, reference=None):
         try:

@@ -20,7 +20,7 @@ class TestLoggerConfig(unittest.TestCase):
         with self.assertLogs(level='ERROR') as cm:
             logger.error('Test')
         message = cm[0][0].msg
-        message_contents = '\n "event": "Test",\n "trace": "",\n "span": "",\n "parent": "",' \
+        message_contents = '\n "event": "Test",\n "severity": "error",' \
                            '\n "level": "error",\n "service": "ras-frontstage"'
         self.assertIn(message_contents, message)
 
@@ -30,7 +30,7 @@ class TestLoggerConfig(unittest.TestCase):
         with self.assertLogs(level='ERROR') as cm:
             logger.error('Test')
         message = cm[0][0].msg
-        self.assertIn('"event": "Test", "trace": "", "span": "", "parent": "",'
+        self.assertIn('"event": "Test", "severity": "error",'
                       ' "level": "error", "service": "ras-frontstage"', message)
 
     def test_indent_value_error(self):
@@ -40,5 +40,5 @@ class TestLoggerConfig(unittest.TestCase):
         with self.assertLogs(level='ERROR') as cm:
             logger.error('Test')
         message = cm[0][0].msg
-        self.assertIn('"event": "Test", "trace": "", "span": "", "parent": "",'
+        self.assertIn('"event": "Test", "severity": "error",'
                       ' "level": "error", "service": "ras-frontstage"', message)

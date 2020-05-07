@@ -88,10 +88,6 @@ spec:
             {{- else }}
             value: "http://$(COLLECTION_INSTRUMENT_SERVICE_HOST):$(COLLECTION_INSTRUMENT_SERVICE_PORT)"
             {{- end }}
-          - name: COLLECTION_INSTRUMENT_USERNAME
-            value: "$(SECURITY_USER_NAME)"
-          - name: COLLECTION_INSTRUMENT_PASSWORD
-            value: "$(SECURITY_USER_PASSWORD)"
           - name: EMAIL_TOKEN_EXPIRY
             value: "{{ .Values.email.expiry }}"
           - name: EMAIL_TOKEN_SALT

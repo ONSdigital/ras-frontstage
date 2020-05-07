@@ -299,7 +299,7 @@ def caching_data_for_collection_instrument(cache_data):
             collection_instrument_ids.add(case['collectionInstrumentId'])
     for collection_instrument_id in collection_instrument_ids:
         threads.append(ThreadWrapper(get_collection_instrument, cache_data, collection_instrument_id,
-                                     app.config['COLLECTION_INSTRUMENT_URL'], app.config['COLLECTION_INSTRUMENT_AUTH']))
+                                     app.config['COLLECTION_INSTRUMENT_URL'], app.config['BASIC_AUTH']))
 
     for thread in threads:
         thread.start()

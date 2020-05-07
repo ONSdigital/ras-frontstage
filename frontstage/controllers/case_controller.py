@@ -40,7 +40,7 @@ def get_case_by_case_id(case_id):
     logger.info('Attempting to retrieve case by case id', case_id=case_id)
 
     url = f"{app.config['CASE_URL']}/cases/{case_id}"
-    response = requests.get(url, auth=app.config['CASE_AUTH'])
+    response = requests.get(url, auth=app.config['BASIC_AUTH'])
 
     try:
         response.raise_for_status()
@@ -56,7 +56,7 @@ def get_case_by_enrolment_code(enrolment_code):
     logger.info('Attempting to retrieve case by enrolment code')
 
     url = f"{app.config['CASE_URL']}/cases/iac/{enrolment_code}"
-    response = requests.get(url, auth=app.config['CASE_AUTH'])
+    response = requests.get(url, auth=app.config['BASIC_AUTH'])
 
     try:
         response.raise_for_status()
@@ -72,7 +72,7 @@ def get_case_categories():
     logger.info('Attempting to retrieve case categories')
 
     url = f"{app.config['CASE_URL']}/categories"
-    response = requests.get(url, auth=app.config['CASE_AUTH'])
+    response = requests.get(url, auth=app.config['BASIC_AUTH'])
 
     try:
         response.raise_for_status()
@@ -175,7 +175,7 @@ def post_case_event(case_id, party_id, category, description):
         'metadata': {'partyId': party_id},
         'createdBy': 'RAS_FRONTSTAGE'
     }
-    response = requests.post(url, auth=app.config['CASE_AUTH'], json=message)
+    response = requests.post(url, auth=app.config['BASIC_AUTH'], json=message)
 
     try:
         response.raise_for_status()

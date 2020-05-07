@@ -49,9 +49,6 @@ class Config(object):
     PASSWORD_MAX_LENGTH = 160
 
     CASE_URL = os.getenv('CASE_URL')
-    CASE_USERNAME = os.getenv('CASE_USERNAME')
-    CASE_PASSWORD = os.getenv('CASE_PASSWORD')
-    CASE_AUTH = (CASE_USERNAME, CASE_PASSWORD)
 
     COLLECTION_EXERCISE_URL = os.getenv('COLLECTION_EXERCISE_URL')
     COLLECTION_EXERCISE_USERNAME = os.getenv('COLLECTION_EXERCISE_USERNAME')
@@ -120,9 +117,6 @@ class DevelopmentConfig(Config):
     JSON_SECRET_KEYS = os.getenv('JSON_SECRET_KEYS') or open("./tests/test_data/jwt-test-keys/test_key.json").read()
 
     CASE_URL = os.getenv('CASE_URL', 'http://localhost:8171')
-    CASE_USERNAME = os.getenv('CASE_USERNAME', 'admin')
-    CASE_PASSWORD = os.getenv('CASE_PASSWORD', 'secret')
-    CASE_AUTH = (CASE_USERNAME, CASE_PASSWORD)
 
     COLLECTION_EXERCISE_URL = os.getenv('COLLECTION_EXERCISE_URL', 'http://localhost:8145')
     COLLECTION_EXERCISE_USERNAME = os.getenv('COLLECTION_EXERCISE_USERNAME', 'admin')

@@ -76,10 +76,6 @@ spec:
             {{- else }}
             value: "http://$(CASE_SERVICE_HOST):$(CASE_SERVICE_PORT)"
             {{- end }}
-          - name: CASE_USERNAME
-            value: "$(SECURITY_USER_NAME)"
-          - name: CASE_PASSWORD
-            value: "$(SECURITY_USER_PASSWORD)"
           - name: COLLECTION_EXERCISE_URL
             {{- if .Values.dns.enabled }}
             value: "http://collection-exercise.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"

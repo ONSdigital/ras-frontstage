@@ -1,13 +1,11 @@
 import logging
 import os
 import sys
-import flask
 
 from structlog import configure
 from structlog.processors import JSONRenderer, TimeStamper, format_exc_info
 from structlog.stdlib import add_log_level, filter_by_level, LoggerFactory
 from structlog.threadlocal import wrap_dict
-from flask import g
 
 
 def logger_initial_config(service_name=None,  # noqa: C901  pylint: disable=too-complex

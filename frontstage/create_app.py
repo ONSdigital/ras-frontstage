@@ -1,6 +1,5 @@
 import logging
 import os
-import requestsdefaulter
 
 from flask import Flask, request
 from structlog import wrap_logger

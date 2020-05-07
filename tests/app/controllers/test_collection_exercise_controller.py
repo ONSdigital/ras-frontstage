@@ -27,7 +27,7 @@ class TestCollectionExerciseController(unittest.TestCase):
                 collection_exercises = collection_exercise_controller.\
                     get_collection_exercises_for_survey(collection_exercise['surveyId'],
                                                         self.app_config['COLLECTION_EXERCISE_URL'],
-                                                        self.app_config['COLLECTION_EXERCISE_AUTH'])
+                                                        self.app_config['BASIC_AUTH'])
 
                 self.assertTrue(collection_exercises is not None)
 
@@ -39,7 +39,7 @@ class TestCollectionExerciseController(unittest.TestCase):
                     collection_exercise_controller. \
                         get_collection_exercises_for_survey(collection_exercise['surveyId'],
                                                             self.app_config['COLLECTION_EXERCISE_URL'],
-                                                            self.app_config['COLLECTION_EXERCISE_AUTH'])
+                                                            self.app_config['BASIC_AUTH'])
 
     def test_convert_events_to_new_format_successful(self):
         formatted_events = collection_exercise_controller.convert_events_to_new_format(collection_exercise['events'])

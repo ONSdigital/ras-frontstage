@@ -274,7 +274,7 @@ def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
         threads.append(ThreadWrapper(get_survey, cache_data, survey_id, app.config['SURVEY_URL'],
                                      app.config['SURVEY_AUTH']))
         threads.append(ThreadWrapper(get_collex, cache_data, survey_id, app.config['COLLECTION_EXERCISE_URL'],
-                                     app.config['COLLECTION_EXERCISE_AUTH']))
+                                     app.config['BASIC_AUTH']))
 
     for business_id in business_ids:
         threads.append(ThreadWrapper(get_case, cache_data, business_id, app.config['CASE_URL'],

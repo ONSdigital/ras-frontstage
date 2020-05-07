@@ -82,10 +82,6 @@ spec:
             {{- else }}
             value: "http://$(COLLECTION_EXERCISE_SERVICE_HOST):$(COLLECTION_EXERCISE_SERVICE_PORT)"
             {{- end }}
-          - name: COLLECTION_EXERCISE_USERNAME
-            value: "$(SECURITY_USER_NAME)"
-          - name: COLLECTION_EXERCISE_PASSWORD
-            value: "$(SECURITY_USER_PASSWORD)"
           - name: COLLECTION_INSTRUMENT_URL
             {{- if .Values.dns.enabled }}
             value: "http://collection-instrument.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"

@@ -51,13 +51,9 @@ class Config(object):
     CASE_URL = os.getenv('CASE_URL')
     COLLECTION_EXERCISE_URL = os.getenv('COLLECTION_EXERCISE_URL')
     COLLECTION_INSTRUMENT_URL = os.getenv('COLLECTION_INSTRUMENT_URL')
+    IAC_URL = os.getenv('IAC_URL')
 
     EMAIL_MATCH_ERROR_TEXT = 'Your email addresses do not match'
-
-    IAC_URL = os.getenv('IAC_URL')
-    IAC_USERNAME = os.getenv('IAC_USERNAME')
-    IAC_PASSWORD = os.getenv('IAC_PASSWORD')
-    IAC_AUTH = (IAC_USERNAME, IAC_PASSWORD)
 
     OAUTH_URL = os.getenv('OAUTH_URL')
     OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID')
@@ -111,11 +107,7 @@ class DevelopmentConfig(Config):
     CASE_URL = os.getenv('CASE_URL', 'http://localhost:8171')
     COLLECTION_EXERCISE_URL = os.getenv('COLLECTION_EXERCISE_URL', 'http://localhost:8145')
     COLLECTION_INSTRUMENT_URL = os.getenv('COLLECTION_INSTRUMENT_URL', 'http://localhost:8002')
-
     IAC_URL = os.getenv('IAC_URL', 'http://localhost:8121')
-    IAC_USERNAME = os.getenv('IAC_USERNAME', 'admin')
-    IAC_PASSWORD = os.getenv('IAC_PASSWORD', 'secret')
-    IAC_AUTH = (IAC_USERNAME, IAC_PASSWORD)
 
     OAUTH_URL = os.getenv('OAUTH_URL', 'http://localhost:8041')
     OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID', 'admin')

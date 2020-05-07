@@ -114,10 +114,6 @@ spec:
             {{- else }}
             value: "http://$(IAC_SERVICE_HOST):$(IAC_SERVICE_PORT)"
             {{- end }}
-          - name: IAC_USERNAME
-            value: "$(SECURITY_USER_NAME)"
-          - name: IAC_PASSWORD
-            value: "$(SECURITY_USER_PASSWORD)"
           - name: JSON_SECRET_KEYS
             valueFrom:
               secretKeyRef:

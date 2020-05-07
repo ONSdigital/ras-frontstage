@@ -37,7 +37,7 @@ def survey_confirm_organisation(_):
         collection_exercise_id = case['caseGroup']['collectionExerciseId']
         collection_exercise = collection_exercise_controller.get_collection_exercise(collection_exercise_id)
         survey_id = collection_exercise['surveyId']
-        survey_name = survey_controller.get_survey(app.config['SURVEY_URL'], app.config['SURVEY_AUTH'],
+        survey_name = survey_controller.get_survey(app.config['SURVEY_URL'], app.config['BASIC_AUTH'],
                                                    survey_id).get('longName')
     except ApiError as exc:
         logger.error('Failed to retrieve data for confirm add organisation/survey page', api_url=exc.url,

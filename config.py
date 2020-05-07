@@ -53,6 +53,8 @@ class Config(object):
     COLLECTION_INSTRUMENT_URL = os.getenv('COLLECTION_INSTRUMENT_URL')
     IAC_URL = os.getenv('IAC_URL')
     PARTY_URL = os.getenv('PARTY_URL')
+    SECURE_MESSAGE_URL = os.getenv('SECURE_MESSAGE_URL')
+    SURVEY_URL = os.getenv('SURVEY_URL')
 
     EMAIL_MATCH_ERROR_TEXT = 'Your email addresses do not match'
 
@@ -60,15 +62,6 @@ class Config(object):
     OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID')
     OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET')
     OAUTH_BASIC_AUTH = (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET)
-
-
-
-    SECURE_MESSAGE_URL = os.getenv('SECURE_MESSAGE_URL')
-
-    SURVEY_URL = os.getenv('SURVEY_URL')
-    SURVEY_USERNAME = os.getenv('SURVEY_USERNAME')
-    SURVEY_PASSWORD = os.getenv('SURVEY_PASSWORD')
-    SURVEY_AUTH = (SURVEY_USERNAME, SURVEY_PASSWORD)
 
     RAS_NOTIFY_SERVICE_URL = os.getenv('RAS_NOTIFY_SERVICE_URL', 'http://notify-gateway-service/emails/')
     RAS_NOTIFY_EMAIL_VERIFICATION_TEMPLATE = os.getenv('RAS_NOTIFY_EMAIL_VERIFICATION_TEMPLATE',
@@ -106,20 +99,15 @@ class DevelopmentConfig(Config):
     COLLECTION_EXERCISE_URL = os.getenv('COLLECTION_EXERCISE_URL', 'http://localhost:8145')
     COLLECTION_INSTRUMENT_URL = os.getenv('COLLECTION_INSTRUMENT_URL', 'http://localhost:8002')
     IAC_URL = os.getenv('IAC_URL', 'http://localhost:8121')
+    PARTY_URL = os.getenv('PARTY_URL', 'http://localhost:8081')
+    SECURE_MESSAGE_URL = os.getenv('SECURE_MESSAGE_URL', 'http://localhost:5050')
+    SURVEY_URL = os.getenv('SURVEY_URL', 'http://localhost:8080')
 
     OAUTH_URL = os.getenv('OAUTH_URL', 'http://localhost:8041')
     OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID', 'admin')
     OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET', 'secret')
     OAUTH_BASIC_AUTH = (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET)
 
-    PARTY_URL = os.getenv('PARTY_URL', 'http://localhost:8081')
-
-    SECURE_MESSAGE_URL = os.getenv('SECURE_MESSAGE_URL', 'http://localhost:5050')
-
-    SURVEY_URL = os.getenv('SURVEY_URL', 'http://localhost:8080')
-    SURVEY_USERNAME = os.getenv('SURVEY_USERNAME', 'admin')
-    SURVEY_PASSWORD = os.getenv('SURVEY_PASSWORD', 'secret')
-    SURVEY_AUTH = (SURVEY_USERNAME, SURVEY_PASSWORD)
     WTF_CSRF_TIME_LIMIT = int(os.getenv('WTF_CSRF_TIME_LIMIT', '3200'))
     SECURE_APP = bool(strtobool(os.getenv('SECURE_APP', "False")))
 

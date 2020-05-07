@@ -193,10 +193,6 @@ spec:
             {{- else }}
             value: "http://$(SURVEY_SERVICE_HOST):$(SURVEY_SERVICE_PORT)"
             {{- end }}
-          - name: SURVEY_USERNAME
-            value: "$(SECURITY_USER_NAME)"
-          - name: SURVEY_PASSWORD
-            value: "$(SECURITY_USER_PASSWORD)"
           - name: ZIPKIN_DSN
             value: "http://$(ZIPKIN_SERVICE_HOST):$(ZIPKIN_SERVICE_PORT)/api/v1/spans"
           - name: ZIPKIN_SAMPLE_RATE

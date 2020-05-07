@@ -99,7 +99,7 @@ def get_case_data(case_id, party_id, business_party_id, survey_short_name):
          app.config['BASIC_AUTH']),
         "survey": survey_controller.get_survey_by_short_name(survey_short_name),
         "business_party": party_controller.get_party_by_business_id(business_party_id, app.config['PARTY_URL'],
-                                                                    app.config['PARTY_AUTH'])
+                                                                    app.config['BASIC_AUTH'])
     }
 
     logger.info('Successfully retrieved all data relating to case', case_id=case_id, party_id=party_id)

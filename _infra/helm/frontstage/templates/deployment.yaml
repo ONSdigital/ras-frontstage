@@ -141,10 +141,6 @@ spec:
             {{- else }}
             value: "http://$(PARTY_SERVICE_HOST):$(PARTY_SERVICE_PORT)"
             {{- end }}
-          - name: PARTY_USERNAME
-            value: "$(SECURITY_USER_NAME)"
-          - name: PARTY_PASSWORD
-            value: "$(SECURITY_USER_PASSWORD)"
           - name: PORT
             value: "{{ .Values.container.port }}"
           - name: RAS_NOTIFY_SERVICE_URL

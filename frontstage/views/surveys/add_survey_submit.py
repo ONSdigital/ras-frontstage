@@ -42,7 +42,7 @@ def add_survey_submit(session):
             case['caseGroup']['collectionExerciseId']).get('surveyId')
 
         info = party_controller.get_party_by_business_id(business_party_id, app.config['PARTY_URL'],
-                                                         app.config['PARTY_AUTH'], collection_exercise_id)
+                                                         app.config['BASIC_AUTH'], collection_exercise_id)
 
         already_enrolled = None
         if is_respondent_and_business_enrolled(info['associations'], case['caseGroup']['surveyId'], party_id):

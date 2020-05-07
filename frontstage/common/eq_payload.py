@@ -49,7 +49,7 @@ class EqPayload(object):
 
         # Party
         party = party_controller.get_party_by_business_id(business_party_id, current_app.config['PARTY_URL'],
-                                                          current_app.config['PARTY_AUTH'],
+                                                          current_app.config['BASIC_AUTH'],
                                                           collection_exercise_id=collex_id)
 
         account_service_url = current_app.config['ACCOUNT_SERVICE_URL']

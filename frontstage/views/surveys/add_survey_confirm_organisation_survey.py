@@ -31,7 +31,7 @@ def survey_confirm_organisation(_):
         case = case_controller.get_case_by_enrolment_code(enrolment_code)
         business_party_id = case['caseGroup']['partyId']
         business_party = party_controller.get_party_by_business_id(business_party_id, app.config['PARTY_URL'],
-                                                                   app.config['PARTY_AUTH'])
+                                                                   app.config['BASIC_AUTH'])
 
         # Get survey name
         collection_exercise_id = case['caseGroup']['collectionExerciseId']

@@ -97,7 +97,7 @@ class TestPartyController(unittest.TestCase):
             with app.app_context():
                 business = party_controller.get_party_by_business_id(business_party['id'],
                                                                      self.app_config['PARTY_URL'],
-                                                                     self.app_config['PARTY_AUTH'])
+                                                                     self.app_config['BASIC_AUTH'])
 
                 self.assertEqual(business['id'], business_party['id'])
                 self.assertEqual(business['name'], business_party['name'])
@@ -110,7 +110,7 @@ class TestPartyController(unittest.TestCase):
             with app.app_context():
                 business = party_controller.get_party_by_business_id(business_party['id'],
                                                                      self.app_config['PARTY_URL'],
-                                                                     self.app_config['PARTY_AUTH'],
+                                                                     self.app_config['BASIC_AUTH'],
                                                                      collection_exercise['id'])
                 self.assertEqual(business['id'], business_party['id'])
                 self.assertEqual(business['name'], business_party['name'])
@@ -126,7 +126,7 @@ class TestPartyController(unittest.TestCase):
             with app.app_context():
                 business = party_controller.get_party_by_business_id(business_party['id'],
                                                                      self.app_config['PARTY_URL'],
-                                                                     self.app_config['PARTY_AUTH'],
+                                                                     self.app_config['BASIC_AUTH'],
                                                                      collection_exercise['id'],
                                                                      verbose=False)
                 self.assertEqual(business['id'], business_party['id'])
@@ -142,7 +142,7 @@ class TestPartyController(unittest.TestCase):
                 with self.assertRaises(ApiError):
                     party_controller.get_party_by_business_id(business_party['id'],
                                                               self.app_config['PARTY_URL'],
-                                                              self.app_config['PARTY_AUTH'])
+                                                              self.app_config['BASIC_AUTH'])
                 self.assertEqual(len(rsps.calls), 1)
                 self.assertEqual(rsps.calls[0].request.url, called_url)
 

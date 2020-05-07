@@ -52,6 +52,7 @@ class Config(object):
     COLLECTION_EXERCISE_URL = os.getenv('COLLECTION_EXERCISE_URL')
     COLLECTION_INSTRUMENT_URL = os.getenv('COLLECTION_INSTRUMENT_URL')
     IAC_URL = os.getenv('IAC_URL')
+    PARTY_URL = os.getenv('PARTY_URL')
 
     EMAIL_MATCH_ERROR_TEXT = 'Your email addresses do not match'
 
@@ -60,10 +61,7 @@ class Config(object):
     OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET')
     OAUTH_BASIC_AUTH = (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET)
 
-    PARTY_URL = os.getenv('PARTY_URL')
-    PARTY_USERNAME = os.getenv('PARTY_USERNAME')
-    PARTY_PASSWORD = os.getenv('PARTY_PASSWORD')
-    PARTY_AUTH = (PARTY_USERNAME, PARTY_PASSWORD)
+
 
     SECURE_MESSAGE_URL = os.getenv('SECURE_MESSAGE_URL')
 
@@ -115,9 +113,6 @@ class DevelopmentConfig(Config):
     OAUTH_BASIC_AUTH = (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET)
 
     PARTY_URL = os.getenv('PARTY_URL', 'http://localhost:8081')
-    PARTY_USERNAME = os.getenv('PARTY_USERNAME', 'admin')
-    PARTY_PASSWORD = os.getenv('PARTY_PASSWORD', 'secret')
-    PARTY_AUTH = (PARTY_USERNAME, PARTY_PASSWORD)
 
     SECURE_MESSAGE_URL = os.getenv('SECURE_MESSAGE_URL', 'http://localhost:5050')
 

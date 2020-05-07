@@ -41,6 +41,16 @@ def logger_initial_config(service_name=None,  # noqa: C901  pylint: disable=too-
     oauth_log.addHandler(logging.NullHandler())
     oauth_log.propagate = False
 
+    def add_severity_level(logger, method_name, event_dict):
+        """
+        Add the log level to the event dict.
+        """
+        if method_name == "warn":
+            # The stdlib has an alias
+            method_name = "warning"
+
+        event_dict["severity"] = method_name
+        return event_dict
 
     def parse_exception(_, __, event_dict):
         exception = event_dict.get('exception')
@@ -50,7 +60,8 @@ def logger_initial_config(service_name=None,  # noqa: C901  pylint: disable=too-
 
     # setup file logging
     renderer_processor = JSONRenderer(indent=indent)
-    processors = [add_log_level, filter_by_level, add_service, format_exc_info,
+
+    processors = [add_severity_level, add_log_level, filter_by_level, add_service, format_exc_info,
                   TimeStamper(fmt=logger_date_format, utc=True, key='created_at'), parse_exception, renderer_processor]
     configure(context_class=wrap_dict(dict), logger_factory=LoggerFactory(), processors=processors,
               cache_logger_on_first_use=True)

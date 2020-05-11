@@ -40,7 +40,7 @@ def get_case_by_case_id(case_id):
     logger.info('Attempting to retrieve case by case id', case_id=case_id)
 
     url = f"{app.config['CASE_URL']}/cases/{case_id}"
-    response = requests.get(url, auth=app.config['CASE_AUTH'])
+    response = requests.get(url, auth=app.config['BASIC_AUTH'])
 
     try:
         response.raise_for_status()
@@ -56,7 +56,7 @@ def get_case_by_enrolment_code(enrolment_code):
     logger.info('Attempting to retrieve case by enrolment code')
 
     url = f"{app.config['CASE_URL']}/cases/iac/{enrolment_code}"
-    response = requests.get(url, auth=app.config['CASE_AUTH'])
+    response = requests.get(url, auth=app.config['BASIC_AUTH'])
 
     try:
         response.raise_for_status()
@@ -72,7 +72,7 @@ def get_case_categories():
     logger.info('Attempting to retrieve case categories')
 
     url = f"{app.config['CASE_URL']}/categories"
-    response = requests.get(url, auth=app.config['CASE_AUTH'])
+    response = requests.get(url, auth=app.config['BASIC_AUTH'])
 
     try:
         response.raise_for_status()
@@ -96,10 +96,10 @@ def get_case_data(case_id, party_id, business_party_id, survey_short_name):
         "collection_exercise": collection_exercise_controller.get_collection_exercise(case['caseGroup']['collectionExerciseId']),
         "collection_instrument": collection_instrument_controller.get_collection_instrument
         (case['collectionInstrumentId'], app.config['COLLECTION_INSTRUMENT_URL'],
-         app.config['COLLECTION_INSTRUMENT_AUTH']),
+         app.config['BASIC_AUTH']),
         "survey": survey_controller.get_survey_by_short_name(survey_short_name),
         "business_party": party_controller.get_party_by_business_id(business_party_id, app.config['PARTY_URL'],
-                                                                    app.config['PARTY_AUTH'])
+                                                                    app.config['BASIC_AUTH'])
     }
 
     logger.info('Successfully retrieved all data relating to case', case_id=case_id, party_id=party_id)
@@ -175,7 +175,7 @@ def post_case_event(case_id, party_id, category, description):
         'metadata': {'partyId': party_id},
         'createdBy': 'RAS_FRONTSTAGE'
     }
-    response = requests.post(url, auth=app.config['CASE_AUTH'], json=message)
+    response = requests.post(url, auth=app.config['BASIC_AUTH'], json=message)
 
     try:
         response.raise_for_status()

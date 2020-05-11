@@ -21,7 +21,7 @@ def get_respondent_party_by_id(party_id):
     logger.info('Retrieving party from party service by id', party_id=party_id)
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/id/{party_id}"
-    response = requests.get(url, auth=app.config['PARTY_AUTH'])
+    response = requests.get(url, auth=app.config['BASIC_AUTH'])
 
     if response.status_code == 404:
         return
@@ -41,7 +41,7 @@ def add_survey(party_id, enrolment_code):
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/add_survey"
     request_json = {'party_id': party_id, 'enrolment_code': enrolment_code}
-    response = requests.post(url, auth=app.config['PARTY_AUTH'], json=request_json)
+    response = requests.post(url, auth=app.config['BASIC_AUTH'], json=request_json)
 
     try:
         response.raise_for_status()
@@ -58,7 +58,7 @@ def change_password(email, password):
 
     data = {'email_address': email, 'new_password': password}
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/change_password"
-    response = requests.put(url, auth=app.config['PARTY_AUTH'], json=data)
+    response = requests.put(url, auth=app.config['BASIC_AUTH'], json=data)
 
     try:
         response.raise_for_status()
@@ -74,7 +74,7 @@ def create_account(registration_data):
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents"
     registration_data['status'] = 'CREATED'
-    response = requests.post(url, auth=app.config['PARTY_AUTH'], json=registration_data)
+    response = requests.post(url, auth=app.config['BASIC_AUTH'], json=registration_data)
 
     try:
         response.raise_for_status()
@@ -121,7 +121,7 @@ def get_respondent_by_email(email):
     bound_logger.info('Attempting to find respondent party by email')
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/email"
-    response = requests.get(url, json={"email": email}, auth=app.config['PARTY_AUTH'])
+    response = requests.get(url, json={"email": email}, auth=app.config['BASIC_AUTH'])
 
     if response.status_code == 404:
         bound_logger.info('Failed to retrieve party by email')
@@ -140,7 +140,7 @@ def get_respondent_by_email(email):
 def resend_verification_email(party_id):
     logger.info('Re-sending verification email', party_id=party_id)
     url = f'{app.config["PARTY_URL"]}/party-api/v1/resend-verification-email/{party_id}'
-    response = requests.post(url, auth=app.config['PARTY_AUTH'])
+    response = requests.post(url, auth=app.config['BASIC_AUTH'])
 
     try:
         response.raise_for_status()
@@ -153,7 +153,7 @@ def resend_verification_email(party_id):
 def resend_verification_email_expired_token(token):
     logger.info('Re-sending verification email', token=token)
     url = f'{app.config["PARTY_URL"]}/party-api/v1/resend-verification-email-expired-token/{token}'
-    response = requests.post(url, auth=app.config['PARTY_AUTH'])
+    response = requests.post(url, auth=app.config['BASIC_AUTH'])
 
     try:
         response.raise_for_status()
@@ -169,7 +169,7 @@ def reset_password_request(username):
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/request_password_change"
     data = {"email_address": username}
-    response = requests.post(url, auth=app.config['PARTY_AUTH'], json=data)
+    response = requests.post(url, auth=app.config['BASIC_AUTH'], json=data)
 
     try:
         response.raise_for_status()
@@ -185,7 +185,7 @@ def reset_password_request(username):
 def resend_password_email_expired_token(token):
     logger.info('Re-sending password email', token=token)
     url = f'{app.config["PARTY_URL"]}/party-api/v1/resend-password-email-expired-token/{token}'
-    response = requests.post(url, auth=app.config['PARTY_AUTH'])
+    response = requests.post(url, auth=app.config['BASIC_AUTH'])
 
     try:
         response.raise_for_status()
@@ -199,7 +199,7 @@ def verify_email(token):
     logger.info('Attempting to verify email address', token=token)
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/emailverification/{token}"
-    response = requests.put(url, auth=app.config['PARTY_AUTH'])
+    response = requests.put(url, auth=app.config['BASIC_AUTH'])
 
     try:
         response.raise_for_status()
@@ -214,7 +214,7 @@ def verify_token(token):
     logger.info('Attempting to verify token with party service', token=token)
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/tokens/verify/{token}"
-    response = requests.get(url, auth=app.config['PARTY_AUTH'])
+    response = requests.get(url, auth=app.config['BASIC_AUTH'])
 
     try:
         response.raise_for_status()
@@ -272,15 +272,15 @@ def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
 
     for survey_id in surveys_ids:
         threads.append(ThreadWrapper(get_survey, cache_data, survey_id, app.config['SURVEY_URL'],
-                                     app.config['SURVEY_AUTH']))
+                                     app.config['BASIC_AUTH']))
         threads.append(ThreadWrapper(get_collex, cache_data, survey_id, app.config['COLLECTION_EXERCISE_URL'],
-                                     app.config['COLLECTION_EXERCISE_AUTH']))
+                                     app.config['BASIC_AUTH']))
 
     for business_id in business_ids:
         threads.append(ThreadWrapper(get_case, cache_data, business_id, app.config['CASE_URL'],
-                                     app.config['CASE_AUTH'], tag))
+                                     app.config['BASIC_AUTH'], tag))
         threads.append(ThreadWrapper(get_party, cache_data, business_id, app.config['PARTY_URL'],
-                                     app.config['PARTY_AUTH']))
+                                     app.config['BASIC_AUTH']))
 
     for thread in threads:
         thread.start()
@@ -299,7 +299,7 @@ def caching_data_for_collection_instrument(cache_data):
             collection_instrument_ids.add(case['collectionInstrumentId'])
     for collection_instrument_id in collection_instrument_ids:
         threads.append(ThreadWrapper(get_collection_instrument, cache_data, collection_instrument_id,
-                                     app.config['COLLECTION_INSTRUMENT_URL'], app.config['COLLECTION_INSTRUMENT_AUTH']))
+                                     app.config['COLLECTION_INSTRUMENT_URL'], app.config['BASIC_AUTH']))
 
     for thread in threads:
         thread.start()
@@ -447,7 +447,7 @@ def notify_party_and_respondent_account_locked(respondent_id, email_address, sta
         'status_change': status
     }
 
-    response = requests.put(url, json=data, auth=app.config['PARTY_AUTH'])
+    response = requests.put(url, json=data, auth=app.config['BASIC_AUTH'])
 
     try:
         response.raise_for_status()

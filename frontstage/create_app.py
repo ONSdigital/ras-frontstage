@@ -7,13 +7,11 @@ from flask_zipkin import Zipkin
 from structlog import wrap_logger
 from flask_wtf.csrf import CSRFProtect
 
-from frontstage.cloud.cloudfoundry import ONSCloudFoundry
 from frontstage.exceptions.exceptions import MissingEnvironmentVariable
 from frontstage.filters.file_size_filter import file_size_filter
 from frontstage.filters.subject_filter import subject_filter
 from frontstage.logger_config import logger_initial_config
 
-cf = ONSCloudFoundry()
 
 CACHE_HEADERS = {
     'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -41,7 +39,7 @@ def create_app_object():
 
     app.name = "ras-frontstage"
 
-    if not app.config['DEBUG'] and not cf.detected:
+    if not app.config['DEBUG']:
         app.wsgi_app = GCPLoadBalancer(app.wsgi_app)
 
     # Zipkin
@@ -53,12 +51,6 @@ def create_app_object():
     logger_initial_config(service_name='ras-frontstage', log_level=log_level)
     logger = wrap_logger(logging.getLogger(__name__))
     logger.debug('App configuration set', config=app_config)
-
-    # If deploying in cloudfoundry set config to use cf redis instance
-    if cf.detected:
-        logger.info('Cloudfoundry detected, setting service configurations')
-        app.config['REDIS_HOST'] = cf.redis.credentials['host']
-        app.config['REDIS_PORT'] = cf.redis.credentials['port']
 
     # If any required variables are not set abort launch
     for var in app.config['NON_DEFAULT_VARIABLES']:

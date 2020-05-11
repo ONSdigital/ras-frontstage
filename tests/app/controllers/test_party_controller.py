@@ -2,7 +2,7 @@
 import json
 import unittest
 from collections import namedtuple
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 
 import responses
@@ -287,7 +287,7 @@ class TestPartyController(unittest.TestCase):
 
         # Enddates set for tomorrow. Millseconds are set up this way because datetime generates 6 digits
         # where we receive 3 digits.
-        date = datetime.datetime.now() + datetime.timedelta(days=1)
+        date = datetime.now() + timedelta(days=1)
         data[0]['scheduledEndDateTime'] = date.strftime("%Y-%m-%dT%H:%M:%S") + ".000Z"
         data[1]['scheduledEndDateTime'] = date.strftime("%Y-%m-%dT%H:%M:%S") + ".111Z"
         self.assertEqual(2, len(data))
@@ -303,14 +303,14 @@ class TestPartyController(unittest.TestCase):
 
     def test_filter_ended_collection_exercises_remove_multiple(self):
         collection_exercises = [{'missingEndDateTime': '!'},
-                                {'scheduledEndDateTime': str(datetime.datetime.now(datetime.timezone.utc) -
-                                                             datetime.timedelta(days=1))},
-                                {'scheduledEndDateTime': str(datetime.datetime.now(datetime.timezone.utc) -
-                                                             datetime.timedelta(hours=1))},
-                                {'scheduledEndDateTime': str(datetime.datetime.now(datetime.timezone.utc) +
-                                                             datetime.timedelta(hours=1))},
-                                {'scheduledEndDateTime': str(datetime.datetime.now(datetime.timezone.utc) +
-                                                             datetime.timedelta(days=1))}
+                                {'scheduledEndDateTime': str(datetime.now(timezone.utc) -
+                                                             timedelta(days=1))},
+                                {'scheduledEndDateTime': str(datetime.now(timezone.utc) -
+                                                             timedelta(hours=1))},
+                                {'scheduledEndDateTime': str(datetime.now(timezone.utc) +
+                                                             timedelta(hours=1))},
+                                {'scheduledEndDateTime': str(datetime.now(timezone.utc) +
+                                                             timedelta(days=1))}
                                 ]
         result = filter_ended_collection_exercises(collection_exercises)
         self.assertEqual(2, len(result))

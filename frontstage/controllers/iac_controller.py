@@ -15,7 +15,7 @@ def get_iac_from_enrolment(enrolment_code):
     bound_logger = logger.bind(enrolment_code=enrolment_code)
     bound_logger.info('Attempting to retrieve IAC')
     url = f"{app.config['IAC_URL']}/iacs/{enrolment_code}"
-    response = requests.get(url, auth=app.config['IAC_AUTH'])
+    response = requests.get(url, auth=app.config['BASIC_AUTH'])
 
     try:
         response.raise_for_status()

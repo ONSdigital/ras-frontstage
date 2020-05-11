@@ -219,6 +219,10 @@ spec:
             value: "$(SECURITY_USER_NAME)"
           - name: SURVEY_PASSWORD
             value: "$(SECURITY_USER_PASSWORD)"
+          - name: ZIPKIN_DSN
+            value: "http://$(ZIPKIN_SERVICE_HOST):$(ZIPKIN_SERVICE_PORT)/api/v1/spans"
+          - name: ZIPKIN_SAMPLE_RATE
+            value: "100"
           - name: SECURE_APP
             value: "{{- if .Values.security.enabled -}}True{{- else -}}False{{- end -}}"
           - name: WTF_CSRF_ENABLED

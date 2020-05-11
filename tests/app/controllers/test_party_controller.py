@@ -314,4 +314,3 @@ class TestPartyController(unittest.TestCase):
                                 ]
         result = filter_ended_collection_exercises(collection_exercises)
         self.assertEqual(2, len(result))
-

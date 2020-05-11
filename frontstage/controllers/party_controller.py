@@ -387,20 +387,14 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
 def filter_ended_collection_exercises(collection_exercises):
     """
     Takes the list of collection exercises and returns a list with all the ones that don't have a
-    scheduledEndDateTime that is in the past.
+    scheduledEndDateTime that is in the past. If a collection exercise is missing a scheduledEndDateTime
+    attribute then it is also removed from the list.
 
     :param collection_exercises: A list of dictionaries containing collection exercises
-    :raises KeyError:  Raised when scheduledEndDateTime isn't present in the collection exercise data
     """
-    try:
-        for collection_exercise in collection_exercises:
-            if parse(collection_exercise['scheduledEndDateTime']) <= datetime.datetime.now(datetime.timezone.utc):
-                collection_exercises.remove(collection_exercise)
-        return collection_exercises
-    except KeyError:
-        logger.error("Collection exercise doesn't contain a scheduledEndDateTime",
-                     collection_exercise=collection_exercise)
-        raise
+    return [ce for ce in collection_exercises
+            if ce.get('scheduledEndDateTime') and
+            parse(ce.get('scheduledEndDateTime')) > datetime.datetime.now(datetime.timezone.utc)]
 
 
 def get_survey(cache_data, survey_id, survey_url, survey_auth):

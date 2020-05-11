@@ -282,7 +282,7 @@ class TestPartyController(unittest.TestCase):
 
     def test_filter_ended_collection_exercises(self):
         """Tests the functionality of the 'filter_ended_collection_exercises' function"""
-        with open('../../../tests/test_data/party/collection_exercises.json') as business_json_data:
+        with open('tests/test_data/party/collection_exercises.json') as business_json_data:
             data = json.load(business_json_data)
 
         # Enddates set for tomorrow. Millseconds are set up this way because datetime generates 6 digits

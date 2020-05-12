@@ -21,7 +21,7 @@ class TestSurveyController(unittest.TestCase):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_survey, json=survey, status=200, content_type='application/json')
             with app.app_context():
-                get_survey = survey_controller.get_survey(self.app_config['SURVEY_URL'], self.app_config['SURVEY_AUTH'],
+                get_survey = survey_controller.get_survey(self.app_config['SURVEY_URL'], self.app_config['BASIC_AUTH'],
                                                           survey['id'])
 
                 self.assertIn('Bricks', get_survey['shortName'], 'Bricks short name is not in the returned survey')
@@ -31,7 +31,7 @@ class TestSurveyController(unittest.TestCase):
             rsps.add(rsps.GET, url_get_survey, status=400)
             with app.app_context():
                 with self.assertRaises(ApiError):
-                    survey_controller.get_survey(self.app_config['SURVEY_URL'], self.app_config['SURVEY_AUTH'],
+                    survey_controller.get_survey(self.app_config['SURVEY_URL'], self.app_config['BASIC_AUTH'],
                                                  survey['id'])
 
     def test_get_survey_by_short_name_success(self):

@@ -1,3 +1,4 @@
+import os
 import unittest
 
 import requests_mock
@@ -55,6 +56,7 @@ class TestSignIn(unittest.TestCase):
         self.oauth_error = {
             'detail': 'Unauthorized user credentials'
         }
+        os.environ['APP_SETTINGS'] = 'TestingConfig'
 
     def test_view_sign_in(self):
         response = self.app.get('/sign-in/', follow_redirects=True)

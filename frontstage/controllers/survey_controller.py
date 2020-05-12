@@ -28,7 +28,7 @@ def get_survey(survey_url, survey_auth, survey_id):
 def get_survey_by_short_name(survey_short_name):
     logger.info('Attempting to retrieve survey by its short name', survey_short_name=survey_short_name)
     url = f"{app.config['SURVEY_URL']}/surveys/shortname/{survey_short_name}"
-    response = requests.get(url, auth=app.config['SURVEY_AUTH'])
+    response = requests.get(url, auth=app.config['BASIC_AUTH'])
 
     try:
         response.raise_for_status()

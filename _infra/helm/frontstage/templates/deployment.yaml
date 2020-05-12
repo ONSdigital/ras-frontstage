@@ -197,7 +197,6 @@ spec:
             value: "$(SECURITY_USER_NAME)"
           - name: SURVEY_PASSWORD
             value: "$(SECURITY_USER_PASSWORD)"
-            value: "100"
           - name: SECURE_APP
             value: "{{- if .Values.security.enabled -}}True{{- else -}}False{{- end -}}"
           - name: WTF_CSRF_ENABLED

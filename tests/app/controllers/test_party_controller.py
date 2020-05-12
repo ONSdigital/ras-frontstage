@@ -2,7 +2,7 @@
 import json
 import unittest
 from collections import namedtuple
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 
 import responses
@@ -97,7 +97,7 @@ class TestPartyController(unittest.TestCase):
             with app.app_context():
                 business = party_controller.get_party_by_business_id(business_party['id'],
                                                                      self.app_config['PARTY_URL'],
-                                                                     self.app_config['PARTY_AUTH'])
+                                                                     self.app_config['BASIC_AUTH'])
 
                 self.assertEqual(business['id'], business_party['id'])
                 self.assertEqual(business['name'], business_party['name'])
@@ -110,7 +110,7 @@ class TestPartyController(unittest.TestCase):
             with app.app_context():
                 business = party_controller.get_party_by_business_id(business_party['id'],
                                                                      self.app_config['PARTY_URL'],
-                                                                     self.app_config['PARTY_AUTH'],
+                                                                     self.app_config['BASIC_AUTH'],
                                                                      collection_exercise['id'])
                 self.assertEqual(business['id'], business_party['id'])
                 self.assertEqual(business['name'], business_party['name'])
@@ -126,7 +126,7 @@ class TestPartyController(unittest.TestCase):
             with app.app_context():
                 business = party_controller.get_party_by_business_id(business_party['id'],
                                                                      self.app_config['PARTY_URL'],
-                                                                     self.app_config['PARTY_AUTH'],
+                                                                     self.app_config['BASIC_AUTH'],
                                                                      collection_exercise['id'],
                                                                      verbose=False)
                 self.assertEqual(business['id'], business_party['id'])
@@ -142,7 +142,7 @@ class TestPartyController(unittest.TestCase):
                 with self.assertRaises(ApiError):
                     party_controller.get_party_by_business_id(business_party['id'],
                                                               self.app_config['PARTY_URL'],
-                                                              self.app_config['PARTY_AUTH'])
+                                                              self.app_config['BASIC_AUTH'])
                 self.assertEqual(len(rsps.calls), 1)
                 self.assertEqual(rsps.calls[0].request.url, called_url)
 
@@ -290,18 +290,27 @@ class TestPartyController(unittest.TestCase):
         date = datetime.now() + timedelta(days=1)
         data[0]['scheduledEndDateTime'] = date.strftime("%Y-%m-%dT%H:%M:%S") + ".000Z"
         data[1]['scheduledEndDateTime'] = date.strftime("%Y-%m-%dT%H:%M:%S") + ".111Z"
-        self.assertEqual(len(data), 2)
-        filter_ended_collection_exercises(data)
-        self.assertEqual(len(data), 2)
+        self.assertEqual(2, len(data))
+        result = filter_ended_collection_exercises(data)
+        self.assertEqual(2, len(result))
 
         # Change one of the end dates to a past date.  It should successfully filter the collection exercise
         # out of the list.
         data[0]['scheduledEndDateTime'] = "2019-01-31T00:00:00.000Z"
-        self.assertEqual(len(data), 2)
-        filter_ended_collection_exercises(data)
-        self.assertEqual(len(data), 1)
+        self.assertEqual(2, len(data))
+        result = filter_ended_collection_exercises(data)
+        self.assertEqual(1, len(result))
 
-        # The key missing will throw a keyError
-        del data[0]['scheduledEndDateTime']
-        with self.assertRaises(KeyError):
-            filter_ended_collection_exercises(data)
+    def test_filter_ended_collection_exercises_remove_multiple(self):
+        collection_exercises = [{'missingEndDateTime': '!'},
+                                {'scheduledEndDateTime': str(datetime.now(timezone.utc) -
+                                                             timedelta(days=1))},
+                                {'scheduledEndDateTime': str(datetime.now(timezone.utc) -
+                                                             timedelta(hours=1))},
+                                {'scheduledEndDateTime': str(datetime.now(timezone.utc) +
+                                                             timedelta(hours=1))},
+                                {'scheduledEndDateTime': str(datetime.now(timezone.utc) +
+                                                             timedelta(days=1))}
+                                ]
+        result = filter_ended_collection_exercises(collection_exercises)
+        self.assertEqual(2, len(result))

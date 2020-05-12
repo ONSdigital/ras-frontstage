@@ -71,7 +71,6 @@ Environment variables available for configuration are listed below:
 | SECRET_KEY                      | Secret key used by flask                                      | 'ONS_DUMMY_KEY'
 | SECURITY_USER_NAME              | Username for basic auth                                       | 'admin'
 | SECURITY_USER_PASSWORD          | Password for basic auth                                       | 'secret'
-| JWT_ALGORITHM                   | Algorithm used to code JWT                                    | 'HS256'
 | JWT_SECRET                      | SECRET used to code JWT                                       | 'testsecret'
 | VALIDATE_JWT                    | Boolean for turning on/off JWT validation (True=on)           | True 
 | GOOGLE_ANALYTICS                | Code for google analytics                                     | None

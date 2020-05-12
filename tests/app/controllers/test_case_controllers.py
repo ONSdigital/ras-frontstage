@@ -213,7 +213,7 @@ class TestCaseControllers(unittest.TestCase):
 
         cases = case_controller.get_cases_for_list_type_by_party_id(respondent_party['id'],
                                                                     self.app_config['CASE_URL'],
-                                                                    self.app_config['CASE_AUTH'])
+                                                                    self.app_config['BASIC_AUTH'])
         for business_case in cases:
             for status in ['COMPLETE', 'COMPLETEDBYPHONE', 'NOLONGERREQUIRED']:
                 self.assertNotIn(business_case['caseGroup']['caseGroupStatus'], status)
@@ -224,7 +224,7 @@ class TestCaseControllers(unittest.TestCase):
 
         cases = case_controller.get_cases_for_list_type_by_party_id(respondent_party['id'],
                                                                     self.app_config['CASE_URL'],
-                                                                    self.app_config['CASE_AUTH'],
+                                                                    self.app_config['BASIC_AUTH'],
                                                                     list_type='history')
 
         for business_case in cases:
@@ -270,7 +270,7 @@ class TestCaseControllers(unittest.TestCase):
             rsps.add(rsps.GET, url, json=case_list, status=200)
             with app.app_context():
                 returned_cases = case_controller.get_cases_by_party_id(case['partyId'], self.app_config['CASE_URL'],
-                                                                       self.app_config['CASE_AUTH'], case_events=True)
+                                                                       self.app_config['BASIC_AUTH'], case_events=True)
 
                 self.assertNotEqual(len(returned_cases), 0)
 
@@ -279,7 +279,7 @@ class TestCaseControllers(unittest.TestCase):
             rsps.add(rsps.GET, url_get_cases_by_party, json=case_list, status=200)
             with app.app_context():
                 returned_cases = case_controller.get_cases_by_party_id(case['partyId'], self.app_config['CASE_URL'],
-                                                                       self.app_config['CASE_AUTH'])
+                                                                       self.app_config['BASIC_AUTH'])
 
                 self.assertNotEqual(len(returned_cases), 0)
 
@@ -288,7 +288,7 @@ class TestCaseControllers(unittest.TestCase):
             rsps.add(rsps.GET, url_get_cases_by_party, json=case_list, status=200)
             with app.app_context():
                 returned_cases = case_controller.get_cases_by_party_id(case['partyId'], self.app_config['CASE_URL'],
-                                                                       self.app_config['CASE_AUTH'], iac=False)
+                                                                       self.app_config['BASIC_AUTH'], iac=False)
 
                 self.assertNotEqual(len(returned_cases), 0)
                 self.assertIsNone(returned_cases[0]['iac'])
@@ -298,7 +298,7 @@ class TestCaseControllers(unittest.TestCase):
             rsps.add(rsps.GET, url_get_cases_by_party, json=case_list_with_iac_and_case_events, status=200)
             with app.app_context():
                 returned_cases = case_controller.get_cases_by_party_id(case['partyId'], self.app_config['CASE_URL'],
-                                                                       self.app_config['CASE_AUTH'], iac=False,
+                                                                       self.app_config['BASIC_AUTH'], iac=False,
                                                                        case_events=True)
 
                 self.assertNotEqual(len(returned_cases), 0)
@@ -311,4 +311,4 @@ class TestCaseControllers(unittest.TestCase):
             with app.app_context():
                 with self.assertRaises(ApiError):
                     case_controller.get_cases_by_party_id(case['partyId'], self.app_config['CASE_URL'],
-                                                          self.app_config['CASE_AUTH'])
+                                                          self.app_config['BASIC_AUTH'])

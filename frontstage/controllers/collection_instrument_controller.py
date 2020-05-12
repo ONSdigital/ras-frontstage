@@ -17,7 +17,7 @@ def download_collection_instrument(collection_instrument_id, case_id, party_id):
                 party_id=party_id)
 
     url = f"{app.config['COLLECTION_INSTRUMENT_URL']}/collection-instrument-api/1.0.2/download/{collection_instrument_id}"
-    response = requests.get(url, auth=app.config['COLLECTION_INSTRUMENT_AUTH'])
+    response = requests.get(url, auth=app.config['BASIC_AUTH'])
 
     # Post relevant download case event
     category = 'COLLECTION_INSTRUMENT_DOWNLOADED' if response.ok else 'COLLECTION_INSTRUMENT_ERROR'
@@ -67,7 +67,7 @@ def upload_collection_instrument(upload_file, case_id, party_id):
     logger.info('Attempting to upload collection instrument', case_id=case_id, party_id=party_id)
 
     url = f"{app.config['COLLECTION_INSTRUMENT_URL']}/survey_response-api/v1/survey_responses/{case_id}"
-    response = requests.post(url, auth=app.config['COLLECTION_INSTRUMENT_AUTH'], files=upload_file)
+    response = requests.post(url, auth=app.config['BASIC_AUTH'], files=upload_file)
 
     # Post relevant upload case event
     category = 'SUCCESSFUL_RESPONSE_UPLOAD' if response.ok else 'UNSUCCESSFUL_RESPONSE_UPLOAD'

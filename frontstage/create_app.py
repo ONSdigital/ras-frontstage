@@ -1,9 +1,7 @@
 import logging
 import os
-import requestsdefaulter
 
 from flask import Flask, request
-from flask_zipkin import Zipkin
 from structlog import wrap_logger
 from flask_wtf.csrf import CSRFProtect
 
@@ -41,10 +39,6 @@ def create_app_object():
 
     if not app.config['DEBUG']:
         app.wsgi_app = GCPLoadBalancer(app.wsgi_app)
-
-    # Zipkin
-    zipkin = Zipkin(app=app, sample_rate=app.config.get("ZIPKIN_SAMPLE_RATE"))
-    requestsdefaulter.default_headers(zipkin.create_http_headers_for_new_span)
 
     # Configure logger
     log_level = 'DEBUG' if app.config['DEBUG'] else None

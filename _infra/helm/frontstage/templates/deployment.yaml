@@ -193,10 +193,6 @@ spec:
             {{- else }}
             value: "http://$(SURVEY_SERVICE_HOST):$(SURVEY_SERVICE_PORT)"
             {{- end }}
-          - name: ZIPKIN_DSN
-            value: "http://$(ZIPKIN_SERVICE_HOST):$(ZIPKIN_SERVICE_PORT)/api/v1/spans"
-          - name: ZIPKIN_SAMPLE_RATE
-            value: "100"
           - name: SECURE_APP
             value: "{{- if .Values.security.enabled -}}True{{- else -}}False{{- end -}}"
           - name: WTF_CSRF_ENABLED

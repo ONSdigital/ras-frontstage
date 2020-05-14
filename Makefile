@@ -17,7 +17,7 @@ UNIT_TESTS=tests/unit
 INTEGRATION_TESTS=tests/integration
 
 docker-test: REDIS_PORT=6379
-docker-test: test
+docker-test: unit-tests integration-tests
 
 check:
 # TEMPORARILY disable pipenv check, pending resolution of pipenv bugs 2412 and 4147

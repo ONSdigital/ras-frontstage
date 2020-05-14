@@ -119,22 +119,12 @@ spec:
               secretKeyRef:
                 name: json-secrets
                 key: json-secret-keys-frontstage
-          - name: OAUTH_URL
+          - name: AUTH_URL
             {{- if .Values.dns.enabled }}
             value: "http://auth.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"
             {{- else }}
             value: "http://$(AUTH_SERVICE_HOST):$(AUTH_SERVICE_PORT)"
             {{- end }}
-          - name: OAUTH_CLIENT_ID
-            valueFrom:
-              secretKeyRef:
-                name: oauth-secret
-                key: oauth-client-id
-          - name: OAUTH_CLIENT_SECRET
-            valueFrom:
-              secretKeyRef:
-                name: oauth-secret
-                key: oauth-client-secret
           - name: PARTY_URL
             {{- if .Values.dns.enabled }}
             value: "http://party.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"

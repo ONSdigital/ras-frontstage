@@ -15,11 +15,8 @@ def sign_in(username, password):
     bound_logger = logger.bind(email=obfuscate_email(username))
     bound_logger.info('Attempting to retrieve OAuth2 token for sign-in')
 
-    url = f"{app.config['OAUTH_URL']}/api/v1/tokens/"
+    url = f"{app.config['AUTH_URL']}/api/v1/tokens/"
     data = {
-        'grant_type': 'password',
-        'client_id': app.config['OAUTH_CLIENT_ID'],
-        'client_secret': app.config['OAUTH_CLIENT_SECRET'],
         'username': username,
         'password': password,
     }
@@ -27,7 +24,7 @@ def sign_in(username, password):
         'Accept': 'application/json',
         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
     }
-    response = requests.post(url, headers=headers, auth=app.config['OAUTH_BASIC_AUTH'], data=data)
+    response = requests.post(url, headers=headers, auth=app.config['BASIC_AUTH'], data=data)
 
     try:
         response.raise_for_status()

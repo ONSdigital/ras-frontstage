@@ -8,7 +8,7 @@ from frontstage import app, create_app_object
 from frontstage.controllers.party_controller import notify_party_and_respondent_account_locked
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.common.utilities import obfuscate_email
-from tests.app.mocked_services import url_get_respondent_email, url_oauth_token, party, \
+from tests.integration.mocked_services import url_get_respondent_email, url_oauth_token, party, \
     url_notify_party_and_respondent_account_locked, token
 
 respondent_party_id = "cd592e0f-8d07-407b-b75d-e01fbdae8233"

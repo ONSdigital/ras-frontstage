@@ -7,7 +7,7 @@ from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import collection_exercise_controller
 from frontstage.exceptions.exceptions import ApiError
-from tests.app.mocked_services import collection_exercise, collection_exercise_by_survey, \
+from tests.integration.mocked_services import collection_exercise, collection_exercise_by_survey, \
     url_get_collection_exercises_by_survey
 
 

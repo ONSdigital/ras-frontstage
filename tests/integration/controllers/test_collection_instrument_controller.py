@@ -9,8 +9,8 @@ from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import collection_instrument_controller
 from frontstage.exceptions.exceptions import ApiError, CiUploadError
-from tests.app.mocked_services import (case, collection_instrument_seft, business_party,
-                                       url_download_ci, url_get_ci, url_upload_ci)
+from tests.integration.mocked_services import (case, collection_instrument_seft, business_party,
+                                               url_download_ci, url_get_ci, url_upload_ci)
 
 
 class TestCollectionInstrumentController(unittest.TestCase):

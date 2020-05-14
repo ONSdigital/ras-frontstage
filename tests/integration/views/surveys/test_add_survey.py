@@ -7,7 +7,7 @@ from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.exceptions.exceptions import ApiError
-from tests.app.mocked_services import active_iac, encrypted_enrolment_code, enrolment_code, inactive_iac, \
+from tests.integration.mocked_services import active_iac, encrypted_enrolment_code, enrolment_code, inactive_iac, \
     url_validate_enrolment
 
 

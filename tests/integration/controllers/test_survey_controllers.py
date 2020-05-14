@@ -6,7 +6,7 @@ from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import survey_controller
 from frontstage.exceptions.exceptions import ApiError
-from tests.app.mocked_services import survey, url_get_survey, url_get_survey_by_short_name
+from tests.integration.mocked_services import survey, url_get_survey, url_get_survey_by_short_name
 
 
 class TestSurveyController(unittest.TestCase):

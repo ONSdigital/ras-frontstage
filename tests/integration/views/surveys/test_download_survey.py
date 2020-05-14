@@ -4,7 +4,7 @@ from unittest.mock import patch
 from flask import request
 
 from frontstage import app
-from tests.app.mocked_services import business_party, case, collection_instrument_seft, encoded_jwt_token, survey
+from tests.integration.mocked_services import business_party, case, collection_instrument_seft, encoded_jwt_token, survey
 
 
 class TestDownloadSurvey(unittest.TestCase):

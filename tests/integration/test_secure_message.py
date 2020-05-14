@@ -5,9 +5,9 @@ import requests_mock
 
 from frontstage import app
 from frontstage.exceptions.exceptions import IncorrectAccountAccessError
-from tests.app.mocked_services import (conversation_json, conversation_list_json,
-                                       encoded_jwt_token, url_get_thread, url_get_threads,
-                                       url_get_thread_old, url_send_message)
+from tests.integration.mocked_services import (conversation_json, conversation_list_json,
+                                               encoded_jwt_token, url_get_thread, url_get_threads,
+                                               url_get_thread_old, url_send_message)
 
 
 def create_api_error(status_code, data=None):

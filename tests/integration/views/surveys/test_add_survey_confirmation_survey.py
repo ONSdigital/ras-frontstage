@@ -7,7 +7,7 @@ from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.exceptions.exceptions import ApiError
-from tests.app.mocked_services import business_party, case, collection_exercise, encoded_jwt_token, \
+from tests.integration.mocked_services import business_party, case, collection_exercise, encoded_jwt_token, \
     encrypted_enrolment_code, \
     enrolment_code, survey, url_get_case
 

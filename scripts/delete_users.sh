@@ -2,7 +2,7 @@
 # usage: ./delete_users.sh [filename]
 
 # First check all the required environment variables are set
-for env_var in SECURITY_USER_NAME SECURITY_USER_PASSWORD PARTY_URL OAUTH_URL; do
+for env_var in SECURITY_USER_NAME SECURITY_USER_PASSWORD PARTY_URL AUTH_URL; do
     if [ -z ${!env_var} ]
     then
         echo "$env_var is missing"
@@ -37,7 +37,7 @@ while read email; do
         exit
     fi
     echo "-- Deleting $email from auth --"
-    auth_delete_response=$(curl --write-out %{http_code} --silent --output /dev/null -F "username=$email" --user ${SECURITY_USER_NAME}:${SECURITY_USER_PASSWORD} -X DELETE ${OAUTH_URL}/api/account/user)
+    auth_delete_response=$(curl --write-out %{http_code} --silent --output /dev/null -F "username=$email" --user ${SECURITY_USER_NAME}:${SECURITY_USER_PASSWORD} -X DELETE ${AUTH_URL}/api/account/user)
     echo "Response from deleting email from auth [$auth_delete_response]"
     if [[ $auth_delete_response -ne 204 ]]; then
         echo "Failed to delete respondent from auth"

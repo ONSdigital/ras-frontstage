@@ -55,7 +55,7 @@ or if you are running redis in the docker environment
 ```bash
 make docker-test
 ```
-or if you wish to run a single test, it can be specified as follows:
+or if you wish to run a single test file, it can be specified as follows:
 ```bash
 make INTEGRATION_TESTS=tests/integration/views/surveys/test_surveys_list.py integration-tests
 make UNIT_TESTS=tests/unit/test_filters.py unit-tests

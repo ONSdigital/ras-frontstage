@@ -7,16 +7,16 @@ from structlog.stdlib import add_log_level, filter_by_level, LoggerFactory
 from structlog.threadlocal import wrap_dict
 
 
-def logger_initial_config(service_name='ras-frontstage',
-                          log_level='INFO',
+def logger_initial_config(log_level='INFO',
                           logger_format="%(message)s",
                           logger_date_format="%Y-%m-%dT%H:%M%s"):
 
     def add_service(logger, method_name, event_dict):  # pylint: disable=unused-argument
         """
         Add the service name to the event dict.
+        This adds `service: 'ras-frontstage'` to all log lines.
         """
-        event_dict['service'] = service_name
+        event_dict['service'] = 'ras-frontstage'
         return event_dict
 
     logging.basicConfig(stream=sys.stdout, level=log_level, format=logger_format)

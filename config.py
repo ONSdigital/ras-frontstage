@@ -13,6 +13,7 @@ class Config(object):
     PREFERRED_URL_SCHEME = 'https'
     PORT = os.getenv('PORT', 8082)
     MAX_UPLOAD_LENGTH = os.getenv('MAX_UPLOAD_LENGTH', 20 * 1024 * 1024)
+    LOGGING_LEVEL = os.getenv('LOGGING_LEVEL', 'INFO')
 
     EMAIL_TOKEN_SALT = os.getenv('EMAIL_TOKEN_SALT', 'aardvark')
     EMAIL_TOKEN_EXPIRY = int(os.getenv('EMAIL_TOKEN_EXPIRY', '86400'))
@@ -76,6 +77,7 @@ class DevelopmentConfig(Config):
     PREFERRED_URL_SCHEME = 'http'
     SECRET_KEY = os.getenv('SECRET_KEY', 'ONS_DUMMY_KEY')
     JWT_SECRET = os.getenv('JWT_SECRET', 'testsecret')
+    LOGGING_LEVEL = os.getenv('LOGGING_LEVEL', 'DEBUG')
 
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')

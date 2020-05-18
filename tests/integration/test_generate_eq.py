@@ -8,14 +8,14 @@ from frontstage import app
 from frontstage.common.eq_payload import EqPayload
 from frontstage.controllers import collection_exercise_controller
 from frontstage.exceptions.exceptions import ApiError, InvalidEqPayLoad
-from tests.app.mocked_services import (case, collection_exercise, collection_exercise_events,
-                                       business_party, survey, survey_eq, collection_instrument_eq,
-                                       url_get_case, url_get_collection_exercise,
-                                       url_get_collection_exercise_events, url_get_business_party, url_get_survey,
-                                       url_get_ci, collection_instrument_seft, url_post_case_event_uuid,
-                                       url_get_case_categories, url_get_survey_by_short_name_eq, categories,
-                                       completed_case,
-                                       url_get_respondent_party, respondent_party)
+from tests.integration.mocked_services import (case, collection_exercise, collection_exercise_events,
+                                               business_party, survey, survey_eq, collection_instrument_eq,
+                                               url_get_case, url_get_collection_exercise,
+                                               url_get_collection_exercise_events, url_get_business_party, url_get_survey,
+                                               url_get_ci, collection_instrument_seft, url_post_case_event_uuid,
+                                               url_get_case_categories, url_get_survey_by_short_name_eq, categories,
+                                               completed_case,
+                                               url_get_respondent_party, respondent_party)
 
 encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoicmVzcG9uZGVudCIsImFjY2Vzc190b2tlbiI6ImI5OWIyMjA" \
                     "0LWYxMDAtNDcxZS1iOTQ1LTIyN2EyNmVhNjljZCIsInJlZnJlc2hfdG9rZW4iOiIxZTQyY2E2MS02ZDBkLTQxYjMtODU2Yy0" \

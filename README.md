@@ -45,17 +45,21 @@ Install test dependencies with
 ```bash
 pipenv install --dev
 ```
-The [run_tests.py](run_tests.py) script will run the tests in the [/tests](tests) folder using pytest and present a coverage report.  This script can be easily run via the following command
+The Makefile will run the tests in the unit or integration tests folder using pytest, and present a coverage report.  
+These can be easily run via the following commands:
 ```bash
-make test
+make unit-tests
+make integration-tests
 ```
 or if you are running redis in the docker environment
 ```bash
 make docker-test
 ```
-or if you wish to run a single test file it can be specified as follows
+or if you wish to run a single test file, it can be specified as follows:
 ```bash
-make TEST_TARGET=tests/app/test_surveys.py test
+make INTEGRATION_TESTS=tests/integration/views/surveys/test_surveys_list.py integration-tests
+make UNIT_TESTS=tests/unit/test_filters.py unit-tests
+
 ```
 The syntax above will work equally well with the 'docker-test' target
 

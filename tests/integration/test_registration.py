@@ -3,12 +3,12 @@ import unittest
 import requests_mock
 
 from frontstage import app
-from tests.app.mocked_services import (business_party, case, categories, collection_exercise,
-                                       encrypted_enrolment_code, enrolment_code, survey, token,
-                                       url_get_case_by_enrolment_code, url_get_business_party,
-                                       url_get_case_categories, url_get_collection_exercise,
-                                       url_get_survey, url_post_case_event_uuid, url_create_account,
-                                       url_validate_enrolment, url_verify_email)
+from tests.integration.mocked_services import (business_party, case, categories, collection_exercise,
+                                               encrypted_enrolment_code, enrolment_code, survey, token,
+                                               url_get_case_by_enrolment_code, url_get_business_party,
+                                               url_get_case_categories, url_get_collection_exercise,
+                                               url_get_survey, url_post_case_event_uuid, url_create_account,
+                                               url_validate_enrolment, url_verify_email)
 
 
 class TestRegistration(unittest.TestCase):

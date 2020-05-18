@@ -8,7 +8,7 @@ from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.exceptions.exceptions import ApiError
-from tests.app.mocked_services import active_iac, case, collection_exercise, encoded_jwt_token, \
+from tests.integration.mocked_services import active_iac, case, collection_exercise, encoded_jwt_token, \
     encrypted_enrolment_code, \
     enrolment_code, url_validate_enrolment, business_party, case_diff_surveyId
 from frontstage.views.surveys.add_survey_submit import is_respondent_and_business_enrolled

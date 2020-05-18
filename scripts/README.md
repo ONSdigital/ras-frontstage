@@ -80,7 +80,7 @@ In order to use it, you need the following environment variables to be set:
 * SECURITY_USER_NAME
 * SECURITY_USER_PASSWORD
 * PARTY_URL
-* OAUTH_URL
+* AUTH_URL
 
 On a Mac, if you need to set these, you can do the following:
 

@@ -14,11 +14,11 @@ from frontstage.controllers.collection_exercise_controller import convert_events
 from frontstage.controllers.party_controller import (display_button, get_respondent_enrolments_for_known_collex,
                                                      filter_ended_collection_exercises)
 from frontstage.exceptions.exceptions import ApiError
-from tests.app.mocked_services import (business_party, case, case_list, collection_exercise,
-                                       collection_exercise_by_survey,
-                                       collection_instrument_seft, respondent_party, survey, url_get_business_party,
-                                       url_get_respondent_email, url_get_respondent_party, url_post_add_survey,
-                                       url_reset_password_request, url_notify_party_and_respondent_account_locked)
+from tests.integration.mocked_services import (business_party, case, case_list, collection_exercise,
+                                               collection_exercise_by_survey,
+                                               collection_instrument_seft, respondent_party, survey, url_get_business_party,
+                                               url_get_respondent_email, url_get_respondent_party, url_post_add_survey,
+                                               url_reset_password_request, url_notify_party_and_respondent_account_locked)
 
 registration_data = {
                 'emailAddress': respondent_party['emailAddress'],

@@ -8,11 +8,11 @@ from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import case_controller
 from frontstage.exceptions.exceptions import ApiError, InvalidCaseCategory, NoSurveyPermission
-from tests.app.mocked_services import (business_party, case, case_list, categories, collection_exercise,
-                                       collection_instrument_seft, eq_payload, respondent_party, survey,
-                                       survey_eq, url_get_case, url_get_case_by_enrolment_code,
-                                       url_get_cases_by_party, url_get_case_categories, url_post_case_event_uuid,
-                                       case_list_with_iac_and_case_events)
+from tests.integration.mocked_services import (business_party, case, case_list, categories, collection_exercise,
+                                               collection_instrument_seft, eq_payload, respondent_party, survey,
+                                               survey_eq, url_get_case, url_get_case_by_enrolment_code,
+                                               url_get_cases_by_party, url_get_case_categories, url_post_case_event_uuid,
+                                               case_list_with_iac_and_case_events)
 
 
 class TestCaseControllers(unittest.TestCase):

@@ -43,6 +43,7 @@ class Config(object):
     PASSWORD_MIN_LENGTH = 8
     PASSWORD_MAX_LENGTH = 160
 
+    AUTH_URL = os.getenv('AUTH_URL')
     CASE_URL = os.getenv('CASE_URL')
     COLLECTION_EXERCISE_URL = os.getenv('COLLECTION_EXERCISE_URL')
     COLLECTION_INSTRUMENT_URL = os.getenv('COLLECTION_INSTRUMENT_URL')
@@ -52,11 +53,6 @@ class Config(object):
     SURVEY_URL = os.getenv('SURVEY_URL')
 
     EMAIL_MATCH_ERROR_TEXT = 'Your email addresses do not match'
-
-    OAUTH_URL = os.getenv('OAUTH_URL')
-    OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID')
-    OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET')
-    OAUTH_BASIC_AUTH = (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET)
 
     RAS_NOTIFY_SERVICE_URL = os.getenv('RAS_NOTIFY_SERVICE_URL', 'http://notify-gateway-service/emails/')
     RAS_NOTIFY_EMAIL_VERIFICATION_TEMPLATE = os.getenv('RAS_NOTIFY_EMAIL_VERIFICATION_TEMPLATE',
@@ -90,6 +86,7 @@ class DevelopmentConfig(Config):
     EQ_URL = os.getenv('EQ_URL', 'https://localhost:5000/session?token=')
     JSON_SECRET_KEYS = os.getenv('JSON_SECRET_KEYS') or open("./tests/test_data/jwt-test-keys/test_key.json").read()
 
+    AUTH_URL = os.getenv('AUTH_URL', 'http://localhost:8041')
     CASE_URL = os.getenv('CASE_URL', 'http://localhost:8171')
     COLLECTION_EXERCISE_URL = os.getenv('COLLECTION_EXERCISE_URL', 'http://localhost:8145')
     COLLECTION_INSTRUMENT_URL = os.getenv('COLLECTION_INSTRUMENT_URL', 'http://localhost:8002')
@@ -97,11 +94,6 @@ class DevelopmentConfig(Config):
     PARTY_URL = os.getenv('PARTY_URL', 'http://localhost:8081')
     SECURE_MESSAGE_URL = os.getenv('SECURE_MESSAGE_URL', 'http://localhost:5050')
     SURVEY_URL = os.getenv('SURVEY_URL', 'http://localhost:8080')
-
-    OAUTH_URL = os.getenv('OAUTH_URL', 'http://localhost:8041')
-    OAUTH_CLIENT_ID = os.getenv('OAUTH_CLIENT_ID', 'admin')
-    OAUTH_CLIENT_SECRET = os.getenv('OAUTH_CLIENT_SECRET', 'secret')
-    OAUTH_BASIC_AUTH = (OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET)
 
     WTF_CSRF_TIME_LIMIT = int(os.getenv('WTF_CSRF_TIME_LIMIT', '3200'))
     SECURE_APP = bool(strtobool(os.getenv('SECURE_APP', "False")))

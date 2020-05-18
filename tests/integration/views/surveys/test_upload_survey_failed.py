@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch
 
 from frontstage import app
-from tests.app.mocked_services import business_party, case, collection_instrument_seft, collection_exercise, \
+from tests.integration.mocked_services import business_party, case, collection_instrument_seft, collection_exercise, \
     encoded_jwt_token, survey
 
 

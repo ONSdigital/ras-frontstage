@@ -1,6 +1,0 @@
-.build
-.build-test
-.idea
-__pycache__
-.git
-node_modules

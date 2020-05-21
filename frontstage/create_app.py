@@ -41,8 +41,7 @@ def create_app_object():
         app.wsgi_app = GCPLoadBalancer(app.wsgi_app)
 
     # Configure logger
-    log_level = 'DEBUG' if app.config['DEBUG'] else None
-    logger_initial_config(service_name='ras-frontstage', log_level=log_level)
+    logger_initial_config(log_level=app.config['LOGGING_LEVEL'])
     logger = wrap_logger(logging.getLogger(__name__))
     logger.debug('App configuration set', config=app_config)
 

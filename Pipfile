@@ -4,7 +4,7 @@ verify_ssl = true
 url = "https://pypi.python.org/simple"
 
 [requires]
-python_version = "3.6"
+python_version = "3.8"
 
 [packages]
 cfenv = "*"
@@ -27,6 +27,7 @@ flask-zipkin = "*"
 pycryptodome = "*"
 flask-talisman = "*"
 werkzeug = "~=0.16"
+email_validator = "*"
 
 [dev-packages]
 codecov = "*"

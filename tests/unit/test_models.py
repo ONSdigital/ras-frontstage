@@ -28,9 +28,6 @@ invalid_emails = ['email@123.123.123.123',
                   'pipe-in-domain@example.com|gov.uk',
                   'comma,in-local@gov.uk',
                   'comma-in-domain@domain,gov.uk',
-                  'pound-sign-in-local£@domain.com',
-                  'local-with-’-apostrophe@domain.com',
-                  'local-with-”-quotes@domain.com',
                   'domain-starts-with-a-dot@.domain.com',
                   'brackets(in)local@domain.com']
 

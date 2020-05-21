@@ -28,8 +28,8 @@ def home():
     return redirect(url_for('sign_in_bp.login', _external=True, _scheme=getenv('SCHEME', 'http')))
 
 
-@sign_in_bp.route('/', methods=['GET', 'POST'])  # noqa: C901
-def login():
+@sign_in_bp.route('/', methods=['GET', 'POST'])
+def login():  # noqa: C901
     form = LoginForm(request.form)
     form.username.data = form.username.data.strip()
     account_activated = request.args.get('account_activated', None)

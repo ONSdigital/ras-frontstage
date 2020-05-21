@@ -1,4 +1,4 @@
-FROM python:3.6-slim
+FROM python:3.8-slim
 
 RUN apt update && apt install -y build-essential curl
 RUN pip install pipenv

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "42e0aee5aa16fe541d24e00e5c94086691057e390688502f3d2d4528946660db"
+            "sha256": "5f8972fe6e6c8fc3e6d5ce2086a12001d2ba9ecc4c77b24c8bd0d017c234a638"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -29,14 +29,6 @@
                 "sha256:51fcb31174be6e6664c5f69e3e1691a2d72a1a12e90f872cbdb1567eb47b6519"
             ],
             "version": "==2020.4.5.1"
-        },
-        "cfenv": {
-            "hashes": [
-                "sha256:7815bffcc4a3db350f92517157fafc577c11b5a7ff172dc5632f1042b93073e8",
-                "sha256:c7a91a4c82431acfc35db664c194d5e6cc7f4df3dcb692d0f836a6ceb0156167"
-            ],
-            "index": "pypi",
-            "version": "==0.5.3"
         },
         "cffi": {
             "hashes": [
@@ -169,13 +161,6 @@
             ],
             "index": "pypi",
             "version": "==0.0.4"
-        },
-        "furl": {
-            "hashes": [
-                "sha256:c0e0231a1feee2acd256574b7033df3144775451c610cb587060d6a0d7e0b621",
-                "sha256:f4d6f1e5479c376a5b7bdc62795d736d8c1b2a754f366a2ad2816e46e946e22e"
-            ],
-            "version": "==2.1.0"
         },
         "gevent": {
             "hashes": [
@@ -315,13 +300,6 @@
                 "sha256:e8313f01ba26fbbe36c7be1966a7b7424942f670f38e666995b88d012765b9be"
             ],
             "version": "==1.1.1"
-        },
-        "orderedmultidict": {
-            "hashes": [
-                "sha256:04070bbb5e87291cc9bfa51df413677faf2141c73c61d2a5f7b26bea3cd882ad",
-                "sha256:43c839a17ee3cdd62234c47deca1a8508a3f2ca1d0678a3bf791c87cf84adbf3"
-            ],
-            "version": "==1.0.1"
         },
         "phonenumbers": {
             "hashes": [

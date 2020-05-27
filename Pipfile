@@ -25,7 +25,7 @@ requestsdefaulter = "*"
 flask-zipkin = "*"
 pycryptodome = "*"
 flask-talisman = "*"
-werkzeug = "*"
+werkzeug = "~=0.16"
 email_validator = "*"
 
 [dev-packages]

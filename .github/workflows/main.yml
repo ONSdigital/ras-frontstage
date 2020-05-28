@@ -72,7 +72,7 @@ jobs:
         # Build the Docker image
       - name: Build Docker Image
         run: |
-          docker build -t "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":$GITHUB_SHA .
+          docker build -t "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":$GITHUB_SHA -f _infra/docker/Dockerfile .
       - name: Push dev image
         run: |
           docker push "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":$GITHUB_SHA

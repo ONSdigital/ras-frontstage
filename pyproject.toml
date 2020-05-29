@@ -1,0 +1,39 @@
+[tool]
+[tool.poetry]
+name = "frontstage"
+version = "0.1.0"
+description = ""
+authors = ["Jon Fox <jon.fox@ext.ons.gov.uk>"]
+
+[tool.poetry.dependencies]
+python = "==3.8.2"
+dateutils = "*"
+email-validator = "*"
+flask = "*"
+flask-talisman = "*"
+flask-wtf = "*"
+gevent = "*"
+greenlet = "*"
+gunicorn = "*"
+iso8601 = "*"
+phonenumbers = "*"
+pycryptodome = "*"
+python-jose = "*"
+redis = "==2.*,>=2.10.0"
+requests = "*"
+requestsdefaulter = "*"
+sdc-cryptography = "*"
+structlog = "*"
+werkzeug = "==0.*,>=0.16.0"
+wtforms = "*"
+
+[tool.poetry.dev-dependencies]
+codecov = "*"
+coverage = "*"
+flake8 = "*"
+pylint = "*"
+pylint-mccabe = "*"
+pytest = "*"
+pytest-cov = "*"
+requests-mock = "*"
+responses = "*"

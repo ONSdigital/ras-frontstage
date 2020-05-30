@@ -26,6 +26,7 @@ sdc-cryptography = "*"
 structlog = "*"
 werkzeug = "==0.*,>=0.16.0"
 wtforms = "*"
+safety = "^1.9.0"
 
 [tool.poetry.dev-dependencies]
 codecov = "*"
@@ -37,3 +38,4 @@ pytest = "*"
 pytest-cov = "*"
 requests-mock = "*"
 responses = "*"
+safety = "*"

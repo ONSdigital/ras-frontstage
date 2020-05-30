@@ -6,15 +6,15 @@
 User interface for Respondent Account Services
 
 ## Setup
-Based on python 3.5
+Based on python 3.8
 
 Use [Pyenv](https://github.com/pyenv/pyenv) to manage installed Python versions
 
-Install dependencies to a new virtual environment using [Pipenv](https://docs.pipenv.org/)
+Install dependencies to a new virtual environment using [Poetry](https://python-poetry.org/docs/)
 
 ```bash
-pip install -U pipenv
-pipenv install
+pip install -U poetry
+poetry install
 ```
 
 ## Redis
@@ -37,14 +37,20 @@ See that repo for how to run it and see the config below for the environment var
 
 ## Run the application
 ```
-pipenv run python run.py
+poetry run python run.py
 ```
 
 ## Run tests
-Install test dependencies with
+Install test dependencies with:
 ```bash
-pipenv install --dev
+poetry install
 ```
+
+To install without test dependencies:
+```bash
+poetry install --no-dev
+```
+
 The Makefile will run the tests in the unit or integration tests folder using pytest, and present a coverage report.  
 These can be easily run via the following commands:
 ```bash

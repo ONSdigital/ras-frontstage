@@ -1,5 +1,5 @@
 build:
-	pipenv install --dev
+	poetry install
 
 build-docker:
 	docker build .

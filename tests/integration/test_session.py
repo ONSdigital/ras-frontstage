@@ -20,8 +20,9 @@ class TestSession(unittest.TestCase):
         session_key = session.session_key
 
         # Retrieve encoded_jwt from session
-        test_jwt = self.redis.get(session_key)
-        self.assertEqual(test_jwt, 'test_jwt'.encode())
+        test_jwt = session.get_decoded_jwt()
+        self.assertEqual(test_jwt['party_id'], "party")
+        self.assertEqual(test_jwt['unread_message_count']['value'], 0)
 
     def test_update_session(self):
         # Create session and get session key

@@ -77,7 +77,8 @@ class TestSession(unittest.TestCase):
 
     @patch('frontstage.common.session._get_new_timestamp')
     def test_message_count_expired(self, test_patch):
-        test_patch.return_value = datetime.now() - timedelta(seconds=300)
+        expired_time = datetime.now() - timedelta(seconds=301)
+        test_patch.return_value = expired_time.timestamp()
         session = Session.from_party_id("party")
         session.save()
 

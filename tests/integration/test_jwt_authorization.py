@@ -44,6 +44,7 @@ class TestJWTAuthorization(unittest.TestCase):
     def test_jwt_authorization_success(self):
         self.session.encoded_jwt_token = valid_jwt
         self.session.session_key = str(uuid4())
+        self.session.save()
         request = mock.MagicMock(cookies={"authorization": self.session.session_key})
 
         # If this function runs without exceptions the test is considered passed
@@ -52,6 +53,7 @@ class TestJWTAuthorization(unittest.TestCase):
     def test_jwt_authorization_expired_jwt(self):
         self.session.encoded_jwt_token = expired_jwt
         self.session.session_key = str(uuid4())
+        self.session.save()
         request = mock.MagicMock(cookies={"authorization": self.session.session_key})
 
         with self.assertRaises(JWTValidationError):
@@ -60,6 +62,7 @@ class TestJWTAuthorization(unittest.TestCase):
     def test_jwt_authorization_no_expiry(self):
         self.session.encoded_jwt_token = no_expiry_jwt
         self.session.session_key = str(uuid4())
+        self.session.save()
         request = mock.MagicMock(cookies={"authorization": self.session.session_key})
 
         with self.assertRaises(JWTValidationError):
@@ -69,6 +72,7 @@ class TestJWTAuthorization(unittest.TestCase):
     def test_jwt_authorization_decode_failure(self, mock_decode):
         self.session.encoded_jwt_token = valid_jwt
         self.session.session_key = str(uuid4())
+        self.session.save()
         request = mock.MagicMock(cookies={"authorization": self.session.session_key})
         mock_decode.side_effect = JWTError
 

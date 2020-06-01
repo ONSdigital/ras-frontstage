@@ -828,8 +828,8 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
-content-hash = "611b150c431e250cb0b439865458bfec227fac46ab842403913298db39429b96"
-python-versions = "==3.8.2"
+content-hash = "65c5be806852a5aa9c820ce29f29254b59f5d03c3a8e5f865b7f1284e5055aac"
+python-versions = "==3.8.3"
 
 [metadata.files]
 argparse = [

@@ -61,6 +61,9 @@ class Session(object):
     def get_decoded_jwt(self):
         return jwt.decode(self.encoded_jwt_token)
 
+    def get_expires_in(self):
+        return jwt.decode(self.encoded_jwt_token)['expires_in']
+
     def save(self):
         redis.setex(self.session_key, 3600, self.encoded_jwt_token)
 

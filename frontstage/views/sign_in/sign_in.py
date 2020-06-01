@@ -10,7 +10,6 @@ from frontstage.common.utilities import obfuscate_email
 from frontstage.controllers import oauth_controller, party_controller
 from frontstage.controllers.party_controller import notify_party_and_respondent_account_locked
 from frontstage.exceptions.exceptions import OAuth2Error
-from frontstage.jwt import encode, timestamp_token
 from frontstage.models import LoginForm
 from frontstage.views.sign_in import sign_in_bp
 
@@ -42,7 +41,7 @@ def login():  # noqa: C901
         bound_logger = logger.bind(email=obfuscate_email(username))
         bound_logger.info("Attempting to find user in auth service")
         try:
-            oauth2_token = oauth_controller.sign_in(username, password)
+            oauth_controller.sign_in(username, password)
         except OAuth2Error as exc:
             error_message = exc.oauth2_error
             party_json = party_controller.get_respondent_by_email(username)
@@ -91,7 +90,7 @@ def login():  # noqa: C901
         session.save()
         response.set_cookie('authorization',
                             value=session.session_key,
-                            expires=data_dict_for_jwt_token['expires_at'],
+                            expires=session.get_expires_in(),
                             secure=secure,
                             httponly=secure)
         bound_logger.info('Successfully created session', session_key=session.session_key)

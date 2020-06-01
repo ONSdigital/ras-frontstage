@@ -47,3 +47,32 @@ class TestSession(unittest.TestCase):
         session = redis.get(session_key)
 
         self.assertEqual(session, None)
+
+    def test_from_session_key(self):
+        session = Session.from_party_id("party")
+        session.save()
+        session_key = session.session_key
+
+        session_from_redis = Session.from_session_key(session_key)
+
+        self.assertTrue(session_from_redis != None)
+        
+        decoded_jwt = session_from_redis.get_decoded_jwt()
+        self.assertEqual(decoded_jwt["party_id"], "party")
+
+    def test_unread_message_count(self):
+        session = Session.from_party_id("party")
+        session.save()
+
+        self.assertFalse(session.message_count_expired())
+
+        session.set_unread_message_total(5)
+
+        key = session.session_key
+        session_to_assert = Session.from_session_key(key)
+
+        self.assertEqual(session_to_assert.get_unread_message_count(), 5)
+
+    # def test_message_count_expired(self):
+    #     session = Session.from_party_id("party")
+    #     session.save()

@@ -28,7 +28,7 @@ class TestJWTAuthorization(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
         self.app.testing = True
-        self.session = Session()
+        self.session = Session.from_party_id("test")
 
     def tearDown(self):
         self.session.delete_session()
@@ -41,21 +41,21 @@ class TestJWTAuthorization(unittest.TestCase):
         test_function()
 
     def test_jwt_authorization_success(self):
-        self.session.create_session(valid_jwt)
+        self.session.encoded_jwt_token = valid_jwt
         request = mock.MagicMock(cookies={"authorization": self.session.session_key})
 
         # If this function runs without exceptions the test is considered passed
         self.decorator_test(request)
 
     def test_jwt_authorization_expired_jwt(self):
-        self.session.create_session(expired_jwt)
+        self.session.encoded_jwt_token = expired_jwt
         request = mock.MagicMock(cookies={"authorization": self.session.session_key})
 
         with self.assertRaises(JWTValidationError):
             self.decorator_test(request)
 
     def test_jwt_authorization_no_expiry(self):
-        self.session.create_session(no_expiry_jwt)
+        self.session.encoded_jwt_token = no_expiry_jwt
         request = mock.MagicMock(cookies={"authorization": self.session.session_key})
 
         with self.assertRaises(JWTValidationError):
@@ -63,7 +63,7 @@ class TestJWTAuthorization(unittest.TestCase):
 
     @mock.patch('frontstage.common.authorisation.decode')
     def test_jwt_authorization_decode_failure(self, mock_decode):
-        self.session.create_session(valid_jwt)
+        self.session.encoded_jwt_token = valid_jwt
         request = mock.MagicMock(cookies={"authorization": self.session.session_key})
         mock_decode.side_effect = JWTError
 

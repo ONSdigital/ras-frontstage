@@ -75,7 +75,7 @@ class TestSession(unittest.TestCase):
         self.assertEqual(session_to_assert.get_unread_message_count(), 5)
 
     def test_message_count_expired(self):
-        datetime_supplier = lambda: datetime.now - timedelta(seconds=301)
+        datetime_supplier = lambda: datetime.now() - timedelta(seconds=301)
         session = Session.from_party_id("party")
         session.save()
 

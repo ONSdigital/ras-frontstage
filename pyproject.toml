@@ -6,7 +6,7 @@ description = ""
 authors = ["Jon Fox <jon.fox@ext.ons.gov.uk>"]
 
 [tool.poetry.dependencies]
-python = "==3.8.2"
+python = "==3.8.3"
 dateutils = "*"
 email-validator = "*"
 flask = "*"

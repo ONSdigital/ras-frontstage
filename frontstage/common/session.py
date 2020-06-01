@@ -38,8 +38,7 @@ class Session(object):
         self.encoded_jwt_token = jwt.encode(decoded_jwt)
         self.save()
 
-    def delete_session(self, session_key):
-        self.session_key = session_key
+    def delete_session(self):
         redis.delete(self.session_key)
 
     def set_unread_message_total(self, total):

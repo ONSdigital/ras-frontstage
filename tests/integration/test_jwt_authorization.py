@@ -31,7 +31,7 @@ class TestJWTAuthorization(unittest.TestCase):
         self.session = Session()
 
     def tearDown(self):
-        self.session.delete_session(self.session.session_key)
+        self.session.delete_session()
 
     @staticmethod
     def decorator_test(request):

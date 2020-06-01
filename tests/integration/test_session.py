@@ -42,7 +42,7 @@ class TestSession(unittest.TestCase):
         session = Session.from_party_id("party")
         session.save()
         session_key = session.session_key
-        session.delete_session(session_key)
+        session.delete_session()
 
         session = redis.get(session_key)
 

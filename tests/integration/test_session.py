@@ -2,7 +2,7 @@ import time
 import unittest
 
 from frontstage import app, redis
-from frontstage.common.session import SessionHandler
+from frontstage.common.session import Session
 
 
 class TestSession(unittest.TestCase):
@@ -15,7 +15,7 @@ class TestSession(unittest.TestCase):
 
     def test_create_session(self):
         # Create session and get session key
-        session = SessionHandler()
+        session = Session()
         session.create_session(encoded_jwt='test_jwt')
         session_key = session.session_key
 
@@ -25,7 +25,7 @@ class TestSession(unittest.TestCase):
 
     def test_update_session(self):
         # Create session and get session key
-        session = SessionHandler()
+        session = Session()
         session.create_session(encoded_jwt='test_jwt')
         session_key = session.session_key
 
@@ -39,7 +39,7 @@ class TestSession(unittest.TestCase):
 
     def test_update_session_with_session_key(self):
         # Create session and get session key
-        session = SessionHandler()
+        session = Session()
         session.create_session(encoded_jwt='test_jwt')
         session_key = session.session_key
 
@@ -53,7 +53,7 @@ class TestSession(unittest.TestCase):
 
     def test_get_encoded_jwt(self):
         # Create session and get session key
-        session = SessionHandler()
+        session = Session()
         session.create_session(encoded_jwt='test_jwt')
         session_key = session.session_key
 
@@ -63,7 +63,7 @@ class TestSession(unittest.TestCase):
 
     def test_delete_session(self):
         # Create session and get session key
-        session = SessionHandler()
+        session = Session()
         session.create_session(encoded_jwt='test_jwt')
         session_key = session.session_key
         session.delete_session(session_key)

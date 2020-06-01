@@ -9,7 +9,7 @@ from structlog import wrap_logger
 from werkzeug.utils import redirect
 
 from frontstage import app
-from frontstage.common.session import SessionHandler
+from frontstage.common.session import Session
 from frontstage.exceptions.exceptions import JWTValidationError
 
 
@@ -40,9 +40,9 @@ def jwt_authorization(request):
     def extract_session(original_function):
         @wraps(original_function)
         def extract_session_wrapper(*args, **kwargs):
-            session_handler = SessionHandler()
             session_key = request.cookies.get('authorization')
-            encoded_jwt = session_handler.get_encoded_jwt(session_key)
+            session = Session.from_session_key(session_key)
+            encoded_jwt = session_handler.get_encoded_jwt()
             if encoded_jwt:
                 logger.debug('Attempting to authorize token')
                 try:

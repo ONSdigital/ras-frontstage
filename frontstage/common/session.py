@@ -25,8 +25,8 @@ class Session(object):
             "role": "respondent",
             'unread_message_count': {
                 'value': 0,
-                'refresh_in': _get_new_timestamp(300)
-            }, 'expires_in': _get_new_timestamp(3600)}
+                'refresh_in': _get_new_timestamp(ttl=300)
+            }, 'expires_in': _get_new_timestamp()}
         encoded_jwt_token = jwt.encode(data_dict)
         session_key = str(uuid4())
         session = cls(session_key, encoded_jwt_token)
@@ -34,7 +34,7 @@ class Session(object):
 
     def update_session(self):
         decoded_jwt = self.get_decoded_jwt()
-        decoded_jwt = _get_new_timestamp(decoded_jwt)
+        decoded_jwt["expires_in"] = _get_new_timestamp()
         self.encoded_jwt_token = jwt.encode(decoded_jwt)
         self.save()
 
@@ -44,7 +44,7 @@ class Session(object):
     def set_unread_message_total(self, total):
         decoded_token = self.get_decoded_jwt()
         decoded_token['unread_message_count']['value'] = total
-        decoded_token['unread_message_count']['refresh_in'] = _get_new_timestamp(300)
+        decoded_token['unread_message_count']['refresh_in'] = _get_new_timestamp(ttl=300)
         self.encoded_jwt_token = jwt.encode(decoded_token)
         self.save()
 
@@ -67,7 +67,7 @@ class Session(object):
         redis.setex(self.session_key, 3600, self.encoded_jwt_token)
 
 
-def _get_new_timestamp(ttl):
+def _get_new_timestamp(ttl=3600):
     current_time = datetime.now()
     expires_in = current_time + timedelta(seconds=ttl)
     return expires_in.timestamp()

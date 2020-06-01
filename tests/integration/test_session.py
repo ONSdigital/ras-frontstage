@@ -1,5 +1,7 @@
 import time
 import unittest
+from datetime import datetime, timedelta
+from mock import patch
 
 from frontstage import app, redis
 from frontstage.common.session import Session
@@ -73,9 +75,10 @@ class TestSession(unittest.TestCase):
 
         self.assertEqual(session_to_assert.get_unread_message_count(), 5)
 
-    # def test_message_count_expired(self):
-    #     datetime_supplier = lambda: datetime.now() - timedelta(seconds=301)
-    #     session = Session.from_party_id("party")
-    #     session.save()
+    @patch('frontstage.common.session._get_new_timestamp')
+    def test_message_count_expired(self, test_patch):
+        test_patch.return_value = datetime.now() - timedelta(seconds=300)
+        session = Session.from_party_id("party")
+        session.save()
 
-    #     self.assertTrue(session.message_count_expired())
+        self.assertTrue(session.message_count_expired())

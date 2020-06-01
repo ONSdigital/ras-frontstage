@@ -13,7 +13,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 def logout():
     # Delete user session in redis
     session_key = request.cookies.get('authorization')
-    session = Session().from_session_key(session_key)
+    session = Session.from_session_key(session_key)
     session.delete_session()
     if request.args.get('csrf_error'):
         flash('To help protect your information we have signed you out.', 'info')

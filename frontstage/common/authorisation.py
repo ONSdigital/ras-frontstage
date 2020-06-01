@@ -42,7 +42,7 @@ def jwt_authorization(request):
         def extract_session_wrapper(*args, **kwargs):
             session_key = request.cookies.get('authorization')
             session = Session.from_session_key(session_key)
-            encoded_jwt = session_handler.get_encoded_jwt()
+            encoded_jwt = session.get_encoded_jwt()
             if encoded_jwt:
                 logger.debug('Attempting to authorize token')
                 try:
@@ -58,7 +58,7 @@ def jwt_authorization(request):
 
             if app.config['VALIDATE_JWT']:
                 if validate(jwt):
-                    session_handler.update_session()
+                    session.update_session()
                     return original_function(jwt, *args, **kwargs)
                 else:
                     logger.warning('Token is not valid for this request')

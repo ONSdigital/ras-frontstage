@@ -1,7 +1,7 @@
 import time
 import unittest
 from datetime import datetime, timedelta
-from mock import patch
+from unittest.mock import patch
 
 from frontstage import app, redis
 from frontstage.common.session import Session

@@ -17,7 +17,6 @@ class TestSession(unittest.TestCase):
         # Create session and get session key
         session = Session.from_party_id("party")
         session.save()
-        session_key = session.session_key
 
         # Retrieve encoded_jwt from session
         test_jwt = session.get_decoded_jwt()

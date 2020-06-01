@@ -1,6 +1,6 @@
 import unittest
 from unittest import mock
-import uuid4
+from uuid import uuid4
 
 from jose import JWTError
 

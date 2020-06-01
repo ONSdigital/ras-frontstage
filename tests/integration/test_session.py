@@ -55,8 +55,8 @@ class TestSession(unittest.TestCase):
 
         session_from_redis = Session.from_session_key(session_key)
 
-        self.assertTrue(session_from_redis != None)
-        
+        self.assertTrue(session_from_redis is not None)
+
         decoded_jwt = session_from_redis.get_decoded_jwt()
         self.assertEqual(decoded_jwt["party_id"], "party")
 

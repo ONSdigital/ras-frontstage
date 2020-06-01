@@ -5,7 +5,7 @@ from flask import make_response, render_template, redirect, request, url_for
 from structlog import wrap_logger
 
 from frontstage import app
-from frontstage.common.session import SessionHandler
+from frontstage.common.session import Session
 from frontstage.common.utilities import obfuscate_email
 from frontstage.controllers import oauth_controller, party_controller
 from frontstage.controllers.party_controller import notify_party_and_respondent_account_locked
@@ -79,10 +79,6 @@ def login():  # noqa: C901
         party_id = party_json['id']
         bound_logger = bound_logger.bind(party_id=party_id)
 
-        # Take our raw token and add a UTC timestamp to the expires_at attribute
-        data_dict = {**oauth2_token, 'party_id': party_id}
-        data_dict_for_jwt_token = timestamp_token(data_dict)
-        encoded_jwt_token = encode(data_dict_for_jwt_token)
         if request.args.get('next'):
             response = make_response(redirect(request.args.get('next')))
         else:
@@ -90,9 +86,9 @@ def login():  # noqa: C901
                                                       _scheme=getenv('SCHEME', 'http'))))
 
         bound_logger.info("Successfully found user in party service")
-        session = SessionHandler()
         bound_logger.info('Creating session')
-        session.create_session(encoded_jwt_token)
+        session = Session.from_party_id(party_id)
+        session.save()
         response.set_cookie('authorization',
                             value=session.session_key,
                             expires=data_dict_for_jwt_token['expires_at'],

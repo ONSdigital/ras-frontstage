@@ -5,7 +5,7 @@ from jose import JWTError
 
 from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
-from frontstage.common.session import SessionHandler
+from frontstage.common.session import Session
 from frontstage.exceptions.exceptions import JWTValidationError
 
 valid_jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoicmVzcG9uZGVudCIsImFjY2Vzc190b2tlbiI6ImI5OWIyMjA0LWYxM" \
@@ -28,7 +28,7 @@ class TestJWTAuthorization(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
         self.app.testing = True
-        self.session = SessionHandler()
+        self.session = Session()
 
     def tearDown(self):
         self.session.delete_session(self.session.session_key)

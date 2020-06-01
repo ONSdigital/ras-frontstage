@@ -1,8 +1,9 @@
 import time
 import unittest
 
+from datetime import datetime, timedelta
 from frontstage import app, redis
-from frontstage.common.session import Session
+from frontstage.common.session import Session, datetime_supplier
 
 
 class TestSession(unittest.TestCase):
@@ -73,6 +74,9 @@ class TestSession(unittest.TestCase):
 
         self.assertEqual(session_to_assert.get_unread_message_count(), 5)
 
-    # def test_message_count_expired(self):
-    #     session = Session.from_party_id("party")
-    #     session.save()
+    def test_message_count_expired(self):
+        datetime_supplier = lambda: datetime.now - timedelta(seconds=301)
+        session = Session.from_party_id("party")
+        session.save()
+
+        self.assertTrue(session.message_count_expired())

@@ -68,7 +68,7 @@ class Session(object):
         redis.setex(self.session_key, 3600, self.encoded_jwt_token)
 
 
-def _get_new_timestamp(ttl, time_func=lambda: datetime.now()):
-    current_time = time_func()
+def _get_new_timestamp(ttl):
+    current_time = datetime.now()
     expires_in = current_time + timedelta(seconds=ttl)
     return expires_in.timestamp()

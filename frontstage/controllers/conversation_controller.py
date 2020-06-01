@@ -3,7 +3,6 @@ import logging
 from json import JSONDecodeError
 
 import requests
-import datetime
 from flask import current_app, request
 from requests.adapters import HTTPAdapter
 from requests.exceptions import HTTPError
@@ -95,6 +94,7 @@ def send_message(message_json):
     logger.info('Successfully sent message', party_id=party_id)
     return response.json()
 
+
 def get_message_count(party_id, from_session=True):
     logger.info('Getting unread message count', party_id=party_id)
 
@@ -121,6 +121,7 @@ def get_message_count(party_id, from_session=True):
             else:
                 logger.error('An error has occured retrieving the new message count', party_id=party_id)
                 return 0
+
 
 def _create_get_conversation_headers():
     try:

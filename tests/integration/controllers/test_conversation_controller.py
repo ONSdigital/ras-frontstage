@@ -3,7 +3,7 @@ import unittest
 import responses
 
 from config import TestingConfig
-from frontstage import app
+from frontstage import app, redis
 from frontstage.controllers import conversation_controller
 from frontstage.exceptions.exceptions import IncorrectAccountAccessError
 from tests.integration.mocked_services import message_count, url_get_conversation_count
@@ -16,6 +16,8 @@ class TestSurveyController(unittest.TestCase):
         app.config.from_object(app_config)
         self.app = app.test_client()
         self.app_config = self.app.application.config
+        self.redis = redis
+        self.redis.flushall()
 
     def test_get_message_count(self):
         with responses.RequestsMock() as rsps:

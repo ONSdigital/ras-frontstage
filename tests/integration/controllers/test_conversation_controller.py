@@ -35,7 +35,7 @@ class TestSurveyController(unittest.TestCase):
     def test_get_message_count_unauthorized(self, headers):
         headers.return_value = "token"
         with responses.RequestsMock() as rsps:
-            rsps.add(rsps.GET, url_get_conversation_count, json=message_count, status=200, headers={'Authorisation': 'token'}, content_type='application/json')
+            rsps.add(rsps.GET, url_get_conversation_count, status=403)
             with app.app_context():
                 with self.assertRaises(IncorrectAccountAccessError):
                     conversation_controller.get_message_count("party_id", from_session=False)

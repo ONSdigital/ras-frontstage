@@ -133,10 +133,9 @@ def get_message_count_from_api(party_id):
             return count
         except HTTPError as exception:
             if exception.response.status_code == 403:
-                logger.warn()
                 raise IncorrectAccountAccessError(message='User is unauthorized to perform this action', thread_id=party_id)
             else:
-                logger.warn('An error has occured retrieving the new message count', party_id=party_id)
+                logger.exception('An error has occured retrieving the new message count', party_id=party_id)
                 return 0
 
 

@@ -7,7 +7,7 @@ from config import TestingConfig
 from frontstage import app, redis
 from frontstage.controllers import conversation_controller
 # from frontstage.exceptions.exceptions import IncorrectAccountAccessError
-from tests.integration.mocked_services import url_get_conversation_count
+from tests.integration.mocked_services import url_get_conversation_count, message_count
 
 
 class TestSurveyController(unittest.TestCase):
@@ -25,7 +25,7 @@ class TestSurveyController(unittest.TestCase):
     def test_get_message_count(self, headers, total):
         headers.return_value = "token"
         with responses.RequestsMock() as rsps:
-            rsps.add(rsps.GET, url_get_conversation_count, status=200, headers={'Authorisation': 'token'}, content_type='application/json')
+            rsps.add(rsps.GET, url_get_conversation_count, json=message_count, status=200, headers={'Authorisation': 'token'}, content_type='application/json')
             with app.app_context():
                 count = conversation_controller.get_message_count("party_id", from_session=False)
 

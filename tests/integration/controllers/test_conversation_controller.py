@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 
 import responses
 
@@ -19,7 +20,10 @@ class TestSurveyController(unittest.TestCase):
         self.redis = redis
         self.redis.flushall()
 
-    def test_get_message_count(self):
+    @patch("frontstage.controllers._create_get_conversation_headers")
+    @patch("frontstage.common._set_unread_message_total")
+    def test_get_message_count(self, headers, total):
+        headers.return_value = "token"
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_conversation_count, json=message_count, status=200, content_type='application/json')
             with app.app_context():

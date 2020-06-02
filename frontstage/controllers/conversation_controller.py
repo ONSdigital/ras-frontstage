@@ -129,8 +129,7 @@ def get_message_count_from_api(party_id):
             response.raise_for_status()
             count = response.body['total_count']
             logger.debug('Got unread message count, updating session', party_id=party_id, count=count)
-            session = Session.from_session_key(request.cookies['authorization'])
-            session.set_unread_message_total(count)
+            _set_unread_message_total(count)
             return count
         except HTTPError as exception:
             if exception.response.status_code == 403:
@@ -139,6 +138,9 @@ def get_message_count_from_api(party_id):
                 logger.error('An error has occured retrieving the new message count', party_id=party_id)
                 return 0
 
+def _set_unread_message_total(count):
+    session = Session.from_session_key(request.cookies['authorization'])
+    session.set_unread_message_total(count)
 
 def _create_get_conversation_headers():
     try:

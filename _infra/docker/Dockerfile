@@ -3,7 +3,9 @@ FROM python:3.8-slim
 
 RUN apt update && apt install -y build-essential curl gunicorn
 ADD requirements.txt /app
+ADD dev-requirements.txt /app
 RUN pip install -r /app/requirements.txt
+RUN pip install -r /app/dev-requirements.txt
 
 WORKDIR /app
 

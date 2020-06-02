@@ -21,7 +21,7 @@ class TestSurveyController(unittest.TestCase):
         self.redis.flushall()
 
     @patch("frontstage.controllers._create_get_conversation_headers")
-    @patch("frontstage.common._set_unread_message_total")
+    @patch("frontstage.controllers._set_unread_message_total")
     def test_get_message_count(self, headers, total):
         headers.return_value = "token"
         with responses.RequestsMock() as rsps:

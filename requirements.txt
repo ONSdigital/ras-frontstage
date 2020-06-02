@@ -94,14 +94,10 @@ flask-wtf==0.14.3 \
     --hash=sha256:57b3faf6fe5d6168bda0c36b0df1d05770f8e205e18332d0376ddb954d17aef2 \
     --hash=sha256:d417e3a0008b5ba583da1763e4db0f55a1269d9dd91dcc3eb3c026d3c5dbd720 \
     # via -r requirements.in
-flask-zipkin==0.0.4 \
-    --hash=sha256:402bed9a98d3507d82db98a8f7437fb52ef3684af33c58a241b37779f9013d74 \
-    --hash=sha256:fbd3e3c41ceeda922701eebbfce88c8fccb7bc849289d772f5186a14a49827bd \
-    # via -r requirements.in
 flask==1.1.2 \
     --hash=sha256:4efa1ae2d7c9865af48986de8aeb8504bf32c7f3d6fdc9353d34b21f4b127060 \
     --hash=sha256:8a4fdd8936eba2512e9c85df320a37e694c93945b33ef33c89946a340a238557 \
-    # via -r requirements.in, flask-wtf, flask-zipkin
+    # via -r requirements.in, flask-wtf
 gevent==20.5.1 \
     --hash=sha256:13ed2fa4a074c26fd60744a0757bf65004950554dfd9efd7c9deee1c241279af \
     --hash=sha256:1734f56ea545668780a4a283542a48d11298ab525c780a6001071f9d9d3c6880 \
@@ -214,14 +210,6 @@ phonenumbers==8.12.4 \
     --hash=sha256:46c5997fe076026aa2d4b66d0c53eea4babae2e808e8a5f39c09e2dfa6612d08 \
     --hash=sha256:c6c43d6459aac85b646d6b7a7ab79b3b629eb168f0e9b851b331e2e5872bbd01 \
     # via -r requirements.in
-ply==3.11 \
-    --hash=sha256:00c7c1aaa88358b9c765b6d3000c6eec0ba42abca5351b095321aef446081da3 \
-    --hash=sha256:096f9b8350b65ebd2fd1346b12452efe5b9607f7482813ffca50c22722a807ce \
-    # via thriftpy2
-py-zipkin==0.20.0 \
-    --hash=sha256:6f787b040755f45fcc7abbf5eae1a42e96d71ea90a3e7f36062ddbd60adf16dc \
-    --hash=sha256:aecea570f5cb368a9e6dc1430cb0911c40d7b72eb3d97eceebf132e73f4aee02 \
-    # via flask-zipkin
 pyasn1==0.4.8 \
     --hash=sha256:39c7e2ec30515947ff4e87fb6f456dfc6e84857d34be479c9d4a4ba4bf46aa5d \
     --hash=sha256:aef77c9fb94a3ac588e87841208bdec464471d9871bd5050a287cc9a475cd0ba \
@@ -294,7 +282,7 @@ redis==2.10.6 \
 requests==2.23.0 \
     --hash=sha256:43999036bfa82904b6af1d99e4882b560e5e2c68e5c4b0aa03b655f3d7d73fee \
     --hash=sha256:b3f43d496c6daba4493e7c431722aeb7dbc6288f52a6e04e7b6023b0247817e6 \
-    # via -r requirements.in, flask-zipkin
+    # via -r requirements.in
 requestsdefaulter==0.1.1 \
     --hash=sha256:5682733d391af907d8e5e95a5470b3b785275f1089a7a7113f1bb288b9d4631a \
     # via -r requirements.in
@@ -309,14 +297,11 @@ sdc-cryptography==0.4.0 \
 six==1.15.0 \
     --hash=sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259 \
     --hash=sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced \
-    # via cryptography, ecdsa, flask-talisman, py-zipkin, python-dateutil, python-jose, structlog
+    # via cryptography, ecdsa, flask-talisman, python-dateutil, python-jose, structlog
 structlog==20.1.0 \
     --hash=sha256:7a48375db6274ed1d0ae6123c486472aa1d0890b08d314d2b016f3aa7f35990b \
     --hash=sha256:8a672be150547a93d90a7d74229a29e765be05bd156a35cdcc527ebf68e9af92 \
     # via -r requirements.in
-thriftpy2==0.4.11 \
-    --hash=sha256:6516b4c55b656d6de92ec1f554a0f1ce758d42fc8d564385a26fb31e5842dc6e \
-    # via py-zipkin
 urllib3==1.25.9 \
     --hash=sha256:3018294ebefce6572a474f0604c2021e33b3fd8006ecd11d62107a5d2a963527 \
     --hash=sha256:88206b0eb87e6d677d424843ac5209e3fb9d0190d0ee169599165ec25e9d9115 \

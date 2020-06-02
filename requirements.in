@@ -13,7 +13,6 @@ sdc-cryptography
 greenlet
 dateutils
 requestsdefaulter
-flask-zipkin
 pycryptodome
 flask-talisman
 werkzeug~=0.16

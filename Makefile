@@ -1,5 +1,6 @@
 build:
 	pip install -U -r requirements.txt
+	pip install -U -r dev-requirements.txt
 
 build-docker:
 	docker build .

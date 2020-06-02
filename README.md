@@ -19,9 +19,10 @@ To install the dev packages:
 pip install -U -r dev-requirements.txt
 ```
 
-Add or remove pip packages to and from `requirements.in` and `dev-requirements.in`, then use pip-tools to compile them to `requirements.txt`and `dev-requirements.txt`:
+Add or remove pip packages to and from `requirements.in` and `dev-requirements.in`, then use pip-tools to compile them:
 ```bash
 pip-compile --quiet --generate-hashes requirements.in
+pip-compile --quiet --generate-hashes dev-requirements.in
 ```
 
 ## Redis

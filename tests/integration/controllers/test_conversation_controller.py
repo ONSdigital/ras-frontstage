@@ -32,17 +32,20 @@ class TestSurveyController(unittest.TestCase):
                 self.assertEqual(3, count)
 
     @patch("frontstage.controllers.conversation_controller._create_get_conversation_headers")
-    def test_get_message_count_unauthorized(self):
+    def test_get_message_count_unauthorized(self, headers):
+        headers.return_value = "token"
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_conversation_count, json=message_count, status=200, headers={'Authorisation': 'token'}, content_type='application/json')
             with app.app_context():
                 with self.assertRaises(IncorrectAccountAccessError):
                     conversation_controller.get_message_count("party_id", from_session=False)
 
-    # def test_get_message_count_other_error_returns_0(self):
-    #     with responses.RequestsMock() as rsps:
-    #         rsps.add(rsps.GET, url_get_conversation_count, status=400)
-    #         with app.app_context():
-    #             count = conversation_controller.get_message_count("party_id", from_session=False)
+    @patch("frontstage.controllers.conversation_controller._create_get_conversation_headers")
+    def test_get_message_count_other_error_returns_0(self, headers):
+        headers.return_value = "token"
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.GET, url_get_conversation_count, status=400)
+            with app.app_context():
+                count = conversation_controller.get_message_count("party_id", from_session=False)
 
-    #             self.assertEqual(0, count)
+                self.assertEqual(0, count)

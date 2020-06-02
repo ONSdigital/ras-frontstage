@@ -125,13 +125,10 @@ To reset a password
 
 * GET request to this endpoint will assign the new survey to the respondent.  Called by the `surveys/add-survey/confirm-organisation-survey` page.
 
-`surveys/download_survey` - DEPRECATED. Will be removed in a future release
+`surveys/download-survey`
 
-* GET request to this endpoint will download a survey that the respondent will need to complete.
-
-`surveys/download-survey` - Replaces download_survey
-
-* GET request to this endpoint will download a survey that the respondent will need to complete.
+* GET request to this endpoint will download a survey that the respondent will need to complete. 
+Only used for SEFT surveys
 
 `surveys/upload_survey` - DEPRECATED. Will be removed in a future release.
 

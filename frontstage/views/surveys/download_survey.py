@@ -11,7 +11,6 @@ from frontstage.views.surveys import surveys_bp
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-@surveys_bp.route('/download_survey', methods=['GET'])   # Deprecated, will be removed when no longer used
 @surveys_bp.route('/download-survey', methods=['GET'])
 @jwt_authorization(request)
 def download_survey(session):

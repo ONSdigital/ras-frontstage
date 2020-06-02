@@ -6,7 +6,7 @@ import responses
 from config import TestingConfig
 from frontstage import app, redis
 from frontstage.controllers import conversation_controller
-# from frontstage.exceptions.exceptions import IncorrectAccountAccessError
+from frontstage.exceptions.exceptions import IncorrectAccountAccessError
 from tests.integration.mocked_services import url_get_conversation_count, message_count
 
 

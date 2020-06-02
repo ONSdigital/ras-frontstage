@@ -61,6 +61,7 @@ class TestSession(unittest.TestCase):
 
         decoded_jwt = session_from_redis.get_decoded_jwt()
         self.assertEqual(decoded_jwt["party_id"], "party")
+        self.assertEqual(session_from_redis.get_party_id(), "party")
 
     def test_unread_message_count(self):
         session = Session.from_party_id("party")

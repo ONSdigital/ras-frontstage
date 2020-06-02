@@ -54,6 +54,9 @@ class Session(object):
     def message_count_expired(self):
         return self.get_decoded_jwt()['unread_message_count']['refresh_in'] < datetime.now().timestamp()
 
+    def get_party_id(self):
+        return self.get_decoded_jwt()['party_id']
+
     def get_encoded_jwt(self):
         return self.encoded_jwt_token
 

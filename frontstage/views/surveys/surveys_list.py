@@ -5,7 +5,7 @@ from flask import render_template, request, make_response
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
-from frontstage.controllers import party_controller
+from frontstage.controllers import party_controller, conversation_controller
 from frontstage.views.surveys import surveys_bp
 
 
@@ -47,4 +47,6 @@ def get_survey_list(session, tag):
 
         return response
     else:
-        return render_template('surveys/surveys-history.html', sorted_surveys_list=sorted_survey_list, history=True)
+        unread_message_count = { 'unread_message_count': conversation_controller.get_message_count(party_id) }
+        return render_template('surveys/surveys-history.html', sorted_surveys_list=sorted_survey_list, history=True,
+            unread_message_count=unread_message_count)

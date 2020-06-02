@@ -4,7 +4,7 @@ from flask import render_template, request
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
-from frontstage.controllers import case_controller
+from frontstage.controllers import case_controller, conversation_controller
 from frontstage.views.surveys import surveys_bp
 
 
@@ -37,6 +37,7 @@ def upload_failed(session):
     else:
         error_info = {'header': "Something went wrong",
                       'body': 'Please try uploading your spreadsheet again'}
-
+    unread_message_count = { 'unread_message_count': conversation_controller.get_message_count(party_id) }
     return render_template('surveys/surveys-upload-failure.html', business_info=case_data['business_party'], survey_info=case_data['survey'],
-                           collection_exercise_info=case_data['collection_exercise'], error_info=error_info, case_id=case_id)
+                           collection_exercise_info=case_data['collection_exercise'], error_info=error_info, case_id=case_id,
+                           unread_message_count=unread_message_count)

@@ -5,7 +5,7 @@ from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
-from frontstage.controllers import collection_instrument_controller, party_controller
+from frontstage.controllers import collection_instrument_controller, party_controller, conversation_controller
 from frontstage.exceptions.exceptions import CiUploadError
 from frontstage.views.surveys import surveys_bp
 
@@ -66,4 +66,6 @@ def upload_survey(session):
                                 error_info=error_info))
 
     logger.info('Successfully uploaded collection instrument', party_id=party_id, case_id=case_id)
-    return render_template('surveys/surveys-upload-success.html', upload_filename=upload_filename)
+    unread_message_count = { 'unread_message_count': conversation_controller.get_message_count(party_id) }
+    return render_template('surveys/surveys-upload-success.html', upload_filename=upload_filename,
+        unread_message_count=unread_message_count)

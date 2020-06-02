@@ -7,7 +7,7 @@ from structlog import wrap_logger
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.common.message_helper import from_internal, refine
 from frontstage.controllers.conversation_controller import get_conversation, get_conversation_list, \
-    remove_unread_label, send_message
+    remove_unread_label, send_message, get_message_count
 from frontstage.models import SecureMessagingForm
 from frontstage.views.secure_messaging import secure_message_bp
 
@@ -53,10 +53,13 @@ def view_conversation(session, thread_id):
             flash(Markup('Message sent. <a href={}>View Message</a>'.format(thread_url)))
             return redirect(url_for('secure_message_bp.view_conversation_list'))
 
+    unread_message_count = { 'unread_message_count': get_message_count(party_id, from_session=False) }
+
     return render_template('secure-messages/conversation-view.html',
                            form=form,
                            conversation=refined_conversation,
-                           conversation_data=conversation)
+                           conversation_data=conversation,
+                           unread_message_count=unread_message_count)
 
 
 @secure_message_bp.route('/threads', methods=['GET'])
@@ -75,10 +78,11 @@ def view_conversation_list(session):
         logger.error('A key error occurred', party_id=party_id)
         raise e
     logger.info('Retrieving and refining conversation successful', party_id=party_id)
-
+    unread_message_count = { 'unread_message_count': get_message_count(party_id) }
     return render_template('secure-messages/conversation-list.html',
                            messages=refined_conversation,
-                           is_closed=strtobool(is_closed))
+                           is_closed=strtobool(is_closed),
+                           unread_message_count=unread_message_count)
 
 
 def _get_message_json(form, first_message_in_conversation, msg_to, msg_from):

@@ -7,9 +7,6 @@ build-docker:
 build-kubernetes:
 	docker build -f _infra/docker/Dockerfile .
 
-lint:
-	pipenv run flake8 ./frontstage ./tests
-
 start:
 	pipenv run python run.py
 

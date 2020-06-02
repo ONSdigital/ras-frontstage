@@ -122,12 +122,12 @@ def get_message_count_from_api(party_id):
     logger.info('Getting message count from secure-message api', party_id=party_id)
     params = {'new_respondent_conversations': True}
     headers = _create_get_conversation_headers()
-    url = f"{current_app.config['SECURE_MESSAGE_URL']}/message/count"
+    url = f"{current_app.config['SECURE_MESSAGE_URL']}/messages/count"
     with _get_session() as requestSession:
         response = requestSession.get(url, headers=headers, params=params)
         try:
             response.raise_for_status()
-            count = response.body['total_count']
+            count = response.body['total']
             logger.debug('Got unread message count, updating session', party_id=party_id, count=count)
             _set_unread_message_total(count)
             return count

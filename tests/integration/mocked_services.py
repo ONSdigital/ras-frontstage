@@ -76,6 +76,9 @@ with open('tests/test_data/iac/iac-inactive.json') as fp:
 with open('tests/test_data/secure_messaging/message.json') as fp:
     message = json.load(fp)
 
+with open('tests/test_data/secure_messaging/count.json') as fp:
+    message_count = json.load(fp)
+
 with open('tests/test_data/party/party.json') as fp:
     party = json.load(fp)
 
@@ -124,6 +127,7 @@ url_get_survey_by_short_name_rsi = f"{app.config['SURVEY_URL']}/surveys/shortnam
 url_get_token = f"{app.config['AUTH_URL']}/api/v1/tokens/"
 url_get_thread = app.config['SECURE_MESSAGE_URL'] + '/threads/9e3465c0-9172-4974-a7d1-3a01592d1594'
 url_get_thread_old = app.config['SECURE_MESSAGE_URL'] + '/thread/9e3465c0-9172-4974-a7d1-3a01592d1594'
+url_get_conversation_count = f"{app.config['SECURE_MESSAGE_URL']}/messages/count"
 url_get_threads = app.config['SECURE_MESSAGE_URL'] + '/threads'
 url_oauth_token = f"{app.config['AUTH_URL']}/api/v1/tokens/"
 url_password_change = f"{app.config['PARTY_URL']}/party-api/v1/respondents/change_password"

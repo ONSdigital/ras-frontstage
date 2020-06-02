@@ -97,15 +97,29 @@ def send_message(message_json):
 
 def get_message_count(party_id, from_session=True):
     logger.info('Getting unread message count', party_id=party_id)
+    return try_message_count_from_session(party_id) if from_session else get_message_count_from_api(party_id)
 
+
+def try_message_count_from_session(party_id):
+    """ Attempts to get the unread message count from the session,
+        will fall back to the secure-message api if unsuccessful"""
     session = Session.from_session_key(request.cookies['authorization'])
-    if session.get_encoded_jwt() and from_session:
+    if session.get_encoded_jwt():
         logger.debug('Encoded JWT found, getting message count from session', party_id=party_id)
-        if not session.message_count_expired():
-            return session.get_unread_message_count()
-        logger.debug('Unread Message count Redis timer has expired', party_id=party_id)
+        try:
+            if not session.message_count_expired():
+                return session.get_unread_message_count()
+            logger.debug('Unread Message count timer has expired', party_id=party_id)
+        except KeyError:
+            logger.warn('Unread message count does not exist in the session, \
+                count should be retrieved from the api.', party_id=party_id)
+    return get_message_count_from_api(party_id)
 
-    logger.debug('Getting message count from secure-message api', party_id=party_id)
+
+def get_message_count_from_api(party_id):
+    """ Gets the unread message count from the secure-message api.
+        A successful get will update the session."""
+    logger.info('Getting message count from secure-message api', party_id=party_id)
     params = {'new_respondent_conversations': True}
     headers = _create_get_conversation_headers()
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/message/count"
@@ -113,8 +127,11 @@ def get_message_count(party_id, from_session=True):
         response = requestSession.get(url, headers=headers, params=params)
         try:
             response.raise_for_status()
-            session.set_unread_message_total(response.body['total_count'])
-            return response.body['total_count']
+            count = response.body['total_count']
+            logger.debug('Got unread message count, updating session', party_id=party_id, count=count)
+            session = Session.from_session_key(request.cookies['authorization'])
+            session.set_unread_message_total(count)
+            return count
         except HTTPError as exception:
             if exception.response.status_code == 403:
                 raise IncorrectAccountAccessError(message='User is unauthorized to perform this action', party_id=party_id)

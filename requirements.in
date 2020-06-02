@@ -18,15 +18,3 @@ pycryptodome
 flask-talisman
 werkzeug~=0.16
 email_validator
-
-# dev-packages
-codecov
-coverage
-flake8
-pylint
-pytest
-requests-mock
-pylint-mccabe
-pytest-cov
-responses
-safety

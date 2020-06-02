@@ -1,0 +1,12 @@
+# dev-packages
+-c requirements.txt
+codecov
+coverage
+flake8
+pylint
+pytest
+requests-mock
+pylint-mccabe
+pytest-cov
+responses
+safety

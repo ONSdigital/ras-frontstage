@@ -8,13 +8,20 @@ User interface for Respondent Account Services
 ## Setup
 Based on python 3.5
 
-Use [Pyenv](https://github.com/pyenv/pyenv) to manage installed Python versions
+Use [Pyenv](https://github.com/pyenv/pyenv) to manage installed Python versions.
 
-Install dependencies to a new virtual environment using [Pipenv](https://docs.pipenv.org/)
-
+To install the app packages:
 ```bash
-pip install -U pipenv
-pipenv install
+pip install -U -r requirements.txt
+```
+To install the dev packages:
+```bash
+pip install -U -r dev-requirements.txt
+```
+
+Add or remove pip packages to and from `requirements.in` and `dev-requirements.in`, then use pip-tools to compile them to `requirements.txt`and `dev-requirements.txt`:
+```bash
+pip-compile --quiet --generate-hashes requirements.in
 ```
 
 ## Redis
@@ -37,7 +44,7 @@ See that repo for how to run it and see the config below for the environment var
 
 ## Run the application
 ```
-pipenv run python run.py
+python run.py
 ```
 
 ## Run tests

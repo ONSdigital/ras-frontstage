@@ -3,6 +3,7 @@ FROM python:3.8-slim
 RUN apt update && apt install -y build-essential curl
 ADD requirements.txt /app/
 RUN pip install -r /app/requirements.txt
+RUN pip install -r /app/dev-requirements.txt
 
 WORKDIR /app
 EXPOSE 8082

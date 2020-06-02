@@ -94,14 +94,12 @@ class TestAccessSurvey(unittest.TestCase):
             "business_party": business_party
         }
         get_case_data.return_value = case_data
-        urls = ['access_survey', 'access-survey']
-        for url in urls:
-            with self.subTest(url=url):
-                response = self.app.get(f'/surveys/{url}?case_id=8cdc01f9-656a-4715-a148-ffed0dbe1b04&business_party_id=0008279d-9425-4e28-897d-bfd876aa7f3f&'
-                                        'survey_short_name=Bricks&ci_type=SEFT', headers=self.headers, follow_redirects=True)
 
-                self.assertEqual(response.status_code, 500)
-                self.assertTrue('An error has occurred'.encode() in response.data)
+        response = self.app.get('/surveys/access-survey?case_id=8cdc01f9-656a-4715-a148-ffed0dbe1b04&business_party_id=0008279d-9425-4e28-897d-bfd876aa7f3f&'
+                                'survey_short_name=Bricks&ci_type=SEFT', headers=self.headers, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     @patch('frontstage.controllers.case_controller.get_case_data')
     def test_access_survey_missing_business_party_from_case_data(self, get_case_data):
@@ -112,51 +110,36 @@ class TestAccessSurvey(unittest.TestCase):
         }
         get_case_data.return_value = case_data
 
-        urls = ['access_survey', 'access-survey']
-        for url in urls:
-            with self.subTest(url=url):
-                response = self.app.get(f'/surveys/{url}?case_id=8cdc01f9-656a-4715-a148-ffed0dbe1b04&business_party_id=0008279d-9425-4e28-897d-bfd876aa7f3f&'
-                                        'survey_short_name=Bricks&ci_type=SEFT', headers=self.headers, follow_redirects=True)
+        response = self.app.get('/surveys/access-survey?case_id=8cdc01f9-656a-4715-a148-ffed0dbe1b04&business_party_id=0008279d-9425-4e28-897d-bfd876aa7f3f&'
+                                'survey_short_name=Bricks&ci_type=SEFT', headers=self.headers, follow_redirects=True)
 
-                self.assertEqual(response.status_code, 500)
-                self.assertTrue('An error has occurred'.encode() in response.data)
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     def test_access_survey_without_request_arg_case_id(self):
-        urls = ['access_survey', 'access-survey']
-        for url in urls:
-            with self.subTest(url=url):
-                response = self.app.get(f'/surveys/{url}?business_party_id=0008279d-9425-4e28-897d-bfd876aa7f3f&'
-                                        'survey_short_name=Bricks&ci_type=SEFT', headers=self.headers, follow_redirects=True)
+        response = self.app.get('/surveys/access-survey?business_party_id=0008279d-9425-4e28-897d-bfd876aa7f3f&'
+                                'survey_short_name=Bricks&ci_type=SEFT', headers=self.headers, follow_redirects=True)
 
-                self.assertEqual(response.status_code, 400)
-                self.assertTrue('An error has occurred'.encode() in response.data)
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     def test_access_survey_missing_request_arg_business_party_id(self):
-        urls = ['access_survey', 'access-survey']
-        for url in urls:
-            with self.subTest(url=url):
-                response = self.app.get(f'/surveys/{url}?case_id=8cdc01f9-656a-4715-a148-ffed0dbe1b04&'
-                                        'survey_short_name=Bricks&ci_type=SEFT', headers=self.headers)
+        response = self.app.get('/surveys/access-survey?case_id=8cdc01f9-656a-4715-a148-ffed0dbe1b04&'
+                                'survey_short_name=Bricks&ci_type=SEFT', headers=self.headers)
 
-                self.assertEqual(response.status_code, 400)
-                self.assertTrue('An error has occurred'.encode() in response.data)
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     def test_access_survey_missing_request_arg_survey_short_name(self):
-        urls = ['access_survey', 'access-survey']
-        for url in urls:
-            with self.subTest(url=url):
-                response = self.app.get(f'/surveys/{url}?case_id=8cdc01f9-656a-4715-a148-ffed0dbe1b04&business_party_id=0008279d-9425-4e28-897d-bfd876aa7f3f&'
-                                        'ci_type=SEFT', headers=self.headers, follow_redirects=True)
+        response = self.app.get('/surveys/access-survey?case_id=8cdc01f9-656a-4715-a148-ffed0dbe1b04&business_party_id=0008279d-9425-4e28-897d-bfd876aa7f3f&'
+                                'ci_type=SEFT', headers=self.headers, follow_redirects=True)
 
-                self.assertEqual(response.status_code, 400)
-                self.assertTrue('An error has occurred'.encode() in response.data)
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('An error has occurred'.encode() in response.data)
 
     def test_access_survey_missing_request_arg_ci_type(self):
-        urls = ['access_survey', 'access-survey']
-        for url in urls:
-            with self.subTest(url=url):
-                response = self.app.get(f'/surveys/{url}?case_id=8cdc01f9-656a-4715-a148-ffed0dbe1b04&business_party_id=0008279d-9425-4e28-897d-bfd876aa7f3f&'
-                                        'survey_short_name=Bricks', headers=self.headers, follow_redirects=True)
+        response = self.app.get('/surveys/access-survey?case_id=8cdc01f9-656a-4715-a148-ffed0dbe1b04&business_party_id=0008279d-9425-4e28-897d-bfd876aa7f3f&'
+                                'survey_short_name=Bricks', headers=self.headers, follow_redirects=True)
 
-                self.assertEqual(response.status_code, 400)
-                self.assertTrue('An error has occurred'.encode() in response.data)
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('An error has occurred'.encode() in response.data)

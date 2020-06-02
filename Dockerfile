@@ -2,6 +2,7 @@ FROM python:3.8-slim
 
 RUN apt update && apt install -y build-essential curl
 RUN pip install poetry
+RUN poetry config virtualenvs.create false
 
 WORKDIR /app
 EXPOSE 8082

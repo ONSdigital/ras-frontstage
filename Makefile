@@ -19,8 +19,8 @@ docker-test: unit-tests integration-tests
 check:
 	pipenv check
 
-unit-tests: check lint
+unit-tests: check
 	APP_SETTINGS=TestingConfig pipenv run pytest $(UNIT_TESTS) --cov frontstage --cov-report term-missing	
 
-integration-tests: check lint
+integration-tests: check
 	APP_SETTINGS=TestingConfig pipenv run pytest $(INTEGRATION_TESTS) --cov frontstage --cov-report term-missing	

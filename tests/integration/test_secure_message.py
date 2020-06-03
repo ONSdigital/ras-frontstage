@@ -69,7 +69,8 @@ class TestSecureMessage(unittest.TestCase):
         response = self.app.get("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers, follow_redirects=True)
         self.assertEqual(response.status_code, 500)
 
-    def test_create_message_get(self):
+    @patch("frontstage.controllers.conversation_controller.get_message_count")
+    def test_create_message_get(self, message_count):
         response = self.app.get("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789", headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)

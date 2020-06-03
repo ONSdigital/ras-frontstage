@@ -121,7 +121,7 @@ def get_message_count_from_api(party_id, encoded_jwt=None):
         A successful get will update the session."""
     logger.info('Getting message count from secure-message api', party_id=party_id)
     params = {'new_respondent_conversations': True}
-    headers = _create_get_conversation_headers() if encoded_jwt is None else _create_get_conversation_headers(encoded_jwt)
+    headers = _create_get_conversation_headers(encoded_jwt)
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/messages/count"
     with _get_session() as requestSession:
         response = requestSession.get(url, headers=headers, params=params)

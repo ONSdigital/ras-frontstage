@@ -14,7 +14,9 @@ class Session(object):
     @classmethod
     def from_session_key(cls, session_key):
         encoded_jwt_token = redis.get(session_key)
-        return cls(session_key, encoded_jwt_token)
+        session = cls(session_key, encoded_jwt_token)
+        session.persisted = True
+        return session
 
     @classmethod
     def from_party_id(cls, party_id):

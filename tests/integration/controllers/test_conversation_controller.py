@@ -24,8 +24,7 @@ class TestSurveyController(unittest.TestCase):
         self.redis.flushall()
 
     @patch("frontstage.controllers.conversation_controller._create_get_conversation_headers")
-    @patch("frontstage.controllers.conversation_controller._set_unread_message_total")
-    def test_get_message_count_from_api(self, headers, total):
+    def test_get_message_count_from_api(self, headers):
         headers.return_value = {'Authorization': "token"}
         session = Session.from_party_id("id")
         with responses.RequestsMock() as rsps:
@@ -43,9 +42,22 @@ class TestSurveyController(unittest.TestCase):
 
             self.assertEqual(3, count)
 
+    def test_get_message_count_from_session_if_persisted_by_api(self):
+        session = Session.from_party_id("id")
+        session.set_unread_message_total(1)
+
+        session_key = session.session_key
+
+        session_under_test = Session.from_session_key(session_key)
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.GET, url_get_conversation_count, json=message_count, status=200, headers={'Authorisation': 'token'}, content_type='application/json')
+            with app.app_context():
+                count = conversation_controller.get_message_count_from_api(session_under_test)
+
+                self.assertEqual(3, session_under_test.get_unread_message_count())
+
     @patch("frontstage.controllers.conversation_controller._create_get_conversation_headers")
-    @patch("frontstage.controllers.conversation_controller._set_unread_message_total")
-    def test_get_message_count_from_api_when_expired(self, headers, total):
+    def test_get_message_count_from_api_when_expired(self, headers):
         headers.return_value = {'Authorization': "token"}
         session = Session.from_party_id("id")
         decoded = session.get_decoded_jwt()

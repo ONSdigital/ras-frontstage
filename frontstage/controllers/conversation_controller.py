@@ -93,7 +93,7 @@ def send_message(message_json):
 
     logger.info('Successfully sent message', party_id=party_id)
     return response.json()
-    
+
 
 def try_message_count_from_session(session):
     """ Attempts to get the unread message count from the session,
@@ -124,7 +124,7 @@ def get_message_count_from_api(session):
             count = response.json()['total']
             logger.debug('Got unread message count, updating session', party_id=party_id, count=count)
             if session.is_persisted():
-                _set_unread_message_total(count)
+                session.set_unread_message_total(count)
             return count
         except HTTPError as exception:
             if exception.response.status_code == 403:
@@ -132,11 +132,6 @@ def get_message_count_from_api(session):
             else:
                 logger.exception('An error has occured retrieving the new message count', party_id=party_id)
                 return 0
-
-
-def _set_unread_message_total(count):
-    session = Session.from_session_key(request.cookies['authorization'])
-    session.set_unread_message_total(count)
 
 
 def _create_get_conversation_headers(encoded_jwt=None):

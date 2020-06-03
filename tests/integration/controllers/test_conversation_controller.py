@@ -13,7 +13,7 @@ from frontstage.exceptions.exceptions import IncorrectAccountAccessError
 from tests.integration.mocked_services import url_get_conversation_count, message_count
 
 
-class TestSurveyController(unittest.TestCase):
+class TestConversationController(unittest.TestCase):
 
     def setUp(self):
         app_config = TestingConfig()

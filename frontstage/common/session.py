@@ -18,8 +18,7 @@ class Session(object):
     @classmethod
     def from_party_id(cls, party_id):
         """Create a new and unpersisted session object from a party_id, this will encode a JWT
-            and set and expiry time, it will default the unread message count to 0
-            you must persist this yourself by calling session.save()"""
+            and set an expiry time, it will default the unread message count to 0"""
         data_dict = {
             'party_id': party_id,
             "role": "respondent",
@@ -32,7 +31,8 @@ class Session(object):
         session = cls(session_key, encoded_jwt_token)
         return session
 
-    def update_session(self):
+    def refresh_session(self):
+        """ Refesh a session by setting a new expiry timestamp """
         decoded_jwt = self.get_decoded_jwt()
         decoded_jwt["expires_in"] = _get_new_timestamp()
         self.encoded_jwt_token = jwt.encode(decoded_jwt)

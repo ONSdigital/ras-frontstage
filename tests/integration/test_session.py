@@ -25,7 +25,7 @@ class TestSession(unittest.TestCase):
         self.assertEqual(test_jwt['party_id'], "party")
         self.assertEqual(test_jwt['unread_message_count']['value'], 0)
 
-    def test_update_session(self):
+    def test_refresh_session(self):
         # Create session and get session key
         session = Session.from_party_id("party")
         session.save()
@@ -33,7 +33,7 @@ class TestSession(unittest.TestCase):
 
         # Wait 3 seconds and update the session
         time.sleep(1)
-        session.update_session()
+        session.refresh_session()
 
         # Check that the session expiry time has been reset
         expires_in = redis.ttl(session_key)

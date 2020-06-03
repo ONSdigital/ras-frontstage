@@ -97,10 +97,13 @@ with open('tests/test_data/survey/survey_list_todo.json') as fp:
 with open('tests/test_data/survey/survey_list_history.json') as fp:
     survey_list_history = json.load(fp)
 
-encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoicmVzcG9uZGVudCIsImFjY2Vzc190b2tlbiI6ImI5OWIyMjA0LWYxM" \
-                    "DAtNDcxZS1iOTQ1LTIyN2EyNmVhNjljZCIsInJlZnJlc2hfdG9rZW4iOiIxZTQyY2E2MS02ZDBkLTQxYjMtODU2Yy02YjhhMDhlYmI" \
-                    "yZTMiLCJleHBpcmVzX2F0IjoxNzM4MTU4MzI4LjAsInBhcnR5X2lkIjoiZjk1NmU4YWUtNmUwZi00NDE0LWIwY2YtYTA3YzFhYTNlM" \
-                    "zdiIn0.7W9yikGtX2gbKLclxv-dajcJ2NL0Nb_HDVqHrCrYvQE"
+encoded_jwt_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicmVzcG9uZGVu" \
+                    "dCIsImFjY2Vzc190b2tlbiI6ImI5OWIyMjA0LWYxMDAtNDcxZS1iOTQ1LTIyN" \
+                    "2EyNmVhNjljZCIsInJlZnJlc2hfdG9rZW4iOiIxZTQyY2E2MS02ZDBkLTQxYj" \
+                    "MtODU2Yy02YjhhMDhlYmIyZTMiLCJleHBpcmVzX2F0IjoxNzM4MTU4MzI4LjA" \
+                    "sInBhcnR5X2lkIjoiZjk1NmU4YWUtNmUwZi00NDE0LWIwY2YtYTA3YzFhYTNl" \
+                    "MzdiIiwidW5yZWFkX21lc3NhZ2VfY291bnQiOnsidmFsdWUiOjAsInJlZnJlc" \
+                    "2hfaW4iOjMyNTAzNjgwMDAwLjB9fQ.d9KA3ltbNbcgqYmknQwiR2SEEOZ25ja2cZlQ4yC-dy8"
 enrolment_code = 'ABCDEF123456'
 encrypted_enrolment_code = 'WfwJghohWOZTIYnutlTcVucqnuED5Lm9q8t0L4ASHPo='
 token = 'test_token'

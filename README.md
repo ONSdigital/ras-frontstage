@@ -51,7 +51,7 @@ python run.py
 ## Run tests
 Install test dependencies with
 ```bash
-pipenv install --dev
+pip install -U -r dev-requirements.txt
 ```
 The Makefile will run the tests in the unit or integration tests folder using pytest, and present a coverage report.  
 These can be easily run via the following commands:

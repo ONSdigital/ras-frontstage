@@ -15,7 +15,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 @surveys_bp.route('/access-survey', methods=['GET'])
 @jwt_authorization(request)
 def access_survey(session):
-    party_id = session['party_id']
+    party_id = session.get_party_id()
     case_id = request.args['case_id']
     business_party_id = request.args['business_party_id']
     survey_short_name = request.args['survey_short_name']
@@ -31,7 +31,7 @@ def access_survey(session):
     case_data = case_controller.get_case_data(case_id, party_id, business_party_id, survey_short_name)
 
     logger.info('Successfully retrieved case data', party_id=party_id, case_id=case_id)
-    unread_message_count = { 'unread_message_count': conversation_controller.get_message_count(party_id) }
+    unread_message_count = { 'unread_message_count': conversation_controller.try_message_count_from_session(session) }
     return render_template('surveys/surveys-access.html', case_id=case_id,
                            collection_instrument_id=case_data['collection_instrument']['id'],
                            collection_instrument_size=case_data['collection_instrument']['len'],

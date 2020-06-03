@@ -17,7 +17,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 @surveys_bp.route('/upload-survey', methods=['POST'])
 @jwt_authorization(request)
 def upload_survey(session):
-    party_id = session['party_id']
+    party_id = session.get_party_id()
     case_id = request.args['case_id']
     business_party_id = request.args['business_party_id']
     survey_short_name = request.args['survey_short_name']
@@ -66,6 +66,6 @@ def upload_survey(session):
                                 error_info=error_info))
 
     logger.info('Successfully uploaded collection instrument', party_id=party_id, case_id=case_id)
-    unread_message_count = { 'unread_message_count': conversation_controller.get_message_count(party_id) }
+    unread_message_count = { 'unread_message_count': conversation_controller.try_message_count_from_session(session) }
     return render_template('surveys/surveys-upload-success.html', upload_filename=upload_filename,
         unread_message_count=unread_message_count)

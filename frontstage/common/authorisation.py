@@ -59,7 +59,7 @@ def jwt_authorization(request):
             if app.config['VALIDATE_JWT']:
                 if validate(jwt):
                     session.refresh_session()
-                    return original_function(jwt, *args, **kwargs)
+                    return original_function(session, *args, **kwargs)
                 else:
                     logger.warning('Token is not valid for this request')
                     raise JWTValidationError

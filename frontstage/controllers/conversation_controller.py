@@ -93,35 +93,29 @@ def send_message(message_json):
 
     logger.info('Successfully sent message', party_id=party_id)
     return response.json()
+    
 
-
-def get_message_count(party_id, from_session=True):
-    logger.info('Getting unread message count', party_id=party_id)
-    return try_message_count_from_session(party_id) if from_session else get_message_count_from_api(party_id)
-
-
-def try_message_count_from_session(party_id):
+def try_message_count_from_session(session):
     """ Attempts to get the unread message count from the session,
         will fall back to the secure-message api if unsuccessful"""
-    session = Session.from_session_key(request.cookies['authorization'])
-    if session.get_encoded_jwt():
-        logger.debug('Encoded JWT found, getting message count from session', party_id=party_id)
-        try:
-            if not session.message_count_expired():
-                return session.get_unread_message_count()
-            logger.debug('Unread Message count timer has expired', party_id=party_id)
-        except KeyError:
-            logger.warn('Unread message count does not exist in the session, \
-                count should be retrieved from the api.', party_id=party_id)
-    return get_message_count_from_api(party_id)
+    party_id = session.get_party_id()
+    logger.debug('Getting message count from session', party_id=party_id)
+    try:
+        if not session.message_count_expired():
+            return session.get_unread_message_count()
+        logger.debug('Unread Message count timer has expired', party_id=party_id)
+    except KeyError:
+        logger.warn('Unread message count does not exist in the session', party_id=party_id)
+    return get_message_count_from_api(session)
 
 
-def get_message_count_from_api(party_id, encoded_jwt=None):
+def get_message_count_from_api(session):
     """ Gets the unread message count from the secure-message api.
         A successful get will update the session."""
+    party_id = session.get_party_id()
     logger.info('Getting message count from secure-message api', party_id=party_id)
     params = {'new_respondent_conversations': True}
-    headers = _create_get_conversation_headers(encoded_jwt)
+    headers = _create_get_conversation_headers(session.get_encoded_jwt())
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/messages/count"
     with _get_session() as requestSession:
         response = requestSession.get(url, headers=headers, params=params)
@@ -129,7 +123,7 @@ def get_message_count_from_api(party_id, encoded_jwt=None):
             response.raise_for_status()
             count = response.json()['total']
             logger.debug('Got unread message count, updating session', party_id=party_id, count=count)
-            if encoded_jwt is None:
+            if session.is_persisted():
                 _set_unread_message_total(count)
             return count
         except HTTPError as exception:

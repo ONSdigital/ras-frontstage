@@ -19,7 +19,7 @@ def get_survey_list(session, tag):
     Displays the list of surveys for the respondent by tag.  A tag represents the state the
     survey is in (e.g., todo, history, etc)
     """
-    party_id = session.get('party_id')
+    party_id = session.get_party_id()
     business_id = request.args.get('business_party_id')
     survey_id = request.args.get('survey_id')
     already_enrolled = request.args.get('already_enrolled')
@@ -47,6 +47,6 @@ def get_survey_list(session, tag):
 
         return response
     else:
-        unread_message_count = { 'unread_message_count': conversation_controller.get_message_count(party_id) }
+        unread_message_count = { 'unread_message_count': conversation_controller.try_message_count_from_session(session) }
         return render_template('surveys/surveys-history.html', sorted_surveys_list=sorted_survey_list, history=True,
             unread_message_count=unread_message_count)

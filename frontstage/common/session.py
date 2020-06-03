@@ -9,6 +9,7 @@ class Session(object):
     def __init__(self, session_key, encoded_jwt_token):
         self.encoded_jwt_token = encoded_jwt_token
         self.session_key = session_key
+        self.persisted = False
 
     @classmethod
     def from_session_key(cls, session_key):
@@ -66,8 +67,12 @@ class Session(object):
     def get_expires_in(self):
         return jwt.decode(self.encoded_jwt_token)['expires_in']
 
+    def is_persisted(self):
+        return self.persisted
+
     def save(self):
         redis.setex(self.session_key, 3600, self.encoded_jwt_token)
+        self.persisted = True
 
 
 def _get_new_timestamp(ttl=3600):

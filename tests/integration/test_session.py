@@ -18,8 +18,10 @@ class TestSession(unittest.TestCase):
     def test_create_session(self):
         # Create session and get session key
         session = Session.from_party_id("party")
-        session.save()
 
+        self.assertFalse(session.is_persisted())
+        session.save()
+        self.assertTrue(session.is_persisted())
         # Retrieve encoded_jwt from session
         test_jwt = session.get_decoded_jwt()
         self.assertEqual(test_jwt['party_id'], "party")

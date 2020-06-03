@@ -29,67 +29,49 @@ class TestUploadSurveyFailed(unittest.TestCase):
     @patch('frontstage.controllers.case_controller.get_case_data')
     def test_upload_failed_no_error_info(self, get_case_data):
         get_case_data.return_value = self.case_data
-        urls = ['upload_failed', 'upload-failed']
-        for url in urls:
-            with self.subTest(url=url):
-                response = self.app.get(f'/surveys/{url}?case_id={case["id"]}&business_party_id={business_party["id"]}&survey_short_name={survey["shortName"]}')
+        response = self.app.get(f'/surveys/upload-failed?case_id={case["id"]}&business_party_id={business_party["id"]}&survey_short_name={survey["shortName"]}')
 
-                self.assertEqual(response.status_code, 200)
-                self.assertTrue("Something went wrong".encode() in response.data)
-                self.assertTrue("Please try uploading your spreadsheet again".encode() in response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("Something went wrong".encode() in response.data)
+        self.assertTrue("Please try uploading your spreadsheet again".encode() in response.data)
 
     @patch('frontstage.controllers.case_controller.get_case_data')
     def test_upload_failed_type_error_info(self, get_case_data):
         get_case_data.return_value = self.case_data
-        urls = ['upload_failed', 'upload-failed']
-        for url in urls:
-            with self.subTest(url=url):
-                response = self.app.get(f'/surveys/{url}?case_id={case["id"]}&business_party_id={business_party["id"]}&survey_short_name={survey["shortName"]}'
-                                        f'&error_info=type')
+        response = self.app.get(f'/surveys/upload-failed?case_id={case["id"]}&business_party_id={business_party["id"]}&survey_short_name={survey["shortName"]}'
+                                f'&error_info=type')
 
-                self.assertEqual(response.status_code, 200)
-                self.assertTrue("Error uploading - incorrect file type".encode() in response.data)
-                self.assertTrue("The spreadsheet must be in .xls or .xlsx format".encode() in response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("Error uploading - incorrect file type".encode() in response.data)
+        self.assertTrue("The spreadsheet must be in .xls or .xlsx format".encode() in response.data)
 
     @patch('frontstage.controllers.case_controller.get_case_data')
     def test_upload_failed_charLimit_error_info(self, get_case_data):
         get_case_data.return_value = self.case_data
-        urls = ['upload_failed', 'upload-failed']
-        for url in urls:
-            with self.subTest(url=url):
-                response = self.app.get(f'/surveys/{url}?case_id={case["id"]}&business_party_id={business_party["id"]}&survey_short_name={survey["shortName"]}'
-                                        f'&error_info=charLimit')
+        response = self.app.get(f'/surveys/upload-failed?case_id={case["id"]}&business_party_id={business_party["id"]}&survey_short_name={survey["shortName"]}'
+                                f'&error_info=charLimit')
 
-                self.assertEqual(response.status_code, 200)
-                self.assertTrue("Error uploading - file name too long".encode() in response.data)
-                self.assertTrue("The file name of your spreadsheet must be less than 50 characters long".encode() in response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("Error uploading - file name too long".encode() in response.data)
+        self.assertTrue("The file name of your spreadsheet must be less than 50 characters long".encode() in response.data)
 
     @patch('frontstage.controllers.case_controller.get_case_data')
     def test_upload_failed_size_error_info(self, get_case_data):
         get_case_data.return_value = self.case_data
-        urls = ['upload_failed', 'upload-failed']
-        for url in urls:
-            with self.subTest(url=url):
-                response = self.app.get(f'/surveys/{url}?case_id={case["id"]}&business_party_id={business_party["id"]}&survey_short_name={survey["shortName"]}'
-                                        f'&error_info=size')
+        response = self.app.get(f'/surveys/upload-failed?case_id={case["id"]}&business_party_id={business_party["id"]}&survey_short_name={survey["shortName"]}'
+                                f'&error_info=size')
 
-                self.assertEqual(response.status_code, 200)
-                self.assertTrue("Error uploading - file size too large".encode() in response.data)
-                self.assertTrue("The spreadsheet must be smaller than 20MB in size".encode() in response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("Error uploading - file size too large".encode() in response.data)
+        self.assertTrue("The spreadsheet must be smaller than 20MB in size".encode() in response.data)
 
     def test_upload_survey_failed_with_no_business_party_id_fails(self):
-        urls = ['upload_failed', 'upload-failed']
-        for url in urls:
-            with self.subTest(url=url):
-                response = self.app.get(f'/surveys/{url}?case_id={case["id"]}&survey_short_name={survey["shortName"]}&error_info=size')
+        response = self.app.get(f'/surveys/upload-failed?case_id={case["id"]}&survey_short_name={survey["shortName"]}&error_info=size')
 
-                self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
     def test_upload_survey_failed_with_no_survey_short_name_fails(self):
-        urls = ['upload_failed', 'upload-failed']
-        for url in urls:
-            with self.subTest(url=url):
-                response = self.app.get(f'/surveys/{url}?case_id={case["id"]}&business_party_id={business_party["id"]}'
-                                        f'&error_info=size')
+        response = self.app.get(f'/surveys/upload-failed?case_id={case["id"]}&business_party_id={business_party["id"]}'
+                                f'&error_info=size')
 
-                self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)

@@ -141,11 +141,7 @@ To reset a password
 
 * POST request to this endpoint will upload a collection instrument to the collection instrument service.
 
-`surveys/upload_failed` - DEPRECATED. Will be removed in a future release.
-
-* GET request to this endpoint will render an error page if it fails to upload the collection instrument.
-
-`surveys/upload-failed` - Replaces upload_failed
+`surveys/upload-failed`
 
 * GET request to this endpoint will render an error page if it fails to upload the collection instrument.
 

@@ -116,12 +116,12 @@ def try_message_count_from_session(party_id):
     return get_message_count_from_api(party_id)
 
 
-def get_message_count_from_api(party_id):
+def get_message_count_from_api(party_id, encoded_jwt=None):
     """ Gets the unread message count from the secure-message api.
         A successful get will update the session."""
     logger.info('Getting message count from secure-message api', party_id=party_id)
     params = {'new_respondent_conversations': True}
-    headers = _create_get_conversation_headers()
+    headers = _create_get_conversation_headers() if encoded_jwt is None else _create_get_conversation_headers(encoded_jwt)
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/messages/count"
     with _get_session() as requestSession:
         response = requestSession.get(url, headers=headers, params=params)
@@ -129,7 +129,8 @@ def get_message_count_from_api(party_id):
             response.raise_for_status()
             count = response.json()['total']
             logger.debug('Got unread message count, updating session', party_id=party_id, count=count)
-            _set_unread_message_total(count)
+            if encoded_jwt is None:
+                _set_unread_message_total(count)
             return count
         except HTTPError as exception:
             if exception.response.status_code == 403:
@@ -144,9 +145,10 @@ def _set_unread_message_total(count):
     session.set_unread_message_total(count)
 
 
-def _create_get_conversation_headers():
+def _create_get_conversation_headers(encoded_jwt=None):
     try:
-        encoded_jwt = Session.from_session_key(request.cookies['authorization']).get_encoded_jwt()
+        if encoded_jwt is None:
+            encoded_jwt = Session.from_session_key(request.cookies['authorization']).get_encoded_jwt()
     except KeyError:
         logger.error('Authorization token missing in cookie')
         raise AuthorizationTokenMissing

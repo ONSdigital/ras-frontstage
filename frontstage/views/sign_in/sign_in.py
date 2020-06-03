@@ -9,6 +9,7 @@ from frontstage.common.session import Session
 from frontstage.common.utilities import obfuscate_email
 from frontstage.controllers import oauth_controller, party_controller
 from frontstage.controllers.party_controller import notify_party_and_respondent_account_locked
+from frontstage.controllers import conversation_controller
 from frontstage.exceptions.exceptions import OAuth2Error
 from frontstage.models import LoginForm
 from frontstage.views.sign_in import sign_in_bp
@@ -87,12 +88,13 @@ def login():  # noqa: C901
         bound_logger.info("Successfully found user in party service")
         bound_logger.info('Creating session')
         session = Session.from_party_id(party_id)
-        session.save()
         response.set_cookie('authorization',
                             value=session.session_key,
                             expires=session.get_expires_in(),
                             secure=secure,
                             httponly=secure)
+        count = conversation_controller.get_message_count_from_api(party_id, encoded_jwt=session.get_encoded_jwt())
+        session.set_unread_message_total(count)
         bound_logger.info('Successfully created session', session_key=session.session_key)
         return response
 

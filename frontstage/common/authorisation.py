@@ -20,7 +20,7 @@ def validate(token):
     logger.debug('Validating token')
 
     now = datetime.now().timestamp()
-    expires_at = token.get('expires_at')
+    expires_at = token.get('expires_in')
     if expires_at:
         if now >= expires_at:
             flash('To help protect your information we have signed you out.', 'info')

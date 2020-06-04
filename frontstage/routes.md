@@ -131,11 +131,7 @@ Called by the `surveys/add-survey/confirm-organisation-survey` page.
 
 * GET request to this endpoint will download a survey that the respondent will need to complete.
 
-`surveys/upload_survey` - DEPRECATED. Will be removed in a future release.
-
-* POST request to this endpoint will upload a collection instrument to the collection instrument service.
-
-`surveys/upload-survey` - Replaces upload_survey
+`surveys/upload-survey`
 
 * POST request to this endpoint will upload a collection instrument to the collection instrument service.
 

@@ -11,7 +11,6 @@ from frontstage.views.surveys import surveys_bp
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-@surveys_bp.route('/access_survey', methods=['GET'])  # Deprecated , will be removed when no longer in use
 @surveys_bp.route('/access-survey', methods=['GET'])
 @jwt_authorization(request)
 def access_survey(session):

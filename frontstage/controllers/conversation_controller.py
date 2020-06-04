@@ -114,7 +114,7 @@ def get_message_count_from_api(session):
         A successful get will update the session."""
     party_id = session.get_party_id()
     logger.info('Getting message count from secure-message api', party_id=party_id)
-    params = {'new_respondent_conversations': True}
+    params = {'unread_conversations': 'true'}
     headers = _create_get_conversation_headers(session.get_encoded_jwt())
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/messages/count"
     with _get_session() as requestSession:
@@ -131,7 +131,9 @@ def get_message_count_from_api(session):
                 raise IncorrectAccountAccessError(message='User is unauthorized to perform this action', thread_id=party_id)
             else:
                 logger.exception('An error has occured retrieving the new message count', party_id=party_id)
-                return 0
+        except Exception as ex:
+            logger.exception("An unknown error has occured getting message count from secure-message api", party_id=party_id)
+        return 0
 
 
 def _create_get_conversation_headers(encoded_jwt=None):

@@ -17,8 +17,9 @@
                  {% if request.path.startswith('/secure-message/') %} navigation-tabs__item--active {% endif %}">
           <a id="SURVEY_MESSAGES_TAB" href="{{ url_for('secure_message_bp.view_conversation_list') }}"
              class="navigation-tabs__tab
-                    {% if request.path.startswith('/secure-message/') %} navigation-tabs__tab--active {% endif %}">Messages</a>
-                    
+                    {% if request.path.startswith('/secure-message/') %} navigation-tabs__tab--active {% endif %}">Messages
+              {% if unread_message_count and unread_message_count.unread_message_count > 0 %}<span class="notification-badge">{{ unread_message_count.unread_message_count }}</span>{% endif %}
+          </a>
       </li>
   </ul>
 </div>

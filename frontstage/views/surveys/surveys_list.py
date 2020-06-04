@@ -36,17 +36,18 @@ def get_survey_list(session, tag):
     sorted_survey_list = sorted(survey_list, key=lambda k: datetime.strptime(k['submit_by'], '%d %b %Y'), reverse=True)
     bound_logger.info("Successfully retreived survey list")
 
+    unread_message_count = { 'unread_message_count': conversation_controller.try_message_count_from_session(session) }
     if tag == 'todo':
         added_survey = True if business_id and survey_id and not already_enrolled else None
         response = make_response(render_template('surveys/surveys-todo.html',
                                                  sorted_surveys_list=sorted_survey_list,
-                                                 added_survey=added_survey, already_enrolled=already_enrolled))
+                                                 added_survey=added_survey, already_enrolled=already_enrolled,
+                                                 unread_message_count=unread_message_count))
 
         # Ensure any return to list of surveys (e.g. browser back) round trips the server to display the latest statuses
         response.headers.set("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store")
 
         return response
     else:
-        unread_message_count = { 'unread_message_count': conversation_controller.try_message_count_from_session(session) }
         return render_template('surveys/surveys-history.html', sorted_surveys_list=sorted_survey_list, history=True,
             unread_message_count=unread_message_count)

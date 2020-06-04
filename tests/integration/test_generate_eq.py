@@ -52,15 +52,12 @@ class TestGenerateEqURL(unittest.TestCase):
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
 
         # When the generate-eq-url is called
-        urls = ['access_survey', 'access-survey']
-        for url in urls:
-            with self.subTest(url=url):
-                response = self.app.get(f"/surveys/{url}?case_id={case['id']}&business_party_id={business_party['id']}"
-                                        f"&survey_short_name={survey_eq['shortName']}&ci_type=EQ", headers=self.headers)
+        response = self.app.get(f"/surveys/access-survey?case_id={case['id']}&business_party_id={business_party['id']}"
+                                f"&survey_short_name={survey_eq['shortName']}&ci_type=EQ", headers=self.headers)
 
-                # An eq url is generated
-                self.assertEqual(response.status_code, 302)
-                self.assertIn("https://eq-test/session?token=", response.location)
+        # An eq url is generated
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("https://eq-test/session?token=", response.location)
 
     @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
@@ -70,14 +67,11 @@ class TestGenerateEqURL(unittest.TestCase):
         mock_request.get(url_get_case, json=completed_case)
 
         # When the generate-eq-url is called
-        urls = ['access_survey', 'access-survey']
-        for url in urls:
-            with self.subTest(url=url):
-                response = self.app.get(f"/surveys/{url}?case_id={completed_case['id']}&business_party_id={business_party['id']}"
-                                        f"&survey_short_name={survey_eq['shortName']}&ci_type=EQ", headers=self.headers, follow_redirects=True)
+        response = self.app.get(f"/surveys/access-survey?case_id={completed_case['id']}&business_party_id={business_party['id']}"
+                                f"&survey_short_name={survey_eq['shortName']}&ci_type=EQ", headers=self.headers, follow_redirects=True)
 
-                # A 403 is returned
-                self.assertEqual(response.status_code, 403)
+        # A 403 is returned
+        self.assertEqual(response.status_code, 403)
 
     @requests_mock.mock()
     def test_generate_eq_url_seft(self, mock_request):

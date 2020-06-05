@@ -7,7 +7,7 @@ from structlog import wrap_logger
 from werkzeug.utils import redirect
 
 from frontstage import app
-from frontstage.common.session import SessionHandler
+from frontstage.common.session import Session
 from frontstage.exceptions.exceptions import ApiError, InvalidEqPayLoad, JWTValidationError, IncorrectAccountAccessError
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -29,9 +29,9 @@ def not_found_error(error):
 def handle_csrf_error(error):
     logger.warning('CSRF token has expired', error_message=error.description, status_code=error.code)
 
-    session_handler = SessionHandler()
     session_key = request.cookies.get('authorization')
-    encoded_jwt = session_handler.get_encoded_jwt(session_key)
+    session_handler = Session.from_session_key(session_key)
+    encoded_jwt = session_handler.get_encoded_jwt()
     if not encoded_jwt:
         return render_template('errors/400-error.html'), 400
     else:

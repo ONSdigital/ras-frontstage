@@ -9,7 +9,7 @@ from structlog import wrap_logger
 from werkzeug.utils import redirect
 
 from frontstage import app
-from frontstage.common.session import SessionHandler
+from frontstage.common.session import Session
 from frontstage.exceptions.exceptions import JWTValidationError
 
 
@@ -20,7 +20,7 @@ def validate(token):
     logger.debug('Validating token')
 
     now = datetime.now().timestamp()
-    expires_at = token.get('expires_at')
+    expires_at = token.get('expires_in')
     if expires_at:
         if now >= expires_at:
             flash('To help protect your information we have signed you out.', 'info')
@@ -40,9 +40,9 @@ def jwt_authorization(request):
     def extract_session(original_function):
         @wraps(original_function)
         def extract_session_wrapper(*args, **kwargs):
-            session_handler = SessionHandler()
             session_key = request.cookies.get('authorization')
-            encoded_jwt = session_handler.get_encoded_jwt(session_key)
+            session = Session.from_session_key(session_key)
+            encoded_jwt = session.get_encoded_jwt()
             if encoded_jwt:
                 logger.debug('Attempting to authorize token')
                 try:
@@ -58,8 +58,8 @@ def jwt_authorization(request):
 
             if app.config['VALIDATE_JWT']:
                 if validate(jwt):
-                    session_handler.update_session()
-                    return original_function(jwt, *args, **kwargs)
+                    session.refresh_session()
+                    return original_function(session, *args, **kwargs)
                 else:
                     logger.warning('Token is not valid for this request')
                     raise JWTValidationError

@@ -19,7 +19,7 @@ def create_message(session):
     """Creates and sends a message outside of the context of an existing conversation"""
     survey = request.args['survey']
     ru_ref = request.args['ru_ref']
-    party_id = session['party_id']
+    party_id = session.get_party_id()
     form = SecureMessagingForm(request.form)
     if request.method == 'POST' and form.validate():
         logger.info("Form validation successful", party_id=party_id)
@@ -30,9 +30,11 @@ def create_message(session):
         return redirect(url_for('secure_message_bp.view_conversation_list'))
 
     else:
+        unread_message_count = { 'unread_message_count': conversation_controller.try_message_count_from_session(session) }
         return render_template('secure-messages/secure-messages-view.html',
                                ru_ref=ru_ref, survey=survey,
-                               form=form, errors=form.errors, message={})
+                               form=form, errors=form.errors, message={},
+                               unread_message_count=unread_message_count)
 
 
 def _send_new_message(party_id, survey, business_id):

@@ -170,54 +170,58 @@ font-weight: 400;
   padding: 0;
   list-style-type: none;
   border-bottom: 1px solid #555;
+} 
+.navigation-tabs .notification-badge {
+  display: inline-block;
+  min-width: 28px;
+  padding: 0px 4px 0 3px;
+  margin-left: 2px;
+  border-radius: 16px;
+  color: #fff;
+  background: #4263c2;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
 }
-
 .navigation-tabs:after {
-  content: ".";
+  content: '.';
   display: block;
   clear: both;
   visibility: hidden;
   line-height: 0;
   height: 0;
 }
-
 .navigation-tabs-component {
   padding: 0;
   margin: 0;
 }
-
 .navigation-tabs .navigation-tabs__item {
   margin-bottom: 0;
   margin-left: 10px;
   padding: 9px 18px 0;
-  padding: .5rem 1rem -0.506rem;
+  padding: 0.5rem 1rem -0.506rem;
   border: 1px solid transparent;
   border-radius: 0.3rem;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   border-bottom: none;
 }
-
 .navigation-tabs .navigation-tabs__item .navigation-tabs__tab {
   margin-bottom: 0;
   display: block;
 }
-
 .navigation-tabs .navigation-tabs__item.navigation-tabs__item--primary {
   float: left;
 }
-
 .navigation-tabs .navigation-tabs__item.navigation-tabs__item--secondary {
   float: right;
 }
-
 .navigation-tabs .navigation-tabs__item.navigation-tabs__item--active {
   margin-bottom: -1px;
   padding-bottom: 8px;
   border-color: #555;
   border-bottom: 1px solid #fff;
 }
-
 .no-js .hide-if-no-js {
   display: none;
 }

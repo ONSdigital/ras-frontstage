@@ -7,7 +7,7 @@ from structlog import wrap_logger
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.common.message_helper import from_internal, refine
 from frontstage.controllers.conversation_controller import get_conversation, get_conversation_list, \
-    remove_unread_label, send_message
+    remove_unread_label, send_message, try_message_count_from_session, get_message_count_from_api
 from frontstage.models import SecureMessagingForm
 from frontstage.views.secure_messaging import secure_message_bp
 
@@ -25,7 +25,7 @@ def view_conversation(session, thread_id):
     From September 2019 onwards, it should be safe to remove the /thread endpoint (just check the analytics to make
     sure that it's a very small number of people trying to hit it first!).
     """
-    party_id = session.get('party_id')
+    party_id = session.get_party_id()
     logger.info("Getting conversation", thread_id=thread_id, party_id=party_id)
     # TODO, do we really want to do a GET every time, even if we're POSTing? Rops does it this
     # way so we can get it working, then get it right.
@@ -47,22 +47,25 @@ def view_conversation(session, thread_id):
         if form.validate_on_submit():
             logger.info("Sending message", thread_id=thread_id, party_id=party_id)
             msg_to = get_msg_to(refined_conversation)
-            send_message(_get_message_json(form, refined_conversation[0], msg_to=msg_to, msg_from=session['party_id']))
+            send_message(_get_message_json(form, refined_conversation[0], msg_to=msg_to, msg_from=party_id))
             logger.info("Successfully sent message", thread_id=thread_id, party_id=party_id)
             thread_url = url_for("secure_message_bp.view_conversation", thread_id=thread_id) + "#latest-message"
             flash(Markup('Message sent. <a href={}>View Message</a>'.format(thread_url)))
             return redirect(url_for('secure_message_bp.view_conversation_list'))
 
+    unread_message_count = { 'unread_message_count': get_message_count_from_api(session) }
+
     return render_template('secure-messages/conversation-view.html',
                            form=form,
                            conversation=refined_conversation,
-                           conversation_data=conversation)
+                           conversation_data=conversation,
+                           unread_message_count=unread_message_count)
 
 
 @secure_message_bp.route('/threads', methods=['GET'])
 @jwt_authorization(request)
 def view_conversation_list(session):
-    party_id = session.get('party_id')
+    party_id = session.get_party_id()
     logger.info('Getting conversation list', party_id=party_id)
     is_closed = request.args.get('is_closed', default='false')
     params = {'is_closed': is_closed}
@@ -75,10 +78,11 @@ def view_conversation_list(session):
         logger.error('A key error occurred', party_id=party_id)
         raise e
     logger.info('Retrieving and refining conversation successful', party_id=party_id)
-
+    unread_message_count = { 'unread_message_count': try_message_count_from_session(session) }
     return render_template('secure-messages/conversation-list.html',
                            messages=refined_conversation,
-                           is_closed=strtobool(is_closed))
+                           is_closed=strtobool(is_closed),
+                           unread_message_count=unread_message_count)
 
 
 def _get_message_json(form, first_message_in_conversation, msg_to, msg_from):

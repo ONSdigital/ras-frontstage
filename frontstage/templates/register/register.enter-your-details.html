@@ -116,8 +116,8 @@
 
 
         <div class="section">
-            <h2 class="section__title neptune u-mt-m">Phone number</h2>
-            <p class="section__description u-fs-r">We may sometimes need to call you to discuss information you have provided</p>
+            <h2 class="section__title neptune u-mt-m">Contact telephone number</h2>
+            <p class="section__description u-fs-r">We'll use this number if we need to discuss any survey information provided</p>
             {% if errors.phone_number %}
             <div class="panel panel--simple panel--error">
                 <p class="error-message">{{ errors['phone_number'][0] }}</p>
@@ -126,6 +126,7 @@
                     {{ form.phone_number.label(class_='label') }}
                     {{ form.phone_number(class_='input input--text input-type__input') }}
                 </div>
+                <span style="font-size: 80%">For international numbers include the country code</span>
             {% if errors.phone_number %}
             </div>
             {% endif %}

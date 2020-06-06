@@ -9,8 +9,6 @@ on:
     branches: [ master ]
 
 env:
-  GITHUB_SHA: ${{ github.sha }}
-  GITHUB_REF: ${{ github.ref }}
   IMAGE: frontstage
   REGISTRY_HOSTNAME: eu.gcr.io
   HOST: ${{ secrets.GOOGLE_PROJECT_ID }}
@@ -62,13 +60,23 @@ jobs:
         # Configure docker to use the gcloud command-line tool as a credential helper
       - run: |
           gcloud auth configure-docker
+
+      - name: pr docker tag
+        if: github.ref != 'refs/heads/master'
+        id: tag
+        run: |
+          PR=$(echo "$GITHUB_REF" | awk -F / '{print $3}')
+          echo "$PR"
+          echo ::set-output name=pr_number::pr-"$PR"
         # Build the Docker image
       - name: Build Docker Image
+        if: github.ref != 'refs/heads/master'
         run: |
-          docker build -t "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":$GITHUB_SHA -f _infra/docker/Dockerfile .
+          docker build -t "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":${{ steps.tag.outputs.pr_number }} -f _infra/docker/Dockerfile .
       - name: Push dev image
+        if: github.ref != 'refs/heads/master'
         run: |
-          docker push "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":$GITHUB_SHA
+          docker push "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":${{ steps.tag.outputs.pr_number }}
       - name: template helm
         run: |
           helm template _infra/helm/frontstage

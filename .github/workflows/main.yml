@@ -94,13 +94,6 @@ jobs:
         run: |
           mv $IMAGE-${{ env.HELM_VERSION }}.tgz $IMAGE-latest.tgz
           gsutil cp $IMAGE-*.tgz gs://$ARTIFACT_BUCKET/$IMAGE/
-      
-      - name: CI hook
-        if: github.ref != 'refs/heads/master'
-        run: |
-          gcloud pubsub topics publish $SPINNAKER_TOPIC --project $HOST \
-          --message "{ \"kind\": \"storage#object\", \"name\": \"$IMAGE/$IMAGE-latest.tgz\", \"bucket\": \"$ARTIFACT_BUCKET\", \"parameters\": { \"tag\": \"${{ steps.release.outputs.pr_number }}\", \"actor\": \"$GITHUB_ACTOR\" } }" \
-          --attribute ci="actions"
 
       - name: Set current tag
         if: github.ref != 'refs/heads/master'
@@ -155,12 +148,6 @@ jobs:
         run: |
           echo ::set-output name=version::$(grep -E "appVersion:\s+" $CHART_DIRECTORY/Chart.yaml | cut -d" " -f2 | sed -r 's/"//g')
 
-      - name: package helm
-        if: github.ref == 'refs/heads/master'
-        run: |
-          helm dep up _infra/helm/frontstage
-          helm package _infra/helm/frontstage
-
       - name: Build Release Image
         if: github.ref == 'refs/heads/master'
         run: |
@@ -173,7 +160,7 @@ jobs:
       - name: Publish Charts
         if: github.ref == 'refs/heads/master'
         run: |
-          gsutil cp frontstage-*.tgz gs://ras-rm-artifacts/frontstage/
+          gsutil cp $IMAGE-*.tgz gs://$ARTIFACT_BUCKET/$IMAGE/
 
       - uses: actions/create-release@v1
         if: github.ref == 'refs/heads/master'
@@ -193,4 +180,4 @@ jobs:
         run: |
           gcloud pubsub topics publish $SPINNAKER_TOPIC --project $HOST \
           --message "{ \"kind\": \"storage#object\", \"name\": \"$IMAGE/$IMAGE-${{ env.HELM_VERSION }}.tgz\", \"bucket\": \"$ARTIFACT_BUCKET\" }" \
-          --attribute ci="actions"
+          --attribute cd="actions"

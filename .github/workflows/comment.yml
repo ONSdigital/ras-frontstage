@@ -5,7 +5,7 @@ on:
     types: [created]
 
 env:
-  IMAGE: ras-rm-sandbox
+  IMAGE: frontstage
   SPINNAKER_TOPIC: ${{ secrets.SPINNAKER_TOPIC }}
   ARTIFACT_BUCKET: ${{ secrets.ARTIFACT_BUCKET }}
   HOST: ${{ secrets.GOOGLE_PROJECT_ID }}

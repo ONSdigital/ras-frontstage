@@ -1,0 +1,42 @@
+name: comment
+
+on:
+  issue_comment:
+    types: [created]
+
+env:
+  IMAGE: ras-rm-sandbox
+  SPINNAKER_TOPIC: ${{ secrets.SPINNAKER_TOPIC }}
+  ARTIFACT_BUCKET: ${{ secrets.ARTIFACT_BUCKET }}
+  HOST: ${{ secrets.GOOGLE_PROJECT_ID }}
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    if: contains(github.event.comment.body, '/deploy')
+    steps:
+      - name: set namespace
+        run: |
+          echo ::set-env name=NAMESPACE::$(echo ${{ github.event.comment.body }} | cut -d' ' -f2)
+
+      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          version: '270.0.0'
+          service_account_key: ${{ secrets.GCR_KEY }}
+      - run: |
+          gcloud auth configure-docker
+
+      - uses: actions/checkout@v1
+      - name: Add commit comment
+        run: |
+          jq -nc "{\"body\": \"@${{ github.event.issue.user.login }}, Spinnaker is deploying the PR to your environment\"}" | \
+          curl -sL  -X POST -d @- \
+            -H "Content-Type: application/json" \
+            -H "Authorization: token ${{ secrets.BOT_TOKEN }}" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/${{ github.event.issue.number }}/comments"
+
+      - name: Trigger spinnaker
+        run: |
+          gcloud pubsub topics publish $SPINNAKER_TOPIC --project $HOST \
+          --message "{ \"kind\": \"storage#object\", \"name\": \"$IMAGE/$IMAGE-latest.tgz\", \"bucket\": \"$ARTIFACT_BUCKET\", \"parameters\": { \"tag\": \"pr-${{ github.event.issue.number }}\", \"namespace\": \"${{ env.NAMESPACE }}\", \"cluster\": \"sandbox\", \"actor\": \"$GITHUB_ACTOR\" } }" \
+          --attribute ci="actions"

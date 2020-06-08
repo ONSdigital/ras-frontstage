@@ -225,3 +225,7 @@ font-weight: 400;
 .no-js .hide-if-no-js {
   display: none;
 }
+
+.field-description {
+  font-size: smaller;
+}

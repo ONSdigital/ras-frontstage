@@ -14,7 +14,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 @surveys_bp.route('/download-survey', methods=['GET'])
 @jwt_authorization(request)
 def download_survey(session):
-    party_id = session['party_id']
+    party_id = session.get_party_id()
     case_id = request.args['case_id']
     business_party_id = request.args['business_party_id']
     survey_short_name = request.args['survey_short_name']

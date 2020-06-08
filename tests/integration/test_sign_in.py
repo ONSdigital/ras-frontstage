@@ -9,7 +9,7 @@ from frontstage.controllers.party_controller import notify_party_and_respondent_
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.common.utilities import obfuscate_email
 from tests.integration.mocked_services import url_get_respondent_email, url_oauth_token, party, \
-    url_notify_party_and_respondent_account_locked, token
+    url_notify_party_and_respondent_account_locked, token, url_get_conversation_count, message_count
 
 respondent_party_id = "cd592e0f-8d07-407b-b75d-e01fbdae8233"
 
@@ -108,6 +108,7 @@ class TestSignIn(unittest.TestCase):
     def test_sign_in_success(self, mock_object):
         mock_object.get(url_get_respondent_email, json=party)
         mock_object.post(url_oauth_token, status_code=200, json=self.oauth_token)
+        mock_object.get(url_get_conversation_count, json=message_count)
 
         response = self.app.post('/sign-in/', data=self.sign_in_form)
 
@@ -118,6 +119,7 @@ class TestSignIn(unittest.TestCase):
     def test_sign_in_success_redirect_to_url(self, mock_object):
         mock_object.get(url_get_respondent_email, json=party)
         mock_object.post(url_oauth_token, status_code=200, json=self.oauth_token)
+        mock_object.get(url_get_conversation_count, json=message_count)
         response = self.app.post('/sign-in/', data=self.sign_in_form, query_string={'next': 'http://localhost:8082/secure-message/threads'})
         self.assertEqual(response.status_code, 302)
         self.assertTrue('/secure-message/threads'.encode() in response.data)

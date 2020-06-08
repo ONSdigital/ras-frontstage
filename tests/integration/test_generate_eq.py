@@ -17,10 +17,11 @@ from tests.integration.mocked_services import (case, collection_exercise, collec
                                                completed_case,
                                                url_get_respondent_party, respondent_party)
 
-encoded_jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoicmVzcG9uZGVudCIsImFjY2Vzc190b2tlbiI6ImI5OWIyMjA" \
-                    "0LWYxMDAtNDcxZS1iOTQ1LTIyN2EyNmVhNjljZCIsInJlZnJlc2hfdG9rZW4iOiIxZTQyY2E2MS02ZDBkLTQxYjMtODU2Yy0" \
-                    "2YjhhMDhlYmIyZTMiLCJleHBpcmVzX2F0IjoxNzM4MTU4MzI4LjAsInBhcnR5X2lkIjoiZjk1NmU4YWUtNmUwZi00NDE0LWI" \
-                    "wY2YtYTA3YzFhYTNlMzdiIn0.7W9yikGtX2gbKLclxv-dajcJ2NL0Nb_HDVqHrCrYvQE"
+encoded_jwt_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXJ0eV9pZCI6ImY5NTZlOGFlLTZ" \
+                    "lMGYtNDQxNC1iMGNmLWEwN2MxYWEzZTM3YiIsImV4cGlyZXNfYXQiOiIxMDAxMjM0NTY" \
+                    "3ODkiLCJyb2xlIjoicmVzcG9uZGVudCIsInVucmVhZF9tZXNzYWdlX2NvdW50Ijp7InZh" \
+                    "bHVlIjowLCJyZWZyZXNoX2luIjozMjUyNzY3NDAwMC4wfSwiZXhwaXJlc19pbiI6MzI1M" \
+                    "jc2NzQwMDAuMH0.m94R50EPIKTJmE6gf6PvCmCq8ZpYwwV8PHSqsJh5fnI"
 
 
 class TestGenerateEqURL(unittest.TestCase):
@@ -52,15 +53,12 @@ class TestGenerateEqURL(unittest.TestCase):
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
 
         # When the generate-eq-url is called
-        urls = ['access_survey', 'access-survey']
-        for url in urls:
-            with self.subTest(url=url):
-                response = self.app.get(f"/surveys/{url}?case_id={case['id']}&business_party_id={business_party['id']}"
-                                        f"&survey_short_name={survey_eq['shortName']}&ci_type=EQ", headers=self.headers)
+        response = self.app.get(f"/surveys/access-survey?case_id={case['id']}&business_party_id={business_party['id']}"
+                                f"&survey_short_name={survey_eq['shortName']}&ci_type=EQ", headers=self.headers)
 
-                # An eq url is generated
-                self.assertEqual(response.status_code, 302)
-                self.assertIn("https://eq-test/session?token=", response.location)
+        # An eq url is generated
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("https://eq-test/session?token=", response.location)
 
     @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
@@ -70,14 +68,11 @@ class TestGenerateEqURL(unittest.TestCase):
         mock_request.get(url_get_case, json=completed_case)
 
         # When the generate-eq-url is called
-        urls = ['access_survey', 'access-survey']
-        for url in urls:
-            with self.subTest(url=url):
-                response = self.app.get(f"/surveys/{url}?case_id={completed_case['id']}&business_party_id={business_party['id']}"
-                                        f"&survey_short_name={survey_eq['shortName']}&ci_type=EQ", headers=self.headers, follow_redirects=True)
+        response = self.app.get(f"/surveys/access-survey?case_id={completed_case['id']}&business_party_id={business_party['id']}"
+                                f"&survey_short_name={survey_eq['shortName']}&ci_type=EQ", headers=self.headers, follow_redirects=True)
 
-                # A 403 is returned
-                self.assertEqual(response.status_code, 403)
+        # A 403 is returned
+        self.assertEqual(response.status_code, 403)
 
     @requests_mock.mock()
     def test_generate_eq_url_seft(self, mock_request):

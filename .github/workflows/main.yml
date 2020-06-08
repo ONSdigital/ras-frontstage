@@ -9,13 +9,13 @@ on:
     branches: [ master ]
 
 env:
-  GITHUB_SHA: ${{ github.sha }}
-  GITHUB_REF: ${{ github.ref }}
   IMAGE: frontstage
   REGISTRY_HOSTNAME: eu.gcr.io
   HOST: ${{ secrets.GOOGLE_PROJECT_ID }}
   RELEASE_HOST: ${{ secrets.RELEASE_PROJECT_ID }}
   CHART_DIRECTORY: _infra/helm/frontstage
+  SPINNAKER_TOPIC: ${{ secrets.SPINNAKER_TOPIC }}
+  ARTIFACT_BUCKET: ${{ secrets.ARTIFACT_BUCKET }}
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -53,7 +53,6 @@ jobs:
           pipenv install --dev
       - name: Test
         run: |
-          make lint
           make unit-tests
           make integration-tests
       - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
@@ -63,16 +62,38 @@ jobs:
         # Configure docker to use the gcloud command-line tool as a credential helper
       - run: |
           gcloud auth configure-docker
+
+      - name: pr docker tag
+        if: github.ref != 'refs/heads/master'
+        id: tag
+        run: |
+          PR=$(echo "$GITHUB_REF" | awk -F / '{print $3}')
+          echo "$PR"
+          echo ::set-output name=pr_number::pr-"$PR"
         # Build the Docker image
       - name: Build Docker Image
+        if: github.ref != 'refs/heads/master'
         run: |
-          docker build -t "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":$GITHUB_SHA -f _infra/docker/Dockerfile .
+          docker build -t "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":${{ steps.tag.outputs.pr_number }} -f _infra/docker/Dockerfile .
       - name: Push dev image
+        if: github.ref != 'refs/heads/master'
         run: |
-          docker push "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":$GITHUB_SHA
+          docker push "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":${{ steps.tag.outputs.pr_number }}
       - name: template helm
         run: |
-          helm template _infra/helm/frontstage
+          helm template $CHART_DIRECTORY
+    
+      - name: package helm
+        run: |
+          echo ::set-env name=HELM_VERSION::$(grep -E "version:\s+" $CHART_DIRECTORY/Chart.yaml | cut -d" " -f2 | sed -r 's/"//g')
+          helm dep up $CHART_DIRECTORY
+          helm package $CHART_DIRECTORY
+
+      - name: Publish dev Chart
+        if: github.ref != 'refs/heads/master'
+        run: |
+          mv $IMAGE-${{ env.HELM_VERSION }}.tgz $IMAGE-latest.tgz
+          gsutil cp $IMAGE-*.tgz gs://$ARTIFACT_BUCKET/$IMAGE/
 
       - name: Set current tag
         if: github.ref != 'refs/heads/master'
@@ -127,12 +148,6 @@ jobs:
         run: |
           echo ::set-output name=version::$(grep -E "appVersion:\s+" $CHART_DIRECTORY/Chart.yaml | cut -d" " -f2 | sed -r 's/"//g')
 
-      - name: package helm
-        if: github.ref == 'refs/heads/master'
-        run: |
-          helm dep up _infra/helm/frontstage
-          helm package _infra/helm/frontstage
-
       - name: Build Release Image
         if: github.ref == 'refs/heads/master'
         run: |
@@ -145,7 +160,7 @@ jobs:
       - name: Publish Charts
         if: github.ref == 'refs/heads/master'
         run: |
-          gsutil cp frontstage-*.tgz gs://ras-rm-artifacts/frontstage/
+          gsutil cp $IMAGE-*.tgz gs://$ARTIFACT_BUCKET/$IMAGE/
 
       - uses: actions/create-release@v1
         if: github.ref == 'refs/heads/master'
@@ -159,3 +174,10 @@ jobs:
             ${{ steps.release.outputs.version }}
           draft: false
           prerelease: false
+
+      - name: CD hook
+        if: github.ref == 'refs/heads/master'
+        run: |
+          gcloud pubsub topics publish $SPINNAKER_TOPIC --project $HOST \
+          --message "{ \"kind\": \"storage#object\", \"name\": \"$IMAGE/$IMAGE-${{ env.HELM_VERSION }}.tgz\", \"bucket\": \"$ARTIFACT_BUCKET\" }" \
+          --attribute cd="actions"

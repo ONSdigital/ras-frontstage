@@ -3,10 +3,12 @@ build:
 
 build-docker:
 	pipenv lock --requirements > requirements.txt
+	pipenv lock --requirements --dev > dev-requirements.txt	
 	docker build .
 
 build-kubernetes:
 	pipenv lock --requirements > requirements.txt
+	pipenv lock --requirements --dev > dev-requirements.txt
 	docker build -f _infra/docker/Dockerfile .
 
 start:

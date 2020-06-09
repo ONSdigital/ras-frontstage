@@ -1,9 +1,8 @@
 build:
-	pipenv install --dev
-
-build-docker:
 	pipenv lock --requirements > requirements.txt
 	pipenv lock --requirements --dev > dev-requirements.txt	
+
+build-docker: build
 	docker build .
 
 build-kubernetes:

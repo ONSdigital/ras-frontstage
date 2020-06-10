@@ -22,8 +22,8 @@ docker-test: unit-tests integration-tests
 check:
 	poetry run safety check
 
-unit-tests: check # lint
+unit-tests: check lint
 	APP_SETTINGS=TestingConfig poetry run pytest $(UNIT_TESTS) --cov frontstage --cov-report term-missing	
 
-integration-tests: check # lint
+integration-tests: check lint
 	APP_SETTINGS=TestingConfig poetry run pytest $(INTEGRATION_TESTS) --cov frontstage --cov-report term-missing	

@@ -1,7 +1,7 @@
 build:
 	poetry install
 
-build-docker:
+build-docker: build
 	docker build .
 
 build-kubernetes:

@@ -41,7 +41,7 @@ poetry run python run.py
 ```
 
 ## Run tests
-Install test dependencies with:
+Install with test dependencies:
 ```bash
 poetry install
 ```

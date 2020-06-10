@@ -5,12 +5,12 @@ from flask import make_response, render_template, redirect, request, url_for
 from structlog import wrap_logger
 
 from frontstage import app
-from frontstage.common.session import SessionHandler
+from frontstage.common.session import Session
 from frontstage.common.utilities import obfuscate_email
 from frontstage.controllers import oauth_controller, party_controller
 from frontstage.controllers.party_controller import notify_party_and_respondent_account_locked
+from frontstage.controllers import conversation_controller
 from frontstage.exceptions.exceptions import OAuth2Error
-from frontstage.jwt import encode, timestamp_token
 from frontstage.models import LoginForm
 from frontstage.views.sign_in import sign_in_bp
 
@@ -42,7 +42,7 @@ def login():  # noqa: C901
         bound_logger = logger.bind(email=obfuscate_email(username))
         bound_logger.info("Attempting to find user in auth service")
         try:
-            oauth2_token = oauth_controller.sign_in(username, password)
+            oauth_controller.sign_in(username, password)
         except OAuth2Error as exc:
             error_message = exc.oauth2_error
             party_json = party_controller.get_respondent_by_email(username)
@@ -79,10 +79,6 @@ def login():  # noqa: C901
         party_id = party_json['id']
         bound_logger = bound_logger.bind(party_id=party_id)
 
-        # Take our raw token and add a UTC timestamp to the expires_at attribute
-        data_dict = {**oauth2_token, 'party_id': party_id}
-        data_dict_for_jwt_token = timestamp_token(data_dict)
-        encoded_jwt_token = encode(data_dict_for_jwt_token)
         if request.args.get('next'):
             response = make_response(redirect(request.args.get('next')))
         else:
@@ -90,14 +86,15 @@ def login():  # noqa: C901
                                                       _scheme=getenv('SCHEME', 'http'))))
 
         bound_logger.info("Successfully found user in party service")
-        session = SessionHandler()
         bound_logger.info('Creating session')
-        session.create_session(encoded_jwt_token)
+        session = Session.from_party_id(party_id)
         response.set_cookie('authorization',
                             value=session.session_key,
-                            expires=data_dict_for_jwt_token['expires_at'],
+                            expires=session.get_expires_in(),
                             secure=secure,
                             httponly=secure)
+        count = conversation_controller.get_message_count_from_api(session)
+        session.set_unread_message_total(count)
         bound_logger.info('Successfully created session', session_key=session.session_key)
         return response
 

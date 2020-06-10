@@ -15,7 +15,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 @surveys_bp.route('/add-survey/add-survey-submit', methods=['GET'])
 @jwt_authorization(request)
 def add_survey_submit(session):
-    party_id = session['party_id']
+    party_id = session.get_party_id()
     logger.info('Assigning new survey to a user', party_id=party_id)
 
     cryptographer = Cryptographer()

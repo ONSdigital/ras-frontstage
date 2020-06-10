@@ -87,3 +87,10 @@ Environment variables available for configuration are listed below:
 | RAS_FRONTSTAGE_API_PORT         | Port used for frontstage-api uri                              | 8083
 
 These are set in [config.py](config.py)
+
+## Final build
+When you commit your tested changes to the repo, be sure to run:
+```bash
+make build
+```
+...to regenerate `requirements.txt` and `dev-requirements.txt`. CI/CD uses `pip` with these files to build and test the container. 

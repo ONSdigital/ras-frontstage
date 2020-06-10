@@ -1,8 +1,6 @@
 """
 Module to create jwt token.
 """
-from datetime import datetime, timedelta
-
 from jose import jwt
 
 from frontstage import app

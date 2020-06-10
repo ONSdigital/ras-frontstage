@@ -36,7 +36,7 @@ def upload_failed(session):
     else:
         error_info = {'header': "Something went wrong",
                       'body': 'Please try uploading your spreadsheet again'}
-    unread_message_count = { 'unread_message_count': conversation_controller.try_message_count_from_session(session) }
+    unread_message_count = {'unread_message_count': conversation_controller.try_message_count_from_session(session)}
     return render_template('surveys/surveys-upload-failure.html', business_info=case_data['business_party'], survey_info=case_data['survey'],
                            collection_exercise_info=case_data['collection_exercise'], error_info=error_info, case_id=case_id,
                            unread_message_count=unread_message_count)

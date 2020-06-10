@@ -52,7 +52,7 @@ class TestConversationController(unittest.TestCase):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_conversation_count, json=message_count, status=200, headers={'Authorisation': 'token'}, content_type='application/json')
             with app.app_context():
-                count = conversation_controller.get_message_count_from_api(session_under_test)
+                _ = conversation_controller.get_message_count_from_api(session_under_test)
 
                 self.assertEqual(3, session_under_test.get_unread_message_count())
 
@@ -61,7 +61,8 @@ class TestConversationController(unittest.TestCase):
         headers.return_value = {'Authorization': "token"}
         session = Session.from_party_id("id")
         decoded = session.get_decoded_jwt()
-        decoded['unread_message_count']['refresh_in'] = (datetime.fromtimestamp(decoded['unread_message_count']['refresh_in']) - timedelta(seconds=301)).timestamp()
+        decoded['unread_message_count']['refresh_in'] = (datetime.fromtimestamp(decoded['unread_message_count']['refresh_in']) -
+                                                         timedelta(seconds=301)).timestamp()
         encoded = jwt.encode(decoded)
         session.encoded_jwt_token = encoded
         with responses.RequestsMock() as rsps:

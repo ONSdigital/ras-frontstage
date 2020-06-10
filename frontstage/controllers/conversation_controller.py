@@ -132,7 +132,7 @@ def get_message_count_from_api(session):
             else:
                 logger.exception('An error has occured retrieving the new message count', party_id=party_id)
         except Exception as ex:
-            logger.exception("An unknown error has occured getting message count from secure-message api", party_id=party_id)
+            logger.exception(ex + "An unknown error has occured getting message count from secure-message api", party_id=party_id)
         return 0
 
 

@@ -53,7 +53,7 @@ def view_conversation(session, thread_id):
             flash(Markup('Message sent. <a href={}>View Message</a>'.format(thread_url)))
             return redirect(url_for('secure_message_bp.view_conversation_list'))
 
-    unread_message_count = { 'unread_message_count': get_message_count_from_api(session) }
+    unread_message_count = {'unread_message_count': get_message_count_from_api(session)}
 
     return render_template('secure-messages/conversation-view.html',
                            form=form,
@@ -78,7 +78,7 @@ def view_conversation_list(session):
         logger.error('A key error occurred', party_id=party_id)
         raise e
     logger.info('Retrieving and refining conversation successful', party_id=party_id)
-    unread_message_count = { 'unread_message_count': try_message_count_from_session(session) }
+    unread_message_count = {'unread_message_count': try_message_count_from_session(session)}
     return render_template('secure-messages/conversation-list.html',
                            messages=refined_conversation,
                            is_closed=strtobool(is_closed),

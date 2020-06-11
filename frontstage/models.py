@@ -64,8 +64,8 @@ class RegistrationForm(FlaskForm):
     @staticmethod
     def validate_phone_number(form, field):
         try:
-            logger.info('Checking this is a valid GB phone number')
-            input_number = phonenumbers.parse(field.data, 'GB')  # Tell the parser we are looking for a GB number
+            logger.info('Checking this is a valid phone number')
+            input_number = phonenumbers.parse(field.data, 'GB')  # Default region GB (44), unless country code added by user 
 
             if not phonenumbers.is_possible_number(input_number):
                 raise ValidationError(_('This should be a valid telephone number between 9 and 15 digits'))

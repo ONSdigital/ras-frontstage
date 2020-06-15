@@ -1,4 +1,5 @@
 import logging
+import os
 
 import requests
 from flask import current_app as app
@@ -86,3 +87,12 @@ def upload_collection_instrument(upload_file, case_id, party_id):
         raise ApiError(logger, response)
 
     logger.info('Successfully uploaded collection instrument', case_id=case_id, party_id=party_id)
+
+
+def check_collection_instrument_size(upload_file, party_id, case_id):
+    logger.info('Checking the file size', party_id=party_id, case_id=case_id)
+    upload_file.save('/tmp/file')
+    upload_file_size = os.stat('/tmp/file').st_size
+    if upload_file_size > 0:
+        logger.info('File size is correct', party_id=party_id, case_id=case_id)
+        return True

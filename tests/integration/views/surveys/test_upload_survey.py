@@ -117,6 +117,19 @@ class TestUploadSurvey(unittest.TestCase):
                 self.assertEqual(response.status_code, 302)
                 self.assertTrue('/surveys/upload-failed'.encode() in response.data)
 
+    @patch('frontstage.controllers.collection_instrument_controller.upload_collection_instrument')
+    @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
+    def test_upload_survey_fail_size_too_small(self, _, upload_ci):
+        urls = ['upload-survey', 'upload_survey']
+        for url in urls:
+            with self.subTest(url=url):
+                self.survey_file = dict(file=(io.BytesIO(), "testfile.xlsx"))
+                response = self.app.post(f'/surveys/{url}?case_id={case["id"]}&business_party_id={business_party["id"]}'
+                                         f'&survey_short_name={survey["shortName"]}', data=self.survey_file)
+
+                self.assertEqual(response.status_code, 302)
+                self.assertTrue('/surveys/upload-failed'.encode() in response.data)
+
     def test_upload_survey_content_too_long(self):
         file_data = 'a' * 21 * 1024 * 1024
         urls = ['upload_survey', 'upload-survey']

@@ -1,4 +1,4 @@
-# ras frontstage routes
+# ras-frontstage routes
 
 This page documents the ras frontstage routes that can be hit.
 
@@ -105,13 +105,10 @@ To reset a password
 
 ## Surveys endpoints
 
-`surveys/access_survey` - DEPRECATED. Will be removed in a future release
-
-* GET request to this endpoint will allow the respondent to upload and download a survey.
-
 `surveys/access-survey` - Replaces access_survey
 
-* GET request to this endpoint will allow the respondent to upload and download a survey.
+* GET request to this endpoint will allow the respondent to upload and download a survey if the ci_type is a SEFT.
+If the ci_type is EQ then it'll redirect the user to EQ to complete a questionnaire.
 
 `surveys/add-survey`
 
@@ -123,7 +120,8 @@ To reset a password
 
 `surveys/add-survey/add-survey-submit`
 
-* GET request to this endpoint will assign the new survey to the respondent.  Called by the `surveys/add-survey/confirm-organisation-survey` page.
+* GET request to this endpoint will assign the new survey to the respondent.
+Called by the `surveys/add-survey/confirm-organisation-survey` page.
 
 `surveys/download_survey` - DEPRECATED. Will be removed in a future release
 
@@ -133,19 +131,11 @@ To reset a password
 
 * GET request to this endpoint will download a survey that the respondent will need to complete.
 
-`surveys/upload_survey` - DEPRECATED. Will be removed in a future release.
+`surveys/upload-survey`
 
 * POST request to this endpoint will upload a collection instrument to the collection instrument service.
 
-`surveys/upload-survey` - Replaces upload_survey
-
-* POST request to this endpoint will upload a collection instrument to the collection instrument service.
-
-`surveys/upload_failed` - DEPRECATED. Will be removed in a future release.
-
-* GET request to this endpoint will render an error page if it fails to upload the collection instrument.
-
-`surveys/upload-failed` - Replaces upload_failed
+`surveys/upload-failed`
 
 * GET request to this endpoint will render an error page if it fails to upload the collection instrument.
 

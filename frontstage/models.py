@@ -52,7 +52,7 @@ class RegistrationForm(FlaskForm):
                                                 max=app.config['PASSWORD_MAX_LENGTH'],
                                                 message=app.config['PASSWORD_CRITERIA_ERROR_TEXT'])])
     password_confirm = PasswordField(_('Re-type your password'))
-    phone_number = StringField(_('Enter your phone number'),
+    phone_number = StringField(_('Telephone number'),
                                validators=[DataRequired(_('Phone number is required')),
                                            Length(min=9,
                                                   max=15,
@@ -64,17 +64,17 @@ class RegistrationForm(FlaskForm):
     @staticmethod
     def validate_phone_number(form, field):
         try:
-            logger.info('Checking this is a valid GB phone number')
-            input_number = phonenumbers.parse(field.data, 'GB')  # Tell the parser we are looking for a GB number
+            logger.info('Checking this is a valid phone number')
+            input_number = phonenumbers.parse(field.data, 'GB')  # Default region GB (44), unless country code added by user
 
             if not phonenumbers.is_possible_number(input_number):
-                raise ValidationError(_('This should be a valid phone number between 9 and 15 digits'))
+                raise ValidationError(_('This should be a valid telephone number between 9 and 15 digits'))
 
             if not phonenumbers.is_valid_number(input_number):
-                raise ValidationError(_('Please use a valid UK number e.g. 01632 496 0018.'))
+                raise ValidationError(_('Please use a valid telephone number e.g. 01632 496 0018.'))
         except NumberParseException:
             logger.info('There is a number parse exception in the phonenumber field')
-            raise ValidationError(_('This should be a valid UK number e.g. 01632 496 0018. '))
+            raise ValidationError(_('This should be a valid telephone number e.g. 01632 496 0018. '))
 
     @staticmethod
     def validate_email_address(_, field):

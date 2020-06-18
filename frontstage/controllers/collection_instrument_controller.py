@@ -88,12 +88,11 @@ def upload_collection_instrument(upload_file, case_id, party_id):
     logger.info('Successfully uploaded collection instrument', case_id=case_id, party_id=party_id)
 
 
-def check_collection_instrument_size(upload_file, party_id, case_id):
-    logger.info('Checking the file size', party_id=party_id, case_id=case_id)
-    upload_file_readable = upload_file.read()
-    upload_file_size = len(upload_file_readable)
-    print('file size is: ', upload_file_size)
+def is_collection_instrument_too_small(upload_file):
 
+    logger.info('Checking the file size')
+    upload_file_size = len(upload_file.read())
     if upload_file_size > 0:
-        logger.info('File size is correct', party_id=party_id, case_id=case_id)
+        logger.info('File size is correct')
         return True
+    return False

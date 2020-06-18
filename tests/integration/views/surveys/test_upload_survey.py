@@ -8,6 +8,7 @@ from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.exceptions.exceptions import CiUploadError
+from frontstage.controllers import collection_instrument_controller
 from tests.integration.mocked_services import business_party, case, encoded_jwt_token, survey, url_upload_ci
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -121,3 +122,9 @@ class TestUploadSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertTrue('/surveys/upload-failed'.encode() in response.data)
+
+    def test_is_collection_instrument_too_small(self):
+        self.survey_file = io.BytesIO()
+        self.assertFalse(collection_instrument_controller.is_collection_instrument_too_small(self.survey_file))
+        self.survey_file = io.BytesIO(b'this file contains information')
+        self.assertTrue(collection_instrument_controller.is_collection_instrument_too_small(self.survey_file))

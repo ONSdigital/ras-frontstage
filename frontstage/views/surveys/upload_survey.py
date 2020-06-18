@@ -34,10 +34,6 @@ def upload_survey(session):
     party_controller.is_respondent_enrolled(party_id, business_party_id, survey_short_name)
 
     # Get the uploaded file
-
-    # The variable name has '_raw' so that it can be called in the file size checking function,
-    # and not interfere with the actual upload function
-
     upload_file_raw = request.files['file']
     upload_filename = upload_file_raw.filename
 
@@ -45,8 +41,7 @@ def upload_survey(session):
         'file': (upload_filename, upload_file_raw.stream, upload_file_raw.mimetype, {'Expires': 0})
     }
 
-    # Checking if the file size is great than 5999 bytes
-    if collection_instrument_controller.check_collection_instrument_size(upload_file_raw, party_id, case_id):
+    if collection_instrument_controller.is_collection_instrument_too_small(upload_file_raw):
         try:
             # Upload the file to the collection instrument service
             collection_instrument_controller.upload_collection_instrument(upload_file, case_id, party_id)

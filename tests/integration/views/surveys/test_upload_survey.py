@@ -125,6 +125,6 @@ class TestUploadSurvey(unittest.TestCase):
 
     def test_is_collection_instrument_too_small(self):
         self.survey_file = io.BytesIO()
-        self.assertFalse(collection_instrument_controller.is_collection_instrument_too_small(self.survey_file))
-        self.survey_file = io.BytesIO(b'this file contains information')
         self.assertTrue(collection_instrument_controller.is_collection_instrument_too_small(self.survey_file))
+        self.survey_file = io.BytesIO(b'this file contains information')
+        self.assertFalse(collection_instrument_controller.is_collection_instrument_too_small(self.survey_file))

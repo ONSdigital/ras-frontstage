@@ -41,7 +41,7 @@ def upload_survey(session):
         'file': (upload_filename, upload_file_raw.stream, upload_file_raw.mimetype, {'Expires': 0})
     }
 
-    if collection_instrument_controller.is_collection_instrument_too_small(upload_file_raw):
+    if not collection_instrument_controller.is_collection_instrument_too_small(upload_file_raw):
         try:
             # Upload the file to the collection instrument service
             collection_instrument_controller.upload_collection_instrument(upload_file, case_id, party_id)

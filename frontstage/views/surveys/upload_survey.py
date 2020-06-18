@@ -41,34 +41,7 @@ def upload_survey(session):
         'file': (upload_filename, upload_file_raw.stream, upload_file_raw.mimetype, {'Expires': 0})
     }
 
-    if not collection_instrument_controller.is_collection_instrument_too_small(upload_file_raw):
-        try:
-            # Upload the file to the collection instrument service
-            collection_instrument_controller.upload_collection_instrument(upload_file, case_id, party_id)
-        except CiUploadError as ex:
-            if ".xlsx format" in ex.error_message:
-                error_info = "type"
-            elif "50 characters" in ex.error_message:
-                error_info = "charLimit"
-            elif "File too large" in ex.error_message:
-                error_info = 'size'
-            else:
-                logger.error('Unexpected error message returned from collection instrument service',
-                             status=ex.status_code,
-                             error_message=ex.error_message,
-                             party_id=party_id,
-                             case_id=case_id)
-                error_info = "unexpected"
-            return redirect(url_for('surveys_bp.upload_failed',
-                                    _external=True,
-                                    case_id=case_id,
-                                    business_party_id=business_party_id,
-                                    survey_short_name=survey_short_name,
-                                    error_info=error_info))
-
-        logger.info('Successfully uploaded collection instrument', party_id=party_id, case_id=case_id)
-        return render_template('surveys/surveys-upload-success.html', upload_filename=upload_filename)
-    else:
+    if collection_instrument_controller.is_collection_instrument_too_small(upload_file_raw):
         logger.error('File size is too small', party_id=party_id, case_id=case_id)
         return redirect(url_for('surveys_bp.upload_failed',
                                 _external=True,
@@ -76,3 +49,29 @@ def upload_survey(session):
                                 business_party_id=business_party_id,
                                 survey_short_name=survey_short_name,
                                 error_info="sizeSmall"))
+    try:
+        # Upload the file to the collection instrument service
+        collection_instrument_controller.upload_collection_instrument(upload_file, case_id, party_id)
+    except CiUploadError as ex:
+        if ".xlsx format" in ex.error_message:
+            error_info = "type"
+        elif "50 characters" in ex.error_message:
+            error_info = "charLimit"
+        elif "File too large" in ex.error_message:
+            error_info = 'size'
+        else:
+            logger.error('Unexpected error message returned from collection instrument service',
+                         status=ex.status_code,
+                         error_message=ex.error_message,
+                         party_id=party_id,
+                         case_id=case_id)
+            error_info = "unexpected"
+        return redirect(url_for('surveys_bp.upload_failed',
+                                _external=True,
+                                case_id=case_id,
+                                business_party_id=business_party_id,
+                                survey_short_name=survey_short_name,
+                                error_info=error_info))
+
+    logger.info('Successfully uploaded collection instrument', party_id=party_id, case_id=case_id)
+    return render_template('surveys/surveys-upload-success.html', upload_filename=upload_filename)

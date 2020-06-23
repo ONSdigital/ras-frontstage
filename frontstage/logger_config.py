@@ -20,9 +20,9 @@ def logger_initial_config(log_level='INFO',
         return event_dict
 
     logging.basicConfig(stream=sys.stdout, level=log_level, format=logger_format)
-    oauth_log = logging.getLogger("requests_oauthlib")
-    oauth_log.addHandler(logging.NullHandler())
-    oauth_log.propagate = False
+    auth_log = logging.getLogger("requests_authlib")
+    auth_log.addHandler(logging.NullHandler())
+    auth_log.propagate = False
 
     def add_severity_level(logger, method_name, event_dict):
         """

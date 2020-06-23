@@ -6,7 +6,7 @@ from requests.exceptions import ConnectionError
 
 from frontstage import app
 from frontstage.exceptions.exceptions import ApiError, JWTValidationError
-from tests.integration.mocked_services import url_get_respondent_email, url_oauth_token, party, encoded_jwt_token
+from tests.integration.mocked_services import url_get_respondent_email, url_auth_token, party, encoded_jwt_token
 
 
 class TestErrorHandlers(unittest.TestCase):
@@ -31,7 +31,7 @@ class TestErrorHandlers(unittest.TestCase):
     # Use bad data to raise an uncaught exception
     @requests_mock.mock()
     def test_server_error(self, mock_request):
-        mock_request.post(url_oauth_token, status_code=200)
+        mock_request.post(url_auth_token, status_code=200)
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
@@ -42,7 +42,7 @@ class TestErrorHandlers(unittest.TestCase):
     def test_api_error(self, mock_request):
         response_mock = MagicMock()
         logger_mock = MagicMock()
-        mock_request.post(url_oauth_token, exc=ApiError(logger_mock, response_mock))
+        mock_request.post(url_auth_token, exc=ApiError(logger_mock, response_mock))
 
         response = self.app.post('sign-in', data=self.sign_in_form, follow_redirects=True)
 
@@ -52,7 +52,7 @@ class TestErrorHandlers(unittest.TestCase):
     @requests_mock.mock()
     def test_connection_error(self, mock_request):
         mock_exception_request = MagicMock()
-        mock_request.post(url_oauth_token, exc=ConnectionError(request=mock_exception_request))
+        mock_request.post(url_auth_token, exc=ConnectionError(request=mock_exception_request))
 
         response = self.app.post('sign-in', data=self.sign_in_form, follow_redirects=True)
 
@@ -62,7 +62,7 @@ class TestErrorHandlers(unittest.TestCase):
     @requests_mock.mock()
     def test_jwt_validation_error(self, mock_request):
         mock_request.get(url_get_respondent_email, json=party)
-        mock_request.post(url_oauth_token, exc=JWTValidationError)
+        mock_request.post(url_auth_token, exc=JWTValidationError)
 
         response = self.app.post('sign-in', data=self.sign_in_form, follow_redirects=True)
 

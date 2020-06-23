@@ -22,7 +22,7 @@ class TestPasswords(unittest.TestCase):
         app.testing = True
         self.app = app.test_client()
         self.email_form = {"email_address": "test@email.com"}
-        self.oauth2_response = {
+        self.auth_response = {
             'id': 1,
             'access_token': '99a81f9c-e827-448b-8fa7-d563b76137ca',
             'expires_in': 3600,

@@ -29,15 +29,10 @@ def sign_in(username, password):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        if response.status_code != 204:
-            auth_error = response.json().get('detail', '')
-            message = response.json().get('title', '')
-
-            raise AuthError(logger, response, log_level='warning', message=message, auth_error=auth_error)
-        else:
-            bound_logger.error('Failed to authenticate')
-            raise ApiError(logger, response)
+        auth_error = response.json().get('detail', '')
+        message = response.json().get('title', '')
+        bound_logger.error('Failed to authenticate')
+        raise AuthError(logger, response, log_level='warning', message=message, auth_error=auth_error)
 
     bound_logger.info('Successfully signed in')
     return {}
-    

@@ -15,7 +15,7 @@ def sign_in(username, password):
     bound_logger = logger.bind(email=obfuscate_email(username))
     bound_logger.info('Attempting to sign in')
 
-    url = f"{app.config['AUTH_URL']}"
+    url = f"{app.config['AUTH_URL']}/api/v1/tokens/"
     data = {
         'username': username,
         'password': password,

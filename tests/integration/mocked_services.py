@@ -129,7 +129,7 @@ url_get_thread = app.config['SECURE_MESSAGE_URL'] + '/threads/9e3465c0-9172-4974
 url_get_thread_old = app.config['SECURE_MESSAGE_URL'] + '/thread/9e3465c0-9172-4974-a7d1-3a01592d1594'
 url_get_conversation_count = f"{app.config['SECURE_MESSAGE_URL']}/messages/count?unread_conversations=true"
 url_get_threads = app.config['SECURE_MESSAGE_URL'] + '/threads'
-url_auth_token = f"{app.config['AUTH_URL']}"
+url_auth_token = f"{app.config['AUTH_URL']}/api/v1/tokens/"
 url_password_change = f"{app.config['PARTY_URL']}/party-api/v1/respondents/change_password"
 url_post_add_survey = f"{app.config['PARTY_URL']}/party-api/v1/respondents/add_survey"
 url_post_case_event_uuid = f"{app.config['CASE_URL']}/cases/{case['id']}/events"

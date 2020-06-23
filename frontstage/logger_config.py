@@ -20,7 +20,7 @@ def logger_initial_config(log_level='INFO',
         return event_dict
 
     logging.basicConfig(stream=sys.stdout, level=log_level, format=logger_format)
-    auth_log = logging.getLogger("requests_authlib")
+    auth_log = logging.getLogger(__name__)
     auth_log.addHandler(logging.NullHandler())
     auth_log.propagate = False
 

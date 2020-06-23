@@ -29,7 +29,7 @@ def sign_in(username, password):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        if response.status_code == 401:
+        if response.status_code != 204:
             auth_error = response.json().get('detail', '')
             message = response.json().get('title', '')
 
@@ -40,3 +40,4 @@ def sign_in(username, password):
 
     bound_logger.info('Successfully signed in')
     return {}
+    

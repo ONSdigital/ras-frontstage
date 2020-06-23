@@ -28,8 +28,6 @@ def sign_in(username, password):
 
     try:
         response.raise_for_status()
-        if response.status_code == 204:
-            return {}
     except requests.exceptions.HTTPError:
         if response.status_code == 401:
             auth_error = response.json().get('detail', '')
@@ -41,4 +39,4 @@ def sign_in(username, password):
             raise ApiError(logger, response)
 
     bound_logger.info('Successfully signed in')
-    return response.json()
+    return {}

@@ -86,17 +86,3 @@ def upload_collection_instrument(upload_file, case_id, party_id):
         raise ApiError(logger, response)
 
     logger.info('Successfully uploaded collection instrument', case_id=case_id, party_id=party_id)
-
-
-def is_collection_instrument_too_small(upload_file):
-    """
-    This function checks the size of the file being uploaded and returns True if it below 0 bytes.
-    """
-    logger.info('Checking the file size')
-    upload_file_size = len(upload_file.read())
-    if upload_file_size < 1:
-        logger.info('File size is incorrect')
-        return True
-    else:
-        logger.info('File size is correct')
-        return False

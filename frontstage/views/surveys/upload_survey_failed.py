@@ -33,9 +33,6 @@ def upload_failed(session):
     elif error_info == "size":
         error_info = {'header': "Error uploading - file size too large",
                       'body': 'The spreadsheet must be smaller than 20MB in size'}
-    elif error_info == "sizeSmall":
-        error_info = {'header': "Error uploading - file size too small",
-                      'body': "The spreadsheet must be larger than 6KB in size"}
     else:
         error_info = {'header': "Something went wrong",
                       'body': 'Please try uploading your spreadsheet again'}

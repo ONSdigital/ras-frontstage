@@ -1,11 +1,11 @@
 {% import 'partials/section.html' as section %}
-{% extends "layouts/_twocol.html" %}
+{% extends "layouts/_twothirds.html" %}
 
 {% set errorType = data['error']['type'] %}
 
 {% block page_title %}Completed surveys - ONS Business Surveys{% endblock %}
 
-{% block main %}
+{% block content %}
 
 {% if errorType == "failed" %}
 <div class="panel panel--error">
@@ -54,4 +54,4 @@
     </form>
 </section>
 
-{% endblock main %}
+{% endblock content %}

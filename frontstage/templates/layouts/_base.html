@@ -1,12 +1,7 @@
 {% extends "layout/_template.njk" %}
 {% block head %}
-
-      {% set cdn_hash = "v2.0.0" %}
-      {% set cdn_url_prefix = "https://cdn.ons.gov.uk/sdc/"~cdn_hash %}
-      {% set css_responsive_cdn = cdn_url_prefix~"/css/responsive.css" %}
-      {% set css_theme = "css/"~_theme~"/theme.css" %}
-
-      <link href="{{ url_for('static', filename=css_theme) }}" rel="stylesheet" />
+    {% set css_theme = "css/"~_theme~"/theme.css" %}
+    <link href="{{ url_for('static', filename=css_theme) }}" rel="stylesheet" />
       
     {% if config.GOOGLE_TAG_MANAGER %}
       <!-- Google Tag Manager -->	
@@ -33,14 +28,10 @@
   "title": page_title + " | ONS Business Surveys" if page_title else "Survey Data Collection",
   "header": {
     "title": "ONS Business Surveys",
-  },
-  "toggleButton": {
-    "text": "Menu",
-    "ariaLabel": "Toggle main navigation"
   }
 } %}
 
-{% include 'layouts/configs/navigation.html' %}
+{% include 'layouts/configs/service-links.html' %}
 {% include 'layouts/configs/footer.html' %}
 {% from "components/panel/_macro.njk" import onsPanel %}
 
@@ -49,22 +40,24 @@
 {%- block pageContent %}
   <div class="page__container container">
     {% block preMain %}
-      {% if breadcrumbs and hide_breadcrumbs != true %}
-        {% include 'layouts/configs/breadcrumbs.html' %}
+      {% if availability_message %}
+        {{ 
+            onsPanel({
+                body: availability_message
+            }) 
+        }}
       {% endif %}
     {% endblock %}
     <div class="grid">
-      <div class="grid__col col-12@m">
+      <div class="grid__col col-12@m u-mt-s">
         <main id="main-content" class="page__main {{ pageClasses }}">
-          {%- block main %}{% endblock main -%}
+          {%- block content %}{% endblock content -%}
         </main>
       </div>
     </div>
   </div>  
 {% endblock pageContent -%}
 {% block bodyEnd %}
-      {% set scripts_cdn = cdn_url_prefix~"/scripts/bundle.js" %}
-      <script src="{{ scripts_cdn }}"></script>
 
       {% set js_script = "js/script.js" %}
       <script src="{{ url_for('static', filename=js_script) }}"></script>

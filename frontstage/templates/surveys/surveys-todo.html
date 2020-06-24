@@ -1,10 +1,10 @@
 {% import 'partials/section.html' as section %}
 
-{% extends "layouts/_onecol.html" %}
+
 
 {% block page_title %}Surveys to complete - ONS Business Surveys{% endblock page_title %}
 
-{% block main %}
+{% block content %}
 {% include "partials/tab_list.html" %}
 
 {% if added_survey %}
@@ -34,4 +34,4 @@
 {% set emptySurveyListLabel = 'You have no surveys to complete' %}
 {% include "surveys/surveys.html" %}
 
-{% endblock main %}
+{% endblock content %}

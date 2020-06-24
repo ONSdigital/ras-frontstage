@@ -6,10 +6,11 @@ from structlog import wrap_logger
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-cookies_privacy_bp = Blueprint('cookies_privacy_bp', __name__,
+privacy_bp = Blueprint('privacy_bp', __name__,
                                static_folder='static', template_folder='templates')
 
 
-@cookies_privacy_bp.route('/', methods=['GET'])
-def cookies_privacy():
-    return render_template('cookies-privacy.html')
+@privacy_bp.route('/', methods=['GET'])
+def privacy():
+
+    return render_template('privacy-and-data-protection.html')

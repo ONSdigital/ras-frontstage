@@ -98,7 +98,7 @@ class DevelopmentConfig(Config):
     SURVEY_URL = os.getenv('SURVEY_URL', 'http://localhost:8080')
 
     WTF_CSRF_TIME_LIMIT = int(os.getenv('WTF_CSRF_TIME_LIMIT', '3200'))
-    SECURE_APP = bool(strtobool(os.getenv('SECURE_APP', "False")))
+    SECURE_APP = bool(strtobool(os.getenv('SECURE_APP', "True")))
 
 
 class TestingConfig(DevelopmentConfig):

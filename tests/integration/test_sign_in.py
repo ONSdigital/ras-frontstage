@@ -31,24 +31,7 @@ class TestSignIn(unittest.TestCase):
 
     def setUp(self):
         self.app = app.test_client()
-        self.auth_token = {
-            "id": 1,
-            "access_token": "8c77e013-d8dc-472c-b4d3-d4fbe21f80e7",
-            "expires_in": 3600,
-            "token_type": "Bearer",
-            "scope": "",
-            "refresh_token": "b7ac07a6-4c28-43bd-a335-00250b490e9f",
-            "party_id": "test-id"
-        }
-        self.expired_auth_token = {
-            "id": 1,
-            "access_token": "8c77e013-d8dc-472c-b4d3-d4fbe21f80e7",
-            "expires_in": -1,
-            "token_type": "Bearer",
-            "scope": "",
-            "refresh_token": "b7ac07a6-4c28-43bd-a335-00250b490e9f",
-            "party_id": "test-id"
-        }
+        self.auth_response = {}
         self.sign_in_form = {
             "username": "testuser@email.com",
             "password": "password"
@@ -107,7 +90,7 @@ class TestSignIn(unittest.TestCase):
     @requests_mock.mock()
     def test_sign_in_success(self, mock_object):
         mock_object.get(url_get_respondent_email, json=party)
-        mock_object.post(url_auth_token, status_code=200, json=self.auth_token)
+        mock_object.post(url_auth_token, status_code=200, json=self.auth_response)
         mock_object.get(url_get_conversation_count, json=message_count)
 
         response = self.app.post('/sign-in/', data=self.sign_in_form)
@@ -118,7 +101,7 @@ class TestSignIn(unittest.TestCase):
     @requests_mock.mock()
     def test_sign_in_success_redirect_to_url(self, mock_object):
         mock_object.get(url_get_respondent_email, json=party)
-        mock_object.post(url_auth_token, status_code=200, json=self.auth_token)
+        mock_object.post(url_auth_token, status_code=200, json=self.auth_response)
         mock_object.get(url_get_conversation_count, json=message_count)
         response = self.app.post('/sign-in/', data=self.sign_in_form, query_string={'next': 'http://localhost:8082/secure-message/threads'})
         self.assertEqual(response.status_code, 302)
@@ -127,7 +110,7 @@ class TestSignIn(unittest.TestCase):
     @requests_mock.mock()
     def test_sign_in_expired_redirects_to_login_page(self, mock_object):
         mock_object.get(url_get_respondent_email, json=party)
-        mock_object.post(url_auth_token, status_code=200, json=self.expired_auth_token)
+        mock_object.post(url_auth_token, status_code=200)
 
         self.app.get('/sign-in/', data=self.sign_in_form)
 
@@ -149,7 +132,7 @@ class TestSignIn(unittest.TestCase):
     @requests_mock.mock()
     def test_sign_in_party_fail(self, mock_object):
         mock_object.get(url_get_respondent_email, status_code=500)
-        mock_object.post(url_auth_token, status_code=200, json=self.auth_token)
+        mock_object.post(url_auth_token, status_code=200, json=self.auth_response)
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 

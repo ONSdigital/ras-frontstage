@@ -22,14 +22,7 @@ class TestPasswords(unittest.TestCase):
         app.testing = True
         self.app = app.test_client()
         self.email_form = {"email_address": "test@email.com"}
-        self.auth_response = {
-            'id': 1,
-            'access_token': '99a81f9c-e827-448b-8fa7-d563b76137ca',
-            'expires_in': 3600,
-            'token_type': 'Bearer',
-            'scope': '',
-            'refresh_token': 'a74fd471-6981-4503-9f59-00d45d339a15'
-        }
+        self.auth_response = {}
         self.password_form = {"password": "Gizmo007!", "password_confirm": "Gizmo007!"}
 
     def test_forgot_password_get(self):

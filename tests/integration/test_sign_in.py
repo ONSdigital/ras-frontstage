@@ -8,7 +8,7 @@ from frontstage import app, create_app_object
 from frontstage.controllers.party_controller import notify_party_and_respondent_account_locked
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.common.utilities import obfuscate_email
-from tests.integration.mocked_services import url_get_respondent_email, url_oauth_token, party, \
+from tests.integration.mocked_services import url_get_respondent_email, url_auth_token, party, \
     url_notify_party_and_respondent_account_locked, token, url_get_conversation_count, message_count
 
 respondent_party_id = "cd592e0f-8d07-407b-b75d-e01fbdae8233"
@@ -31,29 +31,12 @@ class TestSignIn(unittest.TestCase):
 
     def setUp(self):
         self.app = app.test_client()
-        self.oauth_token = {
-            "id": 1,
-            "access_token": "8c77e013-d8dc-472c-b4d3-d4fbe21f80e7",
-            "expires_in": 3600,
-            "token_type": "Bearer",
-            "scope": "",
-            "refresh_token": "b7ac07a6-4c28-43bd-a335-00250b490e9f",
-            "party_id": "test-id"
-        }
-        self.expired_oauth_token = {
-            "id": 1,
-            "access_token": "8c77e013-d8dc-472c-b4d3-d4fbe21f80e7",
-            "expires_in": -1,
-            "token_type": "Bearer",
-            "scope": "",
-            "refresh_token": "b7ac07a6-4c28-43bd-a335-00250b490e9f",
-            "party_id": "test-id"
-        }
+        self.auth_response = {}
         self.sign_in_form = {
             "username": "testuser@email.com",
             "password": "password"
         }
-        self.oauth_error = {
+        self.auth_error = {
             'detail': 'Unauthorized user credentials'
         }
         os.environ['APP_SETTINGS'] = 'TestingConfig'
@@ -107,7 +90,7 @@ class TestSignIn(unittest.TestCase):
     @requests_mock.mock()
     def test_sign_in_success(self, mock_object):
         mock_object.get(url_get_respondent_email, json=party)
-        mock_object.post(url_oauth_token, status_code=200, json=self.oauth_token)
+        mock_object.post(url_auth_token, status_code=200, json=self.auth_response)
         mock_object.get(url_get_conversation_count, json=message_count)
 
         response = self.app.post('/sign-in/', data=self.sign_in_form)
@@ -118,7 +101,7 @@ class TestSignIn(unittest.TestCase):
     @requests_mock.mock()
     def test_sign_in_success_redirect_to_url(self, mock_object):
         mock_object.get(url_get_respondent_email, json=party)
-        mock_object.post(url_oauth_token, status_code=200, json=self.oauth_token)
+        mock_object.post(url_auth_token, status_code=200, json=self.auth_response)
         mock_object.get(url_get_conversation_count, json=message_count)
         response = self.app.post('/sign-in/', data=self.sign_in_form, query_string={'next': 'http://localhost:8082/secure-message/threads'})
         self.assertEqual(response.status_code, 302)
@@ -127,7 +110,7 @@ class TestSignIn(unittest.TestCase):
     @requests_mock.mock()
     def test_sign_in_expired_redirects_to_login_page(self, mock_object):
         mock_object.get(url_get_respondent_email, json=party)
-        mock_object.post(url_oauth_token, status_code=200, json=self.expired_oauth_token)
+        mock_object.post(url_auth_token, status_code=200)
 
         self.app.get('/sign-in/', data=self.sign_in_form)
 
@@ -137,9 +120,9 @@ class TestSignIn(unittest.TestCase):
         self.assertIn(b'Sign in', response.data)
 
     @requests_mock.mock()
-    def test_sign_in_oauth_fail(self, mock_object):
+    def test_sign_in_auth_fail(self, mock_object):
         mock_object.get(url_get_respondent_email, json=party)
-        mock_object.post(url_oauth_token, status_code=500)
+        mock_object.post(url_auth_token, status_code=500)
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
@@ -149,7 +132,7 @@ class TestSignIn(unittest.TestCase):
     @requests_mock.mock()
     def test_sign_in_party_fail(self, mock_object):
         mock_object.get(url_get_respondent_email, status_code=500)
-        mock_object.post(url_oauth_token, status_code=200, json=self.oauth_token)
+        mock_object.post(url_auth_token, status_code=200, json=self.auth_response)
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
@@ -158,7 +141,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_sign_in_party_404(self, mock_object):
-        mock_object.post(url_oauth_token, status_code=204)
+        mock_object.post(url_auth_token, status_code=204)
         mock_object.get(url_get_respondent_email, status_code=404)
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
@@ -166,8 +149,8 @@ class TestSignIn(unittest.TestCase):
         self.assertTrue('Incorrect email or password'.encode() in response.data)
 
     @requests_mock.mock()
-    def test_sign_in_unauthorised_oauth_credentials(self, mock_object):
-        mock_object.post(url_oauth_token, status_code=401, json=self.oauth_error)
+    def test_sign_in_unauthorised_auth_credentials(self, mock_object):
+        mock_object.post(url_auth_token, status_code=401, json=self.auth_error)
         mock_object.get(url_get_respondent_email, json=party)
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
@@ -177,8 +160,8 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_sign_in_unverified_account(self, mock_object):
-        self.oauth_error['detail'] = 'User account not verified'
-        mock_object.post(url_oauth_token, status_code=401, json=self.oauth_error)
+        self.auth_error['detail'] = 'User account not verified'
+        mock_object.post(url_auth_token, status_code=401, json=self.auth_error)
         mock_object.get(url_get_respondent_email, json=party)
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
@@ -189,8 +172,8 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_sign_in_unknown_response(self, mock_object):
-        self.oauth_error['detail'] = 'wat'
-        mock_object.post(url_oauth_token, status_code=401, json=self.oauth_error)
+        self.auth_error['detail'] = 'wat'
+        mock_object.post(url_auth_token, status_code=401, json=self.auth_error)
         mock_object.get(url_get_respondent_email, json=party)
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
@@ -231,8 +214,8 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_sign_in_account_locked(self, mock_object):
-        self.oauth_error['detail'] = 'User account locked'
-        mock_object.post(url_oauth_token, status_code=401, json=self.oauth_error)
+        self.auth_error['detail'] = 'User account locked'
+        mock_object.post(url_auth_token, status_code=401, json=self.auth_error)
         mock_object.get(url_get_respondent_email, json=party)
         mock_object.put(url_notify_party_and_respondent_account_locked,
                         json={'respondent_id': 'f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b',

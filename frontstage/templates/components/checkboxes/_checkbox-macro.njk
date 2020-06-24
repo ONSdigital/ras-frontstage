@@ -1,0 +1,45 @@
+{% macro onsCheckbox(params) %}
+    {% from "components/label/_macro.njk" import onsLabel %}
+    
+    <span class="checkbox {{ params.classes }}">
+        <input
+            type="checkbox"
+            id="{{ params.id }}"
+            class="checkbox__input js-checkbox {{ params.inputClasses }}"
+            value="{{ params.value }}"
+            {% if params.name %} name="{{ params.name }}"{% endif %}
+            {% if params.checked %} checked{% endif %}
+            {% if params.other and not params.other.open %} aria-controls="{{ params.id }}-other-wrap" aria-haspopup="true"{% endif %}
+            {% if params.attributes %}{% for attribute, value in (params.attributes.items() if params.attributes is mapping and params.attributes.items else params.attributes) %}{{ attribute }}{% if value %}="{{ value }}"{% endif %} {% endfor %}{% endif %}
+        >
+
+        {{ onsLabel({
+            "for": params.id,
+            "inputType": "checkbox",
+            "text": params.label.text,
+            "classes": "radio__label " + params.label.classes | default(''),
+            "description": params.label.description
+        }) }}
+
+        {% if params.other %}
+            <span class="checkbox__other {{ 'checkbox__other--open' if params.other.open }}" id="{{ params.id }}-other-wrap">
+                {% from "components/input/_macro.njk" import onsInput %}
+                {{
+                    onsInput({
+                        "id": params.other.id,
+                        "name": params.other.name,
+                        "type": params.other.type,
+                        "classes": "input--w-auto " + params.other.classes | default(''),
+                        "attributes": params.other.attributes,
+                        "label": {
+                            "text": params.other.label.text,
+                            "classes": 'u-fs-s--b'
+                        },
+                        "dontWrap": true,
+                        "value": params.other.value
+                    })
+                }}
+            </span>
+        {% endif %}
+    </span>
+{% endmacro %}

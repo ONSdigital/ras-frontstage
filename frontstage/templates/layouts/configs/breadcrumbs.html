@@ -1,0 +1,27 @@
+{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+
+{% set breadcrumbsData = [
+  {
+    "text": "Home",
+    "url": "/"
+  }
+] %}
+
+{% for breadcrumb in breadcrumbs[:-1] %}
+  {% do breadcrumbsData.append(breadcrumb) %}
+{% endfor %}
+
+{% do breadcrumbsData.append(
+  { 
+    "text": breadcrumbs[-1].text,
+    "url": breadcrumbs[-1].url,
+    "current": true
+  }
+) %}
+{{ 
+    onsBreadcrumb({
+        "ariaLabel": "Breadcrumbs",
+        "id": "breadcrumbs",
+        "itemsList": breadcrumbsData
+    })
+}}

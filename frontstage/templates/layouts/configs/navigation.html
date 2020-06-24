@@ -1,0 +1,34 @@
+{% set navigation = {
+  "classes": "nav--inline nav--light nav--header nav--h-m js-main-nav",
+  "id": "main-nav",
+  "ariaLabel": "Main menu",
+  "ariraListLabel": "Navigation menu",
+  "currentPath": request.path,
+} %}
+
+{% do navigation | setAttribute("itemsList", [
+    {
+      "title": "Home",
+      "url": "/"
+    },
+    {
+      "title": "Surveys",
+      "url": "/surveys/"
+    },
+    {
+      "title": "Reporting units",
+      "url": "/reporting-units/"
+    },
+    {
+      "title": "Respondents",
+      "url": "/respondents/"
+    },
+    {
+      "title": "Messages",
+      "url": "/messages/",
+      "id": "messages-link"
+    }
+  ]) 
+%}
+
+{% do pageConfig | setAttribute("navigation", navigation) %}

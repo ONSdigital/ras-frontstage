@@ -1,0 +1,90 @@
+{% macro onsCheckboxes(params) %}
+    {% from "components/fieldset/_macro.njk" import onsFieldset %}
+    {% from "components/mutually-exclusive/_macro.njk" import onsMutuallyExclusive %}
+    {% from "components/checkboxes/_checkbox-macro.njk" import onsCheckbox %}
+
+    {% set fields %}
+        <p class="checkboxes__label">{{ params.checkboxesLabel }}</p>
+        <div class="checkboxes__items">
+            {% for checkbox in params.checkboxes %}
+                {% set labelHTML = checkbox.label.text %}
+                {% if params.mutuallyExclusive %}
+                    {% set exclusiveClass = ' js-exclusive-group' %}
+                {% endif %}
+                <p class="checkboxes__item">
+                    {% set config = {
+                        "id": checkbox.id,
+                        "name": checkbox.name,
+                        "value": checkbox.value,
+                        "checked": checkbox.checked,
+                        "classes": checkbox.classes,
+                        "inputClasses": exclusiveClass,
+                        "label": {
+                            "for": checkbox.id,
+                            "text": labelHTML,
+                            "description": checkbox.label.description,
+                            "classes": checkbox.label.classes | default('')
+                        },
+                        "attributes": checkbox.attributes
+                    } %}
+
+                    {% if checkbox.other %}
+                        {% set config = config | setAttributes({
+                            "other": {
+                                "open": checkbox.other.open | default(false),
+                                "id": checkbox.other.id,
+                                "name": checkbox.other.name,
+                                "type": checkbox.other.type,
+                                "classes": checkbox.other.classes | default('') + exclusiveClass | default(''),
+                                "attributes": checkbox.other.attributes,
+                                "label": {
+                                    "text": checkbox.other.label.text
+                                },
+                                "value": checkbox.other.value
+                            }
+                        }) %}
+                    {% endif %}
+                    {{ onsCheckbox(config) }}
+                </p>
+                {% if not loop.last %}
+                    <br>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endset %}
+
+    {% if params.mutuallyExclusive %}
+        {% call onsMutuallyExclusive({
+            "id": params.id,
+            "description": params.description,
+            "classes": params.classes,
+            "legend": params.legend,
+            "legendClasses": params.legendClasses,
+            "description": params.description,
+            "attributes": params.attributes,
+            "dontWrap": params.dontWrap,
+            "checkbox": params.mutuallyExclusive.checkbox,
+            "or": params.mutuallyExclusive.or,
+            "deselectMessage": params.mutuallyExclusive.deselectMessage,
+            "deselectGroupAdjective": params.mutuallyExclusive.deselectGroupAdjective,
+            "deselectCheckboxAdjective": params.mutuallyExclusive.deselectCheckboxAdjective,
+            "error": params.error
+        }) %}
+            {{ fields | safe }}
+        {% endcall %}
+    {% else %}
+        {% call onsFieldset({
+            "id": params.id,
+            "description": params.description,
+            "classes": params.classes,
+            "legend": params.legend,
+            "legendClasses": params.legendClasses,
+            "description": params.description,
+            "attributes": params.attributes,
+            "dontWrap": params.dontWrap,
+            "error": params.error
+        }) %}
+            {{ fields | safe }}
+        {% endcall %}
+    {% endif %}
+{% endmacro %}

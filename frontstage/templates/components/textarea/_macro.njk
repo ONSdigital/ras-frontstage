@@ -1,0 +1,70 @@
+{% macro onsTextarea(params) %}
+    {% from "components/mutually-exclusive/_macro.njk" import onsMutuallyExclusive %}
+    {% from "components/field/_macro.njk" import onsField %}
+    {% from "components/label/_macro.njk" import onsLabel %}
+
+
+    {% set field %}
+        {% set textareaExlusiveClass = " js-exclusive-group" if params.mutuallyExclusive else "" %}
+
+        {{ onsLabel({
+            "for": params.id,
+            "text": params.label.text,
+            "description": params.label.description,
+            "classes": params.label.classes
+        }) }}
+
+        <textarea
+            id="{{ params.id }}"
+            class="input input--textarea {% if params.maxlength %} js-charlimit-input{% endif %}{{ textareaExlusiveClass }} {{ params.classes }}"
+            name="{{ params.name }}"
+            rows="{{ params.rows | default(8) }}"
+            {% if params.maxlength %}
+            maxlength="{{ params.maxlength }}"
+            data-char-limit-ref="{{ params.id }}-lim-remaining"
+            {% endif %}
+            {% if params.attributes %}{% for attribute, value in (params.attributes.items() if params.attributes is mapping and params.attributes.items else params.attributes) %}{{ attribute }}{% if value %}="{{ value }}"{% endif %} {% endfor %}{% endif %}
+        >{{ params.value }}</textarea>
+
+        {% if params.maxlength %}
+            <span
+                id="{{ params.id }}-lim-remaining"
+                class="input__limit u-mt-xs u-fs-s--b u-d-no"
+                data-charcount-singular="{{ params.charCountSingular }}"
+                data-charcount-plural="{{ params.charCountPlural }}">
+            </span>
+        {% endif %}
+    {% endset %}
+
+    {% if params.mutuallyExclusive %}
+        {% call onsMutuallyExclusive({
+            "id": params.fieldId,
+            "classes": params.fieldClasses,
+            "legend": params.legend,
+            "legendClasses": params.legendClasses,
+            "description": params.description,
+            "dontWrap": params.dontWrap,
+            "checkbox": params.mutuallyExclusive.checkbox,
+            "or": params.mutuallyExclusive.or,
+            "deselectMessage": params.mutuallyExclusive.deselectMessage,
+            "deselectGroupAdjective": params.mutuallyExclusive.deselectGroupAdjective,
+            "deselectCheckboxAdjective": params.mutuallyExclusive.deselectCheckboxAdjective,
+            "error": params.error
+        }) %}
+            {% call onsField({
+                "error": params.error
+            }) %}
+                {{ field | safe }}
+            {% endcall %}
+        {% endcall %}
+    {% else %}
+        {% call onsField({
+            "id": params.fieldId,
+            "classes": params.fieldClasses,
+            "dontWrap": params.dontWrap,
+            "error": params.error
+        }) %}
+            {{ field | safe }}
+        {% endcall %}
+    {% endif %}
+{% endmacro %}

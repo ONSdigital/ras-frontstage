@@ -154,14 +154,21 @@ Called by the `surveys/add-survey/confirm-organisation-survey` page.
 
 ---
 
-## Cookies privacy endpoints
+## Cookies endpoints
 
-`/cookies-privacy`
+`/cookies`
 
-* GET request to this endpoint will display cookies and privacy details that ONS collects on frontstage.
+* GET request to this endpoint will display cookies that ONS collects on frontstage.
 
 ---
 
+## Privacy endpoints
+
+`/privacy-and-data-protection`
+
+* GET request to this endpoint will display privacy and data protection information on frontstage.
+
+---
 ## Info endpoint
 
 `/info`

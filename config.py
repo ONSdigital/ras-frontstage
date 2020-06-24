@@ -65,7 +65,7 @@ class Config(object):
     RAS_NOTIFY_ACCOUNT_LOCKED_TEMPLATE = os.getenv('RAS_NOTIFY_ACCOUNT_LOCKED_TEMPLATE', 'account_locked_id')
     SEND_EMAIL_TO_GOV_NOTIFY = os.getenv('SEND_EMAIL_TO_GOV_NOTIFY', False)
     REQUESTS_POST_TIMEOUT = os.getenv('REQUESTS_POST_TIMEOUT', 20)
-    SECURE_APP = bool(strtobool(os.getenv('SECURE_APP', "False")))
+    SECURE_APP = bool(strtobool(os.getenv('SECURE_APP', "True")))
     WTF_CSRF_ENABLED = bool(strtobool(os.getenv('WTF_CSRF_ENABLED', str(SECURE_APP))))
     WTF_CSRF_TIME_LIMIT = int(os.getenv('WTF_CSRF_TIME_LIMIT', '7200'))
 
@@ -98,7 +98,7 @@ class DevelopmentConfig(Config):
     SURVEY_URL = os.getenv('SURVEY_URL', 'http://localhost:8080')
 
     WTF_CSRF_TIME_LIMIT = int(os.getenv('WTF_CSRF_TIME_LIMIT', '3200'))
-    SECURE_APP = bool(strtobool(os.getenv('SECURE_APP', "True")))
+    SECURE_APP = bool(strtobool(os.getenv('SECURE_APP', "False")))
 
 
 class TestingConfig(DevelopmentConfig):

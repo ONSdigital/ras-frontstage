@@ -225,20 +225,3 @@ font-weight: 400;
 .no-js .hide-if-no-js {
   display: none;
 }
-
-/* ///////////////////////////////////////////////////////////////////////////////////// */
-/* TEMPORARY COOKIES BANNER AND SETTINGS PAGE STYLES - REMOVE ONCE SERVICE IS REFACTORED */
-/* ///////////////////////////////////////////////////////////////////////////////////// */
-
-
-.js-enabled .no-js-banner {
-  display:none;
-}
-
-.has-js-banner {
-  display:none;
-}
-
-.js-enabled .has-js-banner {
-  display:block;
-}

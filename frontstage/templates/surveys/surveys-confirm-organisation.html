@@ -1,5 +1,6 @@
-{% import 'partials/section.html' as section %}
+
 {% extends "layouts/_twothirds.html" %}
+{% from "components/button/_macro.njk" import onsButton %}
 
 {% block page_title %}Confirm organisation and survey - ONS Business Surveys{% endblock %}
 
@@ -9,11 +10,17 @@
 
  {% include('partials/business_survey_credentials.html') %}
 
-<br/>
+{{
+    onsButton({
+        "url": url_for('surveys_bp.add_survey_submit', encrypted_enrolment_code=context.encrypted_enrolment_code) ,
+        "text": "Confirm",
+        "type": "submit",
+        "classes": "u-mt-l u-mb-s",
+        "id": "confirm_survey_button",
+        "submitType": "timer"
+    })
+}}
 
-<a id="confirm_survey_button" href="{{ url_for('surveys_bp.add_survey_submit', encrypted_enrolment_code=context.encrypted_enrolment_code) }}" class="btn js-timer js-submit-btn u-mb-s">
-    Confirm
-</a>
 <p>
   <a id="cancel_button" href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}">Cancel</a>
 </p>

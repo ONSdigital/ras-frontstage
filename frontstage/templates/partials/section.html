@@ -1,7 +1,0 @@
-{% macro section_default(title, description) -%}
-    <div class="section">
-        <h2 class="section__title u-fs-l">{{ title }}</h2>
-        <p class="section__description u-fs-r">{{ description }}</p>
-        {{ caller() }}
-    </div>
-{% endmacro %}

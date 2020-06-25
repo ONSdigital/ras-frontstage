@@ -1,3 +1,4 @@
+{% from "components/button/_macro.njk" import onsButton %}
 <ul class="survey-list" id="survey-list">
 
     <li class="grid header-row">
@@ -54,9 +55,15 @@
                {% if survey.collection_instrument_type == 'EQ' %}
                 onclick="ga('send', 'event', 'survey', 'launcheq', 'survey_ref = {{ survey.survey_ref }} collection_exercise_ref = {{ survey.collection_exercise_ref }}');"
                {% endif %}>
-                <button id="access_survey_button_{{loop.index}}" class="btn u-mb-s action-button js-timer js-submit-btn" type="submit">
-                    Access <span class="u-vh">{{ survey.survey_long_name|replace("Survey", " ") }}</span> survey
-                </button>
+                {{
+                    onsButton({
+                        "text": 'Access survey',
+                        "type": "submit",
+                        "classes": "btn--small u-mt-l u-mb-s",
+                        "id": 'access_survey_button_' ~ loop.index,
+                        "submitType": "timer"
+                    })
+                }}
             </a>
             {% endif %}
             <a id="create-message-link-{{loop.index}}" href="/secure-message/create-message/?survey={{survey.survey_id}}&ru_ref={{survey.business_party_id}}" class="u-fs-s survey-message history__message">Send a message </span></a>

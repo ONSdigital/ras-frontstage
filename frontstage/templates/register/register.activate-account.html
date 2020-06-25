@@ -1,5 +1,6 @@
-{% import 'partials/section.html' as section %}
+
 {% extends "layouts/_twothirds.html" %}
+{% from "components/button/_macro.njk" import onsButton %}
 
 {% block page_title %}Create an account - ONS Business Surveys{% endblock %}
 
@@ -18,10 +19,14 @@
 
         <div class="label__description label__inner u-fs-s">Please now activate your account</div>
 
-        <br />
-        <br />
-
-        <button class="btn btn--secondary u-fs-r--b js-timer js-submit-btn" id="activate_account_button" type="submit">Activate account</button>
-
+    {{
+        onsButton({
+            "text": "Activate account",
+            "type": "submit",
+            "classes": "u-mt-l u-mb-s",
+            "id": "activate_account_button",
+            "submitType": "timer"
+        })
+    }}        
     </form>
 {% endblock main %}

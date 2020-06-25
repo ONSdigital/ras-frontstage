@@ -125,7 +125,7 @@
             {% endif %}
                 <div class="field" id="phone_number_field">
                     {{ form.phone_number.label(class_='label') }}
-                    <span class="field-description">For international numbers include the country code</span>
+                    <div class="label__description label__inner u-fs-s">For international numbers include the country code</span>
                     {{ form.phone_number(class_='input input--text input-type__input') }}
                 </div>
             {% if errors.phone_number %}

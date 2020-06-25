@@ -226,6 +226,19 @@ font-weight: 400;
   display: none;
 }
 
-.field-description {
-  font-size: smaller;
+/* ///////////////////////////////////////////////////////////////////////////////////// */
+/* TEMPORARY COOKIES BANNER AND SETTINGS PAGE STYLES - REMOVE ONCE SERVICE IS REFACTORED */
+/* ///////////////////////////////////////////////////////////////////////////////////// */
+
+
+.js-enabled .no-js-banner {
+  display:none;
+}
+
+.has-js-banner {
+  display:none;
+}
+
+.js-enabled .has-js-banner {
+  display:block;
 }

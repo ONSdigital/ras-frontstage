@@ -49,20 +49,15 @@
 {% include 'layouts/configs/footer.html' %}
 {% from "components/panel/_macro.njk" import onsPanel %}
 
-{# To be removed when refactor complete #}
-
 {%- block pageContent %}
-
+    {% if availability_message %}
+      {{ 
+          onsPanel({
+              body: availability_message
+          }) 
+      }}
+    {% endif %}
   <div class="page__container container">
-    {% block preMain %}
-      {% if availability_message %}
-        {{ 
-            onsPanel({
-                body: availability_message
-            }) 
-        }}
-      {% endif %}
-    {% endblock %}
     <div class="grid">
       <div class="grid__col col-12@m u-mt-s">
         <main id="main-content" class="page__main {{ pageClasses }}">

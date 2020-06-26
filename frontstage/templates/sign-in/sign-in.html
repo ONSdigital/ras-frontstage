@@ -6,14 +6,7 @@
 {% from "components/button/_macro.njk" import onsButton %}
 
 {% set errorType = data['error']['type'] %}
-
-{% block page_title %}
-    {% if errorType %}
-        Error signing in - ONS Business Surveys
-    {% else %}
-        Complete a survey on behalf of a business - ONS Business Surveys
-    {% endif %}
-{% endblock %}
+{% set page_title = "Sign in" %}
 
 {% block main %}
 

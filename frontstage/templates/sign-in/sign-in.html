@@ -6,14 +6,14 @@
 {% from "components/button/_macro.njk" import onsButton %}
 
 {% set errorType = data['error']['type'] %}
-{% set page_title = "Sign in" %}
+{% set page_title = "Error signing in" if errorType else "Complete a survey on behalf of a business" %}
 
 {% block main %}
 
     {% if errorType %}
         {% if errorType == 'failed' %}
             {% set errorTitle = 'Incorrect email or password' %}
-        {% elif errorType|length > 1 %}
+        {% elif errorType|length > 1 %}s
             {% set errorTitle = 'There are ' ~ errorType|length ~ ' errors on this page' %}
         {% else %}
             {% for error in errorType %}

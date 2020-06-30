@@ -1,33 +1,48 @@
 
 {% extends "layouts/_twothirds.html" %}
 {% from "components/button/_macro.njk" import onsButton %}
+{% from "components/lists/_macro.njk" import onsList %}
+{% from "components/input/_macro.njk" import onsInput %}
+{% from "components/password/_macro.njk" import onsPassword %}
+{% from "components/fieldset/_macro.njk" import onsFieldset %}
 
 {% set page_title = "Enter account details" %}
 
 {% block main %}
-
-        {% if errors|length > 0 %}
-        <div class="panel panel--error">
-            <div class="panel__header">
-                {% if errors|length == 1 %}
-                {% for error in errors %}
-                <h1 class="panel__title u-fs-r--b">{{ errors[error][0] }}</h1>
-                {% endfor %}
-                {% elif errors|length > 1 %}
-                <h1 class="panel__title u-fs-r--b">There are {{ errors|length }} errors on this page</h1>
-                {% endif %}
-            </div>
-            <div class="panel__body" data-qa="error-body">
-                {% for error in errors %}
-                    {% set error_text = 'passwords' if error == 'password' else error %}
-                    <p class="u-fs-r"><a class="js-inpagelink" href="#{{error}}_field">Please check the {{error_text.replace('_', ' ')}} and try again</a></p>
-                {% endfor %}
-            </div>
-        </div>
-        <br/>
+    {% if errors|length > 0 %}
+        {% if errors|length == 1 %}
+            {% set errorTitle = 'There is 1 error on this page' %}
+        {% elif errors|length > 1 %}
+            {% set errorTitle = 'There are ' ~ errors|length ~ ' errors on this page' %}
         {% endif %}
-
-
+        {% call
+            onsPanel({
+                "type": "error",
+                "classes": "u-mb-s",    
+                "title":  errorTitle
+            })
+        %}
+            <p>These <strong>must be corrected</strong> to continue.</p>
+            {% set errorData = [] %}
+            {% for error in errors %}
+                {% set error_text = 'passwords' if error == 'password' else error %}
+                {% do errorData.append(
+                    {
+                        "text": error_text.replace('_', ' '),
+                        "index": true,
+                        "url": "#" ~ error ~ '_error',
+                        "classes": "js-inpagelink"
+                    }
+                ) %}
+            {% endfor %}
+            {{
+                onsList({
+                    "classes": "list--bare",
+                    "itemsList": errorData
+                }) 
+            }}
+        {% endcall %}
+    {% endif %}
         <form
             method="post"
             class="form"
@@ -35,103 +50,142 @@
             onsubmit="formSubmitted(event);">
             {{ form.csrf_token }}
 
-        <h1 class="u-fs-l">Enter your account details</h1>
+        <h1 class="u-fs-xl">Enter your account details</h1>
         {{ form.enrolment_code }}
 
-        <div class="section">
-            <h2 class="section__title neptune">Your name</h2>
+        <h2>Your name</h2>
+
+        {%- call onsFieldset({
+            "legend": "Your name",
+            "legendClasses": "u-vh"
+        }) -%}
             {% if errors.first_name %}
-            <div class="panel panel--simple panel--error">
-                <p class="error-message">{{ errors['first_name'][0] }}</p>
+                {% set errorFirstName = { "text": errors['first_name'][0],  "id": 'first_name_error' } %}
             {% endif %}
-                <div class="field" id="first_name_field">
-                    {{ form.first_name.label(class_='label') }}
-                    {{ form.first_name(class_='input input--text input-type__input') }}
-                </div>
-            {% if errors.first_name %}
-            </div>
-            {% endif %}
-            <br />
+            {{
+                onsInput({
+                    "id": "first_name",
+                    "name": "first_name",
+                    "type": "text",
+                    "label": {
+                        "text": "First name"
+                    },
+                    "error": errorFirstName
+                })
+            }}
             {% if errors.last_name %}
-            <div class="panel panel--simple panel--error">
-                <p class="error-message">{{ errors['last_name'][0] }}</p>
+                {% set errorLastName = { "text": errors['last_name'][0],  "id": 'last_name_error' } %}
             {% endif %}
-                <div class="field" id="last_name_field">
-                    {{ form.last_name.label(class_='label') }}
-                    {{ form.last_name(class_='input input--text input-type__input') }}
-                </div>
-            {% if errors.last_name %}
-            </div>
-            {% endif %}
-        </div>
-
-        <div class="section">
-            <h2 class="section__title neptune u-mt-m">Email address</h2>
-            <p class="section__description u-fs-r">We'll send you an email so you can activate your account</p>
+            {{
+                onsInput({
+                    "id": "last_name",
+                    "name": "last_name",
+                    "type": "text",
+                    "label": {
+                        "text": "Last name"
+                    },
+                    "error": errorLastName
+                })
+            }}
+        {% endcall %}
+        
+        <h2 class="u-mt-l">Email address</h2>
+        <p>We'll send you an email so you can activate your account</p>
+        {%- call onsFieldset({
+            "legend": "Email address",
+            "legendClasses": "u-vh"
+        }) -%}
             {% if errors.email_address %}
-            <div class="panel panel--simple panel--error">
-                <p class="error-message">{{ errors['email_address'][0] }}</p>
+                {% set errorEmailAddress = { "text": errors['email_address'][0],  "id": 'email_address_error' } %}
             {% endif %}
-                <div class="field" id="email_address_field">
-                    {{ form.email_address.label(class_='label') }}
-                    {{ form.email_address(class_='input input--text input-type__input') }}
-                </div>
-                <br />
-                <div class="field">
-                    {{ form.email_address_confirm.label(class_='label') }}
-                    {{ form.email_address_confirm(class_='input input--text input-type__input') }}
-                </div>
-            {% if errors.email_address %}
-            </div>
+            {{
+                onsInput({
+                    "id": "email_address",
+                    "name": "email_address",
+                    "type": "text",
+                    "label": {
+                        "text": "Email address"
+                    },
+                    "error": errorEmailAddress
+                })
+            }}
+            {{
+                onsInput({
+                    "id": "email_address_confirm",
+                    "name": "email_address_confirm",
+                    "type": "text",
+                    "label": {
+                        "text": "Re-type your email address"
+                    },
+                    "error": errorEmailAddress
+                })
+            }}
+        {% endcall %}
+        <h2 class="u-mt-l">Create a password</h2>
+        <p>Your password must have:</p>
+        <ul>
+            <li>at least 8 characters </li>
+            <li>at least one symbol (eg ?!£%) </li>
+            <li>at least one capital letter</li>
+            <li>at least one number</li>
+        </ul>
+        {%- call onsFieldset({
+            "legend": "Create a password",
+            "legendClasses": "u-vh"
+        }) -%}
+            {% if errors.password %}
+                {% set errorPassword = { "text": errors['password'][0],  "id": 'password_error' } %}
             {% endif %}
-        </div>
+            {{
+                onsPassword({
+                    "id": "password",
+                    "name": "password",
+                    "type": "text",
+                    "label": {
+                        "text": "Password"
+                    },
+                    "showPasswordText": "Show password",
+                    "error": errorPassword
+                })
+            }}
+            {{
+                onsPassword({
+                    "id": "password_confirm",
+                    "name": "password_confirm",
+                    "type": "text",
+                    "label": {
+                        "text": "Re-type your password"
+                    },
+                    "showPasswordText": "Show password",
+                    "error": errorPassword
+                })
+            }}
 
-        <div class="section">
-            <h2 class="section__title neptune u-mt-m">Create a password</h2>
-            <p class="section__description u-fs-r">Your password must have:</p>
-            <ul>
-                <li>at least 8 characters </li>
-                <li>at least one symbol (eg ?!£%) </li>
-                <li>at least one capital letter</li>
-                <li>at least one number</li>
-            </ul>
-            <fieldset class="js-new-password-group">
-                {% if errors.password %}
-                <div class="panel panel--simple panel--error">
-                    <p class="error-message">{{ errors['password'][0] }}</p>
-                {% endif %}
-                    <div class="field" id="password_field">
-                        {{ form.password.label(class_='label') }}
-                        {{ form.password(class_='input input--text input-type__input js-new-password') }}
-                    </div>
-                    <br />
-                    <div class="field">
-                        {{ form.password_confirm.label(class_='label') }}
-                        {{ form.password_confirm(class_='input input--text input-type__input js-confirm-new-password') }}
-                    </div>
-                {% if errors.password %}
-                </div>
-                {% endif %}
-            </fieldset>
-        </div>
-
-
-        <div class="section">
-            <h2 class="section__title neptune u-mt-m">Contact telephone number</h2>
-            <p class="section__description u-fs-r">We'll use this number if we need to discuss any survey information provided</p>
+        {% endcall %}
+        
+        <h2 class="u-mt-l">Contact telephone number</h2>
+        <p>We'll use this number if we need to discuss any survey information provided</p>
+        {%- call onsFieldset({
+            "legend": "Create a password",
+            "legendClasses": "u-vh"
+        }) -%}
             {% if errors.phone_number %}
-            <div class="panel panel--simple panel--error">
-                <p class="error-message">{{ errors['phone_number'][0] }}</p>
+                {% set errorPhoneNumber = { "text": errors['phone_number'][0],  "id": 'phone_number_error' } %}
             {% endif %}
-                <div class="field" id="phone_number_field">
-                    {{ form.phone_number.label(class_='label') }}
-                    <div class="label__description label__inner u-fs-s">For international numbers include the country code</span>
-                    {{ form.phone_number(class_='input input--text input-type__input') }}
-                </div>
-            {% if errors.phone_number %}
-            </div>
-            {% endif %}
-        </div>
+            {{
+                onsInput({
+                    "id": "phone_number",
+                    "type": "tel",
+                    "autocomplete": "tel",
+                    "classes": "input--w-8",
+                    "label": {
+                        "text": "Telephone number",
+                        "description": "For international numbers include the country code, for example +33 1234 567 890"
+                    },
+                    "error": errorPhoneNumber
+                })
+            }}        
+        {% endcall %}
 
         {{
             onsButton({

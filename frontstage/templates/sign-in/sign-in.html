@@ -2,7 +2,6 @@
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/input/_macro.njk" import onsInput %}
 {% from "components/password/_macro.njk" import onsPassword %}
-{% from "components/error/_macro.njk" import onsError %}
 {% from "components/button/_macro.njk" import onsButton %}
 
 {% set errorType = data['error']['type'] %}
@@ -12,23 +11,37 @@
 
     {% if errorType %}
         {% if errorType == 'failed' %}
-            {% set errorTitle = 'Incorrect email or password' %}
-        {% elif errorType|length > 1 %}s
+            {% set errorTitle = 'There is 1 error on this page' %}
+            {% set errorMsg = 'Incorrect email or password' %}
+        {% elif errorType|length > 1 %}
             {% set errorTitle = 'There are ' ~ errorType|length ~ ' errors on this page' %}
+            {% set errorMsg = 'Please try again' %}
         {% else %}
-            {% for error in errorType %}
-                {% set errorTitle =  errorType[error][0] %}
-            {% endfor %}
+            {% set errorTitle = 'There is 1 error on this page' %}
+            {% set errorMsg = 'Please try again' %}
         {% endif %}
         {% call
             onsPanel({
                 "type": "error",
-                "classes": "u-mb-s",
+                "classes": "u-mb-s",    
                 "title":  errorTitle
             })
         %}
-            <p class="u-fs-r"><a href="#sign-in-details" id="try-again-link" class="js-inpagelink">Please try again</a></p>
-
+            <p>This <strong>must be corrected</strong> to continue.</p>
+            {% from "components/lists/_macro.njk" import onsList %}
+            {{
+                onsList({
+                    "classes": "list--bare",
+                    "itemsList": [
+                        {
+                            "text": errorMsg,
+                            "index": true,
+                            "url": "#sign-in-details",
+                            "classes": "js-inpagelink"
+                        }
+                    ]
+                })
+            }}
         {% endcall %}
     {% endif %}
 
@@ -76,8 +89,8 @@
         <h1 class="u-fs-xl">Sign in</h1>
         {% endif %}
 
-        {% if errorType.username %}
-            {% set error = { "text": errorType['username'][0] } %}
+        {% if errorType == 'failed' %}
+            {% set errorUN = { "text": errorMsg } %}
         {% endif %}
         {%- call onsFieldset({
             "legend": "Sign in",
@@ -95,12 +108,12 @@
                     "attributes": {
                         "required": true
                     },
-                    "error": error
+                    "error": errorUN
                 })
             }}
 
-            {% if errorType.password %}
-                {% set error = { "text": errorType['password'][0] } %}
+            {% if errorType == 'failed' %}
+                {% set errorPW = { "text": errorMsg } %}
             {% endif %}
             {{
                 onsPassword({
@@ -114,7 +127,7 @@
                     "attributes": {
                         "required": true
                     },
-                    "error": error
+                    "error": errorPW
                 })
             }}
 

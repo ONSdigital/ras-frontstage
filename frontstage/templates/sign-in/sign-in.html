@@ -10,16 +10,43 @@
 {% block main %}
 
     {% if errorType %}
+        {% set errorData = [] %}
         {% if errorType == 'failed' %}
             {% set errorTitle = 'There is 1 error on this page' %}
-            {% set errorMsg = 'Incorrect email or password' %}
+            {% do errorData.append(
+                {
+                    "text": "Incorrect email or password",
+                    "index": true,
+                    "url": "#username_error",
+                    "classes": "js-inpagelink"
+                }
+            ) %}
         {% elif errorType|length > 1 %}
             {% set errorTitle = 'There are ' ~ errorType|length ~ ' errors on this page' %}
-            {% set errorMsg = 'Please try again' %}
+            {% for error in errorType %}
+                {% do errorData.append(
+                    {
+                        "text": errorType[error][0],
+                        "index": true,
+                        "url": "#username_error",
+                        "classes": "js-inpagelink"
+                    }
+                ) %}
+            {% endfor %}
         {% else %}
             {% set errorTitle = 'There is 1 error on this page' %}
-            {% set errorMsg = 'Please try again' %}
+            {% for error in errorType %}
+                {% do errorData.append(
+                    {
+                        "text": errorType[error][0],
+                        "index": true,
+                        "url": "#username_error",
+                        "classes": "js-inpagelink"
+                    }
+                ) %}
+            {% endfor %}
         {% endif %}
+        
         {% call
             onsPanel({
                 "type": "error",
@@ -28,18 +55,12 @@
             })
         %}
             <p>This <strong>must be corrected</strong> to continue.</p>
+
             {% from "components/lists/_macro.njk" import onsList %}
             {{
                 onsList({
                     "classes": "list--bare",
-                    "itemsList": [
-                        {
-                            "text": errorMsg,
-                            "index": true,
-                            "url": "#sign-in-details",
-                            "classes": "js-inpagelink"
-                        }
-                    ]
+                    "itemsList": errorData
                 })
             }}
         {% endcall %}
@@ -90,7 +111,9 @@
         {% endif %}
 
         {% if errorType == 'failed' %}
-            {% set errorUN = { "text": errorMsg } %}
+            {% set errorUN = { "text": "Email Address is required", "id": 'username_error' } %}
+        {% else %}
+            {% set errorUN = { "text": "Invalid email address", "id": 'username_error' } %}
         {% endif %}
         {%- call onsFieldset({
             "legend": "Sign in",
@@ -105,15 +128,12 @@
                     "label": {
                         "text": "Email Address"
                     },
-                    "attributes": {
-                        "required": true
-                    },
                     "error": errorUN
                 })
             }}
 
-            {% if errorType == 'failed' %}
-                {% set errorPW = { "text": errorMsg } %}
+            {% if errorType %}
+                {% set errorPW = { "text": "Password is required", "id": 'password_error' } %}
             {% endif %}
             {{
                 onsPassword({
@@ -124,9 +144,6 @@
                         "text": "Password"
                     },
                     "showPasswordText": "Show password",
-                    "attributes": {
-                        "required": true
-                    },
                     "error": errorPW
                 })
             }}

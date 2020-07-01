@@ -1,9 +1,10 @@
-{% import 'partials/section.html' as section %}
-{% extends "layouts/_twocol.html" %}
+
+{% extends "layouts/_twothirds.html" %}
+{% from "components/button/_macro.njk" import onsButton %}
 
 {% set errorType = data['error']['type'] %}
 
-{% block page_title %}Sign in - ONS Business surveys{% endblock %}
+{% set page_title = "Sign in" %}
 
 
 
@@ -17,7 +18,16 @@
             {{ form.csrf_token}}
             <div class="form-group">{{ form.username.label }}: {{ form.username() }}</div>
             <div class="form-group">{{ form.password.label }}: {{ form.password() }}</div>
-            <button type="submit" class="btn btn-default js-timer js-submit-btn" id="login_button">Sign in</button>
+
+            {{
+                onsButton({
+                    "text": "Sign in",
+                    "type": "submit",
+                    "classes": "u-mt-l",
+                    "id": "login_button",
+                    "submitType": "timer"
+                })
+            }}
         </form>
     </div>
 {% endblock main %}

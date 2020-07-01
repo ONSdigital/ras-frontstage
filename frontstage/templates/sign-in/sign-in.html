@@ -1,123 +1,135 @@
-{% import 'partials/section.html' as section %}
-{% extends "layouts/_twocol.html" %}
+{% extends "layouts/_twothirds.html" %}
+{% from "components/fieldset/_macro.njk" import onsFieldset %}
+{% from "components/input/_macro.njk" import onsInput %}
+{% from "components/password/_macro.njk" import onsPassword %}
+{% from "components/error/_macro.njk" import onsError %}
+{% from "components/button/_macro.njk" import onsButton %}
 
 {% set errorType = data['error']['type'] %}
-
-{% block page_title %}
-    {% if errorType %}
-        Error signing in - ONS Business Surveys
-    {% else %}
-        Complete a survey on behalf of a business - ONS Business Surveys
-    {% endif %}
-{% endblock %}
+{% set page_title = "Error signing in" if errorType else "Complete a survey on behalf of a business" %}
 
 {% block main %}
 
     {% if errorType %}
-    <div class="panel panel--error">
-        <div class="panel__header">
-            {% if errorType == "failed" %}
-            <h1 class="panel__title u-fs-r--b">Incorrect email or password</h1>
-            {% elif errorType|length > 1 %}
-            <h1 class="panel__title u-fs-r--b">There are {{ errorType|length }} errors on this page</h1>
-            {% else %}
+        {% if errorType == 'failed' %}
+            {% set errorTitle = 'Incorrect email or password' %}
+        {% elif errorType|length > 1 %}s
+            {% set errorTitle = 'There are ' ~ errorType|length ~ ' errors on this page' %}
+        {% else %}
             {% for error in errorType %}
-            <h1 class="panel__title u-fs-r--b">{{ errorType[error][0] }}</h1>
+                {% set errorTitle =  errorType[error][0] %}
             {% endfor %}
-            {% endif %}
-        </div>
-        <div class="panel__body" data-qa="error-body">
+        {% endif %}
+        {% call
+            onsPanel({
+                "type": "error",
+                "classes": "u-mb-s",
+                "title":  errorTitle
+            })
+        %}
             <p class="u-fs-r"><a href="#sign-in-details" id="try-again-link" class="js-inpagelink">Please try again</a></p>
-        </div>
-    </div>
-    <br />
+
+        {% endcall %}
     {% endif %}
 
     {%- with messages = get_flashed_messages(category_filter=["info"]) -%}
-    {%- if messages -%}
-    <div class="panel panel--simple panel--info u-mb-l">
-      <div class="panel__body" id="session-expired">
-        <div id='info-text'>
-            <h2>Your session has expired</h2>
-          {%- for message in messages -%}
-          <p>{{ message }}</p>
-          {%- endfor -%}
-        </div>
-      </div>
-    </div>
-      {%- endif -%}
-      {%- endwith -%}
+        {%- if messages -%}
+            {% call
+                onsPanel({
+                    "classes": "u-mb-s"
+                })
+            %}
+                <div id="session-expired">
+                    <h2>Your session has expired</h2>
+                    {%- for message in messages -%}
+                        <p>{{ message }}</p>
+                    {%- endfor -%}
+                </div>
+            {% endcall %}
+        {%- endif -%}
+    {%- endwith -%}
 
     <form method="post" class="form" action="{{ url_for('sign_in_bp.login', next=next) }}" role="form">
         {{ form.csrf_token }}
 
         {% if data['account_activated'] %}
-        <h1 class="u-fs-l">You've activated your account</h1>
-        <p>You may now sign in.</p>
+            <h1 class="u-fs-xl">You've activated your account</h1>
+            <p>You may now sign in.</p>
         {% else %}
 
         {% if config.AVAILABILITY_BANNER and config.AVAILABILITY_BANNER != 'False' %}
-        <div class="panel panel--simple panel--info">
-            <div class="panel__body">
+            {% call
+                onsPanel({
+                    "classes": "u-mb-s"
+                })
+            %}
                 <strong class="u-d-b">Service Availability</strong>
-            </div>
-            <p class="u-fs-r u-mt-xs">Thank you for visiting the Office for National Statistics Secure Data Collection website.</p>
-	    <p>We are carrying out essential maintenance on our internal systems.</p>
-	    <p>You are able to use the system and submit data during this period however your response status may not display as completed until after the maintenance has been completed.</p>
-        </div>
-        <br>
+                <p class="u-fs-r u-mt-xs">Thank you for visiting the Office for National Statistics Secure Data Collection website.</p>
+                <p>We are carrying out essential maintenance on our internal systems.</p>
+                <p>You are able to use the system and submit data during this period however your response status may not display as completed until after the maintenance has been completed.</p>
+            {% endcall %}
         {% endif %}
 
         <p>New to this service?
            <a id="create-account" href="/register/create-account/">Create an account</a>
         </p>
-        <h1 class="u-fs-l">Sign in</h1>
+        <h1 class="u-fs-xl">Sign in</h1>
         {% endif %}
 
-        <fieldset id="sign-in-details">
-            {% if errorType == "failed" %}
-            <div class="panel panel--simple panel--error">
-            {% endif %}
-                <div class="field">
-                    {% if errorType.username %}
-                    <div class="panel panel--simple panel--error">
-                        <p class="error-message">{{ errorType['username'][0] }}</p>
-                    {% endif %}
-                    {{ form.username.label(class_='label') }}
-                    {{ form.username(class_='input input--text input-type__input') }}
-                    {% if errorType.username %}
-                    </div>
-                    {% endif %}
-                </div>
-                <br />
-
-                <div class="field js-password-obfuscation-group">
-                    {% if errorType.password %}
-                    <div class="panel panel--simple panel--error">
-                        <p class="error-message">{{ errorType['password'][0] }}</p>
-                    {% endif %}
-                        {{ form.password.label(class_='label') }}
-                        <div class="hide-if-no-js field--toggle">
-                            <label class="label label--inline u-fs-r--b field__label" for="showPasswordToggle">Show password</label>
-                            <input id="showPasswordToggle" class="field__input input input--checkbox" type="checkbox">
-                          </div>
-                        {{ form.password(id='inputPassword', class_='input input--text input-type__input', autocomplete="off", **{'aria-describedby':'inputPasswordLabel'}) }}
-                        <br />
-                        <a href="/passwords/forgot-password">Forgot password?</a>
-                    {% if errorType.password %}
-                    </div>
-                    {% endif %}
-                </div>
-                <br />
-
-                <button class="btn u-fs-r--b js-timer js-submit-btn" type="submit" id="sign_in_button">Sign in</button>
-            {% if errorType == "failed" %}
-            </div>
-            {% endif %}
-        </fieldset>
-        {% if errorType == "failed" %}
-        <br />
+        {% if errorType.username %}
+            {% set error = { "text": errorType['username'][0] } %}
         {% endif %}
+        {%- call onsFieldset({
+            "legend": "Sign in",
+            "legendClasses": "u-vh",
+            "id": "sign-in-details"
+        }) -%}
+            {{
+                onsInput({
+                    "id": "username",
+                    "name": "username",
+                    "type": "text",
+                    "label": {
+                        "text": "Email Address"
+                    },
+                    "attributes": {
+                        "required": true
+                    },
+                    "error": error
+                })
+            }}
 
+            {% if errorType.password %}
+                {% set error = { "text": errorType['password'][0] } %}
+            {% endif %}
+            {{
+                onsPassword({
+                    "id": "inputPassword",
+                    "name": "password",
+                    "type": "password",
+                    "label": {
+                        "text": "Password"
+                    },
+                    "showPasswordText": "Show password",
+                    "attributes": {
+                        "required": true
+                    },
+                    "error": error
+                })
+            }}
+
+        {% endcall %}
+        {{
+            onsButton({
+                "text": "Sign in",
+                "type": "submit",
+                "classes": "u-mt-l",
+                "id": "sign_in_button",
+                "submitType": "timer"
+            })
+        }}        
+        <div class="u-mt-m">
+            <a href="/passwords/forgot-password">Forgot password?</a>
+        </div>
     </form>
 {% endblock main %}

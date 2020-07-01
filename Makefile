@@ -24,3 +24,6 @@ unit-tests: check
 
 integration-tests: check
 	APP_SETTINGS=TestingConfig pipenv run pytest $(INTEGRATION_TESTS) --cov frontstage --cov-report term-missing	
+
+load-templates:
+	pipenv run ./scripts/load_templates.sh

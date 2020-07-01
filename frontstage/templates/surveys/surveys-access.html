@@ -1,10 +1,10 @@
-{% import 'partials/section.html' as section %}
+{% extends 'layouts/_base.html' %}
+{% from "components/button/_macro.njk" import onsButton %}
+{% from "components/collapsible/_macro.njk" import onsCollapsible %}
 
-{% extends "layouts/_onecol.html" %}
+{% set page_title = survey_info.longName ~ ' ' ~ collection_exercise_info.userDescription %}
 
-{% block page_title %}{{ survey_info.longName }} {{ collection_exercise_info.userDescription }} - ONS Business Surveys{% endblock %}
-
-{% block main %}
+{% block content %}
 
 <div>
     {% if 'history' in referer_header %}
@@ -27,44 +27,42 @@
 
 <p>If actual figures are not available, please provide informed estimates.</p>
 
-
-<a id="download_survey_button" class="btn" target="_blank"
-   href="{{ url_for('surveys_bp.download_survey', case_id=case_id, business_party_id=business_info.id, survey_short_name=survey_info.shortName) }}"
-   onclick="ga('send', 'event', 'survey', 'download', 'survey_ref = {{ survey_info.surveyRef }} collection_exercise_ref = {{ collection_exercise_info.exerciseRef }}');" >
-
-    <div>
-        <span class="download__text">Download spreadsheet&nbsp;&nbsp;&nbsp;</span>
-        <span class="download__text"><i class="fa fa-download fa-lg" aria-hidden="true"></i></span>
-    </div>
-    <div class="download__text u-fs-s">({{ collection_instrument_size | file_size_filter }} kb XLS)</div>
-</a>
-
-<br/>
-<br/>
+{{
+    onsButton({
+        "url": url_for('surveys_bp.download_survey', case_id=case_id, business_party_id=business_info.id, survey_short_name=survey_info.shortName),
+        "text": '<span class="download__text">Download spreadsheet&nbsp;&nbsp;&nbsp;</span><span class="download__text"><i class="fa fa-download fa-lg" aria-hidden="true"></i></span><div class="download__text u-fs-s">(' ~ collection_instrument_size | file_size_filter ~ ' kb XLS)</div>',
+        "type": "submit",
+        "hideCaret": true,
+        "classes": "u-mt-m u-mb-m",
+        "id": "download_survey_button",
+        "submitType": "timer",
+        "attributes": {
+            "onclick": "ga('send', 'event', 'survey', 'download', 'survey_ref = " ~ survey_info.surveyRef ~ " collection_exercise_ref = " ~ collection_exercise_info.exerciseRef ~ "');"
+        }
+    })
+}}        
 
 <h2 class="neptune">Upload your spreadsheet</h2>
 {% if collection_exercise_info.scheduledReturnDateTimeFormatted %}
 <p>Please upload by <strong>{{ collection_exercise_info.scheduledReturnDateTimeFormatted }}</strong></p>
 {% endif %}
 
-<div class="collapsible collapsible--simple js-collapsible js-collapsible-simple">
-    <div class="js-collapsible-content">
-        <h3 class="collapsible__title js-collapsible-title icon--collapsible-simple u-fs-r--b" data-ga="click" data-ga-category="definition" data-ga-action="Open panel" data-ga-label="Guidance for uploading">Guidance for uploading</h3>
-        <div class="collapsible__body js-collapsible-body">
-            <h4 class="u-mb-s">Your file needs to be:</h4>
-            <ul>
-                <li>.xls or .xlsx format</li>
-                <li>smaller than 20MB</li>
-            </ul>
-            <button class="btn--secondary btn--small js-collapsible-close u-no-js-hide" data-ga="click" data-ga-category="definition" data-ga-action="Close panel" data-ga-label="Guidance for uploading">Hide this</button>
-        </div>
-    </div>
-</div>
-
-<br/>
-
+ {% call onsCollapsible({
+    "id": "collapsible",
+    "title": "Guidance for uploading",
+    "button": {
+        "close": "Hide this",
+        "contextSuffix": "content"
+    }
+}) %}
+    <h4 class="u-mb-s">Your file needs to be:</h4>
+    <ul>
+        <li>.xls or .xlsx format</li>
+        <li>smaller than 20MB</li>
+    </ul>
+{% endcall %}
 <p class="u-fs-r--b icon--lock">We will treat your data securely and confidentially</p>
 
 {% include "surveys/surveys-upload-file-picker.html" %}
 
-{% endblock main %}
+{% endblock content %}

@@ -1,7 +1,8 @@
-{% import 'partials/section.html' as section %}
-{% extends "layouts/_twocol.html" %}
 
-{% block page_title %}Confirm organisation and survey - ONS Business Surveys{% endblock %}
+{% extends "layouts/_twothirds.html" %}
+{% from "components/button/_macro.njk" import onsButton %}
+
+{% set page_title = "Confirm organisation and survey" %}
 
 {% block main %}
 
@@ -9,11 +10,16 @@
 
  {% include('partials/business_survey_credentials.html') %}
 
-<br/>
-
-<a id="confirm_button" href="{{ url_for('register_bp.register_enter_your_details', encrypted_enrolment_code=context.encrypted_enrolment_code) }}" class="btn u-mb-s">
-    Confirm
-</a>
+{{
+    onsButton({
+        "url": url_for('register_bp.register_enter_your_details', encrypted_enrolment_code=context.encrypted_enrolment_code),
+        "text": "Confirm",
+        "type": "submit",
+        "classes": "u-mt-l u-mb-s",
+        "id": "confirm_button",
+        "submitType": "timer"
+    })
+}}
 
 <p>If the organisation or survey details aren't what you were expecting, please contact us on <a class="nowrap" href="tel:+44-300-1234-931">0300 1234 931</a>
     or send an <br/>

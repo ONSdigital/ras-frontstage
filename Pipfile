@@ -27,7 +27,6 @@ pycryptodome = "*"
 flask-talisman = "*"
 werkzeug = "~=0.16"
 email_validator = "*"
-rsa = "*"
 
 [dev-packages]
 codecov = "*"

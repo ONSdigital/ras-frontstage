@@ -28,7 +28,7 @@
                 {% set error_text = 'passwords' if error == 'password' else error %}
                 {% do errorData.append(
                     {
-                        "text": error_text.replace('_', ' '),
+                        "text": 'Problem with the ' ~ error_text.replace('_', ' '),
                         "index": true,
                         "url": "#" ~ error ~ '_error',
                         "classes": "js-inpagelink"
@@ -175,6 +175,7 @@
             {{
                 onsInput({
                     "id": "phone_number",
+                    "name": "phone_number",
                     "type": "tel",
                     "autocomplete": "tel",
                     "classes": "input--w-8",

@@ -112,7 +112,7 @@
 
         {% if errorType == 'failed' %}
             {% set errorUN = { "text": "Email Address is required", "id": 'username_error' } %}
-        {% else %}
+        {% elif errorType %}
             {% set errorUN = { "text": "Invalid email address", "id": 'username_error' } %}
         {% endif %}
         {%- call onsFieldset({

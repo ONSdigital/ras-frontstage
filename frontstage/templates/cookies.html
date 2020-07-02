@@ -5,7 +5,7 @@
 {% from "components/collapsible/_macro.njk" import onsCollapsible %}
 {% from "components/table/_macro.njk" import onsTable %}
 
-{% set page_title = "Cookies on ONS Business Surveys" %}
+{% set page_title = "Cookies on surveys.ons.gov.uk" %}
 
 {% block main %}
 {% call onsPanel({
@@ -13,11 +13,11 @@
         "type": "success"
     }) %}
         <p class="u-fs-r-b">Your cookie settings have been saved</p>
-        <p>Some parts of the census may use additional cookies and will have their own cookie policy and banner.</p>
+        <p>Some parts of surveys.ons.gov.uk may use additional cookies and will have their own cookie policy and banner.</p>
     {% endcall %}
-    <h1 class="u-fs-xxl">Cookies on ONS Business Surveys</h1>
+    <h1 class="u-fs-xxl">Cookies on surveys.ons.gov.uk</h1>
     <p>Cookies are small files saved on your phone, tablet or computer when you visit a website.</p>
-    <p>We use cookies to store information about how you use the census website, such as the pages you visit.</p>
+    <p>We use cookies to store information about how you use this service, such as the pages you visit.</p>
     <h2>Cookie settings</h2>
     <div class="u-db-no-js_enabled">
         <p>We use JavaScript to set our cookies. Javascript is not running on your browser so you cannot change your settings.</p>
@@ -34,7 +34,7 @@
             <p>We use Google Analytics to measure how you use the website so we can improve it based on user needs. Google Analytics sets cookies that store anonymised information about:</p>
             <ul>
                 <li>how you got to the site</li>
-                <li>the pages you visit on census.gov.uk and how long you spend on each page</li>
+                <li>the pages you visit on surveys.ons.gov.uk and how long you spend on each page</li>
                 <li>what you click on while you're visiting the site</li>
             </ul>
             {% call onsCollapsible({
@@ -66,7 +66,7 @@
                                         "value": "<code>_ga</code>"
                                     },
                                     {
-                                        "value": 'This helps us count how many people visit census.gov.uk by tracking if you’ve visited before'
+                                        "value": 'This helps us count how many people visit surveys.ons.gov.uk by tracking if you’ve visited before'
                                     },
                                     {
                                         "value": "2 years"
@@ -79,7 +79,7 @@
                                         "value": "<code>_gid</code>"
                                     },
                                     {
-                                        "value": 'This helps us count how many people visit census.gov.uk by tracking if you’ve visited before'
+                                        "value": 'This helps us count how many people visit survey.ons.gov.uk by tracking if you’ve visited before'
                                     },
                                     {
                                         "value": "24 hours"
@@ -182,7 +182,7 @@
             <p>These essential cookies do things like:</p>
             <ul>
                 <li>remember the notifications you've seen so we do not show them to you again</li>
-                <li>remember your progress through a form (for example, the census online)</li>
+                <li>remember your progress through a form (for example, online business surveys)</li>
             </ul>
             <p>They always need to be on.</p>
             {% call onsCollapsible({
@@ -318,7 +318,7 @@
                     })
                 }}
                 <h4>Cookie message</h4>
-                <p>You may see a banner when you visit census.gov.uk inviting you to accept cookies or review your settings. We’ll set cookies so that your computer knows you’ve seen it and not to show it again, and also to store your settings.</p>
+                <p>You may see a banner when you visit surveys.ons.gov.uk inviting you to accept cookies or review your settings. We’ll set cookies so that your computer knows you’ve seen it and not to show it again, and also to store your settings.</p>
                 {{
                     onsTable({
                         "ths": [

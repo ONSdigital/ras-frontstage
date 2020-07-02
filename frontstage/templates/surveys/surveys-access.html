@@ -16,9 +16,9 @@
 
 <br/>
 
-<h1 class="u-fs-l">{{ survey_info.longName }}</h1>
+<h1 class="u-fs-xl">{{ survey_info.longName }}</h1>
 
-<h2 class="neptune">Download</h2>
+<h2>Download</h2>
 
 <p>
     {{ survey_info.shortName }} spreadsheet for <strong>{{ business_info.name }}</strong>
@@ -33,7 +33,7 @@
         "text": '<span class="download__text">Download spreadsheet&nbsp;&nbsp;&nbsp;</span><span class="download__text"><i class="fa fa-download fa-lg" aria-hidden="true"></i></span><div class="download__text u-fs-s">(' ~ collection_instrument_size | file_size_filter ~ ' kb XLS)</div>',
         "type": "submit",
         "hideCaret": true,
-        "classes": "u-mt-m u-mb-m",
+        "classes": "u-mt-s u-mb-s",
         "id": "download_survey_button",
         "submitType": "timer",
         "attributes": {
@@ -41,21 +41,22 @@
         }
     })
 }}        
-
-<h2 class="neptune">Upload your spreadsheet</h2>
+<hr>
+<h2 class="u-mt-m">Upload your spreadsheet</h2>
 {% if collection_exercise_info.scheduledReturnDateTimeFormatted %}
 <p>Please upload by <strong>{{ collection_exercise_info.scheduledReturnDateTimeFormatted }}</strong></p>
 {% endif %}
 
  {% call onsCollapsible({
     "id": "collapsible",
+    "classes": "u-mb-m",
     "title": "Guidance for uploading",
     "button": {
         "close": "Hide this",
         "contextSuffix": "content"
     }
 }) %}
-    <h4 class="u-mb-s">Your file needs to be:</h4>
+    <h3 class="u-mb-s">Your file needs to be:</h3>
     <ul>
         <li>.xls or .xlsx format</li>
         <li>smaller than 20MB</li>

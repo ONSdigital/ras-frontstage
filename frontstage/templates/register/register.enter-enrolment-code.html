@@ -1,5 +1,6 @@
 {% extends 'layouts/_twothirds.html' %}
 {% from "components/button/_macro.njk" import onsButton %}
+{% from "components/input/_macro.njk" import onsInput %}
 
 {% set errorType = data['error']['type'] %}
 {% set errors = form['errors'] %}
@@ -7,20 +8,33 @@
 {% set page_title = "Create an account" %}
 
 {% block main %}
-
-{% if errorType == "failed" %}
-    {% with panel_title='Enrolment code not valid', forcus_on='enrolment_code', context='#enrolment_code',
-    error_message='Please re-enter the code and try again' %}
-        {% include './errors/validation_error.html' %}
-    {%  endwith %}
-{% elif errors %}
-    {% with panel_title='Enrolment code not valid', focus_on='enrolment_code', context='#enrolment_code',
-    error_message=errors.enrolment_code[0] %}
-        {% include './errors/validation_error.html' %}
-    {%  endwith %}
-{% endif %}
-
-<section>
+    {% if errorType or errors %}
+        {% set errorMsg = 'Please enter a valid enrolment code' %}
+        {% set errorMsgText = { "text": errorMsg } %}
+        {% call
+            onsPanel({
+                "type": "error",
+                "classes": "u-mb-s",
+                "title":  "This page has 1 error"
+            })
+        %}
+        <p>This <strong>must be corrected</strong> to continue.</p>
+        {% from "components/lists/_macro.njk" import onsList %}
+        {{
+            onsList({
+                "classes": "list--bare",
+                "itemsList": [
+                    {
+                        "text": errorMsg,
+                        "index": true,
+                        "url": "#enrolment_code",
+                        "classes": "js-inpagelink"
+                    }
+                ]
+            })
+        }}
+        {% endcall %}
+    {% endif %}
 
     <form
             method="post"
@@ -29,24 +43,21 @@
             role="form">
         {{ form.csrf_token }}
 
-        <h1 class="u-fs-l">Create an account</h1>
+        <h1 class="u-fs-xl">Create an account</h1>
 
-        {% if errorType == "failed" or errors|length > 0 %}
-        <div class="panel panel--simple panel--error panel--spacious">
-            <p class="error-message">Please enter a valid enrolment code</p>
-        {% endif %}
+        {{
+            onsInput({
+                "id": "enrolment_code",
+                "name": "enrolment_code",
+                "type": "text",
+                "label": {
+                    "text": "Enrolment Code",
+                    "description": "You'll find this in the letter we sent you"
+                },
+                "error": errorMsgText
+            })
+        }}
 
-            <div class="field">
-
-                {{ form.enrolment_code.label(class_='label') }}
-
-                <span class="label__description label__inner u-fs-s">You'll find this in the letter we sent you</span>
-                {{ form.enrolment_code(class_='input input--text input-type__input') }}
-            </div>
-
-        {% if errorType == "failed" or errors|length > 0 %}
-        </div>
-        {% endif %}
         {{
             onsButton({
                 "text": "Send reset link",
@@ -57,8 +68,5 @@
             })
         }}        
     </form>
-
-</section>
-
 
 {% endblock main %}

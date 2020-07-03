@@ -6,7 +6,7 @@
 
 {% block main %}
 
-<h1 class="u-fs-l">Confirm organisation and survey details</h1>
+<h1 class="u-fs-xl">Confirm organisation and survey details</h1>
 
  {% include('partials/business_survey_credentials.html') %}
 
@@ -15,15 +15,12 @@
         "url": url_for('register_bp.register_enter_your_details', encrypted_enrolment_code=context.encrypted_enrolment_code),
         "text": "Confirm",
         "type": "submit",
-        "classes": "u-mt-l u-mb-s",
-        "id": "confirm_button",
-        "submitType": "timer"
+        "classes": "u-mb-m",
+        "id": "confirm_button"
     })
 }}
 
 <p>If the organisation or survey details aren't what you were expecting, please contact us on <a class="nowrap" href="tel:+44-300-1234-931">0300 1234 931</a>
-    or send an <br/>
-    email to <a href="mailto:surveys@ons.gov.uk">surveys@ons.gov.uk</a>
-    </p>
+    or send an email to <a href="mailto:surveys@ons.gov.uk">surveys@ons.gov.uk</a></p>
 
 {% endblock main %}

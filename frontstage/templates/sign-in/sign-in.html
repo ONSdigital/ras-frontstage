@@ -2,7 +2,6 @@
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/input/_macro.njk" import onsInput %}
 {% from "components/password/_macro.njk" import onsPassword %}
-{% from "components/error/_macro.njk" import onsError %}
 {% from "components/button/_macro.njk" import onsButton %}
 
 {% set errorType = data['error']['type'] %}
@@ -11,24 +10,59 @@
 {% block main %}
 
     {% if errorType %}
+        {% set errorData = [] %}
         {% if errorType == 'failed' %}
-            {% set errorTitle = 'Incorrect email or password' %}
-        {% elif errorType|length > 1 %}s
+            {% set errorTitle = 'There is 1 error on this page' %}
+            {% do errorData.append(
+                {
+                    "text": "Incorrect email or password",
+                    "index": true,
+                    "url": "#username_error",
+                    "classes": "js-inpagelink"
+                }
+            ) %}
+        {% elif errorType|length > 1 %}
             {% set errorTitle = 'There are ' ~ errorType|length ~ ' errors on this page' %}
-        {% else %}
             {% for error in errorType %}
-                {% set errorTitle =  errorType[error][0] %}
+                {% do errorData.append(
+                    {
+                        "text": errorType[error][0],
+                        "index": true,
+                        "url": "#username_error",
+                        "classes": "js-inpagelink"
+                    }
+                ) %}
+            {% endfor %}
+        {% else %}
+            {% set errorTitle = 'There is 1 error on this page' %}
+            {% for error in errorType %}
+                {% do errorData.append(
+                    {
+                        "text": errorType[error][0],
+                        "index": true,
+                        "url": "#username_error",
+                        "classes": "js-inpagelink"
+                    }
+                ) %}
             {% endfor %}
         {% endif %}
+        
         {% call
             onsPanel({
                 "type": "error",
-                "classes": "u-mb-s",
+                "classes": "u-mb-s",    
                 "title":  errorTitle
             })
         %}
-            <p class="u-fs-r"><a href="#sign-in-details" id="try-again-link" class="js-inpagelink">Please try again</a></p>
+            <p>This <strong>must be corrected</strong> to continue.</p>
 
+            {% from "components/lists/_macro.njk" import onsList %}
+            {{
+                onsList({
+                    "classes": "list--bare",
+                    "itemsList": errorData
+                })
+            }}
         {% endcall %}
     {% endif %}
 
@@ -76,8 +110,10 @@
         <h1 class="u-fs-xl">Sign in</h1>
         {% endif %}
 
-        {% if errorType.username %}
-            {% set error = { "text": errorType['username'][0] } %}
+        {% if errorType == 'failed' %}
+            {% set errorUN = { "text": "Email Address is required", "id": 'username_error' } %}
+        {% elif errorType %}
+            {% set errorUN = { "text": "Invalid email address", "id": 'username_error' } %}
         {% endif %}
         {%- call onsFieldset({
             "legend": "Sign in",
@@ -92,15 +128,12 @@
                     "label": {
                         "text": "Email Address"
                     },
-                    "attributes": {
-                        "required": true
-                    },
-                    "error": error
+                    "error": errorUN
                 })
             }}
 
-            {% if errorType.password %}
-                {% set error = { "text": errorType['password'][0] } %}
+            {% if errorType %}
+                {% set errorPW = { "text": "Password is required", "id": 'password_error' } %}
             {% endif %}
             {{
                 onsPassword({
@@ -111,10 +144,7 @@
                         "text": "Password"
                     },
                     "showPasswordText": "Show password",
-                    "attributes": {
-                        "required": true
-                    },
-                    "error": error
+                    "error": errorPW
                 })
             }}
 

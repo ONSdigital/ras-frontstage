@@ -12,7 +12,7 @@ class TestCookiesContact(unittest.TestCase):
         response = self.app.get('/cookies')
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Cookies on ONS Business Surveys'.encode() in response.data)
+        self.assertTrue('Cookies on surveys.ons.gov.uk'.encode() in response.data)
         self.assertTrue('Cookies are small files saved on your phone, tablet or computer when you visit a website'.encode() in response.data)
 
     def test_privacy_success(self):

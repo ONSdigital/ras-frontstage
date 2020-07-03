@@ -50,14 +50,15 @@
 {% from "components/panel/_macro.njk" import onsPanel %}
 
 {%- block pageContent %}
+  <div class="page__container container">
     {% if availability_message %}
       {{ 
           onsPanel({
-              "body": availability_message
+              "body": availability_message,
+              "classes": "u-mt-l"
           }) 
       }}
     {% endif %}
-  <div class="page__container container">
     <div class="grid">
       <div class="grid__col col-12@m u-mt-s">
         <main id="main-content" class="page__main {{ pageClasses }}">

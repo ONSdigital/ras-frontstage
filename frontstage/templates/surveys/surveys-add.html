@@ -1,11 +1,12 @@
-{% import 'partials/section.html' as section %}
-{% extends "layouts/_twocol.html" %}
+
+{% extends "layouts/_twothirds.html" %}
+{% from "components/button/_macro.njk" import onsButton %}
 
 {% set errorType = data['error']['type'] %}
 
-{% block page_title %}Completed surveys - ONS Business Surveys{% endblock %}
+{% set page_title = "Completed surveys" %}
 
-{% block main %}
+{% block content %}
 
 {% if errorType == "failed" %}
 <div class="panel panel--error">
@@ -44,8 +45,15 @@
             {% if errorType == "failed" %}
         </div>
         {% endif %}
-
-        <button id="continue_button" class="btn u-fs-r--b u-mt-s u-mb-s js-timer js-submit-btn" type="submit">Continue</button>
+        {{
+            onsButton({
+                "text": "Continue",
+                "type": "submit",
+                "classes": "u-mt-l u-mb-s",
+                "id": "continue_button",
+                "submitType": "timer"
+            })
+        }}        
 
         <p>
             <a id="cancel_button" href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}">Cancel</a>
@@ -54,4 +62,4 @@
     </form>
 </section>
 
-{% endblock main %}
+{% endblock content %}

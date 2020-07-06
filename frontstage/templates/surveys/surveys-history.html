@@ -1,10 +1,8 @@
-{% import 'partials/section.html' as section %}
+{% extends 'layouts/_base.html' %}
 
-{% extends "layouts/_onecol.html" %}
+{% set page_title = "Completed surveys" %}
 
-{% block page_title %}Completed surveys - ONS Business Surveys{% endblock %}
-
-{% block main %}
+{% block content %}
 {% include "partials/tab_list.html" %}
 
 <h1 class="u-vh">Completed surveys</h1>
@@ -12,4 +10,4 @@
 {% set emptySurveyListLabel = 'No items to show' %}
 {% include "surveys/surveys.html" %}
 
-{% endblock main %}
+{% endblock content %}

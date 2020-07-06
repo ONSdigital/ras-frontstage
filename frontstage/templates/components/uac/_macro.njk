@@ -1,0 +1,44 @@
+{% from "components/input/_macro.njk" import onsInput %}
+{% from "components/panel/_macro.njk" import onsPanel %}
+
+{% macro onsUACInput(params) %}
+    {% set groupSize = params.groupSize | default(4) %}
+    {% set extraSpaces = (params.maxlength | default(16) / groupSize) - 1 %}
+    {% set maxlength = params.maxlength | default(16) + extraSpaces %}
+
+    {% set content %}
+        {{ onsInput({
+            "id": params.id,
+            "type": params.type,
+            "name": params.name,
+            "classes": "uac__input js-uac" + (" u-mb-xs" if params.postTextboxLinkText else ""),
+            "label": params.label,
+            "attributes": {
+                "maxlength": maxlength,
+                "data-group-size": groupSize,
+                "autocomplete": "off",
+                "required": true,
+                "autocapitalize": "characters"
+            },
+            "fieldClasses": "question__answer",
+            "error": params.error,
+            "postTextboxLinkText": params.postTextboxLinkText,
+            "postTextboxLinkUrl": params.postTextboxLinkUrl
+        }) }}
+    {% endset %}
+
+    {% if not params.error %}
+        {% call onsPanel() %}
+            {{ content | safe }}
+        {% endcall %}
+    {% else %}
+        {{ content | safe }}
+    {% endif %}
+
+    {% if params.securityMessage %}
+        <div class="uac__security u-mt-m">
+            <div class="uac__icon"><span class="icon icon--lock"></span></div>
+            <p class="uac__message">{{ params.securityMessage }}</p>
+        </div>
+    {% endif %}
+{% endmacro %}

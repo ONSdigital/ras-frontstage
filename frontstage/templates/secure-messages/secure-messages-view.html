@@ -1,6 +1,7 @@
 {% extends "secure-messages/messages.html" %}
+{% from "components/button/_macro.njk" import onsButton %}
 
-{% block page_title %}View message - ONS Business Surveys{% endblock %}
+{% set page_title = "View message" %}
 
 {% block messages %}
 
@@ -56,8 +57,16 @@
                         </div>
                     {% endif %}
 
-                    <br />
-                    {{ form.send(class_='btn u-mb-s' ) }}
+                    {{
+                        onsButton({
+                            "text": "Send",
+                            "name": "send",
+                            "type": "submit",
+                            "classes": "u-mt-l u-mb-s",
+                            "id": "send-message-btn",
+                            "submitType": "timer"
+                        })
+                    }}        
                 </form>
             </div>
 

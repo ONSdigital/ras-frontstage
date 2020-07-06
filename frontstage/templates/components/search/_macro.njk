@@ -1,0 +1,18 @@
+{% macro onsSearch(params) %}
+    {% from "components/button/_macro.njk" import onsButton %}
+
+    {% set content = caller() %}
+
+    <span class="grid--flex">
+        {{ content | safe }}
+        {{ 
+            onsButton({
+                "type": params.searchButton.type,
+                "text": params.searchButton.text,
+                "id": params.searchButton.id,
+                "classes": 'btn--small u-flex-align-bottom u-mb-no'
+            }) 
+        }}
+    </span>
+
+{% endmacro %}

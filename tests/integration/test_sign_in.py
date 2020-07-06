@@ -145,7 +145,6 @@ class TestSignIn(unittest.TestCase):
         mock_object.get(url_get_respondent_email, status_code=404)
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
-        self.assertTrue('Error signing in'.encode() in response.data)
         self.assertTrue('Incorrect email or password'.encode() in response.data)
 
     @requests_mock.mock()

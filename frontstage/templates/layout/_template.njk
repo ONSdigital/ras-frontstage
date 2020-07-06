@@ -1,0 +1,208 @@
+{% set release_version = '18.2.2' %}
+{% from "components/skip-to-content/_macro.njk" import onsSkipToContent %}
+{% from "components/header/_macro.njk" import onsHeader %}
+{% from "components/feedback/_macro.njk" import onsFeedback %}
+{% from "components/footer/_macro.njk" import onsFooter %}
+
+{% set currentLanguageISOCode = "en" %}
+
+{% if pageConfig and pageConfig.language and pageConfig.language.languages %}
+    {% set currentLanguage = pageConfig.language.languages | selectattr("current") | first %}
+    {% set currentLanguageISOCode = currentLanguage.ISOCode %}
+{% endif %}
+
+{% if pageConfig.cdn or release_version %}
+    {# Production #}
+    {% set assetsURL = "https://cdn.ons.gov.uk/sdc/design-system/" + (pageConfig.cdn or release_version) %}
+{% elif data and data.version %}
+    {# Prototype kits #}
+    {% set assetsURL = "/" + data.version %}
+{% elif pageConfig.assetsURL %}
+    {# Runner Dev #}
+    {% set assetsURL = pageConfig.assetsURL %}
+{% else %}
+    {# Development #}
+    {% set assetsURL = "" %}
+{% endif %}
+
+{% if pageConfig and pageConfig.title %}
+    {% set page_title = pageConfig.title %}
+{% elif data and data.title %}
+    {% set page_title = data.title %}
+{% else %}
+    {% set page_title = "" %}
+{% endif %}
+
+<!doctype html>
+<html lang="{{ currentLanguageISOCode }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{{ page_title }}</title>
+        <link rel="stylesheet" href="{{ assetsURL }}/css/{{ pageConfig.theme | default('main') }}.css">
+        {% if pageConfig.headMeta %}
+            <meta property="og:description" content="{{ pageConfig.headMeta.description }}">
+            <meta property="og:title" content="{{ pageConfig.title }}">
+            <meta property="og:url" content="{{ pageConfig.absoluteUrl }}">
+            <meta property="og:type" content="article">
+            <meta property="og:site_name" content="{{ pageConfig.header.title | default(pageConfig.title) }}">
+            <meta property="og:image" content="{{ assetsURL }}{{ pageConfig.header.titleLogo | default(pageConfig.header.logo) }}">
+            <meta name="twitter:card" content="summary">
+            <meta name="description" content="{{ pageConfig.headMeta.description }}">
+            <link rel="canonical" href="{{ pageConfig.headMeta.canonicalUrl | default(pageConfig.absoluteUrl) }}">
+        {% endif %}
+        {% block headIcons %}
+            <meta name="msapplication-config" content="{{ assetsURL }}/favicons/browserconfig.json">
+            <link rel="icon" type="image/x-icon" href="{{ assetsURL }}/favicons/favicon.ico">
+            <link rel="icon" type="image/png" href="{{ assetsURL }}/favicons/favicon-32x32.png" sizes="32x32">
+            <link rel="icon" type="image/png" href="{{ assetsURL }}/favicons/favicon-16x16.png" sizes="16x16">
+            <link rel="mask-icon" color="#5bbad5" href="{{ assetsURL }}/favicons/safari-pinned-tab.svg">
+            <link rel="apple-touch-icon" type="image/png" href="{{ assetsURL }}/favicons/apple-touch-icon.png" sizes="180x180">
+            <link rel="manifest" href="{{ assetsURL }}/favicons/manifest.json">
+        {% endblock %}
+
+        {% block head %}{% endblock %}
+    </head>
+    <body{% if pageConfig.bodyClasses %} class="{{ pageConfig.bodyClasses }}"{% endif %}>
+        <script{% if csp_nonce %} nonce="{{ csp_nonce() }}"{% endif %}>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
+        {% block bodyStart %}{% endblock %}
+        {% block body %}
+            <div class="page">
+                <div class="page__content">
+                    {% block skipLink %}
+                        {{
+                            onsSkipToContent({
+                                "url": "#main-content",
+                                "text": "Skip to main content"
+                            })
+                        }}
+                    {% endblock %}
+                    {% if form and form.attributes %}
+                        <form
+                            {% if form.classes %}class="{{ form.classes }}"{% endif %}
+                            method="{{ form.method | default('POST') }}"
+                            {% if form.attributes %}{% for attribute, value in (form.attributes.items() if form.attributes is mapping and form.attributes.items else form.attributes) %}{{ attribute }}{% if value %}="{{value}}" {% endif %}{% endfor %}{% endif %}
+                        >
+                    {% endif %}
+                    {% block preHeader %}{% endblock %}
+                    {% block header %}
+                        {{
+                            onsHeader({
+                                "title": pageConfig.header.title | default(pageConfig.title),
+                                "classes": pageConfig.header.classes,
+                                "wide": pageConfig.wide,
+                                "language": pageConfig.language,
+                                "button": pageConfig.signoutButton,
+                                "toggleButton": pageConfig.toggleButton,
+                                "navigation": pageConfig.navigation,
+                                "phase": pageConfig.phase,
+                                "assetsURL": assetsURL,
+                                "serviceLinks": pageConfig.serviceLinks,
+                                "logo": pageConfig.header.logo,
+                                "mobilelogo": pageConfig.header.mobilelogo,
+                                "logoAlt": pageConfig.header.logoAlt,
+                                "logoHref": pageConfig.header.logoHref,
+                                "titleLogo": pageConfig.header.titleLogo,
+                                "titleLogoAlt": pageConfig.header.titleLogoAlt,
+                                "titleLogoHref": pageConfig.header.titleLogoHref,
+                                "customHeaderLogo": pageConfig.header.customHeaderLogo
+                            })
+                        }}
+                    {% endblock %}
+                    {% block pageContent %}
+                        <div class="page__container container {{ containerClasses }}">
+                            {% block preMain %}{% endblock %}
+                            <div class="grid">
+                                <div class="grid__col col-8@m">
+                                    <main id="main-content" class="page__main {{ pageClasses }}">
+                                        {% block main %}{% endblock %}
+                                    </main>
+                                </div>
+                            </div>
+                        </div>
+                    {% endblock %}
+
+                    {% if form and form.attributes %}
+                        </form>
+                    {% endif %}
+                </div>
+                {% block preFooter %}
+                    {% if pageConfig.feedback %}
+                        {{
+                            onsFeedback({
+                                "id": pageConfig.feedback.id | default("feedback"),
+                                "action": pageConfig.feedback.action,
+                                "title": pageConfig.feedback.title,
+                                "button": pageConfig.feedback.button,
+                                "textarea": pageConfig.feedback.textarea,
+                                "pageTitle": pageConfig.feedback.pageTitle,
+                                "pageURL": pageConfig.feedback.pageURL,
+                                "name": pageConfig.feedback.name,
+                                "email": pageConfig.feedback.email,
+                                "mailto": pageConfig.feedback.mailto,
+                                "thankYouMessage": pageConfig.feedback.thankYouMessage,
+                                "errorMessage": pageConfig.feedback.errorMessage,
+                                "summaryAttributes": pageConfig.feedback.summaryAttributes
+                            })
+                        }}
+                    {% endif %}
+                {% endblock %}
+                {% block footer %}
+                    {% if pageConfig.footer %}
+                        {{
+                            onsFooter({
+                                "assetsURL": assetsURL,
+                                "wide": pageConfig.wide,
+                                "classes": "page__footer",
+                                "language": pageConfig.language,
+                                "lang": currentLanguageISOCode,
+                                "rows": pageConfig.footer.rows,
+                                "cols": pageConfig.footer.cols,
+                                "poweredBy": pageConfig.footer.poweredBy,
+                                "OGLLink": pageConfig.footer.OGLLink,
+                                "button": pageConfig.signoutButton,
+                                "feedback": pageConfig.feedback,
+                                "serviceLinks": pageConfig.serviceLinks
+                            })
+                        }}
+                    {% endif %}
+                {% endblock %}
+            </div>
+            {% block bodyEnd %}{% endblock %}
+        {% endblock %}
+
+        {% if isPatternLib %}
+            {% set scripts = assetsURL + "/scripts/main.js," + assetsURL + "/scripts/patternlib.js" %}
+        {% else %}
+            {% set scripts = assetsURL + "/scripts/main.js" %}
+        {% endif %}
+
+        <script{% if csp_nonce %} nonce="{{ csp_nonce() }}"{% endif %}>
+            (function() {
+                {% if assetsURL -%}window.ONS_assets_base_URL = "{{ assetsURL }}/";{%- endif %}
+                var s = '{{ scripts | safe }}'.split(','),
+                c = document.createElement('script');
+
+                if (!('noModule' in c)) {
+                    for (var i = 0; i < s.length; i++) {
+                        s[i] = s[i].replace('.js', '.es5.js');
+                    }
+                }
+
+                for (var i = 0; i < s.length; i++) {
+                    var e = document.createElement('script');
+
+                    e.src = s[i];
+
+                    document.body.appendChild(e);
+                }
+            })();
+        </script>
+
+        {% if devMode %}
+            <script>document.write('<script src="//' + (location.hostname || 'localhost').split(':')[0] + ':35729/livereload.js" defer><\/script>');</script>
+        {% endif %}
+
+        {% block scripts %}{% endblock %}
+    </body>
+</html>

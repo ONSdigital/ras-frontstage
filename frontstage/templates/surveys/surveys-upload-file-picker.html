@@ -1,4 +1,6 @@
-{% set survey_name = survey_info['longName'] if survey_info %}
+{% from "components/button/_macro.njk" import onsButton %}
+
+    {% set survey_name = survey_info['longName'] if survey_info %}
 <form
         method="post"
         action="{{ url_for('surveys_bp.upload_survey', case_id=case_id, business_party_id=business_info.id, survey_short_name=survey_info.shortName) }}"
@@ -15,8 +17,6 @@
 
     <script>
         function clickEvent(button){
-            button.disabled=true;
-            button.innerHTML='Uploading...';
             try {
                 ga('send', 'event', 'survey', 'upload', 'survey_ref = {{ survey_info.surveyRef }} collection_exercise_ref = {{ collection_exercise_info.exerciseRef }}');
             } catch {}
@@ -25,10 +25,17 @@
             form.submit();
         }
     </script>
-    <button class="btn btn--secondary u-mt-s js-timer js-submit-btn" id="upload_survey_button"
-            onclick="clickEvent(this)"
-            type="submit">Upload</button>
 
-
-
+    {{
+        onsButton({
+            "text": "Upload",
+            "type": "submit",
+            "classes": "u-mt-s",
+            "id": "upload_survey_button",
+            "submitType": "loader",
+            "attributes": {
+                "onclick": "clickEvent(this)"
+            }
+        })
+    }}
 </form>

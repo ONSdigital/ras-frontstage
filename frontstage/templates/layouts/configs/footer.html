@@ -1,0 +1,63 @@
+{% set footer = {
+
+  "OGLLink": {
+    "pre": "All content is available under the",
+    "link": "Open Government Licence v3.0",
+    "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+    "post": ", except where otherwise stated"
+  },
+  "poweredBy": false
+
+} %}
+
+{% do footer | setAttribute("cols", [
+  {
+      "title": "Legal information",
+      "itemsList": [
+          {
+              "text": "Cookies",
+              "url": "/cookies"
+          },
+          {
+              "text": "Privacy and data protection",
+              "url": "/privacy-and-data-protection"
+          }
+      ]
+  },
+  {
+      "title": "About ONS",
+      "itemsList": [
+          {
+              "text": "What we do",
+              "url": "https://www.ons.gov.uk/aboutus/whatwedo"
+          },
+          {
+              "text": "Contact us",
+              "url": "/contact-us"
+          },
+          {
+              "text": "Accessibility",
+              "url": "https://www.ons.gov.uk/help/accessibility"
+          }
+      ]
+  },
+  {
+      "title": "Statistics",
+      "itemsList": [
+          {
+              "text": "UK Statistics Authority",
+              "url": "https://www.statisticsauthority.gov.uk/about-the-authority/"
+          },
+          {
+              "text": "Release calendar",
+              "url": "https://www.ons.gov.uk/releasecalendar"
+          },
+          {
+              "text": "News",
+              "url": "https://www.ons.gov.uk/news"
+          }
+      ]
+  }
+]) %}
+
+{% do pageConfig | setAttribute("footer", footer) %}

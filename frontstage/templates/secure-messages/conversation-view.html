@@ -1,3 +1,6 @@
+{% extends "secure-messages/messages.html" %}
+{% from "components/button/_macro.njk" import onsButton %}
+
 {% set page_title = "View message" %}
 {% set subject = conversation[-1]["subject"] or "No Subject" %}
 
@@ -61,8 +64,16 @@
         <label class="u-fs-r--b" for="message-text">Reply</label>
         {{ form.csrf_token }}
         {{ form.body(id='secure-message-body', class_='input input--textarea input--textarea-message', rows='10', maxlength='10000') }}
-        <br>
-        <input class="btn u-mb-m" id="send_message_button" name="send" type="submit" value="Send" />
+        {{
+            onsButton({
+                "text": "Send",
+                "name": "send",
+                "type": "submit",
+                "classes": "u-mt-l u-mb-s",
+                "id": "send_message_button",
+                "submitType": "timer"
+            })
+        }}        
     </form>
 </div>
 {% endif %}

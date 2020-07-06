@@ -47,7 +47,7 @@ class TestPasswords(unittest.TestCase):
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Invalid email'.encode() in response.data)
+        self.assertTrue('There is 1 error on this page'.encode() in response.data)
 
     def test_forgot_password_post_invalid_email(self):
         self.email_form['email_address'] = "aaaaa"
@@ -189,7 +189,7 @@ class TestPasswords(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         print(response.data)
-        self.assertTrue("Your password doesn&#39;t meet the requirements".encode() in response.data)
+        self.assertTrue("Your password doesn't meet the requirements".encode() in response.data)
 
     @requests_mock.mock()
     def test_reset_password_no_password(self, mock_object):

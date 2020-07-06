@@ -50,6 +50,8 @@ def upload_survey(session):
             error_info = "charLimit"
         elif "File too large" in ex.error_message:
             error_info = 'size'
+        elif "File too small" in ex.error_message:
+            error_info = 'sizeSmall'
         else:
             logger.error('Unexpected error message returned from collection instrument service',
                          status=ex.status_code,

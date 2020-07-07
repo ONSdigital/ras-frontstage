@@ -54,7 +54,7 @@
       {% for message in messages %}
           {% do messageList.append(
               {
-                "id": "message-link-{{ loop.index }}",
+                "id": "message-link-" ~ loop.index,
                 "unread": true if message['unread'] else false,
                 "url": url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) ~ "#latest-message",
                 "subject": message.subject,

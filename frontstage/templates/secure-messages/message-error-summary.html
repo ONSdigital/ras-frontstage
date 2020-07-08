@@ -1,23 +1,30 @@
 {% if "subject" in errors or "body" in errors %}
-    <div class="panel panel--error">
-        <div class="panel__header">
-        {% if errors|length == 1 %}
-            <h1 class="panel__title u-fs-r--b">This page has 1 error</h1>
-        {% elif errors|length > 1 %}
-            <h1 class="panel__title u-fs-r--b">This page has {{ errors|length }} errors</h1>
-        {% endif %}
-        </div>
-        <div class="panel__body" data-qa="error-body">
-        {% if errors|length == 1 %}
-            <p>This <b>must be corrected </b>to continue.</p>
-        {% elif errors|length > 1 %}
-            <p>These <b>must be corrected </b>to continue.</p>
-        {% endif %}
+    {% set errorData = [] %}
 
-        {% for error in errors %}
-            <p class=“u-fs-r”>{{ loop.index0 + 1 }}) <a class="js-inpagelink" href="#{{error}}-error">{{ errors[error][0] }}</a></p>
-        {% endfor %}
-        </div>
-    </div>
-    <br/>
+    {% call
+        onsPanel({
+            "title": "This page has 1 error" if errors|length == 1 else "There are " + errors|length|string + " errors on this page",
+            "type": "error",
+            "classes": "u-mb-l"
+        })
+    %}
+    <p>These <strong>must be corrected</strong> to continue.</p>
+    {% for error in errors %}        
+        {% do errorData.append(
+            {
+                "text": error,
+                "index": true,
+                "url": "#" ~ error ~ "_error",
+                "classes": "js-inpagelink"
+            }
+        ) %}
+    {% endfor %}
+
+    {{
+        onsList({
+            "classes": "list--bare",
+            "itemsList": errorData
+        }) 
+    }}
+    {% endcall %}
 {% endif %}

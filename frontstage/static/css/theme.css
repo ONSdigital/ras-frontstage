@@ -66,116 +66,11 @@ a.btn {
   }
 }
 
-
-
-
-
-.message-list {
-  padding-left: 0;
-  list-style-type: none;
-}
-
-.message-list > .message-list__item {
-  margin-bottom: 0;
-  padding-bottom: 18px;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #ccc;
-}
-
-.message-list > .message-list__item + .message-list__item {
-  padding-top: 18px;
-  padding-top: 1rem;
-}
-
-
-.secure-message-sent-message{
-   /*margin: 1rem;*/
-   display:block;
-}
-
-.secure-message-sent-message-body{
-  white-space:pre-line;
-  word-wrap:break-word;
-}
-
-.secure-message-sent-message-meta{
-  border-top-left-radius: 0.2rem;
-  border-top-right-radius: 0.2rem;
-  padding-top: 0.333rem;
-  padding-bottom: 0.333rem;
-  font-size: 18px;
-}
-
-
-.secure-message-sent-message-meta__label{
-  display: none;
-}
-
-.secure-message-sent-message-meta-datetime{
-	color: #666;
-	display: block;
-}
-
-.secure-message-sent-message-meta-from{
-    display:block;
-}
-
-.secure-message--subject, .secure-message--message{
-  display: block;
-  width: 100%;
-}
-
-input.secure-message--recipient{
-  width: 80%;
-  font-size: 1rem; /* avert your eyes! */
-  margin-bottom: 1rem;
-}
-
-label.secure-message--subject{
-  margin-top: 1rem;
-}
-
-input.secure-message--subject{
-  border: 1px solid #222;
-  margin-bottom: 1rem;
-}
-
-textarea.secure-message--message{
-  border: 1px solid #222;
-  margin-bottom: 1rem;
-}
-
-.secure-message-sent-message-meta-from > span{
-  width: 2.5rem;
-}
-
-
-.secure-message-view-component{
-   width:75%;
-   padding-bottom:3.7774%;
-}
-
-.secure-message-reply{
-    width:75%;
-}
-
-.message-read {
-color: purple;
-font-weight: 400;
-}
-
-.navigation-tabs {
-  margin-bottom: 27px;
-  margin-bottom: 1.5rem;
-  padding: 0;
-  list-style-type: none;
-  border-bottom: 1px solid #555;
-} 
-.navigation-tabs .notification-badge {
+.notification-badge {
   display: inline-block;
   min-width: 28px;
   padding: 0px 4px 0 3px;
-  margin-left: 2px;
+  margin-left: 8px;
   border-radius: 16px;
   color: #fff;
   background: #4263c2;
@@ -183,45 +78,7 @@ font-weight: 400;
   text-align: center;
   white-space: nowrap;
 }
-.navigation-tabs:after {
-  content: '.';
-  display: block;
-  clear: both;
-  visibility: hidden;
-  line-height: 0;
-  height: 0;
-}
-.navigation-tabs-component {
-  padding: 0;
-  margin: 0;
-}
-.navigation-tabs .navigation-tabs__item {
-  margin-bottom: 0;
-  margin-left: 10px;
-  padding: 9px 18px 0;
-  padding: 0.5rem 1rem -0.506rem;
-  border: 1px solid transparent;
-  border-radius: 0.3rem;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  border-bottom: none;
-}
-.navigation-tabs .navigation-tabs__item .navigation-tabs__tab {
-  margin-bottom: 0;
-  display: block;
-}
-.navigation-tabs .navigation-tabs__item.navigation-tabs__item--primary {
-  float: left;
-}
-.navigation-tabs .navigation-tabs__item.navigation-tabs__item--secondary {
-  float: right;
-}
-.navigation-tabs .navigation-tabs__item.navigation-tabs__item--active {
-  margin-bottom: -1px;
-  padding-bottom: 8px;
-  border-color: #555;
-  border-bottom: 1px solid #fff;
-}
+
 .no-js .hide-if-no-js {
   display: none;
 }

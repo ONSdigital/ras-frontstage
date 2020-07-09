@@ -47,7 +47,7 @@ class TestAddSurvey(unittest.TestCase):
         response = self.app.post('/surveys/add-survey', data={'enrolment_code': enrolment_code})
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Enrolment code not valid'.encode() in response.data)
+        self.assertTrue('Enter a valid enrolment code'.encode() in response.data)
         self.assertTrue('Please re-enter the code and try again'.encode() in response.data)
 
     @patch('frontstage.controllers.iac_controller.get_iac_from_enrolment')
@@ -57,7 +57,7 @@ class TestAddSurvey(unittest.TestCase):
         response = self.app.post('/surveys/add-survey', data={'enrolment_code': enrolment_code})
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Enrolment code not valid'.encode() in response.data)
+        self.assertTrue('Enter a valid enrolment code'.encode() in response.data)
         self.assertTrue('Please re-enter the code and try again'.encode() in response.data)
 
     @patch('frontstage.controllers.iac_controller.get_iac_from_enrolment')
@@ -73,7 +73,7 @@ class TestAddSurvey(unittest.TestCase):
         response = self.app.post('/surveys/add-survey', data={'enrolment_code': enrolment_code})
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Enrolment code not valid'.encode() in response.data)
+        self.assertTrue('Enter a valid enrolment code'.encode() in response.data)
         self.assertTrue('Please re-enter the code and try again'.encode() in response.data)
 
     @patch('frontstage.controllers.iac_controller.get_iac_from_enrolment')
@@ -96,5 +96,5 @@ class TestAddSurvey(unittest.TestCase):
         response = self.app.post('/surveys/add-survey', data={'enrolment_code': '1234'})
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Enrolment code not valid'.encode() in response.data)
+        self.assertTrue('Enter a valid enrolment code'.encode() in response.data)
         self.assertTrue('Please re-enter the code and try again'.encode() in response.data)

@@ -1,29 +1,26 @@
 {% extends 'layouts/_base.html' %}
     
-
-
-
 {% set page_title = "Surveys to complete" %}
 
 {% block content %}
 {% include "partials/tab_list.html" %}
 
 {% if added_survey %}
-<div class="panel panel--simple panel--success survey--success col-5@m u-mb-m ">
-    <div class="panel__body">
-        <div>Your <a id="NEW_SURVEY_NOTIF" href="#new-survey">new survey</a> has been added</div>
-
-    </div>
-</div>
+    {% call onsPanel({
+            "type": "success",
+            "classes": "u-mb-s"
+        }) %}
+            Your <a id="NEW_SURVEY_NOTIF" href="#new-survey">new survey</a> has been added.
+    {% endcall %}
 {% endif %}
 
 
 {% if already_enrolled %}
-<div class="panel panel--simple panel--info panel--spacious">
-    <div class="panel__body">
-        <div id="ALREADY_ADDED_NOTIF">You have already added that <a href="#new-survey">survey</a> </div>
-    </div>
-</div>
+    {% call onsPanel({
+        "classes": "u-mb-s"
+    }) %}
+            <div id="ALREADY_ADDED_NOTIF">You have already added that <a href="#new-survey">survey</a> </div>
+    {% endcall %}
 {% endif %}
 
 <p>

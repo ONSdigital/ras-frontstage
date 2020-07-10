@@ -1,16 +1,11 @@
 {% extends 'layouts/_base.html' %}
 
-
-{% set page_title = "Messages" %}
-
 {% block content %}
-{% include "partials/tab_list.html" %}
+    {% include "partials/tab_list.html" %}
 
-<h1 class="u-vh">Messages</h1>
-
-<div>
-    {% block messages %}
-    {% endblock messages %}
-</div>
+    <div>
+        {% block messages %}
+        {% endblock messages %}
+    </div>
 
 {% endblock content %}

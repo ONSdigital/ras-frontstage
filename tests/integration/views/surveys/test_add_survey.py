@@ -47,8 +47,7 @@ class TestAddSurvey(unittest.TestCase):
         response = self.app.post('/surveys/add-survey', data={'enrolment_code': enrolment_code})
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Enrolment code not valid'.encode() in response.data)
-        self.assertTrue('Please re-enter the code and try again'.encode() in response.data)
+        self.assertTrue('Enter a valid enrolment code'.encode() in response.data)
 
     @patch('frontstage.controllers.iac_controller.get_iac_from_enrolment')
     def test_add_survey_post_iac_not_active_for_enrolment_code(self, get_iac_by_enrolment_code):
@@ -57,8 +56,7 @@ class TestAddSurvey(unittest.TestCase):
         response = self.app.post('/surveys/add-survey', data={'enrolment_code': enrolment_code})
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Enrolment code not valid'.encode() in response.data)
-        self.assertTrue('Please re-enter the code and try again'.encode() in response.data)
+        self.assertTrue('Enter a valid enrolment code'.encode() in response.data)
 
     @patch('frontstage.controllers.iac_controller.get_iac_from_enrolment')
     def test_add_survey_enrolment_code_already_used(self, get_iac_by_enrolment_code):
@@ -73,8 +71,7 @@ class TestAddSurvey(unittest.TestCase):
         response = self.app.post('/surveys/add-survey', data={'enrolment_code': enrolment_code})
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Enrolment code not valid'.encode() in response.data)
-        self.assertTrue('Please re-enter the code and try again'.encode() in response.data)
+        self.assertTrue('Enter a valid enrolment code'.encode() in response.data)
 
     @patch('frontstage.controllers.iac_controller.get_iac_from_enrolment')
     def test_add_survey_post_fail(self, get_iac_by_enrolment_code):
@@ -96,5 +93,4 @@ class TestAddSurvey(unittest.TestCase):
         response = self.app.post('/surveys/add-survey', data={'enrolment_code': '1234'})
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Enrolment code not valid'.encode() in response.data)
-        self.assertTrue('Please re-enter the code and try again'.encode() in response.data)
+        self.assertTrue('Enter a valid enrolment code'.encode() in response.data)

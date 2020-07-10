@@ -9,8 +9,8 @@
 
 {% block main %}
     {% if errorType or errors %}
-        {% set errorMsg = 'Please enter a valid enrolment code' %}
-        {% set errorMsgText = { "text": errorMsg } %}
+        {% set errorMsg = 'Enter a valid enrolment code' %}
+        {% set errorMsgText = { "text": errorMsg, "id": 'enrolment_code_error' } %}
         {% call
             onsPanel({
                 "type": "error",
@@ -27,7 +27,7 @@
                     {
                         "text": errorMsg,
                         "index": true,
-                        "url": "#enrolment_code",
+                        "url": "#enrolment_code_error",
                         "classes": "js-inpagelink"
                     }
                 ]

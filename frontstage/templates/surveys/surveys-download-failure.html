@@ -1,18 +1,13 @@
-{% extends 'layouts/_base.html' %}
+{% extends 'layouts/_twothirds.html' %}
 
 {% set page_title = "Error downloading file" %}
 
 {% block content %}
+{% call onsPanel({
+    }) %}
+        <h1 class="u-fs-r--b">Something went wrong</h1>
+        <p>Please call us on <a href="tel:03001234931">0300 1234 931</a></p>
+{% endcall %}
 
-<div class="grid">
-    <div class="grid__col col-6@m">
-        <div class="panel panel--simple panel--warn">
-            <div class="panel__body">
-                <h1 class="u-fs-r--b">Something went wrong</h1>
-                <p>Please call us on <a href="tel:03001234931">0300 1234 931</a></p>
-            </div>
-        </div>
-    </div>
-</div>
 
 {% endblock content %}

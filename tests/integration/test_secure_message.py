@@ -7,7 +7,7 @@ from frontstage import app
 from frontstage.exceptions.exceptions import IncorrectAccountAccessError
 from tests.integration.mocked_services import (conversation_json, conversation_list_json,
                                                encoded_jwt_token, url_get_thread, url_get_threads,
-                                               url_get_thread_old, url_send_message, url_get_conversation_count)
+                                               url_send_message, url_get_conversation_count)
 
 
 def create_api_error(status_code, data=None):
@@ -44,16 +44,10 @@ class TestSecureMessage(unittest.TestCase):
     @requests_mock.mock()
     def test_get_thread_success(self, mock_request):
         mock_request.get(url_get_thread, json={'messages': [conversation_json], 'is_closed': False})
-        mock_request.get(url_get_thread_old, json={'messages': [conversation_json], 'is_closed': False})
         mock_request.get(url_get_conversation_count, json={'total': 0})
 
-        response = self.app.get("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers, follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('Peter Griffin'.encode() in response.data)
-        self.assertTrue('testy2'.encode() in response.data)
-        self.assertTrue('something else'.encode() in response.data)
-
-        response = self.app.get("secure-message/thread/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers, follow_redirects=True)
+        response = self.app.get("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594",
+                                headers=self.headers, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Peter Griffin'.encode() in response.data)
         self.assertTrue('testy2'.encode() in response.data)

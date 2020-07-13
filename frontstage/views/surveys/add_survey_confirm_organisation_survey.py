@@ -60,6 +60,4 @@ def survey_confirm_organisation(_):
                 business_party_id=business_party_id,
                 survey_id=survey_id)
 
-    return render_template('surveys/surveys-confirm-organisation.html',
-                           context=business_context,
-                           )
+    return render_template('surveys/surveys-confirm-organisation.html', context=business_context)

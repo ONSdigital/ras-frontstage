@@ -12,6 +12,14 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def get_iac_from_enrolment(enrolment_code):
+    """
+    Gets enrolment details from IAC service for a given enrolment code
+
+    :param enrolment_code: An enrolment code
+    :type enrolment_code: str
+    :raises ApiError: Raised when IAC service returns a 401 status
+    :return: A dict with the IAC details if it exists and is active, and None otherwise
+    """
     bound_logger = logger.bind(enrolment_code=enrolment_code)
     bound_logger.info('Attempting to retrieve IAC')
     url = f"{app.config['IAC_URL']}/iacs/{enrolment_code}"

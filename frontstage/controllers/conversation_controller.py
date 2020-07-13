@@ -77,6 +77,14 @@ def get_conversation_list(params):
 
 
 def send_message(message_json):
+    """
+    Creates a message in the secure-message service
+
+    :param message_json: A block of JSON representing a message
+    :type message_json: dict
+    :raises ApiError: Raised when secure-message returns a non-200 status code
+    :return: A json response from secure-message
+    """
     party_id = json.loads(message_json).get('msg_from')
     logger.info('Sending message', party_id=party_id)
 

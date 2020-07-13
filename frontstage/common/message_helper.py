@@ -95,9 +95,9 @@ def get_formatted_date(datetime_string, string_format='%Y-%m-%d %H:%M:%S'):
     time = convert_to_bst(datetime_parsed).strftime('%H:%M')
 
     if time_difference.days == 0:
-        return "Today at {}".format(time)
+        return f"Today at {time}"
     elif time_difference.days == -1:
-        return "Yesterday at {}".format(time)
+        return f"Yesterday at {time}"
     return "{} {}".format(datetime_parsed.strftime('%d %b %Y'), time)
 
 

@@ -26,11 +26,11 @@ def create_message(session):
         sent_message = _send_new_message(party_id, survey, ru_ref)
         thread_url = url_for("secure_message_bp.view_conversation",
                              thread_id=sent_message['thread_id']) + "#latest-message"
-        flash(Markup('Message sent. <a href={}>View Message</a>'.format(thread_url)))
+        flash(Markup(f'Message sent. <a href={thread_url}>View Message</a>'))
         return redirect(url_for('secure_message_bp.view_conversation_list'))
 
     else:
-        unread_message_count = { 'unread_message_count': conversation_controller.try_message_count_from_session(session) }
+        unread_message_count = {'unread_message_count': conversation_controller.try_message_count_from_session(session)}
         return render_template('secure-messages/secure-messages-view.html',
                                ru_ref=ru_ref, survey=survey,
                                form=form, errors=form.errors, message={},

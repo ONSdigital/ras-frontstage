@@ -40,16 +40,17 @@
         {% if survey.display_button %}
                 {{
                     onsButton({
-                        "text": 'Access survey',
+                        "text": 'Access survey <span class="u-vh"> for ' ~ survey.survey_long_name,
                         "url": url_for('surveys_bp.access_survey', case_id=survey.case_id, ci_type = survey.collection_instrument_type, business_party_id=survey.business_party_id, survey_short_name=survey.survey_short_name),
                         "type": "submit",
-                        "classes": "btn--small u-mt-xs u-mb-s",
+                        "classes": "btn--small u-mt-xs u-mb-xs",
                         "id": 'access_survey_button_' ~ loop.index,
                         "submitType": "timer"
                     })
                 }}
+            <br>
         {% endif %}
-        <a id="create-message-link-{{loop.index}}" href="/secure-message/create-message/?survey={{survey.survey_id}}&ru_ref={{survey.business_party_id}}" class="u-fs-s u-db">Send a message </span></a>
+        <a id="create-message-link-{{loop.index}}" href="/secure-message/create-message/?survey={{survey.survey_id}}&ru_ref={{survey.business_party_id}}" class="u-fs-s">Send a message <span class="u-vh"> about {{ survey.survey_long_name }}</span></a>
     {% endset %}
     {% do surveyTableDataRows.append(
         {

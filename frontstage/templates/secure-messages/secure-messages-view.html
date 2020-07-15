@@ -35,7 +35,7 @@
                             <div class="panel panel--simple panel--error panel--spacious" id="subject-error">
                                 <p class="error-message">{{ errors['subject'][0] }}</p>
                         {% endif %}
-                            <label class="u-fs-r--b" for="subject">Subject</label>
+                            <label class="u-fs-r--b" for="secure-message-subject">Subject</label>
                             {{ form.subject(id='secure-message-subject', class_='secure-message-form__subject input input--text') }}
                         {% if "subject" in errors %}
                             </div>
@@ -48,9 +48,9 @@
                             <p class="error-message">{{ errors['body'][0] }}</p>
                     {% endif %}
                     {% if message %}
-                        <label class="u-fs-r--b" for="body">Reply</label>
+                        <label class="u-fs-r--b" for="secure-message-body">Reply</label>
                     {% else %}
-                        <label class="u-fs-r--b" for="body">Message</label>
+                        <label class="u-fs-r--b" for="secure-message-body">Message</label>
                     {% endif %}
                     {{ form.body(id='secure-message-body', class_='input input--textarea input--textarea-message', rows='10', maxlength='10000') }}
                     {% if "body" in errors %}

@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v1
       - name: Add commit comment
         run: |
-          jq -nc "{\"body\": \"@${{ github.event.issue.user.login }}, Spinnaker is deploying the PR to your environment\"}" | \
+          jq -nc "{\"body\": \"@${{ github.event.comment.user.login }}, Spinnaker is deploying the PR to your environment\"}" | \
           curl -sL  -X POST -d @- \
             -H "Content-Type: application/json" \
             -H "Authorization: token ${{ secrets.BOT_TOKEN }}" \

@@ -1,3 +1,5 @@
+{% from "components/button/_macro.njk" import onsButton %}
+
 {% set survey_name = survey_info['longName'] if survey_info %}
 <form
         method="post"
@@ -6,17 +8,21 @@
         class="form"
         role="form"
         enctype="multipart/form-data">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-
-    <div>
-        <input class="input input--text" id="selected-file" name="file" type="file" required
-        accept=".xls,.xlsx" />
-    </div>
-
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        {% from "components/upload/_macro.njk" import onsUpload %}
+        {{
+            onsUpload({
+                "id": "selected-file",
+                "accept": ".xls,.xlsx",
+                "name": "file",
+                "label": {
+                    "description": "File types accepted are .xls and .xlsx",
+                    "text": "Upload a file",
+                }
+            })
+        }}
     <script>
         function clickEvent(button){
-            button.disabled=true;
-            button.innerHTML='Uploading...';
             try {
                 ga('send', 'event', 'survey', 'upload', 'survey_ref = {{ survey_info.surveyRef }} collection_exercise_ref = {{ collection_exercise_info.exerciseRef }}');
             } catch {}
@@ -25,10 +31,17 @@
             form.submit();
         }
     </script>
-    <button class="btn btn--secondary u-mt-s js-timer js-submit-btn" id="upload_survey_button"
-            onclick="clickEvent(this)"
-            type="submit">Upload</button>
 
-
-
+    {{
+        onsButton({
+            "text": "Upload",
+            "type": "submit",
+            "classes": "u-mt-s",
+            "id": "upload_survey_button",
+            "submitType": "loader",
+            "attributes": {
+                "onclick": "clickEvent(this)"
+            }
+        })
+    }}
 </form>

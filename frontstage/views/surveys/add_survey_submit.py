@@ -58,8 +58,7 @@ def add_survey_submit(session):
             party_controller.add_survey(party_id, enrolment_code)
 
     except ApiError as exc:
-        logger.error('Failed to assign user to a survey',
-                     party_id=party_id, status_code=exc.status_code)
+        logger.error('Failed to assign user to a survey', party_id=party_id, status_code=exc.status_code)
         raise
 
     logger.info('Successfully retrieved data for confirm add organisation/survey page',

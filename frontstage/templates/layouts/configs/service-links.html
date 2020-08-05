@@ -1,0 +1,26 @@
+{% set serviceLinks = {} %}
+{% set signInOutText = {} %}
+{% set signInOutURL = {} %}
+
+  {% if 'authorization' in request.cookies %}
+    {% set signInOutURL = url_for('sign_in_bp.logout') %}
+    {% set signInOutText = "Sign out" %}
+  {% else %}
+    {% set signInOutURL = "/sign-in" %}
+    {% set signInOutText = "Sign in" %}
+  {% endif %}
+
+
+{% do serviceLinks | setAttribute("itemsList", [
+    {
+      "text": "Help",
+      "url": "/contact-us"    
+    },
+    {
+      "text": signInOutText,
+      "url": signInOutURL
+    }
+  ]) 
+%}
+
+{% do pageConfig | setAttribute("serviceLinks", serviceLinks) %}

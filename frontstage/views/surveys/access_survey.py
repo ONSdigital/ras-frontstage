@@ -30,7 +30,7 @@ def access_survey(session):
     case_data = case_controller.get_case_data(case_id, party_id, business_party_id, survey_short_name)
 
     logger.info('Successfully retrieved case data', party_id=party_id, case_id=case_id)
-    unread_message_count = { 'unread_message_count': conversation_controller.try_message_count_from_session(session) }
+    unread_message_count = {'unread_message_count': conversation_controller.try_message_count_from_session(session)}
     return render_template('surveys/surveys-access.html', case_id=case_id,
                            collection_instrument_id=case_data['collection_instrument']['id'],
                            collection_instrument_size=case_data['collection_instrument']['len'],

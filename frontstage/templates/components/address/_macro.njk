@@ -1,0 +1,123 @@
+{% from "components/fieldset/_macro.njk" import onsFieldset %}
+{% from "components/input/_macro.njk" import onsInput %}
+
+{% macro onsAddressInput(params) %}
+    {% set fields %}
+        {% if params.organisation %}
+            {{
+                onsInput({
+                    "id": params.id + "-organisation",
+                    "type": params.organisation.type,
+                    "label": {
+                        "text": params.organisation.label
+                    },
+                    "classes": "input--w-20@m",
+                    "name": params.organisation.name | default(params.id + "-organisation"),
+                    "value": params.organisation.value,
+                    "error": params.organisation.error
+                })
+            }}
+        {% endif %}
+
+        {{
+            onsInput({
+                "id": params.line1.id | default(params.id + "-line-1"),
+                "label": {
+                    "text": params.line1.label
+                },
+                "classes": "input--w-20@m",
+                "name": params.line1.name | default(params.id + "-line-1"),
+                "value": params.line1.value,
+                "error": params.line1.error
+            })
+        }}
+
+        {% if params.line2 %}
+            {{
+                onsInput({
+                    "id": params.line2.id | default(params.id + "-line-2"),
+                    "type": params.line2.type,
+                    "label": {
+                        "text": params.line2.label
+                    },
+                    "classes": "input--w-20@m",
+                    "name": params.line2.name | default(params.id + "-line-2"),
+                    "value": params.line2.value,
+                    "error": params.line2.error
+                })
+            }}
+        {% endif %}
+
+        {% if params.line3 %}
+            {{
+                onsInput({
+                    "id": params.line3.id | default(params.id + "-line-3"),
+                    "type": params.line3.type,
+                    "label": {
+                        "text": params.line3.label
+                    },
+                    "classes": "input--w-20@m",
+                    "name": params.line3.name | default(params.id + "-line-3"),
+                    "value": params.line3.value,
+                    "error": params.line3.error
+                })
+            }}
+        {% endif %}
+
+        {% if params.town %}
+            {{
+                onsInput({
+                    "id": params.town.id | default(params.id + "-town"),
+                    "type": params.town.type,
+                    "label": {
+                        "text": params.town.label
+                    },
+                    "name": params.town.name | default(params.id + "-town"),
+                    "value": params.town.value,
+                    "error": params.town.error
+                })
+            }}
+        {% endif %}
+
+        {% if params.county %}
+            {{
+                onsInput({
+                    "id": params.county.id | default(params.id + "-county"),
+                    "type": params.county.type,
+                    "label": {
+                        "text": params.county.label
+                    },
+                    "name": params.county.name | default(params.id + "-county"),
+                    "value": params.county.value,
+                    "error": params.county.error
+                })
+            }}
+        {% endif %}
+
+        {{
+            onsInput({
+                "id": params.postcode.id | default(params.id + "-postcode"),
+                "label": {
+                    "text": params.postcode.label
+                },
+                "classes": "input--w-5",
+                "name": params.postcode.name | default(params.id + "-postcode"),
+                "value": params.postcode.value,
+                "error": params.postcode.error
+            })
+        }}
+    {% endset %}
+
+    {% if params.dontWrap %}
+        {{ fields | safe }}
+    {% else %}
+        {% call onsFieldset({
+            "id": params.id,
+            "classes": params.classes,
+            "legend": params.legend,
+            "legendClasses": params.legendClasses
+        }) %}
+            {{ fields | safe }}
+        {% endcall %}
+    {% endif %}
+{% endmacro %}

@@ -1,16 +1,11 @@
-{% import 'partials/section.html' as section %}
-{% extends "layouts/_onecol.html" %}
+{% extends 'layouts/_base.html' %}
 
-{% block page_title %}Messages - ONS Business Surveys{% endblock %}
+{% block content %}
+    {% include "partials/tab_list.html" %}
 
-{% block main %}
-{% include "partials/tab_list.html" %}
+    <div>
+        {% block messages %}
+        {% endblock messages %}
+    </div>
 
-<h1 class="u-vh">Messages</h1>
-
-<div>
-    {% block messages %}
-    {% endblock messages %}
-</div>
-
-{% endblock main %}
+{% endblock content %}

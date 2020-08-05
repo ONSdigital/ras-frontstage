@@ -1,37 +1,33 @@
-{% import 'partials/section.html' as section %}
+{% extends 'layouts/_base.html' %}
+    
+{% set page_title = "Surveys to complete" %}
 
-{% extends "layouts/_onecol.html" %}
-
-{% block page_title %}Surveys to complete - ONS Business Surveys{% endblock page_title %}
-
-{% block main %}
+{% block content %}
 {% include "partials/tab_list.html" %}
 
 {% if added_survey %}
-<div class="panel panel--simple panel--success survey--success col-5@m u-mb-m ">
-    <div class="panel__body">
-        <div>Your <a id="NEW_SURVEY_NOTIF" href="#new-survey">new survey</a> has been added</div>
-
-    </div>
-</div>
+    {% call onsPanel({
+            "type": "success",
+            "classes": "u-mb-s"
+        }) %}
+            Your <a id="NEW_SURVEY_NOTIF" href="#new-survey">new survey</a> has been added.
+    {% endcall %}
 {% endif %}
 
 
 {% if already_enrolled %}
-<div class="panel panel--simple panel--info panel--spacious">
-    <div class="panel__body">
-        <div id="ALREADY_ADDED_NOTIF">You have already added that <a href="#new-survey">survey</a> </div>
-    </div>
-</div>
+    {% call onsPanel({
+        "classes": "u-mb-s"
+    }) %}
+            <div id="ALREADY_ADDED_NOTIF">You have already added that <a href="#new-survey">survey</a> </div>
+    {% endcall %}
 {% endif %}
 
 <p>
     <a id="add_survey_button" href="{{ url_for('surveys_bp.add_survey') }}">Add a survey</a> using your enrolment code
 </p>
 
-<h1 class="u-vh">Surveys to complete</h1>
-
 {% set emptySurveyListLabel = 'You have no surveys to complete' %}
 {% include "surveys/surveys.html" %}
 
-{% endblock main %}
+{% endblock content %}

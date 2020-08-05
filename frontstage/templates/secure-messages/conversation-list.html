@@ -1,38 +1,47 @@
-{% import 'partials/section.html' as section %}
-{% extends "layouts/_onecol.html" %}
+{% extends 'layouts/_base.html' %}
 
-{% block page_title %}Messages - ONS Business Surveys{% endblock %}
+{% set page_title = "Messages" %}
 
-{% block main %}
+{% block content %}
 {% include "partials/tab_list.html" %}
 
-<div role="main" id="main" class="page__main">
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-      <div class="panel panel--simple panel--success col-6@m">
-          <div class="panel__body" data-qa="success-body">
-            {% for message in messages %}
-            <p class="u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>
-            {% endfor %}
-          </div>
-      </div>
-      <br>
-      {% endif %}
-    {% endwith %}
-    
-    <nav class="nav nav--horizontal nav--sub nav--dark u-mb-l u-pt-s" role="menu">
-        <div class="container">
-            <ul class="nav__list" aria-label="Section navigation menu">
-                <li class="nav__item u-fs-s {% if not is_closed %}nav__item--current{% endif %}">
-                    <a class="nav__link" href="{{ url_for('secure_message_bp.view_conversation_list') }}" aria-current="{% if not is_closed %}location{% endif %}" role="menuitem">Open</a>
-                </li>
-                <li class="nav__item u-fs-s {% if is_closed %}nav__item--current{% endif %}">
-                    <a class="nav__link" href="{{ url_for('secure_message_bp.view_conversation_list', is_closed='true') }}" aria-current="{% if is_closed %}location{% endif %}" role="menuitem">Closed</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+          {% call
+          onsPanel({
+              "type":"success",
+              "classes": "u-mb-s",
+              "bodyAttributes": {
+                 "data-qa": "success-body"
+              }
+          })
+      %}
+        {% for message in messages %}
+          <p id="flashed-message-{{ loop.index }}">{{ message }}</p>
+        {% endfor %}
+      {% endcall %}
+    {% endif %}
+  {% endwith %}
+    <section class="u-mb-s">
+      {% from "components/section-navigation/_macro.njk" import onsSectionNavigation %}
+      {{
+          onsSectionNavigation({
+              "ariaLabel": "Section menu",
+              "ariraListLabel": "Navigation menu",
+              "tabQuery": "closed" if is_closed else "open",
+              "itemsList": [
+                  {
+                      "title": "Open",
+                      "url": url_for('secure_message_bp.view_conversation_list')
+                  },
+                  {
+                      "title": "Closed",
+                      "url": url_for('secure_message_bp.view_conversation_list', is_closed='true')
+                  }
+              ]
+          })
+      }}    
+    </section>
     {% if not messages %}
       {% if is_closed %}
       <p>No closed conversations</p>
@@ -40,45 +49,33 @@
       <p>No new conversations</p>
       {% endif %}
     {% else %}
+      {% from "components/message-list/_macro.njk" import onsMessageList %}
+      {% set messageList = [] %}
+      {% for message in messages %}
+          {% do messageList.append(
+              {
+                "id": "message-link-" ~ loop.index,
+                "unread": true if message['unread'] else false,
+                "url": url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) ~ "#latest-message",
+                "subject": message.subject,
+                "fromText": message.from or 'Unavailable',
+                "dateText": message.sent_date or 'Unavailable',
+                "body": message['body']|truncate(80, False, '...', 0)
+              }
+          ) %}
+      {% endfor %}
 
-      <ul class="message-list">
-        {% for message in messages %}
-          {% if message['unread'] %}
-            <li id="message-list-unread" class="message-list__item u-fs-r--b">
-              <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" id="message-link-{{ loop.index }}">{{ message.subject }}</a>
-              <span class="secure-message-conversation-meta__label u-fs-s--b" style="color: #666;"> (New) </span>
-          {% else %}
-            <li id="message-list" class="message-list__item u-fs-r">
-            <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" class="message-read" id="message-link-{{ loop.index }}">{{ message.subject }}</a>
-          {% endif %}
-
-          <div class="message-details">
-            <div class="secure-message-sent-message-meta-from u-fs-r">
-              <span class="u-vh">From: </span>
-              {{ message.from or 'Unavailable' }}
-            </div>
-
-            <div class="secure-message-sent-message-meta-datetime u-fs-r u-mb-s" style="display: block; color: #666;">
-              <span class="u-vh">Sent: </span>
-              {{ message.sent_date or 'Unavailable' }}
-            </div>
-          </div>
-
-          <p class="message-list__item-preview u-fs-r" id="message-summary-{{ loop.index }}">{{ message['body']|truncate(80, False, '...', 0) }}</p>
-
-          {% if message['unread'] %}
-            <p class="message-list__item-preview--link">
-              <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" class="u-fs-r--b" id="open-conversation-link-{{ loop.index }}">Read full message</a>
-            </p>
-          {% else %}
-            <p class="message-list__item-preview--link">
-              <a href="{{ url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) }}#latest-message" class="message-read" id="open-conversation-link-{{ loop.index }}">Read full message</a>
-            </p>
-          {% endif %}
-
-          </li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-</div>
-{% endblock main %}
+      {{ 
+          onsMessageList({
+              "ariaLabel": "Message list for ONS Business Surveys",
+              "unreadText": "New",
+              "fromLabel": "From",
+              "dateLabel": "Date",
+              "hiddenReadLabel": "Read the message",
+              "ariaLabelMetaData": "Message information",
+              "ariaLabelMsg": "Message preview",
+              "messages": messageList
+          })
+      }}
+  {% endif %}
+{% endblock content %}

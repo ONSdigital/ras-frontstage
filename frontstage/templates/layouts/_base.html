@@ -1,115 +1,73 @@
-<!doctype html>
-{%- set cdn_hash = "v2.0.0" -%}
+{% extends "layout/_template.njk" %}
+{% from "components/cookies-banner/_macro.njk" import onsCookiesBanner %}
 
-{% set cdn_url_prefix = "https://cdn.ons.gov.uk/sdc/"~cdn_hash %}
-
-<!--[if lt IE 7]>      <html lang="en-gb" dir="ltr" class="no-js lt-ie10 lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html lang="en-gb" dir="ltr" class="no-js lt-ie10 lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html lang="en-gb" dir="ltr" class="no-js lt-ie10 lt-ie9"> <![endif]-->
-<!--[if IE 9]>         <html lang="en-gb" dir="ltr" class="no-js lt-ie10"> <![endif]-->
-<!--[if gt IE 9]><!--> <html lang="en-gb" dir="ltr" class="no-js"> <!--<![endif]-->
-  <head>
-    {%- block head %}
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <title>{% block page_title %}{{ _('Survey Data Collection') }}{% endblock page_title %}</title>
-    <meta content="" name="description">
-    <meta content="width=device-width, initial-scale=1" name="viewport">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ cdn_url_prefix }}/favicons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" href="{{ cdn_url_prefix }}/favicons/favicon-32x32.png" sizes="32x32">
-    <link rel="icon" type="image/png" href="{{ cdn_url_prefix }}/favicons/favicon-16x16.png" sizes="16x16">
-    <link rel="manifest" href="{{ cdn_url_prefix }}/favicons/manifest.json">
-    <link rel="mask-icon" href="{{ cdn_url_prefix }}/favicons/safari-pinned-tab.svg" color="#5bbad5">
-    <link rel="shortcut icon" href="{{ cdn_url_prefix }}/favicons/favicon.ico" >
-    <meta name="theme-color" content="#ffffff">
-    <!--[if lt IE 9]>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <![endif]-->
-    <!--[if gt IE 8]><!-->
-      <script nonce="{{ csp_nonce() }}">document.documentElement.className = document.documentElement.className.replace('no-js','has-js')</script>
-    <!--<![endif]-->
-    {%- block styles %}
-    {% set css_fixed_cdn = cdn_url_prefix~"/css/fixed.css" %}
-    {% set css_responsive_cdn = cdn_url_prefix~"/css/responsive.css" %}
+{% block head %}
     {% set css_theme = "css/"~_theme~"/theme.css" %}
-
-
-    <!--[if (gt IE 9) | (IEMobile)]><!-->
-    {%- if request.args.get('fixed') == 'true' %}
-      <link href="{{ css_fixed_cdn }}" rel="stylesheet" />
-    {%- else %}
-      <link href="{{ css_responsive_cdn }}" rel="stylesheet" />
-    {%- endif %}
-    <!--<![endif]-->
-    <!--[if (lte IE 9) & (!IEMobile)]>
-      <link href="{{ css_fixed_cdn }}" rel="stylesheet" />
-    <![endif]-->
-
     <link href="{{ url_for('static', filename=css_theme) }}" rel="stylesheet" />
-
-    {% endblock styles -%}
-    {% endblock head -%}
-
+      
     {% if config.GOOGLE_TAG_MANAGER %}
       <!-- Google Tag Manager -->	
       <script>
-        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':	
-        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],	
-        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=	
-        'https://www.googletagmanager.com/gtm.js?id='+i+dl+'&gtm_auth={{ config.GOOGLE_TAG_MANAGER_PROP }}&gtm_cookies_win=x';f.parentNode.insertBefore(j,f);	
-        })(window,document,'script','dataLayer','{{ config.GOOGLE_TAG_MANAGER }}');
+        var testCookies = /^(.*)?\s*'usage':true\s*[^;]+(.*)?$/;
+        if (document.cookie.match(testCookies)) {
+          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':	
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],	
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=	
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl+'&gtm_auth={{ config.GOOGLE_TAG_MANAGER_PROP }}&gtm_cookies_win=x';f.parentNode.insertBefore(j,f);	
+          })(window,document,'script','dataLayer','{{ config.GOOGLE_TAG_MANAGER }}');
+        }
       </script>	
       <!-- End Google Tag Manager -->
     {% endif %}
-
-  </head>
-
-  <body>
-
+{% endblock %}
+{% block bodyStart %}	
   {% if config.GOOGLE_TAG_MANAGER %}
     <!-- Google Tag Manager (noscript) -->	
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ config.GOOGLE_TAG_MANAGER }}&gtm_auth={{ config.GOOGLE_TAG_MANAGER_PROP }}&gtm_cookies_win=x"	
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>	
     <!-- End Google Tag Manager (noscript) -->	
    {% endif %}
+{% endblock %}
+{% block preHeader %}
+  {{
+      onsCookiesBanner({
+          "statementTitle": 'Tell us whether you accept cookies',
+          "statementText": 'We use <a href="/cookies">cookies to collect information</a> about how you use surveys.ons.gov.uk. We use this information to make the website work as well as possible and improve our services.',
+          "confirmationText": 'You’ve accepted all cookies. You can <a href="/cookies">change your cookie preferences</a> at any time.',
+          "secondaryButtonUrl": '/cookies'
+      })
+  }}
+{% endblock %}
+{% set pageConfig = { 
+  "title": page_title + " | ONS Business Surveys" if page_title else "ONS Business Surveys",
+  "header": {
+    "title": "ONS Business Surveys",
+  }
+} %}
 
-    {% if request.args.get('grid_debug') == 'true' and config['DEBUG'] == true %}
-      {% include 'partials/grid-overlay.html' %}
+{% include 'layouts/configs/service-links.html' %}
+{% include 'layouts/configs/footer.html' %}
+{% from "components/panel/_macro.njk" import onsPanel %}
+
+{%- block pageContent %}
+  <div class="page__container container">
+    {% if availability_message %}
+      {{ 
+          onsPanel({
+              "body": availability_message,
+              "classes": "u-mt-l"
+          }) 
+      }}
     {% endif %}
-
-    <div class="page">
-
-      <div class="page__content">
-
-        <div class="skip">
-          <a class="skip__link" id="skip-link" href="#main">Skip to content</a>
-        </div>
-
-        <div class="page__header">
-          {% include 'partials/header.html' %}
-        </div>
-        <div class="container page__container">
+    <div class="grid">
+      <div class="grid__col col-12@m u-mt-s">
+        <main id="main-content" class="page__main {{ pageClasses }}">
           {%- block content %}{% endblock content -%}
-        </div>
+        </main>
       </div>
-      <div class="page__footer">
-        {% include 'partials/footer.html' %}
-      </div>
-
     </div>
+  </div>  
+{% endblock pageContent -%}
+{% block bodyEnd %}
 
-    <!--[if gte IE 9]><!-->
-    {% block scripts %}
-      <!-- ToDo! Point to bundle.min.js -->
-      {% set scripts_cdn = cdn_url_prefix~"/scripts/bundle.js" %}
-      <script src="{{ scripts_cdn }}"></script>
-
-      {% set js_script = "js/script.js" %}
-      <script src="{{ url_for('static', filename=js_script) }}"></script>
-    {% endblock scripts %}
-  	  <!--<![endif]-->
-
-
-  </body>
-
-</html>
+{% endblock %}

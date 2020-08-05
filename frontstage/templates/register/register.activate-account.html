@@ -1,7 +1,8 @@
-{% import 'partials/section.html' as section %}
-{% extends "layouts/_twocol.html" %}
 
-{% block page_title %}Create an account - ONS Business Surveys{% endblock %}
+{% extends "layouts/_twothirds.html" %}
+{% from "components/button/_macro.njk" import onsButton %}
+
+{% set page_title = "Create an account" %}
 
 {% block main %}
     <form
@@ -9,7 +10,7 @@
             action="{{ url_for('register_bp.register_activate_account') }}"
             class="form"
             role="form">
-        <h1 class="u-fs-l">Activate your account</h1>
+        <h1 class="u-fs-xl">Activate your account</h1>
         {{ form.csrf_token }}
 
         <div class="label__description label__inner u-fs-s">Thanks for confirming your email address</div>
@@ -18,10 +19,14 @@
 
         <div class="label__description label__inner u-fs-s">Please now activate your account</div>
 
-        <br />
-        <br />
-
-        <button class="btn btn--secondary u-fs-r--b js-timer js-submit-btn" id="activate_account_button" type="submit">Activate account</button>
-
+    {{
+        onsButton({
+            "text": "Activate account",
+            "type": "submit",
+            "classes": "u-mt-l u-mb-s",
+            "id": "activate_account_button",
+            "submitType": "timer"
+        })
+    }}        
     </form>
 {% endblock main %}

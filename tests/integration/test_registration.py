@@ -69,7 +69,7 @@ class TestRegistration(unittest.TestCase):
         response = self.app.post('/register/create-account', data={'enrolment_code': enrolment_code})
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Enrolment code not valid'.encode() in response.data)
+        self.assertTrue('Enter a valid enrolment code'.encode() in response.data)
 
     @requests_mock.mock()
     def test_enter_enrolment_code_already_used(self, mock_object):
@@ -78,7 +78,7 @@ class TestRegistration(unittest.TestCase):
         response = self.app.post('/register/create-account', data={'enrolment_code': enrolment_code})
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Enrolment code not valid'.encode() in response.data)
+        self.assertTrue('Enter a valid enrolment code'.encode() in response.data)
 
     @requests_mock.mock()
     def test_enter_enrolment_code_invalid_code(self, mock_object):
@@ -87,7 +87,7 @@ class TestRegistration(unittest.TestCase):
         response = self.app.post('/register/create-account', data={'enrolment_code': enrolment_code})
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Enrolment code not valid'.encode() in response.data)
+        self.assertTrue('Enter a valid enrolment code'.encode() in response.data)
 
     @requests_mock.mock()
     def test_enter_enrolment_code_fail(self, mock_object):
@@ -309,7 +309,7 @@ class TestRegistration(unittest.TestCase):
                                  follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Please check the passwords'.encode() in response.data)
+        self.assertTrue('Problem with the passwords'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_account_register_wrong_password(self, mock_object):
@@ -323,7 +323,7 @@ class TestRegistration(unittest.TestCase):
                                  follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Please check the passwords'.encode() in response.data)
+        self.assertTrue('Problem with the passwords'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_account_register_no_phone_number(self, mock_object):
@@ -337,7 +337,7 @@ class TestRegistration(unittest.TestCase):
                                  follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Please check the phone number'.encode() in response.data)
+        self.assertTrue('Problem with the phone number'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_account_register_illegal_phone_number(self, mock_object):
@@ -351,7 +351,7 @@ class TestRegistration(unittest.TestCase):
                                  follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Please check the phone number'.encode() in response.data)
+        self.assertTrue('Problem with the phone number'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_account_register_phone_number_too_small(self, mock_object):
@@ -365,7 +365,7 @@ class TestRegistration(unittest.TestCase):
                                  follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Please check the phone number'.encode() in response.data)
+        self.assertTrue('Problem with the phone number'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_account_register_phone_number_too_big(self, mock_object):
@@ -379,7 +379,7 @@ class TestRegistration(unittest.TestCase):
                                  follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Please check the phone number'.encode() in response.data)
+        self.assertTrue('Problem with the phone number'.encode() in response.data)
 
     @requests_mock.mock()
     def test_create_account_success(self, mock_object):

@@ -1,25 +1,16 @@
+{% from "components/collapsible/_macro.njk" import onsCollapsible %}
+
 <p>Please check your email</p>
 
-<div class="guidance js-details"
-    data-guidance-label="guidance-help-with-email"
-    data-guidance="Guidance help with email"
-    data-hide-label="Hide help with email"
-    data-show-label="Show help with email">
+{% call onsCollapsible({
+    "id": "guidance-help-with-email",
+    "title": "Help with email",
+    "button": {
+        "close": "Hide this",
+        "contextSuffix": "content"
+    }
+}) %}
+    <p>Email not arrived? It might be in your spam folder.</p>
+    <p>If it doesn’t arrive in the next 15 minutes, please call <a href="tel:03001234931">0300 1234 931</a></p>
+{% endcall %}
 
-    <a class="guidance__link js-details-trigger js-details-label icon--details u-fs-r"
-    id="guidance-help-with-email"
-    data-guidance-trigger="true"
-    aria-expanded="false"
-    href="#guidance-help-with-email"
-    aria-controls="guidance-help-with-email">Help with email</a>
-
-    <div class="guidance__main js-details-body" id="guidance-help-with-email-body" aria-hidden="true">
-        <div class="guidance__content u-fs-r">
-            <div>
-                <p>Email not arrived? It might be in your spam folder.</p>
-                <p>If it doesn’t arrive in the next 15 minutes, please call us on <a href="tel:03001234931">0300 1234 931</a></p>
-            </div>
-        </div>
-    </div>
-
-</div>

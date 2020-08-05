@@ -1,6 +1,7 @@
 import redis
 from frontstage.create_app import create_app_object
 from flask_talisman import Talisman
+from frontstage.common.jinja_filters import filter_blueprint
 
 # TODO: review https://content-security-policy.com/, remove this comment if we're covered.
 CSP_POLICY = {
@@ -25,6 +26,10 @@ talisman = Talisman(
 redis = redis.StrictRedis(host=app.config['REDIS_HOST'],
                           port=app.config['REDIS_PORT'],
                           db=app.config['REDIS_DB'])
+
+app.jinja_env.add_extension('jinja2.ext.do')
+
+app.register_blueprint(filter_blueprint)
 
 
 @app.context_processor

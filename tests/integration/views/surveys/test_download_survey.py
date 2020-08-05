@@ -32,13 +32,10 @@ class TestDownloadSurvey(unittest.TestCase):
         headers = {'Content-type': 'application/json', 'Content-Length': '5962'}
         download_collection_instrument.return_value = binary, headers
 
-        urls = ['download_survey', 'download-survey']
-        for url in urls:
-            with self.subTest(url=url):
-                response = self.app.get(f'/surveys/{url}?case_id={case["id"]}&business_party_id={business_party["id"]}'
-                                        f'&survey_short_name={survey["shortName"]}')
+        response = self.app.get(f'/surveys/download-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
+                                f'&survey_short_name={survey["shortName"]}')
 
-                self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_enforces_secure_headers(self):
         with app.test_client() as client:

@@ -9,7 +9,7 @@
   },
   "variables": {
     "service": "frontstage",
-    "defaultVersion": "1.0.0",
+    "defaultVersion": "1.2.0",
     "devDeploymentCluster": "dev",
     "devDeploymentNamespace": "dev"
   },

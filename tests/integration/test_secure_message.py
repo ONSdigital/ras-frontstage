@@ -153,7 +153,7 @@ class TestSecureMessage(unittest.TestCase):
                                  data=self.message_form, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Body field length must not be greater than 10000'.encode() in response.data)
+        self.assertTrue('Body field length must not be greater than 50000'.encode() in response.data)
 
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
     def test_create_message_post_subject_too_long(self, message_count):

@@ -150,13 +150,13 @@ class TestSecureMessage(unittest.TestCase):
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
     def test_create_message_post_body_too_long(self, message_count):
         message_count.return_value = 0
-        self.message_form['body'] = 'a' * 10100
+        self.message_form['body'] = 'a' * 50100
 
         response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789",
                                  data=self.message_form, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Body field length must not be greater than 10000'.encode() in response.data)
+        self.assertTrue('Body field length must not be greater than 50000'.encode() in response.data)
 
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
     def test_create_message_post_subject_too_long(self, message_count):

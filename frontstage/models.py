@@ -167,8 +167,8 @@ class SecureMessagingForm(FlaskForm):
     @staticmethod
     def validate_body(form, field):
         body = field.data
-        if len(body) > 10000:
-            raise ValidationError(_('Body field length must not be greater than 10000'))
+        if len(body) > 50000:
+            raise ValidationError(_('Body field length must not be greater than 50000'))
         if form.send.data and not body:
             raise ValidationError(_('Please enter a message'))
 

@@ -35,8 +35,7 @@ class TestSecureMessage(unittest.TestCase):
             "thread_id": "7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb",
         }
         self.headers = {
-            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"
-            # NOQA
+            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54" # NOQA
         }
 
     def tearDown(self):
@@ -49,7 +48,6 @@ class TestSecureMessage(unittest.TestCase):
 
         response = self.app.get("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594",
                                 headers=self.headers, follow_redirects=True)
-        print(response.data)
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Peter Griffin'.encode() in response.data)
         self.assertTrue('testy2'.encode() in response.data)

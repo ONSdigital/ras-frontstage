@@ -19,8 +19,8 @@ class TestCookiesContact(unittest.TestCase):
         response = self.app.get('/privacy-and-data-protection')
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Privacy and data protection'.encode() in response.data)
-        self.assertTrue('Your privacy is very important to us'.encode() in response.data)
+        self.assertTrue('We will keep your information secure and confidential'.encode() in response.data)
+        self.assertTrue('Where can I find out more about how my information will be treated?'.encode() in response.data)
 
     def test_contact_success(self):
         response = self.app.get('/contact-us')

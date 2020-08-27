@@ -29,14 +29,14 @@ class TestSecureMessage(unittest.TestCase):
         self.patcher = patch('redis.StrictRedis.get', return_value=encoded_jwt_token)
         self.patcher.start()
         self.message_form = {
-                              "subject": "subject",
-                              "body": "body",
-                              "send": "Send",
-                              "thread_id": "7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb",
-                            }
+            "subject": "subject",
+            "body": "body",
+            "send": "Send",
+            "thread_id": "7bc5d41b-0549-40b3-ba76-42f6d4cf3fdb",
+        }
         self.headers = {
-            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"  # NOQA
-            }
+            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54" # NOQA
+        }
 
     def tearDown(self):
         self.patcher.stop()
@@ -52,6 +52,7 @@ class TestSecureMessage(unittest.TestCase):
         self.assertTrue('Peter Griffin'.encode() in response.data)
         self.assertTrue('testy2'.encode() in response.data)
         self.assertTrue('something else'.encode() in response.data)
+        self.assertIn("Please note, this system should not be used to inform us of changes to".encode(), response.data)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
@@ -61,13 +62,15 @@ class TestSecureMessage(unittest.TestCase):
         del conversation_json_copy['@business_details']
         mock_request.get(url_get_thread, json={'messages': [conversation_json_copy]})
 
-        response = self.app.get("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers, follow_redirects=True)
+        response = self.app.get("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers,
+                                follow_redirects=True)
         self.assertEqual(response.status_code, 500)
 
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
     def test_create_message_get(self, message_count):
         message_count.return_value = 0
-        response = self.app.get("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789", headers=self.headers, follow_redirects=True)
+        response = self.app.get("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789",
+                                headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Create message'.encode() in response.data)

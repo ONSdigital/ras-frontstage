@@ -4,7 +4,7 @@
   "name": "deploy prod",
   "template": {
     "artifactAccount": "front50ArtifactCredentials",
-    "reference": "spinnaker://protectedEnvTemplate@sha256:da176658820e4d95d90d9b61c6355a5743a5dbdf63984b23f912aa226279b7ef",
+    "reference": "spinnaker://protectedEnvTemplate@sha256:0120dd7dc4be75c7f4685ca2beb628dea6500f6c6a8ca16c049874f18be7019d",
     "type": "front50/pipelineTemplate"
   },
   "variables": {

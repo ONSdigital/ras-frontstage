@@ -68,6 +68,8 @@ class Config(object):
     SECURE_APP = bool(strtobool(os.getenv('SECURE_APP', "True")))
     WTF_CSRF_ENABLED = bool(strtobool(os.getenv('WTF_CSRF_ENABLED', str(SECURE_APP))))
     WTF_CSRF_TIME_LIMIT = int(os.getenv('WTF_CSRF_TIME_LIMIT', '7200'))
+    GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "ras-rm-sandbox")
+    PUBSUB_TOPIC = os.getenv("PUBSUB_TOPIC", "ras-rm-notify-test")
 
 
 class DevelopmentConfig(Config):

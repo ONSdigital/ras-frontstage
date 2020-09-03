@@ -41,6 +41,10 @@ email:
   secret:
     key: ONS_DUMMY_KEY
 
+gcp:
+  project: ras-rm-sandbox
+  topic: ras-rm-notify-test
+
 scheme: http
 
 security:

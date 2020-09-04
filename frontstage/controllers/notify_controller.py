@@ -16,7 +16,6 @@ class NotifyGateway:
     """ Client for Notify gateway"""
 
     def __init__(self, config):
-        self.notify_url = config['RAS_NOTIFY_SERVICE_URL']
         self.request_password_change_template = config['RAS_NOTIFY_REQUEST_PASSWORD_CHANGE_TEMPLATE']
         self.send_email_to_notify = config['SEND_EMAIL_TO_GOV_NOTIFY']
         self.project_id = config['GOOGLE_CLOUD_PROJECT']

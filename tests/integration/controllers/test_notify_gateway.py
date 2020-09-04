@@ -21,12 +21,6 @@ class TestNotifyController(unittest.TestCase):
         self.app_config = self.app.application.config
         self.email_form = {"email_address": "test@email.com"}
 
-    def test_an_invalid_template_id(self):
-        with app.app_context():
-            with self.assertRaises(KeyError):
-                NotifyGateway(self.app_config).request_to_notify(email='test@test.test',
-                                                                 template_name='fake-template-name')
-
     def test_request_to_notify_with_pubsub_no_personalisation(self):
         """Tests what is sent to pubsub when no personalisation is added"""
         publisher = unittest.mock.MagicMock()
@@ -34,9 +28,9 @@ class TestNotifyController(unittest.TestCase):
         # Given a mocked notify gateway
         notify = NotifyGateway(self.app_config)
         notify.publisher = publisher
-        result = notify.request_to_notify('test@email.com', 'notify_account_locked')
+        result = notify.request_to_notify('test@email.com')
         data = b'{"notify": {"email_address": "test@email.com", ' \
-               b'"template_id": "account_locked_id"}}'
+               b'"template_id": "request_password_change_id"}}'
 
         publisher.publish.assert_called()
         publisher.publish.assert_called_with('projects/test-project-id/topics/ras-rm-notify-test', data=data)
@@ -50,8 +44,8 @@ class TestNotifyController(unittest.TestCase):
         notify = NotifyGateway(self.app_config)
         notify.publisher = publisher
         personalisation = {"first_name": "testy", "last_name": "surname"}
-        result = notify.request_to_notify('test@email.com', 'notify_account_locked', personalisation)
-        data = b'{"notify": {"email_address": "test@email.com", "template_id": "account_locked_id",' \
+        result = notify.request_to_notify('test@email.com', personalisation)
+        data = b'{"notify": {"email_address": "test@email.com", "template_id": "request_password_change_id",' \
                b' "personalisation": {"first_name": "testy", "last_name": "surname"}}}'
         publisher.publish.assert_called()
         publisher.publish.assert_called_with('projects/test-project-id/topics/ras-rm-notify-test', data=data)
@@ -68,4 +62,4 @@ class TestNotifyController(unittest.TestCase):
         notify = NotifyGateway(self.app_config)
         notify.publisher = publisher
         with self.assertRaises(RasNotifyError):
-            notify.request_to_notify('test@email.com', 'notify_account_locked')
+            notify.request_to_notify('test@email.com')

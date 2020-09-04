@@ -112,7 +112,6 @@ def request_password_change(email):
 
     try:
         NotifyGateway(app.config).request_to_notify(email=email,
-                                                    template_name='request_password_change',
                                                     personalisation=personalisation,
                                                     reference=party_id)
         logger.info('Password reset email successfully sent', party_id=party_id)

@@ -1,12 +1,9 @@
 import unittest
-import responses
 
 from config import TestingConfig
 from frontstage import app
 from frontstage.controllers.notify_controller import NotifyGateway
 from frontstage.exceptions.exceptions import RasNotifyError
-
-url_send_notify = f'{TestingConfig().RAS_NOTIFY_SERVICE_URL}{TestingConfig().RAS_NOTIFY_REQUEST_PASSWORD_CHANGE_TEMPLATE}'
 
 
 class TestNotifyController(unittest.TestCase):
@@ -22,32 +19,45 @@ class TestNotifyController(unittest.TestCase):
         self.app_config = self.app.application.config
         self.email_form = {"email_address": "test@email.com"}
 
-    def test_an_invalid_template_id(self):
-        with app.app_context():
-            with self.assertRaises(KeyError):
-                NotifyGateway(self.app_config).request_to_notify(email='test@test.test',
-                                                                 template_name='fake-template-name')
+    def test_request_to_notify_with_pubsub_no_personalisation(self):
+        """Tests what is sent to pubsub when no personalisation is added"""
+        publisher = unittest.mock.MagicMock()
+        publisher.topic_path.return_value = 'projects/test-project-id/topics/ras-rm-notify-test'
+        # Given a mocked notify gateway
+        notify = NotifyGateway(self.app_config)
+        notify.publisher = publisher
+        result = notify.request_to_notify('test@email.com')
+        data = b'{"notify": {"email_address": "test@email.com", ' \
+               b'"template_id": "request_password_change_id"}}'
 
-    def test_a_successful_send(self):
-        with responses.RequestsMock() as rsps:
-            with app.app_context():
-                rsps.add(rsps.POST, url_send_notify, json={'emailAddress': 'test@test.test', 'id': '1234',
-                                                           "personalisation": "personalisation",
-                                                           "reference": "reference"}, status=201)
-                try:
-                    NotifyGateway(self.app_config).request_to_notify(email='test@test.test',
-                                                                     template_name='request_password_change')
-                except RasNotifyError:
-                    self.fail('NotifyController didnt properly handle a 201')
-                except KeyError:
-                    self.fail('NotifyController couldnt find the template ID request_password_change')
-            assert rsps.assert_all_requests_are_fired
-            assert rsps.calls[0].request.url == 'http://notify-gateway-service/emails/request_password_change_id'
+        publisher.publish.assert_called()
+        publisher.publish.assert_called_with('projects/test-project-id/topics/ras-rm-notify-test', data=data)
+        self.assertIsNone(result)
 
-    def test_an_unsuccessful_send(self):
-        with responses.RequestsMock() as rsps:
-            rsps.add(rsps.POST, url_send_notify, json={'emailAddress': 'test@test.test'}, status=500)
-            with app.app_context():
-                with self.assertRaises(RasNotifyError):
-                    NotifyGateway(self.app_config).request_to_notify(email='test@test.test',
-                                                                     template_name='request_password_change')
+    def test_a_successful_send_with_personalisation(self):
+        """Tests what is sent to pubsub when personalisation is added"""
+        publisher = unittest.mock.MagicMock()
+        publisher.topic_path.return_value = 'projects/test-project-id/topics/ras-rm-notify-test'
+        # Given a mocked notify gateway
+        notify = NotifyGateway(self.app_config)
+        notify.publisher = publisher
+        personalisation = {"first_name": "testy", "last_name": "surname"}
+        result = notify.request_to_notify('test@email.com', personalisation)
+        data = b'{"notify": {"email_address": "test@email.com", "template_id": "request_password_change_id",' \
+               b' "personalisation": {"first_name": "testy", "last_name": "surname"}}}'
+        publisher.publish.assert_called()
+        publisher.publish.assert_called_with('projects/test-project-id/topics/ras-rm-notify-test', data=data)
+        self.assertIsNone(result)
+
+    def test_request_to_notify_with_pubsub_timeout_error(self):
+        """Tests if the future.result() raises a TimeoutError then the function raises a RasNotifyError"""
+        future = unittest.mock.MagicMock()
+        future.result.side_effect = TimeoutError("bad")
+        publisher = unittest.mock.MagicMock()
+        publisher.publish.return_value = future
+
+        # Given a mocked notify gateway
+        notify = NotifyGateway(self.app_config)
+        notify.publisher = publisher
+        with self.assertRaises(RasNotifyError):
+            notify.request_to_notify('test@email.com')

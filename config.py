@@ -55,19 +55,15 @@ class Config(object):
 
     EMAIL_MATCH_ERROR_TEXT = 'Your email addresses do not match'
 
-    RAS_NOTIFY_SERVICE_URL = os.getenv('RAS_NOTIFY_SERVICE_URL', 'http://notify-gateway-service/emails/')
-    RAS_NOTIFY_EMAIL_VERIFICATION_TEMPLATE = os.getenv('RAS_NOTIFY_EMAIL_VERIFICATION_TEMPLATE',
-                                                       'email_verification_id')
     RAS_NOTIFY_REQUEST_PASSWORD_CHANGE_TEMPLATE = os.getenv('RAS_NOTIFY_REQUEST_PASSWORD_CHANGE_TEMPLATE',
                                                             'request_password_change_id')
-    RAS_NOTIFY_CONFIRM_PASSWORD_CHANGE_TEMPLATE = os.getenv('RAS_NOTIFY_CONFIRM_PASSWORD_CHANGE_TEMPLATE',
-                                                            'confirm_password_change_id')
-    RAS_NOTIFY_ACCOUNT_LOCKED_TEMPLATE = os.getenv('RAS_NOTIFY_ACCOUNT_LOCKED_TEMPLATE', 'account_locked_id')
     SEND_EMAIL_TO_GOV_NOTIFY = os.getenv('SEND_EMAIL_TO_GOV_NOTIFY', False)
     REQUESTS_POST_TIMEOUT = os.getenv('REQUESTS_POST_TIMEOUT', 20)
     SECURE_APP = bool(strtobool(os.getenv('SECURE_APP', "True")))
     WTF_CSRF_ENABLED = bool(strtobool(os.getenv('WTF_CSRF_ENABLED', str(SECURE_APP))))
     WTF_CSRF_TIME_LIMIT = int(os.getenv('WTF_CSRF_TIME_LIMIT', '7200'))
+    GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "ras-rm-sandbox")
+    PUBSUB_TOPIC = os.getenv("PUBSUB_TOPIC", "ras-rm-notify-test")
 
 
 class DevelopmentConfig(Config):

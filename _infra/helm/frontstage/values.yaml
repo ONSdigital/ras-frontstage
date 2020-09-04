@@ -40,6 +40,12 @@ email:
   salt: aardvark
   secret:
     key: ONS_DUMMY_KEY
+  templates:
+    passwordChange: 7ba6b103-79d2-4ef1-be2e-979c127fa439
+
+gcp:
+  project: ras-rm-sandbox
+  topic: ras-rm-notify-test
 
 scheme: http
 

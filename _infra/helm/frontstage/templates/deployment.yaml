@@ -19,6 +19,10 @@ spec:
         app: {{ .Chart.Name }}
         env: {{ .Values.env }}
     spec:
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: google-application-credentials
       containers:
         - name: {{ .Chart.Name }}
           {{- if eq .Values.image.tag "latest"}}
@@ -27,6 +31,9 @@ spec:
           image: "{{ .Values.image.devRepo }}/{{ .Chart.Name }}:{{ .Values.image.tag }}"
           {{- end}}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+          - name: google-cloud-key
+            mountPath: /var/secrets/google
           ports:
             - name: http-server
               containerPort: {{ .Values.container.port }}
@@ -133,19 +140,13 @@ spec:
             {{- end }}
           - name: PORT
             value: "{{ .Values.container.port }}"
-          - name: RAS_NOTIFY_SERVICE_URL
-            {{- if .Values.dns.enabled }}
-            value: "http://notify-gateway.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}/emails/"
-            {{- else }}
-            value: "http://$(NOTIFY_GATEWAY_SERVICE_HOST):$(NOTIFY_GATEWAY_SERVICE_PORT)/emails/"
-            {{- end }}
-          {{ if .Values.email.enabled }}
-          - name: RAS_NOTIFY_ACCOUNT_LOCKED_TEMPLATE
-            value: "{{ .Values.email.templates.accountLocked }}"
-          - name: RAS_NOTIFY_CONFIRM_PASSWORD_CHANGE_TEMPLATE
-            value: "{{ .Values.email.templates.confirmPasswordChange }}"
-          - name: RAS_NOTIFY_EMAIL_VERIFICATION_TEMPLATE
-            value: "{{ .Values.email.templates.verification }}"
+          - name: GOOGLE_CLOUD_PROJECT
+            value: "{{ .Values.gcp.project }}"
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /var/secrets/google/credentials.json
+          - name: PUBSUB_TOPIC
+            value: "{{ .Values.gcp.topic }}"
+          {{- if .Values.email.enabled }}
           - name: RAS_NOTIFY_REQUEST_PASSWORD_CHANGE_TEMPLATE
             value: "{{ .Values.email.templates.passwordChange }}"
           {{- end }}

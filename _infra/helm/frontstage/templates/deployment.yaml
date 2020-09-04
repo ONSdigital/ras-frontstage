@@ -144,12 +144,6 @@ spec:
           - name: PUBSUB_TOPIC
             value: "{{ .Values.gcp.topic }}"
           {{ if .Values.email.enabled }}
-          - name: RAS_NOTIFY_ACCOUNT_LOCKED_TEMPLATE
-            value: "{{ .Values.email.templates.accountLocked }}"
-          - name: RAS_NOTIFY_CONFIRM_PASSWORD_CHANGE_TEMPLATE
-            value: "{{ .Values.email.templates.confirmPasswordChange }}"
-          - name: RAS_NOTIFY_EMAIL_VERIFICATION_TEMPLATE
-            value: "{{ .Values.email.templates.verification }}"
           - name: RAS_NOTIFY_REQUEST_PASSWORD_CHANGE_TEMPLATE
             value: "{{ .Values.email.templates.passwordChange }}"
           {{- end }}

@@ -5,8 +5,6 @@ from frontstage import app
 from frontstage.controllers.notify_controller import NotifyGateway
 from frontstage.exceptions.exceptions import RasNotifyError
 
-url_send_notify = f'{TestingConfig().RAS_NOTIFY_SERVICE_URL}{TestingConfig().RAS_NOTIFY_REQUEST_PASSWORD_CHANGE_TEMPLATE}'
-
 
 class TestNotifyController(unittest.TestCase):
     '''

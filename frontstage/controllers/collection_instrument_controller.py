@@ -12,9 +12,18 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def download_collection_instrument(collection_instrument_id, case_id, party_id):
-    logger.info('Attempting to download collection instrument',
-                collection_instrument_id=collection_instrument_id,
-                party_id=party_id)
+    """
+    Downloads the collection instrument and updates the case with the record that the instrument has been downloaded.
+
+    :param collection_instrument_id: UUID of the collection instrument
+    :param case_id: UUID of the case
+    :param party_id: UUID of the party
+    :return: A tuple containing the collection instrument and the headers
+    """
+    bound_logger = logger.bind(collection_instrument_id=collection_instrument_id,
+                               party_id=party_id,
+                               case_id=case_id)
+    bound_logger.info('Attempting to download collection instrument')
 
     url = f"{app.config['COLLECTION_INSTRUMENT_URL']}/collection-instrument-api/1.0.2/download/{collection_instrument_id}"
     response = requests.get(url, auth=app.config['BASIC_AUTH'])
@@ -29,18 +38,14 @@ def download_collection_instrument(collection_instrument_id, case_id, party_id):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error('Failed to download collection instrument',
-                     collection_instrument_id=collection_instrument_id,
-                     party_id=party_id)
+        bound_logger.error('Failed to download collection instrument')
         raise ApiError(logger, response)
 
-    logger.info('Successfully downloaded collection instrument',
-                collection_instrument_id=collection_instrument_id,
-                party_id=party_id)
+    logger.info('Successfully downloaded collection instrument')
 
     headers = response.headers
     acao = app.config['ACCESS_CONTROL_ALLOW_ORIGIN']
-    logger.debug(f"Setting Access-Control-Allow-Origin header to {acao}")
+    bound_logger.debug(f"Setting Access-Control-Allow-Origin header to {acao}")
     headers['Access-Control-Allow-Origin'] = acao
     return response.content, headers.items()
 

@@ -22,7 +22,7 @@ class GCPLoadBalancer:
         self.app = app
 
     def __call__(self, environ, start_response):
-        scheme = environ.get("HTTP_X_FORWARDED_PROTO", "http")
+        scheme = os.environ.get("SCHEME", "http")
         if scheme:
             environ["wsgi.url_scheme"] = scheme
         return self.app(environ, start_response)

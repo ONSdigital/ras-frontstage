@@ -1,6 +1,6 @@
 {{- if .Values.ingress.enabled }}
 {{- if not .Values.public }}
-apiVersion: networking.gke.io/v1beta1
+apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
 metadata:
   name: {{ .Values.ingress.certNameSurveys }}

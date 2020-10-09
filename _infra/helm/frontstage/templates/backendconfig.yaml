@@ -1,13 +1,11 @@
 {{- if not .Values.public }}
-apiVersion: cloud.google.com/v1.1
+apiVersion: cloud.google.com/v1
 kind: BackendConfig
 metadata:
   name: frontstage-backend-config
 spec:
   securityPolicy:
     name: "ras-cloud-armor-policy"
-  customRequestHeaders:
-    X-Forwarded-Proto: https
   sessionAffinity: 
     affinityType: CLIENT_IP
 {{- end }}

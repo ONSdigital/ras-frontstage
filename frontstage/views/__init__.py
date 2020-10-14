@@ -8,7 +8,7 @@ from frontstage.views.register import register_bp
 from frontstage.views.secure_messaging import secure_message_bp
 from frontstage.views.sign_in import sign_in_bp
 from frontstage.views.surveys import surveys_bp
-from frontstage.views.security_controller import security_bp
+from frontstage.views.security import security_bp
 from frontstage.views.help import help_bp
 
 

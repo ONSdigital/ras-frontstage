@@ -10,6 +10,6 @@ help_bp = Blueprint('help_bp', __name__,
                           static_folder='static', template_folder='templates')
 
 
-@help_bp.route('/disclosure', methods=['GET'])
+@help_bp.route('/vulnerability-reporting', methods=['GET'])
 def help():
     return render_template('vunerability_disclosure.html')

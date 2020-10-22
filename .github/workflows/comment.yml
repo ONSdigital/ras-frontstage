@@ -38,5 +38,5 @@ jobs:
       - name: Trigger spinnaker
         run: |
           gcloud pubsub topics publish $SPINNAKER_TOPIC --project $HOST \
-          --message "{ \"kind\": \"storage#object\", \"name\": \"$IMAGE/$IMAGE-latest.tgz\", \"bucket\": \"$ARTIFACT_BUCKET\", \"parameters\": { \"tag\": \"pr-${{ github.event.issue.number }}\", \"namespace\": \"${{ env.NAMESPACE }}\", \"cluster\": \"sandbox\", \"actor\": \"$GITHUB_ACTOR\" } }" \
+          --message "{ \"kind\": \"storage#object\", \"name\": \"$IMAGE/$IMAGE-latest.tgz\", \"bucket\": \"$ARTIFACT_BUCKET\", \"parameters\": { \"tag\": \"pr-${{ github.event.issue.number }}\", \"namespace\": \"${{ env.NAMESPACE }}\", \"cluster\": \"dev\", \"actor\": \"$GITHUB_ACTOR\" } }" \
           --attribute ci="actions"

@@ -236,25 +236,32 @@ def get_respondent_enrolments(party_id):
                 }
 
 
-def get_respondent_enrolments_for_known_collex(enrolment_data, cache_collex):
-    """ Needed because enrolment_data includes not started enrolments ,
+def get_respondent_enrolments_for_started_collex(enrolment_data, collection_exercises):
+    """This will only filter out enrolments for surveys that have 0 live collection exercises.
+
+    Needed because enrolment_data includes not started enrolments ,
     but cache_collex only contains started collex. Hence indexing collex by enrolment[survey] causes a 500
 
     :param enrolment_data: A list of enrolments.
-    :param cache_collex: A list of not started collection exercises.
+    :type enrolment_data: list
+    :param collection_exercises: A list of collection exercises.
+    :type collection_exercises: list
     :return: list of enrolments corresponding to the known collection exercises
     """
 
     enrolments = []
     for enrolment in enrolment_data:
-        if enrolment['survey_id'] in cache_collex:
+        if enrolment['survey_id'] in collection_exercises:
             enrolments.append(enrolment)
     return enrolments
 
 
-def set_enrolment_data(enrolment_data):
-    # In this function, we're getting all the unique set of partys and surveys, so that we don't get the data more
-    # than once.
+def get_unique_survey_and_business_ids(enrolment_data):
+    """Takes a list of enrolment data and returns 2 unique sets of business_id and party_id's
+
+    :param enrolment_data: A list of enrolments
+    :return: A pair of sets with
+    """
 
     surveys_ids = set()
     business_ids = set()
@@ -310,7 +317,6 @@ def caching_data_for_collection_instrument(cache_data):
 
 
 def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_id):
-
     """
     This function uses threads to get responses from Case, Party, Collection exercise, Survey and
     Collection Instrument services. Some respondents to-do pages can have so many Surveys/Collection exercises
@@ -324,14 +330,13 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
 
     """
     enrolment_data = list(get_respondent_enrolments(party_id))
+
     # Gets the survey ids and business ids from the enrolment data that has been generated.
     # Converted to list to avoid multiple calls to party (and the list size is small).
-
-    surveys_ids, business_ids = set_enrolment_data(enrolment_data)
+    surveys_ids, business_ids = get_unique_survey_and_business_ids(enrolment_data)
 
     # This is a dictionary that will store all of the data that is going to be cached instead of making multiple calls
     # inside of the for loop for get_respondent_enrolments.
-
     cache_data = {'surveys': dict(),
                   'businesses': dict(),
                   'collexes': dict(),
@@ -342,7 +347,7 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
     caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag)
     caching_data_for_collection_instrument(cache_data)
 
-    for enrolment in get_respondent_enrolments_for_known_collex(enrolment_data, cache_data['collexes']):
+    for enrolment in get_respondent_enrolments_for_started_collex(enrolment_data, cache_data['collexes']):
         business_party = cache_data['businesses'][enrolment['business_id']]
         survey = cache_data['surveys'][enrolment['survey_id']]
 
@@ -352,8 +357,11 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
         live_collection_exercises = filter_ended_collection_exercises(cache_data['collexes'][survey['id']])
 
         collection_exercises_by_id = dict((ce['id'], ce) for ce in live_collection_exercises)
-        cases = cache_data['cases'][business_party['id']]
-        enrolled_cases = [case for case in cases if case['caseGroup']['collectionExerciseId'] in collection_exercises_by_id.keys()]
+        cases_for_business = cache_data['cases'][business_party['id']]
+
+        # Gets all the cases for reporting unit, and by extension the user (because it's related to the business)
+        enrolled_cases = [case for case in cases_for_business if case['caseGroup']['collectionExerciseId']
+                          in collection_exercises_by_id.keys()]
 
         for case in enrolled_cases:
             collection_exercise = collection_exercises_by_id[case['caseGroup']['collectionExerciseId']]
@@ -362,7 +370,6 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
                                                    [case['collectionInstrumentId']]['type'])
 
             yield {
-
                 'case_id': case['id'],
                 'status': case_controller.calculate_case_status(case['caseGroup']['caseGroupStatus'],
                                                                 cache_data['instrument']

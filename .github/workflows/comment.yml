@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: set namespace
         run: |
-          echo ::set-env name=NAMESPACE::$(echo ${{ github.event.comment.body }} | cut -d' ' -f2)
+          echo NAMESPACE=$(echo ${{ github.event.comment.body }} | cut -d' ' -f2) >> $GITHUB_ENV
 
       - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:

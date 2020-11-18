@@ -89,7 +89,7 @@ jobs:
     
       - name: package helm
         run: |
-          echo ::set-env name=HELM_VERSION::$(grep -E "version:\s+" $CHART_DIRECTORY/Chart.yaml | cut -d" " -f2 | sed -r 's/"//g')
+          echo HELM_VERSION=$(grep -E "version:\s+" $CHART_DIRECTORY/Chart.yaml | cut -d" " -f2 | sed -r 's/"//g') >> $GITHUB_ENV
           helm dep up $CHART_DIRECTORY
           helm package $CHART_DIRECTORY
 

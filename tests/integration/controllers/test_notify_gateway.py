@@ -38,7 +38,6 @@ class TestNotifyController(unittest.TestCase):
         publisher.topic_path.return_value = 'projects/test-project-id/topics/ras-rm-notify-test'
         # Given a mocked notify gateway
         notify = NotifyGateway(self.app_config)
-        notify.project_id = 'test-project-id'
         notify.publisher = publisher
         personalisation = {"first_name": "testy", "last_name": "surname"}
         result = notify.request_to_notify('test@email.com', personalisation)

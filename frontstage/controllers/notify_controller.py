@@ -1,12 +1,9 @@
 import logging
-from urllib import parse as urlparse
 
 import structlog
-import requests
 
 from frontstage.exceptions import exceptions
-from flask import current_app as app
-from google.cloud import pubsub_v1
+from google.cloud import pubsub
 import json
 
 logger = structlog.wrap_logger(logging.getLogger(__name__))
@@ -34,7 +31,7 @@ class NotifyGateway:
         """
 
         bound_logger = logger.bind(template_id=self.request_password_change_template,
-            project_id=self.project_id, topic_id=self.topic_id)
+                                   project_id=self.project_id, topic_id=self.topic_id)
         bound_logger.info("Sending email via pubsub")
         if not self.send_email_to_notify:
             logger.info("Notification not sent. Notify is disabled.")
@@ -54,11 +51,11 @@ class NotifyGateway:
             
             payload_str = json.dumps(payload)
             if self.publisher is None:
-                self.publisher = pubsub_v1.PublisherClient()
-            topic_path = self.publisher.topic_path(self.project_id, self.topic_id)
+                self.publisher = pubsub.PublisherClient()
 
             bound_logger.info("About to publish to pubsub")
-            future = self.publisher.publish(topic_path, data=payload_str.encode())
+            topic = f'projects/{self.project_id}/topics/{self.topic_id}'
+            future = self.publisher.publish(topic, data=payload_str.encode())
 
             msg_id = future.result()
             bound_logger.info("Publish succeeded", msg_id=msg_id)

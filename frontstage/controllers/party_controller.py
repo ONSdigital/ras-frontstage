@@ -260,7 +260,7 @@ def get_unique_survey_and_business_ids(enrolment_data):
     """Takes a list of enrolment data and returns 2 unique sets of business_id and party_id's
 
     :param enrolment_data: A list of enrolments
-    :return: A pair of sets with
+    :return: A pair of sets with deduplicated survey_id's and business_id's
     """
 
     surveys_ids = set()

@@ -7,9 +7,7 @@ from frontstage.exceptions.exceptions import RasNotifyError
 
 
 class TestNotifyController(unittest.TestCase):
-    '''
-    Tests that the notify controller is working as expected
-    '''
+    """Tests that the notify controller is working as expected"""
 
     def setUp(self):
         app.testing = True
@@ -22,7 +20,6 @@ class TestNotifyController(unittest.TestCase):
     def test_request_to_notify_with_pubsub_no_personalisation(self):
         """Tests what is sent to pubsub when no personalisation is added"""
         publisher = unittest.mock.MagicMock()
-        publisher.topic_path.return_value = 'projects/test-project-id/topics/ras-rm-notify-test'
         notify = NotifyGateway(self.app_config)
         notify.project_id = 'test-project-id'
         notify.publisher = publisher
@@ -37,9 +34,9 @@ class TestNotifyController(unittest.TestCase):
     def test_a_successful_send_with_personalisation(self):
         """Tests what is sent to pubsub when personalisation is added"""
         publisher = unittest.mock.MagicMock()
-        publisher.topic_path.return_value = 'projects/test-project-id/topics/ras-rm-notify-test'
         # Given a mocked notify gateway
         notify = NotifyGateway(self.app_config)
+        notify.project_id = 'test-project-id'
         notify.publisher = publisher
         personalisation = {"first_name": "testy", "last_name": "surname"}
         result = notify.request_to_notify('test@email.com', personalisation)

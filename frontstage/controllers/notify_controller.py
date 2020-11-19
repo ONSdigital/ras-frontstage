@@ -3,7 +3,7 @@ import logging
 import structlog
 
 from frontstage.exceptions import exceptions
-from google.cloud import pubsub
+from google.cloud import pubsub_v1
 import json
 
 logger = structlog.wrap_logger(logging.getLogger(__name__))
@@ -51,11 +51,12 @@ class NotifyGateway:
             
             payload_str = json.dumps(payload)
             if self.publisher is None:
-                self.publisher = pubsub.PublisherClient()
+                self.publisher = pubsub_v1.PublisherClient()
 
-            bound_logger.info("About to publish to pubsub")
-            topic = f'projects/{self.project_id}/topics/{self.topic_id}'
-            future = self.publisher.publish(topic, data=payload_str.encode())
+            topic_path = self.publisher.topic_path(self.project_id, self.topic_id)
+
+            bound_logger.info("About to publish to pubsub", topic_path=topic_path)
+            future = self.publisher.publish(topic_path, data=payload_str.encode())
 
             msg_id = future.result()
             bound_logger.info("Publish succeeded", msg_id=msg_id)

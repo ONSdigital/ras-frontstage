@@ -318,10 +318,30 @@ def caching_data_for_collection_instrument(cache_data):
 
 def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_id):
     """
-    This function uses threads to get responses from Case, Party, Collection exercise, Survey and
-    Collection Instrument services. Some respondents to-do pages can have so many Surveys/Collection exercises
-    that it'll cause the page to timeout before finishing the load. Doing this in threads speeds it up and using
-    sets makes sure we're not using repeating calls to the services.
+    Gets a list of cases (and any useful metadata) for a respondent.  Depending on the tag the list of cases will be
+    ones that require action (in the form of an EQ or SEFT submission); Or they will be cases that have been completed
+    and are used to see what has been submitted in the past.
+
+    This function uses threads and caching to get data from Case, Party, Collection exercise, Survey and
+    Collection Instrument services. Without this, respondents with a large number of cases can experience page timeouts
+    as it'll take too long to load due to repeated calls for the same information from the services.
+
+    There isn't a direct link between respondent and the cases they're involved in.  Instead we can work out what
+    cases they're involved in via an implicit and indirect link between:
+        - The combination of survey and business a respondent is enrolled for, and;
+        - the cases and collection exercises the business is involved in
+
+    The algorithm for determining this is roughly:
+      - Get all survey enrolments for the respondent
+      - For each enrolment:
+          - Get the business details the enrolment is for
+          - Get the live-but-not-ended collection exercises for the survey the enrolment is for
+          - Get the cases the business is part of, from the list of collection exercises. Note, this isn't every case
+            against the business; depending if you're looking at the to-do or history page, you'll get a different
+            subset of them.
+          - For each case in this list:
+              - Create an entry in the returned list for each of these cases as the respondent is implicitly part
+                of the case by being enrolled for the survey with that business.
 
     :party_id: This is the respondents uuid
     :tag: This is the page that is being called e.g. to-do, history

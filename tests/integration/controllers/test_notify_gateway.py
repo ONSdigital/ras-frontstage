@@ -7,9 +7,7 @@ from frontstage.exceptions.exceptions import RasNotifyError
 
 
 class TestNotifyController(unittest.TestCase):
-    '''
-    Tests that the notify controller is working as expected
-    '''
+    """Tests that the notify controller is working as expected"""
 
     def setUp(self):
         app.testing = True

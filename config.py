@@ -100,7 +100,7 @@ class DevelopmentConfig(Config):
 class TestingConfig(DevelopmentConfig):
     TESTING = True
     DEVELOPMENT = False
-    WTF_CSRF_ENABLED = True
+    WTF_CSRF_ENABLED = False
     SEND_EMAIL_TO_GOV_NOTIFY = True
     EMAIL_TOKEN_SALT = 'bulbous'
     JWT_SECRET = 'testsecret'

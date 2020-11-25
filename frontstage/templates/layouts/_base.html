@@ -7,7 +7,7 @@
       
     {% if config.GOOGLE_TAG_MANAGER %}
       <!-- Google Tag Manager -->	
-      <script>
+      <script{% if csp_nonce %} nonce="{{ csp_nonce() }}"{% endif %}>
         var testCookies = /^(.*)?\s*'usage':true\s*[^;]+(.*)?$/;
         if (document.cookie.match(testCookies)) {
           (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':	

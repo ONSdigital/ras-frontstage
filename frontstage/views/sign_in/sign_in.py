@@ -92,7 +92,8 @@ def login():  # noqa: C901
                             value=session.session_key,
                             expires=session.get_expires_in(),
                             secure=True,
-                            httponly=True)
+                            httponly=True,
+                            SameSite=None; Secure)
         count = conversation_controller.get_message_count_from_api(session)
         session.set_unread_message_total(count)
         bound_logger.info('Successfully created session', session_key=session.session_key)

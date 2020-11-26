@@ -61,3 +61,7 @@ eq:
 dns:
   enabled: false
   wellKnownPort: 8080
+
+canary:
+  enabled: false
+  name: canary

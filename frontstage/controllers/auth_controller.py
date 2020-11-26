@@ -12,6 +12,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def sign_in(username, password):
+    logger.error("Test canary problem signing in", status=500)
     bound_logger = logger.bind(email=obfuscate_email(username))
     bound_logger.info('Attempting to sign in')
 

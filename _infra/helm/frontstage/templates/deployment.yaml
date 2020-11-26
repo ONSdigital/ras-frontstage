@@ -1,7 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  {{- if .Values.canary.enabled}}
+  name: "{{ .Chart.Name }}-{{ .Values.canary.name }}"
+  labels:
+    type: {{ .Values.canary.name }}
+  {{- else }}
   name: {{ .Chart.Name }}
+  {{- end }}
 spec:
   replicas: {{ .Values.replicas }}
   strategy:

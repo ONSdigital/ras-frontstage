@@ -10,5 +10,5 @@ COPY . /app
 RUN pipenv install --deploy --system
 
 EXPOSE 8082
-CMD ["gunicorn", "app:app", "--timeout 120", "-c", "gunicorn.py", "frontstage:app"]
+CMD ["gunicorn", "--timeout 120", "-c", "gunicorn.py", "frontstage:app"]
 

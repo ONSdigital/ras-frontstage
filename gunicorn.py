@@ -70,7 +70,7 @@ backlog = 2048
 workers = 8
 worker_class = 'gevent'
 worker_connections = 1000
-timeout = 90
+timeout = 0
 keepalive = 2
 
 #

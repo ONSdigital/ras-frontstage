@@ -52,11 +52,11 @@ class NotifyGateway:
             payload_str = json.dumps(payload)
             if self.publisher is None:
                 self.publisher = pubsub_v1.PublisherClient()
+            # new version should work on the topic_name and not topic_path
+            topic_name = f'projects/{self.project_id}/topics/{self.topic_id}'
 
-            topic_path = self.publisher.topic_path(self.project_id, self.topic_id)
-
-            bound_logger.info("About to publish to pubsub", topic_path=topic_path)
-            future = self.publisher.publish(topic_path, data=payload_str.encode())
+            bound_logger.info("About to publish to pubsub", topic_path=topic_name)
+            future = self.publisher.publish(topic_name, data=payload_str.encode())
 
             msg_id = future.result()
             bound_logger.info("Publish succeeded", msg_id=msg_id)

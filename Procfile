@@ -1,1 +1,1 @@
-web: gunicorn app:app --timeout 120 -c gunicorn.py frontstage:app
+web: gunicorn -c gunicorn.py frontstage:app

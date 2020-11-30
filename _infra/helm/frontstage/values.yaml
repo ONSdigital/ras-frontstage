@@ -2,11 +2,6 @@ env: minikube
 namespace: minikube
 public: false
 
-replicas: 1
-rollingUpdate:
-  maxSurge: 1
-  maxUnavailable: 1
-
 image:
   devRepo: eu.gcr.io/ons-rasrmbs-management
   name: eu.gcr.io/ons-rasrmbs-management
@@ -54,6 +49,24 @@ security:
   csrf:
     protected: true
     timeLimit: 7200
+
+resources:
+  requests:
+    memory: "500Mi"
+    cpu: "25m"
+  limits:
+    cpu: "100m"
+    memory: "1000Mi"
+
+autoscaling: false
+scaleAt:
+  # These are expressed as a percentage of resources.requests, not resources.limits
+  memoryPercentage: 150
+  cpuPercentage: 200
+replicas: 1
+rollingUpdate:
+  maxSurge: 1
+  maxUnavailable: 1
 
 eq:
   url: "http://localhost/session?token="

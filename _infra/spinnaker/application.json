@@ -1,6 +1,0 @@
-{
- "cloudProviders": "kubernetes",
- "email": "warren@warrenbailey.net",
- "instancePort": 80,
- "name": "frontstage"
-}

@@ -12,6 +12,8 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def sign_in(username, password):
+    if app.config["CANARY_GENERATE_ERRORS"]:
+        logger.error("Canary experiment running this error can be ignored", status=500)
     bound_logger = logger.bind(email=obfuscate_email(username))
     bound_logger.info('Attempting to sign in')
 

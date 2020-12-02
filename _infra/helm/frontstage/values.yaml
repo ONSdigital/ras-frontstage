@@ -65,3 +65,4 @@ dns:
 canary:
   enabled: false
   name: canary
+  generate_errors: false

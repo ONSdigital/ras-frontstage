@@ -16,8 +16,10 @@ jobs:
     if: contains(github.event.comment.body, '/deploy')
     steps:
       - name: set namespace
+        env:
+          COMMENT_BODY: ${{github.event.comment.body}}
         run: |
-          echo NAMESPACE=$(echo ${{ github.event.comment.body }} | cut -d' ' -f2) >> $GITHUB_ENV
+          echo NAMESPACE=$(echo $COMMENT_BODY | cut -d' ' -f2) >> $GITHUB_ENV
 
       - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:

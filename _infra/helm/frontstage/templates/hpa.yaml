@@ -8,8 +8,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ .Chart.Name }}
-  minReplicas: 1
-  maxReplicas: {{ .Values.replicas }}
+  minReplicas: {{ .Values.replicas }}
+  maxReplicas: {{ .Values.maxReplicas }}
   metrics:
   - type: Resource
     resource:

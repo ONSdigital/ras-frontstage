@@ -128,10 +128,10 @@ jobs:
             echo "new version: $NEW_VERSION"
             sed -i -e "s/appVersion: .*/$NEW_VERSION/g" $CHART_DIRECTORY/Chart.yaml
 
-            git config user.name "ras-rm-bot"
+            git config user.name "ras-rm-pr-bot"
             git config user.email "${{ secrets.BOT_EMAIL }}"
 
-            git remote set-url origin https://ras-rm-bot:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+            git remote set-url origin https://ras-rm-pr-bot:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
 
             git remote update
             git fetch

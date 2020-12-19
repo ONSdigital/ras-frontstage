@@ -104,7 +104,10 @@ spec:
           - name: EMAIL_TOKEN_EXPIRY
             value: "{{ .Values.email.expiry }}"
           - name: EMAIL_TOKEN_SALT
-            value: "{{ .Values.email.salt }}"
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Chart.Name }}
+                key: email-salt
           - name: EQ_URL
             value: "{{ .Values.eq.url }}"
           {{ if .Values.analytics.enabled }}

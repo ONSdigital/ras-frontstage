@@ -28,9 +28,6 @@ analytics:
 email:
   enabled: false
   expiry: "86400"
-  salt: aardvark
-  secret:
-    key: ONS_DUMMY_KEY
   templates:
     passwordChange: 7ba6b103-79d2-4ef1-be2e-979c127fa439
 

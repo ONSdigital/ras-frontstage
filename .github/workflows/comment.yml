@@ -5,40 +5,24 @@ on:
     types: [created]
 
 env:
-  IMAGE: frontstage
-  SPINNAKER_TOPIC: ${{ secrets.SPINNAKER_TOPIC }}
-  ARTIFACT_BUCKET: ${{ secrets.ARTIFACT_BUCKET }}
-  HOST: ${{ secrets.GOOGLE_PROJECT_ID }}
+  SERVICE: frontstage
 
 jobs:
   comment:
     runs-on: ubuntu-latest
     if: contains(github.event.comment.body, '/deploy')
     steps:
-      - name: set namespace
-        env:
-          COMMENT_BODY: ${{github.event.comment.body}}
-        run: |
-          echo NAMESPACE=$(echo $COMMENT_BODY | cut -d' ' -f2) >> $GITHUB_ENV
-
-      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      - uses: google-github-actions/setup-gcloud@master
         with:
-          version: '270.0.0'
+          project_id: ${{ secrets.GOOGLE_PROJECT_ID }}
           service_account_key: ${{ secrets.GCR_KEY }}
-      - run: |
-          gcloud auth configure-docker
-
-      - uses: actions/checkout@v1
-      - name: Add commit comment
-        run: |
-          jq -nc "{\"body\": \"@${{ github.event.comment.user.login }}, Spinnaker is deploying the PR to your environment\"}" | \
-          curl -sL  -X POST -d @- \
-            -H "Content-Type: application/json" \
-            -H "Authorization: token ${{ secrets.BOT_TOKEN }}" \
-            "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/${{ github.event.issue.number }}/comments"
-
-      - name: Trigger spinnaker
-        run: |
-          gcloud pubsub topics publish $SPINNAKER_TOPIC --project $HOST \
-          --message "{ \"kind\": \"storage#object\", \"name\": \"$IMAGE/$IMAGE-latest.tgz\", \"bucket\": \"$ARTIFACT_BUCKET\", \"parameters\": { \"tag\": \"pr-${{ github.event.issue.number }}\", \"namespace\": \"${{ env.NAMESPACE }}\", \"cluster\": \"dev\", \"actor\": \"$GITHUB_ACTOR\" } }" \
-          --attribute ci="actions"
+          export_default_credentials: true
+          
+      - uses: onsdigital/ras-rm-spinnaker-action@main
+        with:
+          comment-body: ${{ github.event.comment.body }}
+          gcp-project: ${{ secrets.GOOGLE_PROJECT_ID }}
+          bot-token: ${{ secrets.BOT_TOKEN }}
+          spinnaker-topic: ${{ secrets.SPINNAKER_TOPIC }}
+          artifact-bucket: ${{ secrets.ARTIFACT_BUCKET }}
+          helm-chart: ${{ env.SERVICE }}/${{ env.SERVICE }}-latest.tgz

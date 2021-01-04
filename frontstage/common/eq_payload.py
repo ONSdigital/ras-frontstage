@@ -81,7 +81,7 @@ class EqPayload(object):
         # Add any non null event dates that exist for this collection exercise
         payload.update([(key, value) for key, value in collex_event_dates.items() if value is not None])
 
-        logger.debug(payload=payload)
+        logger.debug(payload)
 
         return payload
 

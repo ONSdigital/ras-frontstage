@@ -17,11 +17,12 @@ def current_banner():
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error('Failed to retrieve Banner from api')
-        raise ApiError(response)
+        return ""
 
     logger.info('Successfully retrieved current live banner from api')
     if response.status_code == 204:
-        return {}
+        return ""
     banner = response.json()
-    logger.info(f"banner is {banner.content}")
-    return banner.get('content', "")
+    content = banner.get('content', "")
+    logger.info(f"banner is {content}")
+    return content

@@ -15,7 +15,7 @@ from tests.integration.mocked_services import (case, collection_exercise, collec
                                                url_get_ci, collection_instrument_seft, url_post_case_event_uuid,
                                                url_get_case_categories, url_get_survey_by_short_name_eq, categories,
                                                completed_case,
-                                               url_get_respondent_party, respondent_party)
+                                               url_get_respondent_party, url_banner_api, respondent_party)
 
 encoded_jwt_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXJ0eV9pZCI6ImY5NTZlOGFlLTZ" \
                     "lMGYtNDQxNC1iMGNmLWEwN2MxYWEzZTM3YiIsImV4cGlyZXNfYXQiOiIxMDAxMjM0NTY" \
@@ -51,6 +51,7 @@ class TestGenerateEqURL(unittest.TestCase):
         mock_request.get(url_get_case_categories, json=categories)
         mock_request.post(url_post_case_event_uuid, status_code=201)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
+        mock_request.get(url_banner_api, status_code=204)
 
         # When the generate-eq-url is called
         response = self.app.get(f"/surveys/access-survey?case_id={case['id']}&business_party_id={business_party['id']}"
@@ -66,6 +67,7 @@ class TestGenerateEqURL(unittest.TestCase):
 
         # Given a mocked case has its caseGroup status as complete
         mock_request.get(url_get_case, json=completed_case)
+        mock_request.get(url_banner_api, status_code=204)
 
         # When the generate-eq-url is called
         response = self.app.get(f"/surveys/access-survey?case_id={completed_case['id']}&business_party_id={business_party['id']}"
@@ -83,6 +85,7 @@ class TestGenerateEqURL(unittest.TestCase):
         mock_request.get(url_get_business_party, json=business_party)
         mock_request.get(url_get_survey, json=survey)
         mock_request.get(url_get_ci, json=collection_instrument_seft)
+        mock_request.get(url_banner_api, status_code=204)
 
         # When create_payload is called
         # Then an InvalidEqPayLoad is raised
@@ -100,6 +103,7 @@ class TestGenerateEqURL(unittest.TestCase):
             collection_instrument_eq_no_eq_id = json.load(json_data)
 
         mock_request.get(url_get_ci, json=collection_instrument_eq_no_eq_id)
+        mock_request.get(url_banner_api, status_code=204)
 
         # When create_payload is called
         # Then an InvalidEqPayLoad is raised
@@ -119,6 +123,7 @@ class TestGenerateEqURL(unittest.TestCase):
             collection_instrument_eq_no_form_type = json.load(json_data)
 
         mock_request.get(url_get_ci, json=collection_instrument_eq_no_form_type)
+        mock_request.get(url_banner_api, status_code=204)
 
         # When create_payload is called
         # Then an InvalidEqPayLoad is raised
@@ -135,6 +140,7 @@ class TestGenerateEqURL(unittest.TestCase):
 
         # Given a failing collection exercise events service
         mock_request.get(url_get_collection_exercise_events, status_code=500)
+        mock_request.get(url_banner_api, status_code=204)
 
         # When get collection exercise events is called
         # Then an ApiError is raised

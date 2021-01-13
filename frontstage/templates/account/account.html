@@ -1,9 +1,22 @@
 {% extends "layouts/_twothirds.html" %}
+{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
 
 {% set page_title = "Account details" %}
+{% set breadcrumbsData = [
+  {
+    "text": "Surveys",
+    "url": "/surveys/todo"
+  }
+] %}
 
 {% block main %}
-
+{{
+    onsBreadcrumb({
+        "ariaLabel": "Breadcrumbs",
+        "id": "breadcrumbs",
+        "itemsList": breadcrumbsData
+    })
+}}
 <h1 class="u-fs-xl">Account details</h1>
 <dl class="metadata metadata__list grid grid--gutterless u-cf u-mb-l" title="" aria-label="">
   <dt class="metadata__term grid__col col-4@m">Name:</dt>

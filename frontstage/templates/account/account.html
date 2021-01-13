@@ -1,0 +1,17 @@
+{% extends "layouts/_twothirds.html" %}
+
+{% set page_title = "Account details" %}
+
+{% block main %}
+
+<h1 class="u-fs-xl">Account details</h1>
+<dl class="metadata metadata__list grid grid--gutterless u-cf u-mb-l" title="" aria-label="">
+  <dt class="metadata__term grid__col col-4@m">Name:</dt>
+  <dd class="metadata__value grid__col col-8@m">{{ respondent.firstName }} {{ respondent.lastName }}</dd>
+  <dt class="metadata__term grid__col col-4@m">Email address:</dt>
+  <dd class="metadata__value grid__col col-8@m">{{ respondent.emailAddress }}</dd>
+  <dt class="metadata__term grid__col col-4@m">Phone number:</dt>
+  <dd class="metadata__value grid__col col-8@m">{{ respondent.telephone }}</dd>
+</dl>
+
+{% endblock main %}

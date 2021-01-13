@@ -1,4 +1,5 @@
 from frontstage import app
+from frontstage.views.account import account_bp
 from frontstage.views.contact_us import contact_us_bp
 from frontstage.views.cookies import cookies_bp
 from frontstage.views.privacy import privacy_bp
@@ -14,6 +15,7 @@ from frontstage.views.help import help_bp
 
 
 # Import endpoints and register blueprints
+app.register_blueprint(account_bp, url_prefix='/my-account')
 app.register_blueprint(cookies_bp, url_prefix='/cookies')
 app.register_blueprint(privacy_bp, url_prefix='/privacy-and-data-protection')
 app.register_blueprint(contact_us_bp, url_prefix='/contact-us')

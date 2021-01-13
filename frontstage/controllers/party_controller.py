@@ -80,10 +80,9 @@ def create_account(registration_data):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         if response.status_code == 400:
-            message = 'Email has already been used'
+            logger.info('Email has already been used')
         else:
-            message = 'Failed to create account'
-        logger.error(message)
+            logger.error('Failed to create account')
         raise ApiError(logger, response)
 
     logger.info('Successfully created account')

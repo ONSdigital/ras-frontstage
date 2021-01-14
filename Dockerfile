@@ -1,4 +1,4 @@
-FROM python:3.8-slim
+FROM python:3.9-slim
 
 RUN apt update && apt install -y build-essential curl
 RUN pip install 'pipenv==2018.11.26'

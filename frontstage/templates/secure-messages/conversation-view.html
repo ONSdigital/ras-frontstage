@@ -5,6 +5,8 @@
 
 {% set page_title = "View message" %}
 {% set subject = conversation[-1]["subject"] or "No Subject" %}
+{% set survey = conversation[-1]["survey"] or "No Survey" %}
+{% set business = conversation[-1]["ru_name"] or "No Business" %}
 
 {% block messages %}
 
@@ -60,6 +62,10 @@
         <div class="grid__col col-8@m">
             <section role="region" aria-label="Conversation: {{ subject }}">
                 <h1 class="u-fs-xl" name="page-messages-title">{{ subject }}</h1>
+                <div class="u-fs-r--b">Survey: </div>
+                <p>{{ survey }}</p>
+                <div class="u-fs-r--b">Business:</div>
+                <p>{{ business }}</p>
                 {% for message in conversation %}
                     {% if message.get('from_internal') == True %}
                         {% set msgType = 'received' %}

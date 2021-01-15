@@ -1,8 +1,9 @@
 import unittest
 from unittest.mock import patch
+import requests_mock
 
 from frontstage import app
-from tests.integration.mocked_services import encoded_jwt_token, respondent_party
+from tests.integration.mocked_services import encoded_jwt_token, respondent_party, url_banner_api
 
 
 class TestSurveyList(unittest.TestCase):
@@ -19,8 +20,10 @@ class TestSurveyList(unittest.TestCase):
     def tearDown(self):
         self.patcher.stop()
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
-    def test_account(self, get_respondent_party_by_id):
+    def test_account(self, mock_request, get_respondent_party_by_id):
+        mock_request.get(url_banner_api, status_code=204)
         get_respondent_party_by_id.return_value = respondent_party
 
         response = self.app.get('/my-account')

@@ -140,3 +140,4 @@ url_verify_email = f"{app.config['PARTY_URL']}/party-api/v1/emailverification/{t
 url_verify_token = f"{app.config['PARTY_URL']}/party-api/v1/tokens/verify/{token}"
 url_notify_party_and_respondent_account_locked = f'{app.config["PARTY_URL"]}/party-api/v1/respondents/edit-account-' \
                                                  f'status/{party["id"]}'
+url_banner_api = f"{app.config['BANNER_SERVICE_URL']}/banner/active"

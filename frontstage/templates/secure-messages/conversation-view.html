@@ -5,8 +5,8 @@
 
 {% set page_title = "View message" %}
 {% set subject = conversation[-1]["subject"] or "No Subject" %}
-{% set survey = conversation[-1]["survey"] or "No Survey" %}
-{% set business = conversation[-1]["ru_name"] or "No Business" %}
+{% set survey = conversation[-1]["survey_id"] or "No Survey" %}
+{% set business = conversation[-1]["ru_ref"] or "No Business" %}
 
 {% block messages %}
 

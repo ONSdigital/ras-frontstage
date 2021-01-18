@@ -2,14 +2,11 @@ import json
 import unittest
 from unittest.mock import patch
 from flask import request
-import requests_mock
 
 from frontstage import app
-from tests.integration.mocked_services import business_party, case, collection_instrument_seft, encoded_jwt_token, \
-    survey, url_banner_api
+from tests.integration.mocked_services import business_party, case, collection_instrument_seft, encoded_jwt_token, survey
 
 
-@requests_mock.mock()
 class TestDownloadSurvey(unittest.TestCase):
 
     def setUp(self):
@@ -28,8 +25,7 @@ class TestDownloadSurvey(unittest.TestCase):
     @patch('frontstage.controllers.collection_instrument_controller.download_collection_instrument')
     @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
     @patch('frontstage.controllers.case_controller.get_case_by_case_id')
-    def test_download_survey_success(self, mock_request, get_case_by_id, _, download_collection_instrument):
-        mock_request.get(url_banner_api, status_code=204)
+    def test_download_survey_success(self, get_case_by_id, _, download_collection_instrument):
         str = json.dumps(collection_instrument_seft)
         binary = ' '.join(format(ord(letter), 'b') for letter in str)
         get_case_by_id.return_value = case
@@ -41,8 +37,7 @@ class TestDownloadSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_enforces_secure_headers(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+    def test_enforces_secure_headers(self):
         with app.test_client() as client:
             headers = client.get(
                 '/',

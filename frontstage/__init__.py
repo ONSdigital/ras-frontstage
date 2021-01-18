@@ -2,7 +2,6 @@ import redis
 from frontstage.create_app import create_app_object
 from flask_talisman import Talisman
 from frontstage.common.jinja_filters import filter_blueprint
-from frontstage.controllers.banner_controller import current_banner
 
 # TODO: review https://content-security-policy.com/, remove this comment if we're covered.
 CSP_POLICY = {
@@ -35,10 +34,9 @@ app.register_blueprint(filter_blueprint)
 
 @app.context_processor
 def inject_availability_message():
-    banner = current_banner()
-    if banner:
+    if len(redis.keys('AVAILABILITY_MESSAGE')) == 1:
         return {
-            "availability_message": banner
+            "availability_message": redis.get('AVAILABILITY_MESSAGE').decode('utf-8')
             }
     return {}
 

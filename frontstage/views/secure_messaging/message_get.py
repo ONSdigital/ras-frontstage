@@ -50,13 +50,15 @@ def view_conversation(session, thread_id):
     unread_message_count = {'unread_message_count': get_message_count_from_api(session)}
     survey_name = get_survey(app.config['SURVEY_URL'], app.config['BASIC_AUTH'],
                              refined_conversation[-1]['survey_id']).get('longName')
+    business_name = conversation['messages'][0]['@business_details']['name']
 
     return render_template('secure-messages/conversation-view.html',
                            form=form,
                            conversation=refined_conversation,
                            conversation_data=conversation,
                            unread_message_count=unread_message_count,
-                           survey_name=survey_name)
+                           survey_name=survey_name,
+                           business_name = business_name)
 
 
 @secure_message_bp.route('/threads', methods=['GET'])

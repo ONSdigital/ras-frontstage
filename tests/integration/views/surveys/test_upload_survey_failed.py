@@ -1,13 +1,11 @@
 import unittest
 from unittest.mock import patch
-import requests_mock
 
 from frontstage import app
 from tests.integration.mocked_services import business_party, case, collection_instrument_seft, collection_exercise, \
-    encoded_jwt_token, survey, url_banner_api
+    encoded_jwt_token, survey
 
 
-@requests_mock.mock()
 class TestUploadSurveyFailed(unittest.TestCase):
 
     def setUp(self):
@@ -29,8 +27,7 @@ class TestUploadSurveyFailed(unittest.TestCase):
         self.patcher.stop()
 
     @patch('frontstage.controllers.case_controller.get_case_data')
-    def test_upload_failed_no_error_info(self, mock_request, get_case_data):
-        mock_request.get(url_banner_api, status_code=204)
+    def test_upload_failed_no_error_info(self, get_case_data):
         get_case_data.return_value = self.case_data
         response = self.app.get(f'/surveys/upload-failed?case_id={case["id"]}&business_party_id={business_party["id"]}&survey_short_name={survey["shortName"]}')
 
@@ -39,8 +36,7 @@ class TestUploadSurveyFailed(unittest.TestCase):
         self.assertTrue("Please try uploading your spreadsheet again".encode() in response.data)
 
     @patch('frontstage.controllers.case_controller.get_case_data')
-    def test_upload_failed_type_error_info(self, mock_request, get_case_data):
-        mock_request.get(url_banner_api, status_code=204)
+    def test_upload_failed_type_error_info(self, get_case_data):
         get_case_data.return_value = self.case_data
         response = self.app.get(f'/surveys/upload-failed?case_id={case["id"]}&business_party_id={business_party["id"]}&survey_short_name={survey["shortName"]}'
                                 f'&error_info=type')
@@ -50,8 +46,7 @@ class TestUploadSurveyFailed(unittest.TestCase):
         self.assertTrue("The spreadsheet must be in .xls or .xlsx format".encode() in response.data)
 
     @patch('frontstage.controllers.case_controller.get_case_data')
-    def test_upload_failed_charLimit_error_info(self, mock_request, get_case_data):
-        mock_request.get(url_banner_api, status_code=204)
+    def test_upload_failed_charLimit_error_info(self, get_case_data):
         get_case_data.return_value = self.case_data
         response = self.app.get(f'/surveys/upload-failed?case_id={case["id"]}&business_party_id={business_party["id"]}&survey_short_name={survey["shortName"]}'
                                 f'&error_info=charLimit')
@@ -61,8 +56,7 @@ class TestUploadSurveyFailed(unittest.TestCase):
         self.assertTrue("The file name of your spreadsheet must be less than 50 characters long".encode() in response.data)
 
     @patch('frontstage.controllers.case_controller.get_case_data')
-    def test_upload_failed_size_error_info(self, mock_request, get_case_data):
-        mock_request.get(url_banner_api, status_code=204)
+    def test_upload_failed_size_error_info(self, get_case_data):
         get_case_data.return_value = self.case_data
         response = self.app.get(f'/surveys/upload-failed?case_id={case["id"]}&business_party_id={business_party["id"]}&survey_short_name={survey["shortName"]}'
                                 f'&error_info=size')
@@ -71,14 +65,12 @@ class TestUploadSurveyFailed(unittest.TestCase):
         self.assertTrue("Error uploading - file size too large".encode() in response.data)
         self.assertTrue("The spreadsheet must be smaller than 20MB in size".encode() in response.data)
 
-    def test_upload_survey_failed_with_no_business_party_id_fails(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+    def test_upload_survey_failed_with_no_business_party_id_fails(self):
         response = self.app.get(f'/surveys/upload-failed?case_id={case["id"]}&survey_short_name={survey["shortName"]}&error_info=size')
 
         self.assertEqual(response.status_code, 400)
 
-    def test_upload_survey_failed_with_no_survey_short_name_fails(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+    def test_upload_survey_failed_with_no_survey_short_name_fails(self):
         response = self.app.get(f'/surveys/upload-failed?case_id={case["id"]}&business_party_id={business_party["id"]}'
                                 f'&error_info=size')
 

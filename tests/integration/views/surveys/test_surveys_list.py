@@ -1,12 +1,10 @@
 import unittest
 from unittest.mock import patch
-import requests_mock
 
 from frontstage import app
-from tests.integration.mocked_services import encoded_jwt_token, survey_list_history, survey_list_todo, url_banner_api
+from tests.integration.mocked_services import encoded_jwt_token, survey_list_history, survey_list_todo
 
 
-@requests_mock.mock()
 class TestSurveyList(unittest.TestCase):
 
     def setUp(self):
@@ -22,8 +20,7 @@ class TestSurveyList(unittest.TestCase):
         self.patcher.stop()
 
     @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
-    def test_survey_list_todo(self, mock_request, get_survey_list):
-        mock_request.get(url_banner_api, status_code=204)
+    def test_survey_list_todo(self, get_survey_list):
         get_survey_list.return_value = survey_list_todo
 
         response = self.app.get('/surveys/todo')
@@ -31,8 +28,7 @@ class TestSurveyList(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
-    def test_survey_list_history(self, mock_request, get_survey_list):
-        mock_request.get(url_banner_api, status_code=204)
+    def test_survey_list_history(self, get_survey_list):
         get_survey_list.return_value = survey_list_history
 
         response = self.app.get('/surveys/history')

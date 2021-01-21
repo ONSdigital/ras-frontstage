@@ -1,5 +1,8 @@
 {% extends "layouts/_twothirds.html" %}
 {% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/fieldset/_macro.njk" import onsFieldset %}
+{% from "components/radios/_macro.njk" import onsRadios %}
+{% from "components/button/_macro.njk" import onsButton %}
 
 {% set page_title = "Account details" %}
 {% set breadcrumbsData = [
@@ -10,6 +13,17 @@
 ] %}
 
 {% block main %}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+          <div class="panel panel--simple panel--error u-mb-m">
+              <div class="panel__body" data-qa="error-body">
+                {% for message in messages %}
+                <p class="u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>
+                {% endfor %}
+              </div>
+          </div>
+    {% endif %}
+{% endwith %}
 {{
     onsBreadcrumb({
         "ariaLabel": "Breadcrumbs",
@@ -26,5 +40,89 @@
   <dt class="metadata__term grid__col col-4@m">Phone number:</dt>
   <dd class="metadata__value grid__col col-8@m">{{ respondent.telephone }}</dd>
 </dl>
+<hr class="u-mb-l">
+<h1 class="u-fs-xl">Help with your account</h1>
+<form action="{{ url_for('account_bp.get_account', respondent=respondent)}}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        {{
+            onsRadios({
+                "legend": "Choose an option",
+                "name": "option",
+                "radios": [
+                    {
+                        "id": "contact_details",
+                        "label": {
+                            "text": "Change my contact details"
+                        },
+                        "value": "contact_details"
+                    },
+                    {
+                        "id": "business_details",
+                        "label": {
+                            "text": "Change business details",
+                        },
+                        "value": "business_details",
+                        "attributes": {
+                            "disabled": true
+                        }
+                    },
+                    {
+                        "id": "share_survey",
+                        "label": {
+                            "text": "Share access to my surveys"
+                        },
+                        "value": "share_survey",
+                        "attributes": {
+                            "disabled": true
+                        }
+                    },
+                    {
+                        "id": "no_longer_required",
+                        "label": {
+                            "text": "I'm no longer required to complete any surveys",
+                        },
+                        "value": "no_longer_required",
+                        "attributes": {
+                            "disabled": true
+                        }
+                    },
+                    {
+                        "id": "change_password",
+                        "label": {
+                            "text": "Change password"
+                        },
+                        "value": "change_password",
+                        "attributes": {
+                            "disabled": true
+                        }
+                    },
+                    {
+                        "id": "something_else",
+                        "label": {
+                            "text": "Something else"
+                        },
+                        "value": "something_else",
+                        "attributes": {
+                            "disabled": true
+                        }
+                    }
+                ]
+            })
+        }}
+    <p class="field u-mt-l">
+        <div class="btn-group">
+        {{
+            onsButton({
+            "text": "Continue",
+            "id": "btn-option-continue",
+            "classes": 'btn-group__btn',
+            "submitType": "timer"
+            })
+        }}
+        <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}"
+      role="button" class="btn btn--secondary" id="btn-upload-ci-cancel"><span class="btn__inner">Cancel</span></a>
+        </div>
+    </p>
+</form>
 
 {% endblock main %}

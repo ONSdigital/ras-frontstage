@@ -3,6 +3,17 @@
 {% set page_title = "Surveys to complete" %}
 
 {% block content %}
+{% if success_panel %}
+    {% call
+        onsPanel({
+            "type": "success",
+            "classes": "u-mb-s",
+            "id": "success-panel"
+        })
+    %}
+        {{ success_panel }}
+    {% endcall %}
+{% endif %}
 {% include "partials/tab_list.html" %}
 
 {% if added_survey %}

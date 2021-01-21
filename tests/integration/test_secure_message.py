@@ -7,7 +7,8 @@ from frontstage import app
 from frontstage.exceptions.exceptions import IncorrectAccountAccessError
 from tests.integration.mocked_services import (conversation_json, conversation_list_json,
                                                encoded_jwt_token, url_get_thread, url_get_threads,
-                                               url_send_message, url_get_conversation_count, url_banner_api)
+                                               url_send_message, url_get_conversation_count)
+
 url_get_survey_long_name = app.config['SURVEY_URL'] + '/surveys/02b9c366-7397-42f7-942a-76dc5876d86d'
 
 

@@ -58,7 +58,7 @@ def view_conversation(session, thread_id):
                            conversation_data=conversation,
                            unread_message_count=unread_message_count,
                            survey_name=survey_name,
-                           business_name = business_name)
+                           business_name=business_name)
 
 
 @secure_message_bp.route('/threads', methods=['GET'])

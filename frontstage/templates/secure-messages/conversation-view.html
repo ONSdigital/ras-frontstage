@@ -33,7 +33,7 @@
         {% call
             onsPanel({
                 "type": "error",
-                "classes": "u-mb-s",    
+                "classes": "u-mb-s",
                 "title":  errorTitle
             })
         %}
@@ -53,7 +53,7 @@
                 onsList({
                     "classes": "list--bare",
                     "itemsList": errorData
-                }) 
+                })
             }}
 
         {% endcall %}
@@ -91,7 +91,7 @@
                             "messageID": 'conversation-message-body-' + loop.index|string,
                             "messageName": 'conversation-message-body'
                         })
-                    %}        
+                    %}
                         <span style="white-space:pre-line">{{ message.get('body') }}</span>
                     {% endcall %}
                     {% if loop.last %}
@@ -128,7 +128,7 @@
                                     "id": "send_message_button",
                                     "submitType": "timer"
                                 })
-                            }}        
+                            }}
                         </form>
                     </div>
                 {% endif %}

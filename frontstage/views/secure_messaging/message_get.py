@@ -4,10 +4,12 @@ from distutils.util import strtobool
 from flask import json, flash, Markup, render_template, redirect, request, url_for
 from structlog import wrap_logger
 
+from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.common.message_helper import from_internal, refine
 from frontstage.controllers.conversation_controller import get_conversation, get_conversation_list, \
     remove_unread_label, send_message, try_message_count_from_session, get_message_count_from_api
+from frontstage.controllers.survey_controller import get_survey
 from frontstage.models import SecureMessagingForm
 from frontstage.views.secure_messaging import secure_message_bp
 
@@ -46,12 +48,17 @@ def view_conversation(session, thread_id):
             return redirect(url_for('secure_message_bp.view_conversation_list'))
 
     unread_message_count = {'unread_message_count': get_message_count_from_api(session)}
+    survey_name = get_survey(app.config['SURVEY_URL'], app.config['BASIC_AUTH'],
+                             refined_conversation[-1]['survey_id']).get('longName')
+    business_name = conversation['messages'][-1]['@business_details']['name']
 
     return render_template('secure-messages/conversation-view.html',
                            form=form,
                            conversation=refined_conversation,
                            conversation_data=conversation,
-                           unread_message_count=unread_message_count)
+                           unread_message_count=unread_message_count,
+                           survey_name=survey_name,
+                           business_name=business_name)
 
 
 @secure_message_bp.route('/threads', methods=['GET'])

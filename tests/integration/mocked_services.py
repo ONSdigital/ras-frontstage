@@ -58,8 +58,8 @@ with open('tests/test_data/case/completed_case.json') as fp:
 with open('tests/test_data/case/completed_by_phone_case.json') as fp:
     completed_by_phone_case = [json.load(fp)]
 
-with open('tests/test_data/conversation.json') as fp:
-    conversation_json = json.load(fp)
+with open('tests/test_data/message.json') as fp:
+    message_json = json.load(fp)
 
 with open('tests/test_data/conversation_list.json') as fp:
     conversation_list_json = json.load(fp)

@@ -64,6 +64,7 @@ class TestSecureMessage(unittest.TestCase):
         self.assertTrue('Peter Griffin'.encode() in response.data)
         self.assertTrue('testy2'.encode() in response.data)
         self.assertTrue('something else'.encode() in response.data)
+        self.assertTrue('Quarterly Business Survey'.encode() in response.data)
         self.assertTrue('OFFICE FOR NATIONAL STATISTICS'.encode() in response.data)
         self.assertIn("Please note, this system should not be used to inform us of changes to".encode(), response.data)
 

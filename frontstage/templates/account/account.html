@@ -13,17 +13,17 @@
 ] %}
 
 {% block main %}
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-          <div class="panel panel--simple panel--error u-mb-m">
-              <div class="panel__body" data-qa="error-body">
-                {% for message in messages %}
-                <p class="u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>
-                {% endfor %}
-              </div>
-          </div>
-    {% endif %}
-{% endwith %}
+{% if error_panel %}
+    {% call
+        onsPanel({
+            "type": "error",
+            "classes": "u-mb-s",
+            "id": "error-panel"
+        })
+    %}
+        {{ error_panel }}
+    {% endcall %}
+{% endif %}
 {{
     onsBreadcrumb({
         "ariaLabel": "Breadcrumbs",
@@ -55,56 +55,6 @@
                             "text": "Change my contact details"
                         },
                         "value": "contact_details"
-                    },
-                    {
-                        "id": "business_details",
-                        "label": {
-                            "text": "Change business details",
-                        },
-                        "value": "business_details",
-                        "attributes": {
-                            "disabled": true
-                        }
-                    },
-                    {
-                        "id": "share_survey",
-                        "label": {
-                            "text": "Share access to my surveys"
-                        },
-                        "value": "share_survey",
-                        "attributes": {
-                            "disabled": true
-                        }
-                    },
-                    {
-                        "id": "no_longer_required",
-                        "label": {
-                            "text": "I'm no longer required to complete any surveys",
-                        },
-                        "value": "no_longer_required",
-                        "attributes": {
-                            "disabled": true
-                        }
-                    },
-                    {
-                        "id": "change_password",
-                        "label": {
-                            "text": "Change password"
-                        },
-                        "value": "change_password",
-                        "attributes": {
-                            "disabled": true
-                        }
-                    },
-                    {
-                        "id": "something_else",
-                        "label": {
-                            "text": "Something else"
-                        },
-                        "value": "something_else",
-                        "attributes": {
-                            "disabled": true
-                        }
                     }
                 ]
             })
@@ -120,7 +70,7 @@
             })
         }}
         <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}"
-      role="button" class="btn btn--secondary" id="btn-upload-ci-cancel"><span class="btn__inner">Cancel</span></a>
+      role="button" class="btn btn--secondary" id="btn-option-cancel"><span class="btn__inner">Cancel</span></a>
         </div>
     </p>
 </form>

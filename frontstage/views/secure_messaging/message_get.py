@@ -54,7 +54,7 @@ def view_conversation(session, thread_id):
         survey_name = get_survey(app.config['SURVEY_URL'], app.config['BASIC_AUTH'],
                                  refined_conversation[-1]['survey_id']).get('longName')
     except ApiError as exc:
-        logger.error('Failed to retrieve survey name', status_code=exc.status_code)
+        logger.info('Failed to get survey name, setting to None', status_code=exc.status_code)
 
     business_name = conversation['messages'][-1]['@business_details']['name']
 

@@ -56,7 +56,10 @@ def view_conversation(session, thread_id):
     except ApiError as exc:
         logger.info('Failed to get survey name, setting to None', status_code=exc.status_code)
 
-    business_name = conversation['messages'][-1]['@business_details']['name']
+    try:
+        business_name = conversation['messages'][-1]['@business_details']['name']
+    except KeyError:
+        logger.info('Failed to get business name, setting to None')
 
     return render_template('secure-messages/conversation-view.html',
                            form=form,

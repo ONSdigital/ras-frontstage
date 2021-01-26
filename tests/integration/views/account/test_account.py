@@ -43,7 +43,6 @@ class TestSurveyList(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('example@example.com'.encode() in response.data)
-        self.assertTrue('0987654321'.encode() in response.data)
         self.assertIn("Help with your account".encode(), response.data)
 
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')

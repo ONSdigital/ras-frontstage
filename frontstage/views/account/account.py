@@ -69,6 +69,10 @@ def change_account_details(session):
 def check_attribute_change(form, attributes_changed, respondent_details, update_required_flag):
     """
      checks if the form data matches with the respondent details
+     : form : the form data
+     : attributes_changed: which attribute changed
+     : respondent_details: respondent data
+     : update_required_flag: boolean flag if update is required
     """
     if form['first_name'].data != respondent_details['firstName']:
         respondent_details['firstName'] = form['first_name'].data
@@ -89,6 +93,8 @@ def create_success_message(attr, message):
     """
       takes a string as message and a list of strings attr
       to append message with attributes adding ',' and 'and'
+      : attr : list of string
+      : message : string
       for example: if message = "I ate "
       and attr = ["apple","banana","grapes"]
       result will be = "I ate apple, banana and grapes."

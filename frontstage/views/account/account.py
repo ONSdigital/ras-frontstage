@@ -20,8 +20,7 @@ def get_account(session):
     form = OptionsForm()
     party_id = session.get_party_id()
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
-    error_panel = request.args.get('error_panel')
-    return render_template('account/account.html', form=form, respondent=respondent_details, error_panel=error_panel)
+    return render_template('account/account.html', form=form, respondent=respondent_details)
 
 
 @account_bp.route('/', methods=['POST'])
@@ -30,8 +29,8 @@ def update_account(session):
     form = OptionsForm()
     form_valid = form.validate()
     if not form_valid:
-        error_panel = 'At least one option should be selected.'
-        return redirect(url_for('account_bp.get_account', error_panel=error_panel))
+        flash('At least one option should be selected!')
+        return redirect(url_for('account_bp.get_account'))
     if form.data['option'] == 'contact_details':
         return redirect(url_for('account_bp.change_account_details'))
 
@@ -46,7 +45,10 @@ def change_account_details(session):
     attributes_changed = []
     if request.method == 'POST' and form.validate():
         logger.info('Attempting to update contact details changes on the account')
-        update_required_flag = check_attribute_change(attributes_changed, respondent_details, update_required_flag)
+        update_required_flag = check_attribute_change(form,
+                                                      attributes_changed,
+                                                      respondent_details,
+                                                      update_required_flag)
         if update_required_flag:
             try:
                 party_controller.update_account(respondent_details)
@@ -55,7 +57,8 @@ def change_account_details(session):
                 raise exc
             logger.info('Successfully updated account')
             success_panel = create_success_message(attributes_changed, "We've updated your ")
-            return redirect(url_for('surveys_bp.get_survey_list', tag='todo', success_panel=success_panel))
+            flash(success_panel)
+            return redirect(url_for('surveys_bp.get_survey_list', tag='todo'))
         else:
             return redirect(url_for('surveys_bp.get_survey_list', tag='todo'))
     else:
@@ -63,23 +66,33 @@ def change_account_details(session):
                                form=form, errors=form.errors, respondent=respondent_details)
 
 
-def check_attribute_change(attributes_changed, respondent_details, update_required_flag):
-    if request.form.get('first_name') != respondent_details['firstName']:
-        respondent_details['firstName'] = request.form.get('first_name')
+def check_attribute_change(form, attributes_changed, respondent_details, update_required_flag):
+    """
+     checks if the form data matches with the respondent details
+    """
+    if form['first_name'].data != respondent_details['firstName']:
+        respondent_details['firstName'] = form['first_name'].data
         update_required_flag = True
         attributes_changed.append('first name')
-    if request.form.get('last_name') != respondent_details['lastName']:
-        respondent_details['lastName'] = request.form.get('last_name')
+    if form['last_name'].data != respondent_details['lastName']:
+        respondent_details['lastName'] = form['last_name'].data
         update_required_flag = True
         attributes_changed.append('last name')
-    if request.form.get('phone_number') != respondent_details['telephone']:
-        respondent_details['telephone'] = request.form.get('phone_number')
+    if form['phone_number'].data != respondent_details['telephone']:
+        respondent_details['telephone'] = form['phone_number'].data
         update_required_flag = True
         attributes_changed.append('telephone number')
     return update_required_flag
 
 
 def create_success_message(attr, message):
+    """
+      takes a string as message and a list of strings attr
+      to append message with attributes adding ',' and 'and'
+      for example: if message = "I ate "
+      and attr = ["apple","banana","grapes"]
+      result will be = "I ate apple, banana and grapes."
+    """
     for x in attr:
         if x == attr[-1] and len(attr) >= 2:
             message += ' and ' + x

@@ -3,17 +3,17 @@
 {% set page_title = "Surveys to complete" %}
 
 {% block content %}
-{% if success_panel %}
-    {% call
-        onsPanel({
-            "type": "success",
-            "classes": "u-mb-s",
-            "id": "success-panel"
-        })
-    %}
-        {{ success_panel }}
-    {% endcall %}
-{% endif %}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+          <div class="panel panel--simple panel--success u-mb-m">
+              <div class="panel__body" data-qa="error-success">
+                {% for message in messages %}
+                <p class="u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>
+                {% endfor %}
+              </div>
+          </div>
+    {% endif %}
+{% endwith %}
 {% include "partials/tab_list.html" %}
 
 {% if added_survey %}

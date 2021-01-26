@@ -13,17 +13,17 @@
 ] %}
 
 {% block main %}
-{% if error_panel %}
-    {% call
-        onsPanel({
-            "type": "error",
-            "classes": "u-mb-s",
-            "id": "error-panel"
-        })
-    %}
-        {{ error_panel }}
-    {% endcall %}
-{% endif %}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+          <div class="panel panel--simple panel--error u-mb-m">
+              <div class="panel__body" data-qa="error-body">
+                {% for message in messages %}
+                <p class="u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>
+                {% endfor %}
+              </div>
+          </div>
+    {% endif %}
+{% endwith %}
 {{
     onsBreadcrumb({
         "ariaLabel": "Breadcrumbs",

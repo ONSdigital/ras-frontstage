@@ -49,7 +49,7 @@ class TestSurveyList(unittest.TestCase):
     def test_account_options_not_selection(self, get_respondent_party_by_id):
         get_respondent_party_by_id.return_value = respondent_party
         response = self.app.post('/my-account', data={"option": None}, follow_redirects=True)
-        self.assertIn("At least one option should be selected.".encode(),
+        self.assertIn("At least one option should be selected".encode(),
                       response.data)
 
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')

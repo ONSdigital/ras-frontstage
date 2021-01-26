@@ -22,7 +22,6 @@ def get_survey_list(session, tag):
     party_id = session.get_party_id()
     business_id = request.args.get('business_party_id')
     survey_id = request.args.get('survey_id')
-    success_panel = request.args.get('success_panel')
     already_enrolled = request.args.get('already_enrolled')
     bound_logger = logger.bind(party_id=party_id,
                                business_id=business_id,
@@ -43,8 +42,7 @@ def get_survey_list(session, tag):
         response = make_response(render_template('surveys/surveys-todo.html',
                                                  sorted_surveys_list=sorted_survey_list,
                                                  added_survey=added_survey, already_enrolled=already_enrolled,
-                                                 unread_message_count=unread_message_count,
-                                                 success_panel=success_panel))
+                                                 unread_message_count=unread_message_count))
 
         # Ensure any return to list of surveys (e.g. browser back) round trips the server to display the latest statuses
         response.headers.set("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store")
@@ -52,4 +50,4 @@ def get_survey_list(session, tag):
         return response
     else:
         return render_template('surveys/surveys-history.html', sorted_surveys_list=sorted_survey_list, history=True,
-            unread_message_count=unread_message_count, success_panel=success_panel)
+            unread_message_count=unread_message_count)

@@ -122,6 +122,7 @@ url_get_collection_exercise_events = f"{app.config['COLLECTION_EXERCISE_URL']}/c
 url_get_collection_exercise_go_live = f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/{collection_exercise['id']}/events/go_live"
 url_get_respondent_email = f"{app.config['PARTY_URL']}/party-api/v1/respondents/email"
 url_get_survey = f"{app.config['SURVEY_URL']}/surveys/{survey['id']}"
+url_get_survey_long_name = app.config['SURVEY_URL'] + '/surveys/02b9c366-7397-42f7-942a-76dc5876d86d'
 url_get_survey_by_short_name = f"{app.config['SURVEY_URL']}/surveys/shortname/{survey['shortName']}"
 url_get_survey_by_short_name_eq = f"{app.config['SURVEY_URL']}/surveys/shortname/{survey_eq['shortName']}"
 url_get_survey_by_short_name_rsi = f"{app.config['SURVEY_URL']}/surveys/shortname/{survey_rsi['shortName']}"

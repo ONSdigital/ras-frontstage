@@ -5,6 +5,8 @@
 
 {% set page_title = "View message" %}
 {% set subject = conversation[-1]["subject"] or "No Subject" %}
+{% set survey = survey_name or "No Survey" %}
+{% set business = business_name or "No Business" %}
 
 {% block messages %}
 
@@ -31,7 +33,7 @@
         {% call
             onsPanel({
                 "type": "error",
-                "classes": "u-mb-s",    
+                "classes": "u-mb-s",
                 "title":  errorTitle
             })
         %}
@@ -51,7 +53,7 @@
                 onsList({
                     "classes": "list--bare",
                     "itemsList": errorData
-                }) 
+                })
             }}
 
         {% endcall %}
@@ -60,6 +62,10 @@
         <div class="grid__col col-8@m">
             <section role="region" aria-label="Conversation: {{ subject }}">
                 <h1 class="u-fs-xl" name="page-messages-title">{{ subject }}</h1>
+                <div class="u-fs-r--b">Survey: </div>
+                <p>{{ survey }}</p>
+                <div class="u-fs-r--b">Business:</div>
+                <p>{{ business }}</p>
                 {% for message in conversation %}
                     {% if message.get('from_internal') == True %}
                         {% set msgType = 'received' %}
@@ -85,7 +91,7 @@
                             "messageID": 'conversation-message-body-' + loop.index|string,
                             "messageName": 'conversation-message-body'
                         })
-                    %}        
+                    %}
                         <span style="white-space:pre-line">{{ message.get('body') }}</span>
                     {% endcall %}
                     {% if loop.last %}
@@ -122,7 +128,7 @@
                                     "id": "send_message_button",
                                     "submitType": "timer"
                                 })
-                            }}        
+                            }}
                         </form>
                     </div>
                 {% endif %}

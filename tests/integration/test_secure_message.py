@@ -9,6 +9,8 @@ from tests.integration.mocked_services import (conversation_json, conversation_l
                                                encoded_jwt_token, url_get_thread, url_get_threads,
                                                url_send_message, url_get_conversation_count)
 
+url_get_survey_long_name = app.config['SURVEY_URL'] + '/surveys/02b9c366-7397-42f7-942a-76dc5876d86d'
+
 
 def create_api_error(status_code, data=None):
     error_json = {
@@ -45,6 +47,16 @@ class TestSecureMessage(unittest.TestCase):
     def test_get_thread_success(self, mock_request):
         mock_request.get(url_get_thread, json={'messages': [conversation_json], 'is_closed': False})
         mock_request.get(url_get_conversation_count, json={'total': 0})
+        mock_request.get(url_get_survey_long_name, json={
+                    "id": "02b9c366-7397-42f7-942a-76dc5876d86d",
+                    "shortName": "QBS",
+                    "longName": "Quarterly Business Survey",
+                    "surveyRef": "139",
+                    "legalBasis": "Statistics of Trade Act 1947",
+                    "surveyType": "Business",
+                    "surveyMode": "EQ",
+                    "legalBasisRef": "STA1947"
+                })
 
         response = self.app.get("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594",
                                 headers=self.headers, follow_redirects=True)
@@ -52,6 +64,8 @@ class TestSecureMessage(unittest.TestCase):
         self.assertTrue('Peter Griffin'.encode() in response.data)
         self.assertTrue('testy2'.encode() in response.data)
         self.assertTrue('something else'.encode() in response.data)
+        self.assertTrue('Quarterly Business Survey'.encode() in response.data)
+        self.assertTrue('OFFICE FOR NATIONAL STATISTICS'.encode() in response.data)
         self.assertIn("Please note, this system should not be used to inform us of changes to".encode(), response.data)
 
     @requests_mock.mock()

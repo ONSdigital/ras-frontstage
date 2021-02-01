@@ -43,6 +43,6 @@ class TestMessageGet(unittest.TestCase):
     def test_get_msg_without_survey_name(self, mock_request):
         mock_request.get(url_get_thread, json={'messages': [message_json], 'is_closed': False})
         mock_request.get(url_get_conversation_count, json={'total': 0})
-        mock_request.get(url_get_survey_long_name, json={"longName": "None",})
+        mock_request.get(url_get_survey_long_name, json={"longName": None})
         response = self.app.get("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594")
-        self.assertTrue('None'.encode() in response.data)
+        self.assertTrue("No Survey".encode() in response.data)

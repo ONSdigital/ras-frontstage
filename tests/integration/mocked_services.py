@@ -122,10 +122,10 @@ url_get_collection_exercise_events = f"{app.config['COLLECTION_EXERCISE_URL']}/c
 url_get_collection_exercise_go_live = f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/{collection_exercise['id']}/events/go_live"
 url_get_respondent_email = f"{app.config['PARTY_URL']}/party-api/v1/respondents/email"
 url_get_survey = f"{app.config['SURVEY_URL']}/surveys/{survey['id']}"
-url_get_survey_long_name = app.config['SURVEY_URL'] + '/surveys/02b9c366-7397-42f7-942a-76dc5876d86d'
 url_get_survey_by_short_name = f"{app.config['SURVEY_URL']}/surveys/shortname/{survey['shortName']}"
 url_get_survey_by_short_name_eq = f"{app.config['SURVEY_URL']}/surveys/shortname/{survey_eq['shortName']}"
 url_get_survey_by_short_name_rsi = f"{app.config['SURVEY_URL']}/surveys/shortname/{survey_rsi['shortName']}"
+url_get_survey_long_name = app.config['SURVEY_URL'] + '/surveys/02b9c366-7397-42f7-942a-76dc5876d86d'
 url_get_thread = app.config['SECURE_MESSAGE_URL'] + '/threads/9e3465c0-9172-4974-a7d1-3a01592d1594'
 url_get_conversation_count = f"{app.config['SECURE_MESSAGE_URL']}/messages/count?unread_conversations=true"
 url_get_threads = app.config['SECURE_MESSAGE_URL'] + '/threads'

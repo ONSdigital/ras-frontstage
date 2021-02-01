@@ -10,6 +10,7 @@ from frontstage.common.message_helper import from_internal, refine
 from frontstage.controllers.conversation_controller import get_conversation, get_conversation_list, \
     remove_unread_label, send_message, try_message_count_from_session, get_message_count_from_api
 from frontstage.controllers.survey_controller import get_survey
+from frontstage.exceptions.exceptions import ApiError
 from frontstage.models import SecureMessagingForm
 from frontstage.views.secure_messaging import secure_message_bp
 
@@ -48,9 +49,17 @@ def view_conversation(session, thread_id):
             return redirect(url_for('secure_message_bp.view_conversation_list'))
 
     unread_message_count = {'unread_message_count': get_message_count_from_api(session)}
-    survey_name = get_survey(app.config['SURVEY_URL'], app.config['BASIC_AUTH'],
-                             refined_conversation[-1]['survey_id']).get('longName')
-    business_name = conversation['messages'][-1]['@business_details']['name']
+    survey_name = None
+    try:
+        survey_name = get_survey(app.config['SURVEY_URL'], app.config['BASIC_AUTH'],
+                                 refined_conversation[-1]['survey_id']).get('longName')
+    except ApiError as exc:
+        logger.info('Failed to get survey name, setting to None', status_code=exc.status_code)
+
+    try:
+        business_name = conversation['messages'][-1]['@business_details']['name']
+    except KeyError:
+        logger.info('Failed to get business name, setting to None')
 
     return render_template('secure-messages/conversation-view.html',
                            form=form,

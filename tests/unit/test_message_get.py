@@ -48,4 +48,5 @@ class TestMessageGet(unittest.TestCase):
         mock_request.get(url_get_conversation_count, json={'total': 0})
         mock_request.get(url_get_survey_long_name, json={"longName": None})
         response = self.app.get("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594")
+        self.assertTrue("Survey: ".encode() in response.data)
         self.assertTrue("No Survey".encode() in response.data)

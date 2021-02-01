@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from frontstage.common.message_helper import refine, get_formatted_date, convert_to_bst, from_internal
 
-with open('tests/test_data/conversation.json') as json_data:
+with open('tests/test_data/message.json') as json_data:
     test_conversation_data = json.load(json_data)
 
 

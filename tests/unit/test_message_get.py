@@ -9,6 +9,7 @@ from tests.integration.mocked_services import (message_json, url_get_conversatio
                                                url_get_thread, url_get_survey_long_name,
                                                encoded_jwt_token)
 
+
 class TestMessageGet(unittest.TestCase):
 
     def setUp(self):
@@ -50,3 +51,15 @@ class TestMessageGet(unittest.TestCase):
         response = self.app.get("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594")
         self.assertTrue("Survey: ".encode() in response.data)
         self.assertTrue("No Survey".encode() in response.data)
+
+    @requests_mock.mock()
+    def test_get_msg_without_business_name(self, mock_request):
+        message_without_business = message_json
+        del message_without_business['@business_details']['name']
+        mock_request.get(url_get_thread, json={'messages': [message_without_business], 'is_closed': False})
+        mock_request.get(url_get_thread, json={'messages': [message_without_business], 'is_closed': False})
+        mock_request.get(url_get_conversation_count, json={'total': 0})
+        mock_request.get(url_get_survey_long_name, json={"longName": None})
+        response = self.app.get("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594")
+        self.assertTrue("Business:".encode() in response.data)
+        self.assertTrue("No Business".encode() in response.data)

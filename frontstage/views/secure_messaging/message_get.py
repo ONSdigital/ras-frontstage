@@ -56,6 +56,7 @@ def view_conversation(session, thread_id):
     except ApiError as exc:
         logger.info('Failed to get survey name, setting to None', status_code=exc.status_code)
 
+    business_name = None
     try:
         business_name = conversation['messages'][-1]['@business_details']['name']
     except KeyError:

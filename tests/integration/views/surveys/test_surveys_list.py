@@ -23,7 +23,7 @@ class TestSurveyList(unittest.TestCase):
 
     @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
     def test_survey_list_todo(self, mock_request, get_survey_list):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         get_survey_list.return_value = survey_list_todo
 
         response = self.app.get('/surveys/todo')
@@ -32,7 +32,7 @@ class TestSurveyList(unittest.TestCase):
 
     @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
     def test_survey_list_history(self, mock_request, get_survey_list):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         get_survey_list.return_value = survey_list_history
 
         response = self.app.get('/surveys/history')

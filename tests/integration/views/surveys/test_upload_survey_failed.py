@@ -30,7 +30,7 @@ class TestUploadSurveyFailed(unittest.TestCase):
 
     @patch('frontstage.controllers.case_controller.get_case_data')
     def test_upload_failed_no_error_info(self, mock_request, get_case_data):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         get_case_data.return_value = self.case_data
         response = self.app.get(f'/surveys/upload-failed?case_id={case["id"]}&business_party_id={business_party["id"]}&survey_short_name={survey["shortName"]}')
 
@@ -40,7 +40,7 @@ class TestUploadSurveyFailed(unittest.TestCase):
 
     @patch('frontstage.controllers.case_controller.get_case_data')
     def test_upload_failed_type_error_info(self, mock_request, get_case_data):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         get_case_data.return_value = self.case_data
         response = self.app.get(f'/surveys/upload-failed?case_id={case["id"]}&business_party_id={business_party["id"]}&survey_short_name={survey["shortName"]}'
                                 f'&error_info=type')
@@ -51,7 +51,7 @@ class TestUploadSurveyFailed(unittest.TestCase):
 
     @patch('frontstage.controllers.case_controller.get_case_data')
     def test_upload_failed_charLimit_error_info(self, mock_request, get_case_data):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         get_case_data.return_value = self.case_data
         response = self.app.get(f'/surveys/upload-failed?case_id={case["id"]}&business_party_id={business_party["id"]}&survey_short_name={survey["shortName"]}'
                                 f'&error_info=charLimit')
@@ -62,7 +62,7 @@ class TestUploadSurveyFailed(unittest.TestCase):
 
     @patch('frontstage.controllers.case_controller.get_case_data')
     def test_upload_failed_size_error_info(self, mock_request, get_case_data):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         get_case_data.return_value = self.case_data
         response = self.app.get(f'/surveys/upload-failed?case_id={case["id"]}&business_party_id={business_party["id"]}&survey_short_name={survey["shortName"]}'
                                 f'&error_info=size')
@@ -72,13 +72,13 @@ class TestUploadSurveyFailed(unittest.TestCase):
         self.assertTrue("The spreadsheet must be smaller than 20MB in size".encode() in response.data)
 
     def test_upload_survey_failed_with_no_business_party_id_fails(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         response = self.app.get(f'/surveys/upload-failed?case_id={case["id"]}&survey_short_name={survey["shortName"]}&error_info=size')
 
         self.assertEqual(response.status_code, 400)
 
     def test_upload_survey_failed_with_no_survey_short_name_fails(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         response = self.app.get(f'/surveys/upload-failed?case_id={case["id"]}&business_party_id={business_party["id"]}'
                                 f'&error_info=size')
 

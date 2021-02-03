@@ -33,7 +33,7 @@ class TestUploadSurvey(unittest.TestCase):
     @patch('frontstage.controllers.collection_instrument_controller.upload_collection_instrument')
     @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
     def test_upload_survey_success(self, mock_request, *_):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         self.survey_file = dict(file=(io.BytesIO(b'my file contents'), "testfile.xlsx"))
         response = self.app.post(f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
                                  f'&survey_short_name={survey["shortName"]}', data=self.survey_file)
@@ -43,7 +43,7 @@ class TestUploadSurvey(unittest.TestCase):
     @patch('frontstage.controllers.collection_instrument_controller.upload_collection_instrument')
     @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
     def test_upload_survey_fail_unexpected_error(self, mock_request, _, upload_ci):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         error_response = Response()
         error_response.status_code = 500
         error_response.url = url_upload_ci
@@ -60,7 +60,7 @@ class TestUploadSurvey(unittest.TestCase):
     @patch('frontstage.controllers.collection_instrument_controller.upload_collection_instrument')
     @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
     def test_upload_survey_fail_type_error(self, mock_request, _, upload_ci):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         error_response = Response()
         error_response.status_code = 500
         error_response.url = url_upload_ci
@@ -77,7 +77,7 @@ class TestUploadSurvey(unittest.TestCase):
     @patch('frontstage.controllers.collection_instrument_controller.upload_collection_instrument')
     @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
     def test_upload_survey_fail_char_limit_error(self, mock_request, _, upload_ci):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         error_response = Response()
         error_response.status_code = 500
         error_response.url = url_upload_ci
@@ -94,7 +94,7 @@ class TestUploadSurvey(unittest.TestCase):
     @patch('frontstage.controllers.collection_instrument_controller.upload_collection_instrument')
     @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
     def test_upload_survey_fail_size_error(self, mock_request, _, upload_ci):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         error_response = Response()
         error_response.status_code = 500
         error_response.url = url_upload_ci
@@ -110,7 +110,7 @@ class TestUploadSurvey(unittest.TestCase):
         self.assertTrue('/surveys/upload-failed'.encode() in response.data)
 
     def test_upload_survey_content_too_long(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         file_data = 'a' * 21 * 1024 * 1024
         over_size_file = dict(file=(io.BytesIO(file_data.encode()), "testfile.xlsx"))
         response = self.app.post(f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'

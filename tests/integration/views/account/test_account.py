@@ -29,7 +29,7 @@ class TestSurveyList(unittest.TestCase):
     @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
     def test_account(self, mock_request, get_respondent_party_by_id):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
 
         response = self.app.get('/my-account')

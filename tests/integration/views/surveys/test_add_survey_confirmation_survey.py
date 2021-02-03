@@ -40,7 +40,7 @@ class TestAddSurveyConfirmation(unittest.TestCase):
     @patch('frontstage.common.cryptographer.Cryptographer.decrypt')
     def test_survey_confirm_organisation_success(self, mock_request, decrypt_enrolment_code, _, get_case_by_enrolment_code,
                                                  get_business_by_party_id, get_collection_exercise, get_survey):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         decrypt_enrolment_code.return_value = enrolment_code.encode()
         get_case_by_enrolment_code.return_value = case
         get_business_by_party_id.return_value = business_party
@@ -58,7 +58,7 @@ class TestAddSurveyConfirmation(unittest.TestCase):
     @patch('frontstage.controllers.iac_controller.validate_enrolment_code')
     @patch('frontstage.common.cryptographer.Cryptographer.decrypt')
     def test_survey_confirm_organisation_fail(self, mock_request, decrypt_enrolment_code, _, get_case):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         decrypt_enrolment_code.return_value = enrolment_code.encode()
 
         error_response = Response()

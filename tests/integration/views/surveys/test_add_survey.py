@@ -26,7 +26,7 @@ class TestAddSurvey(unittest.TestCase):
         }
 
     def test_add_survey_get_form(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         response = self.app.get('/surveys/add-survey')
 
         self.assertEqual(response.status_code, 200)
@@ -35,7 +35,7 @@ class TestAddSurvey(unittest.TestCase):
     @patch('frontstage.controllers.iac_controller.get_iac_from_enrolment')
     @patch('frontstage.common.cryptographer.Cryptographer.encrypt')
     def test_add_survey_post_success(self, mock_request, encrypt_enrolment_code, get_iac_by_enrolment_code):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         encrypt_enrolment_code.return_value = encrypted_enrolment_code.encode()
         get_iac_by_enrolment_code.return_value = active_iac
 
@@ -46,7 +46,7 @@ class TestAddSurvey(unittest.TestCase):
 
     @patch('frontstage.controllers.iac_controller.get_iac_from_enrolment')
     def test_add_survey_post_no_iac_found_for_enrolment_code(self, mock_request, get_iac_by_enrolment_code):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         get_iac_by_enrolment_code.return_value = None
 
         response = self.app.post('/surveys/add-survey', data={'enrolment_code': enrolment_code})
@@ -56,7 +56,7 @@ class TestAddSurvey(unittest.TestCase):
 
     @patch('frontstage.controllers.iac_controller.get_iac_from_enrolment')
     def test_add_survey_post_iac_not_active_for_enrolment_code(self, mock_request, get_iac_by_enrolment_code):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         get_iac_by_enrolment_code.return_value = inactive_iac
 
         response = self.app.post('/surveys/add-survey', data={'enrolment_code': enrolment_code})
@@ -66,7 +66,7 @@ class TestAddSurvey(unittest.TestCase):
 
     @patch('frontstage.controllers.iac_controller.get_iac_from_enrolment')
     def test_add_survey_enrolment_code_already_used(self, mock_request, get_iac_by_enrolment_code):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         error_response = Response()
         error_response.status_code = 400
         error_response.url = url_validate_enrolment
@@ -82,7 +82,7 @@ class TestAddSurvey(unittest.TestCase):
 
     @patch('frontstage.controllers.iac_controller.get_iac_from_enrolment')
     def test_add_survey_post_fail(self, mock_request, get_iac_by_enrolment_code):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         error_response = Response()
         error_response.status_code = 500
         error_response.url = url_validate_enrolment
@@ -97,7 +97,7 @@ class TestAddSurvey(unittest.TestCase):
         self.assertTrue('An error has occurred'.encode() in response.data)
 
     def test_add_survey_invalid_enrolment_code_length(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
 
         response = self.app.post('/surveys/add-survey', data={'enrolment_code': '1234'})
 

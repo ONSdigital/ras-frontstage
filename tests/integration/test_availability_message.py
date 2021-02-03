@@ -16,7 +16,7 @@ class TestAvailabilityMessage(TestCase):
 
     @requests_mock.mock()
     def test_message_does_not_show_if_redis_flag_not_set(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         response = self.app.get('/', follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)

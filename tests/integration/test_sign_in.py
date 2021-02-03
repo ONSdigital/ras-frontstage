@@ -43,7 +43,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_view_sign_in(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         response = self.app.get('/sign-in/', follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -52,7 +52,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_view_sign_in_from_redirect(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         response = self.app.get('/', follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -61,7 +61,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_view_sign_in_account_activated(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         response = self.app.get('/sign-in?account_activated=True', follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -70,7 +70,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_sign_in_no_username(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         del self.sign_in_form['username']
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
@@ -80,7 +80,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_sign_in_invalid_username(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         self.sign_in_form['username'] = 'aaa'
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
@@ -90,7 +90,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_sign_in_no_password(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         self.sign_in_form['username'] = 'testuser@email.com'
         del self.sign_in_form['password']
 
@@ -101,7 +101,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_sign_in_success(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_email, json=party)
         mock_request.post(url_auth_token, status_code=200, json=self.auth_response)
         mock_request.get(url_get_conversation_count, json=message_count)
@@ -113,7 +113,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_sign_in_success_redirect_to_url(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_email, json=party)
         mock_request.post(url_auth_token, status_code=200, json=self.auth_response)
         mock_request.get(url_get_conversation_count, json=message_count)
@@ -123,7 +123,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_sign_in_expired_redirects_to_login_page(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_email, json=party)
         mock_request.post(url_auth_token, status_code=200)
 
@@ -136,7 +136,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_sign_in_auth_fail(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_email, json=party)
         mock_request.post(url_auth_token, status_code=500)
 
@@ -147,7 +147,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_sign_in_party_fail(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_email, status_code=500)
         mock_request.post(url_auth_token, status_code=200, json=self.auth_response)
 
@@ -158,7 +158,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_sign_in_party_404(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         mock_request.post(url_auth_token, status_code=204)
         mock_request.get(url_get_respondent_email, status_code=404)
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
@@ -167,7 +167,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_sign_in_unauthorised_auth_credentials(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         mock_request.post(url_auth_token, status_code=401, json=self.auth_error)
         mock_request.get(url_get_respondent_email, json=party)
 
@@ -178,7 +178,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_sign_in_unverified_account(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         self.auth_error['detail'] = 'User account not verified'
         mock_request.post(url_auth_token, status_code=401, json=self.auth_error)
         mock_request.get(url_get_respondent_email, json=party)
@@ -191,7 +191,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_sign_in_unknown_response(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         self.auth_error['detail'] = 'wat'
         mock_request.post(url_auth_token, status_code=401, json=self.auth_error)
         mock_request.get(url_get_respondent_email, json=party)
@@ -203,7 +203,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_logout(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         self.app.set_cookie('localhost', 'authorization', encoded_jwt_token)
         response = self.app.get('/sign-in/logout', follow_redirects=True)
 
@@ -214,7 +214,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_resend_verification_email(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         urls = ['resend_verification', 'resend-verification']
         for url in urls:
             with self.subTest(url=url):
@@ -226,7 +226,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_fail_resent_verification_email(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         urls = ['resend_verification', 'resend-verification']
         for url in urls:
             with self.subTest(url=url):
@@ -238,7 +238,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_sign_in_account_locked(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         self.auth_error['detail'] = 'User account locked'
         mock_request.post(url_auth_token, status_code=401, json=self.auth_error)
         mock_request.get(url_get_respondent_email, json=party)
@@ -251,7 +251,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_notify_account_error(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         self.app = create_app_object()
         self.app.testing = True
         mock_request.put(url_notify_party_and_respondent_account_locked,
@@ -265,7 +265,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_resend_verification_email_using_expired_token(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         mock_request.post(url_resend_verification_expired_token, status_code=200)
 
         response = self.app.get(f'sign-in/resend-verification-expired-token/{token}',
@@ -276,7 +276,7 @@ class TestSignIn(unittest.TestCase):
 
     @requests_mock.mock()
     def test_fail_resend_verification_email_using_expired_token(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         mock_request.post(url_resend_verification_expired_token, status_code=500)
 
         response = self.app.get(f'sign-in/resend-verification-expired-token/{token}',

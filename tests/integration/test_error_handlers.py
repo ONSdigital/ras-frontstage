@@ -24,7 +24,7 @@ class TestErrorHandlers(unittest.TestCase):
 
     @requests_mock.mock()
     def test_not_found_error(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         response = self.app.get('/not-a-url', follow_redirects=True)
 
         self.assertEqual(response.status_code, 404)
@@ -34,7 +34,7 @@ class TestErrorHandlers(unittest.TestCase):
     @requests_mock.mock()
     def test_server_error(self, mock_request):
         mock_request.post(url_auth_token, status_code=200)
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
 
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
 
@@ -46,7 +46,7 @@ class TestErrorHandlers(unittest.TestCase):
         response_mock = MagicMock()
         logger_mock = MagicMock()
         mock_request.post(url_auth_token, exc=ApiError(logger_mock, response_mock))
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
 
         response = self.app.post('sign-in', data=self.sign_in_form, follow_redirects=True)
 
@@ -57,7 +57,7 @@ class TestErrorHandlers(unittest.TestCase):
     def test_connection_error(self, mock_request):
         mock_exception_request = MagicMock()
         mock_request.post(url_auth_token, exc=ConnectionError(request=mock_exception_request))
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
 
         response = self.app.post('sign-in', data=self.sign_in_form, follow_redirects=True)
 
@@ -68,7 +68,7 @@ class TestErrorHandlers(unittest.TestCase):
     def test_jwt_validation_error(self, mock_request):
         mock_request.get(url_get_respondent_email, json=party)
         mock_request.post(url_auth_token, exc=JWTValidationError)
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
 
         response = self.app.post('sign-in', data=self.sign_in_form, follow_redirects=True)
 
@@ -77,7 +77,7 @@ class TestErrorHandlers(unittest.TestCase):
 
     @requests_mock.mock()
     def test_csrf_token_expired(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         app.config['WTF_CSRF_ENABLED'] = True
         response = self.app.post('/sign-in/', data=self.sign_in_form, follow_redirects=True)
         app.config['WTF_CSRF_ENABLED'] = False
@@ -86,7 +86,7 @@ class TestErrorHandlers(unittest.TestCase):
 
     @requests_mock.mock()
     def test_csrf_token_expired_on_sending_message(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         app.config['WTF_CSRF_ENABLED'] = True
         self.app.set_cookie('localhost', 'authorization', 'session_key')
         self.patcher = patch('redis.StrictRedis.get', return_value=encoded_jwt_token)

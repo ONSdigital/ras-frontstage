@@ -39,7 +39,7 @@ class TestAccessSurvey(unittest.TestCase):
 
     @patch('frontstage.controllers.case_controller.get_case_data')
     def test_access_survey_all_expected_case_data(self, mock_request, get_case_data):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         case_data = {
             "collection_exercise": collection_exercise,
             "collection_instrument": collection_instrument_seft,
@@ -56,7 +56,7 @@ class TestAccessSurvey(unittest.TestCase):
 
     @patch('frontstage.controllers.case_controller.get_case_data')
     def test_access_survey_missing_collection_instrument_from_case_data(self, mock_request, get_case_data):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         case_data = {
             "collection_exercise": collection_exercise,
             "survey": survey,
@@ -71,7 +71,7 @@ class TestAccessSurvey(unittest.TestCase):
 
     @patch('frontstage.controllers.case_controller.get_case_data')
     def test_access_survey_missing_collection_exercise_from_case_data(self, mock_request, get_case_data):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         case_data = {
             "collection_instrument": collection_instrument_seft,
             "survey": survey,
@@ -86,7 +86,7 @@ class TestAccessSurvey(unittest.TestCase):
 
     @patch('frontstage.controllers.case_controller.get_case_data')
     def test_access_survey_missing_survey_from_case_data(self, mock_request, get_case_data):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         case_data = {
             "collection_exercise": collection_exercise,
             "collection_instrument": collection_instrument_seft,
@@ -102,7 +102,7 @@ class TestAccessSurvey(unittest.TestCase):
 
     @patch('frontstage.controllers.case_controller.get_case_data')
     def test_access_survey_missing_business_party_from_case_data(self, mock_request, get_case_data):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         case_data = {
             "collection_exercise": collection_exercise,
             "collection_instrument": collection_instrument_seft,
@@ -117,7 +117,7 @@ class TestAccessSurvey(unittest.TestCase):
         self.assertTrue('An error has occurred'.encode() in response.data)
 
     def test_access_survey_without_request_arg_case_id(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         response = self.app.get(f'/surveys/access-survey?business_party_id={party_id}&'
                                 'survey_short_name=Bricks&ci_type=SEFT', headers=self.headers, follow_redirects=True)
 
@@ -125,7 +125,7 @@ class TestAccessSurvey(unittest.TestCase):
         self.assertTrue('An error has occurred'.encode() in response.data)
 
     def test_access_survey_missing_request_arg_business_party_id(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         response = self.app.get(f'/surveys/access-survey?case_id={case_id}&'
                                 'survey_short_name=Bricks&ci_type=SEFT', headers=self.headers)
 
@@ -133,7 +133,7 @@ class TestAccessSurvey(unittest.TestCase):
         self.assertTrue('An error has occurred'.encode() in response.data)
 
     def test_access_survey_missing_request_arg_survey_short_name(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         response = self.app.get(f'/surveys/access-survey?case_id={case_id}&business_party_id={party_id}&'
                                 'ci_type=SEFT', headers=self.headers, follow_redirects=True)
 
@@ -141,7 +141,7 @@ class TestAccessSurvey(unittest.TestCase):
         self.assertTrue('An error has occurred'.encode() in response.data)
 
     def test_access_survey_missing_request_arg_ci_type(self, mock_request):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         response = self.app.get(f'/surveys/access-survey?case_id={case_id}&business_party_id={party_id}&'
                                 'survey_short_name=Bricks', headers=self.headers, follow_redirects=True)
 

@@ -42,7 +42,7 @@ class TestAddSurveySubmit(unittest.TestCase):
     @patch('frontstage.common.cryptographer.Cryptographer.decrypt')
     def test_add_survey_submit_success_redirect_to_survey_todo_list(self, mock_request, decrypt_enrolment_code, get_iac_by_enrolment_code,
                                                                     get_case_by_enrolment, get_collection_exercise, get_party_by_business_id, *_):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         decrypt_enrolment_code.return_value = enrolment_code.encode()
         get_iac_by_enrolment_code.return_value = active_iac
         get_case_by_enrolment.return_value = case
@@ -66,7 +66,7 @@ class TestAddSurveySubmit(unittest.TestCase):
     @patch('frontstage.common.cryptographer.Cryptographer.decrypt')
     def test_add_survey_submit_already_enrolled(self, mock_request, decrypt_enrolment_code, get_iac_by_enrolment_code,
                                                 get_case_by_enrolment, get_collection_exercise, get_party_by_business_id, *_):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         decrypt_enrolment_code.return_value = enrolment_code.encode()
         get_iac_by_enrolment_code.return_value = active_iac
         get_case_by_enrolment.return_value = case_diff_surveyId
@@ -84,7 +84,7 @@ class TestAddSurveySubmit(unittest.TestCase):
     @patch('frontstage.controllers.iac_controller.get_iac_from_enrolment')
     @patch('frontstage.common.cryptographer.Cryptographer.decrypt')
     def test_add_survey_submit_fail(self, mock_request, decrypt_enrolment_code, get_iac_from_enrolment):
-        mock_request.get(url_banner_api, status_code=204)
+        mock_request.get(url_banner_api, status_code=404)
         decrypt_enrolment_code.return_value = enrolment_code.encode()
 
         error_response = Response()

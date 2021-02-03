@@ -38,8 +38,10 @@ class TestSurveyList(unittest.TestCase):
         self.assertTrue('example@example.com'.encode() in response.data)
         self.assertTrue('0987654321'.encode() in response.data)
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
-    def test_account_options(self, get_respondent_party_by_id):
+    def test_account_options(self, mock_request, get_respondent_party_by_id):
+        mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
 
         response = self.app.get('/my-account')
@@ -48,34 +50,43 @@ class TestSurveyList(unittest.TestCase):
         self.assertTrue('example@example.com'.encode() in response.data)
         self.assertIn("Help with your account".encode(), response.data)
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
-    def test_account_options_not_selection(self, get_respondent_party_by_id):
+    def test_account_options_not_selection(self, mock_request, get_respondent_party_by_id):
+        mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         response = self.app.post('/my-account', data={"option": None}, follow_redirects=True)
         self.assertIn("At least one option should be selected".encode(),
                       response.data)
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
-    def test_account_options_selection(self, get_respondent_party_by_id):
+    def test_account_options_selection(self, mock_request, get_respondent_party_by_id):
+        mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         response = self.app.post('/my-account', data=self.contact_details_form, follow_redirects=True)
         self.assertIn("For international numbers include the country code, for example +33 1234 567 890".encode(),
                       response.data)
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
-    def test_account_contact_details_error(self, get_respondent_party_by_id):
+    def test_account_contact_details_error(self, mock_request, get_respondent_party_by_id):
+        mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         response = self.app.post('/my-account/change-account-details',
                                  data={"first_name": ""}, follow_redirects=True)
         self.assertIn("Problem with the first name".encode(), response.data)
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
     @patch('frontstage.controllers.party_controller.update_account')
     @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
     def test_account_contact_details_success(self,
+                                             mock_request,
                                              get_survey_list,
                                              update_account,
                                              get_respondent_party_by_id):
+        mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         get_survey_list.return_value = survey_list_todo
         response = self.app.post('/my-account/change-account-details',

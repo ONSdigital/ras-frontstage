@@ -1,0 +1,63 @@
+{% extends "layouts/_twothirds.html" %}
+{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/fieldset/_macro.njk" import onsFieldset %}
+{% from "components/button/_macro.njk" import onsButton %}
+
+{% set page_title = "Change email address" %}
+{% set breadcrumbsData = [
+  {
+    "text": "Surveys",
+    "url": "/surveys/todo"
+  },
+  {
+    "text": "Account",
+    "url": "/my-account"
+  },
+  {
+    "text": "Change your contact details",
+    "url": "/change-account-details"
+  },
+] %}
+
+{% block main %}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+          <div class="panel panel--simple panel--success u-mb-m">
+              <div class="panel__body" data-qa="error-success">
+                {% for message in messages %}
+                <p class="u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>
+                {% endfor %}
+              </div>
+          </div>
+    {% endif %}
+{% endwith %}
+{{
+    onsBreadcrumb({
+        "ariaLabel": "Breadcrumbs",
+        "id": "breadcrumbs",
+        "itemsList": breadcrumbsData
+    })
+}}
+<h1 class="u-fs-xl">Change email address</h1>
+<p>You'll need to authorise a change of email address.</p>
+<p>We'll send a confirmation email to <b>{{ new_email }}</b>.</p>
+<form action="" method="post">
+        {{ form.csrf_token }}
+        <input type="hidden" name="new_email" value= "{{ new_email }}"/>
+        <p class="field u-mt-l">
+        <div class="btn-group">
+        {{
+            onsButton({
+            "text": "Send",
+            "id": "btn-option-send-email",
+            "classes": 'btn-group__btn',
+            "submitType": "timer"
+            })
+        }}
+        <a href="{{ url_for('account_bp.change_account_details') }}"
+      role="button" class="btn btn--secondary" id="btn-upload-ci-cancel"><span class="btn__inner">Cancel</span></a>
+        </div>
+    </p>
+    </form>
+
+{% endblock main %}

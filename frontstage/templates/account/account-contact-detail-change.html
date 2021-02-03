@@ -5,7 +5,7 @@
 {% from "components/button/_macro.njk" import onsButton %}
 {% from "components/lists/_macro.njk" import onsList %}
 
-{% set page_title = "Account details" %}
+{% set page_title = "Change contact details" %}
 {% set breadcrumbsData = [
   {
     "text": "Surveys",
@@ -96,6 +96,11 @@
                     "value": lastName
                 })
             }}
+            {% set emailAddress = respondent.emailAddress %}
+            {% if errors.email_address %}
+                {% set errorEmailAddress = { "text": errors['email_address'][0],  "id": 'email_address_error' } %}
+                {% set emailAddress = form.email_address.data %}
+            {% endif %}
             {{
                 onsInput({
                     "id": "email_address",
@@ -104,10 +109,8 @@
                     "label": {
                         "text": "Email address"
                     },
-                    "value": respondent.emailAddress,
-                    "attributes": {
-                            "disabled": true
-                    }
+                    "error": errorEmailAddress,
+                    "value": emailAddress,
                 })
             }}
             {% set phoneNumber = respondent.telephone %}

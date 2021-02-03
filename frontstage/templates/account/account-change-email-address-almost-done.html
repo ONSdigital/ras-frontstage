@@ -1,0 +1,40 @@
+{% extends "layouts/_twothirds.html" %}
+{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/fieldset/_macro.njk" import onsFieldset %}
+{% from "components/button/_macro.njk" import onsButton %}
+
+{% set page_title = "Change email address" %}
+{% set breadcrumbsData = [
+  {
+    "text": "Surveys",
+    "url": "/surveys/todo"
+  },
+  {
+    "text": "Account",
+    "url": "/my-account"
+  },
+  {
+    "text": "Change your contact details",
+    "url": "/change-account-details"
+  },
+] %}
+
+{% block main %}
+{{
+    onsBreadcrumb({
+        "ariaLabel": "Breadcrumbs",
+        "id": "breadcrumbs",
+        "itemsList": breadcrumbsData
+    })
+}}
+<h1 class="u-fs-xl">Almost done</h1>
+<p>We’ve sent an email to your new email address</p>
+<p>Once you have received it, you need to follow the link in the email to confirm and finish setting up your new account.</p>
+<p>Email not arrived? It might be in your spam folder.</p>
+<p>If it doesn’t arrive in the next 15 minutes, please call 0300 1234 931</p>
+<p class="field u-mt-l">
+    <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}"
+      role="button" class="btn btn--primary" id="btn-back-to-survey"><span class="btn__inner">Back to surveys</span></a>
+</p>
+
+{% endblock main %}

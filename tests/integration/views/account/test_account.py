@@ -1,8 +1,6 @@
 import unittest
 from unittest.mock import patch
 
-import requests_mock
-
 from frontstage import app
 from tests.integration.mocked_services import encoded_jwt_token, respondent_party, survey_list_todo
 
@@ -67,6 +65,13 @@ class TestSurveyList(unittest.TestCase):
         self.assertIn("Problem with the first name".encode(), response.data)
 
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
+    def test_account_contact_details_error_email(self, get_respondent_party_by_id):
+        get_respondent_party_by_id.return_value = respondent_party
+        response = self.app.post('/my-account/change-account-details',
+                                 data={"email_address": ""}, follow_redirects=True)
+        self.assertIn("Problem with the email ".encode(), response.data)
+
+    @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
     @patch('frontstage.controllers.party_controller.update_account')
     @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
     def test_account_contact_details_success(self,
@@ -78,5 +83,41 @@ class TestSurveyList(unittest.TestCase):
         response = self.app.post('/my-account/change-account-details',
                                  data={"first_name": "test account",
                                        "last_name": "test_account",
-                                       "phone_number": "07772257773"}, follow_redirects=True)
+                                       "phone_number": "07772257773",
+                                       "email_address": "example@example.com"}, follow_redirects=True)
         self.assertIn("We&#39;ve updated your first name, last name and telephone number".encode(), response.data)
+
+    @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
+    @patch('frontstage.controllers.party_controller.update_account')
+    @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
+    def test_account_change_account_email_address(self,
+                                                  get_survey_list,
+                                                  update_account,
+                                                  get_respondent_party_by_id):
+        get_respondent_party_by_id.return_value = respondent_party
+        get_survey_list.return_value = survey_list_todo
+        response = self.app.post('/my-account/change-account-details',
+                                 data={"first_name": "test account",
+                                       "last_name": "test_account",
+                                       "phone_number": "07772257773",
+                                       "email_address": "exampleone@example.com"}, follow_redirects=True)
+        self.assertIn("We&#39;ve updated your first name, last name and telephone number".encode(), response.data)
+        self.assertIn("Change email address".encode(), response.data)
+        self.assertIn("You'll need to authorise a change of email address.".encode(), response.data)
+        self.assertIn("We\'ll send a confirmation email to".encode(), response.data)
+        self.assertIn("exampleone@example.com".encode(), response.data)
+
+    @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
+    @patch('frontstage.controllers.party_controller.update_account')
+    @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
+    def test_account_change_account_email_addres_almost_done(self,
+                                                             get_survey_list,
+                                                             update_account,
+                                                             get_respondent_party_by_id):
+        get_respondent_party_by_id.return_value = respondent_party
+        get_survey_list.return_value = survey_list_todo
+        response = self.app.post('/my-account/change-account-email-address',
+                                 data={"email_address": "exampleone@example.com"}, follow_redirects=True)
+        self.assertIn("Almost done".encode(), response.data)
+        self.assertIn("Once you have received it, you need to follow the link".encode(), response.data)
+        self.assertIn("please call 0300 1234 931".encode(), response.data)

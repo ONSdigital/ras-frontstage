@@ -5,17 +5,15 @@ import phonenumbers
 from flask_wtf import FlaskForm
 from phonenumbers.phonenumberutil import NumberParseException
 from structlog import wrap_logger
-from wtforms import HiddenField, PasswordField, StringField, SubmitField, TextAreaField
-from wtforms.validators import EqualTo, Length, Email, ValidationError
+from wtforms import HiddenField, PasswordField, StringField, SubmitField, TextAreaField, RadioField
+from wtforms.validators import EqualTo, Length, Email, ValidationError, Required
 from frontstage.common.validators import InputRequired, DataRequired
 
 from frontstage import app
 from frontstage.i18n.translations import Translate
 
-
 translations = Translate('form_messages')
 _ = translations.translate
-
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -65,7 +63,8 @@ class RegistrationForm(FlaskForm):
     def validate_phone_number(form, field):
         try:
             logger.info('Checking this is a valid phone number')
-            input_number = phonenumbers.parse(field.data, 'GB')  # Default region GB (44), unless country code added by user
+            input_number = phonenumbers.parse(field.data,
+                                              'GB')  # Default region GB (44), unless country code added by user
 
             if not phonenumbers.is_possible_number(input_number):
                 raise ValidationError(_('This should be a valid telephone number between 9 and 15 digits'))
@@ -84,7 +83,8 @@ class RegistrationForm(FlaskForm):
     @staticmethod
     def validate_password(_, field):
         password = field.data
-        if password.isalnum() or not any(char.isupper() for char in password) or not any(char.isdigit() for char in password):
+        if password.isalnum() or not any(char.isupper() for char in password) or not any(
+                char.isdigit() for char in password):
             raise ValidationError(app.config['PASSWORD_CRITERIA_ERROR_TEXT'])
 
 
@@ -177,3 +177,30 @@ class RespondentStatus(enum.IntEnum):
     CREATED = 0
     ACTIVE = 1
     SUSPENDED = 2
+
+
+class OptionsForm(FlaskForm):
+    option = RadioField('Label', choices=[
+        ('value', 'contact_details')])
+
+    def validate(self):
+        if self.data['option'] is None:
+            return False
+        return True
+
+
+class ContactDetailsChangeForm(FlaskForm):
+    first_name = StringField(_('First name'), validators=[DataRequired(_('First name is required')),
+                                                          Length(max=254,
+                                                                 message=_('Your first name must be less than 254 '
+                                                                           'characters'))])
+    last_name = StringField(_('Last name'),
+                            validators=[DataRequired(_('Last name is required')),
+                                        Length(max=254, message=_('Your last name must be less than 254 characters'))])
+    phone_number = StringField(_('Telephone number'),
+                               validators=[DataRequired(_('Phone number is required')),
+                                           Length(min=9,
+                                                  max=15,
+                                                  message=_('This should be a valid phone number between 9 and 15 '
+                                                            'digits'))],
+                               default=None)

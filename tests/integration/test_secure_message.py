@@ -5,10 +5,10 @@ import requests_mock
 
 from frontstage import app
 from frontstage.exceptions.exceptions import IncorrectAccountAccessError
-from tests.integration.mocked_services import (conversation_json, conversation_list_json,
+from tests.integration.mocked_services import (message_json, conversation_list_json,
                                                encoded_jwt_token, url_get_thread, url_get_threads,
-                                               url_send_message, url_get_conversation_count, url_banner_api)
-
+                                               url_send_message, url_get_conversation_count, url_banner_api,
+                                               url_get_survey_long_name)
 
 def create_api_error(status_code, data=None):
     error_json = {
@@ -44,8 +44,18 @@ class TestSecureMessage(unittest.TestCase):
     @requests_mock.mock()
     def test_get_thread_success(self, mock_request):
         mock_request.get(url_banner_api, status_code=204)
-        mock_request.get(url_get_thread, json={'messages': [conversation_json], 'is_closed': False})
+        mock_request.get(url_get_thread, json={'messages': [message_json], 'is_closed': False})
         mock_request.get(url_get_conversation_count, json={'total': 0})
+        mock_request.get(url_get_survey_long_name, json={
+                    "id": "02b9c366-7397-42f7-942a-76dc5876d86d",
+                    "shortName": "QBS",
+                    "longName": "Quarterly Business Survey",
+                    "surveyRef": "139",
+                    "legalBasis": "Statistics of Trade Act 1947",
+                    "surveyType": "Business",
+                    "surveyMode": "EQ",
+                    "legalBasisRef": "STA1947"
+                })
 
         response = self.app.get("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594",
                                 headers=self.headers, follow_redirects=True)
@@ -53,16 +63,18 @@ class TestSecureMessage(unittest.TestCase):
         self.assertTrue('Peter Griffin'.encode() in response.data)
         self.assertTrue('testy2'.encode() in response.data)
         self.assertTrue('something else'.encode() in response.data)
-        self.assertIn("Please note, this system should not be used to inform us of changes to".encode(), response.data)
+        self.assertTrue('Quarterly Business Survey'.encode() in response.data)
+        self.assertTrue('OFFICE FOR NATIONAL STATISTICS'.encode() in response.data)
+        self.assertIn("Make changes to your name".encode(), response.data)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
     def test_get_thread_failure(self, mock_request, message_count):
         mock_request.get(url_banner_api, status_code=204)
         message_count.return_value = 0
-        conversation_json_copy = conversation_json.copy()
-        del conversation_json_copy['@business_details']
-        mock_request.get(url_get_thread, json={'messages': [conversation_json_copy]})
+        message_json_copy = message_json.copy()
+        del message_json_copy['@business_details']
+        mock_request.get(url_get_thread, json={'messages': [message_json_copy]})
 
         response = self.app.get("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594", headers=self.headers,
                                 follow_redirects=True)
@@ -227,7 +239,7 @@ class TestSecureMessage(unittest.TestCase):
     def test_get_thread_wrong_account(self, mock_request, message_count):
         mock_request.get(url_banner_api, status_code=204)
         message_count.return_value = 0
-        mock_request.get(url_get_thread, status_code=404, json={'messages': [conversation_json], 'is_closed': False})
+        mock_request.get(url_get_thread, status_code=404, json={'messages': [message_json], 'is_closed': False})
 
         self.assertRaises(IncorrectAccountAccessError)
 

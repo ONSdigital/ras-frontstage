@@ -88,6 +88,21 @@ def create_account(registration_data):
     logger.info('Successfully created account')
 
 
+def update_account(respondent_data):
+    logger.info('Attempting to update account')
+
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/id/{respondent_data['id']}"
+    response = requests.put(url, auth=app.config['BASIC_AUTH'], json=respondent_data)
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        logger.error('Failed to update account')
+        raise ApiError(logger, response)
+
+    logger.info('Successfully updated account')
+
+
 def get_party_by_business_id(party_id, party_url, party_auth, collection_exercise_id=None, verbose=True):
     logger.info('Attempting to retrieve party by business',
                 party_id=party_id,
@@ -386,7 +401,7 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
             collection_exercise = collection_exercises_by_id[case['caseGroup']['collectionExerciseId']]
             added_survey = True if business_party_id == business_party['id'] and survey_id == survey['id'] else None
             display_access_button = display_button(case['caseGroup']['caseGroupStatus'], cache_data['instrument']
-                                                   [case['collectionInstrumentId']]['type'])
+            [case['collectionInstrumentId']]['type'])
 
             yield {
                 'case_id': case['id'],
@@ -428,7 +443,7 @@ def get_survey(cache_data, survey_id, survey_url, survey_auth):
 
 
 def get_collex(cache_data, survey_id, collex_url, collex_auth):
-    cache_data['collexes'][survey_id] = collection_exercise_controller.\
+    cache_data['collexes'][survey_id] = collection_exercise_controller. \
         get_live_collection_exercises_for_survey(survey_id, collex_url, collex_auth)
 
 
@@ -448,7 +463,7 @@ def get_collection_instrument(cache_data, collection_instrument_id, collection_i
 
 
 def display_button(status, ci_type):
-    return not(ci_type == 'EQ' and status in CLOSED_STATE)
+    return not (ci_type == 'EQ' and status in CLOSED_STATE)
 
 
 def is_respondent_enrolled(party_id, business_party_id, survey_short_name, return_survey=False):

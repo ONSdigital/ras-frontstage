@@ -62,14 +62,10 @@ class TestSurveyList(unittest.TestCase):
         get_respondent_party_by_id.return_value = respondent_party
         response = self.app.post('/my-account/change-account-details',
                                  data={"first_name": ""}, follow_redirects=True)
+        self.assertIn("There are 4 errors on this page".encode(), response.data)
         self.assertIn("Problem with the first name".encode(), response.data)
-
-    @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
-    def test_account_contact_details_error_email(self, get_respondent_party_by_id):
-        get_respondent_party_by_id.return_value = respondent_party
-        response = self.app.post('/my-account/change-account-details',
-                                 data={"email_address": ""}, follow_redirects=True)
-        self.assertIn("Problem with the email ".encode(), response.data)
+        self.assertIn("Problem with the phone number".encode(), response.data)
+        self.assertIn("Problem with the email address".encode(), response.data)
 
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
     @patch('frontstage.controllers.party_controller.update_account')
@@ -81,11 +77,11 @@ class TestSurveyList(unittest.TestCase):
         get_respondent_party_by_id.return_value = respondent_party
         get_survey_list.return_value = survey_list_todo
         response = self.app.post('/my-account/change-account-details',
-                                 data={"first_name": "test account",
-                                       "last_name": "test_account",
-                                       "phone_number": "07772257773",
+                                 data={"first_name": "new first name",
+                                       "last_name": "new last name",
+                                       "phone_number": "8882257773",
                                        "email_address": "example@example.com"}, follow_redirects=True)
-        self.assertIn("We&#39;ve updated your first name, last name and telephone number".encode(), response.data)
+        self.assertIn("updated your first name, last name and telephone number".encode(), response.data)
 
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
     @patch('frontstage.controllers.party_controller.update_account')
@@ -101,10 +97,10 @@ class TestSurveyList(unittest.TestCase):
                                        "last_name": "test_account",
                                        "phone_number": "07772257773",
                                        "email_address": "exampleone@example.com"}, follow_redirects=True)
-        self.assertIn("We&#39;ve updated your first name, last name and telephone number".encode(), response.data)
+        self.assertIn("updated your first name, last name and telephone number".encode(), response.data)
         self.assertIn("Change email address".encode(), response.data)
         self.assertIn("You'll need to authorise a change of email address.".encode(), response.data)
-        self.assertIn("We\'ll send a confirmation email to".encode(), response.data)
+        self.assertIn("We'll send a confirmation email to".encode(), response.data)
         self.assertIn("exampleone@example.com".encode(), response.data)
 
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')

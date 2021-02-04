@@ -41,7 +41,9 @@ def change_email_address(session):
     form = ConfirmEmailChangeForm(request.values)
     party_id = session.get_party_id()
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
-    respondent_details['emailAddress'] = form['email_address'].data
+    respondent_details['email_address'] = respondent_details['emailAddress']
+    respondent_details['new_email_address'] = form['email_address'].data
+    respondent_details['respondent_initiated'] = True
     logger.info('Attempting to update email address changes on the account')
     try:
         party_controller.update_account(respondent_details)
@@ -66,6 +68,7 @@ def change_account_details(session):
                                                       attributes_changed,
                                                       respondent_details,
                                                       update_required_flag)
+        email_update_required_flag = form['email_address'].data != respondent_details['emailAddress']
         if update_required_flag:
             try:
                 party_controller.update_account(respondent_details)
@@ -75,14 +78,12 @@ def change_account_details(session):
             logger.info('Successfully updated account')
             success_panel = create_success_message(attributes_changed, "We've updated your ")
             flash(success_panel)
-            if form['email_address'].data == respondent_details['emailAddress']:
-                return redirect(url_for('surveys_bp.get_survey_list', tag='todo'))
-            else:
-                return render_template('account/account-change-email-address.html',
-                                       new_email=form['email_address'].data,
-                                       form=ConfirmEmailChangeForm())
-        else:
-            return redirect(url_for('surveys_bp.get_survey_list', tag='todo'))
+
+        if email_update_required_flag:
+            return render_template('account/account-change-email-address.html',
+                                   new_email=form['email_address'].data,
+                                   form=ConfirmEmailChangeForm())
+        return redirect(url_for('surveys_bp.get_survey_list', tag='todo'))
     else:
         return render_template('account/account-contact-detail-change.html',
                                form=form, errors=form.errors, respondent=respondent_details)

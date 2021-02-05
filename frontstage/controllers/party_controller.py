@@ -222,6 +222,21 @@ def resend_password_email_expired_token(token):
     logger.info('Sucessfully re-sent password email', token=token)
 
 
+def verify_email(token):
+    logger.info('Attempting to verify email address', token=token)
+
+    url = f"{app.config['PARTY_URL']}/party-api/v1/emailverification/{token}"
+    response = requests.put(url, auth=app.config['BASIC_AUTH'])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        logger.error('Failed to verify email', token=token)
+        raise ApiError(logger, response)
+
+    logger.info('Successfully verified email address', token=token)
+
+
 def verify_token(token):
     logger.info('Attempting to verify token with party service', token=token)
 

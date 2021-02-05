@@ -4,7 +4,8 @@ import requests_mock
 
 from config import TestingConfig
 from frontstage import app
-from tests.integration.mocked_services import token, url_verify_token, url_resend_expired_account_change_verification
+from tests.integration.mocked_services import token, url_resend_expired_account_change_verification, \
+    url_verify_email
 
 encoded_valid_email = 'ImV4YW1wbGVAZXhhbXBsZS5jb20i.vMOqeMafWQpuxbUBRyRs29T0vDI'
 encoded_invalid_email = 'abcd'
@@ -21,7 +22,7 @@ class TestAccountEmailChange(unittest.TestCase):
 
     @requests_mock.mock()
     def test_expired_account_email_change_verification_token(self, mock_object):
-        mock_object.get(url_verify_token, status_code=409)
+        mock_object.put(url_verify_email, status_code=409)
         response = self.app.get('/my-account/confirm-account-email-change/test_token')
 
         self.assertEqual(response.status_code, 200)
@@ -30,14 +31,14 @@ class TestAccountEmailChange(unittest.TestCase):
 
     @requests_mock.mock()
     def test_wrong_account_email_change_verification_token(self, mock_object):
-        mock_object.get(url_verify_token, status_code=404)
+        mock_object.put(url_verify_email, status_code=404)
         response = self.app.get('/my-account/confirm-account-email-change/test_token')
 
         self.assertEqual(response.status_code, 404)
 
     @requests_mock.mock()
     def test_success_account_email_change_verification_token(self, mock_object):
-        mock_object.get(url_verify_token, status_code=200)
+        mock_object.put(url_verify_email, status_code=200)
         response = self.app.get('/my-account/confirm-account-email-change/test_token')
 
         self.assertEqual(response.status_code, 200)

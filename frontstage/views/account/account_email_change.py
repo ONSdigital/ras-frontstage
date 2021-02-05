@@ -19,7 +19,7 @@ def confirm_account_email_change(token):
     logger.info('Attempting to confirm account email change', token=token)
 
     try:
-        party_controller.verify_token(token)
+        party_controller.verify_email(token)
     except ApiError as exc:
         # Handle api errors
         if exc.status_code == 409:

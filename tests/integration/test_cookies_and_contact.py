@@ -32,7 +32,6 @@ class TestCookiesContact(unittest.TestCase):
     def test_contact_success(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         response = self.app.get('/contact-us')
-        mock_request.get(url_banner_api, status_code=404)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Contact us'.encode() in response.data)

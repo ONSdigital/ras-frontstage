@@ -73,7 +73,7 @@
                     "name": "first_name",
                     "type": "text",
                     "label": {
-                        "text": "First name"
+                        "text": 'First name - <span class="u-lighter u-fw-n">' ~ respondent.firstName ~ '</span>'
                     },
                     "error": errorFirstName,
                     "value": firstName
@@ -90,7 +90,7 @@
                     "name": "last_name",
                     "type": "text",
                     "label": {
-                        "text": "Surname"
+                        "text": 'Surname - <span class="u-lighter u-fw-n">' ~ respondent.lastName ~ '</span>'
                     },
                     "error": errorLastName,
                     "value": lastName
@@ -107,7 +107,7 @@
                     "name": "email_address",
                     "type": "text",
                     "label": {
-                        "text": "Email address"
+                        "text": 'Email address - <span class="u-lighter u-fw-n">' ~ respondent.emailAddress ~ '</span>'
                     },
                     "error": errorEmailAddress,
                     "value": emailAddress,
@@ -126,7 +126,7 @@
                     "autocomplete": "tel",
                     "classes": "input--w-8",
                     "label": {
-                        "text": "Telephone number",
+                        "text": 'Telephone number - <span class="u-lighter u-fw-n">' ~ respondent.telephone ~ '</span>',
                         "description": "For international numbers include the country code, for example +33 1234 567 890"
                     },
                     "error": errorPhoneNumber,

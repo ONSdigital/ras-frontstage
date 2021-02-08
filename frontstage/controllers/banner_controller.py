@@ -20,7 +20,7 @@ def current_banner():
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         if response.status_code != 404:
-            logger.error('Failed to retrieve Banner from api')
+            logger.error('Failed to retrieve Banner from api', status_code=response.status_code)
         return ""
 
     banner = response.json()

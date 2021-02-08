@@ -185,7 +185,7 @@ def resend_account_email_change_expired_token(token):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error('Re-sending of verification email for expired token failed')
+        logger.error('Re-sending of verification email for expired token failed', token=token)
         raise ApiError(logger, response)
     logger.info('Successfully re-sent verification email', token=token)
 

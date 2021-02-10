@@ -204,3 +204,12 @@ class ContactDetailsChangeForm(FlaskForm):
                                                   message=_('This should be a valid phone number between 9 and 15 '
                                                             'digits'))],
                                default=None)
+    email_address = StringField(_('Email address'),
+                                validators=[DataRequired(_('Email address is required')),
+                                            Email(message=_('Invalid email address')),
+                                            Length(max=254,
+                                                   message=_('Your email must be less than 254 characters'))])
+
+
+class ConfirmEmailChangeForm(FlaskForm):
+    email_address = HiddenField('Email address')

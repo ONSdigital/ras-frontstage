@@ -177,6 +177,19 @@ def resend_verification_email_expired_token(token):
     logger.info('Successfully re-sent verification email', token=token)
 
 
+def resend_account_email_change_expired_token(token):
+    logger.info('Re-sending account email change verification email', token=token)
+    url = f'{app.config["PARTY_URL"]}/party-api/v1/resend-account-email-change-expired-token/{token}'
+    response = requests.post(url, auth=app.config['BASIC_AUTH'])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        logger.error('Re-sending of verification email for expired token failed', token=token)
+        raise ApiError(logger, response)
+    logger.info('Successfully re-sent verification email', token=token)
+
+
 def reset_password_request(username):
     bound_logger = logger.bind(email=obfuscate_email(username))
     bound_logger.info('Attempting to send reset password request to party service')

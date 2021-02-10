@@ -48,7 +48,7 @@ def change_email_address(session):
     try:
         party_controller.update_account(respondent_details)
     except ApiError as exc:
-        logger.error('Failed to updated email on account', status=exc.status_cod, party_id=party_id)
+        logger.error('Failed to updated email on account', status=exc.status_code, party_id=party_id)
         raise exc
     logger.info('Successfully updated email on account', party_id=party_id)
     return render_template('account/account-change-email-address-almost-done.html')

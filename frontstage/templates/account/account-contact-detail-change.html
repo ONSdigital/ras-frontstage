@@ -18,6 +18,13 @@
 ] %}
 
 {% block main %}
+{{
+    onsBreadcrumb({
+        "ariaLabel": "Breadcrumbs",
+        "id": "breadcrumbs",
+        "itemsList": breadcrumbsData
+    })
+}}
 {% if errors|length > 0 %}
         {% if errors|length == 1 %}
             {% set errorTitle = 'There is 1 error on this page' %}
@@ -52,13 +59,6 @@
             }}
         {% endcall %}
     {% endif %}
-{{
-    onsBreadcrumb({
-        "ariaLabel": "Breadcrumbs",
-        "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
-    })
-}}
 <h1 class="u-fs-xl">Change your contact details</h1>
 <form action="" method="post">
         {{ form.csrf_token }}

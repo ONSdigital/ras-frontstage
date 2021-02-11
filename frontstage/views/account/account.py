@@ -76,7 +76,7 @@ def change_account_details(session):
                 logger.error('Failed to updated account', status=exc.status_code)
                 raise exc
             logger.info('Successfully updated account', party_id=party_id)
-            success_panel = create_success_message(attributes_changed, "We've updated your ")
+            success_panel = create_success_message(attributes_changed, "We have updated your ")
             flash(success_panel)
 
         if is_email_update_required:

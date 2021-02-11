@@ -18,6 +18,13 @@
 ] %}
 
 {% block main %}
+{{
+    onsBreadcrumb({
+        "ariaLabel": "Breadcrumbs",
+        "id": "breadcrumbs",
+        "itemsList": breadcrumbsData
+    })
+}}
 {% if errors|length > 0 %}
         {% if errors|length == 1 %}
             {% set errorTitle = 'There is 1 error on this page' %}
@@ -52,13 +59,6 @@
             }}
         {% endcall %}
     {% endif %}
-{{
-    onsBreadcrumb({
-        "ariaLabel": "Breadcrumbs",
-        "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
-    })
-}}
 <h1 class="u-fs-xl">Change your contact details</h1>
 <form action="" method="post">
         {{ form.csrf_token }}
@@ -73,7 +73,7 @@
                     "name": "first_name",
                     "type": "text",
                     "label": {
-                        "text": 'First name - <span class="u-lighter u-fw-n">' ~ respondent.firstName ~ '</span>'
+                        "text": 'First name'
                     },
                     "error": errorFirstName,
                     "value": firstName
@@ -90,7 +90,7 @@
                     "name": "last_name",
                     "type": "text",
                     "label": {
-                        "text": 'Surname - <span class="u-lighter u-fw-n">' ~ respondent.lastName ~ '</span>'
+                        "text": 'Surname'
                     },
                     "error": errorLastName,
                     "value": lastName
@@ -107,7 +107,7 @@
                     "name": "email_address",
                     "type": "text",
                     "label": {
-                        "text": 'Email address - <span class="u-lighter u-fw-n">' ~ respondent.emailAddress ~ '</span>'
+                        "text": 'Email address'
                     },
                     "error": errorEmailAddress,
                     "value": emailAddress,
@@ -126,8 +126,7 @@
                     "autocomplete": "tel",
                     "classes": "input--w-8",
                     "label": {
-                        "text": 'Telephone number - <span class="u-lighter u-fw-n">' ~ respondent.telephone ~ '</span>',
-                        "description": "For international numbers include the country code, for example +33 1234 567 890"
+                        "text": 'Phone number'
                     },
                     "error": errorPhoneNumber,
                     "value": phoneNumber

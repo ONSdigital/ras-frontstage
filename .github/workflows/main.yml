@@ -4,11 +4,13 @@ name: Build
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
     paths-ignore:
       - _infra/spinnaker/**
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
     paths-ignore:
       - _infra/spinnaker/**
 
@@ -110,7 +112,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
           COMMIT_MSG: |
-            [ci skip] auto patch increment
+            [skip ci] auto patch increment
             skip-checks: true
         shell: bash
         run: |

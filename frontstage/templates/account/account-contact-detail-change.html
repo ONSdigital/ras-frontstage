@@ -5,7 +5,7 @@
 {% from "components/button/_macro.njk" import onsButton %}
 {% from "components/lists/_macro.njk" import onsList %}
 
-{% set page_title = "Account details" %}
+{% set page_title = "Change contact details" %}
 {% set breadcrumbsData = [
   {
     "text": "Surveys",
@@ -18,6 +18,13 @@
 ] %}
 
 {% block main %}
+{{
+    onsBreadcrumb({
+        "ariaLabel": "Breadcrumbs",
+        "id": "breadcrumbs",
+        "itemsList": breadcrumbsData
+    })
+}}
 {% if errors|length > 0 %}
         {% if errors|length == 1 %}
             {% set errorTitle = 'There is 1 error on this page' %}
@@ -52,13 +59,6 @@
             }}
         {% endcall %}
     {% endif %}
-{{
-    onsBreadcrumb({
-        "ariaLabel": "Breadcrumbs",
-        "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
-    })
-}}
 <h1 class="u-fs-xl">Change your contact details</h1>
 <form action="" method="post">
         {{ form.csrf_token }}
@@ -73,7 +73,7 @@
                     "name": "first_name",
                     "type": "text",
                     "label": {
-                        "text": "First name"
+                        "text": 'First name'
                     },
                     "error": errorFirstName,
                     "value": firstName
@@ -90,24 +90,27 @@
                     "name": "last_name",
                     "type": "text",
                     "label": {
-                        "text": "Surname"
+                        "text": 'Surname'
                     },
                     "error": errorLastName,
                     "value": lastName
                 })
             }}
+            {% set emailAddress = respondent.emailAddress %}
+            {% if errors.email_address %}
+                {% set errorEmailAddress = { "text": errors['email_address'][0],  "id": 'email_address_error' } %}
+                {% set emailAddress = form.email_address.data %}
+            {% endif %}
             {{
                 onsInput({
                     "id": "email_address",
                     "name": "email_address",
                     "type": "text",
                     "label": {
-                        "text": "Email address"
+                        "text": 'Email address'
                     },
-                    "value": respondent.emailAddress,
-                    "attributes": {
-                            "disabled": true
-                    }
+                    "error": errorEmailAddress,
+                    "value": emailAddress,
                 })
             }}
             {% set phoneNumber = respondent.telephone %}
@@ -123,8 +126,7 @@
                     "autocomplete": "tel",
                     "classes": "input--w-8",
                     "label": {
-                        "text": "Telephone number",
-                        "description": "For international numbers include the country code, for example +33 1234 567 890"
+                        "text": 'Phone number'
                     },
                     "error": errorPhoneNumber,
                     "value": phoneNumber

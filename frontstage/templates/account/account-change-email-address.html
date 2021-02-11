@@ -20,6 +20,13 @@
 ] %}
 
 {% block main %}
+{{
+    onsBreadcrumb({
+        "ariaLabel": "Breadcrumbs",
+        "id": "breadcrumbs",
+        "itemsList": breadcrumbsData
+    })
+}}
 {% with messages = get_flashed_messages() %}
     {% if messages %}
           <div class="panel panel--simple panel--success u-mb-m">
@@ -31,16 +38,9 @@
           </div>
     {% endif %}
 {% endwith %}
-{{
-    onsBreadcrumb({
-        "ariaLabel": "Breadcrumbs",
-        "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
-    })
-}}
 <h1 class="u-fs-xl">Change email address</h1>
-<p>You'll need to authorise a change of email address.</p>
-<p>We'll send a confirmation email to <b>{{ new_email }}</b>.</p>
+<p>You will need to authorise a change of email address.</p>
+<p>We will send a confirmation email to <b>{{ new_email }}</b>.</p>
 <form action="{{ url_for('account_bp.change_email_address')}}" method="post">
         {{ form.csrf_token }}
 

@@ -54,7 +54,7 @@ class TestSurveyList(unittest.TestCase):
     def test_account_options_selection(self, get_respondent_party_by_id):
         get_respondent_party_by_id.return_value = respondent_party
         response = self.app.post('/my-account', data=self.contact_details_form, follow_redirects=True)
-        self.assertIn("For international numbers include the country code, for example +33 1234 567 890".encode(),
+        self.assertIn("Phone number".encode(),
                       response.data)
 
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
@@ -99,8 +99,8 @@ class TestSurveyList(unittest.TestCase):
                                        "email_address": "exampleone@example.com"}, follow_redirects=True)
         self.assertIn("updated your first name, last name and telephone number".encode(), response.data)
         self.assertIn("Change email address".encode(), response.data)
-        self.assertIn("You'll need to authorise a change of email address.".encode(), response.data)
-        self.assertIn("We'll send a confirmation email to".encode(), response.data)
+        self.assertIn("You will need to authorise a change of email address.".encode(), response.data)
+        self.assertIn("We will send a confirmation email to".encode(), response.data)
         self.assertIn("exampleone@example.com".encode(), response.data)
 
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')

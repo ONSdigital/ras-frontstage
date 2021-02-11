@@ -1,8 +1,9 @@
 import unittest
 from unittest.mock import patch
 
-from frontstage import app
+import requests_mock
 
+from frontstage import app
 from tests.integration.mocked_services import encoded_jwt_token, respondent_party, url_banner_api, survey_list_todo
 
 

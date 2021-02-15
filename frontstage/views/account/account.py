@@ -8,7 +8,6 @@ from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import party_controller
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.models import OptionsForm, ContactDetailsChangeForm, ConfirmEmailChangeForm
-
 from frontstage.views.account import account_bp
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -69,6 +68,11 @@ def change_account_details(session):
                                                                     respondent_details,
                                                                     is_contact_details_update_required)
         is_email_update_required = form['email_address'].data != respondent_details['emailAddress']
+        if is_email_update_required and party_controller.is_email_already_used_to_register(form['email_address'].data):
+            logger.info('Email already used')
+            error = {"email_address": ["This email has already been used to register an account"]}
+            return render_template('account/account-contact-detail-change.html',
+                                   form=form, errors=error, respondent=respondent_details)
         if is_contact_details_update_required:
             try:
                 party_controller.update_account(respondent_details)

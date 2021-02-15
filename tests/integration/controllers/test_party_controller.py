@@ -146,6 +146,20 @@ class TestPartyController(unittest.TestCase):
                 self.assertEqual(len(rsps.calls), 1)
                 self.assertEqual(rsps.calls[0].request.url, called_url)
 
+    def test_is_email_already_used_to_register_true(self):
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.GET, url_get_respondent_email, json=respondent_party, status=200)
+            with app.app_context():
+                response = party_controller.is_email_already_used_to_register(respondent_party['emailAddress'])
+                self.assertEqual(True, response)
+
+    def test_is_email_already_used_to_register_false(self):
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.GET, url_get_respondent_email, json=respondent_party, status=404)
+            with app.app_context():
+                response = party_controller.is_email_already_used_to_register(respondent_party['emailAddress'])
+                self.assertEqual(False, response)
+
     def test_get_respondent_by_email_success(self):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_respondent_email, json=respondent_party, status=200)

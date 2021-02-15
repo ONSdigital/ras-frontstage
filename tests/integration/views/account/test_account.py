@@ -70,26 +70,6 @@ class TestSurveyList(unittest.TestCase):
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
     @patch('frontstage.controllers.party_controller.update_account')
     @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
-    @patch('frontstage.controllers.party_controller.is_email_already_used_to_register')
-    def test_email_already_in_use(self,
-                                  is_email_already_used_to_register,
-                                  get_survey_list,
-                                  update_account,
-                                  get_respondent_party_by_id):
-        get_respondent_party_by_id.return_value = respondent_party
-        get_survey_list.return_value = survey_list_todo
-        is_value=True
-        is_email_already_used_to_register.return_value = is_value
-        response = self.app.post('/my-account/change-account-details',
-                                 data={"first_name": "new first name",
-                                       "last_name": "new last name",
-                                       "phone_number": "8882257773",
-                                       "email_address": "example_@example.com"}, follow_redirects=True)
-        self.assertIn("This email has already been used to register an account".encode(), response.data)
-
-    @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
-    @patch('frontstage.controllers.party_controller.update_account')
-    @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
     def test_account_contact_details_success(self,
                                              get_survey_list,
                                              update_account,
@@ -137,3 +117,23 @@ class TestSurveyList(unittest.TestCase):
         self.assertIn("Almost done".encode(), response.data)
         self.assertIn("Once you have received it, you need to follow the link".encode(), response.data)
         self.assertIn("please call 0300 1234 931".encode(), response.data)
+
+    @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
+    @patch('frontstage.controllers.party_controller.update_account')
+    @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
+    @patch('frontstage.controllers.party_controller.is_email_already_used_to_register')
+    def test_email_already_in_use(self,
+                                  is_email_already_used_to_register,
+                                  get_survey_list,
+                                  update_account,
+                                  get_respondent_party_by_id):
+        get_respondent_party_by_id.return_value = respondent_party
+        get_survey_list.return_value = survey_list_todo
+        is_value = True
+        is_email_already_used_to_register.return_value = is_value
+        response = self.app.post('/my-account/change-account-details',
+                                 data={"first_name": "new first name",
+                                       "last_name": "new last name",
+                                       "phone_number": "8882257773",
+                                       "email_address": "something@something.com"}, follow_redirects=True)
+        self.assertIn("This email has already been used to register an account".encode(), response.data)

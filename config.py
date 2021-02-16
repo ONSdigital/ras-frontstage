@@ -65,7 +65,8 @@ class Config(object):
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "ras-rm-sandbox")
     PUBSUB_TOPIC = os.getenv("PUBSUB_TOPIC", "ras-rm-notify-test")
     CANARY_GENERATE_ERRORS = bool(strtobool(os.getenv('CANARY_GENERATE_ERRORS', "False")))
-
+    # TODO: to be removed once account change is reworked on.
+    ACCOUNT_CHANGE_FLAG = bool(strtobool(os.getenv('ACCOUNT_CHANGE_FLAG', "True")))
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True

@@ -189,6 +189,21 @@ class OptionsForm(FlaskForm):
         return True
 
 
+class HelpOptionsForm(FlaskForm):
+    option = RadioField('Label', choices=[
+        ('value', 'help_completing_monthly_business_survey'),
+        ('value', 'info_about_monthly_business_survey'),
+        ('value', 'info_about_ons'),
+        ('value', 'help_with_my_account'),
+        ('value', 'something_else'),
+        ])
+
+    def validate(self):
+        if self.data['option'] is None:
+            return False
+        return True
+
+
 class ContactDetailsChangeForm(FlaskForm):
     first_name = StringField(_('First name'), validators=[DataRequired(_('First name is required')),
                                                           Length(max=254,

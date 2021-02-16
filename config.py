@@ -1,6 +1,5 @@
 import os
 
-
 # To choose which config to use when running frontstage set environment variable APP_SETTINGS to the name of the
 # config object e.g. for the dev config set APP_SETTINGS=DevelopmentConfig
 from distutils.util import strtobool
@@ -67,6 +66,7 @@ class Config(object):
     CANARY_GENERATE_ERRORS = bool(strtobool(os.getenv('CANARY_GENERATE_ERRORS', "False")))
     # TODO: to be removed once account change is reworked on.
     ACCOUNT_CHANGE_FLAG = bool(strtobool(os.getenv('ACCOUNT_CHANGE_FLAG', "True")))
+
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True

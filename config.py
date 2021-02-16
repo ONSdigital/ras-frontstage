@@ -65,7 +65,7 @@ class Config(object):
     PUBSUB_TOPIC = os.getenv("PUBSUB_TOPIC", "ras-rm-notify-test")
     CANARY_GENERATE_ERRORS = bool(strtobool(os.getenv('CANARY_GENERATE_ERRORS', "False")))
     # TODO: to be removed once account change is reworked on.
-    ACCOUNT_CHANGE_FLAG = bool(strtobool(os.getenv('ACCOUNT_CHANGE_FLAG', "True")))
+    ACCOUNT_CHANGE_FLAG = bool(strtobool(os.getenv('ACCOUNT_CHANGE_FLAG', "False")))
 
 
 class DevelopmentConfig(Config):

@@ -4,6 +4,8 @@ from flask import render_template, request, flash, url_for
 from structlog import wrap_logger
 from werkzeug.utils import redirect
 
+import config
+from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import party_controller
 from frontstage.exceptions.exceptions import ApiError
@@ -20,7 +22,10 @@ def get_account(session):
     form = OptionsForm()
     party_id = session.get_party_id()
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
-    return render_template('account/account.html', form=form, respondent=respondent_details)
+    # TODO: is_account_detail_change_enabled to be removed once account change is worked again
+    is_account_detail_change_enabled = app.config['ACCOUNT_CHANGE_FLAG']
+    return render_template('account/account.html', form=form, respondent=respondent_details,
+                           enabled=is_account_detail_change_enabled)
 
 
 @account_bp.route('/', methods=['POST'])

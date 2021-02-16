@@ -36,12 +36,14 @@ class TestSurveyList(unittest.TestCase):
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
     def test_account_options(self, get_respondent_party_by_id):
         get_respondent_party_by_id.return_value = respondent_party
+        with app.app_context():
+            app.config['ACCOUNT_CHANGE_FLAG'] = True
+            response = self.app.get('/my-account')
 
-        response = self.app.get('/my-account')
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue('example@example.com'.encode() in response.data)
+            self.assertIn("Help with your account".encode(), response.data)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('example@example.com'.encode() in response.data)
-        self.assertIn("Help with your account".encode(), response.data)
 
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
     def test_account_options_not_selection(self, get_respondent_party_by_id):

@@ -62,6 +62,11 @@
 <h1 class="u-fs-xl">Change your contact details</h1>
 <form action="" method="post">
         {{ form.csrf_token }}
+        {% call onsPanel() %}
+            <div>
+                If you need to change your email address you should <a href="{{ url_for('contact_us_bp.contact_us')}}">contact us</a>
+            </div>
+        {% endcall %}
         {% set firstName = respondent.firstName %}
         {% if errors.first_name %}
                 {% set errorFirstName = { "text": errors['first_name'][0],  "id": 'first_name_error' } %}

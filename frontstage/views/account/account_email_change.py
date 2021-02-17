@@ -14,7 +14,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 @account_bp.route('/confirm-account-email-change/<token>', methods=['GET'])
 def confirm_account_email_change(token):
-    if not app.config['ACCOUNT_EMAIL_CHANGE_ENABLED']:
+    if not app.config['ACCOUNT_DETAILS_CHANGE_ENABLED']:
         abort(404)
     logger.info('Attempting to confirm account email change', token=token)
     try:
@@ -48,7 +48,7 @@ def confirm_account_email_change(token):
 @account_bp.route('/resend-account-email-change-expired-token/<token>', methods=['GET'])
 @jwt_authorization(request)
 def resend_account_email_change_expired_token(session, token):
-    if not app.config['ACCOUNT_EMAIL_CHANGE_ENABLED']:
+    if not app.config['ACCOUNT_DETAILS_CHANGE_ENABLED']:
         abort(404)
     party_controller.resend_account_email_change_expired_token(token)
     logger.info('Re-sent verification email for account email change expired token.', token=token)

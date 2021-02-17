@@ -27,7 +27,7 @@ class TestSurveyList(unittest.TestCase):
     def test_account(self, get_respondent_party_by_id):
         get_respondent_party_by_id.return_value = respondent_party
         with app.app_context():
-            app.config['ACCOUNT_EMAIL_CHANGE_ENABLED'] = True
+            app.config['ACCOUNT_DETAILS_CHANGE_ENABLED'] = True
             response = self.app.get('/my-account')
 
             self.assertEqual(response.status_code, 200)
@@ -38,7 +38,7 @@ class TestSurveyList(unittest.TestCase):
     def test_account_options(self, get_respondent_party_by_id):
         get_respondent_party_by_id.return_value = respondent_party
         with app.app_context():
-            app.config['ACCOUNT_EMAIL_CHANGE_ENABLED'] = True
+            app.config['ACCOUNT_DETAILS_CHANGE_ENABLED'] = True
             response = self.app.get('/my-account')
 
             self.assertEqual(response.status_code, 200)

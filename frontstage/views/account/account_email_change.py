@@ -1,6 +1,6 @@
 import logging
 
-from flask import app, render_template, abort, request
+from flask import render_template, abort, request, current_app as app
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
@@ -16,9 +16,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 def confirm_account_email_change(token):
     if not app.config['ACCOUNT_EMAIL_CHANGE_ENABLED']:
         abort(404)
-
     logger.info('Attempting to confirm account email change', token=token)
-
     try:
         party_controller.verify_email(token)
     except ApiError as exc:

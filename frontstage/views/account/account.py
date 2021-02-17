@@ -22,10 +22,7 @@ def get_account(session):
     form = OptionsForm()
     party_id = session.get_party_id()
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
-    # TODO: is_account_detail_change_enabled to be removed once account change is worked again
-    is_account_detail_change_enabled = app.config['ACCOUNT_DETAILS_CHANGE_ENABLED']
-    return render_template('account/account.html', form=form, respondent=respondent_details,
-                           enabled=is_account_detail_change_enabled)
+    return render_template('account/account.html', form=form, respondent=respondent_details)
 
 
 @account_bp.route('/', methods=['POST'])
@@ -67,13 +64,16 @@ def change_account_details(session):
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
     is_contact_details_update_required = False
     attributes_changed = []
+    # TODO: is_account_detail_change_enabled to be removed once account change is worked again
+    is_account_email_change_enabled = app.config['ACCOUNT_EMAIL_CHANGE_ENABLED']
     if request.method == 'POST' and form.validate():
         logger.info('Attempting to update contact details changes on the account', party_id=party_id)
+        # check_attribute changes also magically updates the respondent_details as a side effect of running this
+        # function
         is_contact_details_update_required = check_attribute_change(form,
                                                                     attributes_changed,
                                                                     respondent_details,
                                                                     is_contact_details_update_required)
-        is_email_update_required = form['email_address'].data != respondent_details['emailAddress']
         if is_contact_details_update_required:
             try:
                 party_controller.update_account(respondent_details)
@@ -83,15 +83,17 @@ def change_account_details(session):
             logger.info('Successfully updated account', party_id=party_id)
             success_panel = create_success_message(attributes_changed, "We have updated your ")
             flash(success_panel)
-
-        if is_email_update_required:
-            return render_template('account/account-change-email-address.html',
-                                   new_email=form['email_address'].data,
-                                   form=ConfirmEmailChangeForm())
+        if is_account_email_change_enabled:
+            is_email_update_required = form['email_address'].data != respondent_details['emailAddress']
+            if is_email_update_required:
+                return render_template('account/account-change-email-address.html',
+                                       new_email=form['email_address'].data,
+                                       form=ConfirmEmailChangeForm())
         return redirect(url_for('surveys_bp.get_survey_list', tag='todo'))
     else:
         return render_template('account/account-contact-detail-change.html',
-                               form=form, errors=form.errors, respondent=respondent_details)
+                               form=form, errors=form.errors, respondent=respondent_details,
+                               is_email_change_enabled=is_account_email_change_enabled)
 
 
 def check_attribute_change(form, attributes_changed, respondent_details, update_required_flag):

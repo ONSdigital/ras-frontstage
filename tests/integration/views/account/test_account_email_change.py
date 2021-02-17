@@ -23,7 +23,7 @@ class TestAccountEmailChange(unittest.TestCase):
     @requests_mock.mock()
     def test_expired_account_email_change_verification_token(self, mock_object):
         with app.app_context():
-            app.config['ACCOUNT_DETAILS_CHANGE_ENABLED'] = True
+            app.config['ACCOUNT_EMAIL_CHANGE_ENABLED'] = True
             mock_object.put(url_verify_email, status_code=409)
             response = self.app.get('/my-account/confirm-account-email-change/test_token')
 
@@ -34,7 +34,7 @@ class TestAccountEmailChange(unittest.TestCase):
     @requests_mock.mock()
     def test_wrong_account_email_change_verification_token(self, mock_object):
         with app.app_context():
-            app.config['ACCOUNT_DETAILS_CHANGE_ENABLED'] = True
+            app.config['ACCOUNT_EMAIL_CHANGE_ENABLED'] = True
             mock_object.put(url_verify_email, status_code=404)
             response = self.app.get('/my-account/confirm-account-email-change/test_token')
 
@@ -43,7 +43,7 @@ class TestAccountEmailChange(unittest.TestCase):
     @requests_mock.mock()
     def test_success_account_email_change_verification_token(self, mock_object):
         with app.app_context():
-            app.config['ACCOUNT_DETAILS_CHANGE_ENABLED'] = True
+            app.config['ACCOUNT_EMAIL_CHANGE_ENABLED'] = True
             mock_object.put(url_verify_email, status_code=200)
             response = self.app.get('/my-account/confirm-account-email-change/test_token')
 

@@ -40,7 +40,6 @@
   <dt class="metadata__term grid__col col-4@m">Phone number:</dt>
   <dd class="metadata__value grid__col col-8@m">{{ respondent.telephone }}</dd>
 </dl>
-{% if enabled %}
     <hr class="u-mb-l">
 <h1 class="u-fs-xl">Help with your account</h1>
 <form action="{{ url_for('account_bp.update_account')}}" method="post">
@@ -75,5 +74,4 @@
         </div>
     </p>
 </form>
-{% endif %}
 {% endblock main %}

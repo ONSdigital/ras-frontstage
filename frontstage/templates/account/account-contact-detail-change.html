@@ -96,6 +96,7 @@
                     "value": lastName
                 })
             }}
+    {% if is_email_change_enabled %}
             {% set emailAddress = respondent.emailAddress %}
             {% if errors.email_address %}
                 {% set errorEmailAddress = { "text": errors['email_address'][0],  "id": 'email_address_error' } %}
@@ -113,6 +114,7 @@
                     "value": emailAddress,
                 })
             }}
+    {% endif %}
             {% set phoneNumber = respondent.telephone %}
             {% if errors.phone_number %}
                 {% set errorPhoneNumber = { "text": errors['phone_number'][0],  "id": 'phone_number_error' } %}

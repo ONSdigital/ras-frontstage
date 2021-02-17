@@ -40,7 +40,7 @@
   <dt class="metadata__term grid__col col-4@m">Phone number:</dt>
   <dd class="metadata__value grid__col col-8@m">{{ respondent.telephone }}</dd>
 </dl>
-<hr class="u-mb-l">
+    <hr class="u-mb-l">
 <h1 class="u-fs-xl">Help with your account</h1>
 <form action="{{ url_for('account_bp.update_account')}}" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -74,5 +74,4 @@
         </div>
     </p>
 </form>
-
 {% endblock main %}

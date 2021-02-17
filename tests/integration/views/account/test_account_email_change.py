@@ -22,29 +22,35 @@ class TestAccountEmailChange(unittest.TestCase):
 
     @requests_mock.mock()
     def test_expired_account_email_change_verification_token(self, mock_object):
-        mock_object.put(url_verify_email, status_code=409)
-        response = self.app.get('/my-account/confirm-account-email-change/test_token')
+        with app.app_context():
+            app.config['ACCOUNT_EMAIL_CHANGE_ENABLED'] = True
+            mock_object.put(url_verify_email, status_code=409)
+            response = self.app.get('/my-account/confirm-account-email-change/test_token')
 
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('Your verification link has expired'.encode() in response.data)
-        self.assertTrue('This will require a sign in to your account'.encode() in response.data)
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue('Your verification link has expired'.encode() in response.data)
+            self.assertTrue('This will require a sign in to your account'.encode() in response.data)
 
     @requests_mock.mock()
     def test_wrong_account_email_change_verification_token(self, mock_object):
-        mock_object.put(url_verify_email, status_code=404)
-        response = self.app.get('/my-account/confirm-account-email-change/test_token')
+        with app.app_context():
+            app.config['ACCOUNT_EMAIL_CHANGE_ENABLED'] = True
+            mock_object.put(url_verify_email, status_code=404)
+            response = self.app.get('/my-account/confirm-account-email-change/test_token')
 
-        self.assertEqual(response.status_code, 404)
+            self.assertEqual(response.status_code, 404)
 
     @requests_mock.mock()
     def test_success_account_email_change_verification_token(self, mock_object):
-        mock_object.put(url_verify_email, status_code=200)
-        response = self.app.get('/my-account/confirm-account-email-change/test_token')
+        with app.app_context():
+            app.config['ACCOUNT_EMAIL_CHANGE_ENABLED'] = True
+            mock_object.put(url_verify_email, status_code=200)
+            response = self.app.get('/my-account/confirm-account-email-change/test_token')
 
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(
-            'Thank you for changing the email address on your account. '
-            'You can now sign in using the new details at'.encode() in response.data)
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue(
+                'Thank you for changing the email address on your account. '
+                'You can now sign in using the new details at'.encode() in response.data)
 
     @requests_mock.mock()
     def test_resend_account_email_change_verification_token(self, mock_object):

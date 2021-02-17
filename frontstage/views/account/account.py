@@ -23,7 +23,7 @@ def get_account(session):
     party_id = session.get_party_id()
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
     # TODO: is_account_detail_change_enabled to be removed once account change is worked again
-    is_account_detail_change_enabled = app.config['ACCOUNT_CHANGE_FLAG']
+    is_account_detail_change_enabled = app.config['ACCOUNT_EMAIL_CHANGE_ENABLED']
     return render_template('account/account.html', form=form, respondent=respondent_details,
                            enabled=is_account_detail_change_enabled)
 

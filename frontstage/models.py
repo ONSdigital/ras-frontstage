@@ -211,7 +211,7 @@ class ContactDetailsChangeForm(FlaskForm):
     #                             validators=[DataRequired(_('Email address is required')),
     #                                         Email(message=_('Invalid email address')),
     #                                         Length(max=254,
-    #                                                message=_('Your email must be less than 254 characters'))])
+    #                                                message=_('Your email must have fewer than 254 characters'))])
 
 
 class ConfirmEmailChangeForm(FlaskForm):

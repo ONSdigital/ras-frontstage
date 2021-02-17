@@ -64,8 +64,8 @@ class TestSurveyList(unittest.TestCase):
         get_respondent_party_by_id.return_value = respondent_party
         response = self.app.post('/my-account/change-account-details',
                                  data={"first_name": ""}, follow_redirects=True)
-        # Uncomment the '4 errors' line, the 'email address' line and delete the 3 errors line once the
-        # account chang email functionality has been restored
+        # TODO: Uncomment the '4 errors' line, the 'email address' line and delete the 3 errors line once the
+        # account change email functionality has been restored
         self.assertIn("There are 3 errors on this page".encode(), response.data)
         # self.assertIn("There are 4 errors on this page".encode(), response.data)
         self.assertIn("Problem with the first name".encode(), response.data)

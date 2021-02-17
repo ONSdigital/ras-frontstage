@@ -204,7 +204,7 @@ class ContactDetailsChangeForm(FlaskForm):
                                                   message=_('This should be a valid phone number between 9 and 15 '
                                                             'digits'))],
                                default=None)
-    # Remove comments and delete the field without validation once email change functionality is enabled.
+    # TODO: Remove comments and delete the field without validation once email change functionality is enabled.
     # This was commented out rather then feature flagged as it's difficult to feature flag a model.
     email_address = StringField(_('Email address'))
     # email_address = StringField(_('Email address'),

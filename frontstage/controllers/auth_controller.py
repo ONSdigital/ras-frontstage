@@ -12,6 +12,16 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def sign_in(username, password):
+    """
+    Checks if the users credentials are valid. On success it returns an empty dict (a hangover from when
+    this function used to call a different authentication application).
+
+    :param username: The username.  Should be an email address
+    :param password: The password
+    :raises AuthError: Raised if the credentials provided are incorrect
+    :raises ApiError: Raised on any other non-401 error status code
+    :return: An empty dict if credentials are valid.  An exception is raised otherwise
+    """
     if app.config["CANARY_GENERATE_ERRORS"]:
         logger.error("Canary experiment running this error can be ignored", status=500)
     bound_logger = logger.bind(email=obfuscate_email(username))

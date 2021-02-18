@@ -1,8 +1,6 @@
 import logging
-from os import getenv
 
-from flask import redirect, render_template, url_for, abort, request
-from requests import auth
+from flask import render_template, abort, request, current_app as app
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
@@ -16,8 +14,9 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 @account_bp.route('/confirm-account-email-change/<token>', methods=['GET'])
 def confirm_account_email_change(token):
+    if not app.config['ACCOUNT_EMAIL_CHANGE_ENABLED']:
+        abort(404)
     logger.info('Attempting to confirm account email change', token=token)
-
     try:
         party_controller.verify_email(token)
     except ApiError as exc:
@@ -49,6 +48,8 @@ def confirm_account_email_change(token):
 @account_bp.route('/resend-account-email-change-expired-token/<token>', methods=['GET'])
 @jwt_authorization(request)
 def resend_account_email_change_expired_token(session, token):
+    if not app.config['ACCOUNT_EMAIL_CHANGE_ENABLED']:
+        abort(404)
     party_controller.resend_account_email_change_expired_token(token)
     logger.info('Re-sent verification email for account email change expired token.', token=token)
     return render_template('sign-in/sign-in.verification-email-sent.html')

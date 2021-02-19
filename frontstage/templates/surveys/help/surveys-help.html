@@ -21,7 +21,7 @@
     })
 }}
 <h1 class="u-fs-xl">Help</h1>
-<form action="{{ url_for('surveys_bp.help_option_select', short_name=short_name)}}" method="post">
+<form action="{{ url_for('surveys_bp.post_help_page', short_name=short_name)}}" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         {{
             onsRadios({
@@ -80,7 +80,7 @@
             </div>
             <div class="grid__col u-ml-m">
                 <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}"
-                role="button" class="btn btn--secondary" id="btn-option-cancel"><span>Cancel</span></a>
+                id="btn-option-cancel">Cancel</a>
             </div>
         </div>
     </p>

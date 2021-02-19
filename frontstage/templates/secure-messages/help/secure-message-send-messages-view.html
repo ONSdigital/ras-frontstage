@@ -1,77 +1,61 @@
-{% extends "secure-messages/messages.html" %}
+{% extends "layouts/_twothirds.html" %}
+{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
 {% from "components/button/_macro.njk" import onsButton %}
 
 {% set page_title = "Send a message" %}
+{% set breadcrumbsData = [
+  {
+    "text": "Surveys",
+    "url": "/surveys/todo"
+  },
+  {
+    "text": "Help",
+    "url": "/surveys/help/"~short_name
+  },
+  {
+    "text": breadcrumbs_title,
+    "url": "/surveys/help/"~short_name~"/"~option
+  }
+] %}
 
-{% block messages %}
-
+{% block main %}
+{{
+    onsBreadcrumb({
+        "ariaLabel": "Breadcrumbs",
+        "id": "breadcrumbs",
+        "itemsList": breadcrumbsData
+    })
+}}
 {% include 'secure-messages/message-error-summary.html' %}
-
-<div class="secure-message-view-component">
-    <div class="grid grid--reverse">
-        <div class="grid__col col-4@m"></div>
-        <div class="grid__col col-7@m pull-1@m">
-        {% if label != 'SENT' %}
-            {% set message = {} if not message else message %}
-
-            {% if not message %}<h1 class="u-fs-xl">Create message</h1>{% endif %}
-
-            <div class="secure-message-form" id="secure-message-form">
-                <form action="{{ url_for('secure_message_bp.create_message', ru_ref=ru_ref, survey=survey) }}" method="post">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                    {{ form.thread_id }}
-
-                    {% if message %}
-                        {{ form.hidden_subject }}
-
-                    {% else %}
-                        <p>To: ONS Business Surveys team</p>
-                        {% if "subject" in errors %}
-                            <div class="panel panel--simple panel--error panel--spacious" id="subject-error">
-                                <p class="error-message">{{ errors['subject'][0] }}</p>
-                        {% endif %}
-                            <label class="u-fs-r--b" for="secure-message-subject">Subject</label>
-                            {{ form.subject(id='secure-message-subject', class_='secure-message-form__subject input input--text') }}
-                        {% if "subject" in errors %}
-                            </div>
-                        {% endif %}
-                        <br />
-                    {% endif %}
-                    {% if "body" in errors %}
-                        <div class="panel panel--simple panel--error panel--spacious" id="body-error">
-                            <p class="error-message">{{ errors['body'][0] }}</p>
-                    {% endif %}
-                    <p>Make changes to your name, email address, and telephone number
-                        in <a href="/my-account" class="u-fs-r--b">your account</a>.</p>
-                    {% if message %}
-                        <label class="u-fs-r--b" for="secure-message-body">Reply</label>
-                    {% else %}
-                        <label class="u-fs-r--b" for="secure-message-body">Message</label>
-                    {% endif %}
-                    {{ form.body(id='secure-message-body', class_='input input--textarea input--textarea-message', rows='10', maxlength='50000') }}
-                    {% if "body" in errors %}
-                        </div>
-                    {% endif %}
-
+<div class="grid__col col-12@m u-pt-no">
+    <h1>Send a message</h1>
+    <p>Send us a message with a description of your issue and we will get back to you.</p>
+    <dl class="metadata metadata__list grid grid--gutterless u-cf u-mb-l" title="Message subject" aria-label="Message subject">
+                  <dt class="metadata__term grid__col col-2@m">Subject:</dt>
+                  <dd class="metadata__value grid__col col-10@m">{{ subject }}</dd>
+    </dl>
+    <div class="secure-message-form col-10@m" id="secure-message-form">
+        <form action="" method="post">
+            <label class="u-fs-r--b" for="secure-message-body">Create message</label>
+            {{ form.body(id='secure-message-body', class_='input input--textarea input--textarea-message', rows='10', maxlength='50000') }}
+            <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
+                <div class="grid__col">
                     {{
                         onsButton({
-                            "text": "Send",
-                            "name": "send",
-                            "type": "submit",
-                            "classes": "u-mt-l u-mb-s",
-                            "id": "send-message-btn",
-                            "submitType": "timer"
+                        "text": "Send message",
+                        "id": "send-message-btn",
+                        "classes": 'btn btn-group__btn',
+                        "submitType": "timer"
                         })
-                    }}        
-                </form>
+                    }}
+                </div>
+                <div class="grid__col u-ml-m">
+                    <a href="{{ url_for('surveys_bp.get_help_option_select', short_name=short_name, option=option) }}"
+                    id="btn-option-cancel">Cancel</a>
+                </div>
             </div>
-
-        {% endif %}
-        </div>
+        </form>
     </div>
-
-    <p><a href="{{ url_for('secure_message_bp.view_conversation_list') }}">Cancel</a></p>
-
 </div>
 
-{% endblock messages %}
+{% endblock main %}

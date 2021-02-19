@@ -26,22 +26,24 @@ class TestSurveyList(unittest.TestCase):
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
     def test_account(self, get_respondent_party_by_id):
         get_respondent_party_by_id.return_value = respondent_party
+        with app.app_context():
+            app.config['ACCOUNT_EMAIL_CHANGE_ENABLED'] = True
+            response = self.app.get('/my-account')
 
-        response = self.app.get('/my-account')
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('example@example.com'.encode() in response.data)
-        self.assertTrue('0987654321'.encode() in response.data)
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue('example@example.com'.encode() in response.data)
+            self.assertTrue('0987654321'.encode() in response.data)
 
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
     def test_account_options(self, get_respondent_party_by_id):
         get_respondent_party_by_id.return_value = respondent_party
+        with app.app_context():
+            app.config['ACCOUNT_EMAIL_CHANGE_ENABLED'] = True
+            response = self.app.get('/my-account')
 
-        response = self.app.get('/my-account')
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('example@example.com'.encode() in response.data)
-        self.assertIn("Help with your account".encode(), response.data)
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue('example@example.com'.encode() in response.data)
+            self.assertIn("Help with your account".encode(), response.data)
 
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
     def test_account_options_not_selection(self, get_respondent_party_by_id):
@@ -62,10 +64,13 @@ class TestSurveyList(unittest.TestCase):
         get_respondent_party_by_id.return_value = respondent_party
         response = self.app.post('/my-account/change-account-details',
                                  data={"first_name": ""}, follow_redirects=True)
-        self.assertIn("There are 4 errors on this page".encode(), response.data)
+        # TODO: Uncomment the '4 errors' line, the 'email address' line and delete the 3 errors line once the
+        # account change email functionality has been restored
+        self.assertIn("There are 3 errors on this page".encode(), response.data)
+        # self.assertIn("There are 4 errors on this page".encode(), response.data)
         self.assertIn("Problem with the first name".encode(), response.data)
         self.assertIn("Problem with the phone number".encode(), response.data)
-        self.assertIn("Problem with the email address".encode(), response.data)
+        # self.assertIn("Problem with the email address".encode(), response.data)
 
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
     @patch('frontstage.controllers.party_controller.update_account')

@@ -233,11 +233,14 @@ class ContactDetailsChangeForm(FlaskForm):
                                                   message=_('This should be a valid phone number between 9 and 15 '
                                                             'digits'))],
                                default=None)
-    email_address = StringField(_('Email address'),
-                                validators=[DataRequired(_('Email address is required')),
-                                            Email(message=_('Invalid email address')),
-                                            Length(max=254,
-                                                   message=_('Your email must be less than 254 characters'))])
+    # TODO: Remove comments and delete the field without validation once email change functionality is enabled.
+    # This was commented out rather then feature flagged as it's difficult to feature flag a model.
+    email_address = StringField(_('Email address'))
+    # email_address = StringField(_('Email address'),
+    #                             validators=[DataRequired(_('Email address is required')),
+    #                                         Email(message=_('Invalid email address')),
+    #                                         Length(max=254,
+    #                                                message=_('Your email must have fewer than 254 characters'))])
 
 
 class ConfirmEmailChangeForm(FlaskForm):

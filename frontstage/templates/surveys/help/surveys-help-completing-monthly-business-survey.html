@@ -9,6 +9,10 @@
   {
     "text": "Surveys",
     "url": "/surveys/todo"
+  },
+  {
+    "text": "Help",
+    "url": "/surveys/help/"~short_name
   }
 ] %}
 
@@ -20,7 +24,7 @@
         "itemsList": breadcrumbsData
     })
 }}
-<h1 class="u-fs-xl">Help</h1>
+<h1 class="u-fs-xl">Help completing the Monthly Business Survey</h1>
 <form action="{{ url_for('surveys_bp.help_option_select', short_name=short_name)}}" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         {{
@@ -29,32 +33,25 @@
                 "name": "option",
                 "radios": [
                     {
-                        "id": "help_completing_monthly_business_survey",
+                        "id": "answer_survey_question",
                         "label": {
-                            "text": "Help completing the Monthly Business Survey"
+                            "text": "I need help answering a survey question"
                         },
-                        "value": "help_completing_monthly_business_survey"
+                        "value": "answer_survey_question"
                     },
                     {
-                        "id": "info_about_monthly_business_survey",
+                        "id": "do_not_have_specific_figures",
                         "label": {
-                            "text": "Information about the Monthly Business Survey"
+                            "text": "I don't have specific figures for a response"
                         },
-                        "value": "info_about_monthly_business_survey"
+                        "value": "do_not_have_specific_figures"
                     },
                     {
-                        "id": "info_about_ons",
+                        "id": "unable_to_return_by_deadline",
                         "label": {
-                            "text": "Information about ONS"
+                            "text": "I am unable to return the data by the deadline"
                         },
-                        "value": "info_about_ons"
-                    },
-                    {
-                        "id": "help_with_my_account",
-                        "label": {
-                            "text": "Help with my account"
-                        },
-                        "value": "help_with_my_account"
+                        "value": "unable_to_return_by_deadline"
                     },
                     {
                         "id": "something_else",
@@ -66,7 +63,7 @@
                 ]
             })
         }}
-        <p class="field u-mt-l">
+    <p class="field u-mt-l">
         <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
             <div class="grid__col">
                 {{

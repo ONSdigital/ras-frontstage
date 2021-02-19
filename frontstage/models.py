@@ -196,7 +196,21 @@ class HelpOptionsForm(FlaskForm):
         ('value', 'info_about_ons'),
         ('value', 'help_with_my_account'),
         ('value', 'something_else'),
-        ])
+    ])
+
+    def validate(self):
+        if self.data['option'] is None:
+            return False
+        return True
+
+
+class HelpCompletingMonthlyBusinessSurveyForm(FlaskForm):
+    option = RadioField('Label', choices=[
+        ('value', 'answer_survey_question'),
+        ('value', 'do_not_have_specific_figures'),
+        ('value', 'unable_to_return_by_deadline'),
+        ('value', 'something_else'),
+    ])
 
     def validate(self):
         if self.data['option'] is None:

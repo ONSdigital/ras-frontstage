@@ -191,11 +191,7 @@ class OptionsForm(FlaskForm):
 
 class HelpOptionsForm(FlaskForm):
     option = RadioField('Label', choices=[
-        ('value', 'help-completing-this-survey'),
-        ('value', 'info-about-monthly-business-survey'),
-        ('value', 'info-about-ons'),
-        ('value', 'help-with-my-account'),
-        ('value', 'something-else'),
+        ('value', 'help-completing-this-survey')
     ])
 
     def validate(self):
@@ -204,7 +200,7 @@ class HelpOptionsForm(FlaskForm):
         return True
 
 
-class HelpCompletingMonthlyBusinessSurveyForm(FlaskForm):
+class HelpCompletingThisSurveyForm(FlaskForm):
     option = RadioField('Label', choices=[
         ('value', 'answer-survey-question'),
         ('value', 'do-not-have-specific-figures'),

@@ -9,7 +9,7 @@ from werkzeug.utils import redirect
 
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import survey_controller, conversation_controller
-from frontstage.models import HelpOptionsForm, HelpCompletingMonthlyBusinessSurveyForm, SecureMessagingForm
+from frontstage.models import HelpOptionsForm, HelpCompletingThisSurveyForm, SecureMessagingForm
 from frontstage.views.surveys import surveys_bp
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -48,7 +48,7 @@ def get_help_option_select(session, short_name, business_id, option):
     if option == 'help-completing-this-survey':
         return render_template('surveys/help/surveys-help-completing-this-survey.html',
                                short_name=short_name, business_id=business_id, option=option,
-                               form=HelpCompletingMonthlyBusinessSurveyForm(),
+                               form=HelpCompletingThisSurveyForm(),
                                survey_name=survey['longName'])
     else:
         abort(404)
@@ -59,7 +59,7 @@ def get_help_option_select(session, short_name, business_id, option):
 def post_help_option_select(session, short_name, business_id, option):
     """Provides additional options once sub options are selected"""
     if option == 'help-completing-this-survey':
-        form = HelpCompletingMonthlyBusinessSurveyForm(request.values)
+        form = HelpCompletingThisSurveyForm(request.values)
         form_valid = form.validate()
         breadcrumbs_title = 'Help completing this survey'
         if form.data['option'] == 'answer-survey-question' and form_valid:

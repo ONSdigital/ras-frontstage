@@ -51,7 +51,7 @@
                 }}
             <br>
         {% endif %}
-        <a id="create-message-link-{{loop.index}}" href="{{ url_for('surveys_bp.get_help_page', short_name=survey.survey_short_name) }}" class="u-fs-s">Help with this survey <span class="u-vh"> about {{ survey.survey_long_name }}</span></a>
+        <a id="create-message-link-{{loop.index}}" href="{{ url_for('surveys_bp.get_help_page', short_name=survey.survey_short_name, business_id=survey.business_party_id) }}" class="u-fs-s">Help with this survey <span class="u-vh"> about {{ survey.survey_long_name }}</span></a>
     {% endset %}
     {% do surveyTableDataRows.append(
         {

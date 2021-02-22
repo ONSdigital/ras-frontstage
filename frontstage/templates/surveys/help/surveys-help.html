@@ -4,7 +4,7 @@
 {% from "components/radios/_macro.njk" import onsRadios %}
 {% from "components/button/_macro.njk" import onsButton %}
 
-{% set page_title = "Surveys help" %}
+{% set page_title = "Help" %}
 {% set breadcrumbsData = [
   {
     "text": "Surveys",
@@ -52,7 +52,7 @@
             </div>
             <div class="grid__col u-ml-m">
                 <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}"
-                id="btn-option-cancel">Cancel</a>
+                id="btn-help-option-cancel">Cancel</a>
             </div>
         </div>
     </p>

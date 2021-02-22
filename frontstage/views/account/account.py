@@ -4,13 +4,11 @@ from flask import render_template, request, flash, url_for
 from structlog import wrap_logger
 from werkzeug.utils import redirect
 
-import config
 from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import party_controller
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.models import OptionsForm, ContactDetailsChangeForm, ConfirmEmailChangeForm
-
 from frontstage.views.account import account_bp
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -31,7 +29,7 @@ def update_account(session):
     form = OptionsForm()
     form_valid = form.validate()
     if not form_valid:
-        flash('At least one option should be selected!')
+        flash('At least one option should be selected.')
         return redirect(url_for('account_bp.get_account'))
     if form.data['option'] == 'contact_details':
         return redirect(url_for('account_bp.change_account_details'))

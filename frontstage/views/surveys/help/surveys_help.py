@@ -112,6 +112,9 @@ def get_help_option_sub_option_select(session, short_name, business_id, option, 
 @jwt_authorization(request)
 def get_send_help_message(session, short_name, business_id, option):
     """Gets the send message page once the option is selected"""
+    if 'errors' in request.args:
+        errors = request.args['errors']
+        flash(errors)
     if option == 'help-completing-this-survey':
         breadcrumbs_title = 'Help completing this survey'
     return render_template('secure-messages/help/secure-message-send-messages-view.html',
@@ -125,6 +128,9 @@ def get_send_help_message(session, short_name, business_id, option):
 @jwt_authorization(request)
 def get_send_help_message_page(session, short_name, business_id, option, sub_option):
     """Gets the send message page once the option and sub option is selected"""
+    if 'errors' in request.args:
+        errors = request.args['errors']
+        flash(errors)
     subject, text_one, text_two = get_subject_and_breadcrumbs_title(sub_option, f'surveys/help/{short_name}/{option}')
     return render_template('secure-messages/help/secure-message-send-messages-view.html',
                            short_name=short_name, option=option, sub_option=sub_option, form=SecureMessagingForm(),
@@ -135,12 +141,22 @@ def get_send_help_message_page(session, short_name, business_id, option, sub_opt
 @jwt_authorization(request)
 def send_help_message(session, short_name, business_id):
     """Sends secure message for the help pages"""
-    subject = request.args['subject']
-    party_id = session.get_party_id()
-    survey = survey_controller.get_survey_by_short_name(short_name)
-    business_id = business_id
     form = SecureMessagingForm(request.form)
-    if form.validate():
+    option = request.args['option']
+    sub_option = request.args['sub_option']
+    if not form.validate():
+        if sub_option == 'not_defined':
+            return redirect(url_for('surveys_bp.get_send_help_message', short_name=short_name, business_id=business_id,
+                                    option=option, errors=form.errors['body']))
+        else:
+            return redirect(url_for('surveys_bp.get_send_help_message_page', short_name=short_name,
+                                    business_id=business_id, option=option, sub_option=sub_option,
+                                    errors=form.errors['body']))
+    else:
+        subject = request.args['subject']
+        party_id = session.get_party_id()
+        survey = survey_controller.get_survey_by_short_name(short_name)
+        business_id = business_id
         logger.info("Form validation successful", party_id=party_id)
         sent_message = _send_new_message(subject, party_id, survey['id'], business_id)
         thread_url = url_for("secure_message_bp.view_conversation",

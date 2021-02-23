@@ -150,7 +150,10 @@ class ResetPasswordForm(FlaskForm):
 class SecureMessagingForm(FlaskForm):
     send = SubmitField(label=_('Send'), id='send-message-btn')
     subject = StringField(_('Subject'))
-    body = TextAreaField(_('Message'))
+    body = TextAreaField(_('Message'), validators=[DataRequired(_('Message is required')),
+                                                   Length(max=50000,
+                                                          message=_('Message must be less than 50000 '
+                                                                    'characters'))])
     msg_id = HiddenField('Message id')
     thread_id = HiddenField('Thread id')
     hidden_subject = HiddenField('Hidden Subject')

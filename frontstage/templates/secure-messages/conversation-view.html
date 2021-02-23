@@ -100,7 +100,7 @@
                 {% endfor %}
 
                 {% if not conversation_data.is_closed %}
-                    <p>Make changes to your name, email address, and telephone number
+                    <p>You can now make changes to your name and telephone number
                         in <a href="/my-account" class="u-fs-r--b">your account</a>.</p>
                     {% if form.errors %}
                         {% set error = { "text": "Enter a message", "id": 'form_error' } %}

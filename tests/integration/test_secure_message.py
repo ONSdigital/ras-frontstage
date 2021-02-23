@@ -65,7 +65,7 @@ class TestSecureMessage(unittest.TestCase):
         self.assertTrue('something else'.encode() in response.data)
         self.assertTrue('Quarterly Business Survey'.encode() in response.data)
         self.assertTrue('OFFICE FOR NATIONAL STATISTICS'.encode() in response.data)
-        self.assertIn("Make changes to your name".encode(), response.data)
+        self.assertIn("You can now make changes to your name".encode(), response.data)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")

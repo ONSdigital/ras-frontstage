@@ -113,7 +113,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
           COMMIT_MSG: |
-            auto patch increment
+            [skip ci] auto patch increment
+            skip-checks: true
         shell: bash
         run: |
           echo "Current git version: ${{ steps.vars.outputs.tag }}"

@@ -1,16 +1,17 @@
 name: Build
 
 # Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
+# events but only for the main branch
 on:
   push:
     branches:
-      - master
+      - main
     paths-ignore:
       - _infra/spinnaker/**
+      - _infra/helm/frontstage/Chart.yaml
   pull_request:
     branches:
-      - master
+      - main
     paths-ignore:
       - _infra/spinnaker/**
 
@@ -69,7 +70,7 @@ jobs:
           gcloud auth configure-docker
 
       - name: pr docker tag
-        if: github.ref != 'refs/heads/master'
+        if: github.ref != 'refs/heads/main'
         id: tag
         run: |
           PR=$(echo "$GITHUB_REF" | awk -F / '{print $3}')
@@ -77,11 +78,11 @@ jobs:
           echo ::set-output name=pr_number::pr-"$PR"
         # Build the Docker image
       - name: Build Docker Image
-        if: github.ref != 'refs/heads/master'
+        if: github.ref != 'refs/heads/main'
         run: |
           docker build -t "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":${{ steps.tag.outputs.pr_number }} -f _infra/docker/Dockerfile .
       - name: Push dev image
-        if: github.ref != 'refs/heads/master'
+        if: github.ref != 'refs/heads/main'
         run: |
           docker push "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":${{ steps.tag.outputs.pr_number }}
       - name: template helm
@@ -95,20 +96,20 @@ jobs:
           helm package $CHART_DIRECTORY
 
       - name: Publish dev Chart
-        if: github.ref != 'refs/heads/master'
+        if: github.ref != 'refs/heads/main'
         run: |
           mv $IMAGE-${{ env.HELM_VERSION }}.tgz $IMAGE-latest.tgz
           gsutil cp $IMAGE-*.tgz gs://$ARTIFACT_BUCKET/$IMAGE/
 
       - name: Set current tag
-        if: github.ref != 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
         id: vars
         run: |
           git fetch --tags
           echo ::set-output name=tag::$(git describe --tags --abbrev=0)
 
       - name: update version
-        if: github.ref != 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
           COMMIT_MSG: |
@@ -147,28 +148,28 @@ jobs:
           fi
 
       - name: output new version
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
         id: release
         shell: bash
         run: |
           echo ::set-output name=version::$(grep -E "appVersion:\s+" $CHART_DIRECTORY/Chart.yaml | cut -d" " -f2 | sed -r 's/"//g')
 
       - name: Build Release Image
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
         run: |
           docker build -f _infra/docker/Dockerfile -t "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$IMAGE":${{ steps.release.outputs.version }} .
       - name: Push Release image
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
         run: |
           docker push "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$IMAGE":${{ steps.release.outputs.version }}
       
       - name: Publish Charts
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
         run: |
           gsutil cp $IMAGE-*.tgz gs://$ARTIFACT_BUCKET/$IMAGE/
 
       - uses: actions/create-release@v1
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -181,7 +182,7 @@ jobs:
           prerelease: false
 
       - name: CD hook
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
         run: |
           gcloud pubsub topics publish $SPINNAKER_TOPIC --project $HOST \
           --message "{ \"kind\": \"storage#object\", \"name\": \"$IMAGE/$IMAGE-${{ env.HELM_VERSION }}.tgz\", \"bucket\": \"$ARTIFACT_BUCKET\" }" \

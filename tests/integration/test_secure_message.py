@@ -135,7 +135,7 @@ class TestSecureMessage(unittest.TestCase):
                                  data=self.message_form, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Please enter a message'.encode() in response.data)
+        self.assertTrue('Message is required'.encode() in response.data)
 
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
     def test_create_message_post_no_subject(self, message_count):
@@ -168,7 +168,7 @@ class TestSecureMessage(unittest.TestCase):
                                  data=self.message_form, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Body field length must not be greater than 50000'.encode() in response.data)
+        self.assertTrue('Message must be less than 50000 characters'.encode() in response.data)
 
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
     def test_create_message_post_subject_too_long(self, message_count):

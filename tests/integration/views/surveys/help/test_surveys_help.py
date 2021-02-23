@@ -180,8 +180,13 @@ class TestSurveyHelp(unittest.TestCase):
     def test_create_message_post_success(self, get_survey, send_message, get_survey_list):
         get_survey.return_value = survey
         get_survey_list.return_value = survey_list_todo
+        form = {
+            "body": "something-else"
+        }
         response = self.app.post("/surveys/help/Bricks/7f9d681b-419c-4919-ba41-03fde7dc40f7/"
-                                 "send-message?subject=Help completing this survey",
+                                 "send-message?subject=Help completing this survey"
+                                 "&option=help-completing-this-survey&sub_option=answer-survey-question",
+                                 data=form,
                                  follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)

@@ -180,7 +180,8 @@ def get_send_help_message_page(session, short_name, business_id, option, sub_opt
     text = breadcrumb_text.get(sub_option)
     return render_template('secure-messages/help/secure-message-send-messages-view.html',
                            short_name=short_name, option=option, sub_option=sub_option, form=SecureMessagingForm(),
-                           subject=subject, breadcrumb_title_one=text[0], breadcrumb_title_two=text[1], business_id=business_id)
+                           subject=subject, breadcrumb_title_one=text[0], breadcrumb_title_two=text[1],
+                           business_id=business_id)
 
 
 @surveys_bp.route('/help/<short_name>/<business_id>/send-message', methods=['POST'])

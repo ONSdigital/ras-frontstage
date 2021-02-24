@@ -7,7 +7,7 @@ from frontstage import app
 from frontstage.exceptions.exceptions import IncorrectAccountAccessError
 from tests.integration.mocked_services import (message_json, conversation_list_json,
                                                encoded_jwt_token, url_get_thread, url_get_threads,
-                                               url_send_message, url_get_conversation_count,
+                                               url_send_message, url_get_conversation_count, url_banner_api,
                                                url_get_survey_long_name)
 
 def create_api_error(status_code, data=None):
@@ -43,6 +43,7 @@ class TestSecureMessage(unittest.TestCase):
 
     @requests_mock.mock()
     def test_get_thread_success(self, mock_request):
+        mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_thread, json={'messages': [message_json], 'is_closed': False})
         mock_request.get(url_get_conversation_count, json={'total': 0})
         mock_request.get(url_get_survey_long_name, json={
@@ -69,6 +70,7 @@ class TestSecureMessage(unittest.TestCase):
     @requests_mock.mock()
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
     def test_get_thread_failure(self, mock_request, message_count):
+        mock_request.get(url_banner_api, status_code=404)
         message_count.return_value = 0
         message_json_copy = message_json.copy()
         del message_json_copy['@business_details']
@@ -78,8 +80,10 @@ class TestSecureMessage(unittest.TestCase):
                                 follow_redirects=True)
         self.assertEqual(response.status_code, 500)
 
+    @requests_mock.mock()
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
-    def test_create_message_get(self, message_count):
+    def test_create_message_get(self, mock_request, message_count):
+        mock_request.get(url_banner_api, status_code=404)
         message_count.return_value = 0
         response = self.app.get("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789",
                                 headers=self.headers, follow_redirects=True)
@@ -90,6 +94,7 @@ class TestSecureMessage(unittest.TestCase):
     @requests_mock.mock()
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
     def test_create_message_post_success(self, mock_request, message_count):
+        mock_request.get(url_banner_api, status_code=404)
         message_count.return_value = 0
         sent_message_response = {'msg_id': 'd43b6609-0875-4ef8-a34e-f7df1bcc8029', 'status': '201',
                                  'thread_id': '8caeff79-6067-4f2a-96e0-08617fdeb496'}
@@ -105,6 +110,7 @@ class TestSecureMessage(unittest.TestCase):
     @requests_mock.mock()
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
     def test_create_message_post_success_api_failure(self, mock_request, message_count):
+        mock_request.get(url_banner_api, status_code=404)
         message_count.return_value = 0
         mock_request.post(url_send_message, status_code=500)
 
@@ -117,6 +123,7 @@ class TestSecureMessage(unittest.TestCase):
     @requests_mock.mock()
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
     def test_create_message_post_bad_gateway(self, mock_request, message_count):
+        mock_request.get(url_banner_api, status_code=404)
         message_count.return_value = 0
         mock_request.post(url_send_message, status_code=502)
 
@@ -126,8 +133,10 @@ class TestSecureMessage(unittest.TestCase):
         self.assertEqual(response.status_code, 500)
         self.assertTrue('An error has occurred'.encode() in response.data)
 
+    @requests_mock.mock()
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
-    def test_create_message_post_no_body(self, message_count):
+    def test_create_message_post_no_body(self, mock_request, message_count):
+        mock_request.get(url_banner_api, status_code=404)
         message_count.return_value = 0
         del self.message_form['body']
 
@@ -137,8 +146,10 @@ class TestSecureMessage(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Message is required'.encode() in response.data)
 
+    @requests_mock.mock()
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
-    def test_create_message_post_no_subject(self, message_count):
+    def test_create_message_post_no_subject(self, mock_request, message_count):
+        mock_request.get(url_banner_api, status_code=404)
         message_count.return_value = 0
         del self.message_form['subject']
 
@@ -148,8 +159,10 @@ class TestSecureMessage(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Please enter a subject'.encode() in response.data)
 
+    @requests_mock.mock()
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
-    def test_create_message_post_whitespace_subject(self, message_count):
+    def test_create_message_post_whitespace_subject(self, mock_request, message_count):
+        mock_request.get(url_banner_api, status_code=404)
         message_count.return_value = 0
         self.message_form['subject'] = ' '
 
@@ -159,8 +172,10 @@ class TestSecureMessage(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Please enter a subject'.encode() in response.data)
 
+    @requests_mock.mock()
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
-    def test_create_message_post_body_too_long(self, message_count):
+    def test_create_message_post_body_too_long(self, mock_request, message_count):
+        mock_request.get(url_banner_api, status_code=404)
         message_count.return_value = 0
         self.message_form['body'] = 'a' * 50100
 
@@ -170,8 +185,10 @@ class TestSecureMessage(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Message must be less than 50000 characters'.encode() in response.data)
 
+    @requests_mock.mock()
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
-    def test_create_message_post_subject_too_long(self, message_count):
+    def test_create_message_post_subject_too_long(self, mock_request, message_count):
+        mock_request.get(url_banner_api, status_code=404)
         message_count.return_value = 0
         self.message_form['subject'] = 'a' * 110
 
@@ -184,6 +201,7 @@ class TestSecureMessage(unittest.TestCase):
     @requests_mock.mock()
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
     def test_create_message_post_no_case_id(self, mock_request, message_count):
+        mock_request.get(url_banner_api, status_code=404)
         message_count.return_value = 0
         sent_message_response = {'msg_id': 'd43b6609-0875-4ef8-a34e-f7df1bcc8029', 'status': '201',
                                  'thread_id': '8caeff79-6067-4f2a-96e0-08617fdeb496'}
@@ -196,16 +214,20 @@ class TestSecureMessage(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('ONS Business Surveys Team'.encode() in response.data)
 
+    @requests_mock.mock()
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
-    def test_create_message_post_no_survey_id(self, message_count):
+    def test_create_message_post_no_survey_id(self, mock_request, message_count):
+        mock_request.get(url_banner_api, status_code=404)
         message_count.return_value = 0
         response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456",
                                  data=self.message_form, headers=self.headers, follow_redirects=True)
 
         self.assertEqual(response.status_code, 400)
 
+    @requests_mock.mock()
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
-    def test_create_message_post_no_ru_ref(self, message_count):
+    def test_create_message_post_no_ru_ref(self, mock_request, message_count):
+        mock_request.get(url_banner_api, status_code=404)
         message_count.return_value = 0
         response = self.app.post("/secure-message/create-message/?case_id=123&survey=789",
                                  data=self.message_form, headers=self.headers, follow_redirects=True)
@@ -215,6 +237,7 @@ class TestSecureMessage(unittest.TestCase):
     @requests_mock.mock()
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
     def test_get_thread_wrong_account(self, mock_request, message_count):
+        mock_request.get(url_banner_api, status_code=404)
         message_count.return_value = 0
         mock_request.get(url_get_thread, status_code=404, json={'messages': [message_json], 'is_closed': False})
 
@@ -224,6 +247,7 @@ class TestSecureMessage(unittest.TestCase):
     @patch('frontstage.controllers.conversation_controller._create_get_conversation_headers')
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
     def test_secure_message_unauthorized_return(self, mock_request, authorization, message_count):
+        mock_request.get(url_banner_api, status_code=404)
         message_count.return_value = 0
         authorization.return_value = {"Authorization": "wrong authorization"}
 

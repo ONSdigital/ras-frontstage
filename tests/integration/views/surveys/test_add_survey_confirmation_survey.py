@@ -1,6 +1,7 @@
 import logging
 import unittest
 from unittest.mock import patch
+import requests_mock
 
 from requests.models import Response
 from structlog import wrap_logger
@@ -9,12 +10,13 @@ from frontstage import app
 from frontstage.exceptions.exceptions import ApiError
 from tests.integration.mocked_services import business_party, case, collection_exercise, encoded_jwt_token, \
     encrypted_enrolment_code, \
-    enrolment_code, survey, url_get_case
+    enrolment_code, survey, url_get_case, url_banner_api
 
 
 logger = wrap_logger(logging.getLogger(__name__))
 
 
+@requests_mock.mock()
 class TestAddSurveyConfirmation(unittest.TestCase):
 
     def setUp(self):
@@ -36,8 +38,9 @@ class TestAddSurveyConfirmation(unittest.TestCase):
     @patch('frontstage.controllers.case_controller.get_case_by_enrolment_code')
     @patch('frontstage.controllers.iac_controller.validate_enrolment_code')
     @patch('frontstage.common.cryptographer.Cryptographer.decrypt')
-    def test_survey_confirm_organisation_success(self, decrypt_enrolment_code, _, get_case_by_enrolment_code,
+    def test_survey_confirm_organisation_success(self, mock_request, decrypt_enrolment_code, _, get_case_by_enrolment_code,
                                                  get_business_by_party_id, get_collection_exercise, get_survey):
+        mock_request.get(url_banner_api, status_code=404)
         decrypt_enrolment_code.return_value = enrolment_code.encode()
         get_case_by_enrolment_code.return_value = case
         get_business_by_party_id.return_value = business_party
@@ -54,7 +57,8 @@ class TestAddSurveyConfirmation(unittest.TestCase):
     @patch('frontstage.controllers.case_controller.get_case_by_enrolment_code')
     @patch('frontstage.controllers.iac_controller.validate_enrolment_code')
     @patch('frontstage.common.cryptographer.Cryptographer.decrypt')
-    def test_survey_confirm_organisation_fail(self, decrypt_enrolment_code, _, get_case):
+    def test_survey_confirm_organisation_fail(self, mock_request, decrypt_enrolment_code, _, get_case):
+        mock_request.get(url_banner_api, status_code=404)
         decrypt_enrolment_code.return_value = enrolment_code.encode()
 
         error_response = Response()

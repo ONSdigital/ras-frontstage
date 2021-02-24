@@ -16,18 +16,14 @@ from frontstage.views.surveys import surveys_bp
 logger = wrap_logger(logging.getLogger(__name__))
 help_completing_this_survey_title = "Help completing this survey"
 template_url = {
-        1: "January",
-        2: "February",
-        3: "March",
-        4: "April",
-        5: "May",
-        6: "June",
-        7: "July",
-        8: "August",
-        9: "September",
-        10: "October",
-        11: "November",
-        12: "December"
+        'do-not-have-specific-figures': 'surveys/help/surveys-help-specific-figure-for-response.html',
+        'unable-to-return-by-deadline': 'surveys/help/surveys-help-return-data-by-deadline.html',
+        'exemption-completing-survey': 'surveys/help/surveys-help-exemption-completing-survey.html',
+        'why-selected': 'surveys/help/surveys-help-why-selected.html',
+        'time-to-complete': 'surveys/help/surveys-help-time-to-complete.html',
+        'how-long-selected-for': 'surveys/help/surveys-help-how-long-selected-for.html',
+        'penalties': 'surveys/help/surveys-help-penalties.html',
+        'info-something-else': 'surveys/help/surveys-help-info-something-else.html'
 }
 
 
@@ -124,42 +120,13 @@ def post_help_option_select(session, short_name, business_id, option):
 @jwt_authorization(request)
 def get_help_option_sub_option_select(session, short_name, business_id, option, sub_option):
     """Provides additional options with sub option provided"""
-    if sub_option == 'do-not-have-specific-figures':
-        return render_template('surveys/help/surveys-help-specific-figure-for-response.html',
-                               short_name=short_name, option=option, sub_option=sub_option,
-                               business_id=business_id)
-    if sub_option == 'unable-to-return-by-deadline':
-        return render_template('surveys/help/surveys-help-return-data-by-deadline.html',
-                               short_name=short_name, option=option, sub_option=sub_option,
-                               business_id=business_id)
-    if sub_option == 'exemption-completing-survey':
-        inside_legal_basis = _inside_legal_basis(short_name)
-        return render_template('surveys/help/surveys-help-exemption-completing-survey.html',
-                               short_name=short_name, option=option, sub_option=sub_option,
-                               business_id=business_id, inside_legal_basis=inside_legal_basis)
-    if sub_option == 'why-selected':
-        return render_template('surveys/help/surveys-help-why-selected.html',
-                               short_name=short_name, option=option, sub_option=sub_option,
-                               business_id=business_id)
-    if sub_option == 'time-to-complete':
-        return render_template('surveys/help/surveys-help-time-to-complete.html',
-                               short_name=short_name, option=option, sub_option=sub_option,
-                               business_id=business_id)
-    if sub_option == 'how-long-selected-for':
-        return render_template('surveys/help/surveys-help-how-long-selected-for.html',
-                               short_name=short_name, option=option, sub_option=sub_option,
-                               business_id=business_id)
-    if sub_option == 'penalties':
-        return render_template('surveys/help/surveys-help-penalties.html',
-                               short_name=short_name, option=option, sub_option=sub_option,
-                               business_id=business_id)
-    if sub_option == 'info-something-else':
-        survey = survey_controller.get_survey_by_short_name(short_name)
-        return render_template('surveys/help/surveys-help-info-something-else.html',
-                               short_name=short_name, option=option, sub_option=sub_option,
-                               business_id=business_id, survey_name=survey['longName'])
-    else:
+    template = template_url.get(sub_option, "Invalid template")
+    if template == 'Invalid template':
         abort(404)
+    else:
+        return render_template(template,
+                               short_name=short_name, option=option, sub_option=sub_option,
+                               business_id=business_id)
 
 
 @surveys_bp.route('/help/<short_name>/<business_id>/<option>/send-message', methods=['GET'])

@@ -143,3 +143,4 @@ url_resend_expired_account_change_verification = f"{app.config['PARTY_URL']}/par
                                                  f"-expired-token/{token} "
 url_notify_party_and_respondent_account_locked = f'{app.config["PARTY_URL"]}/party-api/v1/respondents/edit-account-' \
                                                  f'status/{party["id"]}'
+url_banner_api = f"{app.config['BANNER_SERVICE_URL']}/banner"

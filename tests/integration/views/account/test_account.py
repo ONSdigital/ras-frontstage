@@ -1,8 +1,10 @@
 import unittest
 from unittest.mock import patch
 
+import requests_mock
+
 from frontstage import app
-from tests.integration.mocked_services import encoded_jwt_token, respondent_party, survey_list_todo
+from tests.integration.mocked_services import encoded_jwt_token, respondent_party, url_banner_api, survey_list_todo
 
 
 class TestSurveyList(unittest.TestCase):
@@ -23,8 +25,10 @@ class TestSurveyList(unittest.TestCase):
     def tearDown(self):
         self.patcher.stop()
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
-    def test_account(self, get_respondent_party_by_id):
+    def test_account(self, mock_request, get_respondent_party_by_id):
+        mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         with app.app_context():
             app.config['ACCOUNT_EMAIL_CHANGE_ENABLED'] = True
@@ -34,8 +38,10 @@ class TestSurveyList(unittest.TestCase):
             self.assertTrue('example@example.com'.encode() in response.data)
             self.assertTrue('0987654321'.encode() in response.data)
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
-    def test_account_options(self, get_respondent_party_by_id):
+    def test_account_options(self, mock_request, get_respondent_party_by_id):
+        mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         with app.app_context():
             app.config['ACCOUNT_EMAIL_CHANGE_ENABLED'] = True
@@ -45,22 +51,28 @@ class TestSurveyList(unittest.TestCase):
             self.assertTrue('example@example.com'.encode() in response.data)
             self.assertIn("Help with your account".encode(), response.data)
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
-    def test_account_options_not_selection(self, get_respondent_party_by_id):
+    def test_account_options_not_selection(self, mock_request, get_respondent_party_by_id):
+        mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         response = self.app.post('/my-account', data={"option": None}, follow_redirects=True)
         self.assertIn("At least one option should be selected".encode(),
                       response.data)
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
-    def test_account_options_selection(self, get_respondent_party_by_id):
+    def test_account_options_selection(self, mock_request, get_respondent_party_by_id):
+        mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         response = self.app.post('/my-account', data=self.contact_details_form, follow_redirects=True)
         self.assertIn("Phone number".encode(),
                       response.data)
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
-    def test_account_contact_details_error(self, get_respondent_party_by_id):
+    def test_account_contact_details_error(self, mock_request, get_respondent_party_by_id):
+        mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         response = self.app.post('/my-account/change-account-details',
                                  data={"first_name": ""}, follow_redirects=True)
@@ -72,13 +84,16 @@ class TestSurveyList(unittest.TestCase):
         self.assertIn("Problem with the phone number".encode(), response.data)
         # self.assertIn("Problem with the email address".encode(), response.data)
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
     @patch('frontstage.controllers.party_controller.update_account')
     @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
     def test_account_contact_details_success(self,
+                                             mock_request,
                                              get_survey_list,
                                              update_account,
                                              get_respondent_party_by_id):
+        mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         get_survey_list.return_value = survey_list_todo
         response = self.app.post('/my-account/change-account-details',
@@ -88,13 +103,16 @@ class TestSurveyList(unittest.TestCase):
                                        "email_address": "example@example.com"}, follow_redirects=True)
         self.assertIn("updated your first name, last name and telephone number".encode(), response.data)
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
     @patch('frontstage.controllers.party_controller.update_account')
     @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
     def test_account_change_account_email_address(self,
+                                                  mock_request,
                                                   get_survey_list,
                                                   update_account,
                                                   get_respondent_party_by_id):
+        mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         get_survey_list.return_value = survey_list_todo
         response = self.app.post('/my-account/change-account-details',
@@ -108,13 +126,16 @@ class TestSurveyList(unittest.TestCase):
         self.assertIn("We will send a confirmation email to".encode(), response.data)
         self.assertIn("exampleone@example.com".encode(), response.data)
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
     @patch('frontstage.controllers.party_controller.update_account')
     @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
-    def test_account_change_account_email_addres_almost_done(self,
-                                                             get_survey_list,
-                                                             update_account,
-                                                             get_respondent_party_by_id):
+    def test_account_change_account_email_address_almost_done(self,
+                                                              mock_request,
+                                                              get_survey_list,
+                                                              update_account,
+                                                              get_respondent_party_by_id):
+        mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         get_survey_list.return_value = survey_list_todo
         response = self.app.post('/my-account/change-account-email-address',

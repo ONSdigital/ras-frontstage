@@ -2,7 +2,10 @@ from unittest import TestCase
 from unittest.mock import patch
 from frontstage import app
 
-TESTMSG = b'THIS IS A TEST MESSAGE'
+import requests_mock
+from tests.integration.mocked_services import url_banner_api
+
+TESTMSG = 'THIS IS A TEST MESSAGE'
 
 
 class TestAvailabilityMessage(TestCase):
@@ -11,23 +14,19 @@ class TestAvailabilityMessage(TestCase):
         app.testing = True
         self.app = app.test_client()
 
-    @patch('redis.StrictRedis.keys')
-    @patch('redis.StrictRedis.get')
-    def test_message_does_not_show_if_redis_flag_not_set(self, mock_redis_get, mock_redis_keys):
-        mock_redis_get.return_value = b''
-        mock_redis_keys.return_value = []
+    @requests_mock.mock()
+    def test_message_does_not_show_no_banner_set(self, mock_request):
+        mock_request.get(url_banner_api, status_code=404)
         response = self.app.get('/', follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(TESTMSG in response.data)
+        self.assertFalse(TESTMSG.encode() in response.data)
 
-    @patch('redis.StrictRedis.keys')
-    @patch('redis.StrictRedis.get')
-    def test_message_shows_correct_message_if_redis_flag_set(self, mock_redis_get, mock_redis_keys):
-        mock_redis_get.return_value = TESTMSG
-        mock_redis_keys.return_value = ['AVAILABILITY_MESSAGE']
+    @requests_mock.mock()
+    def test_message_shows_correct_message_banner_is_set(self, mock_request):
+        mock_request.get(url_banner_api, status_code=200, json={"id": "active", "content": TESTMSG})
 
         response = self.app.get('/', follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(TESTMSG in response.data)
+        self.assertTrue(TESTMSG.encode() in response.data)

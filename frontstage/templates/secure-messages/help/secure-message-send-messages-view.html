@@ -16,15 +16,15 @@
 ] %}
 
 
-{% if text_one is defined %}
+{% if breadcrumb_title_one is defined %}
 {% do breadcrumbsData.append({
-        "text": text_one,
+        "text": breadcrumb_title_one,
         "url": "/surveys/help/"~short_name~"/"~business_id~"/"~option
     },) %}
 {% endif %}
-{% if text_two is defined %}
+{% if breadcrumb_title_two is defined %}
 {% do breadcrumbsData.append({
-        "text": text_two,
+        "text": breadcrumb_title_two,
         "url": "/surveys/help/"~short_name~"/"~business_id~"/"~option~"/"~sub_option
     },) %}
 {% endif %}

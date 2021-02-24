@@ -1,4 +1,4 @@
-{% extends "layouts/_twothirds.html" %}
+{% extends "layouts/_new_twothirds.html" %}
 {% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
 {% from "components/button/_macro.njk" import onsButton %}
 
@@ -28,8 +28,7 @@
         "url": "/surveys/help/"~short_name~"/"~business_id~"/"~option~"/"~sub_option
     },) %}
 {% endif %}
-
-{% block main %}
+{% block breadcrumb %}
 {{
     onsBreadcrumb({
         "ariaLabel": "Breadcrumbs",
@@ -37,6 +36,8 @@
         "itemsList": breadcrumbsData
     })
 }}
+{% endblock breadcrumb %}
+{% block main %}
 {% if sub_option is not defined %}
     {% set sub_option = "not_defined" %}
 {% endif %}

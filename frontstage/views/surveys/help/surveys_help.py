@@ -14,6 +14,21 @@ from frontstage.models import HelpOptionsForm, HelpCompletingThisSurveyForm, Sec
 from frontstage.views.surveys import surveys_bp
 
 logger = wrap_logger(logging.getLogger(__name__))
+help_completing_this_survey_title = "Help completing this survey"
+template_url = {
+        1: "January",
+        2: "February",
+        3: "March",
+        4: "April",
+        5: "May",
+        6: "June",
+        7: "July",
+        8: "August",
+        9: "September",
+        10: "October",
+        11: "November",
+        12: "December"
+}
 
 
 @surveys_bp.route('/help/<short_name>/<business_id>', methods=['GET'])
@@ -68,51 +83,41 @@ def post_help_option_select(session, short_name, business_id, option):
     if option == 'help-completing-this-survey':
         form = HelpCompletingThisSurveyForm(request.values)
         form_valid = form.validate()
-        breadcrumbs_title = 'Help completing this survey'
-        if form.data['option'] == 'answer-survey-question' and form_valid:
-            return redirect(url_for('surveys_bp.get_send_help_message', short_name=short_name,
-                                    option=option, business_id=business_id))
-        if form.data['option'] == 'do-not-have-specific-figures' and form_valid:
-            return redirect(url_for('surveys_bp.get_help_option_sub_option_select', short_name=short_name,
-                                    option=option, sub_option='do-not-have-specific-figures',
-                                    business_id=business_id))
-        if form.data['option'] == 'unable-to-return-by-deadline' and form_valid:
-            return redirect(url_for('surveys_bp.get_help_option_sub_option_select', short_name=short_name,
-                                    option=option, sub_option='unable-to-return-by-deadline',
-                                    business_id=business_id))
-        if form.data['option'] == 'something-else' and form_valid:
-            return render_template('secure-messages/help/secure-message-send-messages-view.html',
-                                   short_name=short_name, option=option, form=SecureMessagingForm(),
-                                   subject='Help completing this survey', text_one=breadcrumbs_title,
-                                   business_id=business_id
-                                   )
+        breadcrumbs_title = help_completing_this_survey_title
+        if form_valid:
+            sub_option = form.data['option']
+            if sub_option == 'answer-survey-question':
+                return redirect(url_for('surveys_bp.get_send_help_message', short_name=short_name,
+                                        option=option, business_id=business_id))
+            if sub_option == 'do-not-have-specific-figures' or sub_option == 'unable-to-return-by-deadline':
+                return redirect(url_for('surveys_bp.get_help_option_sub_option_select', short_name=short_name,
+                                        option=option, sub_option=sub_option,
+                                        business_id=business_id))
+            if form.data['option'] == 'something-else' and form_valid:
+                return render_template('secure-messages/help/secure-message-send-messages-view.html',
+                                       short_name=short_name, option=option, form=SecureMessagingForm(),
+                                       subject=help_completing_this_survey_title, text_one=breadcrumbs_title,
+                                       business_id=business_id
+                                       )
+        else:
+            flash('At least one option should be selected.')
+            return redirect(url_for('surveys_bp.get_help_option_select',
+                                    short_name=short_name, business_id=business_id,
+                                    option=option))
     if option == 'info-about-this-survey':
         form = HelpInfoAboutThisSurveyForm(request.values)
         form_valid = form.validate()
-        breadcrumbs_title = 'Information about the survey'
-        if form.data['option'] == 'exemption-completing-survey' and form_valid:
+        breadcrumbs_title = 'Information about this survey'
+        if form_valid:
+            sub_option = form.data['option']
             return redirect(url_for('surveys_bp.get_help_option_sub_option_select', short_name=short_name,
                                     option=option, business_id=business_id,
-                                    sub_option='exemption-completing-survey'))
-        if form.data['option'] == 'do-not-have-specific-figures' and form_valid:
-            return redirect(url_for('surveys_bp.get_help_option_sub_option_select', short_name=short_name,
-                                    option=option, sub_option='do-not-have-specific-figures',
-                                    business_id=business_id))
-        if form.data['option'] == 'unable-to-return-by-deadline' and form_valid:
-            return redirect(url_for('surveys_bp.get_help_option_sub_option_select', short_name=short_name,
-                                    option=option, sub_option='unable-to-return-by-deadline',
-                                    business_id=business_id))
-        if form.data['option'] == 'something-else' and form_valid:
-            return render_template('secure-messages/help/secure-message-send-messages-view.html',
-                                   short_name=short_name, option=option, form=SecureMessagingForm(),
-                                   subject='Help completing this survey', text_one=breadcrumbs_title,
-                                   business_id=business_id
-                                   )
-    else:
-        flash('At least one option should be selected.')
-        return redirect(url_for('surveys_bp.get_help_option_select',
-                                short_name=short_name, business_id=business_id,
-                                option=option))
+                                    sub_option=sub_option))
+        else:
+            flash('At least one option should be selected.')
+            return redirect(url_for('surveys_bp.get_help_option_select',
+                                    short_name=short_name, business_id=business_id,
+                                    option=option))
 
 
 @surveys_bp.route('/help/<short_name>/<business_id>/<option>/<sub_option>', methods=['GET'])
@@ -122,22 +127,37 @@ def get_help_option_sub_option_select(session, short_name, business_id, option, 
     if sub_option == 'do-not-have-specific-figures':
         return render_template('surveys/help/surveys-help-specific-figure-for-response.html',
                                short_name=short_name, option=option, sub_option=sub_option,
-                               subject='Help answering a survey question',
-                               breadcrumbs=[{"text": "Help completing this survey"}, {}],
                                business_id=business_id)
     if sub_option == 'unable-to-return-by-deadline':
         return render_template('surveys/help/surveys-help-return-data-by-deadline.html',
                                short_name=short_name, option=option, sub_option=sub_option,
-                               subject='Help answering a survey question',
-                               breadcrumbs=[{"text": "Help completing this survey"}, {}],
                                business_id=business_id)
     if sub_option == 'exemption-completing-survey':
         inside_legal_basis = _inside_legal_basis(short_name)
         return render_template('surveys/help/surveys-help-exemption-completing-survey.html',
                                short_name=short_name, option=option, sub_option=sub_option,
-                               subject='Information about the survey',
-                               breadcrumbs=[{"text": "Information about the survey"}, {}],
                                business_id=business_id, inside_legal_basis=inside_legal_basis)
+    if sub_option == 'why-selected':
+        return render_template('surveys/help/surveys-help-why-selected.html',
+                               short_name=short_name, option=option, sub_option=sub_option,
+                               business_id=business_id)
+    if sub_option == 'time-to-complete':
+        return render_template('surveys/help/surveys-help-time-to-complete.html',
+                               short_name=short_name, option=option, sub_option=sub_option,
+                               business_id=business_id)
+    if sub_option == 'how-long-selected-for':
+        return render_template('surveys/help/surveys-help-how-long-selected-for.html',
+                               short_name=short_name, option=option, sub_option=sub_option,
+                               business_id=business_id)
+    if sub_option == 'penalties':
+        return render_template('surveys/help/surveys-help-penalties.html',
+                               short_name=short_name, option=option, sub_option=sub_option,
+                               business_id=business_id)
+    if sub_option == 'info-something-else':
+        survey = survey_controller.get_survey_by_short_name(short_name)
+        return render_template('surveys/help/surveys-help-info-something-else.html',
+                               short_name=short_name, option=option, sub_option=sub_option,
+                               business_id=business_id, survey_name=survey['longName'])
     else:
         abort(404)
 
@@ -150,7 +170,7 @@ def get_send_help_message(session, short_name, business_id, option):
         errors = request.args['errors']
         flash(errors)
     if option == 'help-completing-this-survey':
-        breadcrumbs_title = 'Help completing this survey'
+        breadcrumbs_title = help_completing_this_survey_title
     return render_template('secure-messages/help/secure-message-send-messages-view.html',
                            short_name=short_name, option=option, form=SecureMessagingForm(),
                            subject='Help answering a survey question', text_one=breadcrumbs_title,
@@ -223,16 +243,36 @@ def _get_subject_and_breadcrumbs_title(option, uri):
     """Gets the subject line for the secure message, the title of the breadcrumbs for sub options """
     if option == 'do-not-have-specific-figures':
         return 'I don’t have specific figures for a response', \
-               "Help completing this survey", \
+               help_completing_this_survey_title, \
                "I don’t have specific figures for a response"
     if option == 'unable-to-return-by-deadline':
         return 'I’m unable to return the data by the deadline', \
-               "Help completing this survey", \
+               help_completing_this_survey_title, \
                "I’m unable to return the data by the deadline"
     if option == 'exemption-completing-survey':
         return "Can I be exempt from completing the survey questionnaire?", \
-                "Information about the survey", \
-                "Can I be exempt from completing the survey questionnaire?"
+               "Information about this survey", \
+               "Can I be exempt from completing the survey questionnaire?"
+    if option == 'why-selected':
+        return "How / why was my business selected?", \
+               "Information about this survey", \
+               "How / why was my business selected?"
+    if option == 'time-to-complete':
+        return "How long will it take to complete?", \
+               "Information about this survey", \
+               "How long will it take to complete?"
+    if option == 'how-long-selected-for':
+        return "How long will I be selected for?", \
+               "Information about this survey", \
+               "How long will I be selected for?"
+    if option == 'penalties':
+        return "What are the penalties for not completing a survey?", \
+               "Information about this survey", \
+               "What are the penalties for not completing a survey?"
+    if option == 'info-something-else':
+        return "Information about this survey", \
+               "Information about this survey", \
+               "More information"
 
 
 def _inside_legal_basis(short_name):

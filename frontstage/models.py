@@ -211,7 +211,7 @@ class HelpInfoAboutThisSurveyForm(FlaskForm):
         ('value', 'time-to-complete'),
         ('value', 'how-long-selected-for'),
         ('value', 'penalties'),
-        ('value', 'something-else')
+        ('value', 'info-something-else')
     ])
 
     def validate(self):

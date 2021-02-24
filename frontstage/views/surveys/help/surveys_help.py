@@ -15,7 +15,12 @@ from frontstage.views.surveys import surveys_bp
 
 logger = wrap_logger(logging.getLogger(__name__))
 help_completing_this_survey_title = "Help completing this survey"
-template_url = {
+info_about_this_survey_title = "Information about this survey"
+option_template_url = {
+        'help-completing-this-survey': 'surveys/help/surveys-help-completing-this-survey.html',
+        'info-about-this-survey': 'surveys/help/surveys-help-info-about-this-survey.html'
+}
+sub_option_template_url = {
         'do-not-have-specific-figures': 'surveys/help/surveys-help-specific-figure-for-response.html',
         'unable-to-return-by-deadline': 'surveys/help/surveys-help-return-data-by-deadline.html',
         'exemption-completing-survey': 'surveys/help/surveys-help-exemption-completing-survey.html',
@@ -24,6 +29,33 @@ template_url = {
         'how-long-selected-for': 'surveys/help/surveys-help-how-long-selected-for.html',
         'penalties': 'surveys/help/surveys-help-penalties.html',
         'info-something-else': 'surveys/help/surveys-help-info-something-else.html'
+}
+subject_text = {
+        'do-not-have-specific-figures': 'I don’t have specific figures for a response',
+        'unable-to-return-by-deadline': 'I’m unable to return the data by the deadline',
+        'exemption-completing-survey': 'Can I be exempt from completing the survey questionnaire?',
+        'why-selected': 'How / why was my business selected?',
+        'time-to-complete': 'How long will it take to complete?',
+        'how-long-selected-for': 'How long will I be selected for?',
+        'penalties': 'What are the penalties for not completing a survey?',
+        'info-something-else': info_about_this_survey_title
+}
+breadcrumb_text = {
+        'do-not-have-specific-figures': [help_completing_this_survey_title,
+                                         'I don’t have specific figures for a response'],
+        'unable-to-return-by-deadline': [help_completing_this_survey_title,
+                                         'I’m unable to return the data by the deadline'],
+        'exemption-completing-survey': [info_about_this_survey_title,
+                                        'Can I be exempt from completing the survey questionnaire?'],
+        'why-selected': [info_about_this_survey_title,
+                         'How / why was my business selected?'],
+        'time-to-complete': [info_about_this_survey_title,
+                             'How long will it take to complete?'],
+        'how-long-selected-for': [info_about_this_survey_title,
+                                  'How long will I be selected for?'],
+        'penalties': [info_about_this_survey_title,
+                      'What are the penalties for not completing a survey?'],
+        'info-something-else': [info_about_this_survey_title, 'More information']
 }
 
 
@@ -57,19 +89,15 @@ def post_help_page(session, short_name, business_id):
 @jwt_authorization(request)
 def get_help_option_select(session, short_name, business_id, option):
     """Gets help completing this survey's additional options (sub options)"""
-    survey = survey_controller.get_survey_by_short_name(short_name)
-    if option == 'help-completing-this-survey':
-        return render_template('surveys/help/surveys-help-completing-this-survey.html',
+    template = option_template_url.get(option, "Invalid template")
+    if template == 'Invalid template':
+        abort(404)
+    else:
+        survey = survey_controller.get_survey_by_short_name(short_name)
+        return render_template(template,
                                short_name=short_name, business_id=business_id, option=option,
                                form=HelpCompletingThisSurveyForm(),
                                survey_name=survey['longName'])
-    if option == 'info-about-this-survey':
-        return render_template('surveys/help/surveys-help-info-about-this-survey.html',
-                               short_name=short_name, business_id=business_id, option=option,
-                               form=HelpInfoAboutThisSurveyForm(),
-                               survey_name=survey['longName'])
-    else:
-        abort(404)
 
 
 @surveys_bp.route('/help/<short_name>/<business_id>/<option>', methods=['POST'])
@@ -89,7 +117,7 @@ def post_help_option_select(session, short_name, business_id, option):
                 return redirect(url_for('surveys_bp.get_help_option_sub_option_select', short_name=short_name,
                                         option=option, sub_option=sub_option,
                                         business_id=business_id))
-            if form.data['option'] == 'something-else' and form_valid:
+            if form.data['option'] == 'something-else':
                 return render_template('secure-messages/help/secure-message-send-messages-view.html',
                                        short_name=short_name, option=option, form=SecureMessagingForm(),
                                        subject=help_completing_this_survey_title, text_one=breadcrumbs_title,
@@ -103,7 +131,6 @@ def post_help_option_select(session, short_name, business_id, option):
     if option == 'info-about-this-survey':
         form = HelpInfoAboutThisSurveyForm(request.values)
         form_valid = form.validate()
-        breadcrumbs_title = 'Information about this survey'
         if form_valid:
             sub_option = form.data['option']
             return redirect(url_for('surveys_bp.get_help_option_sub_option_select', short_name=short_name,
@@ -114,13 +141,15 @@ def post_help_option_select(session, short_name, business_id, option):
             return redirect(url_for('surveys_bp.get_help_option_select',
                                     short_name=short_name, business_id=business_id,
                                     option=option))
+    else:
+        abort(404)
 
 
 @surveys_bp.route('/help/<short_name>/<business_id>/<option>/<sub_option>', methods=['GET'])
 @jwt_authorization(request)
 def get_help_option_sub_option_select(session, short_name, business_id, option, sub_option):
     """Provides additional options with sub option provided"""
-    template = template_url.get(sub_option, "Invalid template")
+    template = sub_option_template_url.get(sub_option, "Invalid template")
     if template == 'Invalid template':
         abort(404)
     else:
@@ -133,9 +162,7 @@ def get_help_option_sub_option_select(session, short_name, business_id, option, 
 @jwt_authorization(request)
 def get_send_help_message(session, short_name, business_id, option):
     """Gets the send message page once the option is selected"""
-    if 'errors' in request.args:
-        errors = request.args['errors']
-        flash(errors)
+
     if option == 'help-completing-this-survey':
         breadcrumbs_title = help_completing_this_survey_title
     return render_template('secure-messages/help/secure-message-send-messages-view.html',
@@ -149,13 +176,11 @@ def get_send_help_message(session, short_name, business_id, option):
 @jwt_authorization(request)
 def get_send_help_message_page(session, short_name, business_id, option, sub_option):
     """Gets the send message page once the option and sub option is selected"""
-    if 'errors' in request.args:
-        errors = request.args['errors']
-        flash(errors)
-    subject, text_one, text_two = _get_subject_and_breadcrumbs_title(sub_option, f'surveys/help/{short_name}/{option}')
+    subject = subject_text.get(sub_option)
+    text = breadcrumb_text.get(sub_option)
     return render_template('secure-messages/help/secure-message-send-messages-view.html',
                            short_name=short_name, option=option, sub_option=sub_option, form=SecureMessagingForm(),
-                           subject=subject, text_one=text_one, text_two=text_two, business_id=business_id)
+                           subject=subject, text_one=text[0], text_two=text[1], business_id=business_id)
 
 
 @surveys_bp.route('/help/<short_name>/<business_id>/send-message', methods=['POST'])
@@ -166,13 +191,13 @@ def send_help_message(session, short_name, business_id):
     option = request.args['option']
     sub_option = request.args['sub_option']
     if not form.validate():
+        flash(form.errors['body'][0])
         if sub_option == 'not_defined':
             return redirect(url_for('surveys_bp.get_send_help_message', short_name=short_name, business_id=business_id,
-                                    option=option, errors=form.errors['body']))
+                                    option=option))
         else:
             return redirect(url_for('surveys_bp.get_send_help_message_page', short_name=short_name,
-                                    business_id=business_id, option=option, sub_option=sub_option,
-                                    errors=form.errors['body']))
+                                    business_id=business_id, option=option, sub_option=sub_option))
     else:
         subject = request.args['subject']
         party_id = session.get_party_id()
@@ -204,42 +229,6 @@ def _send_new_message(subject, party_id, survey, business_id):
     logger.info('Secure message sent successfully',
                 message_id=response['msg_id'], party_id=party_id, business_id=business_id)
     return response
-
-
-def _get_subject_and_breadcrumbs_title(option, uri):
-    """Gets the subject line for the secure message, the title of the breadcrumbs for sub options """
-    if option == 'do-not-have-specific-figures':
-        return 'I don’t have specific figures for a response', \
-               help_completing_this_survey_title, \
-               "I don’t have specific figures for a response"
-    if option == 'unable-to-return-by-deadline':
-        return 'I’m unable to return the data by the deadline', \
-               help_completing_this_survey_title, \
-               "I’m unable to return the data by the deadline"
-    if option == 'exemption-completing-survey':
-        return "Can I be exempt from completing the survey questionnaire?", \
-               "Information about this survey", \
-               "Can I be exempt from completing the survey questionnaire?"
-    if option == 'why-selected':
-        return "How / why was my business selected?", \
-               "Information about this survey", \
-               "How / why was my business selected?"
-    if option == 'time-to-complete':
-        return "How long will it take to complete?", \
-               "Information about this survey", \
-               "How long will it take to complete?"
-    if option == 'how-long-selected-for':
-        return "How long will I be selected for?", \
-               "Information about this survey", \
-               "How long will I be selected for?"
-    if option == 'penalties':
-        return "What are the penalties for not completing a survey?", \
-               "Information about this survey", \
-               "What are the penalties for not completing a survey?"
-    if option == 'info-something-else':
-        return "Information about this survey", \
-               "Information about this survey", \
-               "More information"
 
 
 def _inside_legal_basis(short_name):

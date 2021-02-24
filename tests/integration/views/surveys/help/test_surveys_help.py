@@ -1,8 +1,10 @@
 import unittest
 from unittest.mock import patch
 
+import requests_mock
+
 from frontstage import app
-from tests.integration.mocked_services import encoded_jwt_token, survey_eq, survey, survey_list_todo
+from tests.integration.mocked_services import encoded_jwt_token, survey_eq, survey, survey_list_todo, url_banner_api
 
 
 class TestSurveyHelp(unittest.TestCase):
@@ -19,12 +21,12 @@ class TestSurveyHelp(unittest.TestCase):
     def tearDown(self):
         self.patcher.stop()
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_survey_help_for_qbs(self, get_survey):
+    def test_survey_help_for_qbs(self, mock_request, get_survey):
+        mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey_eq
-
         response = self.app.get('/surveys/help/QBS/7f9d681b-419c-4919-ba41-03fde7dc40f7')
-
         self.assertEqual(response.status_code, 200)
         self.assertIn("Help".encode(), response.data)
         self.assertIn("Choose an option".encode(), response.data)
@@ -32,12 +34,12 @@ class TestSurveyHelp(unittest.TestCase):
         self.assertIn("Continue".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_survey_help_for_bricks(self, get_survey):
+    def test_survey_help_for_bricks(self, mock_request, get_survey):
+        mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
-
         response = self.app.get('/surveys/help/Bricks/7f9d681b-419c-4919-ba41-03fde7dc40f7')
-
         self.assertEqual(response.status_code, 200)
         self.assertIn("Help".encode(), response.data)
         self.assertIn("Choose an option".encode(), response.data)
@@ -45,8 +47,10 @@ class TestSurveyHelp(unittest.TestCase):
         self.assertIn("Continue".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_survey_help_for_bricks_with_option_select(self, get_survey):
+    def test_survey_help_for_bricks_with_option_select(self, mock_request, get_survey):
+        mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         form = {
             "option": "help-completing-this-survey"
@@ -65,8 +69,10 @@ class TestSurveyHelp(unittest.TestCase):
         self.assertIn("Continue".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_survey_help_for_bricks_with_sub_option_answer_a_survey_question(self, get_survey):
+    def test_survey_help_for_bricks_with_sub_option_answer_a_survey_question(self, mock_request, get_survey):
+        mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         form = {
             "option": "answer-survey-question"
@@ -84,8 +90,10 @@ class TestSurveyHelp(unittest.TestCase):
         self.assertIn("Send message".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_survey_help_for_bricks_with_sub_option_specific_figures_for_a_response(self, get_survey):
+    def test_survey_help_for_bricks_with_sub_option_specific_figures_for_a_response(self, mock_request, get_survey):
+        mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         form = {
             "option": "do-not-have-specific-figures"
@@ -104,8 +112,12 @@ class TestSurveyHelp(unittest.TestCase):
         self.assertIn("Yes".encode(), response.data)
         self.assertIn("No".encode(), response.data)
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_get_send_help_message_page_for_bricks_with_sub_option_specific_figures_for_a_response(self, get_survey):
+    def test_get_send_help_message_page_for_bricks_with_sub_option_specific_figures_for_a_response(self,
+                                                                                                   mock_request,
+                                                                                                   get_survey):
+        mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         response = self.app.get(
             '/surveys/help/Bricks/7f9d681b-419c-4919-ba41-03fde7dc40f7/help-completing-this-survey/'
@@ -119,8 +131,10 @@ class TestSurveyHelp(unittest.TestCase):
         self.assertIn("Send message".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_survey_help_for_bricks_with_sub_option_unable_to_return_by_deadline(self, get_survey):
+    def test_survey_help_for_bricks_with_sub_option_unable_to_return_by_deadline(self, mock_request, get_survey):
+        mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         form = {
             "option": "unable-to-return-by-deadline"
@@ -140,8 +154,11 @@ class TestSurveyHelp(unittest.TestCase):
         self.assertIn("Yes".encode(), response.data)
         self.assertIn("No".encode(), response.data)
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_get_send_help_message_page_for_bricks_with_sub_option_specific_figures_for_a_response(self, get_survey):
+    def test_get_send_help_message_page_for_bricks_with_sub_option_specific_figures_for_a_response(self, mock_request,
+                                                                                                   get_survey):
+        mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         response = self.app.get(
             '/surveys/help/Bricks/7f9d681b-419c-4919-ba41-03fde7dc40f7/help-completing-this-survey/'
@@ -155,8 +172,10 @@ class TestSurveyHelp(unittest.TestCase):
         self.assertIn("Send message".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_survey_help_for_bricks_with_sub_option_something_else(self, get_survey):
+    def test_survey_help_for_bricks_with_sub_option_something_else(self, mock_request, get_survey):
+        mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         form = {
             "option": "something-else"
@@ -174,10 +193,12 @@ class TestSurveyHelp(unittest.TestCase):
         self.assertIn("Send message".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)
 
+    @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
     @patch("frontstage.controllers.conversation_controller.send_message")
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_create_message_post_success(self, get_survey, send_message, get_survey_list):
+    def test_create_message_post_success(self, mock_request, get_survey, send_message, get_survey_list):
+        mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         get_survey_list.return_value = survey_list_todo
         form = {

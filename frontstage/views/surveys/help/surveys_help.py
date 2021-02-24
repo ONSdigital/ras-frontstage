@@ -76,7 +76,7 @@ def post_help_option_select(session, short_name, business_id, option):
         if form.data['option'] == 'something-else' and form_valid:
             return render_template('secure-messages/help/secure-message-send-messages-view.html',
                                    short_name=short_name, option=option, form=SecureMessagingForm(),
-                                   subject='Help completing this survey', text_one=breadcrumbs_title,
+                                   subject='Help completing this survey', breadcrumb_title_one=breadcrumbs_title,
                                    business_id=business_id
                                    )
         else:
@@ -119,7 +119,7 @@ def get_send_help_message(session, short_name, business_id, option):
         breadcrumbs_title = 'Help completing this survey'
     return render_template('secure-messages/help/secure-message-send-messages-view.html',
                            short_name=short_name, option=option, form=SecureMessagingForm(),
-                           subject='Help answering a survey question', text_one=breadcrumbs_title,
+                           subject='Help answering a survey question', breadcrumb_title_one=breadcrumbs_title,
                            business_id=business_id
                            )
 
@@ -131,10 +131,12 @@ def get_send_help_message_page(session, short_name, business_id, option, sub_opt
     if 'errors' in request.args:
         errors = request.args['errors']
         flash(errors)
-    subject, text_one, text_two = get_subject_and_breadcrumbs_title(sub_option, f'surveys/help/{short_name}/{option}')
+    subject, breadcrumb_title_one, \
+    breadcrumb_title_two = get_subject_and_breadcrumbs_title(sub_option, f'surveys/help/{short_name}/{option}')
     return render_template('secure-messages/help/secure-message-send-messages-view.html',
                            short_name=short_name, option=option, sub_option=sub_option, form=SecureMessagingForm(),
-                           subject=subject, text_one=text_one, text_two=text_two, business_id=business_id)
+                           subject=subject, breadcrumb_title_one=breadcrumb_title_one,
+                           breadcrumb_title_two=breadcrumb_title_two, business_id=business_id)
 
 
 @surveys_bp.route('/help/<short_name>/<business_id>/send-message', methods=['POST'])

@@ -1,0 +1,41 @@
+{% extends "layouts/_twothirds.html" %}
+{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/button/_macro.njk" import onsButton %}
+
+{% set page_title = "Help with deadline" %}
+{% set breadcrumbsData = [
+  {
+    "text": "Surveys",
+    "url": "/surveys/todo"
+  },
+  {
+    "text": "Help",
+    "url": "/surveys/help/"~short_name~"/"~business_id
+  },
+  {
+    "text": "Help completing this survey",
+    "url": "/surveys/help/"~short_name~"/"~business_id~"/"~option
+  }
+] %}
+
+{% block main %}
+{{
+    onsBreadcrumb({
+        "ariaLabel": "Breadcrumbs",
+        "id": "breadcrumbs",
+        "itemsList": breadcrumbsData
+    })
+}}
+<h1 class="u-fs-xl">I am unable to return the data by the deadline</h1>
+<p>All business surveys have a deadline by which you must submit data for us to use for statistical purposes.</p>
+<p>ONS itself does not levy fines for late receipt of data but failure to supply data in a timely way could result in court action and penalties of up to £2,500.</p>
+<p>You can find more information on <a href="https://www.ons.gov.uk/surveys/informationforbusinesses/aboutonsbusinesssurveys" class="icon--external-link" target="_blank" rel="noopener">About ONS business surveys</a>
+</p>
+<h2>Did this answer your question?</h2>
+<p></p>
+<div class="btn-group">
+    <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" role="button" class="btn btn-group__btn"><span class="btn__inner">Yes</span></a>
+    <a href="{{ url_for('surveys_bp.get_send_help_message_page', short_name=short_name, option=option,sub_option='unable-to-return-by-deadline', business_id=business_id) }}" role="button" class="btn btn--secondary btn-group__btn"><span class="btn__inner">No</span></a>
+</div>
+
+{% endblock main %}

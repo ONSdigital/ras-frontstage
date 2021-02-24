@@ -150,7 +150,10 @@ class ResetPasswordForm(FlaskForm):
 class SecureMessagingForm(FlaskForm):
     send = SubmitField(label=_('Send'), id='send-message-btn')
     subject = StringField(_('Subject'))
-    body = TextAreaField(_('Message'))
+    body = TextAreaField(_('Message'), validators=[DataRequired(_('Message is required')),
+                                                   Length(max=50000,
+                                                          message=_('Message must be less than 50000 '
+                                                                    'characters'))])
     msg_id = HiddenField('Message id')
     thread_id = HiddenField('Thread id')
     hidden_subject = HiddenField('Hidden Subject')
@@ -182,6 +185,31 @@ class RespondentStatus(enum.IntEnum):
 class OptionsForm(FlaskForm):
     option = RadioField('Label', choices=[
         ('value', 'contact_details')])
+
+    def validate(self):
+        if self.data['option'] is None:
+            return False
+        return True
+
+
+class HelpOptionsForm(FlaskForm):
+    option = RadioField('Label', choices=[
+        ('value', 'help-completing-this-survey')
+    ])
+
+    def validate(self):
+        if self.data['option'] is None:
+            return False
+        return True
+
+
+class HelpCompletingThisSurveyForm(FlaskForm):
+    option = RadioField('Label', choices=[
+        ('value', 'answer-survey-question'),
+        ('value', 'do-not-have-specific-figures'),
+        ('value', 'unable-to-return-by-deadline'),
+        ('value', 'something-else'),
+    ])
 
     def validate(self):
         if self.data['option'] is None:

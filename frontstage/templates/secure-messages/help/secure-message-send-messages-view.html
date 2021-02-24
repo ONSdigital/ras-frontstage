@@ -1,0 +1,89 @@
+{% extends "layouts/_twothirds.html" %}
+{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/button/_macro.njk" import onsButton %}
+
+{% set page_title = "Send a message" %}
+{% set breadcrumbsData = [
+  {
+    "text": "Surveys",
+    "url": "/surveys/todo"
+  },
+  {
+    "text": "Help",
+    "url": "/surveys/help/"~short_name~"/"~business_id
+  }
+
+] %}
+
+
+{% if breadcrumb_title_one is defined %}
+{% do breadcrumbsData.append({
+        "text": breadcrumb_title_one,
+        "url": "/surveys/help/"~short_name~"/"~business_id~"/"~option
+    },) %}
+{% endif %}
+{% if breadcrumb_title_two is defined %}
+{% do breadcrumbsData.append({
+        "text": breadcrumb_title_two,
+        "url": "/surveys/help/"~short_name~"/"~business_id~"/"~option~"/"~sub_option
+    },) %}
+{% endif %}
+
+{% block main %}
+{{
+    onsBreadcrumb({
+        "ariaLabel": "Breadcrumbs",
+        "id": "breadcrumbs",
+        "itemsList": breadcrumbsData
+    })
+}}
+{% if sub_option is not defined %}
+    {% set sub_option = "not_defined" %}
+{% endif %}
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+          <div class="panel panel--simple panel--error u-mb-m">
+              <div class="panel__body" data-qa="error-body">
+                {% for message in messages %}
+                <p class="u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>
+                {% endfor %}
+              </div>
+          </div>
+    {% endif %}
+{% endwith %}
+    <h1>Send a message</h1>
+    <p>Send us a message with a description of your issue and we will get back to you.</p>
+    <dl class="metadata metadata__list grid grid--gutterless u-cf u-mb-l" title="Message subject" aria-label="Message subject">
+                  <dt class="metadata__term grid__col col-2@m">Subject:</dt>
+                  <dd class="metadata__value grid__col col-10@m">{{ subject }}</dd>
+    </dl>
+    <div class="secure-message-form col-10@m" id="secure-message-form">
+        <form action="{{ url_for('surveys_bp.send_help_message', short_name=short_name, subject=subject, business_id=business_id, option=option, sub_option=sub_option) }}" method="post">
+            <label class="u-fs-r--b" for="secure-message-body">Create message</label>
+            {{ form.body(id='secure-message-body', class_='input input--textarea input--textarea-message', rows='10', maxlength='50000') }}
+            <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
+                <div class="grid__col">
+                    {{
+                        onsButton({
+                        "text": "Send message",
+                        "id": "send-message-btn",
+                        "classes": 'btn btn-group__btn',
+                        "submitType": "timer"
+                        })
+                    }}
+                </div>
+                <div class="grid__col u-ml-m">
+                    {% if sub_option != "not_defined" %}
+                        <a href="{{ url_for('surveys_bp.get_help_option_sub_option_select', short_name=short_name, option=option, sub_option=sub_option, business_id=business_id)}}"
+                    id="btn-sub-option-cancel">Cancel</a>
+                    {% else %}
+                        <a href="{{ url_for('surveys_bp.get_help_option_select', short_name=short_name, option=option, business_id=business_id) }}"
+                    id="btn-option-cancel">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+{% endblock main %}

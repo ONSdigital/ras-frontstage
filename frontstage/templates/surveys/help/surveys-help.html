@@ -20,17 +20,40 @@
         "itemsList": breadcrumbsData
     })
 }}
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-          <div class="panel panel--simple panel--error u-mb-m">
-              <div class="panel__body" data-qa="error-body">
-                {% for message in messages %}
-                <p class="u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>
-                {% endfor %}
-              </div>
-          </div>
+{% if errors|length > 0 %}
+        {% if errors|length == 1 %}
+            {% set errorTitle = 'There is 1 error on this page' %}
+        {% elif errors|length > 1 %}
+            {% set errorTitle = 'There are ' ~ errors|length ~ ' errors on this page' %}
+        {% endif %}
+        {% call
+            onsPanel({
+                "type": "error",
+                "classes": "u-mb-s",
+                "title":  errorTitle
+            })
+        %}
+            <p>These <strong>must be corrected</strong> to continue.</p>
+            {% set errorData = [] %}
+            {% for error in errors %}
+                {% set error_text =  error %}
+                {% do errorData.append(
+                    {
+                        "text": 'Problem with the ' ~ error_text.replace('_', ' '),
+                        "index": true,
+                        "url": "#" ~ error ~ '_error',
+                        "classes": "js-inpagelink"
+                    }
+                ) %}
+            {% endfor %}
+            {{
+                onsList({
+                    "classes": "list--bare",
+                    "itemsList": errorData
+                })
+            }}
+        {% endcall %}
     {% endif %}
-{% endwith %}
 <h1 class="u-fs-xl">Help</h1>
 <form action="{{ url_for('surveys_bp.post_help_page', short_name=short_name, business_id=business_id)}}" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>

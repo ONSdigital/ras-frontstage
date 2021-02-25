@@ -203,6 +203,11 @@ class HelpOptionsForm(FlaskForm):
             return False
         return True
 
+    def error(self):
+        if self.data['option'] is None:
+            return {}
+        return None
+
 
 class HelpInfoAboutThisSurveyForm(FlaskForm):
     option = RadioField('Label', choices=[

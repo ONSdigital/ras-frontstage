@@ -15,6 +15,15 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def calculate_case_status(case_group_status, collection_instrument_type):
+    """
+    Given a case group status and instrument type, this will generate user readable text to describe the status.
+
+    :param case_group_status: Status of the case group
+    :type case_group_status: str
+    :param collection_instrument_type: The type of collection instrument.  Either EQ or SEFT
+    :type collection_instrument_type: str
+    :return: A user readable description of the status.
+    """
     logger.info('Getting the status of caseGroup', case_group_status=case_group_status,
                 collection_instrument_type=collection_instrument_type)
 

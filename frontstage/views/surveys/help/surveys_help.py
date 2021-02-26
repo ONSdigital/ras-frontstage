@@ -81,7 +81,7 @@ def post_help_page(session, short_name, business_id):
         return redirect(url_for('surveys_bp.get_help_option_select', short_name=short_name, business_id=business_id,
                                 option=option))
     else:
-        flash('At least one option should be selected.')
+        flash('You need to choose an option')
         return redirect(url_for('surveys_bp.get_help_page', short_name=short_name, business_id=business_id))
 
 
@@ -124,7 +124,7 @@ def post_help_option_select(session, short_name, business_id, option):
                                        business_id=business_id
                                        )
         else:
-            flash('At least one option should be selected.')
+            flash('You need to choose an option')
             return redirect(url_for('surveys_bp.get_help_option_select',
                                     short_name=short_name, business_id=business_id,
                                     option=option))
@@ -137,7 +137,7 @@ def post_help_option_select(session, short_name, business_id, option):
                                     option=option, business_id=business_id,
                                     sub_option=sub_option))
         else:
-            flash('At least one option should be selected.')
+            flash('You need to choose an option')
             return redirect(url_for('surveys_bp.get_help_option_select',
                                     short_name=short_name, business_id=business_id,
                                     option=option))
@@ -150,12 +150,14 @@ def post_help_option_select(session, short_name, business_id, option):
 def get_help_option_sub_option_select(session, short_name, business_id, option, sub_option):
     """Provides additional options with sub option provided"""
     template = sub_option_template_url.get(sub_option, "Invalid template")
+    survey = survey_controller.get_survey_by_short_name(short_name)
     if template == 'Invalid template':
         abort(404)
     else:
         return render_template(template,
                                short_name=short_name, option=option, sub_option=sub_option,
-                               business_id=business_id)
+                               business_id=business_id, survey_name=survey['longName'],
+                               inside_legal_basis=_inside_legal_basis(survey['legalBasisRef']))
 
 
 @surveys_bp.route('/help/<short_name>/<business_id>/<option>/send-message', methods=['GET'])
@@ -232,7 +234,15 @@ def _send_new_message(subject, party_id, survey, business_id):
     return response
 
 
-def _inside_legal_basis(short_name):
-    survey = survey_controller.get_survey_by_short_name(short_name)
+def _inside_legal_basis(legal_basis):
+    """
+    Returns true if the legal basis matches as mandatory.
+
+            Parameters:
+                    legal_basis (str): the legal basis reference
+
+            Returns:
+                    bool (bool): if legal basis ref matches the mandatory list.
+    """
     inside_legal_basis = ['STA1947', 'STA1947_BEIS', 'GovERD']
-    return any(item == survey['legalBasis'] for item in inside_legal_basis)
+    return any(item == legal_basis for item in inside_legal_basis)

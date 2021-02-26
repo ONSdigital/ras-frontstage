@@ -24,24 +24,20 @@
         "itemsList": breadcrumbsData
     })
 }}
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-          <div class="panel panel--simple panel--error u-mb-m">
-              <div class="panel__body" data-qa="error-body">
-                {% for message in messages %}
-                <p class="u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>
-                {% endfor %}
-              </div>
-          </div>
-    {% endif %}
-{% endwith %}
+{% set ns = namespace () %}
+{% include "radio-option-select-error-panel.html" %}
 <h1 class="u-fs-xl">Information about the {{ survey_name }}</h1>
 <form action="{{ url_for('surveys_bp.post_help_option_select', short_name=short_name, business_id=business_id, option=option)}}" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        {% if ns.optionError %}
+                {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
+        {% endif %}
         {{
             onsRadios({
                 "legend": "Choose an option",
                 "name": "option",
+                "id": "option",
+                "error": errorOption,
                 "radios": [
                     {
                         "id": "exemption-completing-survey",

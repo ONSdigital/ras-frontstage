@@ -1,0 +1,33 @@
+
+{% from "components/lists/_macro.njk" import onsList %}
+{% from "components/panel/_macro.njk" import onsPanel %}
+{% set ns.optionError = false %}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            {% set ns.optionError = true %}
+            {% set ns.optionErrorMessage = 'You need to choose an option' %}
+            {% set errorTitle = 'There is 1 error on this page' %}
+                {% call
+                    onsPanel({
+                        "type": "error",
+                        "classes": "u-mb-s",
+                        "title":  errorTitle
+                    })
+                  %}
+                  {{
+                    onsList({
+                        "element": "ol",
+                        "itemsList": [
+                        {
+                            "text": message,
+                            "url": "#option_error",
+                            "classes": "js-inpagelink"
+                        }
+                        ]
+                    })
+                }}
+                {% endcall %}
+        {% endfor %}
+    {% endif %}
+{% endwith %}

@@ -8,12 +8,12 @@ on:
       - main
     paths-ignore:
       - _infra/spinnaker/**
-      - _infra/helm/frontstage/Chart.yaml
   pull_request:
     branches:
       - main
     paths-ignore:
       - _infra/spinnaker/**
+      - _infra/helm/frontstage/Chart.yaml
 
 env:
   IMAGE: frontstage
@@ -102,7 +102,7 @@ jobs:
           gsutil cp $IMAGE-*.tgz gs://$ARTIFACT_BUCKET/$IMAGE/
 
       - name: Set current tag
-        if: github.ref == 'refs/heads/main'
+        if: github.ref != 'refs/heads/main'
         id: vars
         run: |
           git fetch --tags

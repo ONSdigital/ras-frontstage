@@ -8,12 +8,12 @@ on:
       - main
     paths-ignore:
       - _infra/spinnaker/**
-      - _infra/helm/frontstage/Chart.yaml
   pull_request:
     branches:
-      - main
+        - main
     paths-ignore:
       - _infra/spinnaker/**
+      - _infra/helm/frontstage/Chart.yaml
 
 env:
   IMAGE: frontstage

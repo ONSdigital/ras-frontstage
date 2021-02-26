@@ -61,6 +61,7 @@
     </dl>
     <div class="secure-message-form col-10@m" id="secure-message-form">
         <form action="{{ url_for('surveys_bp.send_help_message', short_name=short_name, subject=subject, business_id=business_id, option=option, sub_option=sub_option) }}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <label class="u-fs-r--b" for="secure-message-body">Create message</label>
             {{ form.body(id='secure-message-body', class_='input input--textarea input--textarea-message', rows='10', maxlength='50000') }}
             <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">

@@ -157,7 +157,7 @@ def get_help_option_sub_option_select(session, short_name, business_id, option, 
         return render_template(template,
                                short_name=short_name, option=option, sub_option=sub_option,
                                business_id=business_id, survey_name=survey['longName'],
-                               inside_legal_basis=_is_inside_legal_basis(survey['legalBasisRef']))
+                               inside_legal_basis=is_legal_basis_mandatory(survey['legalBasisRef']))
 
 
 @surveys_bp.route('/help/<short_name>/<business_id>/<option>/send-message', methods=['GET'])
@@ -234,11 +234,14 @@ def _send_new_message(subject, party_id, survey, business_id):
     return response
 
 
-def _is_inside_legal_basis(legal_basis):
+def is_legal_basis_mandatory(legal_basis):
     """
-    Returns true if the legal basis matches as mandatory.
-    :param: (str) the legal basis reference
-    :return: (bool) if legal basis ref matches the mandatory list.
+        Checks whether the provided legal basis is for a survey which is mandatory.
+
+        :param legal_basis: The legal basis reference
+        :type legal_basis: str
+        :return: True if mandatory, false otherwise
+        :rtype: bool
     """
     inside_legal_basis = ['STA1947', 'STA1947_BEIS', 'GovERD']
     return any(item == legal_basis for item in inside_legal_basis)

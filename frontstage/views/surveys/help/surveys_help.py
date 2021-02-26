@@ -16,11 +16,11 @@ from frontstage.views.surveys import surveys_bp
 logger = wrap_logger(logging.getLogger(__name__))
 help_completing_this_survey_title = "Help completing this survey"
 info_about_this_survey_title = "Information about this survey"
-option_template_url = {
+option_template_url_mapping = {
         'help-completing-this-survey': 'surveys/help/surveys-help-completing-this-survey.html',
         'info-about-this-survey': 'surveys/help/surveys-help-info-about-this-survey.html'
 }
-sub_option_template_url = {
+sub_option_template_url_mapping = {
         'do-not-have-specific-figures': 'surveys/help/surveys-help-specific-figure-for-response.html',
         'unable-to-return-by-deadline': 'surveys/help/surveys-help-return-data-by-deadline.html',
         'exemption-completing-survey': 'surveys/help/surveys-help-exemption-completing-survey.html',
@@ -30,7 +30,7 @@ sub_option_template_url = {
         'penalties': 'surveys/help/surveys-help-penalties.html',
         'info-something-else': 'surveys/help/surveys-help-info-something-else.html'
 }
-subject_text = {
+subject_text_mapping = {
         'do-not-have-specific-figures': 'I don’t have specific figures for a response',
         'unable-to-return-by-deadline': 'I’m unable to return the data by the deadline',
         'exemption-completing-survey': 'Can I be exempt from completing the survey questionnaire?',
@@ -40,7 +40,7 @@ subject_text = {
         'penalties': 'What are the penalties for not completing a survey?',
         'info-something-else': info_about_this_survey_title
 }
-breadcrumb_text = {
+breadcrumb_text_mapping = {
         'do-not-have-specific-figures': [help_completing_this_survey_title,
                                          'I don’t have specific figures for a response'],
         'unable-to-return-by-deadline': [help_completing_this_survey_title,
@@ -89,7 +89,7 @@ def post_help_page(session, short_name, business_id):
 @jwt_authorization(request)
 def get_help_option_select(session, short_name, business_id, option):
     """Gets help completing this survey's additional options (sub options)"""
-    template = option_template_url.get(option, "Invalid template")
+    template = option_template_url_mapping.get(option, "Invalid template")
     if template == 'Invalid template':
         abort(404)
     else:
@@ -149,7 +149,7 @@ def post_help_option_select(session, short_name, business_id, option):
 @jwt_authorization(request)
 def get_help_option_sub_option_select(session, short_name, business_id, option, sub_option):
     """Provides additional options with sub option provided"""
-    template = sub_option_template_url.get(sub_option, "Invalid template")
+    template = sub_option_template_url_mapping.get(sub_option, "Invalid template")
     survey = survey_controller.get_survey_by_short_name(short_name)
     if template == 'Invalid template':
         abort(404)
@@ -157,7 +157,7 @@ def get_help_option_sub_option_select(session, short_name, business_id, option, 
         return render_template(template,
                                short_name=short_name, option=option, sub_option=sub_option,
                                business_id=business_id, survey_name=survey['longName'],
-                               inside_legal_basis=_inside_legal_basis(survey['legalBasisRef']))
+                               inside_legal_basis=_is_inside_legal_basis(survey['legalBasisRef']))
 
 
 @surveys_bp.route('/help/<short_name>/<business_id>/<option>/send-message', methods=['GET'])
@@ -178,8 +178,8 @@ def get_send_help_message(session, short_name, business_id, option):
 @jwt_authorization(request)
 def get_send_help_message_page(session, short_name, business_id, option, sub_option):
     """Gets the send message page once the option and sub option is selected"""
-    subject = subject_text.get(sub_option)
-    text = breadcrumb_text.get(sub_option)
+    subject = subject_text_mapping.get(sub_option)
+    text = breadcrumb_text_mapping.get(sub_option)
     return render_template('secure-messages/help/secure-message-send-messages-view.html',
                            short_name=short_name, option=option, sub_option=sub_option, form=SecureMessagingForm(),
                            subject=subject, breadcrumb_title_one=text[0], breadcrumb_title_two=text[1],
@@ -234,15 +234,11 @@ def _send_new_message(subject, party_id, survey, business_id):
     return response
 
 
-def _inside_legal_basis(legal_basis):
+def _is_inside_legal_basis(legal_basis):
     """
     Returns true if the legal basis matches as mandatory.
-
-            Parameters:
-                    legal_basis (str): the legal basis reference
-
-            Returns:
-                    bool (bool): if legal basis ref matches the mandatory list.
+    :param: (str) the legal basis reference
+    :return: (bool) if legal basis ref matches the mandatory list.
     """
     inside_legal_basis = ['STA1947', 'STA1947_BEIS', 'GovERD']
     return any(item == legal_basis for item in inside_legal_basis)

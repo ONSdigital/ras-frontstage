@@ -1,4 +1,4 @@
-{% extends "layouts/_new_twothirds.html" %}
+{% extends "layouts/_block_content.html" %}
 {% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
 {% from "components/button/_macro.njk" import onsButton %}
 
@@ -29,7 +29,7 @@
 
 {% block main %}
 <h1 class="u-fs-xl">Can I be exempt from completing the survey questionnaire?</h1>
-{% if inside_legal_basis%}
+{% if inside_legal_basis %}
     <p>No. Once selected, the law obliges a business to complete the survey under the provisions of the Statistics of Trade Act 1947</p>
 {% else %}
     <p>Whilst this survey is voluntary, we have selected your company through our normal selection processes. This means that any data you submit to us on this subject will allow us to produce statistics on things which may not otherwise be asked as part of mandatory surveys. </p>

@@ -228,7 +228,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("What are the penalties for not completing a survey?".encode(), response.data)
         self.assertIn("Failure to comply could lead to prosecution at a Magistrates Court with a fine up "
-                      "to a maximum of £2,500 (last up dated by section 17 of the Criminal Justice Act 1991)."
+                      "to a maximum of £2,500 (last updated by section 17 of the Criminal Justice Act 1991)."
                       .encode(), response.data)
         self.assertIn("If this happens you will still need to complete the questionnaire.".encode(), response.data)
         self.assertIn("https://www.ons.gov.uk/surveys/informationforbusinesses".encode(), response.data)

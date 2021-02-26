@@ -109,7 +109,7 @@ jobs:
           echo ::set-output name=tag::$(git describe --tags --abbrev=0)
 
       - name: update version
-        if: github.ref == 'refs/heads/main'
+        if: github.ref != 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
           COMMIT_MSG: |

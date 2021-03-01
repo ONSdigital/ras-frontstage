@@ -2,6 +2,7 @@
 {% from "components/button/_macro.njk" import onsButton %}
 {% from "components/message/_macro.njk" import onsMessage %}
 {% from "components/textarea/_macro.njk" import onsTextarea %}
+{% from "components/lists/_macro.njk" import onsList %}
 
 {% set page_title = "View message" %}
 {% set subject = conversation[-1]["subject"] or "No Subject" %}
@@ -108,6 +109,9 @@
                     <div class="secure-message-reply">
                         <form action="{{ url_for('secure_message_bp.view_conversation', thread_id=conversation[0].thread_id) }}" method="post" id="create-message-form">
                             {{ form.csrf_token }}
+                            {% if form.errors %}
+                                {% set form_error = { "text": errorTitle,  "id": 'form_error' } %}
+                            {% endif %}
                             {{
                                 onsTextarea({
                                     "id": "secure-message-body",
@@ -116,7 +120,7 @@
                                         "text": "Reply"
                                     },
                                     "maxlength": '50000',
-                                    "error": errorData if errorData
+                                    "error": form_error
                                 })
                             }}
                             {{

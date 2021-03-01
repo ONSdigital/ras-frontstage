@@ -1,0 +1,44 @@
+{% extends "layouts/_block_content.html" %}
+{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/button/_macro.njk" import onsButton %}
+
+{% set page_title = "Help with time to complete" %}
+{% set breadcrumbsData = [
+  {
+    "text": "Surveys",
+    "url": "/surveys/todo"
+  },
+  {
+    "text": "Help",
+    "url": "/surveys/help/"~short_name~"/"~business_id
+  },
+  {
+    "text": "Information about this survey",
+    "url": "/surveys/help/"~short_name~"/"~business_id~"/"~option
+  }
+] %}
+{% block breadcrumb %}
+{{
+    onsBreadcrumb({
+        "ariaLabel": "Breadcrumbs",
+        "id": "breadcrumbs",
+        "itemsList": breadcrumbsData
+    })
+}}
+{% endblock breadcrumb %}
+
+{% block main %}
+<h1 class="u-fs-xl">How long will it take to complete?</h1>
+<p>We design each survey to answer a set of statistical requirements. The length and volume of questions can vary.</p>
+<p>The length of time it takes your business to complete will depend on the availability of the information requested.</p>
+<p>We can help with a specific issue by using our secure message service.</p>
+<p>Read more <a href="https://www.ons.gov.uk/surveys/informationforbusinesses" class="icon--external-link" target="_blank" rel="noopener">Information for businesses</a>
+</p>
+<h2>Did this answer your question?</h2>
+<p></p>
+<div class="btn-group">
+    <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" role="button" class="btn btn-group__btn"><span class="btn__inner">Yes</span></a>
+    <a href="{{ url_for('surveys_bp.get_send_help_message_page', short_name=short_name, option=option,sub_option='time-to-complete', business_id=business_id) }}" role="button" class="btn btn--secondary btn-group__btn"><span class="btn__inner">No</span></a>
+</div>
+
+{% endblock main %}

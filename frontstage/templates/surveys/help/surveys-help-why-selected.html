@@ -1,0 +1,46 @@
+{% extends "layouts/_block_content.html" %}
+{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/button/_macro.njk" import onsButton %}
+
+{% set page_title = "Help with why business selected" %}
+{% set breadcrumbsData = [
+  {
+    "text": "Surveys",
+    "url": "/surveys/todo"
+  },
+  {
+    "text": "Help",
+    "url": "/surveys/help/"~short_name~"/"~business_id
+  },
+  {
+    "text": "Information about this survey",
+    "url": "/surveys/help/"~short_name~"/"~business_id~"/"~option
+  }
+] %}
+{% block breadcrumb %}
+{{
+    onsBreadcrumb({
+        "ariaLabel": "Breadcrumbs",
+        "id": "breadcrumbs",
+        "itemsList": breadcrumbsData,
+        "classes": "u-pt-no"
+    })
+}}
+{% endblock breadcrumb %}
+
+{% block main %}
+<h1 class="u-fs-xl">Why was my business selected?</h1>
+<p>We select businesses from the Inter-Departmental Business Register (IDBR). The IDBR is a register of businesses in the UK registered for PAYE, VAT or with Companies House.</p>
+<p>Selection depends on several factors. For example, the number of people employed, how many other businesses are operating in the same industry and the size of those businesses.</p>
+<p>We always include large businesses in the survey sample because the information they provide can be significant.</p>
+<p>Large businesses are usually defined as having over 100 employees.</p>
+<p>Read more <a href="https://www.ons.gov.uk/surveys/informationforbusinesses" class="icon--external-link" target="_blank" rel="noopener">Information for businesses</a>
+</p>
+<h2>Did this answer your question?</h2>
+<p></p>
+<div class="btn-group">
+    <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" role="button" class="btn btn-group__btn"><span class="btn__inner">Yes</span></a>
+    <a href="{{ url_for('surveys_bp.get_send_help_message_page', short_name=short_name, option=option,sub_option='why-selected', business_id=business_id) }}" role="button" class="btn btn--secondary btn-group__btn"><span class="btn__inner">No</span></a>
+</div>
+
+{% endblock main %}

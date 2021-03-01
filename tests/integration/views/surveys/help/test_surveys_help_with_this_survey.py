@@ -7,7 +7,7 @@ from frontstage import app
 from tests.integration.mocked_services import encoded_jwt_token, survey_eq, survey, survey_list_todo, url_banner_api
 
 
-class TestSurveyHelp(unittest.TestCase):
+class TestSurveyHelpWithThisSurvey(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
         self.app.set_cookie('localhost', 'authorization', 'session_key')

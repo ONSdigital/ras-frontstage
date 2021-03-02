@@ -4,8 +4,8 @@ from unittest.mock import patch
 import requests_mock
 
 from frontstage import app
-from tests.integration.mocked_services import encoded_jwt_token, respondent_party, url_banner_api, survey_list_todo, \
-    url_respondent_party_by_id, url_auth_token, url_password_change
+from tests.integration.mocked_services import encoded_jwt_token, respondent_party, url_banner_api, url_auth_token, \
+    url_password_change
 
 
 class TestSurveyList(unittest.TestCase):
@@ -32,10 +32,9 @@ class TestSurveyList(unittest.TestCase):
     @requests_mock.mock()
     def test_account_password_change_option_select(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_respondent_party_by_id, status_code=404)
 
         response = self.app.post('/my-account', data={"option": 'change_password'}, follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 204)
         self.assertTrue('Change your password'.encode() in response.data)
         self.assertTrue('Enter your current password'.encode() in response.data)
         self.assertTrue('Your password must have:'.encode() in response.data)
@@ -50,8 +49,7 @@ class TestSurveyList(unittest.TestCase):
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
     def test_account_password_change_success(self, mock_request, get_respondent_party_by_id):
         mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_respondent_party_by_id, status_code=404)
-        mock_request.post(url_auth_token, status_code=200)
+        mock_request.post(url_auth_token, status_code=204)
         mock_request.put(url_password_change, status_code=200)
         get_respondent_party_by_id.return_value = respondent_party
         response = self.app.post('/my-account/change-password', data={"password": 'test',
@@ -67,8 +65,7 @@ class TestSurveyList(unittest.TestCase):
     def test_account_password_change_form_validation_errors_does_not_meet_requirement(self, mock_request,
                                                                                       get_respondent_party_by_id):
         mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_respondent_party_by_id, status_code=404)
-        mock_request.post(url_auth_token, status_code=200)
+        mock_request.post(url_auth_token, status_code=204)
         mock_request.put(url_password_change, status_code=200)
         get_respondent_party_by_id.return_value = respondent_party
         response = self.app.post('/my-account/change-password', data={"password": 'test',
@@ -82,8 +79,7 @@ class TestSurveyList(unittest.TestCase):
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
     def test_account_password_change_validation_error(self, mock_request, get_respondent_party_by_id):
         mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_respondent_party_by_id, status_code=404)
-        mock_request.post(url_auth_token, status_code=200)
+        mock_request.post(url_auth_token, status_code=204)
         mock_request.put(url_password_change, status_code=200)
         get_respondent_party_by_id.return_value = respondent_party
         response = self.app.post('/my-account/change-password', data={},
@@ -99,7 +95,6 @@ class TestSurveyList(unittest.TestCase):
                                                                              mock_request,
                                                                              get_respondent_party_by_id):
         mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_respondent_party_by_id, status_code=404)
         mock_request.post(url_auth_token, status_code=401, json=self.auth_error)
         mock_request.put(url_password_change, status_code=200)
         get_respondent_party_by_id.return_value = respondent_party
@@ -117,7 +112,6 @@ class TestSurveyList(unittest.TestCase):
                                                                             mock_request,
                                                                             get_respondent_party_by_id):
         mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_respondent_party_by_id, status_code=404)
         mock_request.post(url_auth_token, status_code=401, json=self.auth_error)
         mock_request.put(url_password_change, status_code=200)
         get_respondent_party_by_id.return_value = respondent_party

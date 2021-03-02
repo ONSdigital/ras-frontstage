@@ -14,7 +14,7 @@ from frontstage.views.account import account_bp
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-BAD_AUTH_ERROR = 'Unauthorized user credentials'
+BAD_CREDENTIALS_ERROR = 'Unauthorized user credentials'
 form_redirect_mapper = {
     'contact_details': 'account_bp.change_account_details',
     'change_password': 'account_bp.change_password',
@@ -58,6 +58,7 @@ def change_password(session):
         bound_logger = logger.bind(email=obfuscate_email(username))
         bound_logger.info("Attempting to find user in auth service")
         try:
+            # We call the sign in function to verify that the password provided is correct
             auth_controller.sign_in(username, password)
             bound_logger.info("Attempting to change password via party service")
             party_controller.change_password(username, new_password)
@@ -66,7 +67,7 @@ def change_password(session):
             return redirect(url_for('surveys_bp.get_survey_list', tag='todo'))
         except AuthError as exc:
             error_message = exc.auth_error
-            if BAD_AUTH_ERROR in error_message:
+            if BAD_CREDENTIALS_ERROR in error_message:
                 bound_logger.info('Bad credentials provided')
                 return render_template('account/account-change-password.html', form=form,
                                        errors={"password": ["Incorrect current password"]})

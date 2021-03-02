@@ -52,6 +52,9 @@ def change_password(session):
         username = respondent_details['emailAddress']
         password = request.form.get('password')
         new_password = request.form.get('new_password')
+        if new_password == password:
+            return render_template('account/account-change-password.html', form=form,
+                                   errors={"new_password": ["Your new password is the same as your old password"]})
         bound_logger = logger.bind(email=obfuscate_email(username))
         bound_logger.info("Attempting to find user in auth service")
         try:

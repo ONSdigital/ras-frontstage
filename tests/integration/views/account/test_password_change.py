@@ -110,3 +110,21 @@ class TestSurveyList(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('There is 1 error on this page'.encode() in response.data)
         self.assertTrue('Incorrect current password'.encode() in response.data)
+
+    @requests_mock.mock()
+    @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
+    def test_account_password_change_validation_error_old_new_password_same(self,
+                                                                            mock_request,
+                                                                            get_respondent_party_by_id):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_respondent_party_by_id, status_code=404)
+        mock_request.post(url_auth_token, status_code=401, json=self.auth_error)
+        mock_request.put(url_password_change, status_code=200)
+        get_respondent_party_by_id.return_value = respondent_party
+        response = self.app.post('/my-account/change-password', data={"password": 'Password123!',
+                                                                      "new_password": 'Password123!',
+                                                                      "new_password_confirm": 'Password123!'},
+                                 follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('There is 1 error on this page'.encode() in response.data)
+        self.assertTrue('Your new password is the same as your old password'.encode() in response.data)

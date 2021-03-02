@@ -30,22 +30,6 @@ class TestSurveyList(unittest.TestCase):
         self.patcher.stop()
 
     @requests_mock.mock()
-    def test_account_password_change_option_select(self, mock_request):
-        mock_request.get(url_banner_api, status_code=404)
-
-        response = self.app.post('/my-account', data={"option": 'change_password'}, follow_redirects=True)
-        self.assertEqual(response.status_code, 204)
-        self.assertTrue('Change your password'.encode() in response.data)
-        self.assertTrue('Enter your current password'.encode() in response.data)
-        self.assertTrue('Your password must have:'.encode() in response.data)
-        self.assertTrue('at least 8 characters'.encode() in response.data)
-        self.assertTrue('at least 1 uppercase letter'.encode() in response.data)
-        self.assertTrue('at least 1 symbol (eg: ?!£%)'.encode() in response.data)
-        self.assertTrue('at least 1 number'.encode() in response.data)
-        self.assertTrue('New Password'.encode() in response.data)
-        self.assertTrue('Re-type your new password'.encode() in response.data)
-
-    @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
     def test_account_password_change_success(self, mock_request, get_respondent_party_by_id):
         mock_request.get(url_banner_api, status_code=404)

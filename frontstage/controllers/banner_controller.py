@@ -15,7 +15,12 @@ def current_banner():
     :return: The banner text, if any, else an empty string
     """
     url = f"{app.config['BANNER_SERVICE_URL']}/banner"
-    response = requests.get(url)
+    try:
+        response = requests.get(url)
+    except requests.exceptions.ConnectionError:
+        logger.error("Failed to connect to banner", exc_info=True)
+        return ""
+
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:

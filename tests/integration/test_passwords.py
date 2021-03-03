@@ -34,7 +34,8 @@ class TestPasswords(unittest.TestCase):
         self.assertTrue('reset your password'.encode() in response.data)
 
     @requests_mock.mock()
-    def test_forgot_password_post_success(self, mock_request):
+    @patch("frontstage.controllers.notify_controller.NotifyGateway.request_to_notify")
+    def test_forgot_password_post_success(self, mock_request, mock_notify):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.post(url_reset_password_request, status_code=200)
         mock_request.get(url_get_respondent_by_email, status_code=200, json={"firstName": "Bob", "id": "123456"})
@@ -42,6 +43,7 @@ class TestPasswords(unittest.TestCase):
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
+        mock_notify.assert_called_once()
         self.assertTrue('Check your email'.encode() in response.data)
 
     @requests_mock.mock()
@@ -68,7 +70,7 @@ class TestPasswords(unittest.TestCase):
     def test_forgot_password_post_unrecognised_email_party(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.post(url_reset_password_request, status_code=404)
-        mock_request.get(url_get_respondent_by_email, status_code=200, json={"firstName": "Bob", "id": "123456"})
+        mock_request.get(url_get_respondent_by_email, status_code=404)
 
         self.email_form['email_address'] = "test@email.com"
 

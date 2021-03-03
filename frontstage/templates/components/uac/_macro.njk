@@ -17,7 +17,6 @@
                 "maxlength": maxlength,
                 "data-group-size": groupSize,
                 "autocomplete": "off",
-                "required": true,
                 "autocapitalize": "characters"
             },
             "fieldClasses": "question__answer",
@@ -27,18 +26,25 @@
         }) }}
     {% endset %}
 
-    {% if not params.error %}
-        {% call onsPanel() %}
+    {% if params.error is not defined %}
+        {% call onsPanel({
+                "classes": "u-mb-s"
+            })
+        %}
             {{ content | safe }}
         {% endcall %}
     {% else %}
         {{ content | safe }}
     {% endif %}
 
-    {% if params.securityMessage %}
-        <div class="uac__security u-mt-m">
-            <div class="uac__icon"><span class="icon icon--lock"></span></div>
-            <p class="uac__message">{{ params.securityMessage }}</p>
-        </div>
+    {% if params.securityMessage is defined and params.securityMessage %}
+        {% call onsPanel({
+                "type": "bare",
+                "icon": "lock",
+                "classes": "u-mb-s"
+            })
+        %}
+            {{ params.securityMessage }}
+        {% endcall %}
     {% endif %}
 {% endmacro %}

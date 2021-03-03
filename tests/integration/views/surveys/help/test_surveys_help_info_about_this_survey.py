@@ -82,7 +82,6 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("Why was my business selected?".encode(), response.data)
         self.assertIn("How long will it take to complete?".encode(), response.data)
         self.assertIn("How long will I be selected for?".encode(), response.data)
-        self.assertIn("What are the penalties for not completing a survey?".encode(), response.data)
         self.assertIn("Something else".encode(), response.data)
         self.assertIn("Continue".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)

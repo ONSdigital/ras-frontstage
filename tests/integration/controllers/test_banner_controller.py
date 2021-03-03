@@ -42,5 +42,14 @@ class TestBannerController(unittest.TestCase):
                 actual = banner_controller.current_banner()
                 self.assertEqual(expected, actual)
 
-
-
+    @responses.activate
+    def test_get_banner_connection_error(self):
+        """responses.activate will raise a ConnectionError if a url isn't mocked.  On a connection error
+        we want to be sure that we'll still get an empty string response if it's not working
+        """
+        with app.app_context():
+            with self.assertLogs(level='INFO') as logs:
+                expected = ""
+                actual = banner_controller.current_banner()
+                self.assertEqual(expected, actual)
+                self.assertIn("Failed to connect to banner", logs.output[0])

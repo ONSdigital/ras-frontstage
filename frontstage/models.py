@@ -6,7 +6,7 @@ from flask_wtf import FlaskForm
 from phonenumbers.phonenumberutil import NumberParseException
 from structlog import wrap_logger
 from wtforms import HiddenField, PasswordField, StringField, SubmitField, TextAreaField, RadioField
-from wtforms.validators import EqualTo, Length, Email, ValidationError, Required
+from wtforms.validators import EqualTo, Length, Email, ValidationError, Required, Regexp
 from frontstage.common.validators import InputRequired, DataRequired
 
 from frontstage import app
@@ -184,7 +184,8 @@ class RespondentStatus(enum.IntEnum):
 
 class OptionsForm(FlaskForm):
     option = RadioField('Label', choices=[
-        ('value', 'contact_details')])
+        ('value', 'contact_details'),
+        ('value', 'change_password')])
 
     def validate(self):
         if self.data['option'] is None:
@@ -261,3 +262,19 @@ class ContactDetailsChangeForm(FlaskForm):
 
 class ConfirmEmailChangeForm(FlaskForm):
     email_address = HiddenField('Email address')
+
+
+class ChangePasswordFrom(FlaskForm):
+    password = PasswordField(_('type your password'),
+                             validators=[DataRequired(_('Password is required'))])
+
+    new_password = PasswordField(_('Create a new password'),
+                                 validators=[DataRequired(_('New password is required')),
+                                             EqualTo('new_password_confirm',
+                                                     message=app.config['PASSWORD_MATCH_ERROR_TEXT']),
+                                             Length(min=app.config['PASSWORD_MIN_LENGTH'],
+                                                    max=app.config['PASSWORD_MAX_LENGTH'],
+                                                    message=app.config['PASSWORD_CRITERIA_ERROR_TEXT']),
+                                             Regexp('^(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
+                                                    message=app.config['PASSWORD_CRITERIA_ERROR_TEXT'])])
+    new_password_confirm = PasswordField(_('Re-type your new password'))

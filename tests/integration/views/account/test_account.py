@@ -143,3 +143,26 @@ class TestSurveyList(unittest.TestCase):
         self.assertIn("Almost done".encode(), response.data)
         self.assertIn("Once you have received it, you need to follow the link".encode(), response.data)
         self.assertIn("please call 0300 1234 931".encode(), response.data)
+
+    @requests_mock.mock()
+    def test_account_options_selection(self, mock_request):
+        mock_request.get(url_banner_api, status_code=404)
+        response = self.app.post('/my-account', data={"option": 'contact_details'}, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+
+    @requests_mock.mock()
+    @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
+    def test_account_options_selection(self, mock_request, get_respondent_party_by_id):
+        mock_request.get(url_banner_api, status_code=404)
+        get_respondent_party_by_id.return_value = respondent_party
+        response = self.app.post('/my-account', data={"option": 'change_password'}, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Change your password'.encode() in response.data)
+        self.assertTrue('Enter your current password'.encode() in response.data)
+        self.assertTrue('Your password must have:'.encode() in response.data)
+        self.assertTrue('at least 8 characters'.encode() in response.data)
+        self.assertTrue('at least 1 uppercase letter'.encode() in response.data)
+        self.assertTrue('at least 1 symbol (eg: ?!£%)'.encode() in response.data)
+        self.assertTrue('at least 1 number'.encode() in response.data)
+        self.assertTrue('New Password'.encode() in response.data)
+        self.assertTrue('Re-type your new password'.encode() in response.data)

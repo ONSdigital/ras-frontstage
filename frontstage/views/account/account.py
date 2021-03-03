@@ -6,12 +6,19 @@ from werkzeug.utils import redirect
 
 from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
-from frontstage.controllers import party_controller
-from frontstage.exceptions.exceptions import ApiError
-from frontstage.models import OptionsForm, ContactDetailsChangeForm, ConfirmEmailChangeForm
+from frontstage.common.utilities import obfuscate_email
+from frontstage.controllers import party_controller, auth_controller
+from frontstage.exceptions.exceptions import ApiError, AuthError
+from frontstage.models import OptionsForm, ContactDetailsChangeForm, ConfirmEmailChangeForm, ChangePasswordFrom
 from frontstage.views.account import account_bp
 
 logger = wrap_logger(logging.getLogger(__name__))
+
+BAD_CREDENTIALS_ERROR = 'Unauthorized user credentials'
+form_redirect_mapper = {
+    'contact_details': 'account_bp.change_account_details',
+    'change_password': 'account_bp.change_password',
+}
 
 
 @account_bp.route('/', methods=['GET'])
@@ -31,8 +38,43 @@ def update_account(session):
     if not form_valid:
         flash('At least one option should be selected.')
         return redirect(url_for('account_bp.get_account'))
-    if form.data['option'] == 'contact_details':
-        return redirect(url_for('account_bp.change_account_details'))
+    else:
+        return redirect(url_for(form_redirect_mapper.get(form.data['option'])))
+
+
+@account_bp.route('/change-password', methods=['GET', 'POST'])
+@jwt_authorization(request)
+def change_password(session):
+    form = ChangePasswordFrom(request.values)
+    party_id = session.get_party_id()
+    respondent_details = party_controller.get_respondent_party_by_id(party_id)
+    if request.method == 'POST' and form.validate():
+        username = respondent_details['emailAddress']
+        password = request.form.get('password')
+        new_password = request.form.get('new_password')
+        if new_password == password:
+            return render_template('account/account-change-password.html', form=form,
+                                   errors={"new_password": ["Your new password is the same as your old password"]})
+        bound_logger = logger.bind(email=obfuscate_email(username))
+        bound_logger.info("Attempting to find user in auth service")
+        try:
+            # We call the sign in function to verify that the password provided is correct
+            auth_controller.sign_in(username, password)
+            bound_logger.info("Attempting to change password via party service")
+            party_controller.change_password(username, new_password)
+            bound_logger.info("password changed via party service")
+            flash('Your password has been changed.')
+            return redirect(url_for('surveys_bp.get_survey_list', tag='todo'))
+        except AuthError as exc:
+            error_message = exc.auth_error
+            if BAD_CREDENTIALS_ERROR in error_message:
+                bound_logger.info('Bad credentials provided')
+                return render_template('account/account-change-password.html', form=form,
+                                       errors={"password": ["Incorrect current password"]})
+    else:
+        errors = form.errors
+
+    return render_template('account/account-change-password.html', form=form, errors=errors)
 
 
 @account_bp.route('/change-account-email-address', methods=['POST'])

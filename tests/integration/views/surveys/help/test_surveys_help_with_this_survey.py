@@ -64,7 +64,6 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.assertIn("Choose an option".encode(), response.data)
         self.assertIn("I need help answering a survey question".encode(), response.data)
         self.assertIn("I don't have specific figures for a response".encode(), response.data)
-        self.assertIn("I am unable to return the data by the deadline".encode(), response.data)
         self.assertIn("Something else".encode(), response.data)
         self.assertIn("Continue".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)

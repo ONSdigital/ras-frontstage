@@ -23,12 +23,12 @@
             <a href="/surveys/history">history</a>
         {% endcall %}
     {% endif %}
-
+    {% set ns = namespace() %}
     {% if form.errors %}
         {% if form.errors|length > 1 %}
-            {% set errorTitle = 'This page has' ~ form.errors|length ~ 'errors' %}
+            {% set errorTitle = 'This page has ' ~ form.errors|length ~' '~ 'errors' %}
         {% elif form.errors %}
-            {% set errorTitle = 'This page has' ~ form.errors|length ~ 'error' %}
+            {% set errorTitle = 'This page has ' ~ form.errors|length ~' '~ 'error' %}
         {% endif %}
 
         {% call
@@ -41,6 +41,7 @@
             <p>These <strong>must be corrected</strong> to continue.</p>
             {% set errorData = [] %}
             {% for error in form.body.errors %}
+                {% set ns.errorMessage = error %}
                 {% do errorData.append(
                     {
                         "text": error,
@@ -104,14 +105,11 @@
                     <p>You can now make changes to your name and telephone number
                         in <a href="/my-account" class="u-fs-r--b">your account</a>.</p>
                     {% if form.errors %}
-                        {% set error = { "text": "Enter a message", "id": 'form_error' } %}
+                        {% set form_error = { "text": ns.errorMessage, "id": 'form_error' } %}
                     {% endif %}
                     <div class="secure-message-reply">
                         <form action="{{ url_for('secure_message_bp.view_conversation', thread_id=conversation[0].thread_id) }}" method="post" id="create-message-form">
                             {{ form.csrf_token }}
-                            {% if form.errors %}
-                                {% set form_error = { "text": errorTitle,  "id": 'form_error' } %}
-                            {% endif %}
                             {{
                                 onsTextarea({
                                     "id": "secure-message-body",

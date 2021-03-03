@@ -2,6 +2,7 @@
 {% from "components/button/_macro.njk" import onsButton %}
 {% from "components/message/_macro.njk" import onsMessage %}
 {% from "components/textarea/_macro.njk" import onsTextarea %}
+{% from "components/lists/_macro.njk" import onsList %}
 
 {% set page_title = "View message" %}
 {% set subject = conversation[-1]["subject"] or "No Subject" %}
@@ -22,12 +23,12 @@
             <a href="/surveys/history">history</a>
         {% endcall %}
     {% endif %}
-
+    {% set ns = namespace() %}
     {% if form.errors %}
         {% if form.errors|length > 1 %}
-            {% set errorTitle = 'This page has' ~ form.errors|length ~ 'errors' %}
+            {% set errorTitle = 'This page has ' ~ form.errors|length ~' '~ 'errors' %}
         {% elif form.errors %}
-            {% set errorTitle = 'This page has' ~ form.errors|length ~ 'error' %}
+            {% set errorTitle = 'This page has ' ~ form.errors|length ~' '~ 'error' %}
         {% endif %}
 
         {% call
@@ -40,6 +41,7 @@
             <p>These <strong>must be corrected</strong> to continue.</p>
             {% set errorData = [] %}
             {% for error in form.body.errors %}
+                {% set ns.errorMessage = error %}
                 {% do errorData.append(
                     {
                         "text": error,
@@ -103,7 +105,7 @@
                     <p>You can now make changes to your name and telephone number
                         in <a href="/my-account" class="u-fs-r--b">your account</a>.</p>
                     {% if form.errors %}
-                        {% set error = { "text": "Enter a message", "id": 'form_error' } %}
+                        {% set form_error = { "text": ns.errorMessage, "id": 'form_error' } %}
                     {% endif %}
                     <div class="secure-message-reply">
                         <form action="{{ url_for('secure_message_bp.view_conversation', thread_id=conversation[0].thread_id) }}" method="post" id="create-message-form">
@@ -116,7 +118,7 @@
                                         "text": "Reply"
                                     },
                                     "maxlength": '50000',
-                                    "error": errorData if errorData
+                                    "error": form_error
                                 })
                             }}
                             {{

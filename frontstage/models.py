@@ -274,7 +274,13 @@ class ChangePasswordFrom(FlaskForm):
                                                      message=app.config['PASSWORD_MATCH_ERROR_TEXT']),
                                              Length(min=app.config['PASSWORD_MIN_LENGTH'],
                                                     max=app.config['PASSWORD_MAX_LENGTH'],
-                                                    message=app.config['PASSWORD_CRITERIA_ERROR_TEXT']),
-                                             Regexp('^(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
                                                     message=app.config['PASSWORD_CRITERIA_ERROR_TEXT'])])
     new_password_confirm = PasswordField(_('Re-type your new password'))
+
+    @staticmethod
+    def validate_new_password(form, field):
+        new_password = field.data
+        if new_password.isalnum() or not any(char.isupper() for char in new_password) or not any(
+                char.isdigit() for char in
+                new_password):
+            raise ValidationError(app.config['PASSWORD_CRITERIA_ERROR_TEXT'])

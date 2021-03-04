@@ -75,9 +75,10 @@ def post_help_page(session, short_name, business_id):
     """Post help completing this survey option for respective survey provided
     survey short name and business_id"""
     form = HelpOptionsForm(request.values)
-    form_valid = form.validate()
-    option = form.data['option']
-    if form_valid:
+    if form.validate():
+        option = form.data['option']
+        if option == "help-with-my-account":
+            return redirect(url_for('account_bp.get_account'))
         return redirect(url_for('surveys_bp.get_help_option_select', short_name=short_name, business_id=business_id,
                                 option=option))
     else:

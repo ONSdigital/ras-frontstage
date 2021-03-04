@@ -266,10 +266,10 @@ class ConfirmEmailChangeForm(FlaskForm):
 
 class ChangePasswordFrom(FlaskForm):
     password = PasswordField(_('type your password'),
-                             validators=[DataRequired(_('Password is required'))])
+                             validators=[DataRequired(_('Your current password is required'))])
 
     new_password = PasswordField(_('Create a new password'),
-                                 validators=[DataRequired(_('New password is required')),
+                                 validators=[DataRequired(_('Your new password is required')),
                                              EqualTo('new_password_confirm',
                                                      message=app.config['PASSWORD_MATCH_ERROR_TEXT']),
                                              Length(min=app.config['PASSWORD_MIN_LENGTH'],

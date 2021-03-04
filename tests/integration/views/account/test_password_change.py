@@ -70,8 +70,8 @@ class TestSurveyList(unittest.TestCase):
                                  follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertTrue('There are 2 errors on this page'.encode() in response.data)
-        self.assertTrue('Password is required'.encode() in response.data)
-        self.assertTrue('New password is required'.encode() in response.data)
+        self.assertTrue('Your current password is required'.encode() in response.data)
+        self.assertTrue('Your new password is required'.encode() in response.data)
 
     @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')

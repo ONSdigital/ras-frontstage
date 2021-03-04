@@ -4,7 +4,8 @@ from unittest.mock import patch
 import requests_mock
 
 from frontstage import app
-from tests.integration.mocked_services import encoded_jwt_token, survey_eq, survey, survey_list_todo, url_banner_api
+from tests.integration.mocked_services import encoded_jwt_token, respondent_party, survey_eq, survey, \
+    survey_list_todo, url_banner_api, url_get_respondent_party
 
 
 class TestSurveyHelpWithThisSurvey(unittest.TestCase):
@@ -211,3 +212,18 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Message sent.".encode(), response.data)
+
+    @requests_mock.mock()
+    def test_account_help_redirects_correctly(self, mock_request):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_get_respondent_party, json=respondent_party, status_code=200)
+
+        form = {
+            'option': 'help-with-my-account'
+        }
+        response = self.app.post('/surveys/help/QBS/33524ade-c5d4-4017-aced-2ad25b397072',
+                                 data=form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Account details'.encode(), response.data)
+        self.assertIn('Change my contact details'.encode(), response.data)

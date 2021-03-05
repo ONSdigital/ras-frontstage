@@ -148,32 +148,6 @@ class TestSecureMessage(unittest.TestCase):
 
     @requests_mock.mock()
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
-    def test_create_message_post_no_subject(self, mock_request, message_count):
-        mock_request.get(url_banner_api, status_code=404)
-        message_count.return_value = 0
-        del self.message_form['subject']
-
-        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789",
-                                 data=self.message_form, headers=self.headers, follow_redirects=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('Please enter a subject'.encode() in response.data)
-
-    @requests_mock.mock()
-    @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
-    def test_create_message_post_whitespace_subject(self, mock_request, message_count):
-        mock_request.get(url_banner_api, status_code=404)
-        message_count.return_value = 0
-        self.message_form['subject'] = ' '
-
-        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789",
-                                 data=self.message_form, headers=self.headers, follow_redirects=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('Please enter a subject'.encode() in response.data)
-
-    @requests_mock.mock()
-    @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
     def test_create_message_post_body_too_long(self, mock_request, message_count):
         mock_request.get(url_banner_api, status_code=404)
         message_count.return_value = 0
@@ -184,19 +158,6 @@ class TestSecureMessage(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Message must be less than 50000 characters'.encode() in response.data)
-
-    @requests_mock.mock()
-    @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
-    def test_create_message_post_subject_too_long(self, mock_request, message_count):
-        mock_request.get(url_banner_api, status_code=404)
-        message_count.return_value = 0
-        self.message_form['subject'] = 'a' * 110
-
-        response = self.app.post("/secure-message/create-message/?case_id=123&ru_ref=456&survey=789",
-                                 data=self.message_form, headers=self.headers, follow_redirects=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('Subject field length must not be greater than 100'.encode() in response.data)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")

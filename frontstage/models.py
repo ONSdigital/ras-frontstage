@@ -158,23 +158,6 @@ class SecureMessagingForm(FlaskForm):
     thread_id = HiddenField('Thread id')
     hidden_subject = HiddenField('Hidden Subject')
 
-    @staticmethod
-    def validate_subject(form, field):
-        subject = form['hidden_subject'].data if form['hidden_subject'].data else field.data
-
-        if len(subject) > 96:
-            raise ValidationError(_('Subject field length must not be greater than 100'))
-        if form.send.data and not subject or subject.isspace():
-            raise ValidationError(_('Please enter a subject'))
-
-    @staticmethod
-    def validate_body(form, field):
-        body = field.data
-        if len(body) > 50000:
-            raise ValidationError(_('Body field length must not be greater than 50000'))
-        if form.send.data and not body:
-            raise ValidationError(_('Please enter a message'))
-
 
 class RespondentStatus(enum.IntEnum):
     CREATED = 0

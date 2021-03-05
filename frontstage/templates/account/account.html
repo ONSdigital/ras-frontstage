@@ -62,19 +62,22 @@
                 ]
             })
         }}
-    <p class="field u-mt-l">
-        <div class="btn-group">
-        {{
-            onsButton({
-            "text": "Continue",
-            "id": "btn-option-continue",
-            "classes": 'btn-group__btn',
-            "submitType": "timer"
-            })
-        }}
-        <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}"
-      role="button" class="btn btn--secondary" id="btn-option-cancel"><span class="btn__inner">Cancel</span></a>
+
+
+    <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
+        <div class="grid__col">
+            {{
+                onsButton({
+                "text": "Continue",
+                "id": "btn-option-continue",
+                "classes": 'btn-group__btn',
+                "submitType": "timer"
+                })
+            }}
         </div>
-    </p>
+        <div class="grid__col u-ml-m">
+            <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" id="btn-option-cancel">Cancel</a>
+        </div>
+    </div>
 </form>
 {% endblock main %}

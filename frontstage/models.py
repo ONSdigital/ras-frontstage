@@ -284,3 +284,29 @@ class ChangePasswordFrom(FlaskForm):
                 char.isdigit() for char in
                 new_password):
             raise ValidationError(app.config['PASSWORD_CRITERIA_ERROR_TEXT'])
+
+
+class HelpForm(FlaskForm):
+    option = RadioField('Label', choices=[
+        ('value', 'info-ons'),
+        ('value', 'password'),
+        ('value', 'something-else')
+    ])
+
+    def validate(self):
+        if self.data['option'] is None:
+            return False
+        return True
+
+
+class HelpInfoOnsForm(FlaskForm):
+    option = RadioField('Label', choices=[
+        ('value', 'ons'),
+        ('value', 'data'),
+        ('value', 'info-something-else')
+    ])
+
+    def validate(self):
+        if self.data['option'] is None:
+            return False
+        return True

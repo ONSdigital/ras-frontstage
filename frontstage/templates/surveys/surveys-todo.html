@@ -4,14 +4,17 @@
 
 {% block content %}
 {% with messages = get_flashed_messages() %}
-    {% if messages %}
-          <div class="panel panel--simple panel--success u-mb-m">
-              <div class="panel__body" data-qa="error-success">
-                {% for message in messages %}
+    {% if messages %}        
+        {% call onsPanel({
+                "type": 'success',
+                "id": 'success-id',
+                "icon": 'check',
+                "classes": 'u-mb-m'
+        }) %}
+            {% for message in messages %}
                 <p class="u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>
-                {% endfor %}
-              </div>
-          </div>
+            {% endfor %}
+        {% endcall %}
     {% endif %}
 {% endwith %}
 {% include "partials/tab_list.html" %}

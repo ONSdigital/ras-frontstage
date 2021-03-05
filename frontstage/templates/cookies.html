@@ -8,10 +8,11 @@
 {% set page_title = "Cookies on surveys.ons.gov.uk" %}
 
 {% block main %}
-{% call onsPanel({
-        "classes": "u-mb-s u-d-no cookies-confirmation-message",
-        "type": "success"
-    }) %}
+    {% call onsPanel({
+            "classes": "u-mb-s u-d-no cookies-confirmation-message",
+            "type": "success"
+        })
+    %}
         <p class="u-fs-r-b">Your cookie settings have been saved</p>
         <p>Some parts of surveys.ons.gov.uk may use additional cookies and will have their own cookie policy and banner.</p>
     {% endcall %}

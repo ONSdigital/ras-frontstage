@@ -86,17 +86,20 @@
                 {% if ns.bodyError %}
                     {% set error = { "text": ns.errorMessage,  "id": 'secure-message-body_error' } %}
                 {% endif %}
+
                 {{
-                onsTextarea({
-                    "id": "secure-message-body",
-                    "name": "body",
-                    "rows": "8",
-                    "label": {
-                        "text": "Create message",
-                    },
-                    "error": error,
-                })
-            }}
+                    onsTextarea({
+                        "id": "secure-message-body",
+                        "name": "body",
+                        "label": {
+                            "text": "Create message",
+                        },
+                        "charCheckLimit": false,
+                        "error": error,
+                    })
+                }}
+
+
             <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
                 <div class="grid__col">
                     {{

@@ -38,29 +38,44 @@
         {% if ns.optionError %}
                 {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
         {% endif %}
+        {% set radioComponent = {
+            "legend": "Choose an option",
+            "name": "option",
+            "id": "option",
+            "error": errorOption,
+        } %}
+        {% set radios = [] %}
+        {% do radios.append(
+            {
+                "id": "contact_details",
+                "label": {
+                "text": "Change my contact details"
+                },
+                "value": "contact_details"
+            }) %}
+        {% do radios.append(
+            {
+                "id": "change_password",
+                "label": {
+                    "text": "Change password"
+                },
+                "value": "change_password"
+            }
+            ) %}
+        {% if is_share_survey_enabled %}
+            {% do radios.append(
+            {
+                "id": "share_surveys",
+                "label": {
+                    "text": "Share access to my surveys"
+                },
+                "value": "share_surveys"
+            }
+            ) %}
+        {% endif %}
+        {% do radioComponent | setAttribute("radios", radios) %}
         {{
-            onsRadios({
-                "legend": "Choose an option",
-                "name": "option",
-                "id": "option",
-                "error": errorOption,
-                "radios": [
-                    {
-                        "id": "contact_details",
-                        "label": {
-                            "text": "Change my contact details"
-                        },
-                        "value": "contact_details"
-                    },
-                    {
-                        "id": "change_password",
-                        "label": {
-                            "text": "Change password"
-                        },
-                        "value": "change_password"
-                    }
-                ]
-            })
+            onsRadios(radioComponent)
         }}
 
 

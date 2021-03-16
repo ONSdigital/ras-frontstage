@@ -1,0 +1,45 @@
+{% extends "layouts/_block_content.html" %}
+{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/button/_macro.njk" import onsButton %}
+
+{% set page_title = "Share surveys overview" %}
+{% set breadcrumbsData = [
+  {
+    "text": "Surveys",
+    "url": "/surveys/todo"
+  },
+  {
+    "text": "Account",
+    "url": "/my-account"
+  },
+] %}
+{% block breadcrumb %}
+{{
+    onsBreadcrumb({
+        "ariaLabel": "Breadcrumbs",
+        "id": "breadcrumbs",
+        "itemsList": breadcrumbsData
+    })
+}}
+{% endblock breadcrumb %}
+{% block main %}
+<h1 class="u-fs-xl">Share access to your surveys</h1>
+<h2>What will happen?</h2>
+<ul>
+    <li>You will select which surveys you want to share and enter the person’s email</li>
+    <li>We will email them the instructions to access the survey</li>
+    <li>Once we confirm access, they will be able to respond to surveys on your behalf and share access with colleagues</li>
+</ul>
+<p></p>
+<p class="field u-mt-l">
+        <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
+            <div class="grid__col">
+                <a href="{{ url_for('account_bp.share_survey_business_select') }}" role="button" class="btn btn-group__btn"><span class="btn__inner">Continue</span></a>
+            </div>
+            <div class="grid__col u-ml-m">
+                <a href="{{ url_for('account_bp.get_account') }}">Cancel</a>
+            </div>
+        </div>
+</p>
+
+{% endblock main %}

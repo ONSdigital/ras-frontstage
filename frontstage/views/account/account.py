@@ -18,6 +18,7 @@ BAD_CREDENTIALS_ERROR = 'Unauthorized user credentials'
 form_redirect_mapper = {
     'contact_details': 'account_bp.change_account_details',
     'change_password': 'account_bp.change_password',
+    'share_surveys': 'account_bp.share_survey_overview'
 }
 
 
@@ -27,7 +28,11 @@ def get_account(session):
     form = OptionsForm()
     party_id = session.get_party_id()
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
-    return render_template('account/account.html', form=form, respondent=respondent_details)
+    is_share_survey_enabled = app.config['SHARE_SURVEY_ENABLED']
+    return render_template('account/account.html',
+                           form=form,
+                           respondent=respondent_details,
+                           is_share_survey_enabled=is_share_survey_enabled)
 
 
 @account_bp.route('/', methods=['POST'])
@@ -36,7 +41,7 @@ def update_account(session):
     form = OptionsForm()
     form_valid = form.validate()
     if not form_valid:
-        flash('At least one option should be selected.')
+        flash('You need to choose an option')
         return redirect(url_for('account_bp.get_account'))
     else:
         return redirect(url_for(form_redirect_mapper.get(form.data['option'])))

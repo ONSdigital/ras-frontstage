@@ -1,0 +1,82 @@
+{% extends "layouts/_block_content.html" %}
+{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/fieldset/_macro.njk" import onsFieldset %}
+{% from "components/radios/_macro.njk" import onsRadios %}
+{% from "components/button/_macro.njk" import onsButton %}
+{% set page_title = "Survey share business select" %}
+{% set breadcrumbsData = [
+  {
+    "text": "Surveys",
+    "url": "/surveys/todo"
+  },
+  {
+    "text": "Account",
+    "url": "/my-account"
+  },
+  {
+    "text": "Share Surveys",
+    "url": "/my-account/share-surveys"
+  }
+] %}
+{% block breadcrumb %}
+{{
+    onsBreadcrumb({
+        "ariaLabel": "Breadcrumbs",
+        "id": "breadcrumbs",
+        "itemsList": breadcrumbsData
+    })
+}}
+{% endblock breadcrumb %}
+{% block main %}
+{% set ns = namespace() %}
+{% include "radio-option-select-error-panel.html" %}
+
+<h1 class="u-fs-xl">Which of your business’s surveys do you want to share?</h1>
+
+<form action="" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        {% if ns.optionError %}
+                {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
+        {% endif %}
+        {% set radioComponent = {
+            "id": "option",
+            "legend": "Choose a business",
+            "name": "option",
+            "error": errorOption,
+        } %}
+        {% set radios = [] %}
+        {% for business in businesses %}
+            {% do radios.append(
+                {
+                    "id": business['id']|string,
+                    "label": {
+                        "text": business['name']
+                    },
+                    "value": business['id']|string
+                }
+            ) %}
+        {% endfor %}
+
+        {% do radioComponent | setAttribute("radios", radios) %}
+            {{
+                onsRadios(radioComponent)
+            }}
+        <p class="field u-mt-l">
+        <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
+            <div class="grid__col">
+                {{
+                    onsButton({
+                    "text": "Continue",
+                    "classes": 'btn btn-group__btn',
+                    "submitType": "timer"
+                    })
+                }}
+            </div>
+            <div class="grid__col u-ml-m">
+                <a href="{{ url_for('account_bp.share_survey_overview') }}">Cancel</a>
+            </div>
+        </div>
+    </p>
+</form>
+
+{% endblock main %}

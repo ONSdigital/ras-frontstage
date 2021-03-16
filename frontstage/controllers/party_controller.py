@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 
 import requests
@@ -510,3 +511,34 @@ def notify_party_and_respondent_account_locked(respondent_id, email_address, sta
         raise ApiError(logger, response)
 
     bound_logger.info('Successfully notified respondent and party service that account is locked')
+
+
+def get_list_of_business_for_party(party_id):
+    bound_logger = logger.bind(party_id=party_id)
+    bound_logger.info('Getting enrolment data for the party')
+    enrolment_data = list(get_respondent_enrolments(party_id))
+    business_ids = set()
+    for enrolment in enrolment_data:
+        business_ids.add(enrolment['business_id'])
+    params = {'id': list(business_ids)}
+    bound_logger.info('Attempting to fetch associated businesses')
+    url = f'{app.config["PARTY_URL"]}/party-api/v1/businesses'
+    response = requests.get(url, params=params, auth=app.config['BASIC_AUTH'])
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        raise ApiError(logger, response)
+    return response.json()
+
+
+def get_surveys_listed_against_party_and_business_id(business_id, party_id):
+    enrolment_data = list(get_respondent_enrolments(party_id))
+    survey_ids = set()
+    for enrolment in enrolment_data:
+        if enrolment['business_id'] == business_id:
+            survey_ids.add(enrolment['survey_id'])
+    surveys = []
+    for survey in survey_ids:
+        response = survey_controller.get_survey(app.config['SURVEY_URL'], app.config['BASIC_AUTH'], survey)
+        surveys.append(response)
+    return surveys

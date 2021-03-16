@@ -62,11 +62,14 @@
 <h1 class="u-fs-xl">Change your contact details</h1>
 <form action="" method="post">
         {{ form.csrf_token }}
-        {% call onsPanel() %}
+        
+        {% call onsPanel({}) %}
             <div>
                 If you need to change your email address you should <a href="{{ url_for('contact_us_bp.contact_us')}}">contact us</a>
             </div>
         {% endcall %}
+        
+        
         {% set firstName = respondent.firstName %}
         {% if errors.first_name %}
                 {% set errorFirstName = { "text": errors['first_name'][0],  "id": 'first_name_error' } %}
@@ -139,20 +142,27 @@
                     "value": phoneNumber
                 })
             }}
-        <p class="field u-mt-l">
-        <div class="btn-group">
-        {{
-            onsButton({
-            "text": "Save",
-            "id": "btn-option-save",
-            "classes": 'btn-group__btn',
-            "submitType": "timer"
-            })
-        }}
-        <a href="{{ url_for('account_bp.get_account') }}"
-      role="button" class="btn btn--secondary" id="btn-account-change-detail-cancel"><span class="btn__inner">Cancel</span></a>
+
+
+
+
+
+
+    <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
+        <div class="grid__col">
+            {{
+                onsButton({
+                "text": "Save",
+                "id": "btn-option-save",
+                "classes": 'btn-group__btn',
+                "submitType": "timer"
+                })
+            }}
         </div>
-    </p>
-    </form>
+        <div class="grid__col u-ml-m">
+            <a href="{{ url_for('account_bp.get_account') }}" id="btn-account-change-detail-cancel">Cancel</a>
+        </div>
+    </div>
+</form>
 
 {% endblock main %}

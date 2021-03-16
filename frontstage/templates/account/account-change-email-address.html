@@ -45,20 +45,25 @@
         {{ form.csrf_token }}
 
         <input type="hidden" name="email_address" value="{{ new_email }}"/>
-        <p class="field u-mt-l">
-        <div class="btn-group">
-        {{
-            onsButton({
-            "text": "Send",
-            "id": "btn-option-send-email",
-            "classes": 'btn-group__btn',
-            "submitType": "timer"
-            })
-        }}
-        <a href="{{ url_for('account_bp.change_account_details') }}"
-      role="button" class="btn btn--secondary" id="btn-option-send-email-cancel"><span class="btn__inner">Cancel</span></a>
+
+
+
+
+    <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
+        <div class="grid__col">
+          {{
+              onsButton({
+              "text": "Send",
+              "id": "btn-option-send-email",
+              "classes": 'btn-group__btn',
+              "submitType": "timer"
+              })
+          }}
         </div>
-    </p>
-    </form>
+        <div class="grid__col u-ml-m">
+        <a href="{{ url_for('account_bp.change_account_details') }}" id="btn-option-send-email-cancel">Cancel</a>
+        </div>
+    </div>
+</form>
 
 {% endblock main %}

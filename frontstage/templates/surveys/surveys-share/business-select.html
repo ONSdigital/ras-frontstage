@@ -34,7 +34,7 @@
 <h1 class="u-fs-xl">Which of your business’s surveys do you want to share?</h1>
 
 <form action="" method="post">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    {{ form.csrf_token }}
         {% if ns.optionError %}
                 {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
         {% endif %}

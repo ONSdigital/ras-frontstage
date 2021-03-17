@@ -176,7 +176,8 @@ class TestSurveyList(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Share access to your surveys'.encode() in response.data)
         self.assertTrue('What will happen?'.encode() in response.data)
-        self.assertTrue('You will select which surveys you want to share and enter the person’s email'.encode() in response.data)
+        self.assertTrue(
+            'You will select which surveys you want to share and enter the person’s email'.encode() in response.data)
         self.assertTrue('We will email them the instructions to access the survey'.encode() in response.data)
         self.assertTrue('Once we confirm access, they will be able to respond to surveys on your behalf and share '
                         'access with colleagues'.encode() in response.data)

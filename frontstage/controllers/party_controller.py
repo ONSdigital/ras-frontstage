@@ -520,8 +520,13 @@ def get_list_of_business_for_party(party_id):
     business_ids = set()
     for enrolment in enrolment_data:
         business_ids.add(enrolment['business_id'])
-    params = {'id': list(business_ids)}
-    bound_logger.info('Attempting to fetch associated businesses')
+    bound_logger.info('Getting businesses against business ids')
+    return get_business_by_business_id(list(business_ids))
+
+
+def get_business_by_business_id(business_ids):
+    logger.info('Attempting to fetch businesses')
+    params = {'id': business_ids}
     url = f'{app.config["PARTY_URL"]}/party-api/v1/businesses'
     response = requests.get(url, params=params, auth=app.config['BASIC_AUTH'])
     try:

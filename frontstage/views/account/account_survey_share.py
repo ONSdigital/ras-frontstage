@@ -9,7 +9,7 @@ from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import survey_controller
 from frontstage.controllers.party_controller import get_list_of_business_for_party, \
-    get_surveys_listed_against_party_and_business_id
+    get_surveys_listed_against_party_and_business_id, get_business_by_business_id
 from frontstage.exceptions.exceptions import ShareSurveyProcessError
 from frontstage.models import AccountSurveyShareBusinessSelectForm, AccountSurveyShareRecipientEmailForm, \
     ConfirmEmailChangeForm
@@ -56,8 +56,9 @@ def share_survey_survey_select(session):
     party_id = session.get_party_id()
     surveys = get_surveys_listed_against_party_and_business_id(flask_session['business_selected'], party_id)
     flask_session['surveys_selected'] = None
+    selected_business = get_business_by_business_id([flask_session['business_selected']])
     return render_template('surveys/surveys-share/survey-select.html',
-                           surveys=surveys)
+                           surveys=surveys, business_name=selected_business[0]['name'])
 
 
 @account_bp.route('/share-surveys/survey-selection', methods=['POST'])
@@ -103,9 +104,10 @@ def send_instruction_get(session):
     for survey_id in flask_session['surveys_selected']:
         selected_surveys.append(survey_controller.get_survey(app.config['SURVEY_URL'],
                                                              app.config['BASIC_AUTH'], survey_id))
-
+    selected_business = get_business_by_business_id([flask_session['business_selected']])
     return render_template('surveys/surveys-share/send-instructions.html',
-                           email=email, surveys=selected_surveys, form=ConfirmEmailChangeForm())
+                           email=email, surveys=selected_surveys, form=ConfirmEmailChangeForm(),
+                           business_name=selected_business[0]['name'])
 
 
 @account_bp.route('/share-surveys/send-instruction', methods=['POST'])

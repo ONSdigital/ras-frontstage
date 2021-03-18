@@ -4,22 +4,20 @@ from unittest.mock import patch
 import requests_mock
 
 from frontstage import app
-from frontstage.common.session import Session
-from frontstage.exceptions.exceptions import ShareSurveyProcessError
 from tests.integration.mocked_services import encoded_jwt_token, respondent_party, url_banner_api, \
     url_get_respondent_party, url_get_survey, business_party, survey
 
 url_get_business_details = f"{app.config['PARTY_URL']}/party-api/v1/businesses"
 url_get_survey_second = f"{app.config['SURVEY_URL']}/surveys/02b9c366-7397-42f7-942a-76dc5876d86d"
-dummy_business = [{'associations': [{'businessRespondentStatus': 'ACTIVE',
-                                     'enrolments': [{'enrolmentStatus': 'ENABLED',
-                                                     'surveyId': '02b9c366-7397-42f7-942a-76dc5876d86d'}],
-                                     'partyId': '9f26eb0e-7db7-41fd-9c4c-3ee9f562aa35'}],
-                   'id': 'd7813ec7-10c3-4872-8717-c0b9135f917c',
-                   'name': 'RUNAME1_COMPANY1 RUNNAME2_COMPANY1',
-                   'sampleSummaryId': 'e502324d-6e49-4fcb-8c68-e6553f45fae1',
-                   'sampleUnitRef': '49900000001', 'sampleUnitType': 'B',
-                   'trading_as': 'TOTAL UK ACTIVITY'}]
+dummy_business = {'associations': [{'businessRespondentStatus': 'ACTIVE',
+                                    'enrolments': [{'enrolmentStatus': 'ENABLED',
+                                                    'surveyId': '02b9c366-7397-42f7-942a-76dc5876d86d'}],
+                                    'partyId': '9f26eb0e-7db7-41fd-9c4c-3ee9f562aa35'}],
+                  'id': 'd7813ec7-10c3-4872-8717-c0b9135f917c',
+                  'name': 'RUNAME1_COMPANY1 RUNNAME2_COMPANY1',
+                  'sampleSummaryId': 'e502324d-6e49-4fcb-8c68-e6553f45fae1',
+                  'sampleUnitRef': '49900000001', 'sampleUnitType': 'B',
+                  'trading_as': 'TOTAL UK ACTIVITY'}
 dummy_survey = {"id": "02b9c366-7397-42f7-942a-76dc5876d86d",
                 "shortName": "QBS", "longName": "Quarterly Business Survey", "surveyRef": "139",
                 "legalBasis": "Statistics of Trade Act 1947", "surveyType": "Business", "surveyMode": "EQ",
@@ -47,7 +45,7 @@ class TestSurveyList(unittest.TestCase):
     def test_share_survey_business_select(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_business_details, status_code=200, json=dummy_business)
+        mock_request.get(url_get_business_details, status_code=200, json=[dummy_business])
         response = self.app.get('/my-account/share-surveys/business-selection')
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Which of your business’s surveys do you want to share?'.encode() in response.data)
@@ -60,7 +58,7 @@ class TestSurveyList(unittest.TestCase):
     def test_share_survey_business_select_no_option_selected(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_business_details, status_code=200, json=dummy_business)
+        mock_request.get(url_get_business_details, status_code=200, json=[dummy_business])
         response = self.app.post('/my-account/share-surveys/business-selection',
                                  data={"option": None},
                                  follow_redirects=True)
@@ -72,7 +70,7 @@ class TestSurveyList(unittest.TestCase):
     def test_share_survey_select(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_business_details, status_code=200, json=business_party)
+        mock_request.get(url_get_business_details, status_code=200, json=[business_party])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         response = self.app.post('/my-account/share-surveys/business-selection',
@@ -80,7 +78,7 @@ class TestSurveyList(unittest.TestCase):
                                  follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("Which surveys do you want to share?".encode(), response.data)
-        self.assertIn("ACME Consumer Products".encode(), response.data)
+        self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
         self.assertIn("Select all that apply".encode(), response.data)
         self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
         self.assertIn("Quarterly Business Survey".encode(), response.data)
@@ -91,7 +89,7 @@ class TestSurveyList(unittest.TestCase):
     def test_share_survey_select_no_option_selected(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_business_details, status_code=200, json=business_party)
+        mock_request.get(url_get_business_details, status_code=200, json=[business_party])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         with self.app.session_transaction() as mock_session:
@@ -108,7 +106,7 @@ class TestSurveyList(unittest.TestCase):
     def test_share_survey_select_option_selected(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_business_details, status_code=200, json=business_party)
+        mock_request.get(url_get_business_details, status_code=200, json=[business_party])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         with self.app.session_transaction() as mock_session:
@@ -129,7 +127,7 @@ class TestSurveyList(unittest.TestCase):
     def test_share_survey_recipient_email_not_entered(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_business_details, status_code=200, json=business_party)
+        mock_request.get(url_get_business_details, status_code=200, json=[business_party])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         with self.app.session_transaction() as mock_session:
@@ -149,7 +147,7 @@ class TestSurveyList(unittest.TestCase):
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
         mock_request.get(url_get_business_details, status_code=200, json=business_party)
         mock_request.get(url_get_survey, status_code=200, json=survey)
-        mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
+        mock_request.get(url_get_survey_second, status_code=200, json=[dummy_survey])
         with self.app.session_transaction() as mock_session:
             mock_session['business_selected'] = business_party['id']
             mock_session['surveys_selected'] = survey['id']
@@ -165,7 +163,7 @@ class TestSurveyList(unittest.TestCase):
     def test_share_survey_share_instruction(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_business_details, status_code=200, json=business_party)
+        mock_request.get(url_get_business_details, status_code=200, json=[business_party])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         with self.app.session_transaction() as mock_session:
@@ -187,7 +185,7 @@ class TestSurveyList(unittest.TestCase):
     def test_share_survey_share_instruction_done(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_business_details, status_code=200, json=business_party)
+        mock_request.get(url_get_business_details, status_code=200, json=[business_party])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         with self.app.session_transaction() as mock_session:

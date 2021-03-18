@@ -35,7 +35,7 @@
 {% set ns = namespace (checkbox = 'true') %}
 {% include "radio-option-select-error-panel.html" %}
 
-<h1 class="u-fs-xl">Which surveys do you want to share?</h1>
+<h1>Which surveys do you want to share?</h1>
 {% set checkboxData = [] %}
 <form action="" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>

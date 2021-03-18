@@ -66,7 +66,7 @@ class TestSurveyList(unittest.TestCase):
                                  follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("There is 1 error on this page".encode(), response.data)
-        self.assertIn("You need to select a business".encode(), response.data)
+        self.assertIn("You need to choose a business".encode(), response.data)
 
     @requests_mock.mock()
     def test_share_survey_select(self, mock_request):

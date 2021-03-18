@@ -44,7 +44,7 @@ def share_survey_business_select(session):
 def share_survey_post_business_select(session):
     form = AccountSurveyShareBusinessSelectForm(request.values)
     if not form.validate():
-        flash('You need to select a business')
+        flash('You need to choose a business')
         return redirect(url_for('account_bp.share_survey_business_select'))
     flask_session['business_selected'] = form.data['option']
     return redirect(url_for('account_bp.share_survey_survey_select'))

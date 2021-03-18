@@ -13,16 +13,6 @@
         "scheduledEndDateTime": "2020-02-28T00:00:00.000Z",
         "executedBy": null,
         "state": "READY_FOR_LIVE",
-        "caseTypes": [
-            {
-                "actionPlanId": "c0d5a501-de2a-4b8c-90c8-e00aa5956fed",
-                "sampleUnitType": "B"
-            },
-            {
-                "actionPlanId": "0859a27a-9275-48a9-addd-330630c98f34",
-                "sampleUnitType": "BI"
-            }
-        ],
         "exerciseRef": "201801",
         "userDescription": "January 2018",
         "created": "2018-07-12T08:59:04.047Z",
@@ -82,16 +72,6 @@
         "scheduledEndDateTime": "2020-03-31T00:00:00.000Z",
         "executedBy": null,
         "state": "SCHEDULED",
-        "caseTypes": [
-            {
-                "actionPlanId": "5597d185-48e2-401d-b32e-24e489bd5758",
-                "sampleUnitType": "B"
-            },
-            {
-                "actionPlanId": "a650f13b-766c-4ab7-9d2d-1e5e04253bb5",
-                "sampleUnitType": "BI"
-            }
-        ],
         "exerciseRef": "201802",
         "userDescription": "February 2018",
         "created": "2018-07-12T08:59:04.098Z",
@@ -151,16 +131,6 @@
         "scheduledEndDateTime": "2020-05-31T00:00:00.000Z",
         "executedBy": null,
         "state": "LIVE",
-        "caseTypes": [
-            {
-                "actionPlanId": "f38cf76a-ca7a-4078-ab06-ed5f57f431c6",
-                "sampleUnitType": "B"
-            },
-            {
-                "actionPlanId": "24610f16-4fde-42c9-8600-c45cacb03d43",
-                "sampleUnitType": "BI"
-            }
-        ],
         "exerciseRef": "201804",
         "userDescription": "April 2018",
         "created": "2018-07-12T08:59:04.165Z",
@@ -220,16 +190,6 @@
         "scheduledEndDateTime": "2020-06-30T00:00:00.000Z",
         "executedBy": null,
         "state": "SCHEDULED",
-        "caseTypes": [
-            {
-                "actionPlanId": "bf95f310-282b-480e-b98f-e25c6c90b451",
-                "sampleUnitType": "B"
-            },
-            {
-                "actionPlanId": "ddf46fca-7093-439d-b0c1-c5edd4e03297",
-                "sampleUnitType": "BI"
-            }
-        ],
         "exerciseRef": "201805",
         "userDescription": "May 2018",
         "created": "2018-07-12T08:59:04.190Z",
@@ -289,16 +249,6 @@
         "scheduledEndDateTime": "2020-08-31T00:00:00.000Z",
         "executedBy": null,
         "state": "SCHEDULED",
-        "caseTypes": [
-            {
-                "actionPlanId": "367e5515-6d22-48d3-b3ed-073bcdc04896",
-                "sampleUnitType": "B"
-            },
-            {
-                "actionPlanId": "f106568c-93d8-46e4-b70e-de2eea2d4f85",
-                "sampleUnitType": "BI"
-            }
-        ],
         "exerciseRef": "201807",
         "userDescription": "July 2018",
         "created": "2018-07-12T08:59:04.240Z",
@@ -358,16 +308,6 @@
         "scheduledEndDateTime": "2020-10-31T00:00:00.000Z",
         "executedBy": null,
         "state": "SCHEDULED",
-        "caseTypes": [
-            {
-                "actionPlanId": "47049b25-18dc-463f-ae56-9b8c198fdced",
-                "sampleUnitType": "B"
-            },
-            {
-                "actionPlanId": "1d3ce618-a33c-41b5-95d1-a0e8246d8ed8",
-                "sampleUnitType": "BI"
-            }
-        ],
         "exerciseRef": "201809",
         "userDescription": "September 2018",
         "created": "2018-07-12T08:59:04.300Z",
@@ -427,16 +367,6 @@
         "scheduledEndDateTime": "2020-11-30T00:00:00.000Z",
         "executedBy": null,
         "state": "SCHEDULED",
-        "caseTypes": [
-            {
-                "actionPlanId": "2c51db3f-dda3-4d61-a5f7-53b050ad965d",
-                "sampleUnitType": "B"
-            },
-            {
-                "actionPlanId": "0f554baa-01b2-42be-bbfe-9d33ca3b8213",
-                "sampleUnitType": "BI"
-            }
-        ],
         "exerciseRef": "201810",
         "userDescription": "October 2018",
         "created": "2018-07-12T08:59:04.326Z",
@@ -496,16 +426,6 @@
         "scheduledEndDateTime": "2020-09-30T00:00:00.000Z",
         "executedBy": null,
         "state": "SCHEDULED",
-        "caseTypes": [
-            {
-                "actionPlanId": "f53396f7-ae86-4086-ab99-5a4b846287dc",
-                "sampleUnitType": "B"
-            },
-            {
-                "actionPlanId": "3d6e8409-ff4c-4b7e-8d0f-b6abb01bb759",
-                "sampleUnitType": "BI"
-            }
-        ],
         "exerciseRef": "201808",
         "userDescription": "August 2018",
         "created": "2018-07-12T08:59:04.278Z",
@@ -565,16 +485,6 @@
         "scheduledEndDateTime": "2018-07-23T09:00:13.000Z",
         "executedBy": null,
         "state": "LIVE",
-        "caseTypes": [
-            {
-                "actionPlanId": "0721c4bf-f3d6-4082-9cdb-cfabff1911ed",
-                "sampleUnitType": "B"
-            },
-            {
-                "actionPlanId": "ed79eba1-77d0-4db5-a033-fd47afc64984",
-                "sampleUnitType": "BI"
-            }
-        ],
         "exerciseRef": "204901",
         "userDescription": "test_exercise",
         "created": "2018-07-12T09:00:21.568Z",
@@ -622,16 +532,6 @@
         "scheduledEndDateTime": "2020-04-30T00:00:00.000Z",
         "executedBy": null,
         "state": "SCHEDULED",
-        "caseTypes": [
-            {
-                "actionPlanId": "04613f4c-fc90-4804-a4df-8a7706d3ebbf",
-                "sampleUnitType": "B"
-            },
-            {
-                "actionPlanId": "0e2e0f14-bd62-48e0-a112-4289c6fa384b",
-                "sampleUnitType": "BI"
-            }
-        ],
         "exerciseRef": "201803",
         "userDescription": "March 2018",
         "created": "2018-07-12T08:59:04.129Z",
@@ -691,16 +591,6 @@
         "scheduledEndDateTime": "2020-07-31T00:00:00.000Z",
         "executedBy": null,
         "state": "SCHEDULED",
-        "caseTypes": [
-            {
-                "actionPlanId": "06720fd9-bf6f-40f4-8fe5-249f065f333b",
-                "sampleUnitType": "B"
-            },
-            {
-                "actionPlanId": "a10709f3-216f-4439-af11-313f52599766",
-                "sampleUnitType": "BI"
-            }
-        ],
         "exerciseRef": "201806",
         "userDescription": "June 2018",
         "created": "2018-07-12T08:59:04.219Z",
@@ -760,16 +650,6 @@
         "scheduledEndDateTime": "2020-12-31T00:00:00.000Z",
         "executedBy": null,
         "state": "SCHEDULED",
-        "caseTypes": [
-            {
-                "actionPlanId": "0b06c83f-477b-410a-b0a5-5c7e5d156196",
-                "sampleUnitType": "B"
-            },
-            {
-                "actionPlanId": "4b63211f-74ca-4a89-ba86-73e14693fe2c",
-                "sampleUnitType": "BI"
-            }
-        ],
         "exerciseRef": "201811",
         "userDescription": "November 2018",
         "created": "2018-07-12T08:59:04.356Z",
@@ -829,16 +709,6 @@
         "scheduledEndDateTime": "2021-01-31T00:00:00.000Z",
         "executedBy": null,
         "state": "READY_FOR_LIVE",
-        "caseTypes": [
-            {
-                "actionPlanId": "288fcc63-b8b1-4812-bb47-3dfefd5f164f",
-                "sampleUnitType": "B"
-            },
-            {
-                "actionPlanId": "53e9ab34-083f-4d4b-a946-bd8ef65c28fd",
-                "sampleUnitType": "BI"
-            }
-        ],
         "exerciseRef": "201812",
         "userDescription": "December 2018",
         "created": "2018-07-12T08:59:04.389Z",

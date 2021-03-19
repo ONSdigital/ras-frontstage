@@ -3,21 +3,33 @@
 {% if 'authorization' in request.cookies %}
     {% set signInOutURL = url_for('sign_in_bp.logout') %}
     {% set signInOutText = "Sign out" %}
-    {% do serviceLinks | setAttribute("itemsList", [
-        {
-          "text": "My Account",
-          "url": "/my-account"
-        },
-        {
-          "text": "Help",
-          "url": "/contact-us"
-        },
-        {
-          "text": signInOutText,
-          "url": signInOutURL
-        }
-      ])
-    %}
+    {% if ns and ns.showHelp %}
+        {% do serviceLinks | setAttribute("itemsList", [
+            {
+              "text": "My Account",
+              "url": "/my-account"
+            },
+            {
+              "text": "Help",
+              "url": ""
+            },
+            {
+              "text": signInOutText,
+              "url": signInOutURL
+            }
+        ])%}
+    {% else %}
+        {% do serviceLinks | setAttribute("itemsList", [
+            {
+              "text": "My Account",
+              "url": "/my-account"
+            },
+            {
+              "text": signInOutText,
+              "url": signInOutURL
+            }
+        ])%}
+    {% endif %}
 {% else %}
     {% set signInOutURL = "/sign-in" %}
     {% set signInOutText = "Sign in" %}

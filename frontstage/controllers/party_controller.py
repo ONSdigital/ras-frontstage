@@ -1,5 +1,4 @@
 import datetime
-import json
 import logging
 
 import requests
@@ -515,30 +514,30 @@ def notify_party_and_respondent_account_locked(respondent_id, email_address, sta
 
 def get_list_of_business_for_party(party_id):
     """
-    returns list of businesses associated with a respondent
+    Gets the details for the businesses associated with a respondent
     :param party_id: respondent party id
+    :type party_id: str
     :return: list of businesses
-    :rtype: json
+    :rtype: dict
     """
     bound_logger = logger.bind(party_id=party_id)
     bound_logger.info('Getting enrolment data for the party')
-    enrolment_data = list(get_respondent_enrolments(party_id))
-    business_ids = set()
-    for enrolment in enrolment_data:
-        business_ids.add(enrolment['business_id'])
-    bound_logger.info('Getting businesses against business ids')
-    return get_business_by_id(list(business_ids))
+    enrolment_data = get_respondent_enrolments(party_id)
+    business_ids = {enrolment['business_id'] for enrolment in enrolment_data}
+    bound_logger.info('Getting businesses against business ids', business_ids=business_ids)
+    return get_business_by_id(business_ids)
 
 
-def get_business_by_id(business_id):
+def get_business_by_id(business_ids):
     """
-    returns list of businesses associated with a business id or a list of business ids
-    :param business_id: This takes a single business id or a list of business ids
+    Gets the business details for all the business_id's that are provided (
+    :param business_ids: This takes a single business id or a list of business ids
+    :type business_ids: list
     :return: business
-    :rtype: json
+    :rtype: dict
     """
-    logger.info('Attempting to fetch businesses')
-    params = {'id': business_id}
+    logger.info('Attempting to fetch businesses', business_ids=business_ids)
+    params = {'id': business_ids}
     url = f'{app.config["PARTY_URL"]}/party-api/v1/businesses'
     response = requests.get(url, params=params, auth=app.config['BASIC_AUTH'])
     try:
@@ -552,15 +551,12 @@ def get_surveys_listed_against_party_and_business_id(business_id, party_id):
     """
     returns list of surveys associated with a business id and respondent
     :param business_id: business id
-    :param business_id: party id (respondent party id)
+    :param party_id: The respondent's party id
     :return: list of surveys
     :rtype: list
     """
-    enrolment_data = list(get_respondent_enrolments(party_id))
-    survey_ids = set()
-    for enrolment in enrolment_data:
-        if enrolment['business_id'] == business_id:
-            survey_ids.add(enrolment['survey_id'])
+    enrolment_data = get_respondent_enrolments(party_id)
+    survey_ids = {enrolment['survey_id'] for enrolment in enrolment_data if enrolment['business_id'] == business_id}
     surveys = []
     for survey in survey_ids:
         response = survey_controller.get_survey(app.config['SURVEY_URL'], app.config['BASIC_AUTH'], survey)

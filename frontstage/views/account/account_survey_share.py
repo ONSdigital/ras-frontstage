@@ -71,7 +71,7 @@ def share_survey_post_survey_select(session):
         return redirect(url_for('account_bp.share_survey_survey_select'))
     for survey_selected in surveys_selected:
         # TODO validate of maximum users and reroute for validation failure
-        logger.info('This step is still to be completed')
+        logger.info('Maximum users step is still to be completed')
 
     return redirect(url_for('account_bp.share_survey_email_entry'))
 

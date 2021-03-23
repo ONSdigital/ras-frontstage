@@ -31,11 +31,23 @@ class TestSurveyList(unittest.TestCase):
 
     @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
-    def test_account_password_change_success(self, mock_request, get_respondent_party_by_id):
+    @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
+    def test_account_password_change_success(self, mock_request, get_survey_list, get_respondent_party_by_id):
+        survey_list = [{"case_id": "6f698975-0a36-45ff-ba66-7a575e414023",
+                        "status": "Not started", "collection_instrument_type": "EQ",
+                        "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d",
+                        "survey_long_name": "Quarterly Business Survey",
+                        "survey_short_name": "QBS", "survey_ref": "139",
+                        "business_party_id": "44d8db36-2319-41c6-8887-79033ce55a4b",
+                        "business_name": "PC UNIVERSE", "trading_as": "PC LTD",
+                        "business_ref": "49900000007", "period": "December 2019",
+                        "submit_by": "26 Mar 2021", "collection_exercise_ref": "1912",
+                        "added_survey": None, "display_button": True}]
         mock_request.get(url_banner_api, status_code=404)
         mock_request.post(url_auth_token, status_code=204)
         mock_request.put(url_password_change, status_code=200)
         get_respondent_party_by_id.return_value = respondent_party
+        get_survey_list.return_value = survey_list
         response = self.app.post('/my-account/change-password', data={"password": 'test',
                                                                       "new_password": 'Password123!',
                                                                       "new_password_confirm": 'Password123!'},

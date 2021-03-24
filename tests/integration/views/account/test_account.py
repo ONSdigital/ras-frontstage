@@ -57,7 +57,7 @@ class TestSurveyList(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         response = self.app.post('/my-account', data={"option": None}, follow_redirects=True)
-        self.assertIn("At least one option should be selected".encode(),
+        self.assertIn("You need to choose an option".encode(),
                       response.data)
 
     @requests_mock.mock()
@@ -166,3 +166,18 @@ class TestSurveyList(unittest.TestCase):
         self.assertTrue('at least 1 number'.encode() in response.data)
         self.assertTrue('New Password'.encode() in response.data)
         self.assertTrue('Re-type your new password'.encode() in response.data)
+
+    @requests_mock.mock()
+    @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
+    def test_share_survey_options_selection(self, mock_request, get_respondent_party_by_id):
+        mock_request.get(url_banner_api, status_code=404)
+        get_respondent_party_by_id.return_value = respondent_party
+        response = self.app.post('/my-account', data={"option": 'share_surveys'}, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Share access to your surveys'.encode() in response.data)
+        self.assertTrue('What will happen?'.encode() in response.data)
+        self.assertTrue(
+            'You will select which surveys you want to share and enter the person’s email'.encode() in response.data)
+        self.assertTrue('We will email them the instructions to access the survey'.encode() in response.data)
+        self.assertTrue('Once we confirm access, they will be able to respond to surveys on your behalf and share '
+                        'access with colleagues'.encode() in response.data)

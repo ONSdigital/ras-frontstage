@@ -70,6 +70,7 @@ class Config(object):
     CANARY_GENERATE_ERRORS = bool(strtobool(os.getenv('CANARY_GENERATE_ERRORS', "False")))
     # TODO: to be removed once account change is reworked on.
     ACCOUNT_EMAIL_CHANGE_ENABLED = bool(strtobool(os.getenv('ACCOUNT_EMAIL_CHANGE_ENABLED', "False")))
+    SHARE_SURVEY_ENABLED = bool(strtobool(os.getenv('SHARE_SURVEY_ENABLED', "True")))
 
 
 class DevelopmentConfig(Config):

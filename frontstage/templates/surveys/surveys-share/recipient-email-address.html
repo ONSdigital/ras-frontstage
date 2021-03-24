@@ -1,0 +1,118 @@
+{% extends "layouts/_block_content.html" %}
+{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/fieldset/_macro.njk" import onsFieldset %}
+{% from "components/input/_macro.njk" import onsInput %}
+{% from "components/lists/_macro.njk" import onsList %}
+{% from "components/button/_macro.njk" import onsButton %}
+{% set page_title = "Survey share email entry" %}
+{% set breadcrumbsData = [
+  {
+    "text": "Surveys",
+    "url": "/surveys/todo"
+  },
+  {
+    "text": "Account",
+    "url": "/my-account"
+  },
+  {
+    "text": "Share Surveys",
+    "url": "/my-account/share-surveys"
+  },
+  {
+    "text": "Select business",
+    "url": "/my-account/share-surveys/business-selection"
+  },
+ {
+    "text": "Select survey",
+    "url": "/my-account/share-surveys/survey-selection"
+  }
+] %}
+{% block breadcrumb %}
+{{
+    onsBreadcrumb({
+        "ariaLabel": "Breadcrumbs",
+        "id": "breadcrumbs",
+        "itemsList": breadcrumbsData
+    })
+}}
+{% endblock breadcrumb %}
+{% block main %}
+{% if errors|length > 0 %}
+        {% if errors|length == 1 %}
+            {% set errorTitle = 'There is 1 error on this page' %}
+        {% elif errors|length > 1 %}
+            {% set errorTitle = 'There are ' ~ errors|length ~ ' errors on this page' %}
+        {% endif %}
+        {% call
+            onsPanel({
+                "type": "error",
+                "classes": "u-mb-s",
+                "title":  errorTitle
+            })
+        %}
+            {% set errorData = [] %}
+            {% for error in errors %}
+                {% set error_text =  error %}
+                {% do errorData.append(
+                    {
+                        "text": 'Problem with the ' ~ error_text.replace('_', ' '),
+                        "index": true,
+                        "url": "#" ~ error ~ '_error',
+                        "classes": "js-inpagelink"
+                    }
+                ) %}
+            {% endfor %}
+            {{
+                onsList({
+                    "classes": "list--bare",
+                    "itemsList": errorData
+                })
+            }}
+        {% endcall %}
+    {% endif %}
+
+<h1>Enter recipient's email address</h1>
+{% set checkboxData = [] %}
+<form action="" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        {% call onsPanel({}) %}
+            <div>
+                Make sure you have permission from the recipient to provide their email address to us.
+            </div>
+        {% endcall %}
+        {% if errors.email_address %}
+            {% set errorEmailAddress = { "text": errors['email_address'][0],  "id": 'email_address_error' } %}
+            {% set emailAddress = form.email_address.data %}
+            {% endif %}
+            {{
+                onsInput({
+                    "id": "email_address",
+                    "name": "email_address",
+                    "type": "text",
+                    "label": {
+                        "text": "Recipient's email address",
+                        "description": "This is the person who will be able to respond to your surveys."
+                    },
+                    "error": errorEmailAddress,
+                    "value": emailAddress,
+                })
+            }}
+        <p class="field u-mt-l">
+        <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
+            <div class="grid__col">
+                {{
+                    onsButton({
+                    "text": "Continue",
+                    "classes": 'btn btn-group__btn',
+                    "submitType": "timer"
+                    })
+                }}
+            </div>
+            <div class="grid__col u-ml-m">
+                <a href="{{ url_for('account_bp.share_survey_survey_select') }}">Cancel</a>
+            </div>
+        </div>
+    </p>
+</form>
+
+{% endblock main %}

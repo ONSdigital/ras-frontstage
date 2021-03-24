@@ -1,4 +1,4 @@
-{% extends "layouts/_twothirds.html" %}
+{% extends "layouts/_block_content.html" %}
 {% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/input/_macro.njk" import onsInput %}
@@ -16,15 +16,17 @@
     "url": "/my-account"
   }
 ] %}
-
-{% block main %}
+{% block breadcrumb %}
 {{
     onsBreadcrumb({
         "ariaLabel": "Breadcrumbs",
         "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
+        "itemsList": breadcrumbsData,
+        "classes": "u-pt-no"
     })
 }}
+{% endblock breadcrumb %}
+{% block main %}
 {% if errors|length > 0 %}
         {% if errors|length == 1 %}
             {% set errorTitle = 'There is 1 error on this page' %}

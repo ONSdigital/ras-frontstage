@@ -71,7 +71,7 @@ class Config(object):
     # TODO: to be removed once account change is reworked on.
     ACCOUNT_EMAIL_CHANGE_ENABLED = bool(strtobool(os.getenv('ACCOUNT_EMAIL_CHANGE_ENABLED', "False")))
     SHARE_SURVEY_ENABLED = bool(strtobool(os.getenv('SHARE_SURVEY_ENABLED', "True")))
-
+    MAX_SHARED_SURVEY = int(os.getenv('MAX_SHARED_SURVEY', '50'))
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True

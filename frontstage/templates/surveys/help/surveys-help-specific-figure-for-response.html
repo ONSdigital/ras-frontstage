@@ -17,15 +17,18 @@
     "url": "/surveys/help/"~short_name~"/"~business_id~"/"~option
   }
 ] %}
-
-{% block main %}
+{% block breadcrumb %}
 {{
     onsBreadcrumb({
         "ariaLabel": "Breadcrumbs",
         "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
+        "itemsList": breadcrumbsData,
+        "classes": "u-pt-no"
     })
 }}
+{% endblock breadcrumb %}
+{% block main %}
+
 <h1 class="u-fs-xl">I don't have specific figures for a response</h1>
 <p>We do not expect you to spend any great expense or time obtaining the information required.</p>
 <p>We use the aggregated data we receive from all businesses to measure changes in the economy so we will accept informed estimates.</p>

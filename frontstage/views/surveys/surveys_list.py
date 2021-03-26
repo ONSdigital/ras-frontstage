@@ -34,7 +34,7 @@ def get_survey_list(session, tag):
                                                                      survey_id=survey_id)
 
     sorted_survey_list = sorted(survey_list, key=lambda k: datetime.strptime(k['submit_by'], '%d %b %Y'), reverse=True)
-    bound_logger.info("Successfully retreived survey list")
+    bound_logger.info("Successfully retrieved survey list")
 
     unread_message_count = { 'unread_message_count': conversation_controller.try_message_count_from_session(session) }
     if tag == 'todo':

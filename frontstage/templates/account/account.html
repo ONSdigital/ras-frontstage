@@ -1,4 +1,4 @@
-{% extends "layouts/_twothirds.html" %}
+{% extends "layouts/_block_content.html" %}
 {% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/radios/_macro.njk" import onsRadios %}
@@ -11,17 +11,19 @@
     "url": "/surveys/todo"
   }
 ] %}
-
-{% block main %}
-{% set ns = namespace() %}
-{% include "radio-option-select-error-panel.html" %}
+{% block breadcrumb %}
 {{
     onsBreadcrumb({
         "ariaLabel": "Breadcrumbs",
         "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
+        "itemsList": breadcrumbsData,
+        "classes": "u-pt-no"
     })
 }}
+{% endblock breadcrumb %}
+{% block main %}
+{% set ns = namespace() %}
+{% include "radio-option-select-error-panel.html" %}
 <h1 class="u-fs-xl">Account details</h1>
 <dl class="metadata metadata__list grid grid--gutterless u-cf u-mb-l" title="" aria-label="">
   <dt class="metadata__term grid__col col-4@m">Name:</dt>
@@ -38,29 +40,44 @@
         {% if ns.optionError %}
                 {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
         {% endif %}
+        {% set radioComponent = {
+            "legend": "Choose an option",
+            "name": "option",
+            "id": "option",
+            "error": errorOption,
+        } %}
+        {% set radios = [] %}
+        {% do radios.append(
+            {
+                "id": "contact_details",
+                "label": {
+                "text": "Change my contact details"
+                },
+                "value": "contact_details"
+            }) %}
+        {% do radios.append(
+            {
+                "id": "change_password",
+                "label": {
+                    "text": "Change password"
+                },
+                "value": "change_password"
+            }
+            ) %}
+        {% if is_share_survey_enabled %}
+            {% do radios.append(
+            {
+                "id": "share_surveys",
+                "label": {
+                    "text": "Share access to my surveys"
+                },
+                "value": "share_surveys"
+            }
+            ) %}
+        {% endif %}
+        {% do radioComponent | setAttribute("radios", radios) %}
         {{
-            onsRadios({
-                "legend": "Choose an option",
-                "name": "option",
-                "id": "option",
-                "error": errorOption,
-                "radios": [
-                    {
-                        "id": "contact_details",
-                        "label": {
-                            "text": "Change my contact details"
-                        },
-                        "value": "contact_details"
-                    },
-                    {
-                        "id": "change_password",
-                        "label": {
-                            "text": "Change password"
-                        },
-                        "value": "change_password"
-                    }
-                ]
-            })
+            onsRadios(radioComponent)
         }}
 
 

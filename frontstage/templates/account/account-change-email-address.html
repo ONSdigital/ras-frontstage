@@ -1,4 +1,4 @@
-{% extends "layouts/_twothirds.html" %}
+{% extends "layouts/_block_content.html" %}
 {% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/button/_macro.njk" import onsButton %}
@@ -18,15 +18,17 @@
     "url": "/my-account/change-account-details"
   },
 ] %}
-
-{% block main %}
+{% block breadcrumb %}
 {{
     onsBreadcrumb({
         "ariaLabel": "Breadcrumbs",
         "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
+        "itemsList": breadcrumbsData,
+        "classes": "u-pt-no"
     })
 }}
+{% endblock breadcrumb %}
+{% block main %}
 {% with messages = get_flashed_messages() %}
     {% if messages %}
           <div class="panel panel--simple panel--success u-mb-m">

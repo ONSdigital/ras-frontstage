@@ -48,9 +48,9 @@
 {% include 'layouts/configs/service-links.html' %}
 {% include 'layouts/configs/footer.html' %}
 {% from "components/panel/_macro.njk" import onsPanel %}
-
 {%- block pageContent %}
   <div class="page__container container">
+   {% block breadcrumb %}{% endblock breadcrumb %}
     {% if availability_message %}
       {{ 
           onsPanel({
@@ -60,7 +60,7 @@
       }}
     {% endif %}
     <div class="grid">
-      <div class="grid__col col-12@m u-mt-s">
+      <div class="grid__col col-12@m u-mt-s u-pt-no">
         <main id="main-content" class="page__main {{ pageClasses }}">
           {%- block content %}{% endblock content -%}
         </main>
@@ -69,5 +69,4 @@
   </div>  
 {% endblock pageContent -%}
 {% block bodyEnd %}
-
 {% endblock %}

@@ -168,7 +168,8 @@ class RespondentStatus(enum.IntEnum):
 class OptionsForm(FlaskForm):
     option = RadioField('Label', choices=[
         ('value', 'contact_details'),
-        ('value', 'change_password')])
+        ('value', 'change_password'),
+        ('value', 'share_surveys')])
 
     def validate(self):
         if self.data['option'] is None:
@@ -181,6 +182,24 @@ class HelpOptionsForm(FlaskForm):
         ('value', 'help-completing-this-survey'),
         ('value', 'info-about-this-survey')
     ])
+
+    def validate(self):
+        if self.data['option'] is None:
+            return False
+        return True
+
+
+class AccountSurveyShareBusinessSelectForm(FlaskForm):
+    option = RadioField('Label')
+
+    def validate(self):
+        if self.data['option'] is None:
+            return False
+        return True
+
+
+class AccountSurveyShareSurveySelectForm(FlaskForm):
+    option = RadioField('Label')
 
     def validate(self):
         if self.data['option'] is None:
@@ -267,3 +286,16 @@ class ChangePasswordFrom(FlaskForm):
                 char.isdigit() for char in
                 new_password):
             raise ValidationError(app.config['PASSWORD_CRITERIA_ERROR_TEXT'])
+
+
+class AccountSurveyShareRecipientEmailForm(FlaskForm):
+    email_address = StringField(_('Enter recipient email address'),
+                                validators=[InputRequired(_("You need to enter an email address")),
+                                            Email(message=_('Invalid email address')),
+                                            Length(max=254,
+                                                   message=_('Your email must be less than 254 characters'))])
+
+    @staticmethod
+    def validate_email_address(_, field):
+        email = field.data
+        return _validate_email_address(email)

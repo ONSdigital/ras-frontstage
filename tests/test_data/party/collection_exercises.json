@@ -13,16 +13,6 @@
         "scheduledEndDateTime": "2021-01-31T00:00:00.000Z",
         "executedBy": null,
         "state": "LIVE",
-        "caseTypes": [
-            {
-                "actionPlanId": "2eda862b-e070-4836-b539-2f7339fb8910",
-                "sampleUnitType": "B"
-            },
-            {
-                "actionPlanId": "b2a00973-1f13-4de0-b05a-1762fe169bf2",
-                "sampleUnitType": "BI"
-            }
-        ],
         "exerciseRef": "201812",
         "userDescription": "December 2018",
         "created": "2019-11-27T13:36:04.924Z",
@@ -76,16 +66,6 @@
         "scheduledEndDateTime": "2020-02-28T00:00:00.000Z",
         "executedBy": null,
         "state": "LIVE",
-        "caseTypes": [
-            {
-                "actionPlanId": "675a6dac-2c2a-4db5-b052-2ace821825de",
-                "sampleUnitType": "B"
-            },
-            {
-                "actionPlanId": "a7e27c14-304b-48f8-86fb-3ffa101a3264",
-                "sampleUnitType": "BI"
-            }
-        ],
         "exerciseRef": "201801",
         "userDescription": "January 2018",
         "created": "2019-11-27T13:36:04.539Z",

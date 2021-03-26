@@ -10,15 +10,17 @@
     "url": "/surveys/todo"
   }
 ] %}
-
-{% block main %}
+{% block breadcrumb %}
 {{
     onsBreadcrumb({
         "ariaLabel": "Breadcrumbs",
         "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
+        "itemsList": breadcrumbsData,
+        "classes": "u-pt-no"
     })
 }}
+{% endblock breadcrumb %}
+{% block main %}
 {% set ns = namespace() %}
 {% include "radio-option-select-error-panel.html" %}
 

@@ -8,6 +8,8 @@ from tests.integration.mocked_services import encoded_jwt_token, respondent_part
     url_get_respondent_party, url_get_survey, business_party, survey
 
 url_get_business_details = f"{app.config['PARTY_URL']}/party-api/v1/businesses"
+url_get_user_count = f"{app.config['PARTY_URL']}/party-api/v1/share-survey-users-count"
+url_post_pending_shares = f"{app.config['PARTY_URL']}/party-api/v1/pending-shares"
 url_get_survey_second = f"{app.config['SURVEY_URL']}/surveys/02b9c366-7397-42f7-942a-76dc5876d86d"
 dummy_business = {'associations': [{'businessRespondentStatus': 'ACTIVE',
                                     'enrolments': [{'enrolmentStatus': 'ENABLED',
@@ -109,6 +111,7 @@ class TestSurveyList(unittest.TestCase):
         mock_request.get(url_get_business_details, status_code=200, json=[business_party])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
+        mock_request.get(url_get_user_count, status_code=200, json=2)
         with self.app.session_transaction() as mock_session:
             mock_session['share_survey_business_selected'] = business_party['id']
         response = self.app.post('/my-account/share-surveys/survey-selection',
@@ -122,6 +125,26 @@ class TestSurveyList(unittest.TestCase):
         self.assertIn("This is the person who will be able to respond to your surveys.".encode(), response.data)
         self.assertTrue('Continue'.encode() in response.data)
         self.assertTrue('Cancel'.encode() in response.data)
+
+    @requests_mock.mock()
+    def test_share_survey_select_option_selected_fails_max_user_validation(self, mock_request):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
+        mock_request.get(url_get_business_details, status_code=200, json=[business_party])
+        mock_request.get(url_get_survey, status_code=200, json=survey)
+        mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
+        mock_request.get(url_get_user_count, status_code=200, json=52)
+        with self.app.session_transaction() as mock_session:
+            mock_session['share_survey_business_selected'] = business_party['id']
+        response = self.app.post('/my-account/share-surveys/survey-selection',
+                                 data={"checkbox-answer": ['02b9c366-7397-42f7-942a-76dc5876d86d']},
+                                 follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("There is 1 error on this page".encode(), response.data)
+        self.assertIn("You have reached the maximum amount of emails you can enroll on one or more surveys".encode(),
+                      response.data)
+        self.assertIn("Deselect the survey/s to continue or call 0300 1234 931 to discuss your options.".encode(),
+                      response.data)
 
     @requests_mock.mock()
     def test_share_survey_recipient_email_not_entered(self, mock_request):
@@ -188,6 +211,8 @@ class TestSurveyList(unittest.TestCase):
         mock_request.get(url_get_business_details, status_code=200, json=[business_party])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
+        mock_request.post(url_post_pending_shares, status_code=201, json={'created': 'success'})
+
         with self.app.session_transaction() as mock_session:
             mock_session['share_survey_business_selected'] = business_party['id']
             mock_session['share_survey_surveys_selected'] = [survey['id']]

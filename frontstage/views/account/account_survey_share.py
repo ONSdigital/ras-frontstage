@@ -67,6 +67,9 @@ def share_survey_survey_select(session):
 
 
 def validate_max_shared_survey():
+    """
+        This is a validation for maximum user reached against a survey
+    """
     business = flask_session['share_survey_business_selected']
     share_survey_surveys_selected = flask_session['share_survey_surveys_selected']
     for survey_selected in share_survey_surveys_selected:
@@ -131,11 +134,13 @@ def build_payload():
     business_id = flask_session['share_survey_business_selected']
     share_survey_surveys_selected = flask_session['share_survey_surveys_selected']
     payload = {}
+    pending_shares = []
 
     for survey in share_survey_surveys_selected:
-        business = {'survey_id': survey, 'email_address': email}
-        payload[business_id] = business
+        pending_share = {'business_id': business_id, 'survey_id': survey, 'email_address': email}
+        pending_shares.append(pending_share)
 
+    payload['pending_shares'] = pending_shares
     return json.dumps(payload)
 
 

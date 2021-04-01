@@ -130,6 +130,22 @@ def send_instruction_get(session):
 
 
 def build_payload():
+    """
+        This method builds payload required for the party endpoint to register new pending shares.
+        TODO: The logic should change for multiple business once the story is in play.
+        payload example:
+        {  pending_shares: [{
+            "business_id": "business_id"
+            "survey_id": "survey_id",
+            "email_address": "email_address"
+        },
+        {
+            "business_id": "business_id":
+            "survey_id": "survey_id",
+            "email_address": "email_address"
+        }]
+        }
+    """
     email = flask_session['share_survey_recipient_email_address']
     business_id = flask_session['share_survey_business_selected']
     share_survey_surveys_selected = flask_session['share_survey_surveys_selected']

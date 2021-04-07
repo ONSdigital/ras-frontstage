@@ -579,7 +579,7 @@ def get_user_count_registered_against_business_and_survey(business_id, survey_id
         'business_id': business_id,
         'survey_id': survey_id,
     }
-    response = requests.get(url, json=data, auth=app.config['BASIC_AUTH'])
+    response = requests.get(url, params=data, auth=app.config['BASIC_AUTH'])
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:

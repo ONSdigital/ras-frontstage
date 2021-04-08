@@ -8,7 +8,7 @@ from werkzeug.utils import redirect
 
 from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
-from frontstage.controllers import survey_controller
+from frontstage.controllers import survey_controller, party_controller
 from frontstage.controllers.party_controller import get_list_of_business_for_party, \
     get_surveys_listed_against_party_and_business_id, get_business_by_id, \
     get_user_count_registered_against_business_and_survey, register_pending_shares
@@ -129,7 +129,7 @@ def send_instruction_get(session):
                            business_name=selected_business[0]['name'])
 
 
-def build_payload():
+def build_payload(respondent_id):
     """
         This method builds payload required for the party endpoint to register new pending shares.
         TODO: The logic should change for multiple business once the story is in play.
@@ -137,12 +137,14 @@ def build_payload():
         {  pending_shares: [{
             "business_id": "business_id"
             "survey_id": "survey_id",
-            "email_address": "email_address"
+            "email_address": "email_address",
+            "shared_by": "respondent_id"
         },
         {
             "business_id": "business_id":
             "survey_id": "survey_id",
-            "email_address": "email_address"
+            "email_address": "email_address",
+            "shared_by": "respondent_id"
         }]
         }
     """
@@ -151,9 +153,11 @@ def build_payload():
     share_survey_surveys_selected = flask_session['share_survey_surveys_selected']
     payload = {}
     pending_shares = []
-
     for survey in share_survey_surveys_selected:
-        pending_share = {'business_id': business_id, 'survey_id': survey, 'email_address': email}
+        pending_share = {'business_id': business_id,
+                         'survey_id': survey,
+                         'email_address': email,
+                         'shared_by': respondent_id}
         pending_shares.append(pending_share)
 
     payload['pending_shares'] = pending_shares
@@ -165,9 +169,11 @@ def build_payload():
 def send_instruction(session):
     form = ConfirmEmailChangeForm(request.values)
     email = flask_session['share_survey_recipient_email_address']
+    party_id = session.get_party_id()
+    respondent_details = party_controller.get_respondent_party_by_id(party_id)
     if form['email_address'].data != email:
         raise ShareSurveyProcessError('Process failed due to session error')
-    json_data = build_payload()
+    json_data = build_payload(respondent_details['respondent_id'])
     register_pending_shares(json_data)
     return render_template('surveys/surveys-share/almost-done.html')
 

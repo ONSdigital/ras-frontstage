@@ -138,13 +138,13 @@ def build_payload(respondent_id):
             "business_id": "business_id"
             "survey_id": "survey_id",
             "email_address": "email_address",
-            "shared_by": "respondent_id"
+            "shared_by": "party_uuid"
         },
         {
             "business_id": "business_id":
             "survey_id": "survey_id",
             "email_address": "email_address",
-            "shared_by": "respondent_id"
+            "shared_by": "party_uuid"
         }]
         }
     """
@@ -173,7 +173,7 @@ def send_instruction(session):
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
     if form['email_address'].data != email:
         raise ShareSurveyProcessError('Process failed due to session error')
-    json_data = build_payload(respondent_details['respondent_id'])
+    json_data = build_payload(respondent_details['id'])
     register_pending_shares(json_data)
     return render_template('surveys/surveys-share/almost-done.html')
 

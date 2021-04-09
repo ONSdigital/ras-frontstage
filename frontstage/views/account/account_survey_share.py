@@ -1,3 +1,4 @@
+import json
 import logging
 
 from flask import render_template, request, flash, url_for
@@ -7,9 +8,10 @@ from werkzeug.utils import redirect
 
 from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
-from frontstage.controllers import survey_controller
+from frontstage.controllers import survey_controller, party_controller
 from frontstage.controllers.party_controller import get_list_of_business_for_party, \
-    get_surveys_listed_against_party_and_business_id, get_business_by_id
+    get_surveys_listed_against_party_and_business_id, get_business_by_id, \
+    get_user_count_registered_against_business_and_survey, register_pending_shares
 from frontstage.exceptions.exceptions import ShareSurveyProcessError
 from frontstage.models import AccountSurveyShareBusinessSelectForm, AccountSurveyShareRecipientEmailForm, \
     ConfirmEmailChangeForm
@@ -54,11 +56,29 @@ def share_survey_post_business_select(session):
 @jwt_authorization(request)
 def share_survey_survey_select(session):
     party_id = session.get_party_id()
-    surveys = get_surveys_listed_against_party_and_business_id(flask_session['share_survey_business_selected'], party_id)
+    surveys = get_surveys_listed_against_party_and_business_id(flask_session['share_survey_business_selected'],
+                                                               party_id)
+    is_max_share_survey = request.args.get('max_share_survey', False)
     flask_session['share_survey_surveys_selected'] = None
     selected_business = get_business_by_id([flask_session['share_survey_business_selected']])
     return render_template('surveys/surveys-share/survey-select.html',
-                           surveys=surveys, business_name=selected_business[0]['name'])
+                           surveys=surveys, business_name=selected_business[0]['name'],
+                           is_max_share_survey=is_max_share_survey)
+
+
+def validate_max_shared_survey():
+    """
+        This is a validation for maximum user reached against a survey
+    """
+    business = flask_session['share_survey_business_selected']
+    share_survey_surveys_selected = flask_session['share_survey_surveys_selected']
+    for survey_selected in share_survey_surveys_selected:
+        logger.info('Getting count of users registered against business and survey',
+                    business_id=business, survey_id=survey_selected)
+        user_count = get_user_count_registered_against_business_and_survey(business, survey_selected)
+        if user_count > app.config['MAX_SHARED_SURVEY']:
+            return False
+    return True
 
 
 @account_bp.route('/share-surveys/survey-selection', methods=['POST'])
@@ -69,9 +89,8 @@ def share_survey_post_survey_select(session):
     if len(share_survey_surveys_selected) == 0:
         flash('You need to select a survey')
         return redirect(url_for('account_bp.share_survey_survey_select'))
-    for survey_selected in share_survey_surveys_selected:
-        # TODO validate of maximum users and reroute for validation failure
-        logger.info('Maximum users step is still to be completed')
+    if not validate_max_shared_survey():
+        return redirect(url_for('account_bp.share_survey_survey_select', max_share_survey=True))
 
     return redirect(url_for('account_bp.share_survey_email_entry'))
 
@@ -110,15 +129,52 @@ def send_instruction_get(session):
                            business_name=selected_business[0]['name'])
 
 
+def build_payload(respondent_id):
+    """
+        This method builds payload required for the party endpoint to register new pending shares.
+        TODO: The logic should change for multiple business once the story is in play.
+        payload example:
+        {  pending_shares: [{
+            "business_id": "business_id"
+            "survey_id": "survey_id",
+            "email_address": "email_address",
+            "shared_by": "party_uuid"
+        },
+        {
+            "business_id": "business_id":
+            "survey_id": "survey_id",
+            "email_address": "email_address",
+            "shared_by": "party_uuid"
+        }]
+        }
+    """
+    email = flask_session['share_survey_recipient_email_address']
+    business_id = flask_session['share_survey_business_selected']
+    share_survey_surveys_selected = flask_session['share_survey_surveys_selected']
+    payload = {}
+    pending_shares = []
+    for survey in share_survey_surveys_selected:
+        pending_share = {'business_id': business_id,
+                         'survey_id': survey,
+                         'email_address': email,
+                         'shared_by': respondent_id}
+        pending_shares.append(pending_share)
+
+    payload['pending_shares'] = pending_shares
+    return json.dumps(payload)
+
+
 @account_bp.route('/share-surveys/send-instruction', methods=['POST'])
 @jwt_authorization(request)
 def send_instruction(session):
     form = ConfirmEmailChangeForm(request.values)
     email = flask_session['share_survey_recipient_email_address']
+    party_id = session.get_party_id()
+    respondent_details = party_controller.get_respondent_party_by_id(party_id)
     if form['email_address'].data != email:
         raise ShareSurveyProcessError('Process failed due to session error')
-    # TODO for each survey selected in session new row is written to the new survey share table
-    # TODO Call given to send confirmation email to the recipient email address
+    json_data = build_payload(respondent_details['id'])
+    register_pending_shares(json_data)
     return render_template('surveys/surveys-share/almost-done.html')
 
 

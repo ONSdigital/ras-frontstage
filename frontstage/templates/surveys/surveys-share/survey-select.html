@@ -3,6 +3,7 @@
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/checkboxes/_macro.njk" import onsCheckboxes %}
 {% from "components/button/_macro.njk" import onsButton %}
+{% from "components/lists/_macro.njk" import onsList %}
 {% set page_title = "Survey share survey select" %}
 {% set breadcrumbsData = [
   {
@@ -34,6 +35,32 @@
 {% block main %}
 {% set ns = namespace (checkbox = 'true') %}
 {% include "radio-option-select-error-panel.html" %}
+{% if is_max_share_survey %}
+    {% set ns.optionError = true %}
+    {% set ns.optionErrorMessage = 'Deselect the survey/s to continue or call 0300 1234 931 to discuss your options.' %}
+    {% set errorTitle = 'There is 1 error on this page' %}
+    {% set message = 'You have reached the maximum amount of emails you can enroll on one or more surveys' %}
+                {% call
+                    onsPanel({
+                        "type": "error",
+                        "classes": "u-mb-s",
+                        "title":  errorTitle
+                    })
+                  %}
+                  {{
+                    onsList({
+                        "element": "ol",
+                        "itemsList": [
+                        {
+                            "text": message,
+                            "url": "#option_error",
+                            "classes": "js-inpagelink"
+                        }
+                        ]
+                    })
+                }}
+                {% endcall %}
+{% endif %}
 
 <h1>Which surveys do you want to share?</h1>
 {% set checkboxData = [] %}

@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 
 import requests
@@ -562,3 +563,42 @@ def get_surveys_listed_against_party_and_business_id(business_id, party_id):
         response = survey_controller.get_survey(app.config['SURVEY_URL'], app.config['BASIC_AUTH'], survey)
         surveys.append(response)
     return surveys
+
+
+def get_user_count_registered_against_business_and_survey(business_id, survey_id):
+    """
+    returns total number of users registered against a business and survey
+    :param business_id: business id
+    :param survey_id: The survey id
+    :return: total number of users
+    :rtype: int
+    """
+    logger.info('Attempting to get user count', business_ids=business_id, survey_id=survey_id)
+    url = f'{app.config["PARTY_URL"]}/party-api/v1/share-survey-users-count'
+    data = {
+        'business_id': business_id,
+        'survey_id': survey_id,
+    }
+    response = requests.get(url, params=data, auth=app.config['BASIC_AUTH'])
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        raise ApiError(logger, response)
+    return response.json()
+
+
+def register_pending_shares(payload):
+    """
+    register new entries to party for pending shares
+    :param payload: pending shares entries dict
+    :return: success if post completed
+    :rtype: dict
+    """
+    logger.info('Attempting register pending shares')
+    url = f'{app.config["PARTY_URL"]}/party-api/v1/pending-shares'
+    response = requests.post(url, json=json.loads(payload), auth=app.config['BASIC_AUTH'])
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        raise ApiError(logger, response)
+    return response.json()

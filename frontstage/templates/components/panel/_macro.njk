@@ -14,12 +14,20 @@
         {% set typeClass = ' panel--info' %}
     {% endif %}
 
+    {% if params is defined and params.type == "warn-branded" %}
+        {% set containerClass = 'census-warning' %}
+    {% endif %}
+
+    {% if params is defined and params.type == "announcement" %}
+        {% set containerClass = 'announcement' %}
+    {% endif %}
+
     {% if params is defined and params and params.spacious is defined and params.spacious %}
         {% set spaciousClass = ' panel--spacious' %}
     {% endif %}
 
-    {% if params is defined and params and params.type == "warn-branded" %}
-    <div class="census-warning">
+    {% if params is defined and params and params.type == "warn-branded" or params.type == "announcement" %}
+    <div class="{{containerClass}}">
         <div class="container">
     {% endif %}
 
@@ -72,7 +80,7 @@
 
         </div>
 
-    {% if params is defined and params and params.type == "warn-branded" %}
+    {% if params is defined and params and params.type == "warn-branded" or params.type == "announcement"  %}
         </div>
     </div>
     {% endif %}

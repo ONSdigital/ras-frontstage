@@ -1,4 +1,4 @@
-{% set release_version = '32.0.1' %}
+{% set release_version = '32.2.2' %}
 {% from "components/skip-to-content/_macro.njk" import onsSkipToContent %}
 {% from "components/header/_macro.njk" import onsHeader %}
 {% from "components/footer/_macro.njk" import onsFooter %}
@@ -78,7 +78,7 @@
             <meta name="twitter:url" content="{{ pageConfig.headMeta.canonicalUrl | default(pageConfig.absoluteUrl) }}">
             <meta name="twitter:title" content="{{ pageConfig.headMeta.title | default(pageConfig.title) }}">
             <meta name="twitter:description" content="{{ pageConfig.headMeta.description | default(pageConfig.description) }}">
-            <meta name="twitter:image" content="{{ assetsURL }}/favicons/{{ metaicons }}opengraph.png">
+            <meta name="twitter:image" content="{{ assetsURL }}/favicons/{{ metaicons }}twitter.png">
 
             <!-- Canonical -->
             <link rel="canonical" href="{{ pageConfig.headMeta.canonicalUrl | default(pageConfig.absoluteUrl) }}">
@@ -106,7 +106,7 @@
 
     </head>
     <body{% if pageConfig.bodyClasses is defined and pageConfig.bodyClasses %} class="{{ pageConfig.bodyClasses }}"{% endif %}>
-            <script{% if csp_nonce is defined and csp_nonce %} nonce="{{ csp_nonce() }}"{% endif %}>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
+        <script{% if pageConfig.cspNonce is defined and pageConfig.cspNonce %} nonce="{{ pageConfig.cspNonce }}"{% elif pageConfig.cspNonce is not defined and csp_nonce is defined and csp_nonce %} nonce="{{ csp_nonce() }}"{% endif %}>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
         {% block bodyStart %}{% endblock %}
         {% block body %}
             <div class="page">
@@ -212,7 +212,7 @@
             {% set scripts = assetsURL + "/scripts/main.js" %}
         {% endif %}
 
-        <script{% if csp_nonce %} nonce="{{ csp_nonce() }}"{% endif %}>
+        <script{% if pageConfig.cspNonce is defined and pageConfig.cspNonce %} nonce="{{ pageConfig.cspNonce }}"{% elif pageConfig.cspNonce is not defined and csp_nonce is defined and csp_nonce %} nonce="{{ csp_nonce() }}"{% endif %}>
             (function() {
                 {% if assetsURL is defined and assetsURL -%}window.ONS_assets_base_URL = "{{ assetsURL }}/";{%- endif %}
                 var s = '{{ scripts | safe }}'.split(','),

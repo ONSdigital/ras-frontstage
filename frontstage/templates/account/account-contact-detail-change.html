@@ -9,11 +9,13 @@
 {% set breadcrumbsData = [
   {
     "text": "Surveys",
-    "url": "/surveys/todo"
+    "url": "/surveys/todo",
+    "id": "b-item-1"
   },
   {
     "text": "Account",
-    "url": "/my-account"
+    "url": "/my-account",
+    "id": "b-item-2"
   }
 ] %}
 {% block breadcrumb %}
@@ -21,8 +23,7 @@
     onsBreadcrumb({
         "ariaLabel": "Breadcrumbs",
         "id": "breadcrumbs",
-        "itemsList": breadcrumbsData,
-        "classes": "u-pt-no"
+        "itemsList": breadcrumbsData
     })
 }}
 {% endblock breadcrumb %}

@@ -6,15 +6,18 @@
 {% set breadcrumbsData = [
   {
     "text": "Surveys",
-    "url": "/surveys/todo"
+    "url": "/surveys/todo",
+    "id": "b-item-1"
   },
   {
     "text": "Help",
-    "url": "/surveys/help/"~short_name~"/"~business_id
+    "url": "/surveys/help/"~short_name~"/"~business_id,
+    "id": "b-item-2"
   },
   {
     "text": "Help completing this survey",
-    "url": "/surveys/help/"~short_name~"/"~business_id~"/"~option
+    "url": "/surveys/help/"~short_name~"/"~business_id~"/"~option,
+    "id": "b-item-3"
   }
 ] %}
 {% block breadcrumb %}
@@ -22,8 +25,7 @@
     onsBreadcrumb({
         "ariaLabel": "Breadcrumbs",
         "id": "breadcrumbs",
-        "itemsList": breadcrumbsData,
-        "classes": "u-pt-no"
+        "itemsList": breadcrumbsData
     })
 }}
 {% endblock breadcrumb %}

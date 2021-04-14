@@ -92,21 +92,50 @@ def convert_events_to_new_format(events):
             "date": date_time.strftime(date_format),
             "month": date_time.strftime('%m'),
             "is_in_future": date_time > parse_date(datetime.now().isoformat()),
-            "formatted_date": custom_date('{S} %B %Y, %H:%M', date_time),
-            "due_time": due_date(date_time)
+            "formatted_date": ordinal_date_formatter('{S} %B %Y, %H:%M', date_time),
+            "due_time": due_date_convertor(date_time)
         }
     return formatted_events
 
 
-def suffix(d):
-    return 'th' if 11 <= d <= 13 else {1: 'st', 2: 'nd', 3: 'rd'}.get(d % 10, 'th')
+def suffix(day: int):
+    """
+    This function creates the ordinal suffix
+
+    :param: day of the date time object
+    :return: ordinal suffix
+    """
+    return 'th' if 11 <= day <= 13 else {1: 'st', 2: 'nd', 3: 'rd'}.get(day % 10, 'th')
 
 
-def custom_date(day, t):
-    return t.strftime(day).replace('{S}', str(t.day) + suffix(t.day))
+def ordinal_date_formatter(date_format_required: str, date_to_be_formatted: datetime):
+    """
+    This function takes the required output format and date to be formatted and returns the ordinal date in required
+    format.
+
+    :param: date_format_required: output format in which date should be returned
+    :param: date_to_be_formatted: the datetime object which needs ordinal date
+    :return: formatted date
+    """
+    return date_to_be_formatted. \
+        strftime(date_format_required).replace('{S}', str(date_to_be_formatted.day) + suffix(date_to_be_formatted.day))
 
 
-def due_date(date: datetime):
+def due_date_convertor(date: datetime):
+    """
+    This function provides the custom due date based on the difference between now and the date passed.
+    The logic for the due date is based on the following.
+    Due date is today - Due today
+    Due date is tomorrow - Due tomorrow
+    Due date is 2-28 days - Due in X days
+    Due date is 29-59 days - Due in a month
+    Due date is 60-89 days - Due in 2 months
+    Due date is 90-119 days - Due in 3 months
+    Due date is 120+ days - Due in over 3 months
+
+    :param: date: the datetime date for which due date is to be evaluated.
+    :return: due date
+    """
     now = datetime.now()
     event_day = datetime(date.year, date.month, date.day)
     today = return_date_time(now)
@@ -133,11 +162,10 @@ def due_date(date: datetime):
         return 'Due in over 3 months'
 
 
-def return_date_time(now: datetime):
-    return datetime(now.year, now.month, now.day)
-
-
-def number_of_day_diff(day):
-    today = datetime.strptime(date_format, datetime.now())
-    delta = today - day
-    return delta.days
+def return_date_time(timedelta_now: datetime):
+    """
+    This function is a part of the refactor code to return date  time in the following format
+    :timedelta_now: datetime with delta
+    :return:datetime
+    """
+    return datetime(timedelta_now.year, timedelta_now.month, timedelta_now.day)

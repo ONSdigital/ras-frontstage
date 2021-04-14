@@ -20,10 +20,9 @@
                     <dt class="u-ml-no u-mb-xs u-pr-xs u-fs-s">RU ref: {{ survey.business_ref }}</dt>
                 </div>
                 <div class="grid__col col-4@m u-pt-no u-pb-no">
-                    <dt class="u-vh">Due</dt>
-                    <dd class="u-fs-r u-ml-no u-mb-xs" style="line-height:1">
+                    <dt class="u-fs-r u-ml-no u-mb-xs" style="line-height:1">
                         <strong>{{ survey.due_in }}</strong>
-                    </dd>
+                    </dt>
                     <dt class="u-ml-no u-mb-xs u-pr-xs u-fs-s">Submit by: {{ survey.formatted_submit_by }}</dt>
                 </div>
                 {% if survey.status == 'Not started' %}

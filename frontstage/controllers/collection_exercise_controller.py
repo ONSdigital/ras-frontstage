@@ -93,7 +93,7 @@ def convert_events_to_new_format(events):
             "month": date_time.strftime('%m'),
             "is_in_future": date_time > parse_date(datetime.now().isoformat()),
             "formatted_date": ordinal_date_formatter('{S} %B %Y, %H:%M', date_time),
-            "due_time": due_date_convertor(date_time)
+            "due_time": due_date_converter(date_time)
         }
     return formatted_events
 
@@ -121,7 +121,7 @@ def ordinal_date_formatter(date_format_required: str, date_to_be_formatted: date
         strftime(date_format_required).replace('{S}', str(date_to_be_formatted.day) + suffix(date_to_be_formatted.day))
 
 
-def due_date_convertor(date: datetime):
+def due_date_converter(date: datetime) -> str:
     """
     This function provides the custom due date based on the difference between now and the date passed.
     The logic for the due date is based on the following.
@@ -162,7 +162,7 @@ def due_date_convertor(date: datetime):
         return 'Due in over 3 months'
 
 
-def return_date_time(timedelta_now: datetime):
+def return_date_time(timedelta_now: datetime) -> datetime:
     """
     This function is a part of the refactor code to return date  time in the following format
     :timedelta_now: datetime with delta

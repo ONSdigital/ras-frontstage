@@ -50,7 +50,7 @@ class TestSurveyList(unittest.TestCase):
         mock_request.get(url_get_business_details, status_code=200, json=[dummy_business])
         response = self.app.get('/my-account/share-surveys/business-selection')
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Which of your business’s surveys do you want to share?'.encode() in response.data)
+        self.assertTrue('For which business do you want to share your surveys?'.encode() in response.data)
         self.assertTrue('Choose a business'.encode() in response.data)
         self.assertTrue('RUNAME1_COMPANY1 RUNNAME2_COMPANY1'.encode() in response.data)
         self.assertTrue('Continue'.encode() in response.data)
@@ -66,7 +66,7 @@ class TestSurveyList(unittest.TestCase):
                                  follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("There is 1 error on this page".encode(), response.data)
-        self.assertIn("You need to choose a business".encode(), response.data)
+        self.assertIn("Choose an answer".encode(), response.data)
 
     @requests_mock.mock()
     def test_share_survey_select(self, mock_request):
@@ -101,7 +101,7 @@ class TestSurveyList(unittest.TestCase):
                                  follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("There is 1 error on this page".encode(), response.data)
-        self.assertIn("You need to select a survey".encode(), response.data)
+        self.assertIn("Select at least one answer".encode(), response.data)
         self.assertIn("You need to choose at least one option".encode(), response.data)
 
     @requests_mock.mock()

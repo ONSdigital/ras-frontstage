@@ -433,6 +433,8 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
                 'business_ref': business_party['sampleUnitRef'],
                 'period': collection_exercise['userDescription'],
                 'submit_by': collection_exercise['events']['return_by']['date'],
+                'formatted_submit_by': collection_exercise['events']['return_by']['formatted_date'],
+                'due_in': collection_exercise['events']['return_by']['due_time'],
                 'collection_exercise_ref': collection_exercise['exerciseRef'],
                 'added_survey': added_survey,
                 'display_button': display_access_button

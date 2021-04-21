@@ -46,7 +46,7 @@ def share_survey_business_select(session):
 def share_survey_post_business_select(session):
     form = AccountSurveyShareBusinessSelectForm(request.values)
     if not form.validate():
-        flash('You need to choose a business')
+        flash('Choose an answer')
         return redirect(url_for('account_bp.share_survey_business_select'))
     flask_session['share_survey_business_selected'] = form.data['option']
     return redirect(url_for('account_bp.share_survey_survey_select'))
@@ -87,7 +87,7 @@ def share_survey_post_survey_select(session):
     share_survey_surveys_selected = request.form.getlist("checkbox-answer")
     flask_session['share_survey_surveys_selected'] = share_survey_surveys_selected
     if len(share_survey_surveys_selected) == 0:
-        flash('You need to select a survey')
+        flash('Select at least one answer')
         return redirect(url_for('account_bp.share_survey_survey_select'))
     if not validate_max_shared_survey():
         return redirect(url_for('account_bp.share_survey_survey_select', max_share_survey=True))

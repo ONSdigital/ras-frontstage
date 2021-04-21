@@ -77,12 +77,13 @@
     {% endif %}
 
 <h1>Enter recipient's email address</h1>
+<p>We need the email address of the person who will be responding to your surveys.</p>
 {% set checkboxData = [] %}
 <form action="" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         {% call onsPanel({}) %}
             <div>
-                Make sure you have permission from the recipient to provide their email address to us.
+                Make sure you have their permission to give us their email address.
             </div>
         {% endcall %}
         {% if errors.email_address %}
@@ -95,8 +96,7 @@
                     "name": "email_address",
                     "type": "text",
                     "label": {
-                        "text": "Recipient's email address",
-                        "description": "This is the person who will be able to respond to your surveys."
+                        "text": "Enter email address"
                     },
                     "error": errorEmailAddress,
                     "value": emailAddress,

@@ -12,14 +12,16 @@
                 <dt class="u-ml-no u-mb-xs u-pr-xs u-fs-s">RU ref: {{ survey.business_ref }}</dt>
             </div>
             <div class="grid__col col-4@m u-pt-no u-pb-xs">
+                {% if survey.status == 'Complete' %}
                 <dt class="u-fs-r u-ml-no u-mb-xs" style="line-height:1">
                     <strong>{{ survey.due_in }}</strong>
                 </dt>
+                {% endif %}
                 <dt class="u-ml-no u-mb-xs u-pr-xs u-fs-s">Submit by: {{ survey.formatted_submit_by }}</dt>
             </div>
             {% if survey.status == 'Not started' %}
                 {% set status_class = 'status--dead' %}
-            {% elif survey.status == 'Downloaded' or survey.status == 'In progress' %}
+            {% elif survey.status == 'Downloaded' or survey.status == 'In progress' or survey.status == 'Complete' %}
                 {% set status_class = 'status--success' %}
             {% else %}
                 {% set status_class = 'status--error' %}

@@ -13,7 +13,7 @@
     "url": "/help"
   },
   {
-    "text": "Information about the Ons",
+    "text": "Information about the ONS",
     "url": "/help/info-ons"
   }
 ] %}
@@ -28,11 +28,11 @@
 {% endblock breadcrumb %}
 
 {% block main %}
-<h1 class="u-fs-xl">Information about the ONS</h1>
-<p>You will find information about the ONS <a href="https://www.ons.gov.uk/aboutus" class="icon--external-link" target="_blank" rel="noopener">on our website</a>
+<h1 class="u-fs-xl">Information about the Office for National Statistics (ONS)</h1>
+<p>Find out more <a href="https://www.ons.gov.uk/aboutus" class="icon--external-link" target="_blank" rel="noopener">information about the ONS</a>
 </p>
 <h2>Need more information?</h2>
-<p><a href="{{ url_for('sign_in_bp.login') }}" rel="noopener">Sign in</a> to send a secure message.</p>
-<p>If you are unable to sign in you can <a href="{{ url_for('contact_us_bp.contact_us') }}" rel="noopener">Contact us</a>.</p>
+<p><a href="{{ url_for('sign_in_bp.login') }}" rel="noopener">Sign in to your account</a> to send us a secure message.</p>
+<p>If you are having problems signing in, please <a href="{{ url_for('contact_us_bp.contact_us') }}" rel="noopener">contact us</a>.</p>
 <p></p>
 {% endblock main %}

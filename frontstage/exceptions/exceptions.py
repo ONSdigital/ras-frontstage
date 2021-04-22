@@ -108,3 +108,9 @@ class RasNotifyError(Exception):
         self.error = error
         for k, v in kwargs.items():
             self.__dict__[k] = v
+
+
+class ShareSurveyProcessError(Exception):
+    def __init__(self, message):
+        super().__init__()
+        self.message = message

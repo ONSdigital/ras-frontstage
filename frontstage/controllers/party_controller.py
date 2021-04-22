@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 
 import requests
@@ -432,6 +433,8 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
                 'business_ref': business_party['sampleUnitRef'],
                 'period': collection_exercise['userDescription'],
                 'submit_by': collection_exercise['events']['return_by']['date'],
+                'formatted_submit_by': collection_exercise['events']['return_by']['formatted_date'],
+                'due_in': collection_exercise['events']['return_by']['due_time'],
                 'collection_exercise_ref': collection_exercise['exerciseRef'],
                 'added_survey': added_survey,
                 'display_button': display_access_button
@@ -510,3 +513,94 @@ def notify_party_and_respondent_account_locked(respondent_id, email_address, sta
         raise ApiError(logger, response)
 
     bound_logger.info('Successfully notified respondent and party service that account is locked')
+
+
+def get_list_of_business_for_party(party_id):
+    """
+    Gets the details for the businesses associated with a respondent
+    :param party_id: respondent party id
+    :type party_id: str
+    :return: list of businesses
+    :rtype: dict
+    """
+    bound_logger = logger.bind(party_id=party_id)
+    bound_logger.info('Getting enrolment data for the party')
+    enrolment_data = get_respondent_enrolments(party_id)
+    business_ids = {enrolment['business_id'] for enrolment in enrolment_data}
+    bound_logger.info('Getting businesses against business ids', business_ids=business_ids)
+    return get_business_by_id(business_ids)
+
+
+def get_business_by_id(business_ids):
+    """
+    Gets the business details for all the business_id's that are provided (
+    :param business_ids: This takes a single business id or a list of business ids
+    :type business_ids: list
+    :return: business
+    :rtype: dict
+    """
+    logger.info('Attempting to fetch businesses', business_ids=business_ids)
+    params = {'id': business_ids}
+    url = f'{app.config["PARTY_URL"]}/party-api/v1/businesses'
+    response = requests.get(url, params=params, auth=app.config['BASIC_AUTH'])
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        raise ApiError(logger, response)
+    return response.json()
+
+
+def get_surveys_listed_against_party_and_business_id(business_id, party_id):
+    """
+    returns list of surveys associated with a business id and respondent
+    :param business_id: business id
+    :param party_id: The respondent's party id
+    :return: list of surveys
+    :rtype: list
+    """
+    enrolment_data = get_respondent_enrolments(party_id)
+    survey_ids = {enrolment['survey_id'] for enrolment in enrolment_data if enrolment['business_id'] == business_id}
+    surveys = []
+    for survey in survey_ids:
+        response = survey_controller.get_survey(app.config['SURVEY_URL'], app.config['BASIC_AUTH'], survey)
+        surveys.append(response)
+    return surveys
+
+
+def get_user_count_registered_against_business_and_survey(business_id, survey_id):
+    """
+    returns total number of users registered against a business and survey
+    :param business_id: business id
+    :param survey_id: The survey id
+    :return: total number of users
+    :rtype: int
+    """
+    logger.info('Attempting to get user count', business_ids=business_id, survey_id=survey_id)
+    url = f'{app.config["PARTY_URL"]}/party-api/v1/share-survey-users-count'
+    data = {
+        'business_id': business_id,
+        'survey_id': survey_id,
+    }
+    response = requests.get(url, params=data, auth=app.config['BASIC_AUTH'])
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        raise ApiError(logger, response)
+    return response.json()
+
+
+def register_pending_shares(payload):
+    """
+    register new entries to party for pending shares
+    :param payload: pending shares entries dict
+    :return: success if post completed
+    :rtype: dict
+    """
+    logger.info('Attempting register pending shares')
+    url = f'{app.config["PARTY_URL"]}/party-api/v1/pending-shares'
+    response = requests.post(url, json=json.loads(payload), auth=app.config['BASIC_AUTH'])
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        raise ApiError(logger, response)
+    return response.json()

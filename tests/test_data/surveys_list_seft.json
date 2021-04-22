@@ -35,15 +35,6 @@
       "scheduledEndDateTime": "2018-06-29T23:00:00.000+0000",
       "executedBy": "None",
       "state": "PUBLISHED",
-      "caseTypes": [
-        {
-          "actionPlanId": "e71002ac-3575-47eb-b87f-cd9db92bf9a7",
-          "sampleUnitType": "B"
-        }, {
-          "actionPlanId": "0009e978-0932-463b-a2a1-b45cb3ffcb2a",
-          "sampleUnitType": "BI"
-        }
-      ],
       "exerciseRef": "221_201712",
       "periodStartDateTimeFormatted": "14 Sep 2017",
       "periodEndDateTimeFormatted": "15 Sep 2017",
@@ -113,15 +104,6 @@
       "scheduledEndDateTime": "2018-06-29T23:00:00.000+0000",
       "executedBy": "None",
       "state": "PUBLISHED",
-      "caseTypes": [
-        {
-          "actionPlanId": "e71002ac-3575-47eb-b87f-cd9db92bf9a7",
-          "sampleUnitType": "B"
-        }, {
-          "actionPlanId": "0009e978-0932-463b-a2a1-b45cb3ffcb2a",
-          "sampleUnitType": "BI"
-        }
-      ],
       "exerciseRef": "221_201712",
       "periodStartDateTimeFormatted": "14 Sep 2017",
       "periodEndDateTimeFormatted": "15 Sep 2017",

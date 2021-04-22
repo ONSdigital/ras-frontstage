@@ -8,7 +8,6 @@ from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import party_controller, conversation_controller
 from frontstage.views.surveys import surveys_bp
 
-
 logger = wrap_logger(logging.getLogger(__name__))
 
 
@@ -33,10 +32,10 @@ def get_survey_list(session, tag):
     survey_list = party_controller.get_survey_list_details_for_party(party_id, tag, business_party_id=business_id,
                                                                      survey_id=survey_id)
 
-    sorted_survey_list = sorted(survey_list, key=lambda k: datetime.strptime(k['submit_by'], '%d %b %Y'), reverse=True)
-    bound_logger.info("Successfully retreived survey list")
+    sorted_survey_list = sorted(survey_list, key=lambda k: datetime.strptime(k['submit_by'], '%d %b %Y'))
+    bound_logger.info("Successfully retrieved survey list")
 
-    unread_message_count = { 'unread_message_count': conversation_controller.try_message_count_from_session(session) }
+    unread_message_count = {'unread_message_count': conversation_controller.try_message_count_from_session(session)}
     if tag == 'todo':
         added_survey = True if business_id and survey_id and not already_enrolled else None
         response = make_response(render_template('surveys/surveys-todo.html',
@@ -50,4 +49,4 @@ def get_survey_list(session, tag):
         return response
     else:
         return render_template('surveys/surveys-history.html', sorted_surveys_list=sorted_survey_list, history=True,
-            unread_message_count=unread_message_count)
+                               unread_message_count=unread_message_count)

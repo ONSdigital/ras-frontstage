@@ -1,41 +1,113 @@
 {% macro onsHero(params) %}
-    <section class="hero {% if params.darkTheme %}hero--dark-theme {% endif %}{% if params.image %}hero--with-image {% endif %}">
-        {% if params.image %}
-            <picture>
-                {% if params.image %}
-                    <source media="(max-width: 768px)" srcset="{{ params.image.mobileImageSrc }}">
+
+{% from "components/icons/_macro.njk" import onsIcon %}
+
+{# style adjustments if dark or light skin #}
+{% if params.censusThemeDark is defined and params.censusThemeDark %}
+    {% set skinName = "dark" %}
+{% else %}
+    {% set skinName = "light" %}
+{% endif %}
+
+{# If hero contains a collapsible, style it differently #}
+{% if params.collapsible is defined and params.collapsible %}
+    {% set containerClasses = " hero__container--has-collapsible" %}
+{% endif %}
+
+{# if hero is census specific, change column usage #}
+{% if params.censusTheme is defined and params.censusTheme %}
+    {% set detailsColumns = "6" %}
+{% else %}
+    {% set detailsColumns = "8" %}
+{% endif %}
+
+{# if hero style is a dark theme, change theme #}
+{% if params.censusThemeDark is defined and params.censusThemeDark %}
+    {% set detailsClasses = " hero__details--ondark" %}
+{% endif %}
+
+<section class="hero grid--gutterless{% if params.censusTheme is defined and params.censusTheme %} hero--census{% endif %}">
+
+    <div class="hero__container container{{ containerClasses }}">
+
+        <div class="hero__details{{ detailsClasses }} grid__col col-{{ detailsColumns }}@m">
+
+            <header>
+                {% if params.preTitleImage is defined and params.preTitleImage %}
+                    {% set preTitleImageWithModifier = params.preTitleImage.name|replace(r/(\.[^\.]+)$/, "--" + skinName + "$1") %}
+                    <img class="hero__pre-title" src="{{ params.placeholderURL }}/img/{{ preTitleImageWithModifier }}" alt="{{ params.preTitleImage.alt }}">
                 {% endif %}
-                <img class="hero__img" src="{{ params.image.src }}" alt="{{ params.image.alt }}">
-            </picture>
-        {% endif %}
-        <div class="hero__container">
-            <div class="hero__content grid grid--gutterless grid--flex grid--vertical-center">
-                <div class="container">
-                    <div class="grid__col col-8@m">
-                        <header>
-                            <h1 class="hero__title">{{ params.title }}</h1>
-                            {% if params.subtitle %}
-                                <h2 class="hero__subtitle u-fs-m">{{ params.subtitle }}</h2>
-                            {% endif %}
-                        </header>
-                        {% if params.text %}
-                            <p class="hero__text">{{ params.text | safe }}</p>
-                        {% endif %}
-                        {% if params.button %}
-                            {% from "components/button/_macro.njk" import onsButton %}
-                            {{
-                                onsButton({
-                                    "type": 'button',
-                                    "text": params.button.text,
-                                    "classes": 'u-mb-m',
-                                    "url": params.button.url,
-                                    "innerClasses": "icon--chevron-right-white"
-                                })
-                            }}
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+                {% if params.censusTheme is defined and params.censusTheme %}
+                    <h1 class="u-fs-xxxl">{{ params.title }}</h1>
+                {% else %}
+                    <h1 class="hero__title">{{ params.title }}</h1>
+                {% endif %}
+                {% if params.subtitle is defined and params.subtitle %}
+                    <h2 class="u-fs-r--b">{{ params.subtitle }}</h2>
+                {% endif %}
+            </header>
+
+            {% if params.text is defined and params.text %}
+                <p class="hero__text">{{ params.text | safe }}</p>
+            {% endif %}
+
+            {% if params.button is defined and params.button %}
+                {% from "components/button/_macro.njk" import onsButton %}
+                {{
+                    onsButton({
+                        "classes": params.button.classes,
+                        "type": 'button',
+                        "text": params.button.text,
+                        "url": params.button.url
+                    })
+                }}
+            {% endif %}
+
+            {% if params.collapsible is defined and params.collapsible %}
+                {% from "components/collapsible/_macro.njk" import onsCollapsible %}
+                {{
+                    onsCollapsible({
+                        "classes": 'u-mb-s ' + params.collapsible.classes,
+                        "id": params.collapsible.id,
+                        "title": params.collapsible.title,
+                        "titleTag": params.collapsible.titleTag,
+                        "content": params.collapsible.content,
+                        "button": {
+                            "close": params.collapsible.closeButtonText | default('Hide this'),
+                            "contextSuffix": params.collapsible.closeButtonContextSuffix | default('content')
+                        }
+                    })
+                }}
+            {% endif %}
+
+            {% if params.suffixText is defined and params.suffixText %}
+                <p class="hero__suffixText u-fs-s u-mt-m u-mb-no">{{ params.suffixText | safe }}</p>
+            {% endif %}
+
         </div>
-    </section>
+        {% if params.censusTheme is defined and params.censusTheme %}
+
+            {% if params.image is defined and params.image %}
+            <div class="hero__circle-image">
+                <img height="558" width="558" srcset="{{ params.image.smallSrc }} 1x, {{ params.image.largeSrc }} 2x" src="{{ params.image.smallSrc }}" alt="">
+            </div>
+            {% endif %}
+
+            {{
+                onsIcon({
+                    "icon": 'circle-lined'
+                })
+            }}
+
+            <div class="hero__circle-gradient"></div>
+
+            {% if params.censusThemeDark is not defined or params.censusThemeDark === false %}
+                <div class="hero__circle"></div>
+            {% endif %}
+
+        {% endif %}
+
+    </div>
+
+</section>
 {% endmacro %}

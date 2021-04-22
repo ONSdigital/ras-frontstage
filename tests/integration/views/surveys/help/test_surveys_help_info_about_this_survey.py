@@ -47,6 +47,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("Information about the Monthly Survey of Building Materials Bricks".encode(), response.data)
         self.assertIn("Continue".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)
+        self.assertIn("Help".encode(), response.data)
 
     @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')

@@ -8,15 +8,16 @@
 {% set breadcrumbsData = [
   {
     "text": "Surveys",
-    "url": "/surveys/todo"
+    "url": "/surveys/todo",
+    "id": "b-item-1"
   },
   {
     "text": "Help",
-    "url": "/surveys/help/"~short_name~"/"~business_id
+    "url": "/surveys/help/"~short_name~"/"~business_id,
+    "id": "b-item-2"
   }
 ] %}
-
-{% block main %}
+{% block breadcrumb %}
 {{
     onsBreadcrumb({
         "ariaLabel": "Breadcrumbs",
@@ -24,6 +25,8 @@
         "itemsList": breadcrumbsData
     })
 }}
+{% endblock breadcrumb %}
+{% block main %}
 {% set ns = namespace() %}
 {% include "radio-option-select-error-panel.html" %}
 <h1 class="u-fs-xl">Information about the {{ survey_name }}</h1>

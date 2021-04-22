@@ -1,4 +1,4 @@
-{% extends "layouts/_twothirds.html" %}
+{% extends "layouts/_block_content.html" %}
 {% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/button/_macro.njk" import onsButton %}
@@ -7,19 +7,21 @@
 {% set breadcrumbsData = [
   {
     "text": "Surveys",
-    "url": "/surveys/todo"
+    "url": "/surveys/todo",
+    "id": "b-item-1"
   },
   {
     "text": "Account",
-    "url": "/my-account"
+    "url": "/my-account",
+    "id": "b-item-2"
   },
   {
     "text": "Change your contact details",
-    "url": "/my-account/change-account-details"
+    "url": "/my-account/change-account-details",
+    "id": "b-item-3"
   },
 ] %}
-
-{% block main %}
+{% block breadcrumb %}
 {{
     onsBreadcrumb({
         "ariaLabel": "Breadcrumbs",
@@ -27,6 +29,8 @@
         "itemsList": breadcrumbsData
     })
 }}
+{% endblock breadcrumb %}
+{% block main %}
 {% with messages = get_flashed_messages() %}
     {% if messages %}
           <div class="panel panel--simple panel--success u-mb-m">
@@ -45,20 +49,25 @@
         {{ form.csrf_token }}
 
         <input type="hidden" name="email_address" value="{{ new_email }}"/>
-        <p class="field u-mt-l">
-        <div class="btn-group">
-        {{
-            onsButton({
-            "text": "Send",
-            "id": "btn-option-send-email",
-            "classes": 'btn-group__btn',
-            "submitType": "timer"
-            })
-        }}
-        <a href="{{ url_for('account_bp.change_account_details') }}"
-      role="button" class="btn btn--secondary" id="btn-option-send-email-cancel"><span class="btn__inner">Cancel</span></a>
+
+
+
+
+    <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
+        <div class="grid__col">
+          {{
+              onsButton({
+              "text": "Send",
+              "id": "btn-option-send-email",
+              "classes": 'btn-group__btn',
+              "submitType": "timer"
+              })
+          }}
         </div>
-    </p>
-    </form>
+        <div class="grid__col u-ml-m">
+        <a href="{{ url_for('account_bp.change_account_details') }}" id="btn-option-send-email-cancel">Cancel</a>
+        </div>
+    </div>
+</form>
 
 {% endblock main %}

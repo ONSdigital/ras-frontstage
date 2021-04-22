@@ -9,11 +9,13 @@
 {% set breadcrumbsData = [
   {
     "text": "Surveys",
-    "url": "/surveys/todo"
+    "url": "/surveys/todo",
+    "id": "b-item-1"
   },
   {
     "text": "Help",
-    "url": "/surveys/help/"~short_name~"/"~business_id
+    "url": "/surveys/help/"~short_name~"/"~business_id,
+    "id": "b-item-2"
   }
 
 ] %}
@@ -22,13 +24,15 @@
 {% if breadcrumb_title_one is defined %}
 {% do breadcrumbsData.append({
         "text": breadcrumb_title_one,
-        "url": "/surveys/help/"~short_name~"/"~business_id~"/"~option
+        "url": "/surveys/help/"~short_name~"/"~business_id~"/"~option,
+        "id": "b-item-8"
     },) %}
 {% endif %}
 {% if breadcrumb_title_two is defined %}
 {% do breadcrumbsData.append({
         "text": breadcrumb_title_two,
-        "url": "/surveys/help/"~short_name~"/"~business_id~"/"~option~"/"~sub_option
+        "url": "/surveys/help/"~short_name~"/"~business_id~"/"~option~"/"~sub_option,
+        "id": "b-item-7"
     },) %}
 {% endif %}
 {% block breadcrumb %}
@@ -86,17 +90,20 @@
                 {% if ns.bodyError %}
                     {% set error = { "text": ns.errorMessage,  "id": 'secure-message-body_error' } %}
                 {% endif %}
+
                 {{
-                onsTextarea({
-                    "id": "secure-message-body",
-                    "name": "body",
-                    "rows": "8",
-                    "label": {
-                        "text": "Create message",
-                    },
-                    "error": error,
-                })
-            }}
+                    onsTextarea({
+                        "id": "secure-message-body",
+                        "name": "body",
+                        "label": {
+                            "text": "Create message",
+                        },
+                        "charCheckLimit": false,
+                        "error": error,
+                    })
+                }}
+
+
             <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
                 <div class="grid__col">
                     {{

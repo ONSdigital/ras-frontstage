@@ -1,4 +1,4 @@
-{% extends "layouts/_twothirds.html" %}
+{% extends "layouts/_block_content.html" %}
 {% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/button/_macro.njk" import onsButton %}
@@ -7,19 +7,21 @@
 {% set breadcrumbsData = [
   {
     "text": "Surveys",
-    "url": "/surveys/todo"
+    "url": "/surveys/todo",
+    "id": "b-item-1"
   },
   {
     "text": "Account",
-    "url": "/my-account"
+    "url": "/my-account",
+    "id": "b-item-2"
   },
   {
     "text": "Change your contact details",
-    "url": "/my-account/change-account-details"
+    "url": "/my-account/change-account-details",
+    "id": "b-item-3"
   },
 ] %}
-
-{% block main %}
+{% block breadcrumb %}
 {{
     onsBreadcrumb({
         "ariaLabel": "Breadcrumbs",
@@ -27,6 +29,8 @@
         "itemsList": breadcrumbsData
     })
 }}
+{% endblock breadcrumb %}
+{% block main %}
 <h1 class="u-fs-xl">Almost done</h1>
 <p>We’ve sent an email to your new email address</p>
 <p>Once you have received it, you need to follow the link in the email to confirm and finish setting up your new account.</p>

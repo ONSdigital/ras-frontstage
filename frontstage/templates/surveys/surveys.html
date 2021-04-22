@@ -12,7 +12,7 @@
                 <dt class="u-ml-no u-mb-xs u-pr-xs u-fs-s">RU ref: {{ survey.business_ref }}</dt>
             </div>
             <div class="grid__col col-4@m u-pt-no u-pb-xs">
-                {% if survey.status != 'Complete' and survey.due_in != 'None' %}
+                {% if survey.status != 'Complete' and survey.due_in != None %}
                 <dt class="u-fs-r u-ml-no u-mb-xs" style="line-height:1">
                     <strong>{{ survey.due_in }}</strong>
                 </dt>

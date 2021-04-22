@@ -6,7 +6,7 @@
     {% if ns and ns.showHelp and ns.short_name and ns.business_id%}
         {% do serviceLinks | setAttribute("itemsList", [
             {
-              "text": "My Account",
+              "text": "My account",
               "url": "/my-account"
             },
             {
@@ -21,7 +21,7 @@
     {% else %}
         {% do serviceLinks | setAttribute("itemsList", [
             {
-              "text": "My Account",
+              "text": "My account",
               "url": "/my-account"
             },
             {

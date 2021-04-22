@@ -64,7 +64,7 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.assertIn("Help completing the Monthly Survey of Building Materials Bricks".encode(), response.data)
         self.assertIn("Choose an option".encode(), response.data)
         self.assertIn("I need help answering a survey question".encode(), response.data)
-        self.assertIn("I don't have specific figures for a response".encode(), response.data)
+        self.assertIn("I do not have specific figures for a response".encode(), response.data)
         self.assertIn("Something else".encode(), response.data)
         self.assertIn("Continue".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)
@@ -104,7 +104,7 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
             follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("I don't have specific figures for a response".encode(), response.data)
+        self.assertIn("I do not have specific figures for a response".encode(), response.data)
         self.assertIn(
             "We do not expect you to spend any great expense or time obtaining the information required.".encode(),
             response.data)

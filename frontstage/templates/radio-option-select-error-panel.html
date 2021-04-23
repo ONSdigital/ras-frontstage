@@ -6,10 +6,12 @@
     {% if messages %}
         {% for message in messages %}
             {% set ns.optionError = true %}
-            {% if not ns.checkbox %}
-                {% set ns.optionErrorMessage = 'You need to choose an option' %}
-            {% else %}
-                {% set ns.optionErrorMessage = 'You need to choose at least one option' %}
+            {% if not ns.optionErrorMessage %}
+                {% if not ns.checkbox %}
+                    {% set ns.optionErrorMessage = 'You need to choose an option' %}
+                {% else %}
+                    {% set ns.optionErrorMessage = 'You need to choose at least one option' %}
+                {% endif %}
             {% endif %}
             {% set errorTitle = 'There is 1 error on this page' %}
                 {% call

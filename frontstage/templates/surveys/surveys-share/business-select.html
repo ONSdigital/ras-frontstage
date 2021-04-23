@@ -32,6 +32,7 @@
 {% endblock breadcrumb %}
 {% block main %}
 {% set ns = namespace() %}
+{% set ns.optionErrorMessage = 'You need to select a business' %}
 {% include "radio-option-select-error-panel.html" %}
 
 <h1>For which business do you want to share your surveys?</h1>

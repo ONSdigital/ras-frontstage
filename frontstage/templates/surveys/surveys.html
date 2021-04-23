@@ -1,10 +1,23 @@
 {% from "components/button/_macro.njk" import onsButton %}
 {% from "components/table/_macro.njk" import onsTable %}
 {% for survey in sorted_surveys_list %}
-    <section class="survey u-bb">
-        <h1 class="u-mb-xs u-fs-m u-mt-s u-mb-s">
-            <a href="{{ url_for('surveys_bp.access_survey', case_id=survey.case_id, ci_type = survey.collection_instrument_type, business_party_id=survey.business_party_id, survey_short_name=survey.survey_short_name) }}" aria-label="Access the {{ survey.survey_long_name }}">{{ survey.survey_long_name }}</a>
-        </h1>
+    {% if survey.added_survey %}
+        {% set highlight = 'table__row--highlight' %}
+        {% set id = 'new-survey' %}
+    {% else %}
+        {% set highlight = '' %}
+        {% set id = 'access_survey_button_' ~ loop.index %}
+    {% endif %}
+    <section class="u-bb {{ highlight }}" id="{{ id }}">
+        {% if survey.display_button %}
+            <h1 class="u-mb-xs u-fs-m u-mt-s u-mb-s">
+                <a href="{{ url_for('surveys_bp.access_survey', case_id=survey.case_id, ci_type = survey.collection_instrument_type, business_party_id=survey.business_party_id, survey_short_name=survey.survey_short_name) }}" aria-label="Access the {{ survey.survey_long_name }}">{{ survey.survey_long_name }}</a>
+            </h1>
+        {% else %}
+            <h1 class="u-mb-xs u-fs-m u-mt-s u-mb-s">
+                {{ survey.survey_long_name }}
+            </h1>
+        {% endif %}
         <dl class="grid">
             <div class="grid__col col-5@m u-pt-no u-pb-xs">
                 <dt class="u-ml-no u-mb-xs u-pr-xs u-fs-s">Period covered: {{ survey.period }}</dt>
@@ -12,14 +25,16 @@
                 <dt class="u-ml-no u-mb-xs u-pr-xs u-fs-s">RU ref: {{ survey.business_ref }}</dt>
             </div>
             <div class="grid__col col-4@m u-pt-no u-pb-xs">
+                {% if survey.status != 'Complete' and survey.due_in != None %}
                 <dt class="u-fs-r u-ml-no u-mb-xs" style="line-height:1">
                     <strong>{{ survey.due_in }}</strong>
                 </dt>
+                {% endif %}
                 <dt class="u-ml-no u-mb-xs u-pr-xs u-fs-s">Submit by: {{ survey.formatted_submit_by }}</dt>
             </div>
             {% if survey.status == 'Not started' %}
                 {% set status_class = 'status--dead' %}
-            {% elif survey.status == 'Downloaded' or survey.status == 'In progress' %}
+            {% elif survey.status == 'Downloaded' or survey.status == 'In progress' or survey.status == 'Complete' %}
                 {% set status_class = 'status--success' %}
             {% else %}
                 {% set status_class = 'status--error' %}

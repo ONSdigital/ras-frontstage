@@ -37,7 +37,7 @@
             {% elif survey.status == 'Downloaded' or survey.status == 'In progress' or survey.status == 'Complete' %}
                 {% set status_class = 'status--success' %}
             {% else %}
-                {% set status_class = 'status--error' %}
+                {% set status_class = 'status--dead' %}
             {% endif %}
             <div class="grid__col col-3@m u-pt-no u-pb-xs">
                 <dt class="u-vh">Status</dt>

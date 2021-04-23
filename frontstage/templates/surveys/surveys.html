@@ -20,7 +20,10 @@
         {% endif %}
         <dl class="grid">
             <div class="grid__col col-5@m u-pt-no u-pb-xs">
-                <dt class="u-ml-no u-mb-xs u-pr-xs u-fs-s">Period covered: {{ survey.period }}</dt>
+                <dt class="u-vh">Period covered</dt>
+                <dd class="u-fs-r u-ml-no u-mb-xs" style="line-height:1">
+                    <strong>{{ survey.period }}</strong>
+                </dd>
                 <dt class="u-ml-no u-mb-xs u-pr-xs u-fs-s">Business: {{ survey.business_name }}</dt>
                 <dt class="u-ml-no u-mb-xs u-pr-xs u-fs-s">RU ref: {{ survey.business_ref }}</dt>
             </div>
@@ -33,8 +36,8 @@
                 <dt class="u-ml-no u-mb-xs u-pr-xs u-fs-s">Submit by: {{ survey.formatted_submit_by }}</dt>
             </div>
             {% if survey.status == 'Not started' %}
-                {% set status_class = 'status--dead' %}
-            {% elif survey.status == 'Downloaded' or survey.status == 'In progress' or survey.status == 'Complete' %}
+                {% set status_class = 'status--info' %}
+            {% elif survey.status == 'Downloaded' or survey.status == 'In progress'%}
                 {% set status_class = 'status--success' %}
             {% else %}
                 {% set status_class = 'status--dead' %}

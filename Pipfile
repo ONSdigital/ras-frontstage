@@ -29,7 +29,6 @@ email_validator = "*"
 google-cloud-pubsub = "==1.7.0"
 
 [dev-packages]
-codecov = "*"
 coverage = "*"
 flake8 = "*"
 pylint = "*"

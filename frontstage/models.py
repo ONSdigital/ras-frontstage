@@ -10,6 +10,7 @@ from wtforms.validators import EqualTo, Length, Email, ValidationError, Required
 from frontstage.common.validators import InputRequired, DataRequired
 
 from frontstage import app
+from frontstage.form import Form
 from frontstage.i18n.translations import Translate
 
 translations = Translate('form_messages')
@@ -165,49 +166,29 @@ class RespondentStatus(enum.IntEnum):
     SUSPENDED = 2
 
 
-class OptionsForm(FlaskForm):
+class OptionsForm(Form):
     option = RadioField('Label', choices=[
         ('value', 'contact_details'),
         ('value', 'change_password'),
         ('value', 'share_surveys')])
 
-    def validate(self):
-        if self.data['option'] is None:
-            return False
-        return True
 
-
-class HelpOptionsForm(FlaskForm):
+class HelpOptionsForm(Form):
     option = RadioField('Label', choices=[
         ('value', 'help-completing-this-survey'),
         ('value', 'info-about-this-survey')
     ])
 
-    def validate(self):
-        if self.data['option'] is None:
-            return False
-        return True
 
-
-class AccountSurveyShareBusinessSelectForm(FlaskForm):
+class AccountSurveyShareBusinessSelectForm(Form):
     option = RadioField('Label')
 
-    def validate(self):
-        if self.data['option'] is None:
-            return False
-        return True
 
-
-class AccountSurveyShareSurveySelectForm(FlaskForm):
+class AccountSurveyShareSurveySelectForm(Form):
     option = RadioField('Label')
 
-    def validate(self):
-        if self.data['option'] is None:
-            return False
-        return True
 
-
-class HelpInfoAboutThisSurveyForm(FlaskForm):
+class HelpInfoAboutThisSurveyForm(Form):
     option = RadioField('Label', choices=[
         ('value', 'exemption-completing-survey'),
         ('value', 'why-selected'),
@@ -217,24 +198,14 @@ class HelpInfoAboutThisSurveyForm(FlaskForm):
         ('value', 'info-something-else')
     ])
 
-    def validate(self):
-        if self.data['option'] is None:
-            return False
-        return True
 
-
-class HelpCompletingThisSurveyForm(FlaskForm):
+class HelpCompletingThisSurveyForm(Form):
     option = RadioField('Label', choices=[
         ('value', 'answer-survey-question'),
         ('value', 'do-not-have-specific-figures'),
         ('value', 'unable-to-return-by-deadline'),
         ('value', 'something-else'),
     ])
-
-    def validate(self):
-        if self.data['option'] is None:
-            return False
-        return True
 
 
 class ContactDetailsChangeForm(FlaskForm):
@@ -299,3 +270,19 @@ class AccountSurveyShareRecipientEmailForm(FlaskForm):
     def validate_email_address(_, field):
         email = field.data
         return _validate_email_address(email)
+
+
+class HelpForm(Form):
+    option = RadioField('Label', choices=[
+        ('value', 'info-ons'),
+        ('value', 'password'),
+        ('value', 'something-else')
+    ])
+
+
+class HelpInfoOnsForm(Form):
+    option = RadioField('Label', choices=[
+        ('value', 'ons'),
+        ('value', 'data'),
+        ('value', 'info-something-else')
+    ])

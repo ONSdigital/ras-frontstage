@@ -35,7 +35,7 @@ def help_get():
 @help_bp.route('/', methods=['POST'])
 def help_submit():
     form = HelpForm(request.values)
-    if request.method == 'POST' and form.validate():
+    if form.validate():
         return redirect(url_for(form_redirect_mapper.get(form.data['option'])))
     else:
         flash('At least one option should be selected.')
@@ -50,7 +50,7 @@ def info_ons_get():
 @help_bp.route('/info-ons', methods=['POST'])
 def info_ons_submit():
     form = HelpInfoOnsForm(request.values)
-    if request.method == 'POST' and form.validate():
+    if form.validate():
         return render_template(form_render_page_mapper.get(form.data['option']))
     else:
         flash('At least one option should be selected.')

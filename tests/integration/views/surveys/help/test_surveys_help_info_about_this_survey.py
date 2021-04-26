@@ -79,7 +79,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Information about the Monthly Survey of Building Materials Bricks".encode(), response.data)
         self.assertIn("Choose an option".encode(), response.data)
-        self.assertIn("Can I be exempt from completing the survey?".encode(), response.data)
+        self.assertIn("Can I be exempt from completing the survey questionnaire?".encode(), response.data)
         self.assertIn("How was my business selected?".encode(), response.data)
         self.assertIn("How long will it take to complete?".encode(), response.data)
         self.assertIn("How long will my business be selected for?".encode(), response.data)
@@ -101,7 +101,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
             follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Can I be exempt from completing the survey?".encode(), response.data)
+        self.assertIn("Can I be exempt from completing the survey questionnaire?".encode(), response.data)
         self.assertIn("Whilst this survey is voluntary, we have selected your company through our normal "
                       "selection processes. This means that any data you submit to us on this subject will "
                       "allow us to produce statistics on things which may not otherwise be asked as part of "
@@ -125,7 +125,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
             follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Can I be exempt from completing the survey?".encode(), response.data)
+        self.assertIn("Can I be exempt from completing the survey questionnaire?".encode(), response.data)
         self.assertIn("No. Once selected, the law obliges a business to complete the survey under the provisions "
                       "of the Statistics of Trade Act 1947".encode(), response.data)
         self.assertIn("https://www.ons.gov.uk/surveys/informationforbusinesses".encode(), response.data)
@@ -271,7 +271,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
             follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Can I be exempt from completing the survey?".encode(), response.data)
+        self.assertIn("Can I be exempt from completing the survey questionnaire?".encode(), response.data)
 
     @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')

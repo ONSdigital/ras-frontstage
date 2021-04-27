@@ -37,7 +37,7 @@ subject_text_mapping = {
         'why-selected': 'How / why was my business selected?',
         'time-to-complete': 'How long will it take to complete?',
         'how-long-selected-for': 'How long will my business be selected for?',
-        'penalties': 'What are the penalties for not completing a survey?',
+        'penalties': 'What happens if I don’t complete a survey?',
         'info-something-else': info_about_this_survey_title
 }
 breadcrumb_text_mapping = {
@@ -54,7 +54,7 @@ breadcrumb_text_mapping = {
         'how-long-selected-for': [info_about_this_survey_title,
                                   'How long will my business be selected for?'],
         'penalties': [info_about_this_survey_title,
-                      'What are the penalties for not completing a survey?'],
+                      'What happens if I don’t complete a survey?'],
         'info-something-else': [info_about_this_survey_title, 'More information']
 }
 

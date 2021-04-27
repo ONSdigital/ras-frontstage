@@ -226,7 +226,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
             follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("What are the penalties for not completing a survey?".encode(), response.data)
+        self.assertIn("What happens if I don’t complete a survey?".encode(), response.data)
         self.assertIn("Failure to comply could lead to prosecution at a Magistrates Court with a fine up "
                       "to a maximum of £2,500 (last updated by section 17 of the Criminal Justice Act 1991)."
                       .encode(), response.data)
@@ -338,7 +338,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Send a message".encode(), response.data)
         self.assertIn("Send us a message with a description of your issue".encode(), response.data)
-        self.assertIn("What are the penalties for not completing a survey?".encode(), response.data)
+        self.assertIn("What happens if I don’t complete a survey?".encode(), response.data)
         self.assertIn("Create message".encode(), response.data)
         self.assertIn("Send message".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)

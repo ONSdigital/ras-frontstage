@@ -31,13 +31,15 @@
 {% endblock breadcrumb %}
 
 {% block main %}
-<h1 class="u-fs-xl">What are the penalties for not completing a survey?</h1>
-<p>Failure to comply could lead to prosecution at a Magistrates Court with a fine up to a maximum of £2,500 (last updated by section 17 of the Criminal Justice Act 1991).</p>
-<p>If this happens you will still need to complete the questionnaire.</p>
-<p>Read more <a href="https://www.ons.gov.uk/surveys/informationforbusinesses" class="icon--external-link" target="_blank" rel="noopener">Information for businesses</a>
+<h1 class="u-fs-xl">What happens if I don’t complete a survey?</h1>
+<p>Failure to complete a survey by the deadline could lead to prosecution at a Magistrates Court with a fine of up to £2,500 (last updated by section 17 of the Criminal Justice Act 1991).</p>
+<p>If this happens, you will still need to complete the survey.</p>
+<p>See more <a href="https://www.ons.gov.uk/surveys/informationforbusinesses" class="external-link" target="_blank" rel="noopener">information for businesses<svg id="external-link" class="svg-icon" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+    <path d="M13.5,9H13a.5.5,0,0,0-.5.5v3h-9v-9h3A.5.5,0,0,0,7,3V2.5A.5.5,0,0,0,6.5,2h-4a.5.5,0,0,0-.5.5v11a.5.5,0,0,0,.5.5h11a.5.5,0,0,0,.5-.5v-4A.5.5,0,0,0,13.5,9Z" transform="translate(-2 -1.99)" />
+    <path d="M8.83,7.88a.51.51,0,0,0,.71,0l2.31-2.32,1.28,1.28A.51.51,0,0,0,14,6.49v-4a.52.52,0,0,0-.5-.5h-4A.51.51,0,0,0,9,2.52a.58.58,0,0,0,.14.33l1.28,1.28L8.12,6.46a.51.51,0,0,0,0,.71Z" transform="translate(-2 -1.99)" />
+  </svg></a>
 </p>
 <h2>Did this answer your question?</h2>
-<p></p>
 <div class="btn-group">
     <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" role="button" class="btn btn-group__btn"><span class="btn__inner">Yes</span></a>
     <a href="{{ url_for('surveys_bp.get_send_help_message_page', short_name=short_name, option=option,sub_option='penalties', business_id=business_id) }}" role="button" class="btn btn--secondary btn-group__btn"><span class="btn__inner">No</span></a>

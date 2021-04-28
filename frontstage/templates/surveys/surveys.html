@@ -10,22 +10,21 @@
     {% endif %}
     <section class="u-bb {{ highlight }}" id="{{ id }}">
         {% if survey.display_button %}
-            <h1 class="u-mb-xs u-fs-m u-mt-s u-mb-s">
+            <h1 class="u-mb-xs u-fs-m u-mt-s">
                 <a href="{{ url_for('surveys_bp.access_survey', case_id=survey.case_id, ci_type = survey.collection_instrument_type, business_party_id=survey.business_party_id, survey_short_name=survey.survey_short_name) }}" aria-label="Access the {{ survey.survey_long_name }}">{{ survey.survey_long_name }}</a>
             </h1>
         {% else %}
-            <h1 class="u-mb-xs u-fs-m u-mt-s u-mb-s">
+            <h1 class="u-mb-xs u-fs-m u-mt-s">
                 {{ survey.survey_long_name }}
             </h1>
         {% endif %}
+        <h2 class="u-mb-xs u-mt-no u-fs-r u-fw-b"><span>Period covered:</span> {{ survey.period }}</h2>
         <dl class="grid">
             <div class="grid__col col-5@m u-pt-no u-pb-xs">
-                <dt class="u-vh">Period covered</dt>
-                <dd class="u-fs-r u-ml-no u-mb-xs" style="line-height:1.2">
-                    <strong>{{ survey.period }}</strong>
-                </dd>
-                <dt class="u-ml-no u-mb-xs u-pr-xs u-fs-s">Business: {{ survey.business_name }}</dt>
-                <dt class="u-ml-no u-mb-xs u-pr-xs u-fs-s">RU ref: {{ survey.business_ref }}</dt>
+                <dt style="float: left; clear: left;" class="u-ml-no u-mb-xs u-pr-xs u-fs-s">Business: </dt>
+                <dd class="u-ml-no u-mb-xs u-fs-s">{{ survey.business_name }}</dd>
+                <dt style="float: left; clear: left;" class="u-ml-no u-mb-xs u-pr-xs u-fs-s">RU ref: </dt>
+                <dd class="u-ml-no u-mb-xs u-fs-s">{{ survey.business_ref }}</dd>
             </div>
             <div class="grid__col col-4@m u-pt-no u-pb-xs">
                 {% if survey.status != 'Complete' and survey.due_in != None %}
@@ -33,7 +32,8 @@
                     <strong>{{ survey.due_in }}</strong>
                 </dt>
                 {% endif %}
-                <dt class="u-ml-no u-mb-xs u-pr-xs u-fs-s">Submit by: {{ survey.formatted_submit_by }}</dt>
+                <dt style="float: left; clear: left;" class="u-ml-no u-mb-xs u-pr-xs u-fs-s">Submit by: </dt>
+                <dd class="u-ml-no u-mb-xs u-fs-s">{{ survey.formatted_submit_by }}</dd>
             </div>
             {% if survey.status == 'Not started' %}
                 {% set status_class = 'status--info' %}
@@ -43,12 +43,12 @@
                 {% set status_class = 'status--dead' %}
             {% endif %}
             <div class="grid__col col-3@m u-pt-no u-pb-xs">
-                <dt class="u-vh">Status</dt>
-                <dd class="u-fs-r u-ml-no u-mb-xs">
+                <dt style="float: left; clear: left;" class="u-vh">Status: </dt>
+                <dd class="u-fs-r u-ml-no u-mb-xs" style="line-height:1">
                     <span class="status {{ status_class }}">{{ survey.status }}</span>
                 </dd>
-                <dt class="u-vh">Help</dt>
-                <dd class="u-ml-no u-mb-m">
+                <dt style="float: left; clear: left;" class="u-vh">Help: </dt>
+                <dd class="u-ml-no u-mb-s">
                     <a id="create-message-link-{{loop.index}}" href="{{ url_for('surveys_bp.get_help_page', short_name=survey.survey_short_name, business_id=survey.business_party_id) }}"  aria-label="Get help with the {{ survey.survey_long_name }}">Get help with this survey <span class="u-vh"> about {{ survey.survey_long_name }}</span></a>
                 </dd>
             </div>

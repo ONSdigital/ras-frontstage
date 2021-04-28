@@ -92,7 +92,7 @@ def convert_events_to_new_format(events):
             "date": date_time.strftime(date_format),
             "month": date_time.strftime('%m'),
             "is_in_future": date_time > parse_date(datetime.now().isoformat()),
-            "formatted_date": ordinal_date_formatter('{S} %B %Y, %H:%M', date_time),
+            "formatted_date": ordinal_date_formatter('{S} %B %Y', date_time),
             "due_time": due_date_converter(date_time)
         }
     return formatted_events

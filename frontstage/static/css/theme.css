@@ -22,10 +22,3 @@
 .no-js .hide-if-no-js {
   display: none;
 }
-
-/* To do screen list */
-
-dl.grid dt {
-  float: left;
-  clear: left;
-}

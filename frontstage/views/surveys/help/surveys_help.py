@@ -36,7 +36,7 @@ subject_text_mapping = {
         'exemption-completing-survey': 'Can I be exempt from completing the survey questionnaire?',
         'why-selected': 'How / why was my business selected?',
         'time-to-complete': 'How long will it take to complete?',
-        'how-long-selected-for': 'How long will I be selected for?',
+        'how-long-selected-for': 'How long will my business be selected for?',
         'penalties': 'What are the penalties for not completing a survey?',
         'info-something-else': info_about_this_survey_title
 }
@@ -52,7 +52,7 @@ breadcrumb_text_mapping = {
         'time-to-complete': [info_about_this_survey_title,
                              'How long will it take to complete?'],
         'how-long-selected-for': [info_about_this_survey_title,
-                                  'How long will I be selected for?'],
+                                  'How long will my business be selected for?'],
         'penalties': [info_about_this_survey_title,
                       'What are the penalties for not completing a survey?'],
         'info-something-else': [info_about_this_survey_title, 'More information']

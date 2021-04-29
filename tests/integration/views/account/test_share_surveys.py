@@ -50,7 +50,7 @@ class TestSurveyList(unittest.TestCase):
         mock_request.get(url_get_business_details, status_code=200, json=[dummy_business])
         response = self.app.get('/my-account/share-surveys/business-selection')
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Which of your business’s surveys do you want to share?'.encode() in response.data)
+        self.assertTrue('For which business do you want to share your surveys?'.encode() in response.data)
         self.assertTrue('Choose a business'.encode() in response.data)
         self.assertTrue('RUNAME1_COMPANY1 RUNNAME2_COMPANY1'.encode() in response.data)
         self.assertTrue('Continue'.encode() in response.data)
@@ -66,7 +66,7 @@ class TestSurveyList(unittest.TestCase):
                                  follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("There is 1 error on this page".encode(), response.data)
-        self.assertIn("You need to choose a business".encode(), response.data)
+        self.assertIn("Choose an answer".encode(), response.data)
 
     @requests_mock.mock()
     def test_share_survey_select(self, mock_request):
@@ -101,8 +101,8 @@ class TestSurveyList(unittest.TestCase):
                                  follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("There is 1 error on this page".encode(), response.data)
+        self.assertIn("Select at least one answer".encode(), response.data)
         self.assertIn("You need to select a survey".encode(), response.data)
-        self.assertIn("You need to choose at least one option".encode(), response.data)
 
     @requests_mock.mock()
     def test_share_survey_select_option_selected(self, mock_request):
@@ -119,10 +119,10 @@ class TestSurveyList(unittest.TestCase):
                                  follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("Enter recipient's email address".encode(), response.data)
-        self.assertIn("Make sure you have permission from the recipient to provide their email address to us.".encode(),
+        self.assertIn("We need the email address of the person who will be responding to your surveys.".encode(),
                       response.data)
-        self.assertIn("Recipient's email address".encode(), response.data)
-        self.assertIn("This is the person who will be able to respond to your surveys.".encode(), response.data)
+        self.assertIn("Enter email address".encode(), response.data)
+        self.assertIn("Make sure you have their permission to give us their email address.".encode(), response.data)
         self.assertTrue('Continue'.encode() in response.data)
         self.assertTrue('Cancel'.encode() in response.data)
 
@@ -221,9 +221,9 @@ class TestSurveyList(unittest.TestCase):
                                  data={'email_address': 'a@a.com'},
                                  follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn("We have sent an email to the new respondent.".encode(), response.data)
-        self.assertTrue('Once they have received it, they need to follow the link in the email to confirm their email '
-                        'address and finish setting up their account.'.encode() in response.data)
-        self.assertIn("Email not arrived? It might be in their spam folder.".encode(), response.data)
-        self.assertIn("If it doesn’t arrive in the next 15 minutes, please call 0300 1234 931.".encode(), response.data)
+        self.assertIn("We have sent an email to the new person who will be responding to ONS surveys.".encode(), response.data)
+        self.assertTrue('They need to follow the link in the email to confirm their email address and finish setting '
+                        'up their account.'.encode() in response.data)
+        self.assertIn("Email not arrived? It may be in their junk folder.".encode(), response.data)
+        self.assertIn("If it does not arrive in the next 15 minutes, please call 0300 1234 931.".encode(), response.data)
         self.assertTrue('Back to surveys'.encode() in response.data)

@@ -38,10 +38,13 @@
 {% endblock breadcrumb %}
 {% block main %}
 {% set ns = namespace (checkbox = 'true') %}
+{% set ns.optionErrorMessage = 'You need to select a survey' %}
 {% include "radio-option-select-error-panel.html" %}
 {% if is_max_share_survey %}
     {% set ns.optionError = true %}
-    {% set ns.optionErrorMessage = 'Deselect the survey/s to continue or call 0300 1234 931 to discuss your options.' %}
+    {% set ns.optionErrorMessage = 'You have reached the maximum amount of emails you can enroll on one or more surveys.<br><br>
+Deselect the survey/s to continue or call 0300 1234 931 to discuss your options.
+' %}
     {% set errorTitle = 'There is 1 error on this page' %}
     {% set message = 'You have reached the maximum amount of emails you can enroll on one or more surveys' %}
                 {% call

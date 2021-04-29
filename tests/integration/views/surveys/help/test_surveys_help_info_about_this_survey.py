@@ -79,14 +79,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Information about the Monthly Survey of Building Materials Bricks".encode(), response.data)
         self.assertIn("Choose an option".encode(), response.data)
-<<<<<<< HEAD
         self.assertIn("Can I be exempt from completing the survey questionnaire?".encode(), response.data)
-<<<<<<< HEAD
-=======
-        self.assertIn("Can I be exempt from completing the survey?".encode(), response.data)
->>>>>>> Information about this survey content
-=======
->>>>>>> fc78fa1ca11c118e6fd363b5a64b1eed09d09a2b
         self.assertIn("How was my business selected?".encode(), response.data)
         self.assertIn("How long will it take to complete?".encode(), response.data)
         self.assertIn("How long will my business be selected for?".encode(), response.data)

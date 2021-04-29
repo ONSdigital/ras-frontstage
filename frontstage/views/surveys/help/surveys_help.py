@@ -37,15 +37,7 @@ subject_text_mapping = {
         'why-selected': 'How / why was my business selected?',
         'time-to-complete': 'How long will it take to complete?',
         'how-long-selected-for': 'How long will my business be selected for?',
-<<<<<<< HEAD
-<<<<<<< HEAD
         'penalties': 'What happens if I don’t complete a survey?',
-=======
-        'penalties': 'What are the penalties for not completing a survey?',
->>>>>>> Information about this survey content
-=======
-        'penalties': 'What happens if I don’t complete a survey?',
->>>>>>> info for businesses link
         'info-something-else': info_about_this_survey_title
 }
 breadcrumb_text_mapping = {

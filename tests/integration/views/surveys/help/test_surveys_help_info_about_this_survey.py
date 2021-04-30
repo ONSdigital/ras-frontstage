@@ -102,9 +102,9 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Can I be exempt from completing the survey questionnaire?".encode(), response.data)
-        self.assertIn("Whilst this survey is voluntary, we have selected your company through our normal "
-                      "selection processes. This means that any data you submit to us on this subject will "
-                      "allow us to produce statistics on things which may not otherwise be asked as part of "
+        self.assertIn("While this survey is voluntary, we have selected your company in the same way we "
+                      "select companies for mandatory surveys. This means that any information you share with "
+                      "us will allow us to produce statistics on things that may not be asked as part of "
                       "mandatory surveys.".encode(), response.data)
         self.assertIn("https://www.ons.gov.uk/surveys/informationforbusinesses".encode(), response.data)
         self.assertIn("Did this answer your question?".encode(), response.data)
@@ -201,8 +201,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("How long will my business be selected for?".encode(), response.data)
-        self.assertIn("We cannot give a definite period of selection for business surveys as this depends on "
-                      "many factors.".encode(), response.data)
+        self.assertIn("We cannot give a definite period of selection for business surveys as this depends on various factors.".encode(), response.data)
         self.assertIn("We choose a specific number of businesses for a survey sample. This can change as "
                       "businesses start and other businesses stop trading. ".encode(), response.data)
         self.assertIn("Employment levels within each business may change, which affects the "

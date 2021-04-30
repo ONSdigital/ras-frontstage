@@ -86,7 +86,7 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.assertIn("Send a message".encode(), response.data)
         self.assertIn("Describe your issue and we will get back to you.".encode(), response.data)
         self.assertIn("Help answering a survey question".encode(), response.data)
-        self.assertIn("Create message".encode(), response.data)
+        self.assertIn("Enter message".encode(), response.data)
         self.assertIn("Send message".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)
 
@@ -127,7 +127,7 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.assertIn("Send a message".encode(), response.data)
         self.assertIn("Describe your issue and we will get back to you.".encode(), response.data)
         self.assertIn("I don’t have specific figures for a response".encode(), response.data)
-        self.assertIn("Create message".encode(), response.data)
+        self.assertIn("Enter message".encode(), response.data)
         self.assertIn("Send message".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)
 
@@ -164,7 +164,7 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.assertIn("Send a message".encode(), response.data)
         self.assertIn("Describe your issue and we will get back to you.".encode(), response.data)
         self.assertIn("I am unable to return the data by the deadline".encode(), response.data)
-        self.assertIn("Create message".encode(), response.data)
+        self.assertIn("Enter message".encode(), response.data)
         self.assertIn("Send message".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)
 
@@ -185,7 +185,7 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.assertIn("Send a message".encode(), response.data)
         self.assertIn("Describe your issue and we will get back to you.".encode(), response.data)
         self.assertIn("Help completing this survey".encode(), response.data)
-        self.assertIn("Create message".encode(), response.data)
+        self.assertIn("Enter message".encode(), response.data)
         self.assertIn("Send message".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)
 

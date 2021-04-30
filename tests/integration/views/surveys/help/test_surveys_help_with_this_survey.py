@@ -106,7 +106,7 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("I do not have specific figures for a response".encode(), response.data)
         self.assertIn(
-            "We do not expect you to spend any great expense or time obtaining the information required.".encode(),
+            "We do not expect you to spend too long or go to any great expense to get hold of the information we request.".encode(),
             response.data)
         self.assertIn("Did this answer your question?".encode(), response.data)
         self.assertIn("Yes".encode(), response.data)

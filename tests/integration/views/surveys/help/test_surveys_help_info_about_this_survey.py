@@ -156,7 +156,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
                       "and the size of those businesses.".encode(), response.data)
         self.assertIn("We always include large businesses in the survey sample because the information "
                       "they provide can be significant.".encode(), response.data)
-        self.assertIn("Large businesses are usually defined as having over 100 employees.".encode(), response.data)
+        self.assertIn("Large businesses are usually defined as having more than 100 employees.".encode(), response.data)
         self.assertIn("https://www.ons.gov.uk/surveys/informationforbusinesses".encode(), response.data)
         self.assertIn("Did this answer your question?".encode(), response.data)
         self.assertIn("Yes".encode(), response.data)
@@ -179,9 +179,8 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("How long will it take to complete?".encode(), response.data)
         self.assertIn("We design each survey to answer a set of statistical requirements. "
                       "The length and volume of questions can vary.".encode(), response.data)
-        self.assertIn("The length of time it takes your business to complete will depend on the "
-                      "availability of the information requested.".encode(), response.data)
-        self.assertIn("We can help with a specific issue by using our secure message service.".encode(), response.data)
+        self.assertIn("How long it takes your business to complete a survey will depend on how "
+                      "easily you can get hold of the information we ask for.".encode(), response.data)
         self.assertIn("https://www.ons.gov.uk/surveys/informationforbusinesses".encode(), response.data)
         self.assertIn("Did this answer your question?".encode(), response.data)
         self.assertIn("Yes".encode(), response.data)
@@ -202,11 +201,13 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("How long will my business be selected for?".encode(), response.data)
-        self.assertIn("We cannot give a definitive period of selection for business surveys as this depends on "
+        self.assertIn("We cannot give a definite period of selection for business surveys as this depends on "
                       "many factors.".encode(), response.data)
         self.assertIn("We choose a specific number of businesses for a survey sample. This can change as "
-                      "businesses start and other businesses stop trading. As employment levels within each "
-                      "business change, so do the number of businesses in each size-band.".encode(), response.data)
+                      "businesses start and other businesses stop trading. ".encode(), response.data)
+        self.assertIn("Employment levels within each business may change, which affects the "
+                      "number of businesses in each size-band. "
+                      "This also has an impact on how long a business is selected for.".encode(), response.data)
         self.assertIn("https://www.ons.gov.uk/surveys/informationforbusinesses".encode(), response.data)
         self.assertIn("Did this answer your question?".encode(), response.data)
         self.assertIn("Yes".encode(), response.data)
@@ -286,7 +287,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
             follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("How / why was my business selected?".encode(), response.data)
+        self.assertIn("How  was my business selected?".encode(), response.data)
 
     @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')

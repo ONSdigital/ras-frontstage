@@ -166,7 +166,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("How long will it take to complete?".encode(), response.data)
-        self.assertIn("We design each survey to answer a set of statistical requirements. ".encode(), response.data)
+        self.assertIn("https://www.ons.gov.uk/surveys/informationforbusinesses".encode(), response.data)
         self.assertIn("Did this answer your question?".encode(), response.data)
         self.assertIn("Yes".encode(), response.data)
         self.assertIn("No".encode(), response.data)
@@ -186,7 +186,6 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("How long will my business be selected for?".encode(), response.data)
-        self.assertIn("We cannot give a definite period of selection for business surveys as this depends on various factors.".encode(), response.data)
         self.assertIn("https://www.ons.gov.uk/surveys/informationforbusinesses".encode(), response.data)
         self.assertIn("Did this answer your question?".encode(), response.data)
         self.assertIn("Yes".encode(), response.data)
@@ -207,7 +206,6 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("What are the penalties for not completing a survey?".encode(), response.data)
-        self.assertIn("Failure to comply could lead to prosecution at a Magistrates Court with a fine up ".encode(), response.data)
         self.assertIn("https://www.ons.gov.uk/surveys/informationforbusinesses".encode(), response.data)
         self.assertIn("Did this answer your question?".encode(), response.data)
         self.assertIn("Yes".encode(), response.data)
@@ -228,7 +226,6 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Information about the Monthly Survey of Building Materials Bricks".encode(), response.data)
-        self.assertIn("You will find answers to most of your questions in our".encode(), response.data)
         self.assertIn("https://www.ons.gov.uk/surveys/informationforbusinesses".encode(), response.data)
         self.assertIn("Did this answer your question?".encode(), response.data)
         self.assertIn("Yes".encode(), response.data)

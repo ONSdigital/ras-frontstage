@@ -23,8 +23,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 @account_bp.route('/share-surveys', methods=['GET'])
 @jwt_authorization(request)
 def share_survey_overview(session):
-    flask_session.pop('share_survey_business_selected', None)
-    flask_session.pop('share_survey_surveys_selected', None)
+    flask_session.pop('share', None)
     flask_session.pop('share_survey_recipient_email_address', None)
     return render_template('surveys/surveys-share/overview.html')
 
@@ -35,7 +34,6 @@ def share_survey_business_select(session):
     form = AccountSurveyShareBusinessSelectForm(request.values)
     party_id = session.get_party_id()
     businesses = get_list_of_business_for_party(party_id)
-    flask_session['share_survey_business_selected'] = None
     return render_template('surveys/surveys-share/business-select.html',
                            businesses=businesses,
                            form=form)
@@ -44,11 +42,11 @@ def share_survey_business_select(session):
 @account_bp.route('/share-surveys/business-selection', methods=['POST'])
 @jwt_authorization(request)
 def share_survey_post_business_select(session):
-    form = AccountSurveyShareBusinessSelectForm(request.values)
-    if not form.validate():
-        flash('Choose an answer')
+    share_survey_business_selected = request.form.getlist("checkbox-answer")
+    if len(share_survey_business_selected) == 0:
+        flash('You need to choose a business')
         return redirect(url_for('account_bp.share_survey_business_select'))
-    flask_session['share_survey_business_selected'] = form.data['option']
+    flask_session['share'] = {k: [] for k in share_survey_business_selected}
     return redirect(url_for('account_bp.share_survey_survey_select'))
 
 
@@ -56,26 +54,30 @@ def share_survey_post_business_select(session):
 @jwt_authorization(request)
 def share_survey_survey_select(session):
     party_id = session.get_party_id()
-    surveys = get_surveys_listed_against_party_and_business_id(flask_session['share_survey_business_selected'],
-                                                               party_id)
+    share_dict = {}
+    for key in flask_session['share']:
+        selected_business = get_business_by_id(key)
+        surveys = get_surveys_listed_against_party_and_business_id(key,
+                                                                   party_id)
+        share_dict[selected_business[0]['name']] = surveys
     is_max_share_survey = request.args.get('max_share_survey', False)
-    flask_session['share_survey_surveys_selected'] = None
-    selected_business = get_business_by_id([flask_session['share_survey_business_selected']])
+    failed_survey_key = request.args.get('key', None)
     return render_template('surveys/surveys-share/survey-select.html',
-                           surveys=surveys, business_name=selected_business[0]['name'],
-                           is_max_share_survey=is_max_share_survey)
+                           share_dict=share_dict, is_max_share_survey=is_max_share_survey,
+                           failed_survey_key=failed_survey_key)
 
 
-def validate_max_shared_survey():
+def validate_max_shared_survey(key: str, share_survey_surveys_selected: list):
     """
         This is a validation for maximum user reached against a survey
+        param: key : business id str
+        param: share_survey_surveys_selected : selected business list
+        return:boolean
     """
-    business = flask_session['share_survey_business_selected']
-    share_survey_surveys_selected = flask_session['share_survey_surveys_selected']
     for survey_selected in share_survey_surveys_selected:
         logger.info('Getting count of users registered against business and survey',
-                    business_id=business, survey_id=survey_selected)
-        user_count = get_user_count_registered_against_business_and_survey(business, survey_selected)
+                    business_id=key, survey_id=survey_selected)
+        user_count = get_user_count_registered_against_business_and_survey(key, survey_selected)
         if user_count > app.config['MAX_SHARED_SURVEY']:
             return False
     return True
@@ -84,14 +86,19 @@ def validate_max_shared_survey():
 @account_bp.route('/share-surveys/survey-selection', methods=['POST'])
 @jwt_authorization(request)
 def share_survey_post_survey_select(session):
-    share_survey_surveys_selected = request.form.getlist("checkbox-answer")
-    flask_session['share_survey_surveys_selected'] = share_survey_surveys_selected
-    if len(share_survey_surveys_selected) == 0:
-        flash('Select at least one answer')
-        return redirect(url_for('account_bp.share_survey_survey_select'))
-    if not validate_max_shared_survey():
-        return redirect(url_for('account_bp.share_survey_survey_select', max_share_survey=True))
-
+    share_dictionary_copy = flask_session['share']
+    for key in share_dictionary_copy:
+        selected_business = get_business_by_id(key)
+        share_surveys_selected_against_business = request.form.getlist(selected_business[0]['name'])
+        if len(share_surveys_selected_against_business) == 0:
+            flash('Select at least one answer', selected_business[0]['name'])
+            return redirect(url_for('account_bp.share_survey_survey_select'))
+        if not validate_max_shared_survey(key, share_surveys_selected_against_business):
+            return redirect(url_for('account_bp.share_survey_survey_select', max_share_survey=True,
+                                    key=selected_business[0]['name']))
+        share_dictionary_copy[key] = share_surveys_selected_against_business
+    flask_session.pop('share', None)
+    flask_session['share'] = share_dictionary_copy
     return redirect(url_for('account_bp.share_survey_email_entry'))
 
 
@@ -119,14 +126,16 @@ def share_survey_post_email_entry(session):
 @jwt_authorization(request)
 def send_instruction_get(session):
     email = flask_session['share_survey_recipient_email_address']
-    selected_surveys = []
-    for survey_id in flask_session['share_survey_surveys_selected']:
-        selected_surveys.append(survey_controller.get_survey(app.config['SURVEY_URL'],
-                                                             app.config['BASIC_AUTH'], survey_id))
-    selected_business = get_business_by_id([flask_session['share_survey_business_selected']])
+    share_dict = {}
+    for key in flask_session['share']:
+        selected_business = get_business_by_id(key)
+        surveys = []
+        for survey_id in flask_session['share'][key]:
+            surveys.append(survey_controller.get_survey(app.config['SURVEY_URL'],
+                                                        app.config['BASIC_AUTH'], survey_id))
+        share_dict[selected_business[0]['name']] = surveys
     return render_template('surveys/surveys-share/send-instructions.html',
-                           email=email, surveys=selected_surveys, form=ConfirmEmailChangeForm(),
-                           business_name=selected_business[0]['name'])
+                           email=email, share_dict=share_dict, form=ConfirmEmailChangeForm())
 
 
 def build_payload(respondent_id):
@@ -149,17 +158,16 @@ def build_payload(respondent_id):
         }
     """
     email = flask_session['share_survey_recipient_email_address']
-    business_id = flask_session['share_survey_business_selected']
-    share_survey_surveys_selected = flask_session['share_survey_surveys_selected']
     payload = {}
     pending_shares = []
-    for survey in share_survey_surveys_selected:
-        pending_share = {'business_id': business_id,
-                         'survey_id': survey,
-                         'email_address': email,
-                         'shared_by': respondent_id}
-        pending_shares.append(pending_share)
-
+    share_dictionary = flask_session['share']
+    for key in share_dictionary:
+        for survey in share_dictionary[key]:
+            pending_share = {'business_id': key,
+                             'survey_id': survey,
+                             'email_address': email,
+                             'shared_by': respondent_id}
+            pending_shares.append(pending_share)
     payload['pending_shares'] = pending_shares
     return json.dumps(payload)
 
@@ -181,7 +189,6 @@ def send_instruction(session):
 @account_bp.route('/share-surveys/done', methods=['GET'])
 @jwt_authorization(request)
 def share_survey_done(session):
-    flask_session.pop('share_survey_business_selected', None)
-    flask_session.pop('share_survey_surveys_selected', None)
+    flask_session.pop('share', None)
     flask_session.pop('share_survey_recipient_email_address', None)
     return redirect(url_for('surveys_bp.get_survey_list', tag='todo'))

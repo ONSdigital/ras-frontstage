@@ -50,16 +50,18 @@
 {% block main %}
 <h1 class="u-fs-xl">Send instructions</h1>
 <p>We will send an email to <b>{{ email }}</b> with instructions to access the following surveys:</p>
-<h2 class="u-fs-m">{{ business_name }}</h2>
-{% if surveys|length > 0 %}
+{% for key in share_dict %}
+    <h2 class="u-fs-m">{{ key }}</h2>
+    {% if share_dict[key]|length > 0 %}
     <div class="text-indent">
         <ul class="list list--bare">
-            {% for survey in surveys %}
+            {% for survey in share_dict[key] %}
                 <li>{{ survey['longName'] }}</li>
             {% endfor %}
         </ul>
     </div>
-{% endif %}
+    {% endif %}
+{% endfor %}
 <form action="" method="post">
         {{ form.csrf_token }}
         <input type="hidden" name="email_address" value="{{ email }}"/>

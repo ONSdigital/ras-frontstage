@@ -60,7 +60,7 @@ Deselect the survey/s to continue or call 0300 1234 931 to discuss your options.
                         "itemsList": [
                         {
                             "text": message,
-                            "url": "#option_error",
+                            "url": "#option_error_"~failed_survey_key,
                             "classes": "js-inpagelink"
                         }
                         ]
@@ -70,22 +70,25 @@ Deselect the survey/s to continue or call 0300 1234 931 to discuss your options.
 {% endif %}
 
 <h1>Which surveys do you want to share?</h1>
-{% set checkboxData = [] %}
 <form action="" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    {% for key in share_dict %}
+        {% set checkboxData = [] %}
         {% if ns.optionError %}
-                {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
+            {% if not is_max_share_survey or failed_survey_key == key %}
+                {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error_'~key } %}
+            {% endif %}
         {% endif %}
         {% set checkboxesData = {
-            "legend": business_name,
+            "legend": key,
             "checkboxesLabel": "Select all that apply",
             "error": errorOption,
         } %}
-        {% for survey in surveys %}
+        {% for survey in share_dict[key] %}
               {% do checkboxData.append(
                   {
                     "id": survey['id'],
-                    "name": "checkbox-answer",
+                    "name": key,
                     "label": {
                         "text": survey['longName']
                     },
@@ -95,6 +98,7 @@ Deselect the survey/s to continue or call 0300 1234 931 to discuss your options.
             {% endfor %}
             {% do checkboxesData | setAttribute("checkboxes", checkboxData) %}
         {{ onsCheckboxes(checkboxesData) }}
+    {% endfor %}
         <p class="field u-mt-l">
         <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
             <div class="grid__col">

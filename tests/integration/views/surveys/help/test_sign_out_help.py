@@ -34,7 +34,7 @@ class TestSignOutHelp(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Information about the Office for National Statistics (ONS)".encode(), response.data)
         self.assertIn("Choose an option".encode(), response.data)
-        self.assertIn("Who is the ONS?".encode(), response.data)
+        self.assertIn("Who is the Office for National Statistics (ONS)?".encode(), response.data)
         self.assertIn("How do you keep my data safe?".encode(), response.data)
         self.assertIn("Something else".encode(), response.data)
         self.assertIn("Continue".encode(), response.data)
@@ -73,13 +73,7 @@ class TestSignOutHelp(unittest.TestCase):
                                  data=form,
                                  follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Who is the ONS?".encode(), response.data)
-        self.assertIn("We are the UK’s largest independent producer of official statistics and its recognised "
-                      "national statistical institute.".encode(), response.data)
-        self.assertIn("We are responsible for collecting and publishing statistics related to the economy, population "
-                      "and society at national, regional and local levels.".encode(), response.data)
-        self.assertIn("We also conduct the census in England and Wales every 10 years.".encode(), response.data)
-        self.assertIn("Need more information?".encode(), response.data)
+        self.assertIn("Who is the Office for National Statistics (ONS)?".encode(), response.data)
         self.assertNotIn("Continue".encode(), response.data)
         self.assertNotIn("Cancel".encode(), response.data)
 
@@ -94,10 +88,6 @@ class TestSignOutHelp(unittest.TestCase):
                                  follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("How do you keep my data safe?".encode(), response.data)
-        self.assertIn("We uphold our legal obligation to protect data in both the staff we employ, their training, "
-                      "the procedures we adopt and the IT equipment we use.".encode(), response.data)
-        self.assertIn("We treat your data in strict confidence in line with the provisions of".encode(), response.data)
-        self.assertIn("Need more information?".encode(), response.data)
         self.assertNotIn("Continue".encode(), response.data)
         self.assertNotIn("Cancel".encode(), response.data)
 

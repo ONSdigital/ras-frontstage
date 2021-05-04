@@ -95,13 +95,13 @@ class TestSurveyList(unittest.TestCase):
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         with self.app.session_transaction() as mock_session:
-            mock_session['share'] = {business_party['id']: None}
+            mock_session['share_survey_data'] = {business_party['id']: None}
         response = self.app.post('/my-account/share-surveys/survey-selection',
                                  data={"option": None},
                                  follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("There is 1 error on this page".encode(), response.data)
-        self.assertIn("Select at least one answer".encode(), response.data)
+        self.assertIn("Select an answer".encode(), response.data)
         self.assertIn("You need to select a survey".encode(), response.data)
 
     @requests_mock.mock()
@@ -113,7 +113,7 @@ class TestSurveyList(unittest.TestCase):
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         mock_request.get(url_get_user_count, status_code=200, json=2)
         with self.app.session_transaction() as mock_session:
-            mock_session['share'] = {business_party['id']: None}
+            mock_session['share_survey_data'] = {business_party['id']: None}
         response = self.app.post('/my-account/share-surveys/survey-selection',
                                  data={business_party['name']: ['02b9c366-7397-42f7-942a-76dc5876d86d']},
                                  follow_redirects=True)
@@ -135,7 +135,7 @@ class TestSurveyList(unittest.TestCase):
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         mock_request.get(url_get_user_count, status_code=200, json=52)
         with self.app.session_transaction() as mock_session:
-            mock_session['share'] = {business_party['id']: None}
+            mock_session['share_survey_data'] = {business_party['id']: None}
         response = self.app.post('/my-account/share-surveys/survey-selection',
                                  data={business_party['name']: ['02b9c366-7397-42f7-942a-76dc5876d86d']},
                                  follow_redirects=True)
@@ -154,7 +154,7 @@ class TestSurveyList(unittest.TestCase):
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         with self.app.session_transaction() as mock_session:
-            mock_session['share'] = {business_party['id']: [survey['id']]}
+            mock_session['share_survey_data'] = {business_party['id']: [survey['id']]}
         response = self.app.post('/my-account/share-surveys/recipient-email-address',
                                  data={},
                                  follow_redirects=True)
@@ -171,7 +171,7 @@ class TestSurveyList(unittest.TestCase):
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=[dummy_survey])
         with self.app.session_transaction() as mock_session:
-            mock_session['share'] = {business_party['id']: [survey['id']]}
+            mock_session['share_survey_data'] = {business_party['id']: [survey['id']]}
         response = self.app.post('/my-account/share-surveys/recipient-email-address',
                                  data={'email_address': 'a.a.com'},
                                  follow_redirects=True)
@@ -188,7 +188,7 @@ class TestSurveyList(unittest.TestCase):
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         with self.app.session_transaction() as mock_session:
-            mock_session['share'] = {business_party['id']: [survey['id']]}
+            mock_session['share_survey_data'] = {business_party['id']: [survey['id']]}
         response = self.app.post('/my-account/share-surveys/recipient-email-address',
                                  data={'email_address': 'a@a.com'},
                                  follow_redirects=True)
@@ -211,7 +211,7 @@ class TestSurveyList(unittest.TestCase):
         mock_request.post(url_post_pending_shares, status_code=201, json={'created': 'success'})
 
         with self.app.session_transaction() as mock_session:
-            mock_session['share'] = {business_party['id']: [survey['id']]}
+            mock_session['share_survey_data'] = {business_party['id']: [survey['id']]}
             mock_session['share_survey_recipient_email_address'] = 'a@a.com'
         response = self.app.post('/my-account/share-surveys/send-instruction',
                                  data={'email_address': 'a@a.com'},

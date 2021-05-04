@@ -41,8 +41,8 @@
 <h2>Did this answer your question?</h2>
 <p></p>
 <div class="btn-group">
-    <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" role="button" class="btn btn-group__btn"><span class="btn__inner">Yes</span></a>
-    <a href="{{ url_for('surveys_bp.get_send_help_message_page', short_name=short_name, option=option,sub_option='how-long-selected-for', business_id=business_id) }}" role="button" class="btn btn--secondary btn-group__btn"><span class="btn__inner">No</span></a>
+    <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" role="button" class="btn btn--link btn-group__btn"><span class="btn__inner">Yes</span></a>
+    <a href="{{ url_for('surveys_bp.get_send_help_message_page', short_name=short_name, option=option,sub_option='how-long-selected-for', business_id=business_id) }}" role="button" class="btn btn--link btn--secondary btn-group__btn"><span class="btn__inner">No</span></a>
 </div>
 
 {% endblock main %}

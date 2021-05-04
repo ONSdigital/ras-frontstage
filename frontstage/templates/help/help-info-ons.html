@@ -16,6 +16,8 @@
 ] %}
 
 {% block main %}
+
+{% block breadcrumb %}
 {{
     onsBreadcrumb({
         "ariaLabel": "Breadcrumbs",
@@ -23,6 +25,7 @@
         "itemsList": breadcrumbsData
     })
 }}
+{% endblock breadcrumb %}
 {% set ns = namespace() %}
 {% include "radio-option-select-error-panel.html" %}
 
@@ -75,7 +78,7 @@
                     })
                 }}
         <a href="{{ url_for('help_bp.help_get') }}"
-      role="button" class="btn btn--secondary" id="btn-who-ons-option-cancel"><span class="btn__inner">Cancel</span></a>
+      role="button" class="btn btn--link btn--secondary" id="btn-who-ons-option-cancel"><span class="btn__inner">Cancel</span></a>
         </div>
 </form>
 

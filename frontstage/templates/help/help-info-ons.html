@@ -24,10 +24,10 @@
     })
 }}
 {% endblock breadcrumb %}
-{% block main %}
 {% set ns = namespace() %}
 {% include "radio-option-select-error-panel.html" %}
 
+{% block main %}
 <h1 class="u-fs-xl">Information about the Office for National Statistics (ONS)</h1>
 
 <form action="{{ url_for('help_bp.info_ons_submit')}}" method="post">

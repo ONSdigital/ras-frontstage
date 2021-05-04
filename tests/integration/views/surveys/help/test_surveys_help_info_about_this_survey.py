@@ -79,7 +79,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Information about the Monthly Survey of Building Materials Bricks".encode(), response.data)
         self.assertIn("Choose an option".encode(), response.data)
-        self.assertIn("Can I be exempt from completing the survey questionnaire?".encode(), response.data)
+        self.assertIn("Can I be exempt from completing the survey?".encode(), response.data)
         self.assertIn("How was my business selected?".encode(), response.data)
         self.assertIn("How long will it take to complete?".encode(), response.data)
         self.assertIn("How long will my business be selected for?".encode(), response.data)
@@ -102,10 +102,8 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Can I be exempt from completing the survey?".encode(), response.data)
-        self.assertIn("Whilst this survey is voluntary, we have selected your company through our normal "
-                      "selection processes. This means that any data you submit to us on this subject will "
-                      "allow us to produce statistics on things which may not otherwise be asked as part of "
-                      "mandatory surveys.".encode(), response.data)
+        self.assertIn("While this survey is voluntary, we have selected your company in the same way we select "
+                      "companies for mandatory surveys.".encode(), response.data)
         self.assertIn("https://www.ons.gov.uk/surveys/informationforbusinesses".encode(), response.data)
         self.assertIn("Did this answer your question?".encode(), response.data)
         self.assertIn("Yes".encode(), response.data)
@@ -156,7 +154,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
                       "and the size of those businesses.".encode(), response.data)
         self.assertIn("We always include large businesses in the survey sample because the information "
                       "they provide can be significant.".encode(), response.data)
-        self.assertIn("Large businesses are usually defined as having over 100 employees.".encode(), response.data)
+        self.assertIn("Large businesses are usually defined as having more than 100 employees.".encode(), response.data)
         self.assertIn("https://www.ons.gov.uk/surveys/informationforbusinesses".encode(), response.data)
         self.assertIn("Did this answer your question?".encode(), response.data)
         self.assertIn("Yes".encode(), response.data)
@@ -178,10 +176,9 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("How long will it take to complete?".encode(), response.data)
         self.assertIn("We design each survey to answer a set of statistical requirements. "
-                      "The length and volume of questions can vary.".encode(), response.data)
-        self.assertIn("The length of time it takes your business to complete will depend on the "
-                      "availability of the information requested.".encode(), response.data)
-        self.assertIn("We can help with a specific issue by using our secure message service.".encode(), response.data)
+                      "The length and number of questions can vary.".encode(), response.data)
+        self.assertIn("How long it takes your business to complete a survey will depend on how easily you "
+                      "can get hold of the information we ask for.".encode(), response.data)
         self.assertIn("https://www.ons.gov.uk/surveys/informationforbusinesses".encode(), response.data)
         self.assertIn("Did this answer your question?".encode(), response.data)
         self.assertIn("Yes".encode(), response.data)
@@ -202,11 +199,11 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("How long will my business be selected for?".encode(), response.data)
-        self.assertIn("We cannot give a definitive period of selection for business surveys as this depends on "
-                      "many factors.".encode(), response.data)
+        self.assertIn("We cannot give a definite period of selection for business surveys as this depends "
+                      "on various factors. We choose a specific number of businesses for a survey sample. "
+                      "This can change as businesses start and other businesses stop trading.".encode(), response.data)
         self.assertIn("We choose a specific number of businesses for a survey sample. This can change as "
-                      "businesses start and other businesses stop trading. As employment levels within each "
-                      "business change, so do the number of businesses in each size-band.".encode(), response.data)
+                      "businesses start and other businesses stop trading.".encode(), response.data)
         self.assertIn("https://www.ons.gov.uk/surveys/informationforbusinesses".encode(), response.data)
         self.assertIn("Did this answer your question?".encode(), response.data)
         self.assertIn("Yes".encode(), response.data)
@@ -227,10 +224,10 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("What happens if I don’t complete a survey?".encode(), response.data)
-        self.assertIn("Failure to comply could lead to prosecution at a Magistrates Court with a fine up "
-                      "to a maximum of £2,500 (last updated by section 17 of the Criminal Justice Act 1991)."
+        self.assertIn("Failure to complete a survey by the deadline could lead to prosecution at a Magistrates "
+                      "Court with a fine of up to £2,500 (last updated by section 17 of the Criminal Justice Act 1991)."
                       .encode(), response.data)
-        self.assertIn("If this happens you will still need to complete the questionnaire.".encode(), response.data)
+        self.assertIn("If this happens, you will still need to complete the survey.".encode(), response.data)
         self.assertIn("https://www.ons.gov.uk/surveys/informationforbusinesses".encode(), response.data)
         self.assertIn("Did this answer your question?".encode(), response.data)
         self.assertIn("Yes".encode(), response.data)
@@ -317,9 +314,9 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Send a message".encode(), response.data)
-        self.assertIn("Send us a message with a description of your issue".encode(), response.data)
+        self.assertIn("Tell us what you would like to know and we will get back to you.".encode(), response.data)
         self.assertIn("How long will my business be selected for?".encode(), response.data)
-        self.assertIn("Create message".encode(), response.data)
+        self.assertIn("Enter message".encode(), response.data)
         self.assertIn("Send message".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)
 
@@ -337,9 +334,9 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Send a message".encode(), response.data)
-        self.assertIn("Send us a message with a description of your issue".encode(), response.data)
+        self.assertIn("Tell us what you would like to know and we will get back to you.".encode(), response.data)
         self.assertIn("What happens if I don’t complete a survey?".encode(), response.data)
-        self.assertIn("Create message".encode(), response.data)
+        self.assertIn("Enter message".encode(), response.data)
         self.assertIn("Send message".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)
 
@@ -357,9 +354,9 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Send a message".encode(), response.data)
-        self.assertIn("Send us a message with a description of your issue".encode(), response.data)
+        self.assertIn("Tell us what you would like to know and we will get back to you.".encode(), response.data)
         self.assertIn("Information about this survey".encode(), response.data)
-        self.assertIn("Create message".encode(), response.data)
+        self.assertIn("Enter message".encode(), response.data)
         self.assertIn("Send message".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)
 

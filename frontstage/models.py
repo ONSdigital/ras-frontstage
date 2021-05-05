@@ -6,10 +6,10 @@ from flask_wtf import FlaskForm
 from phonenumbers.phonenumberutil import NumberParseException
 from structlog import wrap_logger
 from wtforms import HiddenField, PasswordField, StringField, SubmitField, TextAreaField, RadioField
-from wtforms.validators import EqualTo, Length, Email, ValidationError, Required, Regexp
-from frontstage.common.validators import InputRequired, DataRequired
+from wtforms.validators import EqualTo, Length, Email, ValidationError
 
 from frontstage import app
+from frontstage.common.validators import InputRequired, DataRequired
 from frontstage.form import Form
 from frontstage.i18n.translations import Translate
 

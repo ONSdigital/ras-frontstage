@@ -181,6 +181,8 @@ def share_survey_post_survey_select(session):
         share_surveys_selected_against_business = request.form.getlist(business[0]['name'])
         share_dictionary_copy[business[0]['id']] = share_surveys_selected_against_business
 
+    flask_session.pop('validation_failure_share_surveys_list', None)
+    flask_session.pop('share_surveys_selected_list', None)
     flask_session.pop('share', None)
     flask_session['share_survey_data'] = share_dictionary_copy
     return redirect(url_for('account_bp.share_survey_email_entry'))

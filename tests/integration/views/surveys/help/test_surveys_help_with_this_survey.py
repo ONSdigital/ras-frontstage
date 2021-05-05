@@ -64,7 +64,7 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.assertIn("Help completing the Monthly Survey of Building Materials Bricks".encode(), response.data)
         self.assertIn("Choose an option".encode(), response.data)
         self.assertIn("I need help answering a survey question".encode(), response.data)
-        self.assertIn("I don't have specific figures for a response".encode(), response.data)
+        self.assertIn("I do not have specific figures for a response".encode(), response.data)
         self.assertIn("Something else".encode(), response.data)
         self.assertIn("Continue".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)
@@ -84,9 +84,9 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Send a message".encode(), response.data)
-        self.assertIn("Send us a message with a description of your issue".encode(), response.data)
+        self.assertIn("Describe your issue and we will get back to you.".encode(), response.data)
         self.assertIn("Help answering a survey question".encode(), response.data)
-        self.assertIn("Create message".encode(), response.data)
+        self.assertIn("Enter message".encode(), response.data)
         self.assertIn("Send message".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)
 
@@ -104,9 +104,9 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
             follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("I don't have specific figures for a response".encode(), response.data)
+        self.assertIn("I do not have specific figures for a response".encode(), response.data)
         self.assertIn(
-            "We do not expect you to spend any great expense or time obtaining the information required.".encode(),
+            "We do not expect you to spend too long or go to any great expense to get hold of the information we request.".encode(),
             response.data)
         self.assertIn("Did this answer your question?".encode(), response.data)
         self.assertIn("Yes".encode(), response.data)
@@ -125,9 +125,9 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Send a message".encode(), response.data)
-        self.assertIn("Send us a message with a description of your issue".encode(), response.data)
+        self.assertIn("Describe your issue and we will get back to you.".encode(), response.data)
         self.assertIn("I don’t have specific figures for a response".encode(), response.data)
-        self.assertIn("Create message".encode(), response.data)
+        self.assertIn("Enter message".encode(), response.data)
         self.assertIn("Send message".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)
 
@@ -146,10 +146,6 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("I am unable to return the data by the deadline".encode(), response.data)
-        self.assertIn(
-            "All business surveys have a deadline by which you must submit data for us to use "
-            "for statistical purposes.".encode(),
-            response.data)
         self.assertIn("Did this answer your question?".encode(), response.data)
         self.assertIn("Yes".encode(), response.data)
         self.assertIn("No".encode(), response.data)
@@ -166,9 +162,9 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Send a message".encode(), response.data)
-        self.assertIn("Send us a message with a description of your issue".encode(), response.data)
-        self.assertIn("I’m unable to return the data by the deadline".encode(), response.data)
-        self.assertIn("Create message".encode(), response.data)
+        self.assertIn("Describe your issue and we will get back to you.".encode(), response.data)
+        self.assertIn("I am unable to return the data by the deadline".encode(), response.data)
+        self.assertIn("Enter message".encode(), response.data)
         self.assertIn("Send message".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)
 
@@ -187,9 +183,9 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Send a message".encode(), response.data)
-        self.assertIn("Send us a message with a description of your issue".encode(), response.data)
+        self.assertIn("Describe your issue and we will get back to you.".encode(), response.data)
         self.assertIn("Help completing this survey".encode(), response.data)
-        self.assertIn("Create message".encode(), response.data)
+        self.assertIn("Enter message".encode(), response.data)
         self.assertIn("Send message".encode(), response.data)
         self.assertIn("Cancel".encode(), response.data)
 

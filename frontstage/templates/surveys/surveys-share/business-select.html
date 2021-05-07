@@ -1,7 +1,7 @@
 {% extends "layouts/_block_content.html" %}
 {% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
-{% from "components/radios/_macro.njk" import onsRadios %}
+{% from "components/checkboxes/_macro.njk" import onsCheckboxes %}
 {% from "components/button/_macro.njk" import onsButton %}
 {% set page_title = "Survey share business select" %}
 {% set breadcrumbsData = [
@@ -36,13 +36,13 @@
 {% include "radio-option-select-error-panel.html" %}
 
 <h1>For which business do you want to share your surveys?</h1>
-
+{% set checkboxData = [] %}
 <form action="" method="post">
     {{ form.csrf_token }}
         {% if ns.optionError %}
                 {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
         {% endif %}
-        {% set radioComponent = {
+        {% set checkboxesData = {
             "id": "option",
             "legend": "Choose a business",
             "name": "option",
@@ -50,21 +50,19 @@
         } %}
         {% set radios = [] %}
         {% for business in businesses %}
-            {% do radios.append(
-                {
+            {% do checkboxData.append(
+                  {
                     "id": business['id']|string,
+                    "name": "checkbox-answer",
                     "label": {
                         "text": business['name']
                     },
-                    "value": business['id']|string
-                }
-            ) %}
+                     "value": business['id']|string
+                  }
+                ) %}
         {% endfor %}
-
-        {% do radioComponent | setAttribute("radios", radios) %}
-            {{
-                onsRadios(radioComponent)
-            }}
+        {% do checkboxesData | setAttribute("checkboxes", checkboxData) %}
+        {{ onsCheckboxes(checkboxesData) }}
         <p class="field u-mt-l">
         <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
             <div class="grid__col">

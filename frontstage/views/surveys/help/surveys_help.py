@@ -32,11 +32,11 @@ sub_option_template_url_mapping = {
 }
 subject_text_mapping = {
         'do-not-have-specific-figures': 'I don’t have specific figures for a response',
-        'unable-to-return-by-deadline': 'I’m unable to return the data by the deadline',
+        'unable-to-return-by-deadline': 'I am unable to return the data by the deadline',
         'exemption-completing-survey': 'Can I be exempt from completing the survey questionnaire?',
-        'why-selected': 'How / why was my business selected?',
+        'why-selected': 'How  was my business selected?',
         'time-to-complete': 'How long will it take to complete?',
-        'how-long-selected-for': 'How long will I be selected for?',
+        'how-long-selected-for': 'How long will my business be selected for?',
         'penalties': 'What are the penalties for not completing a survey?',
         'info-something-else': info_about_this_survey_title
 }
@@ -44,15 +44,15 @@ breadcrumb_text_mapping = {
         'do-not-have-specific-figures': [help_completing_this_survey_title,
                                          'I don’t have specific figures for a response'],
         'unable-to-return-by-deadline': [help_completing_this_survey_title,
-                                         'I’m unable to return the data by the deadline'],
+                                         'I am unable to return the data by the deadline'],
         'exemption-completing-survey': [info_about_this_survey_title,
                                         'Can I be exempt from completing the survey questionnaire?'],
         'why-selected': [info_about_this_survey_title,
-                         'How / why was my business selected?'],
+                         'How  was my business selected?'],
         'time-to-complete': [info_about_this_survey_title,
                              'How long will it take to complete?'],
         'how-long-selected-for': [info_about_this_survey_title,
-                                  'How long will I be selected for?'],
+                                  'How long will my business be selected for?'],
         'penalties': [info_about_this_survey_title,
                       'What are the penalties for not completing a survey?'],
         'info-something-else': [info_about_this_survey_title, 'More information']

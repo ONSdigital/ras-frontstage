@@ -11,7 +11,7 @@
   }
 ] %}
 
-{% block main %}
+{% block breadcrumb %}
 {{
     onsBreadcrumb({
         "ariaLabel": "Breadcrumbs",
@@ -19,6 +19,8 @@
         "itemsList": breadcrumbsData
     })
 }}
+{% endblock breadcrumb %}
+{% block main %}
 {% set ns = namespace() %}
 {% include "radio-option-select-error-panel.html" %}
 

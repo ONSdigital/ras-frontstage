@@ -37,7 +37,7 @@ def create_message(session):
                                unread_message_count=unread_message_count)
 
 
-def _send_new_message(party_id, survey, business_id):
+def _send_new_message(party_id, survey_id, business_id):
     logger.info('Attempting to send message', party_id=party_id, business_id=business_id)
     form = SecureMessagingForm(request.form)
 
@@ -49,7 +49,7 @@ def _send_new_message(party_id, survey, business_id):
         "body": form['body'].data,
         "thread_id": form['thread_id'].data,
         "business_id": business_id,
-        "survey": survey,
+        "survey_id": survey_id,
     }
 
     response = conversation_controller.send_message(json.dumps(message_json))

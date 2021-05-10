@@ -17,7 +17,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 @jwt_authorization(request)
 def create_message(session):
     """Creates and sends a message outside of the context of an existing conversation"""
-    survey_id = request.args['survey_id']
+    survey_id = request.args['survey']
     ru_ref = request.args['ru_ref']
     party_id = session.get_party_id()
     form = SecureMessagingForm(request.form)

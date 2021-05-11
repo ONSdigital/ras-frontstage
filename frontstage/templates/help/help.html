@@ -11,7 +11,7 @@
   }
 ] %}
 
-{% block main %}
+{% block breadcrumb %}
 {{
     onsBreadcrumb({
         "ariaLabel": "Breadcrumbs",
@@ -19,6 +19,8 @@
         "itemsList": breadcrumbsData
     })
 }}
+{% endblock breadcrumb %}
+{% block main %}
 {% set ns = namespace() %}
 {% include "radio-option-select-error-panel.html" %}
 
@@ -57,7 +59,7 @@
                     })
                 }}
         <a href="{{ url_for('sign_in_bp.login') }}"
-      role="button" class="btn btn--secondary" id="btn-help-option-cancel"><span class="btn__inner">Cancel</span></a>
+      role="button" class="btn btn--link btn--secondary" id="btn-help-option-cancel"><span class="btn__inner">Cancel</span></a>
         </div>
     </p>
 </form>

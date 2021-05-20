@@ -26,7 +26,7 @@ dummy_survey = {"id": "02b9c366-7397-42f7-942a-76dc5876d86d",
                 "legalBasisRef": "STA1947"}
 
 
-class TestShareSurvey(unittest.TestCase):
+class TestSurveyList(unittest.TestCase):
 
     def setUp(self):
         self.app = app.test_client()

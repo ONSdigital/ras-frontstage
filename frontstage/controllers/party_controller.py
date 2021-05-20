@@ -253,44 +253,6 @@ def verify_token(token):
     logger.info('Successfully verified token', token=token)
 
 
-def verify_share_survey_token(token):
-    """
-     Gives call to party service to verify share survey token
-    """
-    logger.info('Attempting to verify share survey token with party service', token=token)
-
-    url = f"{app.config['PARTY_URL']}/party-api/v1/share-survey/verification/{token}"
-    response = requests.get(url, auth=app.config['BASIC_AUTH'])
-
-    try:
-        response.raise_for_status()
-    except requests.exceptions.HTTPError:
-        logger.error('Failed to verify share survey token', token=token)
-        raise ApiError(logger, response)
-
-    logger.info('Successfully verified token', token=token)
-    return response
-
-
-def confirm_share_survey(batch_number):
-    """
-    gives call to party service to confirm pending share survey
-    """
-    logger.info('Attempting to confirm share survey with party service', batch_number=batch_number)
-
-    url = f"{app.config['PARTY_URL']}/party-api/v1/share-survey/confirm-pending-shares/{batch_number}"
-    response = requests.post(url, auth=app.config['BASIC_AUTH'])
-
-    try:
-        response.raise_for_status()
-    except requests.exceptions.HTTPError:
-        logger.error('Failed to confirm share survey with batch number', batch_number=batch_number)
-        raise ApiError(logger, response)
-
-    logger.info('Successfully confirmed share survey', batch_number=batch_number)
-    return response
-
-
 def get_respondent_enrolments(party_id):
     respondent = get_respondent_party_by_id(party_id)
     for association in respondent['associations']:

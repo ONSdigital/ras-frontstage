@@ -101,7 +101,7 @@ def _get_message_json(form, first_message_in_conversation, msg_to, msg_from):
         'subject': form.subject.data,
         'body': form.body.data,
         'thread_id': first_message_in_conversation['thread_id'],
-        'survey': first_message_in_conversation['survey_id'],
+        'survey_id': first_message_in_conversation['survey_id'],
         'business_id': first_message_in_conversation['ru_ref']})
 
 

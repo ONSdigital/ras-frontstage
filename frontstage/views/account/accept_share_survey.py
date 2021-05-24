@@ -23,6 +23,8 @@ def get_share_survey_summary(token):
         share_dict = {}
         distinct_businesses = set()
         batch_number = pending_share_surveys[0]['batch_no']
+        originator_party = party_controller.get_respondent_party_by_id(pending_share_surveys[0]['shared_by'])
+        shared_by = originator_party['emailAddress']
         for pending_share_survey in pending_share_surveys:
             distinct_businesses.add(pending_share_survey['business_id'])
         for business_id in distinct_businesses:
@@ -39,7 +41,8 @@ def get_share_survey_summary(token):
             }
         return render_template('surveys/surveys-share/summary.html',
                                share_dict=share_dict,
-                               batch_no=batch_number)
+                               batch_no=batch_number,
+                               shared_by=shared_by)
 
     except ApiError as exc:
         # Handle api errors

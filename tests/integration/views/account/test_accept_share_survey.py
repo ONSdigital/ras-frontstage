@@ -13,7 +13,7 @@ batch_number = '02b9c366-7397-42f7-942a-76dc5876d86d'
 url_get_share_survey_verify = f"{app.config['PARTY_URL']}/party-api/v1/share-survey/verification/{token}"
 url_post_accept_share_survey = f"{app.config['PARTY_URL']}/party-api/v1/share-survey/confirm-pending-shares/" \
                                f"{batch_number}"
-
+url_get_shared_by_respondent_party = f"{app.config['PARTY_URL']}/party-api/v1/respondents/id/sharetest@test.com"
 url_get_business_details = f"{app.config['PARTY_URL']}/party-api/v1/businesses"
 url_get_user_count = f"{app.config['PARTY_URL']}/party-api/v1/share-survey-users-count?business_id={business_party['id']}&survey_id={'02b9c366-7397-42f7-942a-76dc5876d86d'}"
 url_post_pending_shares = f"{app.config['PARTY_URL']}/party-api/v1/pending-shares"
@@ -62,6 +62,7 @@ class TestAcceptShareSurvey(unittest.TestCase):
     def test_get_share_survey_summary_success(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
+        mock_request.get(url_get_shared_by_respondent_party, status_code=200, json=respondent_party)
         mock_request.get(url_get_business_details, status_code=200, json=[dummy_business])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
@@ -70,7 +71,7 @@ class TestAcceptShareSurvey(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Confirm survey access".encode(), response.data)
         self.assertIn("RUNAME1_COMPANY1 RUNNAME2_COMPANY1".encode(), response.data)
-        self.assertIn("TOTAL UK ACTIVITY".encode(), response.data)
+        self.assertIn("Trading as TOTAL UK ACTIVITY".encode(), response.data)
         self.assertIn("Quarterly Business Survey".encode(), response.data)
         self.assertIn("Accept".encode(), response.data)
 

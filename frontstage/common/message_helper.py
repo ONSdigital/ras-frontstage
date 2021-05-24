@@ -13,7 +13,7 @@ def refine(message):
         'thread_id': message.get('thread_id'),
         'subject': get_message_subject(message),
         'body': message.get('body'),
-        'survey_id': message.get('survey'),
+        'survey_id': message.get('survey_id'),
         'ru_ref': get_ru_ref_from_message(message),
         'from': get_from_name(message),                     # As displayed to user
         'from_internal': from_internal(message),

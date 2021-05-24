@@ -58,7 +58,7 @@
       "read_date": "2017-09-20 10:35:34.250858", 
       "business_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
       "sent_date": "2017-09-20 10:21:51.912869", 
-      "subject": "TEST", "survey": "BRES", 
+      "subject": "TEST", "survey_id": "BRES", 
       "thread_id": "dfcb2b2c-a1d8-4d86-a974-7ffe05a3141b"
     }, 
     {
@@ -155,7 +155,7 @@
       "business_id": "1f5e1d68-2a4c-4698-8086-e23c0b98923f", 
       "sent_date": "2017-09-11 11:39:03.185794", 
       "subject": "Testing send message", 
-      "survey": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87", 
+      "survey_id": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87", 
       "thread_id": "5e4be17d-f192-4196-befc-ccb1c85d9e87"
     }, 
     {
@@ -249,7 +249,7 @@
       "business_id": "1f5e1d68-2a4c-4698-8086-e23c0b98923f",
       "sent_date": "2017-09-11 11:03:49.871302",
       "subject": "Testing send message", 
-      "survey": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87",
+      "survey_id": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87",
       "thread_id": "5e4be17d-f192-4196-befc-ccb1c85d9e87"
     }
   ]

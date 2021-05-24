@@ -221,6 +221,7 @@ class TestGenerateEqURL(unittest.TestCase):
         response = EqPayload()._find_event_date_by_tag('employment', collex_events_dates, '123', False)
         self.assertEqual(response, '2018-04-03')
 
+    @requests_mock.mock()
     def test_generate_eq_payload_has_party_id(self, mock_request):
 
         mock_request.get(url_get_case, json=case)

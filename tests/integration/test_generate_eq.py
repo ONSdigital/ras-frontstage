@@ -220,3 +220,9 @@ class TestGenerateEqURL(unittest.TestCase):
 
         response = EqPayload()._find_event_date_by_tag('employment', collex_events_dates, '123', False)
         self.assertEqual(response, '2018-04-03')
+
+    def test_generate_eq_payload_has_party_id(self):
+
+        payload = EqPayload.create_payload(case, party_id=respondent_party['id'],
+                                           business_party_id=business_party['id'], survey=survey_eq)
+        self.assertIn('party_id', payload)

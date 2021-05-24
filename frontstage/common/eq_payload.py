@@ -70,6 +70,7 @@ class EqPayload(object):
             'collection_exercise_sid': collex['id'],
             'ru_ref': party['sampleUnitRef'] + party['checkletter'],
             'ru_name': party['name'],
+            'party_id': party['id'],
             'survey_id': survey['surveyRef'],
             'case_id': case['id'],
             'case_ref': case['caseRef'],

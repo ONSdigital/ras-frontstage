@@ -221,9 +221,20 @@ class TestGenerateEqURL(unittest.TestCase):
         response = EqPayload()._find_event_date_by_tag('employment', collex_events_dates, '123', False)
         self.assertEqual(response, '2018-04-03')
 
-    def test_generate_eq_payload_has_party_id(self):
+    def test_generate_eq_payload_has_party_id(self, mock_request):
+
+        mock_request.get(url_get_case, json=case)
+        mock_request.get(url_get_collection_exercise, json=collection_exercise)
+        mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
+        mock_request.get(url_get_business_party, json=business_party)
+        mock_request.get(url_get_survey_by_short_name_eq, json=survey_eq)
+        mock_request.get(url_get_ci, json=collection_instrument_eq)
+        mock_request.get(url_get_case_categories, json=categories)
+        mock_request.post(url_post_case_event_uuid, status_code=201)
+        mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
+        mock_request.get(url_banner_api, status_code=404)
 
         with app.app_context():
             payload = EqPayload.create_payload(self=self, case=case, party_id=respondent_party['id'],
                                            business_party_id=business_party['id'], survey=survey_eq)
-            self.assertIn('party_id', payload)
+        self.assertIn('party_id', payload)

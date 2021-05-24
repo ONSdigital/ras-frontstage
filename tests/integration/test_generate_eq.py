@@ -223,6 +223,6 @@ class TestGenerateEqURL(unittest.TestCase):
 
     def test_generate_eq_payload_has_party_id(self):
 
-        payload = EqPayload.create_payload(case=case, party_id=respondent_party['id'],
+        payload = EqPayload.create_payload(self=self, case=case, party_id=respondent_party['id'],
                                            business_party_id=business_party['id'], survey=survey_eq)
         self.assertIn('party_id', payload)

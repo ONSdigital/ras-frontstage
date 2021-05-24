@@ -68,17 +68,10 @@ class TestAcceptShareSurvey(unittest.TestCase):
         mock_request.get(url_get_share_survey_verify, status_code=200, json=[dummy_pending_share])
         response = self.app.get(f'/my-account/share-surveys/accept-share-surveys/{token}')
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Surveys have been shared with you".encode(), response.data)
-        self.assertIn("You need to confirm the organisation and survey details to be able to access the surveys."
-                      .encode(), response.data)
+        self.assertIn("Confirm survey access".encode(), response.data)
         self.assertIn("RUNAME1_COMPANY1 RUNNAME2_COMPANY1".encode(), response.data)
         self.assertIn("TOTAL UK ACTIVITY".encode(), response.data)
         self.assertIn("Quarterly Business Survey".encode(), response.data)
-        self.assertIn("If the organisation or survey details aren’t what you were expecting, please refer to the "
-                      "colleague ((originator_email_address)) who shared these with you.".encode(), response.data)
-        self.assertIn("If you do not accept access to the survey/s shared, you can ignore this request."
-                      .encode(), response.data)
-        self.assertIn("The invitation will expire after 72 hours.".encode(), response.data)
         self.assertIn("Accept".encode(), response.data)
 
     @requests_mock.mock()

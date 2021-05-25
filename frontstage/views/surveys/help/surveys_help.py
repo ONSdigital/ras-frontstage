@@ -215,7 +215,7 @@ def send_help_message(session, short_name, business_id):
         return redirect(url_for('surveys_bp.get_survey_list', tag='todo'))
 
 
-def _send_new_message(subject, party_id, survey, business_id):
+def _send_new_message(subject, party_id, survey_id, business_id):
     logger.info('Attempting to send message', party_id=party_id, business_id=business_id)
     form = SecureMessagingForm(request.form)
     message_json = {
@@ -225,7 +225,7 @@ def _send_new_message(subject, party_id, survey, business_id):
         "body": form['body'].data,
         "thread_id": form['thread_id'].data,
         "business_id": business_id,
-        "survey": survey,
+        "survey_id": survey_id,
     }
 
     response = conversation_controller.send_message(json.dumps(message_json))

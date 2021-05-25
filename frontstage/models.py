@@ -286,3 +286,12 @@ class HelpInfoOnsForm(Form):
         ('value', 'data'),
         ('value', 'info-something-else')
     ])
+
+
+class HelpPasswordForm(Form):
+    option = RadioField('Label', choices=[
+        ('value', 'reset-email'),
+        ('value', 'password-not-accept'),
+        ('value', 'reset-password'),
+        ('value', 'password-something-else')
+    ])

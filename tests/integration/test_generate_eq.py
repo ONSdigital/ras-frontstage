@@ -232,6 +232,6 @@ class TestGenerateEqURL(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
 
         with app.app_context():
-            payload = EqPayload.create_payload(case, party_id=respondent_party['id'],
+            payload = EqPayload.create_payload(self=self, case=case, party_id=respondent_party['id'],
                                            business_party_id=business_party['id'], survey=survey_eq)
         self.assertIn('party_id', payload)

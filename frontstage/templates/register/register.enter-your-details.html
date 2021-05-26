@@ -201,7 +201,7 @@
 
     </form>
 
-    <script>
+    <script{% if csp_nonce %} nonce="{{ csp_nonce() }}"{% endif %}>
     var submitted = false;
     function formSubmitted(event) {
         if (submitted) {

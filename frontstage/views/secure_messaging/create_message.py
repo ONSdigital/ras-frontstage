@@ -17,13 +17,13 @@ logger = wrap_logger(logging.getLogger(__name__))
 @jwt_authorization(request)
 def create_message(session):
     """Creates and sends a message outside of the context of an existing conversation"""
-    survey = request.args['survey']
+    survey_id = request.args['survey']
     ru_ref = request.args['ru_ref']
     party_id = session.get_party_id()
     form = SecureMessagingForm(request.form)
     if request.method == 'POST' and form.validate():
         logger.info("Form validation successful", party_id=party_id)
-        sent_message = _send_new_message(party_id, survey, ru_ref)
+        sent_message = _send_new_message(party_id, survey_id, ru_ref)
         thread_url = url_for("secure_message_bp.view_conversation",
                              thread_id=sent_message['thread_id']) + "#latest-message"
         flash(Markup(f'Message sent. <a href={thread_url}>View Message</a>'))
@@ -32,12 +32,12 @@ def create_message(session):
     else:
         unread_message_count = {'unread_message_count': conversation_controller.try_message_count_from_session(session)}
         return render_template('secure-messages/secure-messages-view.html',
-                               ru_ref=ru_ref, survey=survey,
+                               ru_ref=ru_ref, survey_id=survey_id,
                                form=form, errors=form.errors, message={},
                                unread_message_count=unread_message_count)
 
 
-def _send_new_message(party_id, survey, business_id):
+def _send_new_message(party_id, survey_id, business_id):
     logger.info('Attempting to send message', party_id=party_id, business_id=business_id)
     form = SecureMessagingForm(request.form)
 
@@ -49,7 +49,7 @@ def _send_new_message(party_id, survey, business_id):
         "body": form['body'].data,
         "thread_id": form['thread_id'].data,
         "business_id": business_id,
-        "survey": survey,
+        "survey_id": survey_id,
     }
 
     response = conversation_controller.send_message(json.dumps(message_json))

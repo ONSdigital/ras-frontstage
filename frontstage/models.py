@@ -295,3 +295,53 @@ class HelpPasswordForm(Form):
         ('value', 'reset-password'),
         ('value', 'password-something-else')
     ])
+
+
+class ShareSurveyRegistrationForm(FlaskForm):
+    first_name = StringField(_('First name'), validators=[InputRequired(_('First name is required')),
+                                                          Length(max=254,
+                                                                 message=_('Your first name must be less than 254 '
+                                                                           'characters'))])
+    last_name = StringField(_('Last name'),
+                            validators=[InputRequired(_('Last name is required')),
+                                        Length(max=254, message=_('Your last name must be less than 254 characters'))])
+    email = HiddenField('Enter your email address')
+
+    password = PasswordField(_('Create a password'),
+                             validators=[DataRequired(_('Password is required')),
+                                         EqualTo('password_confirm', message=app.config['PASSWORD_MATCH_ERROR_TEXT']),
+                                         Length(min=app.config['PASSWORD_MIN_LENGTH'],
+                                                max=app.config['PASSWORD_MAX_LENGTH'],
+                                                message=app.config['PASSWORD_CRITERIA_ERROR_TEXT'])])
+    password_confirm = PasswordField(_('Re-type your password'))
+    phone_number = StringField(_('Telephone number'),
+                               validators=[DataRequired(_('Phone number is required')),
+                                           Length(min=9,
+                                                  max=15,
+                                                  message=_('This should be a valid phone number between 9 and 15 '
+                                                            'digits'))],
+                               default=None)
+    batch_no = HiddenField('Batch number')
+
+    @staticmethod
+    def validate_phone_number(form, field):
+        try:
+            logger.info('Checking this is a valid phone number')
+            input_number = phonenumbers.parse(field.data,
+                                              'GB')  # Default region GB (44), unless country code added by user
+
+            if not phonenumbers.is_possible_number(input_number):
+                raise ValidationError(_('This should be a valid telephone number between 9 and 15 digits'))
+
+            if not phonenumbers.is_valid_number(input_number):
+                raise ValidationError(_('Please use a valid telephone number e.g. 01632 496 0018.'))
+        except NumberParseException:
+            logger.info('There is a number parse exception in the phonenumber field')
+            raise ValidationError(_('This should be a valid telephone number e.g. 01632 496 0018. '))
+
+    @staticmethod
+    def validate_password(_, field):
+        password = field.data
+        if password.isalnum() or not any(char.isupper() for char in password) or not any(
+                char.isdigit() for char in password):
+            raise ValidationError(app.config['PASSWORD_CRITERIA_ERROR_TEXT'])

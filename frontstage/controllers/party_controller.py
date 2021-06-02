@@ -640,5 +640,58 @@ def register_pending_shares(payload):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        raise ApiError(logger, response)
+        if response.status_code == 400:
+            logger.info('share survey has already been shared, hence ignoring this request.')
+        else:
+            raise ApiError(logger, response)
     return response.json()
+
+
+def get_share_surveys_batch_number(batch_no):
+    """
+    Gets batch number for the shared survey
+
+    :param batch_no: Shared survey batch number
+    :type batch_no: str
+    :raises ApiError: Raised when party returns api error
+    :return: list share surveys
+    """
+    bound_logger = logger.bind(batch_no=batch_no)
+    bound_logger.info('Attempting to retrieve share surveys by batch number')
+    url = f"{app.config['PARTY_URL']}/party-api/v1/share-survey/{batch_no}"
+    response = requests.get(url, auth=app.config['BASIC_AUTH'])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        bound_logger.error('Failed to retrieve share surveys by batch number')
+        raise ApiError(logger, response)
+
+    bound_logger.info('Successfully retrieved share surveys by batch number')
+    return response
+
+
+def create_share_survey_account(registration_data):
+    """
+    Gives call to party service to create a new account and register the account against the email address of share
+    surveys
+    :param registration_data: respondent details
+    :type registration_data: dict
+    :raises ApiError: Raised when party returns api error
+    """
+    logger.info('Attempting to create new account against share survey')
+
+    url = f"{app.config['PARTY_URL']}/party-api/v1/share-survey-respondent"
+    registration_data['status'] = 'ACTIVE'
+    response = requests.post(url, auth=app.config['BASIC_AUTH'], json=registration_data)
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        if response.status_code == 400:
+            logger.info('Email has already been used')
+        else:
+            logger.error('Failed to create account')
+        raise ApiError(logger, response)
+
+    logger.info('Successfully created account')

@@ -16,6 +16,11 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 @account_bp.route('/share-surveys/accept-share-surveys/<token>', methods=['GET'])
 def get_share_survey_summary(token):
+    """
+    Endpoint to verify token and retrieve the summary page
+    :param token: share survey token
+    :type token: str
+    """
     logger.info('Getting share survey summary', token=token)
     try:
         response = party_controller.verify_share_survey_token(token)
@@ -61,13 +66,54 @@ def get_share_survey_summary(token):
 
 
 @account_bp.route('/confirm-share-surveys/<batch>', methods=['GET'])
-@jwt_authorization(request)
-def accept_share_surveys(session, batch):
-    logger.info('Attempting to confirm share surveys', batch_number=batch)
+def accept_share_surveys(batch):
+    """
+    Accept endpoint when a share survey summary is accepted
+    :param batch: batch number
+    :type batch: str
+    """
+    logger.info('Attempting to get batch number', batch_number=batch)
     try:
-        party_controller.confirm_share_survey(batch)
+        response = party_controller.get_share_surveys_batch_number(batch)
+        is_existing_user = _is_existing_account(response.json()[0]['email_address'])
     except ApiError as exc:
         logger.error('Failed to confirm share survey', status=exc.status_code, batch_number=batch)
         raise exc
-    logger.info('Successfully completed share survey', batch_number=batch)
+    if is_existing_user:
+        return redirect(url_for('account_bp.accept_share_surveys_existing_account', batch=batch))
+    return redirect(url_for('register_bp.share_surveys_register_enter_your_details', batch_no=batch,
+                            email=response.json()[0]['email_address']))
+
+
+@account_bp.route('/confirm-share-surveys/<batch>/existing-account', methods=['GET'])
+@jwt_authorization(request)
+def accept_share_surveys_existing_account(session, batch):
+    """
+    Accept redirect endpoint for accepting share surveys for existing account
+    :param session:
+    :type session:
+    :param batch: batch number
+    :type batch: str
+    """
+    logger.info('Attempting to confirm share surveys for existing account', batch_number=batch)
+    try:
+        party_controller.confirm_share_survey(batch)
+    except ApiError as exc:
+        logger.error('Failed to confirm share survey for existing account', status=exc.status_code, batch_number=batch)
+        raise exc
+    logger.info('Successfully completed share survey for existing account', batch_number=batch)
     return redirect(url_for('surveys_bp.get_survey_list', tag='todo'))
+
+
+def _is_existing_account(respondent_email):
+    """
+    Checks if the respondent already exists against the email address provided
+    :param respondent_email: email of the respondent
+    :type respondent_email: str
+    :return: returns true if account already registered
+    :rtype: bool
+    """
+    respondent = party_controller.get_respondent_by_email(respondent_email)
+    if not respondent:
+        return False
+    return True

@@ -5,8 +5,8 @@
 {% from "components/input/_macro.njk" import onsInput %}
 {% from "components/password/_macro.njk" import onsPassword %}
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
-
-{% set page_title = "Enter account details" %}
+{% from "components/label/_macro.njk" import onsLabel %}
+{% set page_title = "Share survey enter account details" %}
 
 {% block main %}
     {% if errors|length > 0 %}
@@ -50,9 +50,10 @@
             onsubmit="formSubmitted(event);">
             {{ form.csrf_token }}
 
-        <h1 class="u-fs-xl">Enter your account details</h1>
-        {{ form.enrolment_code }}
-
+        <h1 class="u-fs-xl">Create an account</h1>
+        <p>Enter your account details for <strong>{{ email }}</strong>.</p>
+        {{ form.email }}
+        {{ form.batch_no }}
         <h2>Your name</h2>
 
         {%- call onsFieldset({
@@ -85,39 +86,6 @@
                         "text": "Last name"
                     },
                     "error": errorLastName
-                })
-            }}
-        {% endcall %}
-        
-        <h2 class="u-mt-l">Email address</h2>
-        <p>We'll send you an email so you can activate your account</p>
-        {%- call onsFieldset({
-            "legend": "Email address",
-            "legendClasses": "u-vh"
-        }) -%}
-            {% if errors.email_address %}
-                {% set errorEmailAddress = { "text": errors['email_address'][0],  "id": 'email_address_error' } %}
-            {% endif %}
-            {{
-                onsInput({
-                    "id": "email_address",
-                    "name": "email_address",
-                    "type": "text",
-                    "label": {
-                        "text": "Email address"
-                    },
-                    "error": errorEmailAddress
-                })
-            }}
-            {{
-                onsInput({
-                    "id": "email_address_confirm",
-                    "name": "email_address_confirm",
-                    "type": "text",
-                    "label": {
-                        "text": "Re-type your email address"
-                    },
-                    "error": errorEmailAddress
                 })
             }}
         {% endcall %}

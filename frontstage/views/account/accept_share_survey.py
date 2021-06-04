@@ -102,7 +102,7 @@ def accept_share_surveys_existing_account(session, batch):
         logger.error('Failed to confirm share survey for existing account', status=exc.status_code, batch_number=batch)
         raise exc
     logger.info('Successfully completed share survey for existing account', batch_number=batch)
-    return redirect(url_for('surveys_bp.get_survey_list', tag='todo'))
+    return render_template('surveys/surveys-share/share-survey-complete-thank-you.html')
 
 
 def _is_existing_account(respondent_email):

@@ -38,3 +38,17 @@ def get_survey_by_short_name(survey_short_name):
 
     logger.info('Successfully retrieved survey by its short name', survey_short_name=survey_short_name)
     return response.json()
+
+def get_survey_by_survey_ref(survey_ref):
+    logger.info('Attempting to retrieve survey by its survey ref', survey_ref=survey_ref)
+    url = f"{app.config['SURVEY_URL']}/surveys/ref/{survey_ref}"
+    response = requests.get(url, auth=app.config['BASIC_AUTH'])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        logger.error('Failed to retrieve survey by its survey ref', survey_ref=survey_ref)
+        raise ApiError(logger, response)
+
+    logger.info('Successfully retrived survey by its survey ref', survey_ref=survey_ref)
+    return response.json()

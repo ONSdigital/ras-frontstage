@@ -695,3 +695,30 @@ def create_share_survey_account(registration_data):
         raise ApiError(logger, response)
 
     logger.info('Successfully created account')
+
+def get_business_by_ru_ref(ru_ref):
+    """
+    Gives call to party service to retrieve a business using a ru_ref parameter
+    :param ru_ref: the reporting unit reference
+    :type registration_data: str
+    :returns: a business
+    :raises ApiError: Raised when party returns api error
+    """
+    logger.info('Attempting to retrieve business by ru_ref',
+                ru_ref=ru_ref)
+
+    url = f"{app.config['PARTY_URL']}/party-api/v1/businesses/ref/<ref>"
+    params = ru_ref
+    response = requests.get(url, params=params)
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        logger.error('Failed to retrieve business by ru_ref',
+                     ru_ref=ru_ref)
+        raise ApiError(logger, response)
+
+    logger.info('Successfully retrieved business by ru_ref',
+                ru_ref=ru_ref)
+
+    return response.json()

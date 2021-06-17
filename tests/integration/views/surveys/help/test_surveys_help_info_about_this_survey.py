@@ -5,7 +5,7 @@ import requests_mock
 
 from frontstage import app
 from tests.integration.mocked_services import encoded_jwt_token, survey_eq, survey, survey_list_todo, url_banner_api, \
-    survey_rsi
+    survey_rsi, business_party
 
 
 class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
@@ -24,10 +24,11 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
     @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_survey_help_info_qbs(self, mock_request, get_survey):
+    def test_survey_help_info_qbs(self, mock_request, get_survey, get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey_eq
-        response = self.app.get('/surveys/help/QBS/7f9d681b-419c-4919-ba41-03fde7dc40f7')
+        get_business.return_value = business_party
+        response = self.app.get('/surveys/help/139/49900000001F')
         self.assertEqual(response.status_code, 200)
         self.assertIn("Help".encode(), response.data)
         self.assertIn("Choose an option".encode(), response.data)
@@ -37,10 +38,11 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
     @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_survey_help_info_bricks(self, mock_request, get_survey):
+    def test_survey_help_info_bricks(self, mock_request, get_survey, get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
-        response = self.app.get('/surveys/help/Bricks/7f9d681b-419c-4919-ba41-03fde7dc40f7')
+        get_business.return_value = business_party
+        response = self.app.get('/surveys/help/074/49900000001F')
         self.assertEqual(response.status_code, 200)
         self.assertIn("Help".encode(), response.data)
         self.assertIn("Choose an option".encode(), response.data)
@@ -51,12 +53,13 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
     @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_survey_help_info_bricks_with_no_option_select(self, mock_request, get_survey):
+    def test_survey_help_info_bricks_with_no_option_select(self, mock_request, get_survey, get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
+        get_business.return_value = business_party
         form = {
         }
-        response = self.app.post('/surveys/help/Bricks/7f9d681b-419c-4919-ba41-03fde7dc40f7',
+        response = self.app.post('/surveys/help/074/49900000001F',
                                  data=form,
                                  follow_redirects=True)
 
@@ -66,13 +69,14 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
     @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_survey_help_info_bricks_with_option_select(self, mock_request, get_survey):
+    def test_survey_help_info_bricks_with_option_select(self, mock_request, get_survey, get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
+        get_business.return_value = business_party
         form = {
             "option": "info-about-this-survey"
         }
-        response = self.app.post('/surveys/help/Bricks/7f9d681b-419c-4919-ba41-03fde7dc40f7',
+        response = self.app.post('/surveys/help/074/49900000001F',
                                  data=form,
                                  follow_redirects=True)
 
@@ -89,14 +93,16 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
     @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_survey_help_info_bricks_with_sub_option_exemption_completing_survey(self, mock_request, get_survey):
+    def test_survey_help_info_bricks_with_sub_option_exemption_completing_survey(self, mock_request, get_survey,
+                                                                                 get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
+        get_business.return_value = business_party
         form = {
             "option": "exemption-completing-survey"
         }
         response = self.app.post(
-            '/surveys/help/Bricks/7f9d681b-419c-4919-ba41-03fde7dc40f7/info-about-this-survey',
+            '/surveys/help/074/49900000001F/info-about-this-survey',
             data=form,
             follow_redirects=True)
 
@@ -110,14 +116,16 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
     @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_survey_help_info_rsi_with_sub_option_exemption_completing_survey(self, mock_request, get_survey):
+    def test_survey_help_info_rsi_with_sub_option_exemption_completing_survey(self, mock_request, get_survey,
+                                                                              get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey_rsi
+        get_business.return_value = business_party
         form = {
             "option": "exemption-completing-survey"
         }
         response = self.app.post(
-            '/surveys/help/RSI/7f9d681b-419c-4919-ba41-03fde7dc40f7/info-about-this-survey',
+            '/surveys/help/023/49900000001F/info-about-this-survey',
             data=form,
             follow_redirects=True)
 
@@ -132,14 +140,15 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
     @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_survey_help_info_bricks_with_sub_option_why_selected(self, mock_request, get_survey):
+    def test_survey_help_info_bricks_with_sub_option_why_selected(self, mock_request, get_survey, get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
+        get_business.return_value = business_party
         form = {
             "option": "why-selected"
         }
         response = self.app.post(
-            '/surveys/help/Bricks/7f9d681b-419c-4919-ba41-03fde7dc40f7/info-about-this-survey',
+            '/surveys/help/074/49900000001F/info-about-this-survey',
             data=form,
             follow_redirects=True)
 
@@ -153,14 +162,15 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
     @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_survey_help_info_bricks_with_sub_option_time_to_complete(self, mock_request, get_survey):
+    def test_survey_help_info_bricks_with_sub_option_time_to_complete(self, mock_request, get_survey, get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
+        get_business.return_value = business_party
         form = {
             "option": "time-to-complete"
         }
         response = self.app.post(
-            '/surveys/help/Bricks/7f9d681b-419c-4919-ba41-03fde7dc40f7/info-about-this-survey',
+            '/surveys/help/074/49900000001F/info-about-this-survey',
             data=form,
             follow_redirects=True)
 
@@ -173,14 +183,15 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
     @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_survey_help_info_bricks_with_sub_option_how_long_selected_for(self, mock_request, get_survey):
+    def test_survey_help_info_bricks_with_sub_option_how_long_selected_for(self, mock_request, get_survey, get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
+        get_business.return_value = business_party
         form = {
             "option": "how-long-selected-for"
         }
         response = self.app.post(
-            '/surveys/help/Bricks/7f9d681b-419c-4919-ba41-03fde7dc40f7/info-about-this-survey',
+            '/surveys/help/074/49900000001F/info-about-this-survey',
             data=form,
             follow_redirects=True)
 
@@ -193,14 +204,15 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
     @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_survey_help_info_bricks_with_sub_option_penalties(self, mock_request, get_survey):
+    def test_survey_help_info_bricks_with_sub_option_penalties(self, mock_request, get_survey, get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
+        get_business.return_value = business_party
         form = {
             "option": "penalties"
         }
         response = self.app.post(
-            '/surveys/help/Bricks/7f9d681b-419c-4919-ba41-03fde7dc40f7/info-about-this-survey',
+            '/surveys/help/074/49900000001F/info-about-this-survey',
             data=form,
             follow_redirects=True)
 
@@ -213,14 +225,15 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
     @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_survey_help_info_bricks_with_sub_option_something_else(self, mock_request, get_survey):
+    def test_survey_help_info_bricks_with_sub_option_something_else(self, mock_request, get_survey, get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
+        get_business.return_value = business_party
         form = {
             "option": "info-something-else"
         }
         response = self.app.post(
-            '/surveys/help/Bricks/7f9d681b-419c-4919-ba41-03fde7dc40f7/info-about-this-survey',
+            '/surveys/help/074/49900000001F/info-about-this-survey',
             data=form,
             follow_redirects=True)
 
@@ -235,11 +248,13 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
     def test_survey_help_send_message_info_bricks_with_sub_option_exemption_completing_survey(self,
                                                                                               mock_request,
-                                                                                              get_survey):
+                                                                                              get_survey,
+                                                                                              get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
+        get_business.return_value = business_party
         response = self.app.get(
-            '/surveys/help/Bricks/7f9d681b-419c-4919-ba41-03fde7dc40f7/info-about-this-survey/'
+            '/surveys/help/074/49900000001F/info-about-this-survey/'
             'exemption-completing-survey/send-message',
             follow_redirects=True)
 
@@ -250,11 +265,13 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
     def test_survey_help_send_message_info_bricks_with_sub_option_why_selected_survey(self,
                                                                                       mock_request,
-                                                                                      get_survey):
+                                                                                      get_survey,
+                                                                                      get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
+        get_business.return_value = business_party
         response = self.app.get(
-            '/surveys/help/Bricks/7f9d681b-419c-4919-ba41-03fde7dc40f7/info-about-this-survey/'
+            '/surveys/help/074/49900000001F/info-about-this-survey/'
             'why-selected/send-message',
             follow_redirects=True)
 
@@ -265,11 +282,13 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
     def test_survey_help_send_message_info_bricks_with_sub_option_time_to_complete(self,
                                                                                    mock_request,
-                                                                                   get_survey):
+                                                                                   get_survey,
+                                                                                   get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
+        get_business.return_value = business_party
         response = self.app.get(
-            '/surveys/help/Bricks/7f9d681b-419c-4919-ba41-03fde7dc40f7/info-about-this-survey/'
+            '/surveys/help/074/49900000001F/info-about-this-survey/'
             'time-to-complete/send-message',
             follow_redirects=True)
 
@@ -280,11 +299,13 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
     def test_survey_help_send_message_info_bricks_with_sub_option_how_long_selected_for(self,
                                                                                         mock_request,
-                                                                                        get_survey):
+                                                                                        get_survey,
+                                                                                        get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
+        get_business.return_value = business_party
         response = self.app.get(
-            '/surveys/help/Bricks/7f9d681b-419c-4919-ba41-03fde7dc40f7/info-about-this-survey/'
+            '/surveys/help/074/49900000001F/info-about-this-survey/'
             'how-long-selected-for/send-message',
             follow_redirects=True)
 
@@ -300,11 +321,13 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
     def test_survey_help_send_message_info_bricks_with_sub_option_penalties(self,
                                                                             mock_request,
-                                                                            get_survey):
+                                                                            get_survey,
+                                                                            get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
+        get_business.return_value = business_party
         response = self.app.get(
-            '/surveys/help/Bricks/7f9d681b-419c-4919-ba41-03fde7dc40f7/info-about-this-survey/'
+            '/surveys/help/B074/49900000001F/info-about-this-survey/'
             'penalties/send-message',
             follow_redirects=True)
 
@@ -320,11 +343,13 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
     def test_survey_help_send_message_info_bricks_with_sub_option_info_something_else(self,
                                                                                       mock_request,
-                                                                                      get_survey):
+                                                                                      get_survey,
+                                                                                      get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
+        get_business.return_value = business_party
         response = self.app.get(
-            '/surveys/help/Bricks/7f9d681b-419c-4919-ba41-03fde7dc40f7/info-about-this-survey/'
+            '/surveys/help/074/49900000001F/info-about-this-survey/'
             'info-something-else/send-message',
             follow_redirects=True)
 
@@ -340,14 +365,15 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
     @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
     @patch("frontstage.controllers.conversation_controller.send_message")
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_create_message_post_success(self, mock_request, get_survey, send_message, get_survey_list):
+    def test_create_message_post_success(self, mock_request, get_survey, get_business, get_survey_list):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
+        get_business.return_value = business_party
         get_survey_list.return_value = survey_list_todo
         form = {
             "body": "info-something-else"
         }
-        response = self.app.post("/surveys/help/Bricks/7f9d681b-419c-4919-ba41-03fde7dc40f7/"
+        response = self.app.post("/surveys/help/074/49900000001F/"
                                  "send-message?subject=Information about this survey"
                                  "&option=info-about-this-survey&sub_option=info-something-else",
                                  data=form,

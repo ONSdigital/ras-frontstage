@@ -75,6 +75,15 @@
             }
             ) %}
         {% endif %}
+            {% do radios.append(
+            {
+                "id": "transfer_surveys",
+                "label": {
+                    "text": "I am no longer required to complete any surveys"
+                },
+                "value": "transfer_surveys"
+            }
+            ) %}
         {% do radioComponent | setAttribute("radios", radios) %}
         {{
             onsRadios(radioComponent)

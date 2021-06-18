@@ -170,7 +170,8 @@ class OptionsForm(Form):
     option = RadioField('Label', choices=[
         ('value', 'contact_details'),
         ('value', 'change_password'),
-        ('value', 'share_surveys')])
+        ('value', 'share_surveys'),
+        ('value', 'transfer_surveys')])
 
 
 class HelpOptionsForm(Form):
@@ -180,11 +181,11 @@ class HelpOptionsForm(Form):
     ])
 
 
-class AccountSurveyShareBusinessSelectForm(Form):
+class AccountSurveyBusinessSelectForm(Form):
     option = RadioField('Label')
 
 
-class AccountSurveyShareSurveySelectForm(Form):
+class AccountSurveySurveySelectForm(Form):
     option = RadioField('Label')
 
 

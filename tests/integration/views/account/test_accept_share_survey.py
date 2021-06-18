@@ -16,7 +16,7 @@ url_post_accept_share_survey = f"{app.config['PARTY_URL']}/party-api/v1/share-su
 url_get_shared_by_respondent_party = f"{app.config['PARTY_URL']}/party-api/v1/respondents/id/sharetest@test.com"
 url_get_business_details = f"{app.config['PARTY_URL']}/party-api/v1/businesses"
 url_get_user_count = f"{app.config['PARTY_URL']}/party-api/v1/share-survey-users-count?business_id={business_party['id']}&survey_id={'02b9c366-7397-42f7-942a-76dc5876d86d'}"
-url_post_pending_shares = f"{app.config['PARTY_URL']}/party-api/v1/pending-shares"
+url_post_pending_shares = f"{app.config['PARTY_URL']}/party-api/v1/share-surveys"
 url_get_survey_second = f"{app.config['SURVEY_URL']}/surveys/02b9c366-7397-42f7-942a-76dc5876d86d"
 url_get_pending_shares_by_batch = f"{app.config['PARTY_URL']}/party-api/v1/share-survey/{batch_number}"
 url_get_shared_to_respondent_party = f"{app.config['PARTY_URL']}/party-api/v1/respondents/email"

@@ -635,13 +635,33 @@ def register_pending_shares(payload):
     :rtype: dict
     """
     logger.info('Attempting register pending shares')
-    url = f'{app.config["PARTY_URL"]}/party-api/v1/pending-shares'
+    url = f'{app.config["PARTY_URL"]}/party-api/v1/share-surveys'
     response = requests.post(url, json=json.loads(payload), auth=app.config['BASIC_AUTH'])
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         if response.status_code == 400:
             logger.info('share survey has already been shared, hence ignoring this request.')
+        else:
+            raise ApiError(logger, response)
+    return response.json()
+
+
+def register_pending_transfers(payload):
+    """
+    register new entries to party for pending transfer
+    :param payload: pending transfers entries dict
+    :return: success if post completed
+    :rtype: dict
+    """
+    logger.info('Attempting register pending transfers')
+    url = f'{app.config["PARTY_URL"]}/party-api/v1/transfer-surveys'
+    response = requests.post(url, json=json.loads(payload), auth=app.config['BASIC_AUTH'])
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        if response.status_code == 400:
+            logger.info('transfer survey has already been transferred, hence ignoring this request.')
         else:
             raise ApiError(logger, response)
     return response.json()

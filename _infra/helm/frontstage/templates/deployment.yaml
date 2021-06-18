@@ -195,6 +195,8 @@ spec:
             value: "{{ .Values.email.enabled }}"
           - name: SHARE_SURVEY_ENABLED
             value: "{{ .Values.features.shareSurveys }}"
+          - name: TECHNICAL_MESSAGE_ENABLED
+            value: "{{ .Values.features.technicalMessage }}"
           - name: SURVEY_URL
             {{- if .Values.dns.enabled }}
             value: "http://survey.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"

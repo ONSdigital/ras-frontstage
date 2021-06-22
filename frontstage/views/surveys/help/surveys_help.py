@@ -269,7 +269,13 @@ def get_short_name_and_business_id(survey_ref, ru_ref):
         :rtype business_id: uuid
     """
     survey = survey_controller.get_survey_by_survey_ref(survey_ref)
-    short_name = survey.get('shortName')
+
+    logger.info('This is the returned survey values: ' + survey)
     business = party_controller.get_business_by_ru_ref(ru_ref)
+    logger.info('This is the returned business values: ' + business)
+
+    short_name = survey.get('shortName')
+
+
     business_id = business.get('id')
     return short_name, business_id

@@ -270,9 +270,9 @@ def get_short_name_and_business_id(survey_ref, ru_ref):
     """
     survey = survey_controller.get_survey_by_survey_ref(survey_ref)
 
-    logger.info('This is the returned survey values: ' + survey['shortName'])
+    print(survey)
     business = party_controller.get_business_by_ru_ref(ru_ref)
-    logger.info('This is the returned business values: ' + business['id'])
+    print(business)
 
     short_name = survey.get('shortName')
 

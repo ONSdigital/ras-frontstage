@@ -708,8 +708,7 @@ def get_business_by_ru_ref(ru_ref):
                 ru_ref=ru_ref)
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/businesses/ref/<ref>"
-    params = ru_ref
-    response = requests.get(url, params=params)
+    response = requests.get(url, auth=app.config['BASIC_AUTH'])
 
     try:
         response.raise_for_status()

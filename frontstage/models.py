@@ -298,7 +298,7 @@ class HelpPasswordForm(Form):
     ])
 
 
-class ShareSurveyRegistrationForm(FlaskForm):
+class PendingSurveyRegistrationForm(FlaskForm):
     first_name = StringField(_('First name'), validators=[InputRequired(_('First name is required')),
                                                           Length(max=254,
                                                                  message=_('Your first name must be less than 254 '

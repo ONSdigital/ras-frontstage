@@ -93,7 +93,7 @@ def validate_max_shared_survey(business_id: str, share_survey_surveys_selected: 
     for survey_selected in share_survey_surveys_selected:
         logger.info('Getting count of users registered against business and survey',
                     business_id=business_id, survey_id=survey_selected)
-        user_count = get_user_count_registered_against_business_and_survey(business_id, survey_selected)
+        user_count = get_user_count_registered_against_business_and_survey(business_id, survey_selected, False)
         if user_count > app.config['MAX_SHARED_SURVEY']:
             is_valid = False
             failed_surveys_list.append(survey_selected)

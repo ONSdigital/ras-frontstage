@@ -11,7 +11,7 @@ from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import survey_controller, party_controller
 from frontstage.controllers.party_controller import get_list_of_business_for_party, \
     get_surveys_listed_against_party_and_business_id, get_business_by_id, \
-    get_user_count_registered_against_business_and_survey, register_pending_shares, register_pending_transfers
+    get_user_count_registered_against_business_and_survey, register_pending_shares
 from frontstage.exceptions.exceptions import ShareSurveyProcessError
 from frontstage.models import AccountSurveyBusinessSelectForm, AccountSurveyShareRecipientEmailForm, \
     ConfirmEmailChangeForm
@@ -93,7 +93,7 @@ def validate_max_transfer_survey(business_id: str, transfer_survey_surveys_selec
     for survey_selected in transfer_survey_surveys_selected:
         logger.info('Getting count of users registered against business and survey',
                     business_id=business_id, survey_id=survey_selected)
-        user_count = get_user_count_registered_against_business_and_survey(business_id, survey_selected)
+        user_count = get_user_count_registered_against_business_and_survey(business_id, survey_selected, True)
         if user_count > (app.config['MAX_SHARED_SURVEY'] + 1):
             is_valid = False
             failed_surveys_list.append(survey_selected)
@@ -267,7 +267,7 @@ def send_transfer_instruction(session):
     if form['email_address'].data != email:
         raise ShareSurveyProcessError('Process failed due to session error')
     json_data = build_payload(respondent_details['id'])
-    register_pending_transfers(json_data)
+    register_pending_shares(json_data)
     return render_template('surveys/surveys-transfer/almost-done.html')
 
 

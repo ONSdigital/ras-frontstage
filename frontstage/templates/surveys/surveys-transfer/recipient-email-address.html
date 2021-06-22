@@ -77,7 +77,7 @@
     {% endif %}
 
 <h1>Enter recipient's email address</h1>
-<p>We need the email address of the person who will be responding to your surveys.</p>
+<p>We need the email address of the person who will be responding to the surveys.</p>
 {% set checkboxData = [] %}
 <form action="" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -96,7 +96,7 @@
                     "name": "email_address",
                     "type": "text",
                     "label": {
-                        "text": "Enter email address"
+                        "text": "Recipient's email address"
                     },
                     "error": errorEmailAddress,
                     "value": emailAddress,

@@ -4,7 +4,8 @@ from unittest.mock import patch
 import requests_mock
 
 from frontstage import app
-from tests.integration.mocked_services import encoded_jwt_token, respondent_party, url_banner_api, survey_list_todo
+from tests.integration.mocked_services import encoded_jwt_token, respondent_party, url_banner_api, survey_list_todo, \
+    survey
 
 
 class TestSurveyList(unittest.TestCase):
@@ -185,3 +186,36 @@ class TestSurveyList(unittest.TestCase):
                         'share access with colleagues.'.encode() in response.data)
         self.assertTrue('Continue'.encode() in response.data)
         self.assertTrue('Cancel'.encode() in response.data)
+
+    @requests_mock.mock()
+    @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
+    def test_something_else_options_selection(self, mock_request, get_respondent_party_by_id):
+        mock_request.get(url_banner_api, status_code=404)
+        get_respondent_party_by_id.return_value = respondent_party
+        response = self.app.post('/my-account', data={"option": 'something_else'}, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Send a message'.encode() in response.data)
+        self.assertTrue('Send us a message with a description of your issue and we will get back to you.'
+                        .encode() in response.data)
+        self.assertTrue(
+            'My account'.encode() in response.data)
+        self.assertTrue('Send'.encode() in response.data)
+        self.assertTrue('Cancel'.encode() in response.data)
+
+    @requests_mock.mock()
+    @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
+    @patch("frontstage.controllers.conversation_controller.send_message")
+    @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
+    def test_create_message_post_success(self, mock_request, get_survey, send_message, get_survey_list):
+        mock_request.get(url_banner_api, status_code=404)
+        get_survey.return_value = survey
+        get_survey_list.return_value = survey_list_todo
+        form = {
+            "body": "something-else"
+        }
+        response = self.app.post("/my-account/something-else",
+                                 data=form,
+                                 follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Message sent.".encode(), response.data)

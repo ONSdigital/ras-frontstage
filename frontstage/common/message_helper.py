@@ -4,7 +4,6 @@ from datetime import datetime, date
 from dateutil.tz import tz
 from structlog import wrap_logger
 
-
 logger = wrap_logger(logging.getLogger(__name__))
 
 
@@ -13,9 +12,9 @@ def refine(message):
         'thread_id': message.get('thread_id'),
         'subject': get_message_subject(message),
         'body': message.get('body'),
-        'survey_id': message.get('survey_id'),
+        'survey_id': message.get('survey_id', None),
         'ru_ref': get_ru_ref_from_message(message),
-        'from': get_from_name(message),                     # As displayed to user
+        'from': get_from_name(message),  # As displayed to user
         'from_internal': from_internal(message),
         'internal_user': get_internal_user_id(message),
         'sent_date': get_human_readable_date(message.get('sent_date')),
@@ -59,6 +58,8 @@ def get_from_name(message):
 
 
 def get_ru_ref_from_message(message):
+    if not message['@business_details']:
+        return None
     try:
         return message['@business_details']['id']
     except (KeyError, TypeError):

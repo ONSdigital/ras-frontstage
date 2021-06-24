@@ -72,6 +72,8 @@ class Config(object):
     ACCOUNT_EMAIL_CHANGE_ENABLED = bool(strtobool(os.getenv('ACCOUNT_EMAIL_CHANGE_ENABLED', "False")))
     SHARE_SURVEY_ENABLED = bool(strtobool(os.getenv('SHARE_SURVEY_ENABLED', "True")))
     MAX_SHARED_SURVEY = int(os.getenv('MAX_SHARED_SURVEY', '50'))
+    TECHNICAL_MESSAGE_ENABLED = bool(strtobool(os.getenv('TECHNICAL_MESSAGE_ENABLED', "True")))
+
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True

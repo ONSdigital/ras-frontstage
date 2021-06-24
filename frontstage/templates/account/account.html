@@ -75,6 +75,17 @@
             }
             ) %}
         {% endif %}
+        {% if is_technical_message_enabled %}
+            {% do radios.append(
+            {
+                "id": "something_else",
+                "label": {
+                    "text": "Something else"
+                },
+                "value": "something_else"
+            }
+            ) %}
+        {% endif %}
         {% do radioComponent | setAttribute("radios", radios) %}
         {{
             onsRadios(radioComponent)

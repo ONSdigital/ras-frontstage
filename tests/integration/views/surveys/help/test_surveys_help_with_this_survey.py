@@ -23,8 +23,8 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.patcher.stop()
 
     @requests_mock.mock()
-    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
     @patch('frontstage.controllers.party_controller.get_business_by_ru_ref')
+    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
     def test_survey_help_for_qbs(self, mock_request, get_survey, get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey_eq
@@ -38,8 +38,8 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.assertIn("Cancel".encode(), response.data)
 
     @requests_mock.mock()
-    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
     @patch('frontstage.controllers.party_controller.get_business_by_ru_ref')
+    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
     def test_survey_help_for_bricks(self, mock_request, get_survey, get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
@@ -53,8 +53,8 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.assertIn("Cancel".encode(), response.data)
 
     @requests_mock.mock()
-    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
     @patch('frontstage.controllers.party_controller.get_business_by_ru_ref')
+    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
     def test_survey_help_for_bricks_with_option_select(self, mock_request, get_survey, get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
@@ -76,8 +76,8 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.assertIn("Cancel".encode(), response.data)
 
     @requests_mock.mock()
-    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
     @patch('frontstage.controllers.party_controller.get_business_by_ru_ref')
+    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
     def test_survey_help_for_bricks_with_sub_option_answer_a_survey_question(self, mock_request, get_survey,
                                                                              get_business):
         mock_request.get(url_banner_api, status_code=404)
@@ -100,8 +100,8 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.assertIn("Cancel".encode(), response.data)
 
     @requests_mock.mock()
-    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
     @patch('frontstage.controllers.party_controller.get_business_by_ru_ref')
+    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
     def test_survey_help_for_bricks_with_sub_option_specific_figures_for_a_response(self, mock_request, get_survey,
                                                                                     get_business):
         mock_request.get(url_banner_api, status_code=404)
@@ -125,8 +125,8 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.assertIn("No".encode(), response.data)
 
     @requests_mock.mock()
-    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
     @patch('frontstage.controllers.party_controller.get_business_by_ru_ref')
+    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
     def test_get_send_help_message_page_for_bricks_with_sub_option_specific_figures_for_a_response(self,
                                                                                                    mock_request,
                                                                                                    get_survey,
@@ -147,8 +147,8 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.assertIn("Cancel".encode(), response.data)
 
     @requests_mock.mock()
-    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
     @patch('frontstage.controllers.party_controller.get_business_by_ru_ref')
+    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
     def test_survey_help_for_bricks_with_sub_option_unable_to_return_by_deadline(self, mock_request, get_survey,
                                                                                  get_business):
         mock_request.get(url_banner_api, status_code=404)
@@ -169,8 +169,8 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.assertIn("No".encode(), response.data)
 
     @requests_mock.mock()
-    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
     @patch('frontstage.controllers.party_controller.get_business_by_ru_ref')
+    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
     def test_get_send_help_message_page_for_bricks_with_sub_option_specific_figures_for_a_response(self, mock_request,
                                                                                                    get_survey,
                                                                                                    get_business):
@@ -190,8 +190,8 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.assertIn("Cancel".encode(), response.data)
 
     @requests_mock.mock()
-    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
     @patch('frontstage.controllers.party_controller.get_business_by_ru_ref')
+    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
     def test_survey_help_for_bricks_with_sub_option_something_else(self, mock_request, get_survey, get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
@@ -213,10 +213,11 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.assertIn("Cancel".encode(), response.data)
 
     @requests_mock.mock()
-    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
+    @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
+    @patch("frontstage.controllers.conversation_controller.send_message")
     @patch('frontstage.controllers.party_controller.get_business_by_ru_ref')
-    @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_create_message_post_success(self, mock_request, get_survey, get_business, get_survey_list):
+    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
+    def test_create_message_post_success(self, mock_request, get_survey, get_business, send_message, get_survey_list):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         get_business.return_value = respondent_party
@@ -234,6 +235,8 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.assertIn("Message sent.".encode(), response.data)
 
     @requests_mock.mock()
+    @patch('frontstage.controllers.party_controller.get_business_by_ru_ref')
+    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
     def test_account_help_redirects_correctly(self, mock_request, get_survey, get_business):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, json=respondent_party, status_code=200)

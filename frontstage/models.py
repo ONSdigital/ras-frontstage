@@ -181,11 +181,11 @@ class HelpOptionsForm(Form):
     ])
 
 
-class AccountSurveyBusinessSelectForm(Form):
+class AccountSurveySelectBusinessForm(Form):
     option = RadioField('Label')
 
 
-class AccountSurveySurveySelectForm(Form):
+class AccountSurveySelectSurveyForm(Form):
     option = RadioField('Label')
 
 

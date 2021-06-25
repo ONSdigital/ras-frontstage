@@ -13,7 +13,7 @@ from frontstage.controllers.party_controller import get_list_of_business_for_par
     get_surveys_listed_against_party_and_business_id, get_business_by_id, \
     get_user_count_registered_against_business_and_survey, register_pending_shares
 from frontstage.exceptions.exceptions import ShareSurveyProcessError
-from frontstage.models import AccountSurveyBusinessSelectForm, AccountSurveyShareRecipientEmailForm, \
+from frontstage.models import AccountSurveySelectBusinessForm, AccountSurveyShareRecipientEmailForm, \
     ConfirmEmailChangeForm
 from frontstage.views.account import account_bp
 
@@ -41,7 +41,7 @@ def transfer_survey_business_select(session):
     flask_session.pop('transfer_survey_recipient_email_address', None)
     flask_session.pop('validation_failure_transfer_surveys_list', None)
     flask_session.pop('transfer_surveys_selected_list', None)
-    form = AccountSurveyBusinessSelectForm(request.values)
+    form = AccountSurveySelectBusinessForm(request.values)
     party_id = session.get_party_id()
     businesses = get_list_of_business_for_party(party_id)
     return render_template('surveys/surveys-transfer/business-select.html',

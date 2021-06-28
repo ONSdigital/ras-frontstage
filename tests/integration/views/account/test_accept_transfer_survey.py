@@ -10,17 +10,17 @@ from tests.integration.mocked_services import encoded_jwt_token, respondent_part
 
 token = 'ImM0NWM3ZDZmLWNlZjItNDMxOS1hNjA3LTU1MDczODA2ODkwNSI.YKZonA.HL-QGEm9Bvdwr7F-r3Z7sI267Cc'
 batch_number = '02b9c366-7397-42f7-942a-76dc5876d86d'
-url_get_share_survey_verify = f"{app.config['PARTY_URL']}/party-api/v1/pending-survey/verification/{token}"
-url_post_accept_share_survey = f"{app.config['PARTY_URL']}/party-api/v1/pending-survey/confirm-pending-surveys/" \
+url_get_transfer_survey_verify = f"{app.config['PARTY_URL']}/party-api/v1/pending-survey/verification/{token}"
+url_post_accept_transfer_survey = f"{app.config['PARTY_URL']}/party-api/v1/pending-survey/confirm-pending-surveys/" \
                                f"{batch_number}"
-url_get_shared_by_respondent_party = f"{app.config['PARTY_URL']}/party-api/v1/respondents/id/sharetest@test.com"
+url_get_transferd_by_respondent_party = f"{app.config['PARTY_URL']}/party-api/v1/respondents/id/transfertest@test.com"
 url_get_business_details = f"{app.config['PARTY_URL']}/party-api/v1/businesses"
 url_get_user_count = f"{app.config['PARTY_URL']}/party-api/v1/pending-survey-users-count?business_id={business_party['id']}&survey_id={'02b9c366-7397-42f7-942a-76dc5876d86d'}"
-url_post_pending_shares = f"{app.config['PARTY_URL']}/party-api/v1/pending-surveys"
+url_post_pending_transfers = f"{app.config['PARTY_URL']}/party-api/v1/pending-surveys"
 url_get_survey_second = f"{app.config['SURVEY_URL']}/surveys/02b9c366-7397-42f7-942a-76dc5876d86d"
-url_get_pending_shares_by_batch = f"{app.config['PARTY_URL']}/party-api/v1/pending-surveys/{batch_number}"
-url_get_shared_to_respondent_party = f"{app.config['PARTY_URL']}/party-api/v1/respondents/email"
-url_post_share_survey_respondent = f"{app.config['PARTY_URL']}/party-api/v1/pending-survey-respondent"
+url_get_pending_transfers_by_batch = f"{app.config['PARTY_URL']}/party-api/v1/pending-surveys/{batch_number}"
+url_get_transferd_to_respondent_party = f"{app.config['PARTY_URL']}/party-api/v1/respondents/email"
+url_post_transfer_survey_respondent = f"{app.config['PARTY_URL']}/party-api/v1/pending-survey-respondent"
 dummy_business = {'associations': [{'businessRespondentStatus': 'ACTIVE',
                                     'enrolments': [{'enrolmentStatus': 'ENABLED',
                                                     'surveyId': '02b9c366-7397-42f7-942a-76dc5876d86d'}],
@@ -35,16 +35,17 @@ dummy_survey = {"id": "02b9c366-7397-42f7-942a-76dc5876d86d",
                 "legalBasis": "Statistics of Trade Act 1947", "surveyType": "Business", "surveyMode": "EQ",
                 "legalBasisRef": "STA1947"}
 
-dummy_pending_share = {
+dummy_pending_transfer = {
     'email_address': 'test@test.com',
     'business_id': 'd7813ec7-10c3-4872-8717-c0b9135f917c',
     'survey_id': '02b9c366-7397-42f7-942a-76dc5876d86d',
-    'shared_by': 'sharetest@test.com',
-    'batch_no': str(uuid.uuid1())
+    'shared_by': 'transfertest@test.com',
+    'batch_no': str(uuid.uuid1()),
+    'is_transfer': True
 }
 
 
-class TestAcceptShareSurvey(unittest.TestCase):
+class TestAcceptTransferSurvey(unittest.TestCase):
 
     def setUp(self):
         self.app = app.test_client()
@@ -62,15 +63,15 @@ class TestAcceptShareSurvey(unittest.TestCase):
         self.patcher.stop()
 
     @requests_mock.mock()
-    def test_get_share_survey_summary_success(self, mock_request):
+    def test_get_transfer_survey_summary_success(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_shared_by_respondent_party, status_code=200, json=respondent_party)
+        mock_request.get(url_get_transferd_by_respondent_party, status_code=200, json=respondent_party)
         mock_request.get(url_get_business_details, status_code=200, json=[dummy_business])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
-        mock_request.get(url_get_share_survey_verify, status_code=200, json=[dummy_pending_share])
-        response = self.app.get(f'/my-account/share-surveys/accept-share-surveys/{token}')
+        mock_request.get(url_get_transfer_survey_verify, status_code=200, json=[dummy_pending_transfer])
+        response = self.app.get(f'/my-account/transfer-surveys/accept-transfer-surveys/{token}')
         self.assertEqual(response.status_code, 200)
         self.assertIn("Confirm survey access".encode(), response.data)
         self.assertIn("RUNAME1_COMPANY1 RUNNAME2_COMPANY1".encode(), response.data)
@@ -79,30 +80,30 @@ class TestAcceptShareSurvey(unittest.TestCase):
         self.assertIn("Accept".encode(), response.data)
 
     @requests_mock.mock()
-    def test_get_share_survey_summary_expired_token(self, mock_request):
+    def test_get_transfer_survey_summary_expired_token(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
         mock_request.get(url_get_business_details, status_code=200, json=[dummy_business])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
-        mock_request.get(url_get_share_survey_verify, status_code=409)
-        response = self.app.get(f'/my-account/share-surveys/accept-share-surveys/{token}')
+        mock_request.get(url_get_transfer_survey_verify, status_code=409)
+        response = self.app.get(f'/my-account/transfer-surveys/accept-transfer-surveys/{token}')
         self.assertEqual(409, response.status_code)
 
     @requests_mock.mock()
-    def test_get_share_survey_summary_not_found(self, mock_request):
+    def test_get_transfer_survey_summary_not_found(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
         mock_request.get(url_get_business_details, status_code=200, json=[dummy_business])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
-        mock_request.get(url_get_share_survey_verify, status_code=404)
-        response = self.app.get(f'/my-account/share-surveys/accept-share-surveys/{token}')
+        mock_request.get(url_get_transfer_survey_verify, status_code=404)
+        response = self.app.get(f'/my-account/transfer-surveys/accept-transfer-surveys/{token}')
         self.assertEqual(404, response.status_code)
 
     @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
-    def test_get_accept_share_surveys_success_existing_account(self, mock_request, get_survey_list):
+    def test_get_accept_transfer_surveys_success_existing_account(self, mock_request, get_survey_list):
         survey_list = [{"case_id": "6f698975-0a36-45ff-ba66-7a575e414023",
                         "status": "Not started", "collection_instrument_type": "EQ",
                         "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d",
@@ -118,16 +119,16 @@ class TestAcceptShareSurvey(unittest.TestCase):
         mock_request.get(url_get_business_details, status_code=200, json=[dummy_business])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
-        mock_request.post(url_post_accept_share_survey, status_code=201)
-        mock_request.get(url_get_pending_shares_by_batch, status_code=200, json=[dummy_pending_share])
-        mock_request.get(url_get_shared_to_respondent_party, status_code=200, json={})
+        mock_request.post(url_post_accept_transfer_survey, status_code=201)
+        mock_request.get(url_get_pending_transfers_by_batch, status_code=200, json=[dummy_pending_transfer])
+        mock_request.get(url_get_transferd_to_respondent_party, status_code=200, json={})
         get_survey_list.return_value = survey_list
-        response = self.app.get(f'/my-account/confirm-share-surveys/{batch_number}', follow_redirects=True)
+        response = self.app.get(f'/my-account/confirm-transfer-surveys/{batch_number}', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
 
     @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_survey_list_details_for_party')
-    def test_get_accept_share_surveys_success_non_existing_account(self, mock_request, get_survey_list):
+    def test_get_accept_transfer_surveys_success_non_existing_account(self, mock_request, get_survey_list):
         survey_list = [{"case_id": "6f698975-0a36-45ff-ba66-7a575e414023",
                         "status": "Not started", "collection_instrument_type": "EQ",
                         "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d",
@@ -143,22 +144,22 @@ class TestAcceptShareSurvey(unittest.TestCase):
         mock_request.get(url_get_business_details, status_code=200, json=[dummy_business])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
-        mock_request.post(url_post_accept_share_survey, status_code=201)
-        mock_request.get(url_get_pending_shares_by_batch, status_code=200, json=[dummy_pending_share])
-        mock_request.get(url_get_shared_to_respondent_party, status_code=404)
+        mock_request.post(url_post_accept_transfer_survey, status_code=201)
+        mock_request.get(url_get_pending_transfers_by_batch, status_code=200, json=[dummy_pending_transfer])
+        mock_request.get(url_get_transferd_to_respondent_party, status_code=404)
         get_survey_list.return_value = survey_list
-        response = self.app.get(f'/my-account/confirm-share-surveys/{batch_number}', follow_redirects=True)
+        response = self.app.get(f'/my-account/confirm-transfer-surveys/{batch_number}', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("Your user account will be deleted after 36 months of inactivity".encode(), response.data)
         self.assertIn("Create a password".encode(), response.data)
         self.assertIn("Create a password".encode(), response.data)
 
     @requests_mock.mock()
-    def test_post_accept_share_surveys_success_non_existing_account(self, mock_request):
+    def test_post_accept_transfer_surveys_success_non_existing_account(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        mock_request.post(url_post_accept_share_survey, status_code=201)
-        mock_request.get(url_get_pending_shares_by_batch, status_code=200, json=[dummy_pending_share])
-        mock_request.post(url_post_share_survey_respondent, status_code=201, json={})
+        mock_request.post(url_post_accept_transfer_survey, status_code=201)
+        mock_request.get(url_get_pending_transfers_by_batch, status_code=200, json=[dummy_pending_transfer])
+        mock_request.post(url_post_transfer_survey_respondent, status_code=201, json={})
         data = {
             'first_name': 'test',
             'last_name': 'test',
@@ -168,21 +169,21 @@ class TestAcceptShareSurvey(unittest.TestCase):
         }
 
         response = self.app.post(f'/register/pending-surveys/create-account/enter-account-details?batch_no={batch_number}'
-                                 f'&email=test@test.com&is_transfer={False}',
+                                 f'&email=test@test.com&is_transfer={True}',
                                  data=data,
                                  follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("Thank you".encode(), response.data)
-        self.assertIn("You are now registered to access the business surveys shared with you.".encode(), response.data)
+        self.assertIn("You are now registered to access the business surveys transferred with you.".encode(), response.data)
         self.assertIn("To access your surveys you must first sign in.".encode(), response.data)
 
     @requests_mock.mock()
-    def test_get_accept_share_surveys_fail(self, mock_request):
+    def test_get_accept_transfer_surveys_fail(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
         mock_request.get(url_get_business_details, status_code=200, json=[dummy_business])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
-        mock_request.post(url_post_accept_share_survey, status_code=404)
-        response = self.app.get(f'/my-account/confirm-share-surveys/{batch_number}', follow_redirects=True)
+        mock_request.post(url_post_accept_transfer_survey, status_code=404)
+        response = self.app.get(f'/my-account/confirm-transfer-surveys/{batch_number}', follow_redirects=True)
         self.assertEqual(response.status_code, 500)

@@ -4,7 +4,7 @@
 {% from "components/input/_macro.njk" import onsInput %}
 {% from "components/lists/_macro.njk" import onsList %}
 {% from "components/button/_macro.njk" import onsButton %}
-{% set page_title = "Share survey registration complete" %}
+{% set page_title = "Pending survey registration complete" %}
 {% set breadcrumbsData = [
   {
     "text": "Surveys",
@@ -28,7 +28,11 @@
 {% endblock breadcrumb %}
 {% block main %}
 <h1 class="u-fs-xl">Thank you</h1>
-<p>You are now registered to access the business survey/s shared with you.</p>
+{% if is_transfer  %}
+    <p>You are now registered to access the business surveys transferred with you.</p>
+{% else %}
+    <p>You are now registered to access the business surveys shared with you.</p>
+{% endif %}
 <p>To access your surveys you must first sign in.</p>
 
 <p class="field u-mt-l">

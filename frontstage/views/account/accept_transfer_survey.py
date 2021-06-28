@@ -14,61 +14,61 @@ from frontstage.views.account import account_bp
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-@account_bp.route('/share-surveys/accept-share-surveys/<token>', methods=['GET'])
-def get_share_survey_summary(token):
+@account_bp.route('/transfer-surveys/accept-transfer-surveys/<token>', methods=['GET'])
+def get_transfer_survey_summary(token):
     """
-    Endpoint to verify token and retrieve the summary page
-    :param token: share survey token
+    Endpoint to verify transfer token and retrieve the summary page
+    :param token: transfer survey token
     :type token: str
     """
-    logger.info('Getting share survey summary', token=token)
+    logger.info('Getting transfer survey summary', token=token)
     try:
         response = party_controller.verify_pending_survey_token(token)
-        pending_share_surveys = response.json()
-        share_dict = {}
+        pending_transfer_surveys = response.json()
+        transfer_dict = {}
         distinct_businesses = set()
-        batch_number = pending_share_surveys[0]['batch_no']
-        originator_party = party_controller.get_respondent_party_by_id(pending_share_surveys[0]['shared_by'])
-        shared_by = originator_party['emailAddress']
-        for pending_share_survey in pending_share_surveys:
-            distinct_businesses.add(pending_share_survey['business_id'])
+        batch_number = pending_transfer_surveys[0]['batch_no']
+        originator_party = party_controller.get_respondent_party_by_id(pending_transfer_surveys[0]['shared_by'])
+        transferred_by = originator_party['emailAddress']
+        for pending_transfer_survey in pending_transfer_surveys:
+            distinct_businesses.add(pending_transfer_survey['business_id'])
         for business_id in distinct_businesses:
             business_surveys = []
-            for pending_share_survey in pending_share_surveys:
-                if pending_share_survey['business_id'] == business_id:
+            for pending_transfer_survey in pending_transfer_surveys:
+                if pending_transfer_survey['business_id'] == business_id:
                     business_surveys.append(survey_controller.get_survey(app.config['SURVEY_URL'],
                                                                          app.config['BASIC_AUTH'],
-                                                                         pending_share_survey['survey_id']))
+                                                                         pending_transfer_survey['survey_id']))
             selected_business = get_business_by_id(business_id)
-            share_dict[selected_business[0]['name']] = {
+            transfer_dict[selected_business[0]['name']] = {
                 'trading_as': selected_business[0]['trading_as'],
                 'surveys': business_surveys
             }
-        return render_template('surveys/surveys-share/summary.html',
-                               share_dict=share_dict,
+        return render_template('surveys/surveys-transfer/summary.html',
+                               transfer_dict=transfer_dict,
                                batch_no=batch_number,
-                               shared_by=shared_by)
+                               transferred_by=transferred_by)
 
     except ApiError as exc:
         # Handle api errors
         if exc.status_code == 409:
-            logger.info('Expired share survey email verification token', token=token, api_url=exc.url,
+            logger.info('Expired transfer survey email verification token', token=token, api_url=exc.url,
                         api_status_code=exc.status_code)
             abort(409)
         elif exc.status_code == 404:
-            logger.warning('Unrecognised share survey email verification token', token=token, api_url=exc.url,
+            logger.warning('Unrecognised transfer survey email verification token', token=token, api_url=exc.url,
                            api_status_code=exc.status_code)
             abort(404)
         else:
-            logger.info('Failed to verify share survey email', token=token, api_url=exc.url,
+            logger.info('Failed to verify transfer survey email', token=token, api_url=exc.url,
                         api_status_code=exc.status_code)
             raise exc
 
 
-@account_bp.route('/confirm-share-surveys/<batch>', methods=['GET'])
-def accept_share_surveys(batch):
+@account_bp.route('/confirm-transfer-surveys/<batch>', methods=['GET'])
+def accept_transfer_surveys(batch):
     """
-    Accept endpoint when a share survey summary is accepted
+    Accept endpoint when a transfer survey summary is accepted
     :param batch: batch number
     :type batch: str
     """
@@ -77,32 +77,32 @@ def accept_share_surveys(batch):
         response = party_controller.get_pending_surveys_batch_number(batch)
         is_existing_user = _is_existing_account(response.json()[0]['email_address'])
     except ApiError as exc:
-        logger.error('Failed to confirm share survey', status=exc.status_code, batch_number=batch)
+        logger.error('Failed to confirm transfer survey', status=exc.status_code, batch_number=batch)
         raise exc
     if is_existing_user:
-        return redirect(url_for('account_bp.accept_share_surveys_existing_account', batch=batch))
+        return redirect(url_for('account_bp.accept_transfer_surveys_existing_account', batch=batch))
     return redirect(url_for('register_bp.pending_surveys_register_enter_your_details', batch_no=batch,
-                            email=response.json()[0]['email_address'], is_transfer=False))
+                            email=response.json()[0]['email_address'], is_transfer=True))
 
 
-@account_bp.route('/confirm-share-surveys/<batch>/existing-account', methods=['GET'])
+@account_bp.route('/confirm-transfer-surveys/<batch>/existing-account', methods=['GET'])
 @jwt_authorization(request)
-def accept_share_surveys_existing_account(session, batch):
+def accept_transfer_surveys_existing_account(session, batch):
     """
-    Accept redirect endpoint for accepting share surveys for existing account
+    Accept redirect endpoint for accepting transfer surveys for existing account
     :param session:
     :type session:
     :param batch: batch number
     :type batch: str
     """
-    logger.info('Attempting to confirm share surveys for existing account', batch_number=batch)
+    logger.info('Attempting to confirm transfer surveys for existing account', batch_number=batch)
     try:
         party_controller.confirm_pending_survey(batch)
     except ApiError as exc:
-        logger.error('Failed to confirm share survey for existing account', status=exc.status_code, batch_number=batch)
+        logger.error('Failed to confirm transfer survey for existing account', status=exc.status_code, batch_number=batch)
         raise exc
-    logger.info('Successfully completed share survey for existing account', batch_number=batch)
-    return render_template('surveys/surveys-share/share-survey-complete-thank-you.html')
+    logger.info('Successfully completed transfer survey for existing account', batch_number=batch)
+    return render_template('surveys/surveys-transfer/transfer-survey-complete-thank-you.html')
 
 
 def _is_existing_account(respondent_email):

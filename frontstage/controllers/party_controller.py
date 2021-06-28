@@ -253,53 +253,54 @@ def verify_token(token):
     logger.info('Successfully verified token', token=token)
 
 
-def verify_share_survey_token(token):
+def verify_pending_survey_token(token):
     """
-     Gives call to party service to verify share survey token
+     Gives call to party service to verify share/transfer survey token
     """
-    logger.info('Attempting to verify share survey token with party service', token=token)
+    logger.info('Attempting to verify share/transfer survey token with party service', token=token)
 
-    url = f"{app.config['PARTY_URL']}/party-api/v1/share-survey/verification/{token}"
+    url = f"{app.config['PARTY_URL']}/party-api/v1/pending-survey/verification/{token}"
     response = requests.get(url, auth=app.config['BASIC_AUTH'])
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error('Failed to verify share survey token', token=token)
+        logger.error('Failed to verify share/transfer survey token', token=token)
         raise ApiError(logger, response)
 
     logger.info('Successfully verified token', token=token)
     return response
 
 
-def confirm_share_survey(batch_number):
+def confirm_pending_survey(batch_number):
     """
-    gives call to party service to confirm pending share survey
+    gives call to party service to confirm pending share/transfer survey
     """
-    logger.info('Attempting to confirm share survey with party service', batch_number=batch_number)
+    logger.info('Attempting to confirm share/transfer survey with party service', batch_number=batch_number)
 
-    url = f"{app.config['PARTY_URL']}/party-api/v1/share-survey/confirm-pending-shares/{batch_number}"
+    url = f"{app.config['PARTY_URL']}/party-api/v1/pending-survey/confirm-pending-surveys/{batch_number}"
     response = requests.post(url, auth=app.config['BASIC_AUTH'])
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error('Failed to confirm share survey with batch number', batch_number=batch_number)
+        logger.error('Failed to confirm share/transfer survey with batch number', batch_number=batch_number)
         raise ApiError(logger, response)
 
-    logger.info('Successfully confirmed share survey', batch_number=batch_number)
+    logger.info('Successfully confirmed share/transfer survey', batch_number=batch_number)
     return response
 
 
 def get_respondent_enrolments(party_id):
     respondent = get_respondent_party_by_id(party_id)
-    for association in respondent['associations']:
-        for enrolment in association['enrolments']:
-            if enrolment['enrolmentStatus'] == 'ENABLED':
-                yield {
-                    'business_id': association['partyId'],
-                    'survey_id': enrolment['surveyId']
-                }
+    if 'associations' in respondent:
+        for association in respondent['associations']:
+            for enrolment in association['enrolments']:
+                if enrolment['enrolmentStatus'] == 'ENABLED':
+                    yield {
+                        'business_id': association['partyId'],
+                        'survey_id': enrolment['surveyId']
+                    }
 
 
 def get_respondent_enrolments_for_started_collex(enrolment_data, collection_exercises):
@@ -432,8 +433,8 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
     # These two will call the services to get responses and cache the data for later use.
     caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag)
     caching_data_for_collection_instrument(cache_data)
-
-    for enrolment in get_respondent_enrolments_for_started_collex(enrolment_data, cache_data['collexes']):
+    enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, cache_data['collexes'])
+    for enrolment in enrolments:
         business_party = cache_data['businesses'][enrolment['business_id']]
         survey = cache_data['surveys'][enrolment['survey_id']]
 
@@ -605,19 +606,21 @@ def get_surveys_listed_against_party_and_business_id(business_id, party_id):
     return surveys
 
 
-def get_user_count_registered_against_business_and_survey(business_id, survey_id):
+def get_user_count_registered_against_business_and_survey(business_id, survey_id, is_transfer):
     """
     returns total number of users registered against a business and survey
     :param business_id: business id
     :param survey_id: The survey id
+    :param is_transfer: True if the request is for transfer survey
     :return: total number of users
     :rtype: int
     """
     logger.info('Attempting to get user count', business_ids=business_id, survey_id=survey_id)
-    url = f'{app.config["PARTY_URL"]}/party-api/v1/share-survey-users-count'
+    url = f'{app.config["PARTY_URL"]}/party-api/v1/pending-survey-users-count'
     data = {
         'business_id': business_id,
         'survey_id': survey_id,
+        'is_transfer': is_transfer
     }
     response = requests.get(url, params=data, auth=app.config['BASIC_AUTH'])
     try:
@@ -635,7 +638,7 @@ def register_pending_shares(payload):
     :rtype: dict
     """
     logger.info('Attempting register pending shares')
-    url = f'{app.config["PARTY_URL"]}/party-api/v1/pending-shares'
+    url = f'{app.config["PARTY_URL"]}/party-api/v1/pending-surveys'
     response = requests.post(url, json=json.loads(payload), auth=app.config['BASIC_AUTH'])
     try:
         response.raise_for_status()
@@ -647,7 +650,7 @@ def register_pending_shares(payload):
     return response.json()
 
 
-def get_share_surveys_batch_number(batch_no):
+def get_pending_surveys_batch_number(batch_no):
     """
     Gets batch number for the shared survey
 
@@ -658,7 +661,7 @@ def get_share_surveys_batch_number(batch_no):
     """
     bound_logger = logger.bind(batch_no=batch_no)
     bound_logger.info('Attempting to retrieve share surveys by batch number')
-    url = f"{app.config['PARTY_URL']}/party-api/v1/share-survey/{batch_no}"
+    url = f"{app.config['PARTY_URL']}/party-api/v1/pending-surveys/{batch_no}"
     response = requests.get(url, auth=app.config['BASIC_AUTH'])
 
     try:
@@ -671,17 +674,17 @@ def get_share_surveys_batch_number(batch_no):
     return response
 
 
-def create_share_survey_account(registration_data):
+def create_pending_survey_account(registration_data):
     """
     Gives call to party service to create a new account and register the account against the email address of share
-    surveys
+    surveys/ transfer surveys
     :param registration_data: respondent details
     :type registration_data: dict
     :raises ApiError: Raised when party returns api error
     """
     logger.info('Attempting to create new account against share survey')
 
-    url = f"{app.config['PARTY_URL']}/party-api/v1/share-survey-respondent"
+    url = f"{app.config['PARTY_URL']}/party-api/v1/pending-survey-respondent"
     registration_data['status'] = 'ACTIVE'
     response = requests.post(url, auth=app.config['BASIC_AUTH'], json=registration_data)
 

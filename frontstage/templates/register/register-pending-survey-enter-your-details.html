@@ -6,7 +6,7 @@
 {% from "components/password/_macro.njk" import onsPassword %}
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/label/_macro.njk" import onsLabel %}
-{% set page_title = "Share survey enter account details" %}
+{% set page_title = "Pending survey enter account details" %}
 
 {% block main %}
     {% if errors|length > 0 %}
@@ -54,6 +54,7 @@
         <p>Enter your account details for <strong>{{ email }}</strong>.</p>
         {{ form.email }}
         {{ form.batch_no }}
+        {{ form.is_transfer }}
         <h2>Your name</h2>
 
         {%- call onsFieldset({

@@ -3,7 +3,7 @@
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/checkboxes/_macro.njk" import onsCheckboxes %}
 {% from "components/button/_macro.njk" import onsButton %}
-{% set page_title = "Survey share business select" %}
+{% set page_title = "Survey transfer business select" %}
 {% set breadcrumbsData = [
   {
     "text": "Surveys",
@@ -16,8 +16,8 @@
     "id": "b-item-2"
   },
   {
-    "text": "Share Surveys",
-    "url": "/my-account/share-surveys",
+    "text": "Transfer Surveys",
+    "url": "/my-account/transfer-surveys",
     "id": "b-item-3"
   }
 ] %}
@@ -35,7 +35,7 @@
 {% set ns.optionErrorMessage = 'You need to choose a business' %}
 {% include "radio-option-select-error-panel.html" %}
 
-<h1>For which business do you want to share your surveys?</h1>
+<h1>For which businesses do you want to transfer your surveys?</h1>
 {% set checkboxData = [] %}
 <form action="" method="post">
     {{ form.csrf_token }}
@@ -75,7 +75,7 @@
                 }}
             </div>
             <div class="grid__col u-ml-m">
-                <a href="{{ url_for('account_bp.share_survey_overview') }}">Cancel</a>
+                <a href="{{ url_for('account_bp.transfer_survey_overview') }}">Cancel</a>
             </div>
         </div>
     </p>

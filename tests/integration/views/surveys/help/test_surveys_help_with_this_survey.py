@@ -106,7 +106,8 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("I do not have specific figures for a response".encode(), response.data)
         self.assertIn(
-            "We do not expect you to spend too long or go to any great expense to get hold of the information we request.".encode(),
+            "We do not expect you to spend too long or go to any great expense to get hold of the information we "
+            "request.".encode(),
             response.data)
         self.assertIn("Did this answer your question?".encode(), response.data)
         self.assertIn("Yes".encode(), response.data)
@@ -133,7 +134,8 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
 
     @requests_mock.mock()
     @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
-    def test_survey_help_for_bricks_with_sub_option_unable_to_return_by_deadline(self, mock_request, get_survey):
+    def test_survey_help_for_voluntary_survey_with_sub_option_unable_to_return_by_deadline(self, mock_request,
+                                                                                           get_survey):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         form = {
@@ -145,8 +147,36 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
             follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("I am unable to return the data by the deadline".encode(), response.data)
+        self.assertIn("What if I cannot return the survey by the deadline?".encode(), response.data)
         self.assertIn("Did this answer your question?".encode(), response.data)
+        self.assertNotIn("If you do not contact us to discuss alternative arrangements or do not complete and return "
+                         "the survey, penalties may be incurred resulting in a fine of up to £2,500 (under section 4 "
+                         "of the Statistics of Trade Act 1947, last updated by section 17 of the Criminal Justice Act "
+                         "1991).".encode(), response.data)
+        self.assertIn("Yes".encode(), response.data)
+        self.assertIn("No".encode(), response.data)
+
+    @requests_mock.mock()
+    @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
+    def test_survey_help_for_statutory_survey_with_sub_option_unable_to_return_by_deadline(self, mock_request,
+                                                                                           get_survey):
+        mock_request.get(url_banner_api, status_code=404)
+        get_survey.return_value = survey_eq
+        form = {
+            "option": "unable-to-return-by-deadline"
+        }
+        response = self.app.post(
+            '/surveys/help/QBS/7f9d681b-419c-4919-ba41-03fde7dc40f7/help-completing-this-survey',
+            data=form,
+            follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("What if I cannot return the survey by the deadline?".encode(), response.data)
+        self.assertIn("Did this answer your question?".encode(), response.data)
+        self.assertIn("If you do not contact us to discuss alternative arrangements or do not complete and return "
+                      "the survey, penalties may be incurred resulting in a fine of up to £2,500 (under section 4 "
+                      "of the Statistics of Trade Act 1947, last updated by section 17 of the Criminal Justice Act "
+                      "1991).".encode(), response.data)
         self.assertIn("Yes".encode(), response.data)
         self.assertIn("No".encode(), response.data)
 

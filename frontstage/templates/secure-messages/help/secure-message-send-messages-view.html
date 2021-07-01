@@ -14,7 +14,7 @@
   },
   {
     "text": "Help",
-    "url": "/surveys/help/"~short_name~"/"~business_id,
+    "url": "/surveys/help/"~survey_ref~"/"~ru_ref,
     "id": "b-item-2"
   }
 
@@ -24,14 +24,14 @@
 {% if breadcrumb_title_one is defined %}
 {% do breadcrumbsData.append({
         "text": breadcrumb_title_one,
-        "url": "/surveys/help/"~short_name~"/"~business_id~"/"~option,
+        "url": "/surveys/help/"~survey_ref~"/"~ru_ref~"/"~option,
         "id": "b-item-8"
     },) %}
 {% endif %}
 {% if breadcrumb_title_two is defined %}
 {% do breadcrumbsData.append({
         "text": breadcrumb_title_two,
-        "url": "/surveys/help/"~short_name~"/"~business_id~"/"~option~"/"~sub_option,
+        "url": "/surveys/help/"~survey_ref~"/"~ru_ref~"/"~option~"/"~sub_option,
         "id": "b-item-7"
     },) %}
 {% endif %}

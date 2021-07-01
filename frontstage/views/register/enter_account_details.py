@@ -1,4 +1,5 @@
 import logging
+from distutils.util import strtobool
 
 from flask import render_template, request, url_for
 from structlog import wrap_logger
@@ -7,7 +8,7 @@ from werkzeug.utils import redirect
 from frontstage.common.cryptographer import Cryptographer
 from frontstage.controllers import iac_controller, party_controller
 from frontstage.exceptions.exceptions import ApiError
-from frontstage.models import RegistrationForm, ShareSurveyRegistrationForm
+from frontstage.models import RegistrationForm, PendingSurveyRegistrationForm
 from frontstage.views.register import register_bp
 
 
@@ -56,23 +57,23 @@ def register_enter_your_details():
         return render_template('register/register.enter-your-details.html', form=form, errors=form.errors)
 
 
-@register_bp.route('/share-surveys/create-account/enter-account-details', methods=['GET', 'POST'])
-def share_surveys_register_enter_your_details():
+@register_bp.route('/pending-surveys/create-account/enter-account-details', methods=['GET', 'POST'])
+def pending_surveys_register_enter_your_details():
     """
-     Registration endpoint for account creation and verification against share surveys (Account does not exist)
+     Registration endpoint for account creation and
+     verification against share surveys  and transfer surveys (Account does not exist)
     :return:
     :rtype:
     """
     # Get and decrypt enrolment code
     batch_no = request.args.get('batch_no', None)
     email = request.args.get('email', None)
-    form = ShareSurveyRegistrationForm(request.values, batch_no=batch_no, email=email)
-
+    is_transfer = request.args.get('is_transfer', None)
+    form = PendingSurveyRegistrationForm(request.values, batch_no=batch_no, email=email, is_transfer=is_transfer)
     # Validate batch_no before rendering or checking the form
-    party_controller.get_share_surveys_batch_number(batch_no)
-
+    response = party_controller.get_pending_surveys_batch_number(batch_no)
     if request.method == 'POST' and form.validate():
-        logger.info('Attempting to create account against share surveys email address')
+        logger.info('Attempting to create account against share/transfer surveys email address')
         email_address = form.email.data
         registration_data = {
             'emailAddress': email_address,
@@ -84,23 +85,26 @@ def share_surveys_register_enter_your_details():
         }
 
         try:
-            logger.info('Calling party service to create account against share surveys email address')
-            party_controller.create_share_survey_account(registration_data)
+            logger.info('Calling party service to create account against share/transfer surveys email address')
+            party_controller.create_pending_survey_account(registration_data)
         except ApiError as exc:
             if exc.status_code == 400:
-                logger.info('share surveys email address already in use')
+                logger.info('pending surveys email address already in use')
                 error = {"email_address": ["This email has already been used to register an account"]}
-                return render_template('register/register-share-survey-enter-your-details.html', form=form,
+                return render_template('register/register-pending-survey-enter-your-details.html', form=form,
                                        errors=error,
                                        email=email)
             else:
-                logger.error('Failed to create/register new account  against share surveys email address',
+                logger.error('Failed to create/register new account  against pending surveys email address',
                              status=exc.status_code)
                 raise exc
 
-        logger.info('Successfully created/registered new account against share surveys email address')
-        return render_template('register/register-share-survey-registration-complete.html')
+        logger.info('Successfully created/registered new account against pending surveys email address')
+        return render_template('register/register-pending-survey-registration-complete.html',
+                               is_transfer=bool(strtobool(is_transfer)))
 
     else:
-        return render_template('register/register-share-survey-enter-your-details.html', form=form, errors=form.errors,
+        return render_template('register/register-pending-survey-enter-your-details.html',
+                               form=form,
+                               errors=form.errors,
                                email=email)

@@ -205,7 +205,7 @@ def share_survey_post_email_entry(session):
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
     if not form.validate() or respondent_details['emailAddress'].lower() == form.data['email_address'].lower():
         if respondent_details['emailAddress'].lower() == form.data['email_address'].lower():
-            errors = {'email_address': ['You can not share surveys to yourself.']}
+            errors = {'email_address': ['You can not share surveys with yourself.']}
         else:
             errors = form.errors
         return render_template('surveys/surveys-share/recipient-email-address.html',

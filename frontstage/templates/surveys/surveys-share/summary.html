@@ -11,7 +11,7 @@
 You need to check the details are correct and then confirm access.</p>
 {% for business in share_dict %}
 <section class="u-mt-l u-mb-l">
-    <h2 class="u-fs-m u-mb-xs">{{ business }}</h2>
+    <h2 class="u-fs-m u-mb-xs">{{ share_dict[business].name }}</h2>
     <p class="u-mb-s">Trading as {{ share_dict[business]['trading_as'] }}</p>
     <div class="text-indent">
         <ul class="list list--bare">

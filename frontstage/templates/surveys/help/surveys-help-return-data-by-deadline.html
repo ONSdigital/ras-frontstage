@@ -33,11 +33,11 @@
 {% block main %}
 <h1 class="u-fs-xl">What if I cannot return the survey by the deadline?</h1>
 {% if inside_legal_basis %}
-    <p><a href="{{ url_for('surveys_bp.get_send_help_message_page', short_name=short_name, option=option,sub_option='unable-to-return-by-deadline', business_id=business_id) }}" class="internal-link">Send us a message</a> if you cannot complete and return by the deadline and we will be able to advise.</p>
+    <p><a href="{{ url_for('surveys_bp.get_send_help_message_page', short_name=short_name, option=option,sub_option='unable-to-return-by-deadline', business_id=business_id, survey_ref=survey_ref, ru_ref=ru_ref) }}" class="internal-link">Send us a message</a> if you cannot complete and return by the deadline and we will be able to advise.</p>
     <p>If you do not contact us to discuss alternative arrangements or do not complete and return the survey, penalties may be incurred resulting in a fine of up to £2,500 (under section 4 of the Statistics of Trade Act 1947, last updated by section 17 of the Criminal Justice Act 1991).</p>
     <p>You will still need to complete the survey.</p>
 {% else %}
-    <p><a href="{{ url_for('surveys_bp.get_send_help_message_page', short_name=short_name, option=option,sub_option='unable-to-return-by-deadline', business_id=business_id) }}" class="internal-link">Send us a message</a> if you cannot complete and return this survey by the deadline and we will be able to advise.</p>
+    <p><a href="{{ url_for('surveys_bp.get_send_help_message_page', short_name=short_name, option=option,sub_option='unable-to-return-by-deadline', business_id=business_id, survey_ref=survey_ref, ru_ref=ru_ref) }}" class="internal-link">Send us a message</a> if you cannot complete and return this survey by the deadline and we will be able to advise.</p>
 {% endif %}
 
 

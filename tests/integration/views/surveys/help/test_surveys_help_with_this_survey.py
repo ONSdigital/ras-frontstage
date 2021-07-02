@@ -174,16 +174,18 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.assertIn("No".encode(), response.data)
 
     @requests_mock.mock()
-    @patch('frontstage.controllers.survey_controller.get_survey_by_short_name')
+    @patch('frontstage.controllers.party_controller.get_business_by_ru_ref')
+    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
     def test_survey_help_for_statutory_survey_with_sub_option_unable_to_return_by_deadline(self, mock_request,
-                                                                                           get_survey):
+                                                                                           get_survey, get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey_eq
+        get_business.return_value = business_party
         form = {
             "option": "unable-to-return-by-deadline"
         }
         response = self.app.post(
-            '/surveys/help/QBS/7f9d681b-419c-4919-ba41-03fde7dc40f7/help-completing-this-survey',
+            '/surveys/help/139/49900000001F/help-completing-this-survey',
             data=form,
             follow_redirects=True)
 

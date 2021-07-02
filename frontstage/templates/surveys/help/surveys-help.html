@@ -26,7 +26,7 @@
 
 <h1 class="u-fs-xl">Help</h1>
 
-<form action="{{ url_for('surveys_bp.post_help_page', short_name=short_name, business_id=business_id)}}" method="post">
+<form action="{{ url_for('surveys_bp.post_help_page', short_name=short_name, business_id=business_id, survey_ref=survey_ref, ru_ref=ru_ref)}}" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         {% if ns.optionError %}
                 {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}

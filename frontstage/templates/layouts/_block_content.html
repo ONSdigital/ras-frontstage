@@ -1,9 +1,9 @@
 {% set ns = namespace() %}
 {% set ns.showHelp = true %}
 {% extends 'layouts/_base.html' %}
-{% if short_name is defined and business_id is defined%}
-  {% set ns.short_name = short_name %}
-  {% set ns.business_id = business_id %}
+{% if survey_ref is defined and ru_ref is defined%}
+  {% set ns.survey_ref = survey_ref %}
+  {% set ns.ru_ref = ru_ref %}
 {% endif %}
 
 {% block content %}

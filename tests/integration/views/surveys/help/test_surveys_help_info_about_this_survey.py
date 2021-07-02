@@ -124,7 +124,6 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
     @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
     def test_survey_help_info_rsi_with_sub_option_exemption_completing_survey(self, mock_request, get_survey,
                                                                               get_business):
-        'THIS IS THE TEST YOURE CURRENTLY LOOKING AT'
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey_rsi
         get_business.return_value = business_party
@@ -215,7 +214,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
     @requests_mock.mock()
     @patch('frontstage.controllers.party_controller.get_business_by_ru_ref')
     @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
-    def test_survey_help_info_bricks_with_sub_option_penalties(self, mock_request, get_survey, get_business):
+    def test_survey_help_for_voluntary_survey_with_sub_option_penalties(self, mock_request, get_survey, get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         get_business.return_value = business_party
@@ -228,9 +227,35 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
             follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("What are the penalties for not completing a survey?".encode(), response.data)
-        self.assertIn("https://www.ons.gov.uk/surveys/informationforbusinesses".encode(), response.data)
+        self.assertIn("Are there penalties for not completing this survey?".encode(), response.data)
         self.assertIn("Did this answer your question?".encode(), response.data)
+        self.assertNotIn("If you do not contact us or complete and return by the deadline, penalties may be incurred "
+                         "resulting in a fine of up to £2,500 (under section 4 of the Statistics of Trade Act 1947, "
+                         "last updated by section 17 of the Criminal Justice Act 1991).".encode(), response.data)
+        self.assertIn("Yes".encode(), response.data)
+        self.assertIn("No".encode(), response.data)
+
+    @requests_mock.mock()
+    @patch('frontstage.controllers.party_controller.get_business_by_ru_ref')
+    @patch('frontstage.controllers.survey_controller.get_survey_by_survey_ref')
+    def test_survey_help_for_statutory_survey_with_sub_option_penalties(self, mock_request, get_survey, get_business):
+        mock_request.get(url_banner_api, status_code=404)
+        get_survey.return_value = survey_eq
+        get_business.return_value = business_party
+        form = {
+            "option": "penalties"
+        }
+        response = self.app.post(
+            '/surveys/help/139/49900000001F/info-about-this-survey',
+            data=form,
+            follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Are there penalties for not completing this survey?".encode(), response.data)
+        self.assertIn("Did this answer your question?".encode(), response.data)
+        self.assertIn("If you do not contact us or complete and return by the deadline, penalties may be incurred "
+                      "resulting in a fine of up to £2,500 (under section 4 of the Statistics of Trade Act 1947, "
+                      "last updated by section 17 of the Criminal Justice Act 1991).".encode(), response.data)
         self.assertIn("Yes".encode(), response.data)
         self.assertIn("No".encode(), response.data)
 
@@ -344,7 +369,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         response = self.app.get(
-            '/surveys/help/B074/49900000001F/info-about-this-survey/'
+            '/surveys/help/074/49900000001F/info-about-this-survey/'
             'penalties/send-message',
             follow_redirects=True)
 

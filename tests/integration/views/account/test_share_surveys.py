@@ -115,7 +115,7 @@ class TestShareSurvey(unittest.TestCase):
         with self.app.session_transaction() as mock_session:
             mock_session['share_survey_data'] = {business_party['id']: None}
         response = self.app.post('/my-account/share-surveys/survey-selection',
-                                 data={business_party['name']: ['02b9c366-7397-42f7-942a-76dc5876d86d']},
+                                 data={business_party['id']: ['02b9c366-7397-42f7-942a-76dc5876d86d']},
                                  follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("Enter recipient's email address".encode(), response.data)
@@ -137,7 +137,7 @@ class TestShareSurvey(unittest.TestCase):
         with self.app.session_transaction() as mock_session:
             mock_session['share_survey_data'] = {business_party['id']: None}
         response = self.app.post('/my-account/share-surveys/survey-selection',
-                                 data={business_party['name']: ['02b9c366-7397-42f7-942a-76dc5876d86d']},
+                                 data={business_party['id']: ['02b9c366-7397-42f7-942a-76dc5876d86d']},
                                  follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("There is 1 error on this page".encode(), response.data)

@@ -100,7 +100,7 @@ def accept_share_surveys_existing_account(session, batch):
     party_id = session.get_party_id()
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
     response = party_controller.get_pending_surveys_batch_number(batch)
-    if respondent_details['emailAddress'].lower() != str(response.json()[0]['email_address']).lower:
+    if respondent_details['emailAddress'].lower() != response.json()[0]['email_address'].lower():
         logger.warning('The user has entered invalid login for share survey.')
         flash('Invalid share survey login. This share survey is not assigned to you.',
               'error')

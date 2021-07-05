@@ -1,6 +1,6 @@
 import logging
 
-from flask import render_template, abort, request, url_for
+from flask import render_template, abort, request, url_for, flash
 from structlog import wrap_logger
 from werkzeug.utils import redirect
 
@@ -40,7 +40,8 @@ def get_transfer_survey_summary(token):
                                                                          app.config['BASIC_AUTH'],
                                                                          pending_transfer_survey['survey_id']))
             selected_business = get_business_by_id(business_id)
-            transfer_dict[selected_business[0]['name']] = {
+            transfer_dict[selected_business[0]['id']] = {
+                'name': selected_business[0]['name'],
                 'trading_as': selected_business[0]['trading_as'],
                 'surveys': business_surveys
             }
@@ -96,10 +97,19 @@ def accept_transfer_surveys_existing_account(session, batch):
     :type batch: str
     """
     logger.info('Attempting to confirm transfer surveys for existing account', batch_number=batch)
+    party_id = session.get_party_id()
+    respondent_details = party_controller.get_respondent_party_by_id(party_id)
+    response = party_controller.get_pending_surveys_batch_number(batch)
+    if respondent_details['emailAddress'].lower() != response.json()[0]['email_address'].lower():
+        logger.warning('The user has entered invalid login for transfer survey.')
+        flash('Invalid transfer survey login. This transfer survey is not assigned to you.',
+              'error')
+        return redirect(url_for('surveys_bp.get_survey_list', tag='todo'))
     try:
         party_controller.confirm_pending_survey(batch)
     except ApiError as exc:
-        logger.error('Failed to confirm transfer survey for existing account', status=exc.status_code, batch_number=batch)
+        logger.error('Failed to confirm transfer survey for existing account', status=exc.status_code,
+                     batch_number=batch)
         raise exc
     logger.info('Successfully completed transfer survey for existing account', batch_number=batch)
     return render_template('surveys/surveys-transfer/transfer-survey-complete-thank-you.html')

@@ -51,11 +51,11 @@
 <h1 class="u-fs-xl">Send instructions</h1>
 <p>We will send an email to <b>{{ email }}</b> with instructions to access the following surveys:</p>
 {% for business in share_dict %}
-    <h2 class="u-fs-m">{{ business }}</h2>
+    <h2 class="u-fs-m">{{ share_dict[business].name }}</h2>
     {% if share_dict[business] | length > 0 %}
     <div class="text-indent">
         <ul class="list list--bare">
-            {% for survey in share_dict[business] %}
+            {% for survey in share_dict[business].surveys %}
                 <li>{{ survey['longName'] }}</li>
             {% endfor %}
         </ul>

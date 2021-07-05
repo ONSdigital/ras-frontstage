@@ -1,6 +1,6 @@
 import logging
 
-from flask import render_template, abort, request, url_for
+from flask import render_template, abort, request, url_for, flash
 from structlog import wrap_logger
 from werkzeug.utils import redirect
 
@@ -40,7 +40,8 @@ def get_share_survey_summary(token):
                                                                          app.config['BASIC_AUTH'],
                                                                          pending_share_survey['survey_id']))
             selected_business = get_business_by_id(business_id)
-            share_dict[selected_business[0]['name']] = {
+            share_dict[selected_business[0]['id']] = {
+                'name': selected_business[0]['name'],
                 'trading_as': selected_business[0]['trading_as'],
                 'surveys': business_surveys
             }
@@ -96,6 +97,14 @@ def accept_share_surveys_existing_account(session, batch):
     :type batch: str
     """
     logger.info('Attempting to confirm share surveys for existing account', batch_number=batch)
+    party_id = session.get_party_id()
+    respondent_details = party_controller.get_respondent_party_by_id(party_id)
+    response = party_controller.get_pending_surveys_batch_number(batch)
+    if respondent_details['emailAddress'].lower() != response.json()[0]['email_address'].lower():
+        logger.warning('The user has entered invalid login for share survey.')
+        flash('Invalid share survey login. This share survey is not assigned to you.',
+              'error')
+        return redirect(url_for('surveys_bp.get_survey_list', tag='todo'))
     try:
         party_controller.confirm_pending_survey(batch)
     except ApiError as exc:

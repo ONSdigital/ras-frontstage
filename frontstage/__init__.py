@@ -59,7 +59,7 @@ def inject_availability_message():
     return {}
 
 
-import frontstage.error_handlers  # NOQA  # pylint: disable=wrong-import-position
+import frontstage.error_handlers  # NOQA
 
 # Bind routes to app
-import frontstage.views  # NOQA  # pylint: disable=wrong-import-position
+import frontstage.views  # NOQA

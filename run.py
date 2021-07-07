@@ -6,9 +6,9 @@ import os
 if not os.getenv("APP_SETTINGS"):
     os.environ["APP_SETTINGS"] = "DevelopmentConfig"
 
-from structlog import wrap_logger  # NOQA  # pylint: disable=wrong-import-position
+from structlog import wrap_logger  # NOQA
 
-from frontstage import app  # NOQA  # pylint: disable=wrong-import-position
+from frontstage import app  # NOQA
 
 logger = wrap_logger(logging.getLogger(__name__))
 

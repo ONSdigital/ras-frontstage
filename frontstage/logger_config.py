@@ -8,7 +8,7 @@ from structlog.threadlocal import wrap_dict
 
 
 def logger_initial_config(log_level="INFO", logger_format="%(message)s", logger_date_format="%Y-%m-%dT%H:%M%s"):
-    def add_service(logger, method_name, event_dict):  # pylint: disable=unused-argument
+    def add_service(logger, method_name, event_dict):
         """
         Add the service name to the event dict.
         This adds `service: 'ras-frontstage'` to all log lines.

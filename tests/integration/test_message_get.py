@@ -60,7 +60,7 @@ class TestMessageGet(unittest.TestCase):
 
     @requests_mock.mock()
     def test_get_msg_without_business_name(self, mock_request):
-        message_without_business = message_json
+        message_without_business = copy.deepcopy(message_json)
         del message_without_business["@business_details"]["name"]
         mock_request.get(url_get_thread, json={"messages": [message_without_business], "is_closed": False})
         mock_request.get(url_get_conversation_count, json={"total": 0})

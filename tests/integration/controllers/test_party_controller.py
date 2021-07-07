@@ -1,4 +1,3 @@
-
 import json
 import unittest
 from collections import namedtuple
@@ -10,29 +9,44 @@ import responses
 from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import party_controller
-from frontstage.controllers.collection_exercise_controller import convert_events_to_new_format
-from frontstage.controllers.party_controller import (display_button, get_respondent_enrolments_for_started_collex,
-                                                     filter_ended_collection_exercises)
+from frontstage.controllers.collection_exercise_controller import (
+    convert_events_to_new_format,
+)
+from frontstage.controllers.party_controller import (
+    display_button,
+    filter_ended_collection_exercises,
+    get_respondent_enrolments_for_started_collex,
+)
 from frontstage.exceptions.exceptions import ApiError
-from tests.integration.mocked_services import (business_party, case, case_list, collection_exercise,
-                                               collection_exercise_by_survey,
-                                               collection_instrument_seft, respondent_party, survey, url_get_business_party,
-                                               url_get_respondent_email, url_get_respondent_party, url_post_add_survey,
-                                               url_reset_password_request, url_notify_party_and_respondent_account_locked)
+from tests.integration.mocked_services import (
+    business_party,
+    case,
+    case_list,
+    collection_exercise,
+    collection_exercise_by_survey,
+    collection_instrument_seft,
+    respondent_party,
+    survey,
+    url_get_business_party,
+    url_get_respondent_email,
+    url_get_respondent_party,
+    url_notify_party_and_respondent_account_locked,
+    url_post_add_survey,
+    url_reset_password_request,
+)
 
 registration_data = {
-                'emailAddress': respondent_party['emailAddress'],
-                'firstName': respondent_party['firstName'],
-                'lastName': respondent_party['lastName'],
-                'password': 'apples',
-                'telephone': respondent_party['telephone'],
-                'enrolmentCode': case['iac'],
-                'status': 'CREATED'
-            }
+    "emailAddress": respondent_party["emailAddress"],
+    "firstName": respondent_party["firstName"],
+    "lastName": respondent_party["lastName"],
+    "password": "apples",
+    "telephone": respondent_party["telephone"],
+    "enrolmentCode": case["iac"],
+    "status": "CREATED",
+}
 
 
 class TestPartyController(unittest.TestCase):
-
     def setUp(self):
         app_config = TestingConfig()
         app.config.from_object(app_config)
@@ -44,63 +58,57 @@ class TestPartyController(unittest.TestCase):
             rsps.add(rsps.GET, url_get_respondent_party, json=respondent_party, status=200)
 
             with app.app_context():
-                party = party_controller.get_respondent_party_by_id(respondent_party['id'])
+                party = party_controller.get_respondent_party_by_id(respondent_party["id"])
 
-                self.assertEqual(party['id'], respondent_party['id'])
-                self.assertEqual(party['emailAddress'], respondent_party['emailAddress'])
+                self.assertEqual(party["id"], respondent_party["id"])
+                self.assertEqual(party["emailAddress"], respondent_party["emailAddress"])
 
     def test_get_respondent_by_party_id_fail(self):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_respondent_party, status=500)
             with app.app_context():
                 with self.assertRaises(ApiError):
-                    party_controller.get_respondent_party_by_id(respondent_party['id'])
+                    party_controller.get_respondent_party_by_id(respondent_party["id"])
 
     def test_get_respondent_by_party_id_not_found(self):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_respondent_party, status=404)
             with app.app_context():
-                party = party_controller.get_respondent_party_by_id(respondent_party['id'])
+                party = party_controller.get_respondent_party_by_id(respondent_party["id"])
 
                 self.assertTrue(party is None)
 
     def test_add_survey_success(self):
         with responses.RequestsMock() as rsps:
-            request_json = {
-                "party_id": respondent_party['id'],
-                "enrolment_code": case['iac']
-            }
+            request_json = {"party_id": respondent_party["id"], "enrolment_code": case["iac"]}
 
             rsps.add(rsps.POST, url_post_add_survey, json=request_json, status=200)
             with app.app_context():
                 try:
-                    party_controller.add_survey(respondent_party['id'], case['iac'])
+                    party_controller.add_survey(respondent_party["id"], case["iac"])
                 except ApiError:
                     self.fail("Unexpected ApiError when adding a survey")
 
     def test_add_survey_fail(self):
         with responses.RequestsMock() as rsps:
-            request_json = {
-                "party_id": respondent_party['id'],
-                "enrolment_code": case['iac']
-            }
+            request_json = {"party_id": respondent_party["id"], "enrolment_code": case["iac"]}
 
             rsps.add(rsps.POST, url_post_add_survey, json=request_json, status=400)
             with app.app_context():
                 with self.assertRaises(ApiError):
-                    party_controller.add_survey(respondent_party['id'], case['iac'])
+                    party_controller.add_survey(respondent_party["id"], case["iac"])
 
     def test_get_party_by_business_id_success_without_collection_exercise_id(self):
         """Tests the function is successful when we only supply the mandatory party_id"""
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_business_party, json=business_party, status=200)
             with app.app_context():
-                business = party_controller.get_party_by_business_id(business_party['id'],
-                                                                     self.app_config['PARTY_URL'],
-                                                                     self.app_config['BASIC_AUTH'])
+                business = party_controller.get_party_by_business_id(
+                    business_party["id"], self.app_config["PARTY_URL"], self.app_config["BASIC_AUTH"]
+                )
 
-                self.assertEqual(business['id'], business_party['id'])
-                self.assertEqual(business['name'], business_party['name'])
+                self.assertEqual(business["id"], business_party["id"])
+                self.assertEqual(business["name"], business_party["name"])
 
     def test_get_party_by_business_id_success_with_collection_exercise_id(self):
         """Tests the function is successful when we supply the optional collection_excercise_id"""
@@ -108,41 +116,49 @@ class TestPartyController(unittest.TestCase):
             url = f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True"
             rsps.add(rsps.GET, url, json=business_party, status=200)
             with app.app_context():
-                business = party_controller.get_party_by_business_id(business_party['id'],
-                                                                     self.app_config['PARTY_URL'],
-                                                                     self.app_config['BASIC_AUTH'],
-                                                                     collection_exercise['id'])
-                self.assertEqual(business['id'], business_party['id'])
-                self.assertEqual(business['name'], business_party['name'])
+                business = party_controller.get_party_by_business_id(
+                    business_party["id"],
+                    self.app_config["PARTY_URL"],
+                    self.app_config["BASIC_AUTH"],
+                    collection_exercise["id"],
+                )
+                self.assertEqual(business["id"], business_party["id"])
+                self.assertEqual(business["name"], business_party["name"])
 
     def test_get_party_by_business_id_success_with_collection_exercise_id_non_verbose(self):
         """Tests the function calls the expected url when we turn verbose off"""
-        called_url = ("http://localhost:8081/party-api/v1/businesses/id/be3483c3-f5c9-4b13-bdd7-244db78ff687"
-                      "?collection_exercise_id=8d990a74-5f07-4765-ac66-df7e1a96505b")
+        called_url = (
+            "http://localhost:8081/party-api/v1/businesses/id/be3483c3-f5c9-4b13-bdd7-244db78ff687"
+            "?collection_exercise_id=8d990a74-5f07-4765-ac66-df7e1a96505b"
+        )
 
         with responses.RequestsMock() as rsps:
             url = f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}"
             rsps.add(rsps.GET, url, json=business_party, status=200)
             with app.app_context():
-                business = party_controller.get_party_by_business_id(business_party['id'],
-                                                                     self.app_config['PARTY_URL'],
-                                                                     self.app_config['BASIC_AUTH'],
-                                                                     collection_exercise['id'],
-                                                                     verbose=False)
-                self.assertEqual(business['id'], business_party['id'])
-                self.assertEqual(business['name'], business_party['name'])
+                business = party_controller.get_party_by_business_id(
+                    business_party["id"],
+                    self.app_config["PARTY_URL"],
+                    self.app_config["BASIC_AUTH"],
+                    collection_exercise["id"],
+                    verbose=False,
+                )
+                self.assertEqual(business["id"], business_party["id"])
+                self.assertEqual(business["name"], business_party["name"])
                 self.assertEqual(len(rsps.calls), 1)
                 self.assertEqual(rsps.calls[0].request.url, called_url)
 
     def test_get_party_by_business_id_fail(self):
-        called_url = "http://localhost:8081/party-api/v1/businesses/id/be3483c3-f5c9-4b13-bdd7-244db78ff687?verbose=True"
+        called_url = (
+            "http://localhost:8081/party-api/v1/businesses/id/be3483c3-f5c9-4b13-bdd7-244db78ff687?verbose=True"
+        )
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_business_party, status=400)
             with app.app_context():
                 with self.assertRaises(ApiError):
-                    party_controller.get_party_by_business_id(business_party['id'],
-                                                              self.app_config['PARTY_URL'],
-                                                              self.app_config['BASIC_AUTH'])
+                    party_controller.get_party_by_business_id(
+                        business_party["id"], self.app_config["PARTY_URL"], self.app_config["BASIC_AUTH"]
+                    )
                 self.assertEqual(len(rsps.calls), 1)
                 self.assertEqual(rsps.calls[0].request.url, called_url)
 
@@ -150,16 +166,16 @@ class TestPartyController(unittest.TestCase):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_respondent_email, json=respondent_party, status=200)
             with app.app_context():
-                respondent = party_controller.get_respondent_by_email(respondent_party['emailAddress'])
+                respondent = party_controller.get_respondent_by_email(respondent_party["emailAddress"])
 
-                self.assertEqual(respondent['emailAddress'], respondent_party['emailAddress'])
-                self.assertEqual(respondent['firstName'], respondent_party['firstName'])
+                self.assertEqual(respondent["emailAddress"], respondent_party["emailAddress"])
+                self.assertEqual(respondent["firstName"], respondent_party["firstName"])
 
     def test_get_respondent_by_email_not_found(self):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_respondent_email, status=404)
             with app.app_context():
-                respondent = party_controller.get_respondent_by_email(respondent_party['emailAddress'])
+                respondent = party_controller.get_respondent_by_email(respondent_party["emailAddress"])
 
                 self.assertTrue(respondent is None)
 
@@ -168,34 +184,34 @@ class TestPartyController(unittest.TestCase):
             rsps.add(rsps.GET, url_get_respondent_email, status=500)
             with app.app_context():
                 with self.assertRaises(ApiError):
-                    party_controller.get_respondent_by_email(respondent_party['emailAddress'])
+                    party_controller.get_respondent_by_email(respondent_party["emailAddress"])
 
     def test_reset_password_request_fail(self):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.POST, url_reset_password_request, status=500)
             with app.app_context():
                 with self.assertRaises(ApiError):
-                    party_controller.reset_password_request(respondent_party['emailAddress'])
+                    party_controller.reset_password_request(respondent_party["emailAddress"])
 
     def test_lock_respondent_account_success(self):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.PUT, url_notify_party_and_respondent_account_locked, status=200)
             with app.app_context():
                 try:
-                    party_controller.notify_party_and_respondent_account_locked(respondent_party['id'],
-                                                                                respondent_party['emailAddress'],
-                                                                                status='ACTIVE')
+                    party_controller.notify_party_and_respondent_account_locked(
+                        respondent_party["id"], respondent_party["emailAddress"], status="ACTIVE"
+                    )
                 except ApiError:
-                    self.fail('Change respondent status fail to PUT your request')
+                    self.fail("Change respondent status fail to PUT your request")
 
     def test_lock_respondent_account_fail(self):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.PUT, url_notify_party_and_respondent_account_locked, status=400)
             with app.app_context():
                 with self.assertRaises(ApiError):
-                    party_controller.notify_party_and_respondent_account_locked(respondent_party['id'],
-                                                                                respondent_party['emailAddress'],
-                                                                                status='ACTIVE')
+                    party_controller.notify_party_and_respondent_account_locked(
+                        respondent_party["id"], respondent_party["emailAddress"], status="ACTIVE"
+                    )
 
     def test_get_respondent_enrolments_for_started_collex(self):
         """test that get_respondent_enrolments_for_started_collex will only return enrolment data
@@ -203,114 +219,119 @@ class TestPartyController(unittest.TestCase):
 
         collex = {"survey1": "collex1", "survey3": "collex3"}
 
-        enrolment_data = [{"survey_id": "survey1", "enrolment_data": "enrolment1"},
-                          {"survey_id": "survey2", "enrolment_data": "enrolment2"},
-                          {"survey_id": "survey3", "enrolment_data": "enrolment3"}]
+        enrolment_data = [
+            {"survey_id": "survey1", "enrolment_data": "enrolment1"},
+            {"survey_id": "survey2", "enrolment_data": "enrolment2"},
+            {"survey_id": "survey3", "enrolment_data": "enrolment3"},
+        ]
 
         result = get_respondent_enrolments_for_started_collex(enrolment_data, collex)
         self.assertEqual(len(result), 2)
         self.assertDictEqual({"survey_id": "survey1", "enrolment_data": "enrolment1"}, result[0])
         self.assertDictEqual({"survey_id": "survey3", "enrolment_data": "enrolment3"}, result[1])
 
-    @patch('frontstage.controllers.party_controller.get_respondent_party_by_id')
+    @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
     def test_get_respondent_enrolments(self, get_respondent_party):
         get_respondent_party.return_value = respondent_party
 
-        enrolments = party_controller.get_respondent_enrolments(respondent_party['id'])
+        enrolments = party_controller.get_respondent_enrolments(respondent_party["id"])
 
         for enrolment in enrolments:
-            self.assertTrue(enrolment['business_id'] is not None)
-            self.assertTrue(enrolment['survey_id'] is not None)
+            self.assertTrue(enrolment["business_id"] is not None)
+            self.assertTrue(enrolment["survey_id"] is not None)
 
-    @patch('frontstage.controllers.party_controller.get_party_by_business_id')
-    @patch('frontstage.controllers.survey_controller.get_survey')
-    @patch('frontstage.controllers.case_controller.calculate_case_status')
-    @patch('frontstage.controllers.collection_instrument_controller.get_collection_instrument')
-    @patch('frontstage.controllers.case_controller.get_cases_for_list_type_by_party_id')
-    @patch('frontstage.controllers.collection_exercise_controller.get_live_collection_exercises_for_survey')
-    @patch('frontstage.controllers.party_controller.get_respondent_enrolments')
-    def test_get_survey_list_details_for_party(self, get_respondent_enrolments, get_collection_exercises, get_cases,
-                                               get_collection_instrument, calculate_case_status, get_survey, get_business):
-        enrolments = [{
-            'business_id': business_party['id'],
-            'survey_id': survey['id']
-        }]
+    @patch("frontstage.controllers.party_controller.get_party_by_business_id")
+    @patch("frontstage.controllers.survey_controller.get_survey")
+    @patch("frontstage.controllers.case_controller.calculate_case_status")
+    @patch("frontstage.controllers.collection_instrument_controller.get_collection_instrument")
+    @patch("frontstage.controllers.case_controller.get_cases_for_list_type_by_party_id")
+    @patch("frontstage.controllers.collection_exercise_controller.get_live_collection_exercises_for_survey")
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    def test_get_survey_list_details_for_party(
+        self,
+        get_respondent_enrolments,
+        get_collection_exercises,
+        get_cases,
+        get_collection_instrument,
+        calculate_case_status,
+        get_survey,
+        get_business,
+    ):
+        enrolments = [{"business_id": business_party["id"], "survey_id": survey["id"]}]
 
         for collection_exercise_index in collection_exercise_by_survey:
-            if collection_exercise_index['events']:
-                collection_exercise_index['events'] = convert_events_to_new_format(collection_exercise_index['events'])
+            if collection_exercise_index["events"]:
+                collection_exercise_index["events"] = convert_events_to_new_format(collection_exercise_index["events"])
 
         get_respondent_enrolments.return_value = enrolments
         get_collection_exercises.return_value = collection_exercise_by_survey
         get_cases.return_value = case_list
         get_collection_instrument.return_value = collection_instrument_seft
-        calculate_case_status.return_value = 'In Progress'
+        calculate_case_status.return_value = "In Progress"
         get_survey.return_value = survey
         get_business.return_value = business_party
 
-        survey_list = party_controller.get_survey_list_details_for_party(respondent_party['id'], 'todo',
-                                                                         business_party['id'], survey['id'])
+        survey_list = party_controller.get_survey_list_details_for_party(
+            respondent_party["id"], "todo", business_party["id"], survey["id"]
+        )
         with app.app_context():
             for survey_details in survey_list:
-                self.assertTrue(survey_details['case_id'] is not None)
-                self.assertTrue(survey_details['status'] is not None)
-                self.assertTrue(survey_details['collection_instrument_type'] is not None)
-                self.assertTrue(survey_details['survey_id'] is not None)
-                self.assertTrue(survey_details['survey_long_name'] is not None)
-                self.assertTrue(survey_details['survey_short_name'] is not None)
-                self.assertTrue(survey_details['business_party_id'] is not None)
-                self.assertTrue(survey_details['collection_exercise_ref'] is not None)
+                self.assertTrue(survey_details["case_id"] is not None)
+                self.assertTrue(survey_details["status"] is not None)
+                self.assertTrue(survey_details["collection_instrument_type"] is not None)
+                self.assertTrue(survey_details["survey_id"] is not None)
+                self.assertTrue(survey_details["survey_long_name"] is not None)
+                self.assertTrue(survey_details["survey_short_name"] is not None)
+                self.assertTrue(survey_details["business_party_id"] is not None)
+                self.assertTrue(survey_details["collection_exercise_ref"] is not None)
 
     def test_display_button(self):
         Combination = namedtuple("Combination", ["status", "ci_type", "expected"])
         combinations = [
-            Combination('COMPLETE', 'SEFT', True),
-            Combination('COMPLETEDBYPHONE', 'SEFT', True),
-            Combination('NOLONGERREQUIRED', 'SEFT', True),
-            Combination('NOTSTARTED', 'SEFT', True),
-            Combination('INPROGRESS', 'SEFT', True),
-            Combination('REOPENED', 'SEFT', True),
-            Combination('REOPENED', 'EQ', True),
-            Combination('INPROGRESS', 'EQ', True),
-            Combination('NOTSTARTED', 'EQ', True),
-            Combination('NOLONGERREQUIRED', 'EQ', False),
-            Combination('COMPLETEDBYPHONE', 'EQ', False),
-            Combination('COMPLETE', 'EQ', False),
+            Combination("COMPLETE", "SEFT", True),
+            Combination("COMPLETEDBYPHONE", "SEFT", True),
+            Combination("NOLONGERREQUIRED", "SEFT", True),
+            Combination("NOTSTARTED", "SEFT", True),
+            Combination("INPROGRESS", "SEFT", True),
+            Combination("REOPENED", "SEFT", True),
+            Combination("REOPENED", "EQ", True),
+            Combination("INPROGRESS", "EQ", True),
+            Combination("NOTSTARTED", "EQ", True),
+            Combination("NOLONGERREQUIRED", "EQ", False),
+            Combination("COMPLETEDBYPHONE", "EQ", False),
+            Combination("COMPLETE", "EQ", False),
         ]
         for combination in combinations:
             self.assertEqual(display_button(combination.status, combination.ci_type), combination.expected)
 
     def test_filter_ended_collection_exercises(self):
         """Tests the functionality of the 'filter_ended_collection_exercises' function"""
-        with open('tests/test_data/party/collection_exercises.json') as business_json_data:
+        with open("tests/test_data/party/collection_exercises.json") as business_json_data:
             data = json.load(business_json_data)
 
         # Enddates set for tomorrow. Millseconds are set up this way because datetime generates 6 digits
         # where we receive 3 digits.
         date = datetime.now() + timedelta(days=1)
-        data[0]['scheduledEndDateTime'] = date.strftime("%Y-%m-%dT%H:%M:%S") + ".000Z"
-        data[1]['scheduledEndDateTime'] = date.strftime("%Y-%m-%dT%H:%M:%S") + ".111Z"
+        data[0]["scheduledEndDateTime"] = date.strftime("%Y-%m-%dT%H:%M:%S") + ".000Z"
+        data[1]["scheduledEndDateTime"] = date.strftime("%Y-%m-%dT%H:%M:%S") + ".111Z"
         self.assertEqual(2, len(data))
         result = filter_ended_collection_exercises(data)
         self.assertEqual(2, len(result))
 
         # Change one of the end dates to a past date.  It should successfully filter the collection exercise
         # out of the list.
-        data[0]['scheduledEndDateTime'] = "2019-01-31T00:00:00.000Z"
+        data[0]["scheduledEndDateTime"] = "2019-01-31T00:00:00.000Z"
         self.assertEqual(2, len(data))
         result = filter_ended_collection_exercises(data)
         self.assertEqual(1, len(result))
 
     def test_filter_ended_collection_exercises_remove_multiple(self):
-        collection_exercises = [{'missingEndDateTime': '!'},
-                                {'scheduledEndDateTime': str(datetime.now(timezone.utc) -
-                                                             timedelta(days=1))},
-                                {'scheduledEndDateTime': str(datetime.now(timezone.utc) -
-                                                             timedelta(hours=1))},
-                                {'scheduledEndDateTime': str(datetime.now(timezone.utc) +
-                                                             timedelta(hours=1))},
-                                {'scheduledEndDateTime': str(datetime.now(timezone.utc) +
-                                                             timedelta(days=1))}
-                                ]
+        collection_exercises = [
+            {"missingEndDateTime": "!"},
+            {"scheduledEndDateTime": str(datetime.now(timezone.utc) - timedelta(days=1))},
+            {"scheduledEndDateTime": str(datetime.now(timezone.utc) - timedelta(hours=1))},
+            {"scheduledEndDateTime": str(datetime.now(timezone.utc) + timedelta(hours=1))},
+            {"scheduledEndDateTime": str(datetime.now(timezone.utc) + timedelta(days=1))},
+        ]
         result = filter_ended_collection_exercises(collection_exercises)
         self.assertEqual(2, len(result))

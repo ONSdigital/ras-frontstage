@@ -7,12 +7,14 @@ from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import collection_exercise_controller
 from frontstage.exceptions.exceptions import ApiError
-from tests.integration.mocked_services import collection_exercise, collection_exercise_by_survey, \
-    url_get_collection_exercises_by_survey
+from tests.integration.mocked_services import (
+    collection_exercise,
+    collection_exercise_by_survey,
+    url_get_collection_exercises_by_survey,
+)
 
 
 class TestCollectionExerciseController(unittest.TestCase):
-
     def setUp(self):
         app_config = TestingConfig()
         app.config.from_object(app_config)
@@ -24,10 +26,11 @@ class TestCollectionExerciseController(unittest.TestCase):
             rsps.add(rsps.GET, url_get_collection_exercises_by_survey, json=collection_exercise_by_survey, status=200)
 
             with app.app_context():
-                collection_exercises = collection_exercise_controller.\
-                    get_collection_exercises_for_survey(collection_exercise['surveyId'],
-                                                        self.app_config['COLLECTION_EXERCISE_URL'],
-                                                        self.app_config['BASIC_AUTH'])
+                collection_exercises = collection_exercise_controller.get_collection_exercises_for_survey(
+                    collection_exercise["surveyId"],
+                    self.app_config["COLLECTION_EXERCISE_URL"],
+                    self.app_config["BASIC_AUTH"],
+                )
 
                 self.assertTrue(collection_exercises is not None)
 
@@ -36,22 +39,21 @@ class TestCollectionExerciseController(unittest.TestCase):
             rsps.add(rsps.GET, url_get_collection_exercises_by_survey, status=400)
             with app.app_context():
                 with self.assertRaises(ApiError):
-                    collection_exercise_controller. \
-                        get_collection_exercises_for_survey(collection_exercise['surveyId'],
-                                                            self.app_config['COLLECTION_EXERCISE_URL'],
-                                                            self.app_config['BASIC_AUTH'])
+                    collection_exercise_controller.get_collection_exercises_for_survey(
+                        collection_exercise["surveyId"],
+                        self.app_config["COLLECTION_EXERCISE_URL"],
+                        self.app_config["BASIC_AUTH"],
+                    )
 
     def test_convert_events_to_new_format_successful(self):
-        formatted_events = collection_exercise_controller.convert_events_to_new_format(collection_exercise['events'])
+        formatted_events = collection_exercise_controller.convert_events_to_new_format(collection_exercise["events"])
 
-        self.assertTrue(formatted_events['go_live'] is not None)
-        self.assertTrue(formatted_events['go_live']['date'] is not None)
-        self.assertTrue(formatted_events['go_live']['is_in_future'] is not None)
+        self.assertTrue(formatted_events["go_live"] is not None)
+        self.assertTrue(formatted_events["go_live"]["date"] is not None)
+        self.assertTrue(formatted_events["go_live"]["is_in_future"] is not None)
 
     def test_convert_events_to_new_format_fail(self):
-        events = [{
-            "timestamp": "abc"
-        }]
+        events = [{"timestamp": "abc"}]
 
         with self.assertRaises(ParseError):
             collection_exercise_controller.convert_events_to_new_format(events)

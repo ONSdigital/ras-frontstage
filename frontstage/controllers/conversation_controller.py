@@ -10,8 +10,12 @@ from structlog import wrap_logger
 from urllib3 import Retry
 
 from frontstage.common.session import Session
-from frontstage.exceptions.exceptions import ApiError, AuthorizationTokenMissing, NoMessagesError, IncorrectAccountAccessError
-
+from frontstage.exceptions.exceptions import (
+    ApiError,
+    AuthorizationTokenMissing,
+    IncorrectAccountAccessError,
+    NoMessagesError,
+)
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -19,13 +23,13 @@ logger = wrap_logger(logging.getLogger(__name__))
 def _get_session():
     session = requests.Session()
     retries = Retry(total=10, backoff_factor=0.1)
-    session.mount('http://', HTTPAdapter(max_retries=retries))
-    session.mount('https://', HTTPAdapter(max_retries=retries))
+    session.mount("http://", HTTPAdapter(max_retries=retries))
+    session.mount("https://", HTTPAdapter(max_retries=retries))
     return session
 
 
 def get_conversation(thread_id):
-    logger.info('Retrieving conversation thread', thread_id=thread_id)
+    logger.info("Retrieving conversation thread", thread_id=thread_id)
 
     headers = _create_get_conversation_headers()
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/threads/{thread_id}"
@@ -36,22 +40,22 @@ def get_conversation(thread_id):
             response.raise_for_status()
         except HTTPError as exception:
             if exception.response.status_code == 403:
-                raise IncorrectAccountAccessError(message='Access not granted for thread', thread_id=thread_id)
+                raise IncorrectAccountAccessError(message="Access not granted for thread", thread_id=thread_id)
             else:
-                logger.error('Thread retrieval failed', thread_id=thread_id)
-                raise ApiError(response)
+                logger.error("Thread retrieval failed", thread_id=thread_id)
+                raise ApiError(logger, response)
 
-    logger.info('Successfully retrieved conversation thread', thread_id=thread_id)
+    logger.info("Successfully retrieved conversation thread", thread_id=thread_id)
 
     try:
         return response.json()
     except JSONDecodeError:
-        logger.error('The thread response could not be decoded', thread_id=thread_id)
-        raise ApiError(response)
+        logger.error("The thread response could not be decoded", thread_id=thread_id)
+        raise ApiError(logger, response)
 
 
 def get_conversation_list(params):
-    logger.info('Retrieving threads list')
+    logger.info("Retrieving threads list")
 
     headers = _create_get_conversation_headers()
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/threads"
@@ -61,16 +65,16 @@ def get_conversation_list(params):
         try:
             response.raise_for_status()
         except HTTPError:
-            logger.error('Threads retrieval failed')
-            raise ApiError(response)
+            logger.error("Threads retrieval failed")
+            raise ApiError(logger, response)
 
-    logger.info('Successfully retrieved threads list')
+    logger.info("Successfully retrieved threads list")
 
     try:
-        return response.json()['messages']
+        return response.json()["messages"]
     except JSONDecodeError:
-        logger.error('The threads response could not be decoded')
-        raise ApiError(response)
+        logger.error("The threads response could not be decoded")
+        raise ApiError(logger, response)
     except KeyError:
         logger.error("Request was successful but didn't contain a 'messages' key")
         raise NoMessagesError
@@ -85,8 +89,8 @@ def send_message(message_json):
     :raises ApiError: Raised when secure-message returns a non-200 status code
     :return: A json response from secure-message
     """
-    party_id = json.loads(message_json).get('msg_from')
-    logger.info('Sending message', party_id=party_id)
+    party_id = json.loads(message_json).get("msg_from")
+    logger.info("Sending message", party_id=party_id)
 
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/messages"
     headers = _create_send_message_headers()
@@ -96,75 +100,79 @@ def send_message(message_json):
         try:
             response.raise_for_status()
         except HTTPError:
-            logger.error('Message sending failed due to API Error', party_id=party_id)
-            raise ApiError(response)
+            logger.error("Message sending failed due to API Error", party_id=party_id, exc_info=True)
+            raise ApiError(logger, response)
 
-    logger.info('Successfully sent message', party_id=party_id)
+    logger.info("Successfully sent message", party_id=party_id)
     return response.json()
 
 
 def try_message_count_from_session(session):
-    """ Attempts to get the unread message count from the session,
-        will fall back to the secure-message api if unsuccessful"""
+    """Attempts to get the unread message count from the session,
+    will fall back to the secure-message api if unsuccessful"""
     party_id = session.get_party_id()
-    logger.debug('Getting message count from session', party_id=party_id)
+    logger.debug("Getting message count from session", party_id=party_id)
     try:
         if not session.message_count_expired():
             return session.get_unread_message_count()
-        logger.debug('Unread Message count timer has expired', party_id=party_id)
+        logger.debug("Unread Message count timer has expired", party_id=party_id)
     except KeyError:
-        logger.warn('Unread message count does not exist in the session', party_id=party_id)
+        logger.warn("Unread message count does not exist in the session", party_id=party_id)
     return get_message_count_from_api(session)
 
 
-def get_message_count_from_api(session):
-    """ Gets the unread message count from the secure-message api.
-        A successful get will update the session."""
+def get_message_count_from_api(session) -> int:
+    """Gets the unread message count from the secure-message api.
+    A successful get will update the session."""
     party_id = session.get_party_id()
-    logger.info('Getting message count from secure-message api', party_id=party_id)
-    params = {'unread_conversations': 'true'}
+    logger.info("Getting message count from secure-message api", party_id=party_id)
+    params = {"unread_conversations": "true"}
     headers = _create_get_conversation_headers(session.get_encoded_jwt())
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/messages/count"
     with _get_session() as requestSession:
         response = requestSession.get(url, headers=headers, params=params)
         try:
             response.raise_for_status()
-            count = response.json()['total']
-            logger.debug('Got unread message count, updating session', party_id=party_id, count=count)
+            count = response.json()["total"]
+            logger.debug("Got unread message count, updating session", party_id=party_id, count=count)
             if session.is_persisted():
                 session.set_unread_message_total(count)
             return count
         except HTTPError as exception:
             if exception.response.status_code == 403:
-                raise IncorrectAccountAccessError(message='User is unauthorized to perform this action', thread_id=party_id)
+                raise IncorrectAccountAccessError(
+                    message="User is unauthorized to perform this action", thread_id=party_id
+                )
             else:
-                logger.exception('An error has occured retrieving the new message count', party_id=party_id)
-        except Exception as ex:
-            logger.exception("An unknown error has occured getting message count from secure-message api", party_id=party_id)
+                logger.exception("An error has occured retrieving the new message count", party_id=party_id)
+        except Exception:
+            logger.exception(
+                "An unknown error has occured getting message count from secure-message api", party_id=party_id
+            )
         return 0
 
 
-def _create_get_conversation_headers(encoded_jwt=None):
+def _create_get_conversation_headers(encoded_jwt=None) -> dict:
     try:
         if encoded_jwt is None:
-            encoded_jwt = Session.from_session_key(request.cookies['authorization']).get_encoded_jwt()
+            encoded_jwt = Session.from_session_key(request.cookies["authorization"]).get_encoded_jwt()
     except KeyError:
-        logger.error('Authorization token missing in cookie')
+        logger.error("Authorization token missing in cookie")
         raise AuthorizationTokenMissing
-    return {'Authorization': encoded_jwt}
+    return {"Authorization": encoded_jwt}
 
 
-def _create_send_message_headers():
+def _create_send_message_headers() -> dict:
     try:
-        encoded_jwt = Session.from_session_key(request.cookies['authorization']).get_encoded_jwt()
+        encoded_jwt = Session.from_session_key(request.cookies["authorization"]).get_encoded_jwt()
     except KeyError:
-        logger.error('Authorization token missing in cookie')
+        logger.error("Authorization token missing in cookie")
         raise AuthorizationTokenMissing
-    return {'Authorization': encoded_jwt, 'Content-Type': 'application/json', 'Accept': 'application/json'}
+    return {"Authorization": encoded_jwt, "Content-Type": "application/json", "Accept": "application/json"}
 
 
-def remove_unread_label(message_id):
-    logger.info('Removing message unread label', message_id=message_id)
+def remove_unread_label(message_id: str):
+    logger.info("Removing message unread label", message_id=message_id)
 
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/messages/modify/{message_id}"
     data = '{"label": "UNREAD", "action": "remove"}'
@@ -175,6 +183,6 @@ def remove_unread_label(message_id):
         try:
             response.raise_for_status()
         except HTTPError:
-            logger.error('Failed to remove unread label', message_id=message_id, status=response.status_code)
+            logger.error("Failed to remove unread label", message_id=message_id, status=response.status_code)
 
-    logger.info('Successfully removed unread label', message_id=message_id)
+    logger.info("Successfully removed unread label", message_id=message_id)

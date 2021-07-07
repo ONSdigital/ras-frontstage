@@ -1,20 +1,18 @@
 import unittest
+from datetime import datetime, timedelta
 from unittest.mock import patch
 
 import responses
-from datetime import timedelta, datetime
-from frontstage import jwt
 
 from config import TestingConfig
-from frontstage import app, redis
+from frontstage import app, jwt, redis
 from frontstage.common.session import Session
 from frontstage.controllers import conversation_controller
 from frontstage.exceptions.exceptions import IncorrectAccountAccessError
-from tests.integration.mocked_services import url_get_conversation_count, message_count
+from tests.integration.mocked_services import message_count, url_get_conversation_count
 
 
 class TestConversationController(unittest.TestCase):
-
     def setUp(self):
         app_config = TestingConfig()
         app.config.from_object(app_config)
@@ -25,10 +23,17 @@ class TestConversationController(unittest.TestCase):
 
     @patch("frontstage.controllers.conversation_controller._create_get_conversation_headers")
     def test_get_message_count_from_api(self, headers):
-        headers.return_value = {'Authorization': "token"}
+        headers.return_value = {"Authorization": "token"}
         session = Session.from_party_id("id")
         with responses.RequestsMock() as rsps:
-            rsps.add(rsps.GET, url_get_conversation_count, json=message_count, status=200, headers={'Authorisation': 'token'}, content_type='application/json')
+            rsps.add(
+                rsps.GET,
+                url_get_conversation_count,
+                json=message_count,
+                status=200,
+                headers={"Authorisation": "token"},
+                content_type="application/json",
+            )
             with app.app_context():
                 count = conversation_controller.get_message_count_from_api(session)
 
@@ -50,7 +55,14 @@ class TestConversationController(unittest.TestCase):
 
         session_under_test = Session.from_session_key(session_key)
         with responses.RequestsMock() as rsps:
-            rsps.add(rsps.GET, url_get_conversation_count, json=message_count, status=200, headers={'Authorisation': 'token'}, content_type='application/json')
+            rsps.add(
+                rsps.GET,
+                url_get_conversation_count,
+                json=message_count,
+                status=200,
+                headers={"Authorisation": "token"},
+                content_type="application/json",
+            )
             with app.app_context():
                 count = conversation_controller.get_message_count_from_api(session_under_test)
 
@@ -58,14 +70,23 @@ class TestConversationController(unittest.TestCase):
 
     @patch("frontstage.controllers.conversation_controller._create_get_conversation_headers")
     def test_get_message_count_from_api_when_expired(self, headers):
-        headers.return_value = {'Authorization': "token"}
+        headers.return_value = {"Authorization": "token"}
         session = Session.from_party_id("id")
         decoded = session.get_decoded_jwt()
-        decoded['unread_message_count']['refresh_in'] = (datetime.fromtimestamp(decoded['unread_message_count']['refresh_in']) - timedelta(seconds=301)).timestamp()
+        decoded["unread_message_count"]["refresh_in"] = (
+            datetime.fromtimestamp(decoded["unread_message_count"]["refresh_in"]) - timedelta(seconds=301)
+        ).timestamp()
         encoded = jwt.encode(decoded)
         session.encoded_jwt_token = encoded
         with responses.RequestsMock() as rsps:
-            rsps.add(rsps.GET, url_get_conversation_count, json=message_count, status=200, headers={'Authorisation': 'token'}, content_type='application/json')
+            rsps.add(
+                rsps.GET,
+                url_get_conversation_count,
+                json=message_count,
+                status=200,
+                headers={"Authorisation": "token"},
+                content_type="application/json",
+            )
             with app.app_context():
                 count = conversation_controller.try_message_count_from_session(session)
 
@@ -73,7 +94,7 @@ class TestConversationController(unittest.TestCase):
 
     @patch("frontstage.controllers.conversation_controller._create_get_conversation_headers")
     def test_get_message_count_unauthorized(self, headers):
-        headers.return_value = {'Authorization': "token"}
+        headers.return_value = {"Authorization": "token"}
         session = Session.from_party_id("id")
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_conversation_count, status=403)
@@ -83,7 +104,7 @@ class TestConversationController(unittest.TestCase):
 
     @patch("frontstage.controllers.conversation_controller._create_get_conversation_headers")
     def test_get_message_count_other_error_returns_0(self, headers):
-        headers.return_value = {'Authorization': "token"}
+        headers.return_value = {"Authorization": "token"}
         session = Session.from_party_id("id")
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_conversation_count, status=400)

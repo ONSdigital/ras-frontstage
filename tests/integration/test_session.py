@@ -8,7 +8,6 @@ from frontstage.common.session import Session
 
 
 class TestSession(unittest.TestCase):
-
     def setUp(self):
         self.app = app.test_client()
         self.app.testing = True
@@ -24,8 +23,8 @@ class TestSession(unittest.TestCase):
         self.assertTrue(session.is_persisted())
         # Retrieve encoded_jwt from session
         test_jwt = session.get_decoded_jwt()
-        self.assertEqual(test_jwt['party_id'], "party")
-        self.assertEqual(test_jwt['unread_message_count']['value'], 0)
+        self.assertEqual(test_jwt["party_id"], "party")
+        self.assertEqual(test_jwt["unread_message_count"]["value"], 0)
 
     def test_refresh_session(self):
         # Create session and get session key
@@ -78,7 +77,7 @@ class TestSession(unittest.TestCase):
 
         self.assertEqual(session_to_assert.get_unread_message_count(), 5)
 
-    @patch('frontstage.common.session._get_new_timestamp')
+    @patch("frontstage.common.session._get_new_timestamp")
     def test_message_count_expired(self, test_patch):
         expired_time = datetime.now() - timedelta(seconds=301)
         test_patch.return_value = expired_time.timestamp()

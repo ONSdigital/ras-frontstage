@@ -19,7 +19,19 @@ docker-test: unit-tests integration-tests
 check:
 	pipenv check
 
-test: unit-tests integration-tests
+lint:
+	pipenv run flake8
+	pipenv check
+	pipenv run isort .
+	pipenv run black --line-length 120 .
+
+lint-check:
+	pipenv run flake8
+	pipenv check
+	pipenv run isort . --check-only
+	pipenv run black --line-length 120 --check .
+
+test: lint-check unit-tests integration-tests
 
 unit-tests: check
 	APP_SETTINGS=TestingConfig pipenv run pytest $(UNIT_TESTS) --cov frontstage --cov-report term-missing	

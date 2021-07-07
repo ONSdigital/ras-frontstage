@@ -1,4 +1,4 @@
-from base64 import b64encode, b64decode
+from base64 import b64decode, b64encode
 from hashlib import sha256
 
 from Crypto import Random
@@ -18,8 +18,8 @@ class Cryptographer:
 
         :param key: The encryption key to use when encrypting the data
         """
-        key = app.config['SECRET_KEY']
-        self._key = sha256(key.encode('utf-8')).digest()
+        key = app.config["SECRET_KEY"]
+        self._key = sha256(key.encode("utf-8")).digest()
 
     def encrypt(self, raw_text):
         """
@@ -62,4 +62,4 @@ class Cryptographer:
         :param data: Our padded data
         :return: The data 'un'padded
         """
-        return data[0:-data[-1]]
+        return data[0 : -data[-1]]

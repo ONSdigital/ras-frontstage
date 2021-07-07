@@ -1,15 +1,12 @@
 import json
 
 from sdc.crypto.encrypter import encrypt
-from sdc.crypto.key_store import KeyStore
-from sdc.crypto.key_store import validate_required_keys
-
+from sdc.crypto.key_store import KeyStore, validate_required_keys
 
 KEY_PURPOSE = "authentication"
 
 
 class Encrypter:
-
     def __init__(self, json_secret_keys):
         keys = json.loads(json_secret_keys)
         validate_required_keys(keys, KEY_PURPOSE)

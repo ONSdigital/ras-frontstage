@@ -5,10 +5,10 @@ def file_size_filter(value):
     """
 
     # Divide by 1024 to convert from bytes to KB, round and then convert into a string
-    return split_thousands(str(round(value/1024)))
+    return split_thousands(str(round(value / 1024)))
 
 
-def split_thousands(value, sep=','):
+def split_thousands(value, sep=","):
     if len(value) <= 3:
         return value
     else:

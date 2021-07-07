@@ -33,10 +33,10 @@ lint-check:
 
 test: lint-check unit-tests integration-tests
 
-unit-tests: check
+unit-tests:
 	APP_SETTINGS=TestingConfig pipenv run pytest $(UNIT_TESTS) --cov frontstage --cov-report term-missing	
 
-integration-tests: check
+integration-tests:
 	APP_SETTINGS=TestingConfig pipenv run pytest $(INTEGRATION_TESTS) --cov frontstage --cov-report term-missing	
 
 load-templates:

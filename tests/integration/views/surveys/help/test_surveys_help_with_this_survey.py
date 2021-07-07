@@ -21,7 +21,8 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.app = app.test_client()
         self.app.set_cookie("localhost", "authorization", "session_key")
         self.headers = {
-            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"
+            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2Vy"
+            "X3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"
             # NOQA
         }
         self.patcher = patch("redis.StrictRedis.get", return_value=encoded_jwt_token)
@@ -136,7 +137,7 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         response = self.app.get(
-            "/surveys/help/074/49900000001F/help-completing-this-survey/" "do-not-have-specific-figures/send-message"
+            "/surveys/help/074/49900000001F/help-completing-this-survey/do-not-have-specific-figures/send-message"
         )
 
         self.assertEqual(response.status_code, 200)
@@ -204,14 +205,14 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
     @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_get_send_help_message_page_for_bricks_with_sub_option_specific_figures_for_a_response(
+    def test_get_send_help_message_page_for_bricks_with_deadline_sub_option_specific_figures_for_a_response(
         self, mock_request, get_survey, get_business
     ):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         get_business.return_value = business_party
         response = self.app.get(
-            "/surveys/help/074/49900000001F/help-completing-this-survey/" "unable-to-return-by-deadline/send-message"
+            "/surveys/help/074/49900000001F/help-completing-this-survey/unable-to-return-by-deadline/send-message"
         )
 
         self.assertEqual(response.status_code, 200)

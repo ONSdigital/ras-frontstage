@@ -1,6 +1,6 @@
 import logging
 
-from flask import Blueprint, render_template, send_from_directory
+from flask import Blueprint, send_from_directory
 from structlog import wrap_logger
 
 logger = wrap_logger(logging.getLogger(__name__))

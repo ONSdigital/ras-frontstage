@@ -1,9 +1,8 @@
 import logging
 from distutils.util import strtobool
 
-from flask import render_template, request, url_for
+from flask import render_template, request
 from structlog import wrap_logger
-from werkzeug.utils import redirect
 
 from frontstage.common.cryptographer import Cryptographer
 from frontstage.controllers import iac_controller, party_controller
@@ -70,7 +69,7 @@ def pending_surveys_register_enter_your_details():
     is_transfer = request.args.get("is_transfer", None)
     form = PendingSurveyRegistrationForm(request.values, batch_no=batch_no, email=email, is_transfer=is_transfer)
     # Validate batch_no before rendering or checking the form
-    response = party_controller.get_pending_surveys_batch_number(batch_no)
+    party_controller.get_pending_surveys_batch_number(batch_no)
     if request.method == "POST" and form.validate():
         logger.info("Attempting to create account against share/transfer surveys email address")
         email_address = form.email.data

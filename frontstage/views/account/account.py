@@ -23,7 +23,6 @@ from frontstage.models import (
     SecureMessagingForm,
 )
 from frontstage.views.account import account_bp
-from frontstage.views.surveys.help.surveys_help import _send_new_message
 
 logger = wrap_logger(logging.getLogger(__name__))
 

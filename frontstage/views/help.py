@@ -1,7 +1,6 @@
 import logging
 
 from flask import Blueprint, flash, render_template, request, url_for
-from requests import session
 from structlog import wrap_logger
 from werkzeug.utils import redirect
 

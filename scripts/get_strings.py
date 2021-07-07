@@ -1,4 +1,3 @@
-from json import dumps
 from os.path import isfile
 from re import findall
 from sys import argv
@@ -14,7 +13,7 @@ print("\nget_strings.py\nExtract strings from python files for replacement in st
 
 
 # Validate args
-if not len(argv) is 2:
+if len(argv) != 2:
     print("Expects 2 arguments.")
     show_help_message()
     exit(1)
@@ -36,7 +35,7 @@ translation_regex = r"_\('([A-z0-9 ,.]+)'\)"  # _( followed by 1 or more typeabl
 
 try:
     file_handle = open(filename, "r")
-except Exception as exc:
+except Exception:
     print(f"An error occured opening file: {filename}")
     exit(1)
 

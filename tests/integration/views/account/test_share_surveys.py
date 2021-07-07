@@ -15,7 +15,10 @@ from tests.integration.mocked_services import (
 )
 
 url_get_business_details = f"{app.config['PARTY_URL']}/party-api/v1/businesses"
-url_get_user_count = f"{app.config['PARTY_URL']}/party-api/v1/pending-survey-users-count?business_id={business_party['id']}&survey_id={'02b9c366-7397-42f7-942a-76dc5876d86d'}"
+url_get_user_count = (
+    f"{app.config['PARTY_URL']}/party-api/v1/pending-survey-users-count?"
+    f"business_id={business_party['id']}&survey_id={'02b9c366-7397-42f7-942a-76dc5876d86d'}"
+)
 url_post_pending_shares = f"{app.config['PARTY_URL']}/party-api/v1/pending-surveys"
 url_get_survey_second = f"{app.config['SURVEY_URL']}/surveys/02b9c366-7397-42f7-942a-76dc5876d86d"
 dummy_business = {
@@ -50,7 +53,8 @@ class TestShareSurvey(unittest.TestCase):
         self.app = app.test_client()
         self.app.set_cookie("localhost", "authorization", "session_key")
         self.headers = {
-            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"
+            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2Vy"
+            "X3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"
             # NOQA
         }
         self.patcher = patch("redis.StrictRedis.get", return_value=encoded_jwt_token)

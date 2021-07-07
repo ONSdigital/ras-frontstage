@@ -67,6 +67,7 @@ class TestConversationController(unittest.TestCase):
                 count = conversation_controller.get_message_count_from_api(session_under_test)
 
                 self.assertEqual(3, session_under_test.get_unread_message_count())
+                self.assertEqual(3, count)
 
     @patch("frontstage.controllers.conversation_controller._create_get_conversation_headers")
     def test_get_message_count_from_api_when_expired(self, headers):

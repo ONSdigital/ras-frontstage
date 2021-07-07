@@ -144,10 +144,10 @@ def get_message_count_from_api(session) -> int:
                     message="User is unauthorized to perform this action", thread_id=party_id
                 )
             else:
-                logger.exception("An error has occured retrieving the new message count", party_id=party_id)
+                logger.exception("An error has occurred retrieving the new message count", party_id=party_id)
         except Exception:
             logger.exception(
-                "An unknown error has occured getting message count from secure-message api", party_id=party_id
+                "An unknown error has occurred getting message count from secure-message api", party_id=party_id
             )
         return 0
 

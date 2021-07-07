@@ -18,7 +18,8 @@ class TestSurveyList(unittest.TestCase):
         self.app = app.test_client()
         self.app.set_cookie("localhost", "authorization", "session_key")
         self.headers = {
-            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"
+            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2Vy"
+            "X3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"
             # NOQA
         }
         self.patcher = patch("redis.StrictRedis.get", return_value=encoded_jwt_token)
@@ -68,6 +69,7 @@ class TestSurveyList(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         response = self.app.post("/my-account", data=self.contact_details_form, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
         self.assertIn("Phone number".encode(), response.data)
 
     @requests_mock.mock()
@@ -152,14 +154,8 @@ class TestSurveyList(unittest.TestCase):
         self.assertIn("please call 0300 1234 931".encode(), response.data)
 
     @requests_mock.mock()
-    def test_account_options_selection(self, mock_request):
-        mock_request.get(url_banner_api, status_code=404)
-        response = self.app.post("/my-account", data={"option": "contact_details"}, follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-
-    @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
-    def test_account_options_selection(self, mock_request, get_respondent_party_by_id):
+    def test_account_options_selection_change_password(self, mock_request, get_respondent_party_by_id):
         mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         response = self.app.post("/my-account", data={"option": "change_password"}, follow_redirects=True)

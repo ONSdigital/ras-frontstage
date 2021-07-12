@@ -7,7 +7,6 @@ from structlog import wrap_logger
 
 from frontstage.exceptions.exceptions import ApiError
 
-
 logger = wrap_logger(logging.getLogger(__name__))
 
 
@@ -21,26 +20,26 @@ def get_iac_from_enrolment(enrolment_code):
     :return: A dict with the IAC details if it exists and is active, and None otherwise
     """
     bound_logger = logger.bind(enrolment_code=enrolment_code)
-    bound_logger.info('Attempting to retrieve IAC')
+    bound_logger.info("Attempting to retrieve IAC")
     url = f"{app.config['IAC_URL']}/iacs/{enrolment_code}"
-    response = requests.get(url, auth=app.config['BASIC_AUTH'])
+    response = requests.get(url, auth=app.config["BASIC_AUTH"])
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         if response.status_code == 404:
-            bound_logger.info('IAC not found', status_code=response.status_code)
+            bound_logger.info("IAC not found", status_code=response.status_code)
             return
         # 401s may include error context in the JSON response
         if response.status_code != 401:
-            bound_logger.error('Failed to retrieve IAC')
+            bound_logger.error("Failed to retrieve IAC")
             raise ApiError(logger, response)
 
-    if response.json().get('active') is False:
+    if response.json().get("active") is False:
         bound_logger.info("IAC is not active")
         return
 
-    bound_logger.info('Successfully retrieved IAC')
+    bound_logger.info("Successfully retrieved IAC")
     return response.json()
 
 

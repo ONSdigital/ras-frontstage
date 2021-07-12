@@ -1,6 +1,6 @@
 import logging
 
-from flask import render_template, abort, request, url_for, flash
+from flask import abort, flash, render_template, request, url_for
 from structlog import wrap_logger
 from werkzeug.utils import redirect
 
@@ -14,79 +14,98 @@ from frontstage.views.account import account_bp
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-@account_bp.route('/transfer-surveys/accept-transfer-surveys/<token>', methods=['GET'])
+@account_bp.route("/transfer-surveys/accept-transfer-surveys/<token>", methods=["GET"])
 def get_transfer_survey_summary(token):
     """
     Endpoint to verify transfer token and retrieve the summary page
     :param token: transfer survey token
     :type token: str
     """
-    logger.info('Getting transfer survey summary', token=token)
+    logger.info("Getting transfer survey summary", token=token)
     try:
         response = party_controller.verify_pending_survey_token(token)
         pending_transfer_surveys = response.json()
         transfer_dict = {}
         distinct_businesses = set()
-        batch_number = pending_transfer_surveys[0]['batch_no']
-        originator_party = party_controller.get_respondent_party_by_id(pending_transfer_surveys[0]['shared_by'])
-        transferred_by = originator_party['emailAddress']
+        batch_number = pending_transfer_surveys[0]["batch_no"]
+        originator_party = party_controller.get_respondent_party_by_id(pending_transfer_surveys[0]["shared_by"])
+        transferred_by = originator_party["emailAddress"]
         for pending_transfer_survey in pending_transfer_surveys:
-            distinct_businesses.add(pending_transfer_survey['business_id'])
+            distinct_businesses.add(pending_transfer_survey["business_id"])
         for business_id in distinct_businesses:
             business_surveys = []
             for pending_transfer_survey in pending_transfer_surveys:
-                if pending_transfer_survey['business_id'] == business_id:
-                    business_surveys.append(survey_controller.get_survey(app.config['SURVEY_URL'],
-                                                                         app.config['BASIC_AUTH'],
-                                                                         pending_transfer_survey['survey_id']))
+                if pending_transfer_survey["business_id"] == business_id:
+                    business_surveys.append(
+                        survey_controller.get_survey(
+                            app.config["SURVEY_URL"], app.config["BASIC_AUTH"], pending_transfer_survey["survey_id"]
+                        )
+                    )
             selected_business = get_business_by_id(business_id)
-            transfer_dict[selected_business[0]['id']] = {
-                'name': selected_business[0]['name'],
-                'trading_as': selected_business[0]['trading_as'],
-                'surveys': business_surveys
+            transfer_dict[selected_business[0]["id"]] = {
+                "name": selected_business[0]["name"],
+                "trading_as": selected_business[0]["trading_as"],
+                "surveys": business_surveys,
             }
-        return render_template('surveys/surveys-transfer/summary.html',
-                               transfer_dict=transfer_dict,
-                               batch_no=batch_number,
-                               transferred_by=transferred_by)
+        return render_template(
+            "surveys/surveys-transfer/summary.html",
+            transfer_dict=transfer_dict,
+            batch_no=batch_number,
+            transferred_by=transferred_by,
+        )
 
     except ApiError as exc:
         # Handle api errors
         if exc.status_code == 409:
-            logger.info('Expired transfer survey email verification token', token=token, api_url=exc.url,
-                        api_status_code=exc.status_code)
+            logger.info(
+                "Expired transfer survey email verification token",
+                token=token,
+                api_url=exc.url,
+                api_status_code=exc.status_code,
+            )
             abort(409)
         elif exc.status_code == 404:
-            logger.warning('Unrecognised transfer survey email verification token', token=token, api_url=exc.url,
-                           api_status_code=exc.status_code)
+            logger.warning(
+                "Unrecognised transfer survey email verification token",
+                token=token,
+                api_url=exc.url,
+                api_status_code=exc.status_code,
+            )
             abort(404)
         else:
-            logger.info('Failed to verify transfer survey email', token=token, api_url=exc.url,
-                        api_status_code=exc.status_code)
+            logger.info(
+                "Failed to verify transfer survey email", token=token, api_url=exc.url, api_status_code=exc.status_code
+            )
             raise exc
 
 
-@account_bp.route('/confirm-transfer-surveys/<batch>', methods=['GET'])
+@account_bp.route("/confirm-transfer-surveys/<batch>", methods=["GET"])
 def accept_transfer_surveys(batch):
     """
     Accept endpoint when a transfer survey summary is accepted
     :param batch: batch number
     :type batch: str
     """
-    logger.info('Attempting to get batch number', batch_number=batch)
+    logger.info("Attempting to get batch number", batch_number=batch)
     try:
         response = party_controller.get_pending_surveys_batch_number(batch)
-        is_existing_user = _is_existing_account(response.json()[0]['email_address'])
+        is_existing_user = _is_existing_account(response.json()[0]["email_address"])
     except ApiError as exc:
-        logger.error('Failed to confirm transfer survey', status=exc.status_code, batch_number=batch)
+        logger.error("Failed to confirm transfer survey", status=exc.status_code, batch_number=batch)
         raise exc
     if is_existing_user:
-        return redirect(url_for('account_bp.accept_transfer_surveys_existing_account', batch=batch))
-    return redirect(url_for('register_bp.pending_surveys_register_enter_your_details', batch_no=batch,
-                            email=response.json()[0]['email_address'], is_transfer=True))
+        return redirect(url_for("account_bp.accept_transfer_surveys_existing_account", batch=batch))
+    return redirect(
+        url_for(
+            "register_bp.pending_surveys_register_enter_your_details",
+            batch_no=batch,
+            email=response.json()[0]["email_address"],
+            is_transfer=True,
+        )
+    )
 
 
-@account_bp.route('/confirm-transfer-surveys/<batch>/existing-account', methods=['GET'])
+@account_bp.route("/confirm-transfer-surveys/<batch>/existing-account", methods=["GET"])
 @jwt_authorization(request)
 def accept_transfer_surveys_existing_account(session, batch):
     """
@@ -96,23 +115,23 @@ def accept_transfer_surveys_existing_account(session, batch):
     :param batch: batch number
     :type batch: str
     """
-    logger.info('Attempting to confirm transfer surveys for existing account', batch_number=batch)
+    logger.info("Attempting to confirm transfer surveys for existing account", batch_number=batch)
     party_id = session.get_party_id()
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
     response = party_controller.get_pending_surveys_batch_number(batch)
-    if respondent_details['emailAddress'].lower() != response.json()[0]['email_address'].lower():
-        logger.warning('The user has entered invalid login for transfer survey.')
-        flash('Invalid transfer survey login. This transfer survey is not assigned to you.',
-              'error')
-        return redirect(url_for('surveys_bp.get_survey_list', tag='todo'))
+    if respondent_details["emailAddress"].lower() != response.json()[0]["email_address"].lower():
+        logger.warning("The user has entered invalid login for transfer survey.")
+        flash("Invalid transfer survey login. This transfer survey is not assigned to you.", "error")
+        return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
     try:
         party_controller.confirm_pending_survey(batch)
     except ApiError as exc:
-        logger.error('Failed to confirm transfer survey for existing account', status=exc.status_code,
-                     batch_number=batch)
+        logger.error(
+            "Failed to confirm transfer survey for existing account", status=exc.status_code, batch_number=batch
+        )
         raise exc
-    logger.info('Successfully completed transfer survey for existing account', batch_number=batch)
-    return render_template('surveys/surveys-transfer/transfer-survey-complete-thank-you.html')
+    logger.info("Successfully completed transfer survey for existing account", batch_number=batch)
+    return render_template("surveys/surveys-transfer/transfer-survey-complete-thank-you.html")
 
 
 def _is_existing_account(respondent_email):

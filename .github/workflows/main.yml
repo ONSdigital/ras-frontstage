@@ -59,8 +59,7 @@ jobs:
           pipenv install --dev
       - name: Test
         run: |
-          make unit-tests
-          make integration-tests
+          make test
       - uses: google-github-actions/setup-gcloud@master
         with:
           service_account_key: ${{ secrets.GCR_KEY }}

@@ -1,47 +1,56 @@
 import io
 import logging
 import unittest
-import requests_mock
 from unittest.mock import patch
 
+import requests_mock
 from requests.models import Response
 from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.exceptions.exceptions import CiUploadError
-from tests.integration.mocked_services import business_party, case, encoded_jwt_token, survey, url_upload_ci, url_banner_api
+from tests.integration.mocked_services import (
+    business_party,
+    case,
+    encoded_jwt_token,
+    survey,
+    url_banner_api,
+    url_upload_ci,
+)
 
 logger = wrap_logger(logging.getLogger(__name__))
 
 
 @requests_mock.mock()
 class TestUploadSurvey(unittest.TestCase):
-
     def setUp(self):
         self.app = app.test_client()
-        self.app.set_cookie('localhost', 'authorization', 'session_key')
+        self.app.set_cookie("localhost", "authorization", "session_key")
         self.headers = {
             "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"  # NOQA
-            }
-        self.survey_file = dict(file=(io.BytesIO(b'my file contents'), "testfile.xlsx"))
-        self.patcher = patch('redis.StrictRedis.get', return_value=encoded_jwt_token)
+        }
+        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
+        self.patcher = patch("redis.StrictRedis.get", return_value=encoded_jwt_token)
         self.patcher.start()
 
     def tearDown(self):
         self.patcher.stop()
 
-    @patch('frontstage.controllers.collection_instrument_controller.upload_collection_instrument')
-    @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
+    @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
+    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
     def test_upload_survey_success(self, mock_request, *_):
         mock_request.get(url_banner_api, status_code=404)
-        self.survey_file = dict(file=(io.BytesIO(b'my file contents'), "testfile.xlsx"))
-        response = self.app.post(f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-                                 f'&survey_short_name={survey["shortName"]}', data=self.survey_file)
+        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
+        response = self.app.post(
+            f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
+            f'&survey_short_name={survey["shortName"]}',
+            data=self.survey_file,
+        )
 
         self.assertEqual(response.status_code, 200)
 
-    @patch('frontstage.controllers.collection_instrument_controller.upload_collection_instrument')
-    @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
+    @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
+    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
     def test_upload_survey_fail_unexpected_error(self, mock_request, _, upload_ci):
         mock_request.get(url_banner_api, status_code=404)
         error_response = Response()
@@ -50,15 +59,18 @@ class TestUploadSurvey(unittest.TestCase):
         error_message = "fail"
         error = CiUploadError(logger, error_response, error_message)
         upload_ci.side_effect = error
-        self.survey_file = dict(file=(io.BytesIO(b'my file contents'), "testfile.xlsx"))
-        response = self.app.post(f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-                                 f'&survey_short_name={survey["shortName"]}', data=self.survey_file)
+        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
+        response = self.app.post(
+            f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
+            f'&survey_short_name={survey["shortName"]}',
+            data=self.survey_file,
+        )
 
         self.assertEqual(response.status_code, 302)
-        self.assertTrue('/surveys/upload-failed'.encode() in response.data)
+        self.assertTrue("/surveys/upload-failed".encode() in response.data)
 
-    @patch('frontstage.controllers.collection_instrument_controller.upload_collection_instrument')
-    @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
+    @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
+    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
     def test_upload_survey_fail_type_error(self, mock_request, _, upload_ci):
         mock_request.get(url_banner_api, status_code=404)
         error_response = Response()
@@ -67,15 +79,18 @@ class TestUploadSurvey(unittest.TestCase):
         error_message = ".xlsx format"
         error = CiUploadError(logger, error_response, error_message)
         upload_ci.side_effect = error
-        self.survey_file = dict(file=(io.BytesIO(b'my file contents'), "testfile.xlsx"))
-        response = self.app.post(f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-                                 f'&survey_short_name={survey["shortName"]}', data=self.survey_file)
+        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
+        response = self.app.post(
+            f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
+            f'&survey_short_name={survey["shortName"]}',
+            data=self.survey_file,
+        )
 
         self.assertEqual(response.status_code, 302)
-        self.assertTrue('/surveys/upload-failed'.encode() in response.data)
+        self.assertTrue("/surveys/upload-failed".encode() in response.data)
 
-    @patch('frontstage.controllers.collection_instrument_controller.upload_collection_instrument')
-    @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
+    @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
+    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
     def test_upload_survey_fail_char_limit_error(self, mock_request, _, upload_ci):
         mock_request.get(url_banner_api, status_code=404)
         error_response = Response()
@@ -84,15 +99,18 @@ class TestUploadSurvey(unittest.TestCase):
         error_message = "50 characters"
         error = CiUploadError(logger, error_response, error_message)
         upload_ci.side_effect = error
-        self.survey_file = dict(file=(io.BytesIO(b'my file contents'), "testfile.xlsx"))
-        response = self.app.post(f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-                                 f'&survey_short_name={survey["shortName"]}', data=self.survey_file)
+        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
+        response = self.app.post(
+            f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
+            f'&survey_short_name={survey["shortName"]}',
+            data=self.survey_file,
+        )
 
         self.assertEqual(response.status_code, 302)
-        self.assertTrue('/surveys/upload-failed'.encode() in response.data)
+        self.assertTrue("/surveys/upload-failed".encode() in response.data)
 
-    @patch('frontstage.controllers.collection_instrument_controller.upload_collection_instrument')
-    @patch('frontstage.controllers.party_controller.is_respondent_enrolled')
+    @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
+    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
     def test_upload_survey_fail_size_error(self, mock_request, _, upload_ci):
         mock_request.get(url_banner_api, status_code=404)
         error_response = Response()
@@ -102,19 +120,25 @@ class TestUploadSurvey(unittest.TestCase):
         error = CiUploadError(logger, error_response, error_message)
         upload_ci.side_effect = error
 
-        self.survey_file = dict(file=(io.BytesIO(b'my file contents'), "testfile.xlsx"))
-        response = self.app.post(f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-                                 f'&survey_short_name={survey["shortName"]}', data=self.survey_file)
+        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
+        response = self.app.post(
+            f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
+            f'&survey_short_name={survey["shortName"]}',
+            data=self.survey_file,
+        )
 
         self.assertEqual(response.status_code, 302)
-        self.assertTrue('/surveys/upload-failed'.encode() in response.data)
+        self.assertTrue("/surveys/upload-failed".encode() in response.data)
 
     def test_upload_survey_content_too_long(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        file_data = 'a' * 21 * 1024 * 1024
+        file_data = "a" * 21 * 1024 * 1024
         over_size_file = dict(file=(io.BytesIO(file_data.encode()), "testfile.xlsx"))
-        response = self.app.post(f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-                                 f'&survey_short_name={survey["shortName"]}', data=over_size_file)
+        response = self.app.post(
+            f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
+            f'&survey_short_name={survey["shortName"]}',
+            data=over_size_file,
+        )
 
         self.assertEqual(response.status_code, 302)
-        self.assertTrue('/surveys/upload-failed'.encode() in response.data)
+        self.assertTrue("/surveys/upload-failed".encode() in response.data)

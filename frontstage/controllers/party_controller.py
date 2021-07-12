@@ -9,20 +9,24 @@ from structlog import wrap_logger
 
 from frontstage.common.thread_wrapper import ThreadWrapper
 from frontstage.common.utilities import obfuscate_email
-from frontstage.controllers import case_controller, collection_exercise_controller, collection_instrument_controller, \
-    survey_controller
+from frontstage.controllers import (
+    case_controller,
+    collection_exercise_controller,
+    collection_instrument_controller,
+    survey_controller,
+)
 from frontstage.exceptions.exceptions import ApiError, UserDoesNotExist
 
-CLOSED_STATE = ['COMPLETE', 'COMPLETEDBYPHONE', 'NOLONGERREQUIRED']
+CLOSED_STATE = ["COMPLETE", "COMPLETEDBYPHONE", "NOLONGERREQUIRED"]
 
 logger = wrap_logger(logging.getLogger(__name__))
 
 
 def get_respondent_party_by_id(party_id):
-    logger.info('Retrieving party from party service by id', party_id=party_id)
+    logger.info("Retrieving party from party service by id", party_id=party_id)
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/id/{party_id}"
-    response = requests.get(url, auth=app.config['BASIC_AUTH'])
+    response = requests.get(url, auth=app.config["BASIC_AUTH"])
 
     if response.status_code == 404:
         return
@@ -30,245 +34,245 @@ def get_respondent_party_by_id(party_id):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error('Failed to find respondent', party_id=party_id)
+        logger.error("Failed to find respondent", party_id=party_id)
         raise ApiError(logger, response)
 
-    logger.info('Successfully retrieved party details', party_id=party_id)
+    logger.info("Successfully retrieved party details", party_id=party_id)
     return response.json()
 
 
 def add_survey(party_id, enrolment_code):
-    logger.info('Attempting to add a survey', party_id=party_id)
+    logger.info("Attempting to add a survey", party_id=party_id)
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/add_survey"
-    request_json = {'party_id': party_id, 'enrolment_code': enrolment_code}
-    response = requests.post(url, auth=app.config['BASIC_AUTH'], json=request_json)
+    request_json = {"party_id": party_id, "enrolment_code": enrolment_code}
+    response = requests.post(url, auth=app.config["BASIC_AUTH"], json=request_json)
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error('Failed to add a survey', party_id=party_id)
+        logger.error("Failed to add a survey", party_id=party_id)
         raise ApiError(logger, response)
 
-    logger.info('Successfully added a survey', party_id=party_id)
+    logger.info("Successfully added a survey", party_id=party_id)
 
 
 def change_password(email, password):
     bound_logger = logger.bind(email=obfuscate_email(email))
-    bound_logger.info('Attempting to change password through the party service')
+    bound_logger.info("Attempting to change password through the party service")
 
-    data = {'email_address': email, 'new_password': password}
+    data = {"email_address": email, "new_password": password}
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/change_password"
-    response = requests.put(url, auth=app.config['BASIC_AUTH'], json=data)
+    response = requests.put(url, auth=app.config["BASIC_AUTH"], json=data)
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        bound_logger.error('Failed to send change password request to party service')
+        bound_logger.error("Failed to send change password request to party service")
         raise ApiError(logger, response)
 
-    bound_logger.info('Successfully changed password through the party service')
+    bound_logger.info("Successfully changed password through the party service")
 
 
 def create_account(registration_data):
-    logger.info('Attempting to create account')
+    logger.info("Attempting to create account")
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents"
-    registration_data['status'] = 'CREATED'
-    response = requests.post(url, auth=app.config['BASIC_AUTH'], json=registration_data)
+    registration_data["status"] = "CREATED"
+    response = requests.post(url, auth=app.config["BASIC_AUTH"], json=registration_data)
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         if response.status_code == 400:
-            logger.info('Email has already been used')
+            logger.info("Email has already been used")
         else:
-            logger.error('Failed to create account')
+            logger.error("Failed to create account")
         raise ApiError(logger, response)
 
-    logger.info('Successfully created account')
+    logger.info("Successfully created account")
 
 
 def update_account(respondent_data):
-    logger.info('Attempting to update account')
+    logger.info("Attempting to update account")
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/id/{respondent_data['id']}"
-    response = requests.put(url, auth=app.config['BASIC_AUTH'], json=respondent_data)
+    response = requests.put(url, auth=app.config["BASIC_AUTH"], json=respondent_data)
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error('Failed to update account')
+        logger.error("Failed to update account")
         raise ApiError(logger, response)
 
-    logger.info('Successfully updated account')
+    logger.info("Successfully updated account")
 
 
 def get_party_by_business_id(party_id, party_url, party_auth, collection_exercise_id=None, verbose=True):
-    logger.info('Attempting to retrieve party by business',
-                party_id=party_id,
-                collection_exercise_id=collection_exercise_id)
+    logger.info(
+        "Attempting to retrieve party by business", party_id=party_id, collection_exercise_id=collection_exercise_id
+    )
 
     url = f"{party_url}/party-api/v1/businesses/id/{party_id}"
     params = {}
     if collection_exercise_id:
-        params['collection_exercise_id'] = collection_exercise_id
+        params["collection_exercise_id"] = collection_exercise_id
     if verbose:
-        params['verbose'] = True
+        params["verbose"] = True
     response = requests.get(url, params=params, auth=party_auth)
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error('Failed to retrieve party by business',
-                     party_id=party_id,
-                     collection_exercise_id=collection_exercise_id)
+        logger.error(
+            "Failed to retrieve party by business", party_id=party_id, collection_exercise_id=collection_exercise_id
+        )
         raise ApiError(logger, response)
 
-    logger.info('Successfully retrieved party by business',
-                party_id=party_id,
-                collection_exercise_id=collection_exercise_id)
+    logger.info(
+        "Successfully retrieved party by business", party_id=party_id, collection_exercise_id=collection_exercise_id
+    )
     return response.json()
 
 
 def get_respondent_by_email(email):
     bound_logger = logger.bind(email=obfuscate_email(email))
-    bound_logger.info('Attempting to find respondent party by email')
+    bound_logger.info("Attempting to find respondent party by email")
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/email"
-    response = requests.get(url, json={"email": email}, auth=app.config['BASIC_AUTH'])
+    response = requests.get(url, json={"email": email}, auth=app.config["BASIC_AUTH"])
 
     if response.status_code == 404:
-        bound_logger.info('Failed to retrieve party by email')
+        bound_logger.info("Failed to retrieve party by email")
         return
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        bound_logger.error('Error retrieving respondent by email')
+        bound_logger.error("Error retrieving respondent by email")
         raise ApiError(logger, response)
 
-    bound_logger.info('Successfully retrieved respondent by email')
+    bound_logger.info("Successfully retrieved respondent by email")
     return response.json()
 
 
 def resend_verification_email(party_id):
-    logger.info('Re-sending verification email', party_id=party_id)
+    logger.info("Re-sending verification email", party_id=party_id)
     url = f'{app.config["PARTY_URL"]}/party-api/v1/resend-verification-email/{party_id}'
-    response = requests.post(url, auth=app.config['BASIC_AUTH'])
+    response = requests.post(url, auth=app.config["BASIC_AUTH"])
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.exception('Re-sending of verification email failed', party_id=party_id)
+        logger.exception("Re-sending of verification email failed", party_id=party_id)
         raise ApiError(logger, response)
-    logger.info('Successfully re-sent verification email', party_id=party_id)
+    logger.info("Successfully re-sent verification email", party_id=party_id)
 
 
 def resend_verification_email_expired_token(token):
-    logger.info('Re-sending verification email', token=token)
+    logger.info("Re-sending verification email", token=token)
     url = f'{app.config["PARTY_URL"]}/party-api/v1/resend-verification-email-expired-token/{token}'
-    response = requests.post(url, auth=app.config['BASIC_AUTH'])
+    response = requests.post(url, auth=app.config["BASIC_AUTH"])
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error('Re-sending of verification email for expired token failed')
+        logger.error("Re-sending of verification email for expired token failed")
         raise ApiError(logger, response)
-    logger.info('Successfully re-sent verification email', token=token)
+    logger.info("Successfully re-sent verification email", token=token)
 
 
 def resend_account_email_change_expired_token(token):
-    logger.info('Re-sending account email change verification email', token=token)
+    logger.info("Re-sending account email change verification email", token=token)
     url = f'{app.config["PARTY_URL"]}/party-api/v1/resend-account-email-change-expired-token/{token}'
-    response = requests.post(url, auth=app.config['BASIC_AUTH'])
+    response = requests.post(url, auth=app.config["BASIC_AUTH"])
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error('Re-sending of verification email for expired token failed', token=token)
+        logger.error("Re-sending of verification email for expired token failed", token=token)
         raise ApiError(logger, response)
-    logger.info('Successfully re-sent verification email', token=token)
+    logger.info("Successfully re-sent verification email", token=token)
 
 
 def reset_password_request(username):
     bound_logger = logger.bind(email=obfuscate_email(username))
-    bound_logger.info('Attempting to send reset password request to party service')
+    bound_logger.info("Attempting to send reset password request to party service")
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/request_password_change"
     data = {"email_address": username}
-    response = requests.post(url, auth=app.config['BASIC_AUTH'], json=data)
+    response = requests.post(url, auth=app.config["BASIC_AUTH"], json=data)
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         if response.status_code == 404:
             raise UserDoesNotExist("User does not exist in party service")
-        bound_logger.error('Failed to send reset password request to party service')
+        bound_logger.error("Failed to send reset password request to party service")
         raise ApiError(logger, response)
 
-    bound_logger.info('Successfully sent reset password request to party service')
+    bound_logger.info("Successfully sent reset password request to party service")
 
 
 def resend_password_email_expired_token(token):
-    logger.info('Re-sending password email', token=token)
+    logger.info("Re-sending password email", token=token)
     url = f'{app.config["PARTY_URL"]}/party-api/v1/resend-password-email-expired-token/{token}'
-    response = requests.post(url, auth=app.config['BASIC_AUTH'])
+    response = requests.post(url, auth=app.config["BASIC_AUTH"])
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error('Re-sending of password email for expired token failed')
+        logger.error("Re-sending of password email for expired token failed")
         raise ApiError(logger, response)
-    logger.info('Sucessfully re-sent password email', token=token)
+    logger.info("Sucessfully re-sent password email", token=token)
 
 
 def verify_email(token):
-    logger.info('Attempting to verify email address', token=token)
+    logger.info("Attempting to verify email address", token=token)
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/emailverification/{token}"
-    response = requests.put(url, auth=app.config['BASIC_AUTH'])
+    response = requests.put(url, auth=app.config["BASIC_AUTH"])
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error('Failed to verify email', token=token)
+        logger.error("Failed to verify email", token=token)
         raise ApiError(logger, response)
 
-    logger.info('Successfully verified email address', token=token)
+    logger.info("Successfully verified email address", token=token)
 
 
 def verify_token(token):
-    logger.info('Attempting to verify token with party service', token=token)
+    logger.info("Attempting to verify token with party service", token=token)
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/tokens/verify/{token}"
-    response = requests.get(url, auth=app.config['BASIC_AUTH'])
+    response = requests.get(url, auth=app.config["BASIC_AUTH"])
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error('Failed to verify token', token=token)
+        logger.error("Failed to verify token", token=token)
         raise ApiError(logger, response)
 
-    logger.info('Successfully verified token', token=token)
+    logger.info("Successfully verified token", token=token)
 
 
 def verify_pending_survey_token(token):
     """
-     Gives call to party service to verify share/transfer survey token
+    Gives call to party service to verify share/transfer survey token
     """
-    logger.info('Attempting to verify share/transfer survey token with party service', token=token)
+    logger.info("Attempting to verify share/transfer survey token with party service", token=token)
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/pending-survey/verification/{token}"
-    response = requests.get(url, auth=app.config['BASIC_AUTH'])
+    response = requests.get(url, auth=app.config["BASIC_AUTH"])
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error('Failed to verify share/transfer survey token', token=token)
+        logger.error("Failed to verify share/transfer survey token", token=token)
         raise ApiError(logger, response)
 
-    logger.info('Successfully verified token', token=token)
+    logger.info("Successfully verified token", token=token)
     return response
 
 
@@ -276,31 +280,28 @@ def confirm_pending_survey(batch_number):
     """
     gives call to party service to confirm pending share/transfer survey
     """
-    logger.info('Attempting to confirm share/transfer survey with party service', batch_number=batch_number)
+    logger.info("Attempting to confirm share/transfer survey with party service", batch_number=batch_number)
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/pending-survey/confirm-pending-surveys/{batch_number}"
-    response = requests.post(url, auth=app.config['BASIC_AUTH'])
+    response = requests.post(url, auth=app.config["BASIC_AUTH"])
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error('Failed to confirm share/transfer survey with batch number', batch_number=batch_number)
+        logger.error("Failed to confirm share/transfer survey with batch number", batch_number=batch_number)
         raise ApiError(logger, response)
 
-    logger.info('Successfully confirmed share/transfer survey', batch_number=batch_number)
+    logger.info("Successfully confirmed share/transfer survey", batch_number=batch_number)
     return response
 
 
 def get_respondent_enrolments(party_id):
     respondent = get_respondent_party_by_id(party_id)
-    if 'associations' in respondent:
-        for association in respondent['associations']:
-            for enrolment in association['enrolments']:
-                if enrolment['enrolmentStatus'] == 'ENABLED':
-                    yield {
-                        'business_id': association['partyId'],
-                        'survey_id': enrolment['surveyId']
-                    }
+    if "associations" in respondent:
+        for association in respondent["associations"]:
+            for enrolment in association["enrolments"]:
+                if enrolment["enrolmentStatus"] == "ENABLED":
+                    yield {"business_id": association["partyId"], "survey_id": enrolment["surveyId"]}
 
 
 def get_respondent_enrolments_for_started_collex(enrolment_data, collection_exercises):
@@ -318,7 +319,7 @@ def get_respondent_enrolments_for_started_collex(enrolment_data, collection_exer
 
     enrolments = []
     for enrolment in enrolment_data:
-        if enrolment['survey_id'] in collection_exercises:
+        if enrolment["survey_id"] in collection_exercises:
             enrolments.append(enrolment)
     return enrolments
 
@@ -333,8 +334,8 @@ def get_unique_survey_and_business_ids(enrolment_data):
     surveys_ids = set()
     business_ids = set()
     for enrolment in enrolment_data:
-        surveys_ids.add(enrolment['survey_id'])
-        business_ids.add(enrolment['business_id'])
+        surveys_ids.add(enrolment["survey_id"])
+        business_ids.add(enrolment["business_id"])
     return surveys_ids, business_ids
 
 
@@ -345,16 +346,22 @@ def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
     threads = []
 
     for survey_id in surveys_ids:
-        threads.append(ThreadWrapper(get_survey, cache_data, survey_id, app.config['SURVEY_URL'],
-                                     app.config['BASIC_AUTH']))
-        threads.append(ThreadWrapper(get_collex, cache_data, survey_id, app.config['COLLECTION_EXERCISE_URL'],
-                                     app.config['BASIC_AUTH']))
+        threads.append(
+            ThreadWrapper(get_survey, cache_data, survey_id, app.config["SURVEY_URL"], app.config["BASIC_AUTH"])
+        )
+        threads.append(
+            ThreadWrapper(
+                get_collex, cache_data, survey_id, app.config["COLLECTION_EXERCISE_URL"], app.config["BASIC_AUTH"]
+            )
+        )
 
     for business_id in business_ids:
-        threads.append(ThreadWrapper(get_case, cache_data, business_id, app.config['CASE_URL'],
-                                     app.config['BASIC_AUTH'], tag))
-        threads.append(ThreadWrapper(get_party, cache_data, business_id, app.config['PARTY_URL'],
-                                     app.config['BASIC_AUTH']))
+        threads.append(
+            ThreadWrapper(get_case, cache_data, business_id, app.config["CASE_URL"], app.config["BASIC_AUTH"], tag)
+        )
+        threads.append(
+            ThreadWrapper(get_party, cache_data, business_id, app.config["PARTY_URL"], app.config["BASIC_AUTH"])
+        )
 
     for thread in threads:
         thread.start()
@@ -368,12 +375,19 @@ def caching_data_for_collection_instrument(cache_data):
     # This function creates a list of threads from the collection instrument id in the cache_data of the cases.
     collection_instrument_ids = set()
     threads = []
-    for _, cases in cache_data['cases'].items():
+    for _, cases in cache_data["cases"].items():
         for case in cases:
-            collection_instrument_ids.add(case['collectionInstrumentId'])
+            collection_instrument_ids.add(case["collectionInstrumentId"])
     for collection_instrument_id in collection_instrument_ids:
-        threads.append(ThreadWrapper(get_collection_instrument, cache_data, collection_instrument_id,
-                                     app.config['COLLECTION_INSTRUMENT_URL'], app.config['BASIC_AUTH']))
+        threads.append(
+            ThreadWrapper(
+                get_collection_instrument,
+                cache_data,
+                collection_instrument_id,
+                app.config["COLLECTION_INSTRUMENT_URL"],
+                app.config["BASIC_AUTH"],
+            )
+        )
 
     for thread in threads:
         thread.start()
@@ -424,59 +438,60 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
 
     # This is a dictionary that will store all of the data that is going to be cached instead of making multiple calls
     # inside of the for loop for get_respondent_enrolments.
-    cache_data = {'surveys': dict(),
-                  'businesses': dict(),
-                  'collexes': dict(),
-                  'cases': dict(),
-                  'instrument': dict()}
+    cache_data = {"surveys": dict(), "businesses": dict(), "collexes": dict(), "cases": dict(), "instrument": dict()}
 
     # These two will call the services to get responses and cache the data for later use.
     caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag)
     caching_data_for_collection_instrument(cache_data)
-    enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, cache_data['collexes'])
+    enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, cache_data["collexes"])
     for enrolment in enrolments:
-        business_party = cache_data['businesses'][enrolment['business_id']]
-        survey = cache_data['surveys'][enrolment['survey_id']]
+        business_party = cache_data["businesses"][enrolment["business_id"]]
+        survey = cache_data["surveys"][enrolment["survey_id"]]
 
         # Note: If it ever becomes possible to get only live-but-not-ended collection exercises from the
         # collection exercise service, the filter_ended_collection_exercises function will no longer
         # be needed as we can request what we want instead of having to filter what we get.
-        live_collection_exercises = filter_ended_collection_exercises(cache_data['collexes'][survey['id']])
+        live_collection_exercises = filter_ended_collection_exercises(cache_data["collexes"][survey["id"]])
 
-        collection_exercises_by_id = dict((ce['id'], ce) for ce in live_collection_exercises)
-        cases_for_business = cache_data['cases'][business_party['id']]
+        collection_exercises_by_id = dict((ce["id"], ce) for ce in live_collection_exercises)
+        cases_for_business = cache_data["cases"][business_party["id"]]
 
         # Gets all the cases for reporting unit, and by extension the user (because it's related to the business)
-        enrolled_cases = [case for case in cases_for_business if case['caseGroup']['collectionExerciseId']
-                          in collection_exercises_by_id.keys()]
+        enrolled_cases = [
+            case
+            for case in cases_for_business
+            if case["caseGroup"]["collectionExerciseId"] in collection_exercises_by_id.keys()
+        ]
 
         for case in enrolled_cases:
-            collection_exercise = collection_exercises_by_id[case['caseGroup']['collectionExerciseId']]
-            added_survey = True if business_party_id == business_party['id'] and survey_id == survey['id'] else None
-            display_access_button = display_button(case['caseGroup']['caseGroupStatus'], cache_data['instrument']
-            [case['collectionInstrumentId']]['type'])
+            collection_exercise = collection_exercises_by_id[case["caseGroup"]["collectionExerciseId"]]
+            added_survey = True if business_party_id == business_party["id"] and survey_id == survey["id"] else None
+            display_access_button = display_button(
+                case["caseGroup"]["caseGroupStatus"], cache_data["instrument"][case["collectionInstrumentId"]]["type"]
+            )
 
             yield {
-                'case_id': case['id'],
-                'status': case_controller.calculate_case_status(case['caseGroup']['caseGroupStatus'],
-                                                                cache_data['instrument']
-                                                                [case['collectionInstrumentId']]['type']),
-                'collection_instrument_type': cache_data['instrument'][case['collectionInstrumentId']]['type'],
-                'survey_id': survey['id'],
-                'survey_long_name': survey['longName'],
-                'survey_short_name': survey['shortName'],
-                'survey_ref': survey['surveyRef'],
-                'business_party_id': business_party['id'],
-                'business_name': business_party['name'],
-                'trading_as': business_party['trading_as'],
-                'business_ref': business_party['sampleUnitRef'],
-                'period': collection_exercise['userDescription'],
-                'submit_by': collection_exercise['events']['return_by']['date'],
-                'formatted_submit_by': collection_exercise['events']['return_by']['formatted_date'],
-                'due_in': collection_exercise['events']['return_by']['due_time'],
-                'collection_exercise_ref': collection_exercise['exerciseRef'],
-                'added_survey': added_survey,
-                'display_button': display_access_button
+                "case_id": case["id"],
+                "status": case_controller.calculate_case_status(
+                    case["caseGroup"]["caseGroupStatus"],
+                    cache_data["instrument"][case["collectionInstrumentId"]]["type"],
+                ),
+                "collection_instrument_type": cache_data["instrument"][case["collectionInstrumentId"]]["type"],
+                "survey_id": survey["id"],
+                "survey_long_name": survey["longName"],
+                "survey_short_name": survey["shortName"],
+                "survey_ref": survey["surveyRef"],
+                "business_party_id": business_party["id"],
+                "business_name": business_party["name"],
+                "trading_as": business_party["trading_as"],
+                "business_ref": business_party["sampleUnitRef"],
+                "period": collection_exercise["userDescription"],
+                "submit_by": collection_exercise["events"]["return_by"]["date"],
+                "formatted_submit_by": collection_exercise["events"]["return_by"]["formatted_date"],
+                "due_in": collection_exercise["events"]["return_by"]["due_time"],
+                "collection_exercise_ref": collection_exercise["exerciseRef"],
+                "added_survey": added_survey,
+                "display_button": display_access_button,
             }
 
 
@@ -488,70 +503,71 @@ def filter_ended_collection_exercises(collection_exercises):
 
     :param collection_exercises: A list of dictionaries containing collection exercises
     """
-    return [ce for ce in collection_exercises
-            if ce.get('scheduledEndDateTime') and
-            parse(ce.get('scheduledEndDateTime')) > datetime.datetime.now(datetime.timezone.utc)]
+    return [
+        ce
+        for ce in collection_exercises
+        if ce.get("scheduledEndDateTime")
+        and parse(ce.get("scheduledEndDateTime")) > datetime.datetime.now(datetime.timezone.utc)
+    ]
 
 
 def get_survey(cache_data, survey_id, survey_url, survey_auth):
-    cache_data['surveys'][survey_id] = survey_controller.get_survey(survey_url, survey_auth, survey_id)
+    cache_data["surveys"][survey_id] = survey_controller.get_survey(survey_url, survey_auth, survey_id)
 
 
 def get_collex(cache_data, survey_id, collex_url, collex_auth):
-    cache_data['collexes'][survey_id] = collection_exercise_controller. \
-        get_live_collection_exercises_for_survey(survey_id, collex_url, collex_auth)
+    cache_data["collexes"][survey_id] = collection_exercise_controller.get_live_collection_exercises_for_survey(
+        survey_id, collex_url, collex_auth
+    )
 
 
 def get_case(cache_data, business_id, case_url, case_auth, tag):
-    cache_data['cases'][business_id] = case_controller.get_cases_for_list_type_by_party_id(business_id, case_url,
-                                                                                           case_auth, tag)
+    cache_data["cases"][business_id] = case_controller.get_cases_for_list_type_by_party_id(
+        business_id, case_url, case_auth, tag
+    )
 
 
 def get_party(cache_data, business_id, party_url, party_auth):
-    cache_data['businesses'][business_id] = get_party_by_business_id(business_id, party_url, party_auth)
+    cache_data["businesses"][business_id] = get_party_by_business_id(business_id, party_url, party_auth)
 
 
-def get_collection_instrument(cache_data, collection_instrument_id, collection_instrument_url,
-                              collection_instrument_auth):
-    cache_data['instrument'][collection_instrument_id] = collection_instrument_controller. \
-        get_collection_instrument(collection_instrument_id, collection_instrument_url, collection_instrument_auth)
+def get_collection_instrument(
+    cache_data, collection_instrument_id, collection_instrument_url, collection_instrument_auth
+):
+    cache_data["instrument"][collection_instrument_id] = collection_instrument_controller.get_collection_instrument(
+        collection_instrument_id, collection_instrument_url, collection_instrument_auth
+    )
 
 
 def display_button(status, ci_type):
-    return not (ci_type == 'EQ' and status in CLOSED_STATE)
+    return not (ci_type == "EQ" and status in CLOSED_STATE)
 
 
 def is_respondent_enrolled(party_id, business_party_id, survey_short_name, return_survey=False):
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
     for enrolment in get_respondent_enrolments(party_id):
-        if enrolment['business_id'] == business_party_id and enrolment['survey_id'] == survey['id']:
+        if enrolment["business_id"] == business_party_id and enrolment["survey_id"] == survey["id"]:
             if return_survey:
-                return {'survey': survey}
+                return {"survey": survey}
             return True
 
 
 def notify_party_and_respondent_account_locked(respondent_id, email_address, status=None):
-    bound_logger = logger.bind(respondent_id=respondent_id,
-                               email=obfuscate_email(email_address),
-                               status=status)
-    bound_logger.info('Notifying respondent and party service that account is locked')
+    bound_logger = logger.bind(respondent_id=respondent_id, email=obfuscate_email(email_address), status=status)
+    bound_logger.info("Notifying respondent and party service that account is locked")
     url = f'{app.config["PARTY_URL"]}/party-api/v1/respondents/edit-account-status/{respondent_id}'
 
-    data = {
-        'respondent_id': respondent_id,
-        'email_address': email_address,
-        'status_change': status
-    }
+    data = {"respondent_id": respondent_id, "email_address": email_address, "status_change": status}
 
-    response = requests.put(url, json=data, auth=app.config['BASIC_AUTH'])
+    response = requests.put(url, json=data, auth=app.config["BASIC_AUTH"])
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        bound_logger.error('Failed to notify party')
+        bound_logger.error("Failed to notify party")
         raise ApiError(logger, response)
 
-    bound_logger.info('Successfully notified respondent and party service that account is locked')
+    bound_logger.info("Successfully notified respondent and party service that account is locked")
 
 
 def get_list_of_business_for_party(party_id):
@@ -563,10 +579,10 @@ def get_list_of_business_for_party(party_id):
     :rtype: dict
     """
     bound_logger = logger.bind(party_id=party_id)
-    bound_logger.info('Getting enrolment data for the party')
+    bound_logger.info("Getting enrolment data for the party")
     enrolment_data = get_respondent_enrolments(party_id)
-    business_ids = {enrolment['business_id'] for enrolment in enrolment_data}
-    bound_logger.info('Getting businesses against business ids', business_ids=business_ids)
+    business_ids = {enrolment["business_id"] for enrolment in enrolment_data}
+    bound_logger.info("Getting businesses against business ids", business_ids=business_ids)
     return get_business_by_id(business_ids)
 
 
@@ -578,10 +594,10 @@ def get_business_by_id(business_ids):
     :return: business
     :rtype: dict
     """
-    logger.info('Attempting to fetch businesses', business_ids=business_ids)
-    params = {'id': business_ids}
+    logger.info("Attempting to fetch businesses", business_ids=business_ids)
+    params = {"id": business_ids}
     url = f'{app.config["PARTY_URL"]}/party-api/v1/businesses'
-    response = requests.get(url, params=params, auth=app.config['BASIC_AUTH'])
+    response = requests.get(url, params=params, auth=app.config["BASIC_AUTH"])
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
@@ -598,10 +614,10 @@ def get_surveys_listed_against_party_and_business_id(business_id, party_id):
     :rtype: list
     """
     enrolment_data = get_respondent_enrolments(party_id)
-    survey_ids = {enrolment['survey_id'] for enrolment in enrolment_data if enrolment['business_id'] == business_id}
+    survey_ids = {enrolment["survey_id"] for enrolment in enrolment_data if enrolment["business_id"] == business_id}
     surveys = []
     for survey in survey_ids:
-        response = survey_controller.get_survey(app.config['SURVEY_URL'], app.config['BASIC_AUTH'], survey)
+        response = survey_controller.get_survey(app.config["SURVEY_URL"], app.config["BASIC_AUTH"], survey)
         surveys.append(response)
     return surveys
 
@@ -615,14 +631,10 @@ def get_user_count_registered_against_business_and_survey(business_id, survey_id
     :return: total number of users
     :rtype: int
     """
-    logger.info('Attempting to get user count', business_ids=business_id, survey_id=survey_id)
+    logger.info("Attempting to get user count", business_ids=business_id, survey_id=survey_id)
     url = f'{app.config["PARTY_URL"]}/party-api/v1/pending-survey-users-count'
-    data = {
-        'business_id': business_id,
-        'survey_id': survey_id,
-        'is_transfer': is_transfer
-    }
-    response = requests.get(url, params=data, auth=app.config['BASIC_AUTH'])
+    data = {"business_id": business_id, "survey_id": survey_id, "is_transfer": is_transfer}
+    response = requests.get(url, params=data, auth=app.config["BASIC_AUTH"])
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
@@ -637,14 +649,14 @@ def register_pending_shares(payload):
     :return: success if post completed
     :rtype: dict
     """
-    logger.info('Attempting register pending shares')
+    logger.info("Attempting register pending shares")
     url = f'{app.config["PARTY_URL"]}/party-api/v1/pending-surveys'
-    response = requests.post(url, json=json.loads(payload), auth=app.config['BASIC_AUTH'])
+    response = requests.post(url, json=json.loads(payload), auth=app.config["BASIC_AUTH"])
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         if response.status_code == 400:
-            logger.info('share survey has already been shared, hence ignoring this request.')
+            logger.info("share survey has already been shared, hence ignoring this request.")
         else:
             raise ApiError(logger, response)
     return response.json()
@@ -660,17 +672,17 @@ def get_pending_surveys_batch_number(batch_no):
     :return: list share surveys
     """
     bound_logger = logger.bind(batch_no=batch_no)
-    bound_logger.info('Attempting to retrieve share surveys by batch number')
+    bound_logger.info("Attempting to retrieve share surveys by batch number")
     url = f"{app.config['PARTY_URL']}/party-api/v1/pending-surveys/{batch_no}"
-    response = requests.get(url, auth=app.config['BASIC_AUTH'])
+    response = requests.get(url, auth=app.config["BASIC_AUTH"])
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        bound_logger.error('Failed to retrieve share surveys by batch number')
+        bound_logger.error("Failed to retrieve share surveys by batch number")
         raise ApiError(logger, response)
 
-    bound_logger.info('Successfully retrieved share surveys by batch number')
+    bound_logger.info("Successfully retrieved share surveys by batch number")
     return response
 
 
@@ -682,45 +694,42 @@ def create_pending_survey_account(registration_data):
     :type registration_data: dict
     :raises ApiError: Raised when party returns api error
     """
-    logger.info('Attempting to create new account against share survey')
+    logger.info("Attempting to create new account against share survey")
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/pending-survey-respondent"
-    registration_data['status'] = 'ACTIVE'
-    response = requests.post(url, auth=app.config['BASIC_AUTH'], json=registration_data)
+    registration_data["status"] = "ACTIVE"
+    response = requests.post(url, auth=app.config["BASIC_AUTH"], json=registration_data)
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         if response.status_code == 400:
-            logger.info('Email has already been used')
+            logger.info("Email has already been used")
         else:
-            logger.error('Failed to create account')
+            logger.error("Failed to create account")
         raise ApiError(logger, response)
 
-    logger.info('Successfully created account')
+    logger.info("Successfully created account")
 
-def get_business_by_ru_ref(ru_ref):
+
+def get_business_by_ru_ref(ru_ref: str):
     """
     Gives call to party service to retrieve a business using a ru_ref parameter
     :param ru_ref: the reporting unit reference
-    :type registration_data: str
     :returns: a business
     :raises ApiError: Raised when party returns api error
     """
-    logger.info('Attempting to retrieve business by ru_ref',
-                ru_ref=ru_ref)
+    logger.info("Attempting to retrieve business by ru_ref", ru_ref=ru_ref)
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/businesses/ref/{ru_ref}"
-    response = requests.get(url, auth=app.config['BASIC_AUTH'])
+    response = requests.get(url, auth=app.config["BASIC_AUTH"])
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error('Failed to retrieve business by ru_ref',
-                     ru_ref=ru_ref)
+        logger.error("Failed to retrieve business by ru_ref", ru_ref=ru_ref)
         raise ApiError(logger, response)
 
-    logger.info('Successfully retrieved business by ru_ref',
-                ru_ref=ru_ref)
+    logger.info("Successfully retrieved business by ru_ref", ru_ref=ru_ref)
 
     return response.json()

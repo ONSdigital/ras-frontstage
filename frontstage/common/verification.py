@@ -5,7 +5,6 @@ from flask import current_app
 from itsdangerous import URLSafeTimedSerializer
 from werkzeug.exceptions import InternalServerError
 
-
 logger = structlog.wrap_logger(logging.getLogger(__name__))
 
 
@@ -36,11 +35,11 @@ def decode_email_token(token, duration=None):
     then this number, an exception will be thrown. Default is None.
     :return: The contents of the deserialised token
     """
-    logger.info('Decoding email verification token', token=token)
+    logger.info("Decoding email verification token", token=token)
 
     timed_serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
     email_token_salt = current_app.config["EMAIL_TOKEN_SALT"]
 
     result = timed_serializer.loads(token, salt=email_token_salt, max_age=duration)
-    logger.info('Successfully decoded email verification token', token=token)
+    logger.info("Successfully decoded email verification token", token=token)
     return result

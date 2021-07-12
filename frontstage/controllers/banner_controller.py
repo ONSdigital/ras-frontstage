@@ -1,6 +1,6 @@
 import logging
-import requests
 
+import requests
 from flask import current_app as app
 from structlog import wrap_logger
 
@@ -25,9 +25,9 @@ def current_banner():
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         if response.status_code != 404:
-            logger.error('Failed to retrieve Banner from api', status_code=response.status_code)
+            logger.error("Failed to retrieve Banner from api", status_code=response.status_code)
         return ""
 
     banner = response.json()
-    content = banner.get('content', "")
+    content = banner.get("content", "")
     return content

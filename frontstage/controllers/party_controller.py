@@ -659,7 +659,7 @@ def register_pending_shares(payload):
             logger.info("share survey has already been shared, hence ignoring this request.")
         else:
             raise ApiError(logger, response)
-    return response.json()
+    return response
 
 
 def get_pending_surveys_batch_number(batch_no):

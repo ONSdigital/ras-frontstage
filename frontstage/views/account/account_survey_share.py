@@ -287,7 +287,15 @@ def send_instruction(session):
     if form["email_address"].data != email:
         raise ShareSurveyProcessError("Process failed due to session error")
     json_data = build_payload(respondent_details["id"])
-    register_pending_shares(json_data)
+    response = register_pending_shares(json_data)
+    if response.status_code == 400:
+        flash(
+            "You have recently shared one or more surveys with someone with this email address. Until they have "
+            "accepted you cannot share any more surveys. If you have made an error you can wait 72 hours for the "
+            "share to expire or you can contact us.",
+            "error",
+        )
+        return redirect(url_for("account_bp.send_instruction_get"))
     return render_template("surveys/surveys-share/almost-done.html")
 
 

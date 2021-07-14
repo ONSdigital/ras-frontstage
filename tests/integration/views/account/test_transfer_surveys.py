@@ -263,3 +263,26 @@ class TestTransferSurvey(unittest.TestCase):
             "If it does not arrive in the next 15 minutes, please call 0300 1234 931.".encode(), response.data
         )
         self.assertTrue("Back to surveys".encode() in response.data)
+
+    @requests_mock.mock()
+    def test_transfer_survey_transfer_instruction_transfer_already_exists(self, mock_request):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
+        mock_request.get(url_get_business_details, status_code=200, json=[business_party])
+        mock_request.get(url_get_survey, status_code=200, json=survey)
+        mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
+        mock_request.post(url_post_pending_transfers, status_code=400, json={"error": "error"})
+
+        with self.app.session_transaction() as mock_session:
+            mock_session["transfer_survey_data"] = {business_party["id"]: [survey["id"]]}
+            mock_session["transfer_survey_recipient_email_address"] = "a@a.com"
+        response = self.app.post(
+            "/my-account/transfer-surveys/send-instruction", data={"email_address": "a@a.com"}, follow_redirects=True
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            "You have recently transferred one or more surveys with someone with this email address. Until they have "
+            "accepted you cannot share any more surveys. If you have made an error you can wait 72 hours for the "
+            "share to expire or you can contact us".encode(),
+            response.data,
+        )

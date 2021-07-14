@@ -1,6 +1,6 @@
 import logging
 
-from flask import abort, flash, render_template, request, url_for
+from flask import flash, render_template, request, url_for
 from structlog import wrap_logger
 from werkzeug.utils import redirect
 
@@ -60,7 +60,7 @@ def get_share_survey_summary(token):
                 api_url=exc.url,
                 api_status_code=exc.status_code,
             )
-            abort(409)
+            return render_template("surveys/surveys-link-expired.html", is_transfer=False)
         elif exc.status_code == 404:
             logger.warning(
                 "Unrecognised share survey email verification token",
@@ -68,7 +68,7 @@ def get_share_survey_summary(token):
                 api_url=exc.url,
                 api_status_code=exc.status_code,
             )
-            abort(404)
+            return render_template("surveys/surveys-link-not-valid.html", is_transfer=False)
         else:
             logger.info(
                 "Failed to verify share survey email", token=token, api_url=exc.url, api_status_code=exc.status_code

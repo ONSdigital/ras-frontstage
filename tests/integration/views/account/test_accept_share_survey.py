@@ -109,7 +109,13 @@ class TestAcceptShareSurvey(unittest.TestCase):
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         mock_request.get(url_get_share_survey_verify, status_code=409)
         response = self.app.get(f"/my-account/share-surveys/accept-share-surveys/{token}")
-        self.assertEqual(409, response.status_code)
+        self.assertEqual(200, response.status_code)
+        self.assertIn("Shared survey link has expired".encode(), response.data)
+        self.assertIn("This link has expired.".encode(), response.data)
+        self.assertIn(
+            "If you still need access to the surveys, you should ask your colleague to share the surveys again.".encode(),
+            response.data,
+        )
 
     @requests_mock.mock()
     def test_get_share_survey_summary_not_found(self, mock_request):
@@ -120,7 +126,13 @@ class TestAcceptShareSurvey(unittest.TestCase):
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         mock_request.get(url_get_share_survey_verify, status_code=404)
         response = self.app.get(f"/my-account/share-surveys/accept-share-surveys/{token}")
-        self.assertEqual(404, response.status_code)
+        self.assertEqual(200, response.status_code)
+        self.assertIn("Shared survey link is not valid".encode(), response.data)
+        self.assertIn("This link is no longer available.".encode(), response.data)
+        self.assertIn(
+            "If you still need access to the surveys, you should ask your colleague to share the surveys again.".encode(),
+            response.data,
+        )
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")

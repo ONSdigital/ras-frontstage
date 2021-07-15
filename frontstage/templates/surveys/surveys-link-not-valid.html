@@ -1,0 +1,18 @@
+{% extends "layouts/_block_content.html" %}
+{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/fieldset/_macro.njk" import onsFieldset %}
+{% from "components/input/_macro.njk" import onsInput %}
+{% from "components/lists/_macro.njk" import onsList %}
+{% from "components/button/_macro.njk" import onsButton %}
+{% set page_title = "survey link not valid" %}
+{% block main %}
+    {% if is_transfer %}
+        <h1 class="u-fs-xl">Transfer survey link is not valid</h1>
+        <p>This link is no longer available.</p>
+        <p>If you still need access to the surveys, you should ask your colleague to transfer the surveys again.</p>
+    {% else %}
+        <h1 class="u-fs-xl">Shared survey link is not valid</h1>
+        <p>This link is no longer available.</p>
+        <p>If you still need access to the surveys, you should ask your colleague to share the surveys again.</p>
+    {% endif %}
+{% endblock main %}

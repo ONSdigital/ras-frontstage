@@ -647,7 +647,7 @@ def register_pending_shares(payload):
     register new entries to party for pending shares
     :param payload: pending shares entries dict
     :return: success if post completed
-    :rtype: dict
+    :rtype: response object
     """
     logger.info("Attempting register pending shares")
     url = f'{app.config["PARTY_URL"]}/party-api/v1/pending-surveys'

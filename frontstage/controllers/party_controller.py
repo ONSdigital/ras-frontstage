@@ -647,7 +647,7 @@ def register_pending_shares(payload):
     register new entries to party for pending shares
     :param payload: pending shares entries dict
     :return: success if post completed
-    :rtype: dict
+    :rtype: response object
     """
     logger.info("Attempting register pending shares")
     url = f'{app.config["PARTY_URL"]}/party-api/v1/pending-surveys'
@@ -659,7 +659,7 @@ def register_pending_shares(payload):
             logger.info("share survey has already been shared, hence ignoring this request.")
         else:
             raise ApiError(logger, response)
-    return response.json()
+    return response
 
 
 def get_pending_surveys_batch_number(batch_no):

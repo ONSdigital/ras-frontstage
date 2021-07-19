@@ -87,18 +87,6 @@ jobs:
         run: |
           helm template $CHART_DIRECTORY
     
-      - name: package helm
-        run: |
-          echo HELM_VERSION=$(grep -E "version:\s+" $CHART_DIRECTORY/Chart.yaml | cut -d" " -f2 | sed -r 's/"//g') >> $GITHUB_ENV
-          helm dep up $CHART_DIRECTORY
-          helm package $CHART_DIRECTORY
-
-      - name: Publish dev Chart
-        if: github.ref != 'refs/heads/main'
-        run: |
-          mv $IMAGE-${{ env.HELM_VERSION }}.tgz $IMAGE-latest.tgz
-          gsutil cp $IMAGE-*.tgz gs://$ARTIFACT_BUCKET/$IMAGE/
-
       - name: Set current tag
         if: github.ref != 'refs/heads/main'
         id: vars
@@ -116,32 +104,47 @@ jobs:
         run: |
           echo "Current git version: ${{ steps.vars.outputs.tag }}"
           export APP_VERSION=$(grep -E "appVersion:\s+" $CHART_DIRECTORY/Chart.yaml | cut -d" " -f2 | sed -r 's/"//g')
+          export CHART_VERSION=$(grep -E "version:\s+" $CHART_DIRECTORY/Chart.yaml | cut -d" " -f2 | sed -r 's/"//g')
           echo "appVersion: $APP_VERSION"
+          echo "chartVersion: $CHART_VERSION"
           if [ ${{ steps.vars.outputs.tag }} = $APP_VERSION ]; then
             echo "versions match, incrementing patch"
             OLD_PATCH=$(echo ${{ steps.vars.outputs.tag }} | cut -d '.' -f3)
             echo "OLD patch: $OLD_PATCH"
             NEW_PATCH=$(($OLD_PATCH + 1))
             echo "New patch version: $NEW_PATCH"
-            NEW_VERSION="appVersion: $(echo ${{ steps.vars.outputs.tag }} | sed -e "s/[0-9]\{1,3\}/$NEW_PATCH/3")"
-            echo "new version: $NEW_VERSION"
-            sed -i -e "s/appVersion: .*/$NEW_VERSION/g" $CHART_DIRECTORY/Chart.yaml
-
+            NEW_APP_VERSION="appVersion: $(echo ${{ steps.vars.outputs.tag }} | sed -e "s/[0-9]\{1,3\}/$NEW_PATCH/3")"
+            NEW_CHART_VERSION="version: $(echo ${{ steps.vars.outputs.tag }} | sed -e "s/[0-9]\{1,3\}/$NEW_PATCH/3")"
+            sed -i -e "s/appVersion: .*/$NEW_APP_VERSION/g" $CHART_DIRECTORY/Chart.yaml
+            sed -i -e "s/version: .*/$NEW_CHART_VERSION/g" $CHART_DIRECTORY/Chart.yaml
             git config user.name "ras-rm-pr-bot"
             git config user.email "${{ secrets.BOT_EMAIL }}"
-
             git remote set-url origin https://ras-rm-pr-bot:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
-
             git remote update
             git fetch
             git checkout ${{ github.head_ref }}
             git add $CHART_DIRECTORY/Chart.yaml
             git commit -m "$COMMIT_MSG"
-
-            git push 
+            git push
           else
-            echo "git version and appVersion do not not match"
-            echo "Using current appVersion: $APP_VERSION"
+            if [ $APP_VERSION != $CHART_VERSION ]; then
+              echo "app version manually updated without updating chart version"
+              NEW_CHART_VERSION="version: $APP_VERSION"
+              echo "replacing version with $NEW_CHART_VERSION"
+              sed -i -e "s/version: .*/$NEW_CHART_VERSION/g" $CHART_DIRECTORY/Chart.yaml
+              git config user.name "ras-rm-pr-bot"
+              git config user.email "${{ secrets.BOT_EMAIL }}"
+              git remote set-url origin https://ras-rm-pr-bot:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+              git remote update
+              git fetch
+              git checkout ${{ github.head_ref }}
+              git add $CHART_DIRECTORY/Chart.yaml
+              git commit -m "$COMMIT_MSG"
+              git push
+            else
+              echo "git version different to chart/app versions and chart/app versions match"
+              echo "Using current version: $APP_VERSION"
+            fi
           fi
 
       - name: output new version
@@ -150,6 +153,18 @@ jobs:
         shell: bash
         run: |
           echo ::set-output name=version::$(grep -E "appVersion:\s+" $CHART_DIRECTORY/Chart.yaml | cut -d" " -f2 | sed -r 's/"//g')
+
+      - name: package helm
+        run: |
+          echo HELM_VERSION=$(grep -E "version:\s+" $CHART_DIRECTORY/Chart.yaml | cut -d" " -f2 | sed -r 's/"//g') >> $GITHUB_ENV
+          helm dep up $CHART_DIRECTORY
+          helm package $CHART_DIRECTORY
+
+      - name: Publish dev Chart
+        if: github.ref != 'refs/heads/main'
+        run: |
+          mv $IMAGE-${{ env.HELM_VERSION }}.tgz $IMAGE-latest.tgz
+          gsutil cp $IMAGE-*.tgz gs://$ARTIFACT_BUCKET/$IMAGE/
 
       - name: Build Release Image
         if: github.ref == 'refs/heads/main'

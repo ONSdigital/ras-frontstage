@@ -66,7 +66,7 @@ class TestSurveyList(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertTrue("Your password has been changed.".encode() in response.data)
-        self.assertTrue("using your enrolment code".encode() in response.data)
+        self.assertTrue("add a new survey to your account".encode() in response.data)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")

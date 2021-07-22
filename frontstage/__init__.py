@@ -1,5 +1,6 @@
 import redis
 from flask_talisman import Talisman
+from flask import render_template
 
 from frontstage.common.jinja_filters import filter_blueprint
 from frontstage.controllers.banner_controller import current_banner
@@ -63,3 +64,10 @@ import frontstage.error_handlers  # NOQA
 
 # Bind routes to app
 import frontstage.views  # NOQA
+
+
+@app.before_request
+def redirect_to_maintenance_page():
+    under_maintenance = True
+    if under_maintenance:
+        return render_template("maintenance_page.html")

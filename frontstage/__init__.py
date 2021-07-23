@@ -1,6 +1,6 @@
 import redis
-from flask_talisman import Talisman
 from flask import render_template
+from flask_talisman import Talisman
 
 from frontstage.common.jinja_filters import filter_blueprint
 from frontstage.controllers.banner_controller import current_banner

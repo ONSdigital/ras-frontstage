@@ -104,7 +104,7 @@
             {% endif %}
               {% do checkboxData.append(
                   {
-                    "id": survey['id'],
+                    "id": range(1, 10000) | random | string,
                     "name": business,
                     "label": {
                         "text": survey['longName']

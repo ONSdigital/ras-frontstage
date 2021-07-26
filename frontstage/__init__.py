@@ -68,5 +68,5 @@ import frontstage.views  # NOQA
 
 @app.before_request
 def redirect_to_maintenance_page():
-    if app.config["UNDER_MAINTENANCE"] is True:
+    if app.config["UNDER_MAINTENANCE"]:
         return render_template("maintenance_page.html")

@@ -73,7 +73,7 @@ class Config(object):
     SHARE_SURVEY_ENABLED = bool(strtobool(os.getenv("SHARE_SURVEY_ENABLED", "True")))
     MAX_SHARED_SURVEY = int(os.getenv("MAX_SHARED_SURVEY", "50"))
     TECHNICAL_MESSAGE_ENABLED = bool(strtobool(os.getenv("TECHNICAL_MESSAGE_ENABLED", "True")))
-    UNDER_MAINTENANCE = os.getenv("UNDER_MAINTENANCE", False)
+    UNDER_MAINTENANCE = bool(strtobool(os.getenv("UNDER_MAINTENANCE", "False")))
 
 
 class DevelopmentConfig(Config):

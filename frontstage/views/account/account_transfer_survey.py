@@ -291,10 +291,9 @@ def send_transfer_instruction(session):
     response = register_pending_shares(json_data)
     if response.status_code == 400:
         flash(
-            "You have recently transferred one or more surveys with someone with this email address. Until they "
-            "have accepted you cannot share any more surveys. If you have made an error you can wait 72 hours for "
-            "the share to expire or you can contact us",
-            "error",
+            "You have already shared or transferred these surveys with someone with this email address. They have 72 "
+            "hours to accept your request. If you have made an error then wait for the share/transfer to expire or "
+            "contact us.",
         )
         return redirect(url_for("account_bp.send_transfer_instruction_get"))
     return render_template("surveys/surveys-transfer/almost-done.html")

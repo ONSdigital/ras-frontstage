@@ -281,8 +281,8 @@ class TestTransferSurvey(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertIn(
-            "You have recently transferred one or more surveys with someone with this email address. Until they have "
-            "accepted you cannot share any more surveys. If you have made an error you can wait 72 hours for the "
-            "share to expire or you can contact us".encode(),
+            "You have already shared or transferred these surveys with someone with this email address. They have 72 "
+            "hours to accept your request. If you have made an error then wait for the share/transfer to expire or "
+            "contact us.".encode(),
             response.data,
         )

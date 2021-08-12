@@ -56,7 +56,11 @@
         {{ form.batch_no }}
         {{ form.is_transfer }}
         <h2>Your name</h2>
-
+        {% if errors %}
+            {% set firstName = form.first_name.data %}
+            {% set lastName = form.last_name.data %}
+            {% set phoneNumber = form.phone_number.data %}
+        {% endif %}
         {%- call onsFieldset({
             "legend": "Your name",
             "legendClasses": "u-vh"
@@ -72,7 +76,8 @@
                     "label": {
                         "text": "First name"
                     },
-                    "error": errorFirstName
+                    "error": errorFirstName,
+                    "value": firstName
                 })
             }}
             {% if errors.last_name %}
@@ -86,7 +91,8 @@
                     "label": {
                         "text": "Last name"
                     },
-                    "error": errorLastName
+                    "error": errorLastName,
+                    "value": lastName
                 })
             }}
         {% endcall %}
@@ -152,7 +158,8 @@
                         "text": "Telephone number",
                         "description": "For international numbers include the country code, for example +33 1234 567 890"
                     },
-                    "error": errorPhoneNumber
+                    "error": errorPhoneNumber,
+                    "value": phoneNumber
                 })
             }}        
         {% endcall %}

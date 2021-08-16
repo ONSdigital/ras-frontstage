@@ -72,7 +72,8 @@
                     "label": {
                         "text": "First name"
                     },
-                    "error": errorFirstName
+                    "error": errorFirstName,
+                    "value": form.first_name.data
                 })
             }}
             {% if errors.last_name %}
@@ -86,7 +87,8 @@
                     "label": {
                         "text": "Last name"
                     },
-                    "error": errorLastName
+                    "error": errorLastName,
+                    "value": form.last_name.data
                 })
             }}
         {% endcall %}
@@ -152,7 +154,8 @@
                         "text": "Telephone number",
                         "description": "For international numbers include the country code, for example +33 1234 567 890"
                     },
-                    "error": errorPhoneNumber
+                    "error": errorPhoneNumber,
+                    "value": form.phone_number.data
                 })
             }}        
         {% endcall %}

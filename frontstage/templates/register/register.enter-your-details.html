@@ -54,12 +54,6 @@
         {{ form.enrolment_code }}
 
         <h2>Your name</h2>
-        {% if errors %}
-            {% set firstName = form.first_name.data %}
-            {% set lastName = form.last_name.data %}
-            {% set emailAddress = form.email_address.data %}
-            {% set phoneNumber = form.phone_number.data %}
-        {% endif %}
         {%- call onsFieldset({
             "legend": "Your name",
             "legendClasses": "u-vh"
@@ -77,7 +71,7 @@
                         "text": "First name"
                     },
                     "error": errorFirstName,
-                    "value": firstName
+                    "value": form.first_name.data
                 })
             }}
             {% if errors.last_name %}
@@ -92,7 +86,7 @@
                         "text": "Last name"
                     },
                     "error": errorLastName,
-                    "value": lastName
+                    "value": form.last_name.data
                 })
             }}
         {% endcall %}
@@ -115,7 +109,7 @@
                         "text": "Email address"
                     },
                     "error": errorEmailAddress,
-                    "value": emailAddress
+                    "value": form.email_address.data
                 })
             }}
             {{
@@ -193,7 +187,7 @@
                         "description": "For international numbers include the country code, for example +33 1234 567 890"
                     },
                     "error": errorPhoneNumber,
-                    "value": phoneNumber
+                    "value": form.phone_number.data
                 })
             }}        
         {% endcall %}

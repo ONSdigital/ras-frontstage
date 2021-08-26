@@ -40,7 +40,6 @@ sub_option_template_url_mapping = {
     "penalties": "surveys/help/surveys-help-penalties.html",
     "who-is-the-ons": "surveys/help/surveys-help-who-is-the-ons.html",
     "how-safe-is-my-data": "surveys/help/surveys-help-how-safe-is-my-data.html",
-    "ons-something-else": "surveys/help/surveys-help-ons-something-else.html",
 }
 subject_text_mapping = {
     "do-not-have-specific-figures": "I don’t have specific figures for a response",
@@ -51,6 +50,8 @@ subject_text_mapping = {
     "how-long-selected-for": "How long will my business be selected for?",
     "penalties": "Are there penalties for not completing this survey?",
     "info-something-else": info_about_this_survey_title,
+    "who-is-the-ons": "Who is the ONS?",
+    "how-safe-is-my-data": "How safe is my data?"
 }
 breadcrumb_text_mapping = {
     "do-not-have-specific-figures": [help_completing_this_survey_title, "I don’t have specific figures for a response"],
@@ -67,6 +68,8 @@ breadcrumb_text_mapping = {
     "how-long-selected-for": [info_about_this_survey_title, "How long will my business be selected for?"],
     "penalties": [info_about_this_survey_title, "What are the penalties for not completing a survey?"],
     "info-something-else": [info_about_this_survey_title, "More information"],
+    "who-is-the-ons": [info_about_this_survey_title, "Who is the ONS?"],
+    "how-safe-is-my-data": [info_about_this_survey_title, "How safe is my data?"],
 }
 
 
@@ -237,6 +240,19 @@ def post_help_option_select(session, survey_ref, ru_ref, option):
         form = HelpInfoAboutTheONSForm(request.values)
         form_valid = form.validate()
         if form_valid:
+            if form.data["option"] == "something-else":
+                breadcrumbs_title = info_about_this_survey_title
+                return render_template(
+                    "secure-messages/help/secure-message-send-messages-view.html",
+                    short_name=short_name,
+                    option=option,
+                    form=SecureMessagingForm(),
+                    subject=help_completing_this_survey_title,
+                    text_one=breadcrumbs_title,
+                    business_id=business_id,
+                    survey_ref=survey_ref,
+                    ru_ref=ru_ref,
+                )
             sub_option = form.data["option"]
             return redirect(
                 url_for(

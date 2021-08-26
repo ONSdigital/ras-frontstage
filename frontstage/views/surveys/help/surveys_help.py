@@ -16,6 +16,7 @@ from frontstage.controllers import (
 from frontstage.models import (
     HelpCompletingThisSurveyForm,
     HelpInfoAboutThisSurveyForm,
+    HelpInfoAboutTheONSForm,
     HelpOptionsForm,
     SecureMessagingForm,
 )
@@ -27,6 +28,7 @@ info_about_this_survey_title = "Information about this survey"
 option_template_url_mapping = {
     "help-completing-this-survey": "surveys/help/surveys-help-completing-this-survey.html",
     "info-about-this-survey": "surveys/help/surveys-help-info-about-this-survey.html",
+    "info-about-the-ons": "surveys/help/surveys-help-info-about-the-ons.html",
 }
 sub_option_template_url_mapping = {
     "do-not-have-specific-figures": "surveys/help/surveys-help-specific-figure-for-response.html",
@@ -36,7 +38,9 @@ sub_option_template_url_mapping = {
     "time-to-complete": "surveys/help/surveys-help-time-to-complete.html",
     "how-long-selected-for": "surveys/help/surveys-help-how-long-selected-for.html",
     "penalties": "surveys/help/surveys-help-penalties.html",
-    "info-something-else": "surveys/help/surveys-help-info-something-else.html",
+    "who-is-the-ons": "surveys/help/surveys-help-who-is-the-ons.html",
+    "how-safe-is-my-data": "surveys/help/surveys-help-how-safe-is-my-data.html",
+    "ons-something-else": "surveys/help/surveys-help-ons-something-else.html",
 }
 subject_text_mapping = {
     "do-not-have-specific-figures": "I don’t have specific figures for a response",
@@ -203,6 +207,34 @@ def post_help_option_select(session, survey_ref, ru_ref, option):
             )
     if option == "info-about-this-survey":
         form = HelpInfoAboutThisSurveyForm(request.values)
+        form_valid = form.validate()
+        if form_valid:
+            sub_option = form.data["option"]
+            return redirect(
+                url_for(
+                    "surveys_bp.get_help_option_sub_option_select",
+                    short_name=short_name,
+                    option=option,
+                    business_id=business_id,
+                    sub_option=sub_option,
+                    survey_ref=survey_ref,
+                    ru_ref=ru_ref,
+                )
+            )
+        else:
+            flash("You need to choose an option")
+            return redirect(
+                url_for(
+                    "surveys_bp.get_help_option_select",
+                    short_name=short_name,
+                    business_id=business_id,
+                    option=option,
+                    survey_ref=survey_ref,
+                    ru_ref=ru_ref,
+                )
+            )
+    if option == "info-about-the-ons":
+        form = HelpInfoAboutTheONSForm(request.values)
         form_valid = form.validate()
         if form_valid:
             sub_option = form.data["option"]

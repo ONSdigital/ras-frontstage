@@ -1,8 +1,7 @@
 import json
 import logging
-from os import abort
 
-from flask import flash, render_template, request, url_for
+from flask import abort, flash, render_template, request, url_for
 from markupsafe import Markup
 from structlog import wrap_logger
 from werkzeug.utils import redirect
@@ -247,7 +246,7 @@ def post_help_option_select(session, survey_ref, ru_ref, option):
                     short_name=short_name,
                     option=option,
                     form=SecureMessagingForm(),
-                    subject=help_completing_this_survey_title,
+                    subject="Information about the ONS",
                     text_one=breadcrumbs_title,
                     business_id=business_id,
                     survey_ref=survey_ref,
@@ -353,7 +352,6 @@ def get_send_help_message_page(session, survey_ref, ru_ref, option, sub_option):
 @jwt_authorization(request)
 def send_help_message(session, survey_ref, ru_ref):
     """Sends secure message for the help pages"""
-    short_name, business_id = get_short_name_and_business_id(survey_ref, ru_ref)
     survey = survey_controller.get_survey_by_survey_ref(survey_ref)
     business = party_controller.get_business_by_ru_ref(ru_ref)
     short_name = survey["shortName"]
@@ -391,7 +389,10 @@ def send_help_message(session, survey_ref, ru_ref):
         party_id = session.get_party_id()
         business_id = business_id
         logger.info("Form validation successful", party_id=party_id)
-        sent_message = _send_new_message(subject, party_id, survey["id"], business_id)
+        category = 'SURVEY'
+        if option == "info-about-the-ons":
+            category = 'TECHNICAL'
+        sent_message = _send_new_message(subject, party_id, survey["id"], business_id, category)
         thread_url = (
             url_for("secure_message_bp.view_conversation", thread_id=sent_message["thread_id"]) + "#latest-message"
         )
@@ -399,7 +400,7 @@ def send_help_message(session, survey_ref, ru_ref):
         return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
 
 
-def _send_new_message(subject, party_id, survey_id, business_id):
+def _send_new_message(subject, party_id, survey_id, business_id, category):
     logger.info("Attempting to send message", party_id=party_id, business_id=business_id)
     form = SecureMessagingForm(request.form)
     message_json = {
@@ -410,6 +411,7 @@ def _send_new_message(subject, party_id, survey_id, business_id):
         "thread_id": form["thread_id"].data,
         "business_id": business_id,
         "survey_id": survey_id,
+        "category": category
     }
 
     response = conversation_controller.send_message(json.dumps(message_json))

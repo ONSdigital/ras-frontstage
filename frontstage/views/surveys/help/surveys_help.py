@@ -15,8 +15,8 @@ from frontstage.controllers import (
 )
 from frontstage.models import (
     HelpCompletingThisSurveyForm,
-    HelpInfoAboutThisSurveyForm,
     HelpInfoAboutTheONSForm,
+    HelpInfoAboutThisSurveyForm,
     HelpOptionsForm,
     SecureMessagingForm,
 )
@@ -51,7 +51,7 @@ subject_text_mapping = {
     "penalties": "Are there penalties for not completing this survey?",
     "info-something-else": info_about_this_survey_title,
     "who-is-the-ons": "Who is the ONS?",
-    "how-safe-is-my-data": "How safe is my data?"
+    "how-safe-is-my-data": "How safe is my data?",
 }
 breadcrumb_text_mapping = {
     "do-not-have-specific-figures": [help_completing_this_survey_title, "I don’t have specific figures for a response"],

@@ -389,9 +389,9 @@ def send_help_message(session, survey_ref, ru_ref):
         party_id = session.get_party_id()
         business_id = business_id
         logger.info("Form validation successful", party_id=party_id)
-        category = 'SURVEY'
+        category = "SURVEY"
         if option == "info-about-the-ons":
-            category = 'TECHNICAL'
+            category = "TECHNICAL"
         sent_message = _send_new_message(subject, party_id, survey["id"], business_id, category)
         thread_url = (
             url_for("secure_message_bp.view_conversation", thread_id=sent_message["thread_id"]) + "#latest-message"
@@ -411,7 +411,7 @@ def _send_new_message(subject, party_id, survey_id, business_id, category):
         "thread_id": form["thread_id"].data,
         "business_id": business_id,
         "survey_id": survey_id,
-        "category": category
+        "category": category,
     }
 
     response = conversation_controller.send_message(json.dumps(message_json))

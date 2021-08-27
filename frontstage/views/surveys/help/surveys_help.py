@@ -37,6 +37,7 @@ sub_option_template_url_mapping = {
     "time-to-complete": "surveys/help/surveys-help-time-to-complete.html",
     "how-long-selected-for": "surveys/help/surveys-help-how-long-selected-for.html",
     "penalties": "surveys/help/surveys-help-penalties.html",
+    "info-something-else": "surveys/help/surveys-help-info-something-else.html",
     "who-is-the-ons": "surveys/help/surveys-help-who-is-the-ons.html",
     "how-safe-is-my-data": "surveys/help/surveys-help-how-safe-is-my-data.html",
 }

@@ -28,6 +28,7 @@ option_template_url_mapping = {
     "help-completing-this-survey": "surveys/help/surveys-help-completing-this-survey.html",
     "info-about-this-survey": "surveys/help/surveys-help-info-about-this-survey.html",
     "info-about-the-ons": "surveys/help/surveys-help-info-about-the-ons.html",
+    "something-else": "surveys/help/surveys-help-something-else.html",
 }
 sub_option_template_url_mapping = {
     "do-not-have-specific-figures": "surveys/help/surveys-help-specific-figure-for-response.html",
@@ -40,6 +41,7 @@ sub_option_template_url_mapping = {
     "info-something-else": "surveys/help/surveys-help-info-something-else.html",
     "who-is-the-ons": "surveys/help/surveys-help-who-is-the-ons.html",
     "how-safe-is-my-data": "surveys/help/surveys-help-how-safe-is-my-data.html",
+    "my-survey-is-not-listed": "surveys/help/surveys-help-my-survey-is-not-listed.html",
 }
 subject_text_mapping = {
     "do-not-have-specific-figures": "I don’t have specific figures for a response",
@@ -52,6 +54,7 @@ subject_text_mapping = {
     "info-something-else": info_about_this_survey_title,
     "who-is-the-ons": "Who is the ONS?",
     "how-safe-is-my-data": "How safe is my data?",
+    "my-survey-is-not-listed": "My survey is not listed",
 }
 breadcrumb_text_mapping = {
     "do-not-have-specific-figures": [help_completing_this_survey_title, "I don’t have specific figures for a response"],
@@ -70,6 +73,7 @@ breadcrumb_text_mapping = {
     "info-something-else": [info_about_this_survey_title, "More information"],
     "who-is-the-ons": [info_about_this_survey_title, "Who is the ONS?"],
     "how-safe-is-my-data": [info_about_this_survey_title, "How safe is my data?"],
+    "my-survey-is-not-listed": [info_about_this_survey_title, "My survey is not listed"],
 }
 
 

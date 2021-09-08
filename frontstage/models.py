@@ -260,6 +260,17 @@ class HelpCompletingThisSurveyForm(Form):
     )
 
 
+class HelpInfoAboutTheONSForm(Form):
+    option = RadioField(
+        "Label",
+        choices=[
+            ("value", "who-is-the-ons"),
+            ("value", "how-safe-is-my-data"),
+            ("value", "something-else"),
+        ],
+    )
+
+
 class ContactDetailsChangeForm(FlaskForm):
     first_name = StringField(
         _("First name"),

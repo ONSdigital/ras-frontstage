@@ -1,8 +1,7 @@
 import json
 import logging
-from os import abort
 
-from flask import flash, render_template, request, url_for
+from flask import abort, flash, render_template, request, url_for
 from markupsafe import Markup
 from structlog import wrap_logger
 from werkzeug.utils import redirect
@@ -15,6 +14,7 @@ from frontstage.controllers import (
 )
 from frontstage.models import (
     HelpCompletingThisSurveyForm,
+    HelpInfoAboutTheONSForm,
     HelpInfoAboutThisSurveyForm,
     HelpOptionsForm,
     SecureMessagingForm,
@@ -27,6 +27,7 @@ info_about_this_survey_title = "Information about this survey"
 option_template_url_mapping = {
     "help-completing-this-survey": "surveys/help/surveys-help-completing-this-survey.html",
     "info-about-this-survey": "surveys/help/surveys-help-info-about-this-survey.html",
+    "info-about-the-ons": "surveys/help/surveys-help-info-about-the-ons.html",
 }
 sub_option_template_url_mapping = {
     "do-not-have-specific-figures": "surveys/help/surveys-help-specific-figure-for-response.html",
@@ -37,6 +38,8 @@ sub_option_template_url_mapping = {
     "how-long-selected-for": "surveys/help/surveys-help-how-long-selected-for.html",
     "penalties": "surveys/help/surveys-help-penalties.html",
     "info-something-else": "surveys/help/surveys-help-info-something-else.html",
+    "who-is-the-ons": "surveys/help/surveys-help-who-is-the-ons.html",
+    "how-safe-is-my-data": "surveys/help/surveys-help-how-safe-is-my-data.html",
 }
 subject_text_mapping = {
     "do-not-have-specific-figures": "I don’t have specific figures for a response",
@@ -47,6 +50,8 @@ subject_text_mapping = {
     "how-long-selected-for": "How long will my business be selected for?",
     "penalties": "Are there penalties for not completing this survey?",
     "info-something-else": info_about_this_survey_title,
+    "who-is-the-ons": "Who is the ONS?",
+    "how-safe-is-my-data": "How safe is my data?",
 }
 breadcrumb_text_mapping = {
     "do-not-have-specific-figures": [help_completing_this_survey_title, "I don’t have specific figures for a response"],
@@ -63,6 +68,8 @@ breadcrumb_text_mapping = {
     "how-long-selected-for": [info_about_this_survey_title, "How long will my business be selected for?"],
     "penalties": [info_about_this_survey_title, "What are the penalties for not completing a survey?"],
     "info-something-else": [info_about_this_survey_title, "More information"],
+    "who-is-the-ons": [info_about_this_survey_title, "Who is the ONS?"],
+    "how-safe-is-my-data": [info_about_this_survey_title, "How safe is my data?"],
 }
 
 
@@ -229,6 +236,47 @@ def post_help_option_select(session, survey_ref, ru_ref, option):
                     ru_ref=ru_ref,
                 )
             )
+    if option == "info-about-the-ons":
+        form = HelpInfoAboutTheONSForm(request.values)
+        form_valid = form.validate()
+        if form_valid:
+            if form.data["option"] == "something-else":
+                breadcrumbs_title = info_about_this_survey_title
+                return render_template(
+                    "secure-messages/help/secure-message-send-messages-view.html",
+                    short_name=short_name,
+                    option=option,
+                    form=SecureMessagingForm(),
+                    subject="Information about the ONS",
+                    text_one=breadcrumbs_title,
+                    business_id=business_id,
+                    survey_ref=survey_ref,
+                    ru_ref=ru_ref,
+                )
+            sub_option = form.data["option"]
+            return redirect(
+                url_for(
+                    "surveys_bp.get_help_option_sub_option_select",
+                    short_name=short_name,
+                    option=option,
+                    business_id=business_id,
+                    sub_option=sub_option,
+                    survey_ref=survey_ref,
+                    ru_ref=ru_ref,
+                )
+            )
+        else:
+            flash("You need to choose an option")
+            return redirect(
+                url_for(
+                    "surveys_bp.get_help_option_select",
+                    short_name=short_name,
+                    business_id=business_id,
+                    option=option,
+                    survey_ref=survey_ref,
+                    ru_ref=ru_ref,
+                )
+            )
     else:
         abort(404)
 
@@ -305,7 +353,6 @@ def get_send_help_message_page(session, survey_ref, ru_ref, option, sub_option):
 @jwt_authorization(request)
 def send_help_message(session, survey_ref, ru_ref):
     """Sends secure message for the help pages"""
-    short_name, business_id = get_short_name_and_business_id(survey_ref, ru_ref)
     survey = survey_controller.get_survey_by_survey_ref(survey_ref)
     business = party_controller.get_business_by_ru_ref(ru_ref)
     short_name = survey["shortName"]
@@ -343,7 +390,10 @@ def send_help_message(session, survey_ref, ru_ref):
         party_id = session.get_party_id()
         business_id = business_id
         logger.info("Form validation successful", party_id=party_id)
-        sent_message = _send_new_message(subject, party_id, survey["id"], business_id)
+        category = "SURVEY"
+        if option == "info-about-the-ons":
+            category = "TECHNICAL"
+        sent_message = _send_new_message(subject, party_id, survey["id"], business_id, category)
         thread_url = (
             url_for("secure_message_bp.view_conversation", thread_id=sent_message["thread_id"]) + "#latest-message"
         )
@@ -351,7 +401,7 @@ def send_help_message(session, survey_ref, ru_ref):
         return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
 
 
-def _send_new_message(subject, party_id, survey_id, business_id):
+def _send_new_message(subject, party_id, survey_id, business_id, category):
     logger.info("Attempting to send message", party_id=party_id, business_id=business_id)
     form = SecureMessagingForm(request.form)
     message_json = {
@@ -362,6 +412,7 @@ def _send_new_message(subject, party_id, survey_id, business_id):
         "thread_id": form["thread_id"].data,
         "business_id": business_id,
         "survey_id": survey_id,
+        "category": category,
     }
 
     response = conversation_controller.send_message(json.dumps(message_json))

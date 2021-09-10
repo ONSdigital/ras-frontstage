@@ -6,6 +6,7 @@ from frontstage.views.account import (  # NOQA
     accept_share_survey,
     accept_transfer_survey,
     account,
+    account_delete,
     account_email_change,
     account_survey_share,
     account_transfer_survey,

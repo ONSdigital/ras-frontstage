@@ -71,4 +71,4 @@ def delete_account(username: str):
         raise ApiError(logger, response)
 
     bound_logger.info("Successfully deleted account")
-    return {}
+    return response

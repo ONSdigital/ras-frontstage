@@ -32,7 +32,17 @@ class TestAccountDelete(unittest.TestCase):
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
     def test_account_delete(self, mock_request, get_respondent_party_by_id):
         mock_request.get(url_banner_api, status_code=404)
-        get_respondent_party_by_id.return_value = respondent_party
+        get_respondent_party_by_id.return_value = {
+            "associations": [],
+            "emailAddress": "example@example.com",
+            "firstName": "first_name",
+            "id": "f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b",
+            "lastName": "last_name",
+            "sampleUnitType": "BI",
+            "status": "ACTIVE",
+            "telephone": "0987654321",
+            "respondent_id": 1,
+        }
         with app.app_context():
             response = self.app.get("/my-account/delete")
 

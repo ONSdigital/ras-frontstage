@@ -1,4 +1,3 @@
-import base64
 import logging
 
 import requests
@@ -57,12 +56,10 @@ def sign_in(username, password):
 def delete_account(username: str):
     bound_logger = logger.bind(email=obfuscate_email(username))
     bound_logger.info("Attempting to delete account")
-    auth = "{}:{}".format(app.config["SECURITY_USER_NAME"], app.config["SECURITY_USER_PASSWORD"]).encode("utf-8")
-    headers = {"Authorization": "Basic %s" % base64.b64encode(bytes(auth)).decode("ascii")}
     url = f'{app.config["AUTH_URL"]}/api/account/user'
     # force_delete will always be true if deletion is initiated by user
     form_data = {"username": username, "force_delete": True}
-    response = requests.delete(url, data=form_data, headers=headers)
+    response = requests.delete(url, data=form_data, auth=app.config["BASIC_AUTH"])
 
     try:
         response.raise_for_status()

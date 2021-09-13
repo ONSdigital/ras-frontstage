@@ -50,7 +50,17 @@ class TestAccountDelete(unittest.TestCase):
     def test_account_delete_confirm(self, mock_request, get_respondent_party_by_id):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.delete(url_auth_delete, status_code=204)
-        get_respondent_party_by_id.return_value = respondent_party
+        get_respondent_party_by_id.return_value = {
+            "associations": [],
+            "emailAddress": "example@example.com",
+            "firstName": "first_name",
+            "id": "f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b",
+            "lastName": "last_name",
+            "sampleUnitType": "BI",
+            "status": "ACTIVE",
+            "telephone": "0987654321",
+            "respondent_id": 1,
+        }
         with app.app_context():
             response = self.app.post("/my-account/delete", follow_redirects=True)
 
@@ -60,3 +70,18 @@ class TestAccountDelete(unittest.TestCase):
             self.assertTrue("Email Address".encode() in response.data)
             self.assertTrue("Password".encode() in response.data)
             self.assertTrue("Forgot password?".encode() in response.data)
+
+    @requests_mock.mock()
+    @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
+    def test_account_delete_not_allowed(self, mock_request, get_respondent_party_by_id):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.delete(url_auth_delete, status_code=204)
+        get_respondent_party_by_id.return_value = respondent_party
+        with app.app_context():
+            response = self.app.get("/my-account/delete", follow_redirects=True)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue("This account can not be deleted.".encode() in response.data)
+            self.assertTrue(
+                "This operation is not allowed as you are currently assigned to a survey.".encode() in response.data
+            )

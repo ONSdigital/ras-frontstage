@@ -22,7 +22,23 @@
 }}
 {% endblock breadcrumb %}
 {% block main %}
-
+{%- with messages = get_flashed_messages(category_filter=["error"]) -%}
+        {%- if messages -%}
+            {% call
+                onsPanel({
+                    "classes": "u-mb-s",
+                    "type": 'error',
+                })
+            %}
+                <div id="delete-error">
+                    <h2>This account can not be deleted.</h2>
+                    {%- for message in messages -%}
+                        <p>{{ message }}</p>
+                    {%- endfor -%}
+                </div>
+            {% endcall %}
+        {%- endif -%}
+    {%- endwith -%}
 <h1 class="u-fs-xl">Delete account</h1>
 {% call onsPanel({
         "type": 'warn'
@@ -35,6 +51,7 @@
 <form action="" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
+        {% if is_validated %}
         <div class="grid__col">
             {{
                 onsButton({
@@ -45,6 +62,7 @@
                 })
             }}
         </div>
+        {% endif %}
         <div class="grid__col u-ml-m">
             <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" id="btn-option-cancel">Cancel</a>
         </div>

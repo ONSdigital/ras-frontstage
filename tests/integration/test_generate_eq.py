@@ -86,7 +86,18 @@ class TestGenerateEqURL(unittest.TestCase):
     def test_generate_eq_url_complete_case(self, mock_request, _):
 
         # Given a mocked case has its caseGroup status as complete
-        mock_request.get(url_get_case, json=completed_case)
+        mock_request.get(
+            f"{app.config['COLLECTION_EXERCISE_URL']}" f"/collectionexercises/14fb3e68-4dca-46db-bf49-04b84e07e77c",
+            json=collection_exercise,
+        )
+        mock_request.get(f"{app.config['CASE_URL']}/cases/8cdc01f9-656a-4715-a148-ffed0dbe1b04", json=completed_case)
+        mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
+        mock_request.get(url_get_business_party, json=business_party)
+        mock_request.get(url_get_survey_by_short_name_eq, json=survey_eq)
+        mock_request.get(url_get_ci, json=collection_instrument_eq)
+        mock_request.get(url_get_case_categories, json=categories)
+        mock_request.post(url_post_case_event_uuid, status_code=201)
+        mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
         mock_request.get(url_banner_api, status_code=404)
 
         # When the generate-eq-url is called

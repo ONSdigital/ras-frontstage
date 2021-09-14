@@ -18,15 +18,16 @@ def access_survey(session):
     business_party_id = request.args["business_party_id"]
     survey_short_name = request.args["survey_short_name"]
     collection_instrument_type = request.args["ci_type"]
-
+    case_data = case_controller.get_case_data(case_id, party_id, business_party_id, survey_short_name)
+    eq_version = case_data["collection_exercise"]["eqVersion"]
     if collection_instrument_type == "EQ":
         logger.info("Attempting to redirect to EQ", party_id=party_id, case_id=case_id)
-        return redirect(case_controller.get_eq_url(case_id, party_id, business_party_id, survey_short_name))
-
+        if eq_version != "v3":
+            return redirect(case_controller.get_eq_url(case_id, party_id, business_party_id, survey_short_name))
+        else:
+            return render_template("surveys/surveys-temp-eq-v3-static.html")
     logger.info("Retrieving case data", party_id=party_id, case_id=case_id)
     referer_header = request.headers.get("referer", {})
-
-    case_data = case_controller.get_case_data(case_id, party_id, business_party_id, survey_short_name)
 
     logger.info("Successfully retrieved case data", party_id=party_id, case_id=case_id)
     unread_message_count = {"unread_message_count": conversation_controller.try_message_count_from_session(session)}

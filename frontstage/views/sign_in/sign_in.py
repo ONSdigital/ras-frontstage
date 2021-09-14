@@ -25,6 +25,7 @@ UNKNOWN_ACCOUNT_ERROR = "Authentication error in Auth service"
 BAD_AUTH_ERROR = "Unauthorized user credentials"
 NOT_VERIFIED_ERROR = "User account not verified"
 USER_ACCOUNT_LOCKED = "User account locked"
+USER_ACCOUNT_DELETED = "User account deleted"
 
 
 @app.route("/", methods=["GET"])
@@ -70,6 +71,8 @@ def login():  # noqa: C901
                 bound_logger.info("Bad credentials provided")
             elif UNKNOWN_ACCOUNT_ERROR in error_message:
                 bound_logger.info("User account does not exist in auth service")
+            elif USER_ACCOUNT_DELETED in error_message:
+                bound_logger.info("User account is marked for deletion")
             else:
                 bound_logger.error("Unexpected error was returned from Auth service", auth_error=error_message)
 

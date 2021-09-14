@@ -63,6 +63,9 @@ The syntax above will work equally well with the 'docker-test' target
 
 Note that this script will fail if there is a `node_modules` folder in the repo
 
+## How to run test in pyCharm
+* Create a new configuration template in edit configuration. Use `autodetect` option and setup Environment Variable to `APP_SETTINGS=TestingConfig`.  
+
 ## Configuration
 Environment variables available for configuration are listed below:
 

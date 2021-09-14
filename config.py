@@ -121,7 +121,9 @@ class TestingConfig(DevelopmentConfig):
     JSON_SECRET_KEYS = open("./tests/test_data/jwt-test-keys/test_key.json").read()
     SECURITY_USER_NAME = "username"
     SECURITY_USER_PASSWORD = "password"
+    SECRET_KEY = os.getenv("SECRET_KEY", "ONS_DUMMY_KEY")
     REQUESTS_POST_TIMEOUT = 99
     WTF_CSRF_TIME_LIMIT = int(os.getenv("WTF_CSRF_TIME_LIMIT", "3200"))
     SECURE_APP = bool(strtobool(os.getenv("SECURE_APP", "False")))
     ACCESS_CONTROL_ALLOW_ORIGIN = os.getenv("ACCESS_CONTROL_ALLOW_ORIGIN", "http://localhost")
+    UNDER_MAINTENANCE = bool(strtobool(os.getenv("UNDER_MAINTENANCE", "False")))

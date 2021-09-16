@@ -377,7 +377,7 @@ def send_help_message(session, survey_ref, ru_ref):
         business_id = business_id
         logger.info("Form validation successful", party_id=party_id)
         category = "SURVEY"
-        if option == "info-about-the-ons":
+        if option == "info-about-the-ons" or option == 'something-else':
             category = "TECHNICAL"
         sent_message = _send_new_message(subject, party_id, survey["id"], business_id, category)
         thread_url = (

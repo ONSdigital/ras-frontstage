@@ -25,6 +25,7 @@ from frontstage.views.surveys import surveys_bp
 logger = wrap_logger(logging.getLogger(__name__))
 help_completing_this_survey_title = "Help completing this survey"
 info_about_this_survey_title = "Information about this survey"
+info_about_the_ons = "Information about the ONS"
 something_else_title = "Something else"
 option_template_url_mapping = {
     "help-completing-this-survey": "surveys/help/surveys-help-completing-this-survey.html",
@@ -76,6 +77,9 @@ breadcrumb_text_mapping = {
     "who-is-the-ons": [info_about_this_survey_title, "Who is the ONS?"],
     "how-safe-is-my-data": [info_about_this_survey_title, "How safe is my data?"],
     "my-survey-is-not-listed": [something_else_title, "My survey is not listed"],
+    "help-completing-this-survey": [help_completing_this_survey_title],
+    "info-about-the-ons": [info_about_the_ons],
+    "something-else": [something_else_title],
 }
 
 
@@ -296,10 +300,8 @@ def get_help_option_sub_option_select(session, survey_ref, ru_ref, option, sub_o
 @jwt_authorization(request)
 def get_send_help_message(session, survey_ref, ru_ref, option):
     """Gets the send message page once the option is selected"""
-
     short_name, business_id = get_short_name_and_business_id(survey_ref, ru_ref)
-    if option == "help-completing-this-survey":
-        breadcrumbs_title = help_completing_this_survey_title
+    breadcrumbs_title = breadcrumb_text_mapping[option][0]
     return render_template(
         "secure-messages/help/secure-message-send-messages-view.html",
         short_name=short_name,

@@ -198,3 +198,29 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Message sent.".encode(), response.data)
+
+    @requests_mock.mock()
+    @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
+    @patch("frontstage.controllers.conversation_controller.send_message")
+    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
+    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
+    def test_create_message_post_something_else_failure(
+        self, mock_request, get_survey, get_business, send_message, get_survey_list
+    ):
+        mock_request.get(url_banner_api, status_code=404)
+        get_survey.return_value = survey
+        get_business.return_value = business_party
+        form = {"body": ""}
+        response = self.app.post(
+            "/surveys/help/074/49900000001F/send-message?short_name=Bricks&subject=Information+about+the+ONS"
+            "&option=info-about-the-ons&sub_option=not_defined",
+            data=form,
+            follow_redirects=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("There is 1 error on this page".encode(), response.data)
+        self.assertIn("Message is required".encode(), response.data)
+        self.assertIn("Send a message".encode(), response.data)
+        self.assertIn("Describe your issue and we will get back to you.".encode(), response.data)
+        self.assertIn("Information about the ONS".encode(), response.data)

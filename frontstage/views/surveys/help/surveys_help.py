@@ -59,7 +59,7 @@ subject_text_mapping = {
     "how-safe-is-my-data": "How safe is my data?",
     "my-survey-is-not-listed": "My survey is not listed",
     "something-else": "Something else",
-    "help-completing-this-survey": "Help answering a survey question"
+    "help-completing-this-survey": "Help answering a survey question",
 }
 breadcrumb_text_mapping = {
     "do-not-have-specific-figures": [help_completing_this_survey_title, "I don’t have specific figures for a response"],

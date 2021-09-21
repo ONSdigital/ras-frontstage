@@ -58,6 +58,9 @@ subject_text_mapping = {
     "who-is-the-ons": "Who is the ONS?",
     "how-safe-is-my-data": "How safe is my data?",
     "my-survey-is-not-listed": "My survey is not listed",
+    "something-else": "Something else",
+    "help-completing-this-survey": "Help answering a survey question",
+    "info-about-the-ons": info_about_the_ons,
 }
 breadcrumb_text_mapping = {
     "do-not-have-specific-figures": [help_completing_this_survey_title, "I don’t have specific figures for a response"],
@@ -302,12 +305,13 @@ def get_send_help_message(session, survey_ref, ru_ref, option):
     """Gets the send message page once the option is selected"""
     short_name, business_id = get_short_name_and_business_id(survey_ref, ru_ref)
     breadcrumbs_title = breadcrumb_text_mapping[option][0]
+    subject = subject_text_mapping[option]
     return render_template(
         "secure-messages/help/secure-message-send-messages-view.html",
         short_name=short_name,
         option=option,
         form=SecureMessagingForm(),
-        subject="Help answering a survey question",
+        subject=subject,
         breadcrumb_title_one=breadcrumbs_title,
         business_id=business_id,
         survey_ref=survey_ref,

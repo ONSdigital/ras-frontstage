@@ -66,12 +66,13 @@ class TestTechnicalHelpSurveyNotListed(unittest.TestCase):
         self.assertIn("Cancel".encode(), response.data)
 
     @requests_mock.mock()
+    @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
     @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
     @patch("frontstage.controllers.conversation_controller.send_message")
     @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
     @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
     def test_create_message_page_technical_success(
-        self, mock_request, get_survey, get_business, send_message, get_survey_list
+        self, mock_request, get_survey, get_business, send_message, get_survey_list, get_respondent_party_by_id
     ):
         mock_request.get(url_banner_api, status_code=404)
         get_business.return_value = respondent_party

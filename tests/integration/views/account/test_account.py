@@ -228,13 +228,17 @@ class TestSurveyList(unittest.TestCase):
         self.assertTrue("Cancel".encode() in response.data)
 
     @requests_mock.mock()
+    @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
     @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
     @patch("frontstage.controllers.conversation_controller.send_message")
     @patch("frontstage.controllers.survey_controller.get_survey_by_short_name")
-    def test_create_message_post_success(self, mock_request, get_survey, send_message, get_survey_list):
+    def test_create_message_post_success(
+        self, mock_request, get_survey, send_message, get_survey_list, get_respondent_party_by_id
+    ):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         get_survey_list.return_value = survey_list_todo
+        get_respondent_party_by_id.return_value = respondent_party
         form = {"body": "something-else"}
         response = self.app.post("/my-account/something-else", data=form, follow_redirects=True)
 

@@ -7,6 +7,7 @@ from frontstage import app
 from tests.integration.mocked_services import (
     business_party,
     encoded_jwt_token,
+    respondent_party,
     survey,
     survey_eq,
     survey_list_todo,
@@ -178,15 +179,19 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("Cancel".encode(), response.data)
 
     @requests_mock.mock()
+    @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
     @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
     @patch("frontstage.controllers.conversation_controller.send_message")
     @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
     @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_create_message_post_success(self, mock_request, get_survey, get_business, send_message, get_survey_list):
+    def test_create_message_post_success(
+        self, mock_request, get_survey, get_business, send_message, get_survey_list, get_respondent_party_by_id
+    ):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         get_business.return_value = business_party
         get_survey_list.return_value = survey_list_todo
+        get_respondent_party_by_id.return_value = respondent_party
         form = {"body": "info-something-else"}
         response = self.app.post(
             "/surveys/help/074/49900000001F/"

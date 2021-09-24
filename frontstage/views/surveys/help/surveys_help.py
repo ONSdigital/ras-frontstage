@@ -1,7 +1,9 @@
 import json
 import logging
 
-from flask import abort, flash, render_template, request, url_for
+from flask import abort, flash, render_template, request
+from flask import session as flask_session
+from flask import url_for
 from markupsafe import Markup
 from structlog import wrap_logger
 from werkzeug.utils import redirect
@@ -59,8 +61,10 @@ subject_text_mapping = {
     "how-safe-is-my-data": "How safe is my data?",
     "my-survey-is-not-listed": "My survey is not listed",
     "something-else": "Something else",
-    "help-completing-this-survey": "Help answering a survey question",
+    "answer-survey-question": "Help answering a survey question",
     "info-about-the-ons": info_about_the_ons,
+    "completing-this-survey-something-else": help_completing_this_survey_title,
+    "info-ons-something-else": info_about_the_ons,
 }
 breadcrumb_text_mapping = {
     "do-not-have-specific-figures": [help_completing_this_survey_title, "I don’t have specific figures for a response"],
@@ -77,23 +81,37 @@ breadcrumb_text_mapping = {
     "how-long-selected-for": [info_about_this_survey_title, "How long will my business be selected for?"],
     "penalties": [info_about_this_survey_title, "What are the penalties for not completing a survey?"],
     "info-something-else": [info_about_this_survey_title, "More information"],
-    "who-is-the-ons": [info_about_this_survey_title, "Who is the ONS?"],
-    "how-safe-is-my-data": [info_about_this_survey_title, "How safe is my data?"],
+    "who-is-the-ons": [info_about_the_ons, "Who is the ONS?"],
+    "how-safe-is-my-data": [info_about_the_ons, "How safe is my data?"],
     "my-survey-is-not-listed": [something_else_title, "My survey is not listed"],
     "help-completing-this-survey": [help_completing_this_survey_title],
-    "info-about-the-ons": [info_about_the_ons],
+    "completing-this-survey-something-else": [help_completing_this_survey_title],
+    "answer-survey-question": [help_completing_this_survey_title],
+    "info-ons-something-else": [info_about_the_ons],
     "something-else": [something_else_title],
 }
 
 
-@surveys_bp.route("/help/<survey_ref>/<ru_ref>", methods=["GET"])
+@surveys_bp.route("/surveys-help", methods=["GET"])
 @jwt_authorization(request)
-def get_help_page(session, survey_ref, ru_ref):
-    """Gets Survey Help page provided survey_ref and ru_ref"""
-    survey = survey_controller.get_survey_by_survey_ref(survey_ref)
-    business = party_controller.get_business_by_ru_ref(ru_ref)
-    short_name = survey["shortName"]
-    business_id = business["id"]
+def get_surveys_help_page(session):
+    """Gets Survey Help page provided survey_ref and ru_ref and creates flash session for selection"""
+    flask_session["help_survey_ref"] = request.args.get("survey_ref", None)
+    flask_session["help_ru_ref"] = request.args.get("ru_ref", None)
+    abort_help_if_session_not_set()
+    return redirect(
+        url_for(
+            "surveys_bp.get_help_page",
+        )
+    )
+
+
+@surveys_bp.route("/help", methods=["GET"])
+@jwt_authorization(request)
+def get_help_page(session):
+    """Gets Survey Help page provided survey_ref and ru_ref are in session"""
+    abort_help_if_session_not_set()
+    business_id, ru_ref, short_name, survey, survey_ref = get_selected_survey_business_details()
     return render_template(
         "surveys/help/surveys-help.html",
         form=HelpOptionsForm(),
@@ -105,48 +123,35 @@ def get_help_page(session, survey_ref, ru_ref):
     )
 
 
-@surveys_bp.route("/help/<survey_ref>/<ru_ref>", methods=["POST"])
+@surveys_bp.route("/help", methods=["POST"])
 @jwt_authorization(request)
-def post_help_page(session, survey_ref, ru_ref):
-    """Post help completing this survey option for respective survey provided
-    survey_ref and ru_ref"""
-    short_name, business_id = get_short_name_and_business_id(survey_ref, ru_ref)
+def post_help_page(session):
+    """Post help completing this survey option for respective survey"""
+    abort_help_if_session_not_set()
+    business_id, ru_ref, short_name, survey, survey_ref = get_selected_survey_business_details()
     form = HelpOptionsForm(request.values)
     if form.validate():
         option = form.data["option"]
         if option == "help-with-my-account":
             return redirect(url_for("account_bp.get_account"))
-        return redirect(
-            url_for(
-                "surveys_bp.get_help_option_select",
-                short_name=short_name,
-                business_id=business_id,
-                option=option,
-                survey_ref=survey_ref,
-                ru_ref=ru_ref,
-            )
-        )
+        return redirect(url_for("surveys_bp.get_help_option_select", option=option))
     else:
         flash("You need to choose an option")
         return redirect(
             url_for(
                 "surveys_bp.get_help_page",
-                short_name=short_name,
-                business_id=business_id,
                 survey_ref=survey_ref,
                 ru_ref=ru_ref,
             )
         )
 
 
-@surveys_bp.route("/help/<survey_ref>/<ru_ref>/<option>", methods=["GET"])
+@surveys_bp.route("/help/<option>", methods=["GET"])
 @jwt_authorization(request)
-def get_help_option_select(session, survey_ref, ru_ref, option):
+def get_help_option_select(session, option):
     """Gets help completing this survey's additional options (sub options)"""
-    survey = survey_controller.get_survey_by_survey_ref(survey_ref)
-    business = party_controller.get_business_by_ru_ref(ru_ref)
-    short_name = survey["shortName"]
-    business_id = business["id"]
+    abort_help_if_session_not_set()
+    business_id, ru_ref, short_name, survey, survey_ref = get_selected_survey_business_details()
     template = option_template_url_mapping.get(option, "Invalid template")
     if template == "Invalid template":
         abort(404)
@@ -163,126 +168,60 @@ def get_help_option_select(session, survey_ref, ru_ref, option):
         )
 
 
-@surveys_bp.route("/help/<survey_ref>/<ru_ref>/<option>", methods=["POST"])
+@surveys_bp.route("/help/<option>", methods=["POST"])
 @jwt_authorization(request)
-def post_help_option_select(session, survey_ref: str, ru_ref: str, option: str):
+def post_help_option_select(session, option: str):
     """Provides additional options once sub options are selected"""
-    short_name, business_id = get_short_name_and_business_id(survey_ref, ru_ref)
     if option == "help-completing-this-survey":
         form = HelpCompletingThisSurveyForm(request.values)
         form_valid = form.validate()
         if form_valid:
             sub_option = form.data["option"]
-            if sub_option == "answer-survey-question":
-                return redirect(
-                    url_for(
-                        "surveys_bp.get_send_help_message",
-                        short_name=short_name,
-                        option=option,
-                        business_id=business_id,
-                        survey_ref=survey_ref,
-                        ru_ref=ru_ref,
-                    )
-                )
+            if sub_option == "answer-survey-question" or sub_option == "completing-this-survey-something-else":
+                return redirect_to_send_message_page(option, sub_option)
             if sub_option == "do-not-have-specific-figures" or sub_option == "unable-to-return-by-deadline":
-                return redirect_to_sub_option_select_page(
-                    business_id, option, ru_ref, short_name, sub_option, survey_ref
-                )
-            if form.data["option"] == "something-else":
-                return render_send_message_template(
-                    business_id, option, ru_ref, short_name, help_completing_this_survey_title, survey_ref
-                )
+                return redirect_to_sub_option_select_page(option, sub_option)
         else:
-            return flash_error_and_redirect(business_id, option, ru_ref, short_name, survey_ref)
+            return flash_error_and_redirect(option)
     if option == "info-about-this-survey":
         form = HelpInfoAboutThisSurveyForm(request.values)
         form_valid = form.validate()
         if form_valid:
             sub_option = form.data["option"]
-            return redirect_to_sub_option_select_page(business_id, option, ru_ref, short_name, sub_option, survey_ref)
+            return redirect_to_sub_option_select_page(option=option, sub_option=sub_option)
         else:
-            return flash_error_and_redirect(business_id, option, ru_ref, short_name, survey_ref)
+            return flash_error_and_redirect(option)
     if option == "info-about-the-ons":
         form = HelpInfoAboutTheONSForm(request.values)
         form_valid = form.validate()
         if form_valid:
-            if form.data["option"] == "something-else":
-                subject = "Information about the ONS"
-                return render_send_message_template(business_id, option, ru_ref, short_name, subject, survey_ref)
-
             sub_option = form.data["option"]
-            return redirect_to_sub_option_select_page(business_id, option, ru_ref, short_name, sub_option, survey_ref)
+            if sub_option == "info-ons-something-else":
+                return redirect_to_send_message_page(option, sub_option)
+            return redirect_to_sub_option_select_page(option=option, sub_option=sub_option)
         else:
-            return flash_error_and_redirect(business_id, option, ru_ref, short_name, survey_ref)
+            return flash_error_and_redirect(option)
     if option == "something-else":
         form = HelpSomethingElseForm(request.values)
         form_valid = form.validate()
         if form_valid:
-            if form.data["option"] == "something-else":
-                subject = "Something else"
-                return render_send_message_template(business_id, option, ru_ref, short_name, subject, survey_ref)
             sub_option = form.data["option"]
-            return redirect_to_sub_option_select_page(business_id, option, ru_ref, short_name, sub_option, survey_ref)
+            if sub_option == "something-else":
+                return redirect_to_send_message_page(option, sub_option)
+            return redirect_to_sub_option_select_page(option, sub_option)
         else:
-            return flash_error_and_redirect(business_id, option, ru_ref, short_name, survey_ref)
+            return flash_error_and_redirect(option)
     else:
         abort(404)
 
 
-def render_send_message_template(
-    business_id: str, option: str, ru_ref: str, short_name: str, subject: str, survey_ref: str
-):
-    return render_template(
-        "secure-messages/help/secure-message-send-messages-view.html",
-        short_name=short_name,
-        option=option,
-        form=SecureMessagingForm(),
-        subject=subject,
-        business_id=business_id,
-        survey_ref=survey_ref,
-        ru_ref=ru_ref,
-    )
-
-
-def redirect_to_sub_option_select_page(
-    business_id: str, option: str, ru_ref: str, short_name: str, sub_option: str, survey_ref: str
-):
-    return redirect(
-        url_for(
-            "surveys_bp.get_help_option_sub_option_select",
-            short_name=short_name,
-            option=option,
-            business_id=business_id,
-            sub_option=sub_option,
-            survey_ref=survey_ref,
-            ru_ref=ru_ref,
-        )
-    )
-
-
-def flash_error_and_redirect(business_id: str, option: str, ru_ref: str, short_name: str, survey_ref: str):
-    flash("You need to choose an option")
-    return redirect(
-        url_for(
-            "surveys_bp.get_help_option_select",
-            short_name=short_name,
-            business_id=business_id,
-            option=option,
-            survey_ref=survey_ref,
-            ru_ref=ru_ref,
-        )
-    )
-
-
-@surveys_bp.route("/help/<survey_ref>/<ru_ref>/<option>/<sub_option>", methods=["GET"])
+@surveys_bp.route("/help/<option>/<sub_option>", methods=["GET"])
 @jwt_authorization(request)
-def get_help_option_sub_option_select(session, survey_ref, ru_ref, option, sub_option):
+def get_help_option_sub_option_select(session, option, sub_option):
     """Provides additional options with sub option provided"""
     template = sub_option_template_url_mapping.get(sub_option, "Invalid template")
-    survey = survey_controller.get_survey_by_survey_ref(survey_ref)
-    business = party_controller.get_business_by_ru_ref(ru_ref)
-    short_name = survey["shortName"]
-    business_id = business["id"]
+    abort_help_if_session_not_set()
+    business_id, ru_ref, short_name, survey, survey_ref = get_selected_survey_business_details()
     if template == "Invalid template":
         abort(404)
     else:
@@ -296,36 +235,20 @@ def get_help_option_sub_option_select(session, survey_ref, ru_ref, option, sub_o
             inside_legal_basis=is_legal_basis_mandatory(survey["legalBasisRef"]),
             survey_ref=survey_ref,
             ru_ref=ru_ref,
+            is_survey_help_page=True,  # currently used by survey not listed.
         )
 
 
-@surveys_bp.route("/help/<survey_ref>/<ru_ref>/<option>/send-message", methods=["GET"])
+@surveys_bp.route("/help/<option>/<sub_option>/send-message", methods=["GET"])
 @jwt_authorization(request)
-def get_send_help_message(session, survey_ref, ru_ref, option):
-    """Gets the send message page once the option is selected"""
-    short_name, business_id = get_short_name_and_business_id(survey_ref, ru_ref)
-    breadcrumbs_title = breadcrumb_text_mapping[option][0]
-    subject = subject_text_mapping[option]
-    return render_template(
-        "secure-messages/help/secure-message-send-messages-view.html",
-        short_name=short_name,
-        option=option,
-        form=SecureMessagingForm(),
-        subject=subject,
-        breadcrumb_title_one=breadcrumbs_title,
-        business_id=business_id,
-        survey_ref=survey_ref,
-        ru_ref=ru_ref,
-    )
-
-
-@surveys_bp.route("/help/<survey_ref>/<ru_ref>/<option>/<sub_option>/send-message", methods=["GET"])
-@jwt_authorization(request)
-def get_send_help_message_page(session, survey_ref, ru_ref, option, sub_option):
+def get_send_help_message_page(session, option, sub_option):
     """Gets the send message page once the option and sub option is selected"""
-    short_name, business_id = get_short_name_and_business_id(survey_ref, ru_ref)
+    abort_help_if_session_not_set()
+    business_id, ru_ref, short_name, survey, survey_ref = get_selected_survey_business_details()
     subject = subject_text_mapping.get(sub_option)
-    text = breadcrumb_text_mapping.get(sub_option)
+    text = breadcrumb_text_mapping.get(sub_option, None)
+    breadcrumb_title_one = text[0] if len(text) > 0 else None
+    breadcrumb_title_two = text[1] if len(text) > 1 else None
     return render_template(
         "secure-messages/help/secure-message-send-messages-view.html",
         short_name=short_name,
@@ -333,52 +256,26 @@ def get_send_help_message_page(session, survey_ref, ru_ref, option, sub_option):
         sub_option=sub_option,
         form=SecureMessagingForm(),
         subject=subject,
-        breadcrumb_title_one=text[0],
-        breadcrumb_title_two=text[1],
+        breadcrumb_title_one=breadcrumb_title_one,
+        breadcrumb_title_two=breadcrumb_title_two,
         business_id=business_id,
         survey_ref=survey_ref,
         ru_ref=ru_ref,
     )
 
 
-@surveys_bp.route("/help/<survey_ref>/<ru_ref>/send-message", methods=["POST"])
+@surveys_bp.route("/help/<option>/<sub_option>/send-message", methods=["POST"])
 @jwt_authorization(request)
-def send_help_message(session, survey_ref, ru_ref):
+def send_help_message(session, option, sub_option):
     """Sends secure message for the help pages"""
-    survey = survey_controller.get_survey_by_survey_ref(survey_ref)
-    business = party_controller.get_business_by_ru_ref(ru_ref)
-    short_name = survey["shortName"]
-    business_id = business["id"]
     form = SecureMessagingForm(request.form)
-    option = request.args["option"]
-    sub_option = request.args["sub_option"]
     if not form.validate():
         flash(form.errors["body"][0])
-        if sub_option == "not_defined":
-            return redirect(
-                url_for(
-                    "surveys_bp.get_send_help_message",
-                    short_name=short_name,
-                    business_id=business_id,
-                    option=option,
-                    survey_ref=survey_ref,
-                    ru_ref=ru_ref,
-                )
-            )
-        else:
-            return redirect(
-                url_for(
-                    "surveys_bp.get_send_help_message_page",
-                    short_name=short_name,
-                    business_id=business_id,
-                    option=option,
-                    sub_option=sub_option,
-                    survey_ref=survey_ref,
-                    ru_ref=ru_ref,
-                )
-            )
+        return redirect(url_for("surveys_bp.get_send_help_message_page", option=option, sub_option=sub_option))
     else:
-        subject = request.args["subject"]
+        abort_help_if_session_not_set()
+        business_id, ru_ref, short_name, survey, survey_ref = get_selected_survey_business_details()
+        subject = subject_text_mapping.get(sub_option)
         party_id = session.get_party_id()
         business_id = business_id
         logger.info("Form validation successful", party_id=party_id)
@@ -391,6 +288,58 @@ def send_help_message(session, survey_ref, ru_ref):
         )
         flash(Markup(f"Message sent. <a href={thread_url}>View Message</a>"))
         return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
+
+
+def abort_help_if_session_not_set():
+    """
+    Aborts the process if flask session attributes are not set
+    """
+    if flask_session["help_survey_ref"] is None or flask_session["help_ru_ref"] is None:
+        abort(404)
+
+
+def get_selected_survey_business_details():
+    """
+    Gets the business_id, ru_ref, short_name, survey, survey_ref using flask session
+    returns business_id, ru_ref, short_name, survey, survey_ref using flask session
+    """
+    survey_ref = flask_session["help_survey_ref"]
+    ru_ref = flask_session["help_ru_ref"]
+    survey = survey_controller.get_survey_by_survey_ref(survey_ref)
+    business = party_controller.get_business_by_ru_ref(ru_ref)
+    short_name = survey["shortName"]
+    business_id = business["id"]
+    return business_id, ru_ref, short_name, survey, survey_ref
+
+
+def redirect_to_sub_option_select_page(option: str, sub_option: str):
+    """
+    redirect to get_help_option_sub_option_select
+    """
+    return redirect(
+        url_for(
+            "surveys_bp.get_help_option_sub_option_select",
+            option=option,
+            sub_option=sub_option,
+        )
+    )
+
+
+def redirect_to_send_message_page(option: str, sub_option: str):
+    """
+    redirect to get_send_help_message_page
+    """
+    return redirect(url_for("surveys_bp.get_send_help_message_page", option=option, sub_option=sub_option))
+
+
+def flash_error_and_redirect(option: str):
+    flash("You need to choose an option")
+    return redirect(
+        url_for(
+            "surveys_bp.get_help_option_select",
+            option=option,
+        )
+    )
 
 
 def _send_new_message(subject, party_id, survey_id, business_id, category):
@@ -426,23 +375,3 @@ def is_legal_basis_mandatory(legal_basis):
     """
     inside_legal_basis = ["STA1947", "STA1947_BEIS", "GovERD"]
     return any(item == legal_basis for item in inside_legal_basis)
-
-
-def get_short_name_and_business_id(survey_ref, ru_ref):
-    """
-    Gets the short name and business id using a survey ref and ru ref.
-
-    :param survey_ref: The survey reference
-    :type survey_ref: int
-    :param ru_ref: The reporting unit reference
-    :type ru_ref: str
-    :return: short name and business id
-    :rtype short_name: str
-    :rtype business_id: uuid
-    """
-    survey = survey_controller.get_survey_by_survey_ref(survey_ref)
-    business = party_controller.get_business_by_ru_ref(ru_ref)
-    short_name = survey["shortName"]
-    business_id = business["id"]
-
-    return short_name, business_id

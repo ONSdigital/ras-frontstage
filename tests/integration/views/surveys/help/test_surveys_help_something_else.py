@@ -29,6 +29,11 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
     def tearDown(self):
         self.patcher.stop()
 
+    def set_flask_session(self):
+        with self.app.session_transaction() as mock_session:
+            mock_session["help_survey_ref"] = "074"
+            mock_session["help_ru_ref"] = "49900000001F"
+
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
     @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
@@ -36,7 +41,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey_eq
         get_business.return_value = business_party
-        response = self.app.get("/surveys/help/074/49900000001F")
+        response = self.app.get("/surveys/surveys-help?survey_ref=074&ru_ref=49900000001F", follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("Help".encode(), response.data)
         self.assertIn("Choose an option".encode(), response.data)
@@ -52,7 +57,8 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         form = {"option": "something-else"}
-        response = self.app.post("/surveys/help/074/49900000001F", data=form, follow_redirects=True)
+        self.set_flask_session()
+        response = self.app.post("/surveys/help", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Information about the ONS".encode(), response.data)
@@ -72,7 +78,8 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         form = {"option": "my-survey-is-not-listed"}
-        response = self.app.post("/surveys/help/074/49900000001F/something-else", data=form, follow_redirects=True)
+        self.set_flask_session()
+        response = self.app.post("/surveys/help/something-else", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("My survey is not listed".encode(), response.data)
@@ -89,7 +96,8 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         form = {"option": "something-else"}
-        response = self.app.post("/surveys/help/074/49900000001F/something-else", data=form, follow_redirects=True)
+        self.set_flask_session()
+        response = self.app.post("/surveys/help/something-else", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Send a message".encode(), response.data)
@@ -108,8 +116,9 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         get_business.return_value = business_party
+        self.set_flask_session()
         response = self.app.get(
-            "/surveys/help/074/49900000001F/something-else/my-survey-is-not-listed/send-message", follow_redirects=True
+            "/surveys/help/something-else/my-survey-is-not-listed/send-message", follow_redirects=True
         )
 
         self.assertEqual(response.status_code, 200)
@@ -131,10 +140,9 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_business.return_value = business_party
         get_survey_list.return_value = survey_list_todo
         form = {"body": "info-something-else"}
+        self.set_flask_session()
         response = self.app.post(
-            "/surveys/help/074/49900000001F/"
-            "send-message?subject=My survey is not listed"
-            "&option=something-else&sub_option=my-survey-is-not-listed",
+            "/surveys/help/something-else/my-survey-is-not-listed/send-message",
             data=form,
             follow_redirects=True,
         )
@@ -154,9 +162,9 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         form = {"body": ""}
+        self.set_flask_session()
         response = self.app.post(
-            "/surveys/help/074/49900000001F/send-message?short_name=Bricks&subject=Something+else&option=something-else"
-            "&sub_option=not_defined",
+            "/surveys/help/something-else/something-else/send-message",
             data=form,
             follow_redirects=True,
         )

@@ -255,7 +255,7 @@ class HelpCompletingThisSurveyForm(Form):
             ("value", "answer-survey-question"),
             ("value", "do-not-have-specific-figures"),
             ("value", "unable-to-return-by-deadline"),
-            ("value", "something-else"),
+            ("value", "completing-this-survey-something-else"),
         ],
     )
 
@@ -266,7 +266,7 @@ class HelpInfoAboutTheONSForm(Form):
         choices=[
             ("value", "who-is-the-ons"),
             ("value", "how-safe-is-my-data"),
-            ("value", "something-else"),
+            ("value", "info-ons-something-else"),
         ],
     )
 

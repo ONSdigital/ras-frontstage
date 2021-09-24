@@ -12,4 +12,4 @@ from frontstage.views.surveys import (  # noqa
     upload_survey,
     upload_survey_failed,
 )
-from frontstage.views.surveys.help import surveys_help  # noqa
+from frontstage.views.surveys.help import surveys_help, technical_help  # noqa

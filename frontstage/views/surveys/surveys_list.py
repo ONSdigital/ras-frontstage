@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 
 from flask import make_response, render_template, request
+from flask import session as flask_session
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
@@ -18,6 +19,8 @@ def get_survey_list(session, tag):
     Displays the list of surveys for the respondent by tag.  A tag represents the state the
     survey is in (e.g., todo, history, etc)
     """
+    flask_session.pop("help_survey_ref", None)
+    flask_session.pop("help_ru_ref", None)
     party_id = session.get_party_id()
     business_id = request.args.get("business_party_id")
     survey_id = request.args.get("survey_id")

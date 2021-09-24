@@ -9,17 +9,20 @@
     "url": "/surveys/todo",
     "id": "b-item-1"
   },
-  {
-    "text": "Help",
-    "url": "/surveys/help/"~survey_ref~"/"~ru_ref,
-    "id": "b-item-2"
-  },
-  {
-    "text": "Something else",
-    "url": "/surveys/help/"~survey_ref~"/"~ru_ref~"/"~option,
-    "id": "b-item-3"
-  }
 ] %}
+
+{% if is_survey_help_page is defined and  is_survey_help_page %}
+{% do breadcrumbsData.append({
+    "text": "Help",
+    "url": "/surveys/surveys-help?survey_ref="~survey_ref~"&ru_ref="~ru_ref,
+    "id": "b-item-2"
+  },) %}
+{% do breadcrumbsData.append({
+    "text": "Something else",
+    "url": "/surveys/help/"~option,
+    "id": "b-item-3"
+  },) %}
+{% endif %}
 {% block breadcrumb %}
 {{
     onsBreadcrumb({
@@ -41,7 +44,11 @@
 <p></p>
 <div class="btn-group">
     <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" role="button" class="btn btn--link btn-group__btn"><span class="btn__inner">Yes</span></a>
-    <a href="{{ url_for('surveys_bp.get_send_help_message_page', short_name=short_name, option=option,sub_option='my-survey-is-not-listed', business_id=business_id, survey_ref=survey_ref, ru_ref=ru_ref) }}" role="button" class="btn btn--link btn--secondary btn-group__btn"><span class="btn__inner">No</span></a>
+    {% if is_survey_help_page is defined and  is_survey_help_page %}
+        <a href="{{ url_for('surveys_bp.get_send_help_message_page', option=option,sub_option='my-survey-is-not-listed') }}" role="button" class="btn btn--link btn--secondary btn-group__btn"><span class="btn__inner">No</span></a>
+    {% else %}
+        <a href="{{ url_for('surveys_bp.get_send_help_technical_message_page', option=option) }}" role="button" class="btn btn--link btn--secondary btn-group__btn"><span class="btn__inner">No</span></a>
+    {% endif %}
 </div>
 
 {% endblock main %}

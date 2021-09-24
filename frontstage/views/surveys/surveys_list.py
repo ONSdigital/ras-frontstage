@@ -30,6 +30,16 @@ def get_survey_list(session, tag):
     )
     bound_logger.info("Retrieving survey list")
 
+    # This logic is added to make sure a user is provided an option to delete an account if there is no
+    # active enrolment which is ENABLED
+    respondent = party_controller.get_respondent_party_by_id(party_id)
+    delete_option_allowed = True
+    if "associations" in respondent:
+        for association in respondent["associations"]:
+            for enrolment in association["enrolments"]:
+                if enrolment["enrolmentStatus"] == "ENABLED":
+                    delete_option_allowed = False
+
     survey_list = party_controller.get_survey_list_details_for_party(
         party_id, tag, business_party_id=business_id, survey_id=survey_id
     )
@@ -46,6 +56,7 @@ def get_survey_list(session, tag):
                 added_survey=added_survey,
                 already_enrolled=already_enrolled,
                 unread_message_count=unread_message_count,
+                delete_option_allowed=delete_option_allowed,
             )
         )
 

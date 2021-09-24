@@ -47,7 +47,7 @@
             <div id="ALREADY_ADDED_NOTIF">You have already added that <a href="#new-survey">survey</a> </div>
     {% endcall %}
 {% endif %}
-{% if sorted_surveys_list|length == 0 %}
+{% if delete_option_allowed %}
     {{
     onsPanel({
         "body": '<p>There are no surveys registered to your account. If you wish to delete your account <a href="/my-account/delete">click here</a>.</p>'

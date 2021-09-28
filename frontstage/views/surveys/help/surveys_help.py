@@ -296,6 +296,7 @@ def abort_help_if_session_not_set():
     :raises HTTPException: Raised when help_survey_ref and help_ru_ref are both not set in the session
     """
     if flask_session.get("help_survey_ref") is None or flask_session.get("help_ru_ref") is None:
+        logger.info("Both help_survey_ref and help_ru_ref is not in session, hence aborting")
         abort(404)
 
 

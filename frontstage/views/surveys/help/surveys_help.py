@@ -66,7 +66,7 @@ subject_text_mapping = {
     "completing-this-survey-something-else": help_completing_this_survey_title,
     "info-ons-something-else": info_about_the_ons,
 }
-breadcrumb_text = {
+breadcrumb_text_mapping = {
     "do-not-have-specific-figures": [help_completing_this_survey_title, "I don’t have specific figures for a response"],
     "unable-to-return-by-deadline": [
         help_completing_this_survey_title,
@@ -246,9 +246,9 @@ def get_send_help_message_page(session, option, sub_option):
     abort_help_if_session_not_set()
     business_id, ru_ref, short_name, survey, survey_ref = get_selected_survey_business_details()
     subject = subject_text_mapping.get(sub_option)
-    text = breadcrumb_text.get(sub_option, None)
-    breadcrumb_title_one = text[0] if len(text) > 0 else None
-    breadcrumb_title_two = text[1] if len(text) > 1 else None
+    breadcrumb_text = breadcrumb_text_mapping.get(sub_option, None)
+    breadcrumb_title_one = breadcrumb_text[0] if len(breadcrumb_text) > 0 else None
+    breadcrumb_title_two = breadcrumb_text[1] if len(breadcrumb_text) > 1 else None
     return render_template(
         "secure-messages/help/secure-message-send-messages-view.html",
         short_name=short_name,

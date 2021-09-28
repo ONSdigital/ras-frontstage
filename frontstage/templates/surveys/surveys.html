@@ -49,7 +49,7 @@
                 </dd>
                 <dt style="float: left; clear: left;" class="u-vh">Help: </dt>
                 <dd class="u-ml-no u-mb-s">
-                    <a id="create-message-link-{{loop.index}}" href="{{ url_for('surveys_bp.get_help_page', short_name=survey.survey_short_name, business_id=survey.business_party_id, survey_ref=survey.survey_ref, ru_ref=survey.business_ref) }}"  aria-label="Get help with the {{ survey.survey_long_name }}">Get help with this survey <span class="u-vh"> about {{ survey.survey_long_name }}</span></a>
+                    <a id="create-message-link-{{loop.index}}" href="{{ url_for('surveys_bp.get_surveys_help_page', survey_ref=survey.survey_ref, ru_ref=survey.business_ref) }}"  aria-label="Get help with the {{ survey.survey_long_name }}">Get help with this survey <span class="u-vh"> about {{ survey.survey_long_name }}</span></a>
                 </dd>
             </div>
         </dl>

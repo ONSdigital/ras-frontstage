@@ -31,6 +31,11 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
     def tearDown(self):
         self.patcher.stop()
 
+    def set_flask_session(self):
+        with self.app.session_transaction() as mock_session:
+            mock_session["help_survey_ref"] = "074"
+            mock_session["help_ru_ref"] = "49900000001F"
+
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
     @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
@@ -38,7 +43,7 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey_eq
         get_business.return_value = business_party
-        response = self.app.get("/surveys/help/139/49900000001F")
+        response = self.app.get("/surveys/surveys-help?survey_ref=139&ru_ref=49900000001F", follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("Help".encode(), response.data)
         self.assertIn("Choose an option".encode(), response.data)
@@ -53,7 +58,7 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         get_business.return_value = business_party
-        response = self.app.get("/surveys/help/074/49900000001F")
+        response = self.app.get("/surveys/surveys-help?survey_ref=074&ru_ref=49900000001F", follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("Help".encode(), response.data)
         self.assertIn("Choose an option".encode(), response.data)
@@ -69,7 +74,8 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         form = {"option": "help-completing-this-survey"}
-        response = self.app.post("/surveys/help/074/49900000001F", data=form, follow_redirects=True)
+        self.set_flask_session()
+        response = self.app.post("/surveys/help", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Help completing the Monthly Survey of Building Materials Bricks".encode(), response.data)
@@ -90,9 +96,8 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         form = {"option": "answer-survey-question"}
-        response = self.app.post(
-            "/surveys/help/074/49900000001F/help-completing-this-survey", data=form, follow_redirects=True
-        )
+        self.set_flask_session()
+        response = self.app.post("/surveys/help/help-completing-this-survey", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Send a message".encode(), response.data)
@@ -112,9 +117,8 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         form = {"option": "do-not-have-specific-figures"}
-        response = self.app.post(
-            "/surveys/help/074/49900000001F/help-completing-this-survey", data=form, follow_redirects=True
-        )
+        self.set_flask_session()
+        response = self.app.post("/surveys/help/help-completing-this-survey", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("I do not have specific figures for a response".encode(), response.data)
@@ -136,9 +140,8 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         get_business.return_value = business_party
-        response = self.app.get(
-            "/surveys/help/074/49900000001F/help-completing-this-survey/do-not-have-specific-figures/send-message"
-        )
+        self.set_flask_session()
+        response = self.app.get("/surveys/help/help-completing-this-survey/do-not-have-specific-figures/send-message")
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Send a message".encode(), response.data)
@@ -158,9 +161,8 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         form = {"option": "unable-to-return-by-deadline"}
-        response = self.app.post(
-            "/surveys/help/074/49900000001F/help-completing-this-survey", data=form, follow_redirects=True
-        )
+        self.set_flask_session()
+        response = self.app.post("/surveys/help/help-completing-this-survey", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("What if I cannot return the survey by the deadline?".encode(), response.data)
@@ -185,9 +187,8 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         get_survey.return_value = survey_eq
         get_business.return_value = business_party
         form = {"option": "unable-to-return-by-deadline"}
-        response = self.app.post(
-            "/surveys/help/139/49900000001F/help-completing-this-survey", data=form, follow_redirects=True
-        )
+        self.set_flask_session()
+        response = self.app.post("/surveys/help/help-completing-this-survey", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("What if I cannot return the survey by the deadline?".encode(), response.data)
@@ -211,9 +212,8 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         get_business.return_value = business_party
-        response = self.app.get(
-            "/surveys/help/074/49900000001F/help-completing-this-survey/unable-to-return-by-deadline/send-message"
-        )
+        self.set_flask_session()
+        response = self.app.get("/surveys/help/help-completing-this-survey/unable-to-return-by-deadline/send-message")
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Send a message".encode(), response.data)
@@ -230,10 +230,9 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         get_business.return_value = business_party
-        form = {"option": "something-else"}
-        response = self.app.post(
-            "/surveys/help/074/49900000001F/help-completing-this-survey", data=form, follow_redirects=True
-        )
+        form = {"option": "completing-this-survey-something-else"}
+        self.set_flask_session()
+        response = self.app.post("/surveys/help/help-completing-this-survey", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Send a message".encode(), response.data)
@@ -256,12 +255,12 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = respondent_party
         get_survey_list.return_value = survey_list_todo
+        form = {"body": "completing-this-survey-something-else"}
+        self.set_flask_session()
         get_respondent_party_by_id.return_value = respondent_party
         form = {"body": "something-else"}
         response = self.app.post(
-            "/surveys/help/074/49900000001F/"
-            "send-message?subject=Help completing this survey"
-            "&option=help-completing-this-survey&sub_option=answer-survey-question",
+            "/surveys/help/help-completing-this-survey/completing-this-survey-something-else/send-message",
             data=form,
             follow_redirects=True,
         )
@@ -277,9 +276,9 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         mock_request.get(url_get_respondent_party, json=respondent_party, status_code=200)
         get_survey.return_value = survey_eq
         get_business.return_value = business_party
-
+        self.set_flask_session()
         form = {"option": "help-with-my-account"}
-        response = self.app.post("/surveys/help/139/49900000001F", data=form, follow_redirects=True)
+        response = self.app.post("/surveys/help/", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Account details".encode(), response.data)

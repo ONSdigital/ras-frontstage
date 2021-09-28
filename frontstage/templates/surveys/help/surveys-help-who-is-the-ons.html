@@ -11,12 +11,12 @@
   },
   {
     "text": "Help",
-    "url": "/surveys/help/"~survey_ref~"/"~ru_ref,
+    "url": "/surveys/surveys-help?survey_ref="~survey_ref~"&ru_ref="~ru_ref,
     "id": "b-item-2"
   },
   {
-    "text": "Information about this survey",
-    "url": "/surveys/help/"~survey_ref~"/"~ru_ref~"/"~option,
+    "text": "Information about the ONS",
+    "url": "/surveys/help/"~option,
     "id": "b-item-3"
   }
 ] %}
@@ -45,7 +45,7 @@
 <p></p>
 <div class="btn-group">
     <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" role="button" class="btn btn--link btn-group__btn"><span class="btn__inner">Yes</span></a>
-    <a href="{{ url_for('surveys_bp.get_send_help_message_page', short_name=short_name, option=option,sub_option='who-is-the-ons', business_id=business_id, survey_ref=survey_ref, ru_ref=ru_ref) }}" role="button" class="btn btn--link btn--secondary btn-group__btn"><span class="btn__inner">No</span></a>
+    <a href="{{ url_for('surveys_bp.get_send_help_message_page', option=option,sub_option='who-is-the-ons') }}" role="button" class="btn btn--link btn--secondary btn-group__btn"><span class="btn__inner">No</span></a>
 </div>
 
 {% endblock main %}

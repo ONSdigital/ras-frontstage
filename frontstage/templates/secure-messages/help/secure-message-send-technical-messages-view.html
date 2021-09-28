@@ -5,49 +5,17 @@
 {% from "components/panel/_macro.njk" import onsPanel %}
 {% from "components/textarea/_macro.njk" import onsTextarea %}
 
-{% set page_title = "Send a message" %}
-{% set breadcrumbsData = [
-  {
-    "text": "Surveys",
-    "url": "/surveys/todo",
-    "id": "b-item-1"
-  },
-  {
-    "text": "Help",
-    "url": "/surveys/surveys-help?survey_ref="~survey_ref~"&ru_ref="~ru_ref,
-    "id": "b-item-2"
-  }
-
-] %}
-
-
-{% if breadcrumb_title_one is defined and  breadcrumb_title_one != None %}
-{% do breadcrumbsData.append({
-        "text": breadcrumb_title_one,
-        "url": "/surveys/help/"~option,
-        "id": "b-item-8"
-    },) %}
-{% endif %}
-{% if breadcrumb_title_two is defined and breadcrumb_title_two != None %}
-{% do breadcrumbsData.append({
-        "text": breadcrumb_title_two,
-        "url": "/surveys/help/"~option~"/"~sub_option,
-        "id": "b-item-7"
-    },) %}
-{% endif %}
+{% set page_title = "Send a technical message" %}
 {% block breadcrumb %}
 {{
     onsBreadcrumb({
         "ariaLabel": "Breadcrumbs",
         "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
+        "itemsList": breadcrumbs
     })
 }}
 {% endblock breadcrumb %}
 {% block main %}
-{% if sub_option is not defined %}
-    {% set sub_option = "not_defined" %}
-{% endif %}
 {% set ns = namespace(bodyError = false) %}
 {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -85,7 +53,7 @@
                   <dd class="metadata__value grid__col col-10@m">{{ subject }}</dd>
     </dl>
     <div class="secure-message-form col-10@m" id="secure-message-form">
-        <form action="{{ url_for('surveys_bp.send_help_message', option=option, sub_option=sub_option) }}" method="post">
+        <form action="{{ url_for('surveys_bp.send_help_technical_message', option=option) }}" method="post">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 {% if ns.bodyError %}
                     {% set error = { "text": ns.errorMessage,  "id": 'secure-message-body_error' } %}
@@ -116,13 +84,8 @@
                     }}
                 </div>
                 <div class="grid__col u-ml-m">
-                    {% if breadcrumb_title_two != None %}
-                        <a href="{{ url_for('surveys_bp.get_help_option_sub_option_select', option=option, sub_option=sub_option)}}"
+                        <a href="{{ url_for('surveys_bp.get_technical_message_page_option', option=option)}}"
                     id="btn-sub-option-cancel">Cancel</a>
-                    {% else %}
-                        <a href="{{ url_for('surveys_bp.get_help_option_select', option=option) }}"
-                    id="btn-option-cancel">Cancel</a>
-                    {% endif %}
                 </div>
             </div>
         </form>

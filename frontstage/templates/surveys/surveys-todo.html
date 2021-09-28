@@ -60,5 +60,8 @@
 
 {% set emptySurveyListLabel = 'You have no surveys to complete' %}
 {% include "surveys/surveys.html" %}
-
+<p class="u-fs-r u-mt-l">
+                <a href="{{ url_for('surveys_bp.get_technical_message_page_option', option='my-survey-is-not-listed') }}"
+                id="survey-not-listed">Survey not listed?</a>
+</p>
 {% endblock content %}

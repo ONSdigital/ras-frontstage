@@ -31,6 +31,11 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
     def tearDown(self):
         self.patcher.stop()
 
+    def set_flask_session(self):
+        with self.app.session_transaction() as mock_session:
+            mock_session["help_survey_ref"] = "074"
+            mock_session["help_ru_ref"] = "49900000001F"
+
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
     @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
@@ -38,7 +43,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey_eq
         get_business.return_value = business_party
-        response = self.app.get("/surveys/help/139/49900000001F")
+        response = self.app.get("/surveys/surveys-help?survey_ref=139&ru_ref=49900000001F", follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("Help".encode(), response.data)
         self.assertIn("Choose an option".encode(), response.data)
@@ -53,7 +58,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         get_business.return_value = business_party
-        response = self.app.get("/surveys/help/074/49900000001F")
+        response = self.app.get("/surveys/surveys-help?survey_ref=074&ru_ref=49900000001F", follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("Help".encode(), response.data)
         self.assertIn("Choose an option".encode(), response.data)
@@ -70,7 +75,8 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         form = {}
-        response = self.app.post("/surveys/help/074/49900000001F", data=form, follow_redirects=True)
+        self.set_flask_session()
+        response = self.app.post("/surveys/help", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("There is 1 error on this page".encode(), response.data)
@@ -84,7 +90,8 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         form = {"option": "info-about-this-survey"}
-        response = self.app.post("/surveys/help/074/49900000001F", data=form, follow_redirects=True)
+        self.set_flask_session()
+        response = self.app.post("/surveys/help", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Information about the Monthly Survey of Building Materials Bricks".encode(), response.data)
@@ -107,9 +114,8 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         form = {"option": "exemption-completing-survey"}
-        response = self.app.post(
-            "/surveys/help/074/49900000001F/info-about-this-survey", data=form, follow_redirects=True
-        )
+        self.set_flask_session()
+        response = self.app.post("/surveys/help/info-about-this-survey", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Can I be exempt from completing the survey questionnaire?".encode(), response.data)
@@ -131,9 +137,8 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_survey.return_value = survey_rsi
         get_business.return_value = business_party
         form = {"option": "exemption-completing-survey"}
-        response = self.app.post(
-            "/surveys/help/023/49900000001F/info-about-this-survey", data=form, follow_redirects=True
-        )
+        self.set_flask_session()
+        response = self.app.post("/surveys/help/info-about-this-survey", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Can I be exempt from completing the survey questionnaire?".encode(), response.data)
@@ -155,9 +160,8 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         form = {"option": "why-selected"}
-        response = self.app.post(
-            "/surveys/help/074/49900000001F/info-about-this-survey", data=form, follow_redirects=True
-        )
+        self.set_flask_session()
+        response = self.app.post("/surveys/help/info-about-this-survey", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("How was my business selected?".encode(), response.data)
@@ -177,9 +181,8 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         form = {"option": "time-to-complete"}
-        response = self.app.post(
-            "/surveys/help/074/49900000001F/info-about-this-survey", data=form, follow_redirects=True
-        )
+        self.set_flask_session()
+        response = self.app.post("/surveys/help/info-about-this-survey", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("How long will it take to complete?".encode(), response.data)
@@ -198,9 +201,8 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         form = {"option": "how-long-selected-for"}
-        response = self.app.post(
-            "/surveys/help/074/49900000001F/info-about-this-survey", data=form, follow_redirects=True
-        )
+        self.set_flask_session()
+        response = self.app.post("/surveys/help/info-about-this-survey", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("How long will my business be selected for?".encode(), response.data)
@@ -217,9 +219,8 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         form = {"option": "penalties"}
-        response = self.app.post(
-            "/surveys/help/074/49900000001F/info-about-this-survey", data=form, follow_redirects=True
-        )
+        self.set_flask_session()
+        response = self.app.post("/surveys/help/info-about-this-survey", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Are there penalties for not completing this survey?".encode(), response.data)
@@ -241,9 +242,8 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_survey.return_value = survey_eq
         get_business.return_value = business_party
         form = {"option": "penalties"}
-        response = self.app.post(
-            "/surveys/help/139/49900000001F/info-about-this-survey", data=form, follow_redirects=True
-        )
+        self.set_flask_session()
+        response = self.app.post("/surveys/help/info-about-this-survey", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Are there penalties for not completing this survey?".encode(), response.data)
@@ -265,9 +265,8 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         form = {"option": "info-something-else"}
-        response = self.app.post(
-            "/surveys/help/074/49900000001F/info-about-this-survey", data=form, follow_redirects=True
-        )
+        self.set_flask_session()
+        response = self.app.post("/surveys/help/info-about-this-survey", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Information about the Monthly Survey of Building Materials Bricks".encode(), response.data)
@@ -285,8 +284,9 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         get_business.return_value = business_party
+        self.set_flask_session()
         response = self.app.get(
-            "/surveys/help/074/49900000001F/info-about-this-survey/" "exemption-completing-survey/send-message",
+            "/surveys/help/info-about-this-survey/" "exemption-completing-survey/send-message",
             follow_redirects=True,
         )
 
@@ -302,8 +302,9 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         get_business.return_value = business_party
+        self.set_flask_session()
         response = self.app.get(
-            "/surveys/help/074/49900000001F/info-about-this-survey/" "why-selected/send-message", follow_redirects=True
+            "/surveys/help/info-about-this-survey/" "why-selected/send-message", follow_redirects=True
         )
 
         self.assertEqual(response.status_code, 200)
@@ -318,8 +319,9 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         get_business.return_value = business_party
+        self.set_flask_session()
         response = self.app.get(
-            "/surveys/help/074/49900000001F/info-about-this-survey/" "time-to-complete/send-message",
+            "/surveys/help/info-about-this-survey/" "time-to-complete/send-message",
             follow_redirects=True,
         )
 
@@ -335,8 +337,9 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         get_business.return_value = business_party
+        self.set_flask_session()
         response = self.app.get(
-            "/surveys/help/074/49900000001F/info-about-this-survey/" "how-long-selected-for/send-message",
+            "/surveys/help/info-about-this-survey/how-long-selected-for/send-message",
             follow_redirects=True,
         )
 
@@ -357,9 +360,8 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         get_business.return_value = business_party
-        response = self.app.get(
-            "/surveys/help/074/49900000001F/info-about-this-survey/" "penalties/send-message", follow_redirects=True
-        )
+        self.set_flask_session()
+        response = self.app.get("/surveys/help/info-about-this-survey/penalties/send-message", follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Send a message".encode(), response.data)
@@ -378,8 +380,9 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         get_business.return_value = business_party
+        self.set_flask_session()
         response = self.app.get(
-            "/surveys/help/074/49900000001F/info-about-this-survey/" "info-something-else/send-message",
+            "/surveys/help/info-about-this-survey/info-something-else/send-message",
             follow_redirects=True,
         )
 
@@ -406,10 +409,9 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_survey_list.return_value = survey_list_todo
         get_respondent_party_by_id.return_value = respondent_party
         form = {"body": "info-something-else"}
+        self.set_flask_session()
         response = self.app.post(
-            "/surveys/help/074/49900000001F/"
-            "send-message?subject=Information about this survey"
-            "&option=info-about-this-survey&sub_option=info-something-else",
+            "/surveys/help/info-about-this-survey/info-something-else/send-message",
             data=form,
             follow_redirects=True,
         )

@@ -66,7 +66,7 @@ subject_text_mapping = {
     "completing-this-survey-something-else": help_completing_this_survey_title,
     "info-ons-something-else": info_about_the_ons,
 }
-breadcrumb_text_mapping = {
+breadcrumb_text = {
     "do-not-have-specific-figures": [help_completing_this_survey_title, "I don’t have specific figures for a response"],
     "unable-to-return-by-deadline": [
         help_completing_this_survey_title,
@@ -246,7 +246,7 @@ def get_send_help_message_page(session, option, sub_option):
     abort_help_if_session_not_set()
     business_id, ru_ref, short_name, survey, survey_ref = get_selected_survey_business_details()
     subject = subject_text_mapping.get(sub_option)
-    text = breadcrumb_text_mapping.get(sub_option, None)
+    text = breadcrumb_text.get(sub_option, None)
     breadcrumb_title_one = text[0] if len(text) > 0 else None
     breadcrumb_title_two = text[1] if len(text) > 1 else None
     return render_template(
@@ -293,12 +293,13 @@ def send_help_message(session, option, sub_option):
 def abort_help_if_session_not_set():
     """
     Aborts the process if flask session attributes are not set
+    :raises HTTPException: Raised when help_survey_ref and help_ru_ref are both not set in the session
     """
-    if flask_session["help_survey_ref"] is None or flask_session["help_ru_ref"] is None:
+    if flask_session.get("help_survey_ref") is None or flask_session.get("help_ru_ref") is None:
         abort(404)
 
 
-def get_selected_survey_business_details():
+def get_selected_survey_business_details() -> tuple[str, str, str, str, str]:
     """
     Gets the business_id, ru_ref, short_name, survey, survey_ref using flask session
     returns business_id, ru_ref, short_name, survey, survey_ref using flask session

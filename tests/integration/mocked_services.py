@@ -117,7 +117,9 @@ url_get_case = f"{app.config['CASE_URL']}/cases/{case['id']}"
 url_get_case_by_enrolment_code = f"{app.config['CASE_URL']}/cases/iac/{enrolment_code}"
 url_get_case_categories = f"{app.config['CASE_URL']}/categories"
 url_get_cases_by_party = f"{app.config['CASE_URL']}/cases/partyid/{case['partyId']}"
-url_get_ci = f"{app.config['COLLECTION_INSTRUMENT_URL']}/collection-instrument-api/1.0.2/collectioninstrument/id/{collection_instrument_seft['id']}"
+url_get_ci = (
+    f"{app.config['COLLECTION_INSTRUMENT_URL']}/collection-instrument-api/1.0.2/{collection_instrument_seft['id']}"
+)
 url_get_collection_exercise = f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/{collection_exercise['id']}"
 url_get_collection_exercises_by_survey = (
     f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/survey/{collection_exercise['surveyId']}"

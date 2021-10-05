@@ -30,7 +30,7 @@ google-cloud-pubsub = "==1.7.0"
 
 [dev-packages]
 black = "==21.6b0"
-coverage= "==6.0b1"
+coverage= "*"
 flake8 = "*"
 isort = "*"
 pytest = "*"

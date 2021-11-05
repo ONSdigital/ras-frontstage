@@ -14,6 +14,8 @@ service:
   type: ClusterIP
   port: 9000
 
+config: DevelopmentConfig
+
 database:
   managedRedis: false
 

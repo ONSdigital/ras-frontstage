@@ -30,7 +30,6 @@ class DataRequired(DR):
 
 def remove_required(flags):
     if "required" in flags:
-        n = flags.index("required")
-        return flags[:n] + flags[n + 1 :]
+        del flags["required"]
 
     return flags

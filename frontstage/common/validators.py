@@ -34,6 +34,6 @@ def remove_required(flags):
             del flags["required"]
             return flags
         n = flags.index("required")
-        return flags[:n] + flags[n + 1:]
+        return flags[:n] + flags[n + 1 :]
 
     return flags

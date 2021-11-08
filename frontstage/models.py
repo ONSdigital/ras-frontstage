@@ -134,7 +134,12 @@ def _validate_email_address(email):
     :param field:
         Field containing email address for validation.
     """
-    local_part, domain_part = email.rsplit("@", 1)
+    try:
+        local_part, domain_part = email.rsplit("@", 1)
+    except ValueError:
+        logger.info("No @ in email address")
+        raise ValidationError(_("Invalid email address"))
+
     logger.info("Checking if the email address contains a space or quotes in the local part")
     # this extends the email validator to check if there is whitespace in the email or quotes surrounding local part
     if " " in email:

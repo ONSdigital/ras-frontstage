@@ -20,7 +20,8 @@ def register_enter_your_details():
     encrypted_enrolment_code = request.args.get("encrypted_enrolment_code", None)
     enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
     form = RegistrationForm(request.values, enrolment_code=encrypted_enrolment_code)
-    form.email_address.data = form.email_address.data.strip()
+    if form.email_address.data is not None:
+        form.email_address.data = form.email_address.data.strip()
 
     # Validate enrolment code before rendering or checking the form
     iac_controller.validate_enrolment_code(enrolment_code)

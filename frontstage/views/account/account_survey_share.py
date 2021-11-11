@@ -216,15 +216,14 @@ def share_survey_post_email_entry(session):
     form = AccountSurveyShareRecipientEmailForm(request.values)
     party_id = session.get_party_id()
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
-    if not form.validate() or respondent_details["emailAddress"].lower() == form.data["email_address"].lower():
-        if (
-            "emailAddress" in respondent_details
-            and respondent_details["emailAddress"].lower() == form.data["email_address"].lower()
-        ):
-            errors = {"email_address": ["You can not share surveys with yourself."]}
-        else:
-            errors = form.errors
+    if not form.validate():
+        errors = form.errors
         return render_template("surveys/surveys-share/recipient-email-address.html", form=form, errors=errors)
+
+    if "emailAddress" in respondent_details:
+        if respondent_details["emailAddress"].lower() == form.data["email_address"].lower():
+            errors = {"email_address": ["You can not share surveys with yourself."]}
+            return render_template("surveys/surveys-share/recipient-email-address.html", form=form, errors=errors)
     flask_session["share_survey_recipient_email_address"] = form.data["email_address"]
     return redirect(url_for("account_bp.send_instruction_get"))
 

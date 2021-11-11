@@ -36,7 +36,8 @@ def home():
 @sign_in_bp.route("/", methods=["GET", "POST"])
 def login():  # noqa: C901
     form = LoginForm(request.form)
-    form.username.data = form.username.data.strip()
+    if form.username.data is not None:
+        form.username.data = form.username.data.strip()
     account_activated = request.args.get("account_activated", None)
 
     secure = app.config["WTF_CSRF_ENABLED"]

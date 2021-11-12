@@ -69,7 +69,7 @@ rollingUpdate:
   maxUnavailable: 1
 
 eq:
-  url: "http://localhost/session?token="
+  url: "http://localhost:8086/session?token="
 
 dns:
   enabled: false

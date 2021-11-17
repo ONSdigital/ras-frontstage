@@ -23,6 +23,7 @@ ingress:
   enabled: false
   surveysHost: surveys.example.com
   certNameSurveys: surveys-cert
+  timeoutSec: 30
 
 analytics:
   enabled: false

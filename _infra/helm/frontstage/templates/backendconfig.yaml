@@ -8,4 +8,5 @@ spec:
     name: "ras-cloud-armor-policy"
   sessionAffinity: 
     affinityType: CLIENT_IP
+  timeoutSec: {{ .Values.ingress.timeoutSec }}
 {{- end }}

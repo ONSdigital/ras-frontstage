@@ -1,12 +1,14 @@
-{{- if not .Values.public }}
+{{- if .Values.public }}
 apiVersion: cloud.google.com/v1
 kind: BackendConfig
 metadata:
   name: frontstage-backend-config
 spec:
+  {{- if ne .Values.env "prod" }}
   securityPolicy:
     name: "ras-cloud-armor-policy"
   sessionAffinity: 
     affinityType: CLIENT_IP
+  {{- end }}
   timeoutSec: {{ .Values.ingress.timeoutSec }}
 {{- end }}

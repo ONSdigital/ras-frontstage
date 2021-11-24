@@ -35,7 +35,6 @@ class TestSurveyList(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         with app.app_context():
-            app.config["ACCOUNT_EMAIL_CHANGE_ENABLED"] = True
             response = self.app.get("/my-account")
 
             self.assertEqual(response.status_code, 200)
@@ -48,7 +47,6 @@ class TestSurveyList(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         with app.app_context():
-            app.config["ACCOUNT_EMAIL_CHANGE_ENABLED"] = True
             response = self.app.get("/my-account")
 
             self.assertEqual(response.status_code, 200)
@@ -150,8 +148,10 @@ class TestSurveyList(unittest.TestCase):
             follow_redirects=True,
         )
         self.assertIn("Almost done".encode(), response.data)
-        self.assertIn("Once you have received it, you need to follow the link".encode(), response.data)
-        self.assertIn("please call 0300 1234 931".encode(), response.data)
+        self.assertIn("We have sent a verification email to your new email address.".encode(), response.data)
+        self.assertIn("Follow the link in the email to verify the change.".encode(), response.data)
+        self.assertIn("Email not arrived? It may be in your junk folder.".encode(), response.data)
+        self.assertIn("If it does not arrive within 15 minutes, please".encode(), response.data)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")

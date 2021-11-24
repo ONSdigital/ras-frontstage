@@ -8,11 +8,10 @@
 
 <div>
     <p>
-        You can <a href="{{ url_for('account_bp.resend_account_email_change_expired_token', token=token) }}">request another verification email for your account changes</a>.
-        <b>This will require a sign in to your account.</b>
+        You will need to sign back into your account and <a href="{{ url_for('account_bp.resend_account_email_change_expired_token', token=token) }}">request another verification email</a>.
     </p>
     <p>
-        or call us on <a href="tel:03001234931">0300 1234 931</a>.
+        <p>If you need help, please <a href="{{ url_for('contact_us_bp.contact_us') }}" rel="noopener">contact us</a>.</p>
     </p>
 </div>
 

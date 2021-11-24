@@ -52,10 +52,10 @@ security:
 
 resources:
   requests:
-    cpu: "50m"
+    cpu: "75m"
     memory: "300Mi"
   limits:
-    cpu: "200m"
+    cpu: "250m"
     memory: "700Mi"
 
 autoscaling: false

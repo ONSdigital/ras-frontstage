@@ -102,6 +102,7 @@ class EqPayload(object):
             "ref_p_end_date": self._find_event_date_by_tag("ref_period_end", collex_events, collex_id, True),
             "employment_date": self._find_event_date_by_tag("employment", collex_events, collex_id, False),
             "return_by": self._find_event_date_by_tag("return_by", collex_events, collex_id, True),
+            "response_expires_at": self._find_event_date_by_tag("exercise_end", collex_events, collex_id, True),
         }
 
     def _find_event_date_by_tag(self, search_param, collex_events, collex_id, mandatory):

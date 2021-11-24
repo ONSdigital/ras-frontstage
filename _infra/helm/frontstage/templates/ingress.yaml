@@ -8,9 +8,9 @@ metadata:
     kubernetes.io/ingress.class: gce
     {{- if .Values.public }}
     ingress.gcp.kubernetes.io/pre-shared-cert: surveyrenew
-    {{- else }}
-    networking.gke.io/managed-certificates: {{ .Values.ingress.certNameSurveys }}
     {{- end }}
+    networking.gke.io/managed-certificates: {{ .Values.ingress.certNameSurveys }}
+
 spec:
   rules:
   - host: {{ .Values.ingress.host | quote }}

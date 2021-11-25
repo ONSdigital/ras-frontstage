@@ -6,11 +6,8 @@ metadata:
   annotations:
     kubernetes.io/ingress.global-static-ip-name: frontstage-ip
     kubernetes.io/ingress.class: gce
-    {{- if .Values.public }}
-    ingress.gcp.kubernetes.io/pre-shared-cert: surveyrenew
-    {{- else }}
     networking.gke.io/managed-certificates: {{ .Values.ingress.certNameSurveys }}
-    {{- end }}
+
 spec:
   rules:
   - host: {{ .Values.ingress.host | quote }}

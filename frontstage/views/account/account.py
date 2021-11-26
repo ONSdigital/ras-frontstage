@@ -118,9 +118,14 @@ def change_email_address(session):
     logger.info("Attempting to update email address changes on the account", party_id=party_id)
     try:
         party_controller.update_account(respondent_details)
+
     except ApiError as exc:
         logger.error("Failed to updated email on account", status=exc.status_code, party_id=party_id)
-        raise exc
+        if exc.status_code == 409:
+            logger.info("The email requested already registered in our system. Request denied", party_id=party_id)
+            return render_template("account/account-change-email-address-conflict.html")
+        else:
+            raise exc
     logger.info("Successfully updated email on account", party_id=party_id)
     return render_template("account/account-change-email-address-almost-done.html")
 
@@ -133,8 +138,6 @@ def change_account_details(session):
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
     is_contact_details_update_required = False
     attributes_changed = []
-    # TODO: is_account_detail_change_enabled to be removed once account change is worked again
-    is_account_email_change_enabled = app.config["ACCOUNT_EMAIL_CHANGE_ENABLED"]
     if request.method == "POST" and form.validate():
         logger.info("Attempting to update contact details changes on the account", party_id=party_id)
         # check_attribute changes also magically updates the respondent_details as a side effect of running this
@@ -151,22 +154,17 @@ def change_account_details(session):
             logger.info("Successfully updated account", party_id=party_id)
             success_panel = create_success_message(attributes_changed, "We have updated your ")
             flash(success_panel)
-        if is_account_email_change_enabled:
-            is_email_update_required = form["email_address"].data != respondent_details["emailAddress"]
-            if is_email_update_required:
-                return render_template(
-                    "account/account-change-email-address.html",
-                    new_email=form["email_address"].data,
-                    form=ConfirmEmailChangeForm(),
-                )
+        is_email_update_required = form["email_address"].data != respondent_details["emailAddress"]
+        if is_email_update_required:
+            return render_template(
+                "account/account-change-email-address.html",
+                new_email=form["email_address"].data,
+                form=ConfirmEmailChangeForm(),
+            )
         return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
     else:
         return render_template(
-            "account/account-contact-detail-change.html",
-            form=form,
-            errors=form.errors,
-            respondent=respondent_details,
-            is_email_change_enabled=is_account_email_change_enabled,
+            "account/account-contact-detail-change.html", form=form, errors=form.errors, respondent=respondent_details
         )
 
 

@@ -310,7 +310,6 @@ class ContactDetailsChangeForm(FlaskForm):
         ],
         default=None,
     )
-    email_address = StringField(_("Email address"))
     email_address = StringField(
         _("Email address"),
         validators=[

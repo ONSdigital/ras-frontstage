@@ -61,7 +61,7 @@
 <p>We will send a confirmation email to <b>{{ new_email }}</b>.</p>
 {% call onsPanel({}) %}
     <div>
-        If you are longer required to respond to your surveys, you can <a href="{{ url_for('account_bp.transfer_survey_overview') }}">transfer your surveys</a>to a colleague.
+        If you are longer required to respond to your surveys, you can <a href="{{ url_for('account_bp.transfer_survey_overview') }}">transfer your surveys </a>to a colleague.
     </div>
 {% endcall %}
 <form action="{{ url_for('account_bp.change_email_address')}}" method="post">

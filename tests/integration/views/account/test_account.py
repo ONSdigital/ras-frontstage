@@ -76,13 +76,11 @@ class TestSurveyList(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         response = self.app.post("/my-account/change-account-details", data={"first_name": ""}, follow_redirects=True)
-        # TODO: Uncomment the '4 errors' line, the 'email address' line and delete the 3 errors line once the
-        # account change email functionality has been restored
-        self.assertIn("There are 3 errors on this page".encode(), response.data)
-        # self.assertIn("There are 4 errors on this page".encode(), response.data)
+
+        self.assertIn("There are 4 errors on this page".encode(), response.data)
         self.assertIn("Problem with the first name".encode(), response.data)
         self.assertIn("Problem with the phone number".encode(), response.data)
-        # self.assertIn("Problem with the email address".encode(), response.data)
+        self.assertIn("Problem with the email address".encode(), response.data)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")

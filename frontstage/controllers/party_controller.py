@@ -370,9 +370,17 @@ def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
         thread.join()
 
 
-def caching_data_for_collection_instrument(cache_data, enrolled_cases):
+def caching_data_for_collection_instrument(cache_data: dict, cases: list):
+    """
+    Adds to the collection instrument part of the cache dictionary.  Given a list of cases, it will get a set of
+    the collectionInstrumentId's, then if the id isn't in the cache already, it'll ask the collection instrument service
+    for it.  This doesn't return a dict with the cached data, this will modify the dictionary as a side-effect.
+
+    :param cache_data: The cache dictionary.
+    :param cases: A list of cases
+    """
     collection_instrument_ids = set()
-    for case in enrolled_cases:
+    for case in cases:
         collection_instrument_ids.add(case["collectionInstrumentId"])
     for collection_instrument_id in collection_instrument_ids:
         if not cache_data["instrument"].get(collection_instrument_id):

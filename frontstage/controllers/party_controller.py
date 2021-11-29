@@ -371,7 +371,6 @@ def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
 
 
 def caching_data_for_collection_instrument(cache_data, enrolled_cases):
-    # This function creates a list of threads from the collection instrument id in the cache_data of the cases.
     collection_instrument_ids = set()
     for case in enrolled_cases:
         collection_instrument_ids.add(case["collectionInstrumentId"])
@@ -427,7 +426,7 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
     # inside of the for loop for get_respondent_enrolments.
     cache_data = {"surveys": dict(), "businesses": dict(), "collexes": dict(), "cases": dict(), "instrument": dict()}
 
-    # These two will call the services to get responses and cache the data for later use.
+    # Populate the cache with all non-instrument data
     caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag)
 
     enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, cache_data["collexes"])
@@ -450,8 +449,10 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
             if case["caseGroup"]["collectionExerciseId"] in collection_exercises_by_id.keys()
         ]
 
+        # Get and cache the collection instruments for all the cases the respondent is part of
+        caching_data_for_collection_instrument(cache_data, enrolled_cases)
+
         for case in enrolled_cases:
-            caching_data_for_collection_instrument(cache_data, enrolled_cases)
             collection_exercise = collection_exercises_by_id[case["caseGroup"]["collectionExerciseId"]]
             added_survey = True if business_party_id == business_party["id"] and survey_id == survey["id"] else None
             display_access_button = display_button(

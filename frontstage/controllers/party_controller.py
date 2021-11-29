@@ -342,7 +342,6 @@ def get_unique_survey_and_business_ids(enrolment_data):
 def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
     # Creates a list of threads which will call functions to set the survey, case, party and collex responses
     # in the cache_data.
-
     threads = []
 
     for survey_id in surveys_ids:
@@ -371,30 +370,25 @@ def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
         thread.join()
 
 
-def caching_data_for_collection_instrument(cache_data):
-    # This function creates a list of threads from the collection instrument id in the cache_data of the cases.
+def caching_data_for_collection_instrument(cache_data: dict, cases: list):
+    """
+    Adds to the collection instrument part of the cache dictionary.  Given a list of cases, it will get a set of
+    the collectionInstrumentId's, then if the id isn't in the cache already, it'll ask the collection instrument service
+    for it.  This doesn't return a dict with the cached data, this will modify the dictionary as a side-effect.
+
+    :param cache_data: The cache dictionary.
+    :param cases: A list of cases
+    """
     collection_instrument_ids = set()
-    threads = []
-    for _, cases in cache_data["cases"].items():
-        for case in cases:
-            collection_instrument_ids.add(case["collectionInstrumentId"])
+    for case in cases:
+        collection_instrument_ids.add(case["collectionInstrumentId"])
     for collection_instrument_id in collection_instrument_ids:
-        threads.append(
-            ThreadWrapper(
-                get_collection_instrument,
-                cache_data,
-                collection_instrument_id,
-                app.config["COLLECTION_INSTRUMENT_URL"],
-                app.config["BASIC_AUTH"],
+        if not cache_data["instrument"].get(collection_instrument_id):
+            cache_data["instrument"][
+                collection_instrument_id
+            ] = collection_instrument_controller.get_collection_instrument(
+                collection_instrument_id, app.config["COLLECTION_INSTRUMENT_URL"], app.config["BASIC_AUTH"]
             )
-        )
-
-    for thread in threads:
-        thread.start()
-
-    # We do a thread join to make sure that the threads have all terminated before it carries on
-    for thread in threads:
-        thread.join()
 
 
 def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_id):
@@ -440,9 +434,9 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
     # inside of the for loop for get_respondent_enrolments.
     cache_data = {"surveys": dict(), "businesses": dict(), "collexes": dict(), "cases": dict(), "instrument": dict()}
 
-    # These two will call the services to get responses and cache the data for later use.
+    # Populate the cache with all non-instrument data
     caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag)
-    caching_data_for_collection_instrument(cache_data)
+
     enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, cache_data["collexes"])
     for enrolment in enrolments:
         business_party = cache_data["businesses"][enrolment["business_id"]]
@@ -462,6 +456,9 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
             for case in cases_for_business
             if case["caseGroup"]["collectionExerciseId"] in collection_exercises_by_id.keys()
         ]
+
+        # Get and cache the collection instruments for all the cases the respondent is part of
+        caching_data_for_collection_instrument(cache_data, enrolled_cases)
 
         for case in enrolled_cases:
             collection_exercise = collection_exercises_by_id[case["caseGroup"]["collectionExerciseId"]]
@@ -495,7 +492,7 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
             }
 
 
-def filter_ended_collection_exercises(collection_exercises):
+def filter_ended_collection_exercises(collection_exercises: dict) -> list:
     """
     Takes the list of collection exercises and returns a list with all the ones that don't have a
     scheduledEndDateTime that is in the past. If a collection exercise is missing a scheduledEndDateTime

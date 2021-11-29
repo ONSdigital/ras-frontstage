@@ -342,7 +342,6 @@ def get_unique_survey_and_business_ids(enrolment_data):
 def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
     # Creates a list of threads which will call functions to set the survey, case, party and collex responses
     # in the cache_data.
-
     threads = []
 
     for survey_id in surveys_ids:
@@ -371,13 +370,12 @@ def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
         thread.join()
 
 
-def caching_data_for_collection_instrument(cache_data):
+def caching_data_for_collection_instrument(cache_data, enrolled_cases):
     # This function creates a list of threads from the collection instrument id in the cache_data of the cases.
     collection_instrument_ids = set()
     threads = []
-    for _, cases in cache_data["cases"].items():
-        for case in cases:
-            collection_instrument_ids.add(case["collectionInstrumentId"])
+    for case in enrolled_cases:
+        collection_instrument_ids.add(case["collectionInstrumentId"])
     for collection_instrument_id in collection_instrument_ids:
         threads.append(
             ThreadWrapper(
@@ -442,7 +440,7 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
 
     # These two will call the services to get responses and cache the data for later use.
     caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag)
-    caching_data_for_collection_instrument(cache_data)
+
     enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, cache_data["collexes"])
     for enrolment in enrolments:
         business_party = cache_data["businesses"][enrolment["business_id"]]
@@ -464,6 +462,7 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
         ]
 
         for case in enrolled_cases:
+            caching_data_for_collection_instrument(cache_data, enrolled_cases)
             collection_exercise = collection_exercises_by_id[case["caseGroup"]["collectionExerciseId"]]
             added_survey = True if business_party_id == business_party["id"] and survey_id == survey["id"] else None
             display_access_button = display_button(
@@ -495,7 +494,7 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
             }
 
 
-def filter_ended_collection_exercises(collection_exercises):
+def filter_ended_collection_exercises(collection_exercises: dict) -> list:
     """
     Takes the list of collection exercises and returns a list with all the ones that don't have a
     scheduledEndDateTime that is in the past. If a collection exercise is missing a scheduledEndDateTime

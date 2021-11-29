@@ -373,26 +373,15 @@ def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
 def caching_data_for_collection_instrument(cache_data, enrolled_cases):
     # This function creates a list of threads from the collection instrument id in the cache_data of the cases.
     collection_instrument_ids = set()
-    threads = []
     for case in enrolled_cases:
         collection_instrument_ids.add(case["collectionInstrumentId"])
     for collection_instrument_id in collection_instrument_ids:
-        threads.append(
-            ThreadWrapper(
-                get_collection_instrument,
-                cache_data,
-                collection_instrument_id,
-                app.config["COLLECTION_INSTRUMENT_URL"],
-                app.config["BASIC_AUTH"],
+        if not cache_data["instrument"].get(collection_instrument_id):
+            cache_data["instrument"][
+                collection_instrument_id
+            ] = collection_instrument_controller.get_collection_instrument(
+                collection_instrument_id, app.config["COLLECTION_INSTRUMENT_URL"], app.config["BASIC_AUTH"]
             )
-        )
-
-    for thread in threads:
-        thread.start()
-
-    # We do a thread join to make sure that the threads have all terminated before it carries on
-    for thread in threads:
-        thread.join()
 
 
 def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_id):

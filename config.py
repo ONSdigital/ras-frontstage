@@ -68,7 +68,6 @@ class Config(object):
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "ras-rm-sandbox")
     PUBSUB_TOPIC = os.getenv("PUBSUB_TOPIC", "ras-rm-notify-test")
     CANARY_GENERATE_ERRORS = bool(strtobool(os.getenv("CANARY_GENERATE_ERRORS", "False")))
-    SHARE_SURVEY_ENABLED = bool(strtobool(os.getenv("SHARE_SURVEY_ENABLED", "True")))
     MAX_SHARED_SURVEY = int(os.getenv("MAX_SHARED_SURVEY", "50"))
     UNDER_MAINTENANCE = bool(strtobool(os.getenv("UNDER_MAINTENANCE", "False")))
 

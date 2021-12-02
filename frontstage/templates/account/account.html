@@ -64,17 +64,15 @@
                 "value": "change_password"
             }
             ) %}
-        {% if is_share_survey_enabled %}
-            {% do radios.append(
-            {
-                "id": "share_surveys",
-                "label": {
-                    "text": "Share access to my surveys"
-                },
-                "value": "share_surveys"
-            }
-            ) %}
-        {% endif %}
+        {% do radios.append(
+        {
+            "id": "share_surveys",
+            "label": {
+                "text": "Share access to my surveys"
+            },
+            "value": "share_surveys"
+        }
+        ) %}
         {% do radios.append(
         {
             "id": "transfer_surveys",

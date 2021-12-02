@@ -195,8 +195,6 @@ spec:
             {{- end }}
           - name: SEND_EMAIL_TO_GOV_NOTIFY
             value: "{{ .Values.email.enabled }}"
-          - name: SHARE_SURVEY_ENABLED
-            value: "{{ .Values.features.shareSurveys }}"
           - name: UNDER_MAINTENANCE
             value: "{{- if .Values.maintenancePage.enabled -}}True{{- else -}}False{{- end -}}"
           - name: SURVEY_URL

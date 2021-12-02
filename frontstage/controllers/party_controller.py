@@ -22,7 +22,7 @@ CLOSED_STATE = ["COMPLETE", "COMPLETEDBYPHONE", "NOLONGERREQUIRED"]
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def get_respondent_party_by_id(party_id):
+def get_respondent_party_by_id(party_id: str) -> dict:
     logger.info("Retrieving party from party service by id", party_id=party_id)
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/id/{party_id}"
@@ -295,7 +295,13 @@ def confirm_pending_survey(batch_number):
     return response
 
 
-def get_respondent_enrolments(respondent):
+def get_respondent_enrolments(respondent: dict):
+    """
+    Returns a generator containing all the business_id and survey_id for all the active enrolments for the
+    respondent.
+
+    :param respondent: A dict containing respondent data
+    """
     if "associations" in respondent:
         for association in respondent["associations"]:
             for enrolment in association["enrolments"]:
@@ -390,7 +396,7 @@ def caching_data_for_collection_instrument(cache_data: dict, cases: list):
             )
 
 
-def get_survey_list_details_for_party(respondent, tag, business_party_id, survey_id):
+def get_survey_list_details_for_party(respondent: dict, tag: str, business_party_id: str, survey_id: str):
     """
     Gets a list of cases (and any useful metadata) for a respondent.  Depending on the tag the list of cases will be
     ones that require action (in the form of an EQ or SEFT submission); Or they will be cases that have been completed
@@ -417,10 +423,10 @@ def get_survey_list_details_for_party(respondent, tag, business_party_id, survey
               - Create an entry in the returned list for each of these cases as the respondent is implicitly part
                 of the case by being enrolled for the survey with that business.
 
-    :party_id: This is the respondents uuid
-    :tag: This is the page that is being called e.g. to-do, history
-    :business_party_id: This is the businesses uuid
-    :survey_id: This is the surveys uuid
+    :param respondent: A dict containing respondent data
+    :param tag: This is the page that is being called e.g. to-do, history
+    :param business_party_id: This is the businesses uuid
+    :param survey_id: This is the surveys uuid
 
     """
     enrolment_data = list(get_respondent_enrolments(respondent))

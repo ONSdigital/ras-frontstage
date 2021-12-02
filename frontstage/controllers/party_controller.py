@@ -295,8 +295,7 @@ def confirm_pending_survey(batch_number):
     return response
 
 
-def get_respondent_enrolments(party_id):
-    respondent = get_respondent_party_by_id(party_id)
+def get_respondent_enrolments(respondent):
     if "associations" in respondent:
         for association in respondent["associations"]:
             for enrolment in association["enrolments"]:
@@ -391,7 +390,7 @@ def caching_data_for_collection_instrument(cache_data: dict, cases: list):
             )
 
 
-def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_id):
+def get_survey_list_details_for_party(respondent, tag, business_party_id, survey_id):
     """
     Gets a list of cases (and any useful metadata) for a respondent.  Depending on the tag the list of cases will be
     ones that require action (in the form of an EQ or SEFT submission); Or they will be cases that have been completed
@@ -424,7 +423,7 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
     :survey_id: This is the surveys uuid
 
     """
-    enrolment_data = list(get_respondent_enrolments(party_id))
+    enrolment_data = list(get_respondent_enrolments(respondent))
 
     # Gets the survey ids and business ids from the enrolment data that has been generated.
     # Converted to list to avoid multiple calls to party (and the list size is small).
@@ -542,7 +541,9 @@ def display_button(status, ci_type):
 
 def is_respondent_enrolled(party_id, business_party_id, survey_short_name, return_survey=False):
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
-    for enrolment in get_respondent_enrolments(party_id):
+    respondent = get_respondent_party_by_id(party_id)
+    enrolments = get_respondent_enrolments(respondent)
+    for enrolment in enrolments:
         if enrolment["business_id"] == business_party_id and enrolment["survey_id"] == survey["id"]:
             if return_survey:
                 return {"survey": survey}
@@ -577,7 +578,8 @@ def get_list_of_business_for_party(party_id):
     """
     bound_logger = logger.bind(party_id=party_id)
     bound_logger.info("Getting enrolment data for the party")
-    enrolment_data = get_respondent_enrolments(party_id)
+    respondent = get_respondent_party_by_id(party_id)
+    enrolment_data = get_respondent_enrolments(respondent)
     business_ids = {enrolment["business_id"] for enrolment in enrolment_data}
     bound_logger.info("Getting businesses against business ids", business_ids=business_ids)
     return get_business_by_id(business_ids)
@@ -610,7 +612,8 @@ def get_surveys_listed_against_party_and_business_id(business_id, party_id):
     :return: list of surveys
     :rtype: list
     """
-    enrolment_data = get_respondent_enrolments(party_id)
+    respondent = get_respondent_party_by_id(party_id)
+    enrolment_data = get_respondent_enrolments(respondent)
     survey_ids = {enrolment["survey_id"] for enrolment in enrolment_data if enrolment["business_id"] == business_id}
     surveys = []
     for survey in survey_ids:

@@ -197,8 +197,6 @@ spec:
             value: "{{ .Values.email.enabled }}"
           - name: SHARE_SURVEY_ENABLED
             value: "{{ .Values.features.shareSurveys }}"
-          - name: TECHNICAL_MESSAGE_ENABLED
-            value: "{{ .Values.features.technicalMessage }}"
           - name: UNDER_MAINTENANCE
             value: "{{- if .Values.maintenancePage.enabled -}}True{{- else -}}False{{- end -}}"
           - name: SURVEY_URL

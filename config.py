@@ -70,7 +70,6 @@ class Config(object):
     CANARY_GENERATE_ERRORS = bool(strtobool(os.getenv("CANARY_GENERATE_ERRORS", "False")))
     SHARE_SURVEY_ENABLED = bool(strtobool(os.getenv("SHARE_SURVEY_ENABLED", "True")))
     MAX_SHARED_SURVEY = int(os.getenv("MAX_SHARED_SURVEY", "50"))
-    TECHNICAL_MESSAGE_ENABLED = bool(strtobool(os.getenv("TECHNICAL_MESSAGE_ENABLED", "True")))
     UNDER_MAINTENANCE = bool(strtobool(os.getenv("UNDER_MAINTENANCE", "False")))
 
 

@@ -43,13 +43,11 @@ def get_account(session):
     party_id = session.get_party_id()
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
     is_share_survey_enabled = app.config["SHARE_SURVEY_ENABLED"]
-    is_technical_message_enabled = app.config["TECHNICAL_MESSAGE_ENABLED"]
     return render_template(
         "account/account.html",
         form=form,
         respondent=respondent_details,
         is_share_survey_enabled=is_share_survey_enabled,
-        is_technical_message_enabled=is_technical_message_enabled,
     )
 
 

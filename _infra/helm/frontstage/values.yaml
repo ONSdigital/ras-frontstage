@@ -36,7 +36,6 @@ email:
 
 features:
   shareSurveys: false
-  technicalMessage: true
 
 gcp:
   project: ras-rm-sandbox

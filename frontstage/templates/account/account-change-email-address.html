@@ -58,7 +58,7 @@
 {% endwith %}
 <h1 class="u-fs-xl">Change email address</h1>
 <p>You will need to authorise a change of email address.</p>
-<p>We will send a confirmation email to <b>{{ new_email }}</b>.</p>
+<p>We will send a verification email to <b>{{ new_email }}</b>.</p>
 {% call onsPanel({}) %}
     <div>
         If you are longer required to respond to your surveys, you can <a href="{{ url_for('account_bp.transfer_survey_overview') }}">transfer your surveys </a>to a colleague.

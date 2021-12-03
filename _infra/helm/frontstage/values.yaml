@@ -35,7 +35,6 @@ email:
     passwordChange: 7ba6b103-79d2-4ef1-be2e-979c127fa439
 
 features:
-  shareSurveys: false
   technicalMessage: true
 
 gcp:

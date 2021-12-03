@@ -11,14 +11,15 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 class RedisCache:
-    def get(self, key):
+    def get(self, category, key):
         """
         Gets the key from redis
 
+        :param category: A category to roughly describe what the key is for (e.g., survey, case, respondent)
         :param key: Key in redis (for this example will be a frontstage:survey id)
         :return:
         """
-        redis_key = f"frontstage:{key}"
+        redis_key = f"frontstage:{category}:{key}"
         logger.info("Seeing if it's in the cache", key=key, redis_key=redis_key)
         result = redis.get(redis_key)
         if not result:

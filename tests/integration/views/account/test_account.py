@@ -127,7 +127,7 @@ class TestSurveyList(unittest.TestCase):
         self.assertIn("updated your first name, last name and telephone number".encode(), response.data)
         self.assertIn("Change email address".encode(), response.data)
         self.assertIn("You will need to authorise a change of email address.".encode(), response.data)
-        self.assertIn("We will send a confirmation email to".encode(), response.data)
+        self.assertIn("We will send a verification email to".encode(), response.data)
         self.assertIn("exampleone@example.com".encode(), response.data)
 
     @requests_mock.mock()

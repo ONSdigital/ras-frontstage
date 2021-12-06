@@ -12,7 +12,11 @@ class Session(object):
 
     @classmethod
     def from_session_key(cls, session_key):
-        encoded_jwt_token = redis.get(session_key)
+        # Redis client throws an error if you try to .get(None)
+        if session_key is None:
+            encoded_jwt_token = None
+        else:
+            encoded_jwt_token = redis.get(session_key)
         session = cls(session_key, encoded_jwt_token)
         session.persisted = True
         return session
@@ -33,14 +37,16 @@ class Session(object):
         return session
 
     def refresh_session(self):
-        """Refesh a session by setting a new expiry timestamp"""
+        """Refresh a session by setting a new expiry timestamp"""
         decoded_jwt = self.get_decoded_jwt()
         decoded_jwt["expires_in"] = _get_new_timestamp()
         self.encoded_jwt_token = jwt.encode(decoded_jwt)
         self.save()
 
     def delete_session(self):
-        redis.delete(self.session_key)
+        # Redis client throws an error if you try to .delete(None)
+        if self.session_key:
+            redis.delete(self.session_key)
 
     def set_unread_message_total(self, total):
         decoded_token = self.get_decoded_jwt()

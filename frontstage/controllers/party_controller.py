@@ -22,7 +22,7 @@ CLOSED_STATE = ["COMPLETE", "COMPLETEDBYPHONE", "NOLONGERREQUIRED"]
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def get_respondent_party_by_id(party_id):
+def get_respondent_party_by_id(party_id: str) -> dict:
     logger.info("Retrieving party from party service by id", party_id=party_id)
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/id/{party_id}"
@@ -295,8 +295,13 @@ def confirm_pending_survey(batch_number):
     return response
 
 
-def get_respondent_enrolments(party_id):
-    respondent = get_respondent_party_by_id(party_id)
+def get_respondent_enrolments(respondent: dict):
+    """
+    Returns a generator containing all the business_id and survey_id for all the active enrolments for the
+    respondent.
+
+    :param respondent: A dict containing respondent data
+    """
     if "associations" in respondent:
         for association in respondent["associations"]:
             for enrolment in association["enrolments"]:
@@ -391,7 +396,7 @@ def caching_data_for_collection_instrument(cache_data: dict, cases: list):
             )
 
 
-def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_id):
+def get_survey_list_details_for_party(respondent: dict, tag: str, business_party_id: str, survey_id: str):
     """
     Gets a list of cases (and any useful metadata) for a respondent.  Depending on the tag the list of cases will be
     ones that require action (in the form of an EQ or SEFT submission); Or they will be cases that have been completed
@@ -418,13 +423,13 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
               - Create an entry in the returned list for each of these cases as the respondent is implicitly part
                 of the case by being enrolled for the survey with that business.
 
-    :party_id: This is the respondents uuid
-    :tag: This is the page that is being called e.g. to-do, history
-    :business_party_id: This is the businesses uuid
-    :survey_id: This is the surveys uuid
+    :param respondent: A dict containing respondent data
+    :param tag: This is the page that is being called e.g. to-do, history
+    :param business_party_id: This is the businesses uuid
+    :param survey_id: This is the surveys uuid
 
     """
-    enrolment_data = list(get_respondent_enrolments(party_id))
+    enrolment_data = list(get_respondent_enrolments(respondent))
 
     # Gets the survey ids and business ids from the enrolment data that has been generated.
     # Converted to list to avoid multiple calls to party (and the list size is small).
@@ -542,7 +547,9 @@ def display_button(status, ci_type):
 
 def is_respondent_enrolled(party_id, business_party_id, survey_short_name, return_survey=False):
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
-    for enrolment in get_respondent_enrolments(party_id):
+    respondent = get_respondent_party_by_id(party_id)
+    enrolments = get_respondent_enrolments(respondent)
+    for enrolment in enrolments:
         if enrolment["business_id"] == business_party_id and enrolment["survey_id"] == survey["id"]:
             if return_survey:
                 return {"survey": survey}
@@ -577,7 +584,8 @@ def get_list_of_business_for_party(party_id):
     """
     bound_logger = logger.bind(party_id=party_id)
     bound_logger.info("Getting enrolment data for the party")
-    enrolment_data = get_respondent_enrolments(party_id)
+    respondent = get_respondent_party_by_id(party_id)
+    enrolment_data = get_respondent_enrolments(respondent)
     business_ids = {enrolment["business_id"] for enrolment in enrolment_data}
     bound_logger.info("Getting businesses against business ids", business_ids=business_ids)
     return get_business_by_id(business_ids)
@@ -610,7 +618,8 @@ def get_surveys_listed_against_party_and_business_id(business_id, party_id):
     :return: list of surveys
     :rtype: list
     """
-    enrolment_data = get_respondent_enrolments(party_id)
+    respondent = get_respondent_party_by_id(party_id)
+    enrolment_data = get_respondent_enrolments(respondent)
     survey_ids = {enrolment["survey_id"] for enrolment in enrolment_data if enrolment["business_id"] == business_id}
     surveys = []
     for survey in survey_ids:

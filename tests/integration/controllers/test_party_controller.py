@@ -230,11 +230,8 @@ class TestPartyController(unittest.TestCase):
         self.assertDictEqual({"survey_id": "survey1", "enrolment_data": "enrolment1"}, result[0])
         self.assertDictEqual({"survey_id": "survey3", "enrolment_data": "enrolment3"}, result[1])
 
-    @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
-    def test_get_respondent_enrolments(self, get_respondent_party):
-        get_respondent_party.return_value = respondent_party
-
-        enrolments = party_controller.get_respondent_enrolments(respondent_party["id"])
+    def test_get_respondent_enrolments(self):
+        enrolments = party_controller.get_respondent_enrolments(respondent_party)
 
         for enrolment in enrolments:
             self.assertTrue(enrolment["business_id"] is not None)

@@ -439,7 +439,7 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
     enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, cache_data["collexes"])
     for enrolment in enrolments:
         business_party = cache_data["businesses"][enrolment["business_id"]]
-        survey = redis_cache.get('survey', enrolment["survey_id"])
+        survey = redis_cache.get("survey", enrolment["survey_id"])
 
         # Note: If it ever becomes possible to get only live-but-not-ended collection exercises from the
         # collection exercise service, the filter_ended_collection_exercises function will no longer

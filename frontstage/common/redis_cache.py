@@ -1,8 +1,8 @@
 import json
 import logging
-from redis.exceptions import RedisError
 
 from flask import current_app as app
+from redis.exceptions import RedisError
 from structlog import wrap_logger
 
 from frontstage import redis

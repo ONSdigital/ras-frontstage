@@ -15,7 +15,7 @@ encoded_valid_email = "ImV4YW1wbGVAZXhhbXBsZS5jb20i.vMOqeMafWQpuxbUBRyRs29T0vDI"
 encoded_invalid_email = "abcd"
 
 url_resend_password_email_expired_token = (
-    f"{TestingConfig.PARTY_URL}/party-api/v1" f"/resend-password-email-expired-token/{token}"
+    f"{TestingConfig.PARTY_URL}/party-api/v1/resend-password-email-expired-token/{token}"
 )
 
 

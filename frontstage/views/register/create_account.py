@@ -21,8 +21,8 @@ def register():
         form.enrolment_code.data = form.enrolment_code.data.strip()
 
     if request.method == "POST" and form.validate():
-        logger.info("Enrolment code submitted")
         enrolment_code = form.enrolment_code.data.lower()
+        logger.info("Enrolment code submitted", enrolment_code=enrolment_code)
 
         # Validate the enrolment code
         try:
@@ -42,7 +42,7 @@ def register():
                     200,
                 )
             else:
-                logger.error("Failed to submit enrolment code")
+                logger.error("Failed to submit enrolment code", enrolment_code=enrolment_code)
                 raise exc
 
         # This is the initial submission of enrolment code so post a case event for authentication attempt
@@ -57,7 +57,7 @@ def register():
         )
 
         encrypted_enrolment_code = cryptographer.encrypt(enrolment_code.encode()).decode()
-        logger.info("Successful enrolment code submitted")
+        logger.info("Successful enrolment code submitted", enrolment_code=enrolment_code)
         return redirect(
             url_for(
                 "register_bp.register_confirm_organisation_survey",

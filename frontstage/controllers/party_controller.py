@@ -7,6 +7,7 @@ from dateutil.parser import parse
 from flask import current_app as app
 from structlog import wrap_logger
 
+from frontstage.common.redis_cache import RedisCache
 from frontstage.common.thread_wrapper import ThreadWrapper
 from frontstage.common.utilities import obfuscate_email
 from frontstage.controllers import (
@@ -351,9 +352,6 @@ def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
 
     for survey_id in surveys_ids:
         threads.append(
-            ThreadWrapper(get_survey, cache_data, survey_id, app.config["SURVEY_URL"], app.config["BASIC_AUTH"])
-        )
-        threads.append(
             ThreadWrapper(
                 get_collex, cache_data, survey_id, app.config["COLLECTION_EXERCISE_URL"], app.config["BASIC_AUTH"]
             )
@@ -437,7 +435,8 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
 
     # This is a dictionary that will store all of the data that is going to be cached instead of making multiple calls
     # inside of the for loop for get_respondent_enrolments.
-    cache_data = {"surveys": dict(), "businesses": dict(), "collexes": dict(), "cases": dict(), "instrument": dict()}
+    cache_data = {"businesses": dict(), "collexes": dict(), "cases": dict(), "instrument": dict()}
+    redis_cache = RedisCache()
 
     # Populate the cache with all non-instrument data
     caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag)
@@ -445,7 +444,7 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
     enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, cache_data["collexes"])
     for enrolment in enrolments:
         business_party = cache_data["businesses"][enrolment["business_id"]]
-        survey = cache_data["surveys"][enrolment["survey_id"]]
+        survey = redis_cache.get_survey(enrolment["survey_id"])
 
         # Note: If it ever becomes possible to get only live-but-not-ended collection exercises from the
         # collection exercise service, the filter_ended_collection_exercises function will no longer

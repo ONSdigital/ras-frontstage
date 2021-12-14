@@ -156,6 +156,7 @@ def get_eq_url(case_id, party_id, business_party_id, survey_short_name):
     logger.info("Attempting to generate EQ URL", case_id=case_id, party_id=party_id)
 
     case = get_case_by_case_id(case_id)
+    logger.info("This is the case", case=case)
 
     valid_enrolment = party_controller.is_respondent_enrolled(
         party_id, business_party_id, survey_short_name, return_survey=True

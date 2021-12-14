@@ -544,7 +544,8 @@ def display_button(status, ci_type):
     return not (ci_type == "EQ" and status in CLOSED_STATE)
 
 
-def is_respondent_enrolled(respondent, business_party_id, survey_short_name, return_survey=False):
+def is_respondent_enrolled(party_id, business_party_id, survey_short_name, return_survey=False):
+    respondent = get_respondent_party_by_id(party_id)
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
     enrolments = get_respondent_enrolments(respondent)
     for enrolment in enrolments:

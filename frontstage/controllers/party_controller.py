@@ -545,8 +545,8 @@ def display_button(status, ci_type):
 
 
 def is_respondent_enrolled(party_id, business_party_id, survey_short_name, return_survey=False):
-    respondent = get_respondent_party_by_id(party_id)
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
+    respondent = get_respondent_party_by_id(party_id)
     enrolments = get_respondent_enrolments(respondent)
     for enrolment in enrolments:
         if enrolment["business_id"] == business_party_id and enrolment["survey_id"] == survey["id"]:

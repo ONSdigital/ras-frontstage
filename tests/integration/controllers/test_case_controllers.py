@@ -134,7 +134,7 @@ class TestCaseControllers(unittest.TestCase):
         create_eq_payload.return_value = eq_payload
         with app.app_context():
             eq_url = case_controller.get_eq_url(
-                case["id"], respondent_party["id"], business_party["id"], survey_eq["shortName"]
+                case, collection_exercise, respondent_party["id"], business_party["id"], survey_eq["shortName"]
             )
 
             self.assertIn("https://eq-test/session?token=", eq_url)
@@ -148,7 +148,11 @@ class TestCaseControllers(unittest.TestCase):
         with app.app_context():
             with self.assertRaises(Forbidden):
                 case_controller.get_eq_url(
-                    case["id"], respondent_party["id"], business_party["id"], survey_eq["shortName"]
+                    case,
+                    collection_exercise,
+                    respondent_party["id"],
+                    business_party["id"],
+                    survey_eq["shortName"],
                 )
 
     @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
@@ -160,7 +164,11 @@ class TestCaseControllers(unittest.TestCase):
         with app.app_context():
             with self.assertRaises(Forbidden):
                 case_controller.get_eq_url(
-                    case["id"], respondent_party["id"], business_party["id"], survey_eq["shortName"]
+                    case,
+                    collection_exercise,
+                    respondent_party["id"],
+                    business_party["id"],
+                    survey_eq["shortName"],
                 )
 
     @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
@@ -172,7 +180,11 @@ class TestCaseControllers(unittest.TestCase):
         with app.app_context():
             with self.assertRaises(Forbidden):
                 case_controller.get_eq_url(
-                    case["id"], respondent_party["id"], business_party["id"], survey_eq["shortName"]
+                    case,
+                    collection_exercise,
+                    respondent_party["id"],
+                    business_party["id"],
+                    survey_eq["shortName"],
                 )
 
     @patch("frontstage.controllers.case_controller.get_case_by_case_id")
@@ -184,7 +196,11 @@ class TestCaseControllers(unittest.TestCase):
         with app.app_context():
             with self.assertRaises(NoSurveyPermission):
                 case_controller.get_eq_url(
-                    case["id"], respondent_party["id"], business_party["id"], survey_eq["shortName"]
+                    case,
+                    collection_exercise,
+                    respondent_party["id"],
+                    business_party["id"],
+                    survey_eq["shortName"],
                 )
 
     @patch("frontstage.controllers.case_controller.validate_case_category")

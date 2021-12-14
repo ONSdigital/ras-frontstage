@@ -6,7 +6,6 @@ from markupsafe import Markup
 from structlog import wrap_logger
 from werkzeug.utils import redirect
 
-from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.common.utilities import obfuscate_email
 from frontstage.controllers import (
@@ -42,11 +41,7 @@ def get_account(session):
     form = OptionsForm()
     party_id = session.get_party_id()
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
-    return render_template(
-        "account/account.html",
-        form=form,
-        respondent=respondent_details
-    )
+    return render_template("account/account.html", form=form, respondent=respondent_details)
 
 
 @account_bp.route("/", methods=["POST"])

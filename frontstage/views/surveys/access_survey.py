@@ -31,7 +31,9 @@ def access_survey(session):
         )
         eq_version = collection_exercise["eqVersion"]
         if eq_version != "v3":
-            return redirect(case_controller.get_eq_url(case_id, party_id, business_party_id, survey_short_name))
+            return redirect(
+                case_controller.get_eq_url(case, collection_exercise, party_id, business_party_id, survey_short_name)
+            )
         else:
             return render_template("surveys/surveys-temp-eq-v3-static.html")
     logger.info("Retrieving case data", party_id=party_id, case_id=case_id)

@@ -42,12 +42,10 @@ def get_account(session):
     form = OptionsForm()
     party_id = session.get_party_id()
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
-    is_technical_message_enabled = app.config["TECHNICAL_MESSAGE_ENABLED"]
     return render_template(
         "account/account.html",
         form=form,
-        respondent=respondent_details,
-        is_technical_message_enabled=is_technical_message_enabled,
+        respondent=respondent_details
     )
 
 

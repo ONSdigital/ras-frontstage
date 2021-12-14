@@ -69,7 +69,6 @@ class Config(object):
     PUBSUB_TOPIC = os.getenv("PUBSUB_TOPIC", "ras-rm-notify-test")
     CANARY_GENERATE_ERRORS = bool(strtobool(os.getenv("CANARY_GENERATE_ERRORS", "False")))
     MAX_SHARED_SURVEY = int(os.getenv("MAX_SHARED_SURVEY", "50"))
-    TECHNICAL_MESSAGE_ENABLED = bool(strtobool(os.getenv("TECHNICAL_MESSAGE_ENABLED", "True")))
     UNDER_MAINTENANCE = bool(strtobool(os.getenv("UNDER_MAINTENANCE", "False")))
 
 

@@ -17,7 +17,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 class EqPayload(object):
-    def create_payload(self, case, party_id, business_party_id, survey):
+    def create_payload(self, case, collection_exercise, party_id, business_party_id, survey):
         """
         Creates the payload needed to communicate with EQ, built from the Case, Collection Exercise, Party,
         Survey and Collection Instrument services
@@ -44,16 +44,15 @@ class EqPayload(object):
         form_type = ci["classifiers"]["form_type"]
 
         # Collection Exercise
-        collex_id = case["caseGroup"]["collectionExerciseId"]
-        collex = collection_exercise_controller.get_collection_exercise(collex_id)
-        collex_event_dates = self._get_collex_event_dates(collex_id)
+        collection_exercise_id = collection_exercise["id"]
+        collex_event_dates = self._get_collex_event_dates(collection_exercise_id)
 
         # Party
         party = party_controller.get_party_by_business_id(
             business_party_id,
             current_app.config["PARTY_URL"],
             current_app.config["BASIC_AUTH"],
-            collection_exercise_id=collex_id,
+            collection_exercise_id=collection_exercise_id,
         )
 
         account_service_url = current_app.config["ACCOUNT_SERVICE_URL"]
@@ -68,10 +67,10 @@ class EqPayload(object):
             "iat": int(iat),
             "exp": int(exp),
             "eq_id": eq_id,
-            "period_str": collex["userDescription"],
-            "period_id": collex["exerciseRef"],
+            "period_str": collection_exercise["userDescription"],
+            "period_id": collection_exercise["exerciseRef"],
             "form_type": form_type,
-            "collection_exercise_sid": collex["id"],
+            "collection_exercise_sid": collection_exercise["id"],
             "ru_ref": party["sampleUnitRef"] + party["checkletter"],
             "ru_name": party["name"],
             "survey_id": survey["surveyRef"],

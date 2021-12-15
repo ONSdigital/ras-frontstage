@@ -152,10 +152,9 @@ def get_cases_by_party_id(party_id, case_url, case_auth, case_events=False, iac=
     return response.json()
 
 
-def get_eq_url(case_id, party_id, business_party_id, survey_short_name):
+def get_eq_url(case, collection_exercise, party_id, business_party_id, survey_short_name):
+    case_id = case["id"]
     logger.info("Attempting to generate EQ URL", case_id=case_id, party_id=party_id)
-
-    case = get_case_by_case_id(case_id)
 
     valid_enrolment = party_controller.is_respondent_enrolled(
         party_id, business_party_id, survey_short_name, return_survey=True
@@ -167,7 +166,9 @@ def get_eq_url(case_id, party_id, business_party_id, survey_short_name):
         logger.info("The case group status is complete, opening an EQ is forbidden", case_id=case_id, party_id=party_id)
         abort(403)
 
-    payload = EqPayload().create_payload(case, party_id, business_party_id, valid_enrolment["survey"])
+    payload = EqPayload().create_payload(
+        case, collection_exercise, party_id, business_party_id, valid_enrolment["survey"]
+    )
 
     json_secret_keys = app.config["JSON_SECRET_KEYS"]
     encrypter = Encrypter(json_secret_keys)

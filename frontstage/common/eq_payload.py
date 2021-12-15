@@ -17,12 +17,16 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 class EqPayload(object):
-    def create_payload(self, case, collection_exercise, party_id, business_party_id, survey):
+    def create_payload(self, case, collection_exercise, party_id: str, business_party_id: str, survey) -> dict:
         """
         Creates the payload needed to communicate with EQ, built from the Case, Collection Exercise, Party,
         Survey and Collection Instrument services
-        :case_id: The unique UUID references of a case
-        :return Payload for EQ
+        :param case: A dict containing information about the case
+        :param collection_exercise: A dict containing information about the collection exercise
+        :param party_id: The uuid of the respondent
+        :param business_party_id: The uuid of the reporting unit
+        :param survey: A dict containing information about the survey
+        :returns: Payload for EQ
         """
 
         tx_id = str(uuid.uuid4())

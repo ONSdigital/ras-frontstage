@@ -108,7 +108,8 @@ def get_case_data(case_id, party_id, business_party_id, survey_short_name):
 
     # Check if respondent has permission to see case data
     case = get_case_by_case_id(case_id)
-    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey_short_name):
+    survey = survey_controller.get_survey_by_short_name(survey_short_name)
+    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey):
         raise NoSurveyPermission(party_id, case_id)
 
     case_data = {
@@ -156,19 +157,15 @@ def get_eq_url(case, collection_exercise, party_id, business_party_id, survey_sh
     case_id = case["id"]
     logger.info("Attempting to generate EQ URL", case_id=case_id, party_id=party_id)
 
-    valid_enrolment = party_controller.is_respondent_enrolled(
-        party_id, business_party_id, survey_short_name, return_survey=True
-    )
-    if not valid_enrolment:
-        raise NoSurveyPermission(party_id, case_id)
-
     if case["caseGroup"]["caseGroupStatus"] in ("COMPLETE", "COMPLETEDBYPHONE", "NOLONGERREQUIRED"):
         logger.info("The case group status is complete, opening an EQ is forbidden", case_id=case_id, party_id=party_id)
         abort(403)
 
-    payload = EqPayload().create_payload(
-        case, collection_exercise, party_id, business_party_id, valid_enrolment["survey"]
-    )
+    survey = survey_controller.get_survey_by_short_name(survey_short_name)
+    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey):
+        raise NoSurveyPermission(party_id, case_id)
+
+    payload = EqPayload().create_payload(case, collection_exercise, party_id, business_party_id, survey)
 
     json_secret_keys = app.config["JSON_SECRET_KEYS"]
     encrypter = Encrypter(json_secret_keys)

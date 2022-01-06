@@ -1,5 +1,5 @@
 # Dockerfile specifically for kubernetes
-FROM python:3.9-slim
+FROM python:3.10-slim
 
 RUN apt update && apt install -y build-essential curl gunicorn
 RUN pip install pipenv

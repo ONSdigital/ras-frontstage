@@ -435,7 +435,7 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
 
     # This is a dictionary that will store all of the data that is going to be cached instead of making multiple calls
     # inside of the for loop for get_respondent_enrolments.
-    cache_data = {"businesses": dict(), "collexes": dict(), "cases": dict(), "instrument": dict()}
+    cache_data = {"businesses": dict(), "collexes": dict(), "cases": dict()}
     redis_cache = RedisCache()
 
     # Populate the cache with all non-instrument data
@@ -461,23 +461,22 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
             if case["caseGroup"]["collectionExerciseId"] in collection_exercises_by_id.keys()
         ]
 
-        # Get and cache the collection instruments for all the cases the respondent is part of
-        caching_data_for_collection_instrument(cache_data, enrolled_cases)
-
         for case in enrolled_cases:
             collection_exercise = collection_exercises_by_id[case["caseGroup"]["collectionExerciseId"]]
+            collection_instrument = redis_cache.get_collection_instrument(case["collectionInstrumentId"])
+            collection_instrument_type = collection_instrument["type"]
             added_survey = True if business_party_id == business_party["id"] and survey_id == survey["id"] else None
             display_access_button = display_button(
-                case["caseGroup"]["caseGroupStatus"], cache_data["instrument"][case["collectionInstrumentId"]]["type"]
+                case["caseGroup"]["caseGroupStatus"], collection_instrument_type
             )
 
             yield {
                 "case_id": case["id"],
                 "status": case_controller.calculate_case_status(
                     case["caseGroup"]["caseGroupStatus"],
-                    cache_data["instrument"][case["collectionInstrumentId"]]["type"],
+                    collection_instrument_type,
                 ),
-                "collection_instrument_type": cache_data["instrument"][case["collectionInstrumentId"]]["type"],
+                "collection_instrument_type": collection_instrument_type,
                 "survey_id": survey["id"],
                 "survey_long_name": survey["longName"],
                 "survey_short_name": survey["shortName"],
@@ -530,14 +529,6 @@ def get_case(cache_data, business_id, case_url, case_auth, tag):
 
 def get_party(cache_data, business_id, party_url, party_auth):
     cache_data["businesses"][business_id] = get_party_by_business_id(business_id, party_url, party_auth)
-
-
-def get_collection_instrument(
-    cache_data, collection_instrument_id, collection_instrument_url, collection_instrument_auth
-):
-    cache_data["instrument"][collection_instrument_id] = collection_instrument_controller.get_collection_instrument(
-        collection_instrument_id, collection_instrument_url, collection_instrument_auth
-    )
 
 
 def display_button(status, ci_type):

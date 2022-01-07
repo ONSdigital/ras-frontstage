@@ -466,9 +466,7 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
             collection_instrument = redis_cache.get_collection_instrument(case["collectionInstrumentId"])
             collection_instrument_type = collection_instrument["type"]
             added_survey = True if business_party_id == business_party["id"] and survey_id == survey["id"] else None
-            display_access_button = display_button(
-                case["caseGroup"]["caseGroupStatus"], collection_instrument_type
-            )
+            display_access_button = display_button(case["caseGroup"]["caseGroupStatus"], collection_instrument_type)
 
             yield {
                 "case_id": case["id"],

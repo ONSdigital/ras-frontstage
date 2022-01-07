@@ -6,7 +6,9 @@ from redis.exceptions import RedisError
 from structlog import wrap_logger
 
 from frontstage import redis
-from frontstage.controllers.collection_instrument_controller import get_collection_instrument
+from frontstage.controllers.collection_instrument_controller import (
+    get_collection_instrument,
+)
 from frontstage.controllers.survey_controller import get_survey
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -14,7 +16,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 class RedisCache:
     SURVEY_CATEGORY_EXPIRY = 600  # 10 mins
-    COLLECTION_INSTRUMENT_CATEGORY_EXPIRY = 600 # 10 mins
+    COLLECTION_INSTRUMENT_CATEGORY_EXPIRY = 600  # 10 mins
 
     def get_survey(self, key):
         """

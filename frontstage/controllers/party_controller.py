@@ -544,15 +544,13 @@ def display_button(status, ci_type):
     return not (ci_type == "EQ" and status in CLOSED_STATE)
 
 
-def is_respondent_enrolled(party_id, business_party_id, survey_short_name, return_survey=False):
-    survey = survey_controller.get_survey_by_short_name(survey_short_name)
+def is_respondent_enrolled(party_id: str, business_party_id: str, survey: dict) -> bool:
     respondent = get_respondent_party_by_id(party_id)
     enrolments = get_respondent_enrolments(respondent)
     for enrolment in enrolments:
         if enrolment["business_id"] == business_party_id and enrolment["survey_id"] == survey["id"]:
-            if return_survey:
-                return {"survey": survey}
             return True
+    return False
 
 
 def notify_party_and_respondent_account_locked(respondent_id, email_address, status=None):

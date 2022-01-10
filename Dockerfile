@@ -1,7 +1,7 @@
 FROM python:3.10-slim
 
 RUN apt update && apt install -y build-essential curl
-RUN pip install 'pipenv==2018.11.26'
+RUN pip install pipenv
 
 WORKDIR /app
 EXPOSE 8082

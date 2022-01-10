@@ -119,7 +119,7 @@ def get_case_data(case_id, party_id, business_party_id, survey_short_name):
         "collection_instrument": collection_instrument_controller.get_collection_instrument(
             case["collectionInstrumentId"], app.config["COLLECTION_INSTRUMENT_URL"], app.config["BASIC_AUTH"]
         ),
-        "survey": survey_controller.get_survey_by_short_name(survey_short_name),
+        "survey": survey,
         "business_party": party_controller.get_party_by_business_id(
             business_party_id, app.config["PARTY_URL"], app.config["BASIC_AUTH"]
         ),

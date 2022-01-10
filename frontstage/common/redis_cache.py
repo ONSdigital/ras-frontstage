@@ -20,7 +20,7 @@ class RedisCache:
 
     def get_survey(self, key):
         """
-        Gets the key from redis
+        Gets the survey from redis or the collection-instrument service
 
         :param key: Key in redis (for this example will be a frontstage:survey:id)
         :return: Result from either the cache or survey service
@@ -42,10 +42,10 @@ class RedisCache:
 
     def get_collection_instrument(self, key):
         """
-        Gets the key from redis for collection
+        Gets the collection-instrument from redis or the collection-instrument service
 
         :param key: Key in redis (for this example will be a frontstage:collection-instrument:id)
-        :return: Result from either the cache or survey service
+        :return: Result from either the cache or collection instrument service
         """
         redis_key = f"frontstage:collection-instrument:{key}"
         try:
@@ -62,7 +62,8 @@ class RedisCache:
 
         return json.loads(result.decode("utf-8"))
 
-    def save(self, key, value, expiry):
+    @staticmethod
+    def save(key, value, expiry):
         if not expiry:
             logger.error("Expiry must be provided")
             raise ValueError("Expiry must be provided")

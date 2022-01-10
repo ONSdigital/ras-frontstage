@@ -415,7 +415,7 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
           - Get the business details the enrolment is for
           - Get the live-but-not-ended collection exercises for the survey the enrolment is for
           - Get the cases the business is part of, from the list of collection exercises. Note, this isn't every case
-            against the business; depending if you're looking at the to-do or history page, you'll get a different
+            against the business; depending on if you're looking at the to-do or history page, you'll get a different
             subset of them.
           - For each case in this list:
               - Create an entry in the returned list for each of these cases as the respondent is implicitly part
@@ -433,8 +433,8 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
     # Converted to list to avoid multiple calls to party (and the list size is small).
     surveys_ids, business_ids = get_unique_survey_and_business_ids(enrolment_data)
 
-    # This is a dictionary that will store all of the data that is going to be cached instead of making multiple calls
-    # inside of the for loop for get_respondent_enrolments.
+    # This is a dictionary that will store all the data that is going to be cached instead of making multiple calls
+    # inside the for loop for get_respondent_enrolments.
     cache_data = {"businesses": dict(), "collexes": dict(), "cases": dict()}
     redis_cache = RedisCache()
 
@@ -596,13 +596,12 @@ def get_business_by_id(business_ids):
     return response.json()
 
 
-def get_surveys_listed_against_party_and_business_id(business_id, party_id):
+def get_surveys_listed_against_party_and_business_id(business_id, party_id) -> list:
     """
     returns list of surveys associated with a business id and respondent
     :param business_id: business id
     :param party_id: The respondent's party id
     :return: list of surveys
-    :rtype: list
     """
     respondent = get_respondent_party_by_id(party_id)
     enrolment_data = get_respondent_enrolments(respondent)
@@ -614,14 +613,14 @@ def get_surveys_listed_against_party_and_business_id(business_id, party_id):
     return surveys
 
 
-def get_user_count_registered_against_business_and_survey(business_id, survey_id, is_transfer):
+def get_user_count_registered_against_business_and_survey(business_id, survey_id, is_transfer) -> int:
     """
     returns total number of users registered against a business and survey
+
     :param business_id: business id
     :param survey_id: The survey id
     :param is_transfer: True if the request is for transfer survey
     :return: total number of users
-    :rtype: int
     """
     logger.info("Attempting to get user count", business_ids=business_id, survey_id=survey_id)
     url = f'{app.config["PARTY_URL"]}/party-api/v1/pending-survey-users-count'
@@ -637,6 +636,7 @@ def get_user_count_registered_against_business_and_survey(business_id, survey_id
 def register_pending_shares(payload):
     """
     register new entries to party for pending shares
+
     :param payload: pending shares entries dict
     :return: success if post completed
     :rtype: response object

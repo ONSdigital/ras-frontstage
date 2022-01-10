@@ -13,6 +13,7 @@ from tests.integration.mocked_services import (
     encoded_jwt_token,
     survey,
     url_banner_api,
+    url_get_survey_by_short_name,
 )
 
 
@@ -36,6 +37,7 @@ class TestDownloadSurvey(unittest.TestCase):
     @patch("frontstage.controllers.case_controller.get_case_by_case_id")
     def test_download_survey_success(self, mock_request, get_case_by_id, _, download_collection_instrument):
         mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
         str = json.dumps(collection_instrument_seft)
         binary = " ".join(format(ord(letter), "b") for letter in str)
         get_case_by_id.return_value = case

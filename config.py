@@ -35,6 +35,8 @@ class Config(object):
     ACCOUNT_SERVICE_URL = os.getenv("ACCOUNT_SERVICE_URL")
     ACCOUNT_SERVICE_LOG_OUT_URL = os.getenv("ACCOUNT_SERVICE_LOG_OUT_URL")
     EQ_URL = os.getenv("EQ_URL")
+    EQ_V3_URL = EQ_URL
+    # EQ_V3_URL = os.getenv("EQ_V3_URL") TODO uncomment and make this work for real
     JSON_SECRET_KEYS = os.getenv("JSON_SECRET_KEYS")
 
     REDIS_HOST = os.getenv("REDIS_HOST", "localhost")

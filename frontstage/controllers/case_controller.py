@@ -153,9 +153,12 @@ def get_cases_by_party_id(party_id, case_url, case_auth, case_events=False, iac=
     return response.json()
 
 
-def get_eq_url(case, collection_exercise, party_id, business_party_id, survey_short_name):
+def get_eq_url(version, case, collection_exercise, party_id, business_party_id, survey_short_name):
     case_id = case["id"]
-    logger.info("Attempting to generate EQ URL", case_id=case_id, party_id=party_id)
+    logger.info("Attempting to generate EQ URL", case_id=case_id, party_id=party_id, version=version)
+
+    if version not in ["v2", "v3"]:
+        raise ValueError(f"The eq version {version} is not supported")
 
     if case["caseGroup"]["caseGroupStatus"] in ("COMPLETE", "COMPLETEDBYPHONE", "NOLONGERREQUIRED"):
         logger.info("The case group status is complete, opening an EQ is forbidden", case_id=case_id, party_id=party_id)
@@ -169,9 +172,13 @@ def get_eq_url(case, collection_exercise, party_id, business_party_id, survey_sh
 
     json_secret_keys = app.config["JSON_SECRET_KEYS"]
     encrypter = Encrypter(json_secret_keys)
-    token = encrypter.encrypt(payload)
 
-    eq_url = app.config["EQ_URL"] + token
+    if version == "v2":
+        token = encrypter.encrypt(payload, "authentication")
+        eq_url = app.config["EQ_URL"] + token
+    elif version == "v3":
+        token = encrypter.encrypt(payload, "eq_v3_launch")
+        eq_url = app.config["EQ_V3_URL"] + token
 
     category = "EQ_LAUNCH"
     ci_id = case["collectionInstrumentId"]
@@ -190,6 +197,7 @@ def get_eq_url(case, collection_exercise, party_id, business_party_id, survey_sh
         business_party_id=business_party_id,
         survey_short_name=survey_short_name,
         tx_id=payload["tx_id"],
+        version=version
     )
     return eq_url
 

@@ -197,7 +197,7 @@ def get_eq_url(version, case, collection_exercise, party_id, business_party_id, 
         business_party_id=business_party_id,
         survey_short_name=survey_short_name,
         tx_id=payload["tx_id"],
-        version=version
+        version=version,
     )
     return eq_url
 

@@ -31,7 +31,9 @@ def access_survey(session):
         )
         eq_version = collection_exercise["eqVersion"]
         return redirect(
-            case_controller.get_eq_url(eq_version, case, collection_exercise, party_id, business_party_id, survey_short_name)
+            case_controller.get_eq_url(
+                eq_version, case, collection_exercise, party_id, business_party_id, survey_short_name
+            )
         )
 
     logger.info("Retrieving case data", party_id=party_id, case_id=case_id)

@@ -1,0 +1,45 @@
+{% extends "layouts/_block_content.html" %}
+{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/fieldset/_macro.njk" import onsFieldset %}
+{% from "components/radios/_macro.njk" import onsRadios %}
+{% from "components/button/_macro.njk" import onsButton %}
+{% from "components/lists/_macro.njk" import onsList %}
+{% set page_title = "V3 Unavailable" %}
+{% set breadcrumbsData = [
+  {
+    "text": "Surveys",
+    "url": "/surveys/todo",
+    "id": "b-item-1"
+  }
+] %}
+{% block breadcrumb %}
+{{
+    onsBreadcrumb({
+        "ariaLabel": "Breadcrumbs",
+        "id": "breadcrumbs",
+        "itemsList": breadcrumbsData
+    })
+}}
+{% endblock breadcrumb %}
+{% block main %}
+
+{% call onsPanel({
+        "title": 'Electronic Questionnaire (eQ) version 3 Unavailable',
+        "type": 'error',
+        "dsExample": isPatternLib
+}) %}
+    {{
+        onsList({
+            "element": 'ol',
+            "itemsList": [
+                {
+                    "text": 'Back to surveys',
+                    "url": '/surveys/todo',
+                    "classes": 'ons-js-inpagelink'
+                }
+            ]
+        })
+    }}
+{% endcall %}
+
+{% endblock main %}

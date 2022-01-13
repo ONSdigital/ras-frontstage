@@ -138,7 +138,12 @@ class TestCaseControllers(unittest.TestCase):
             rsps.add(rsps.GET, url_get_survey_by_short_name_eq, json=survey_eq, status=200)
             with app.app_context():
                 eq_url = case_controller.get_eq_url(
-                    case, collection_exercise, respondent_party["id"], business_party["id"], survey_eq["shortName"]
+                    "v2",
+                    case,
+                    collection_exercise,
+                    respondent_party["id"],
+                    business_party["id"],
+                    survey_eq["shortName"],
                 )
 
                 self.assertIn("https://eq-test/session?token=", eq_url)
@@ -152,6 +157,7 @@ class TestCaseControllers(unittest.TestCase):
         with app.app_context():
             with self.assertRaises(Forbidden):
                 case_controller.get_eq_url(
+                    "v2",
                     case,
                     collection_exercise,
                     respondent_party["id"],
@@ -168,6 +174,7 @@ class TestCaseControllers(unittest.TestCase):
         with app.app_context():
             with self.assertRaises(Forbidden):
                 case_controller.get_eq_url(
+                    "v2",
                     case,
                     collection_exercise,
                     respondent_party["id"],
@@ -184,6 +191,7 @@ class TestCaseControllers(unittest.TestCase):
         with app.app_context():
             with self.assertRaises(Forbidden):
                 case_controller.get_eq_url(
+                    "v2",
                     case,
                     collection_exercise,
                     respondent_party["id"],
@@ -202,6 +210,7 @@ class TestCaseControllers(unittest.TestCase):
             with app.app_context():
                 with self.assertRaises(NoSurveyPermission):
                     case_controller.get_eq_url(
+                        "v2",
                         case,
                         collection_exercise,
                         respondent_party["id"],

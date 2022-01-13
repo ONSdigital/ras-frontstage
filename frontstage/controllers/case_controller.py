@@ -158,7 +158,7 @@ def get_eq_url(version, case, collection_exercise, party_id, business_party_id, 
     logger.info("Attempting to generate EQ URL", case_id=case_id, party_id=party_id, version=version)
 
     if version not in ["v2", "v3"]:
-        raise ValueError(f"The eq version {version} is not supported")
+        raise ValueError(f"The eq version [{version}] is not supported")
 
     if case["caseGroup"]["caseGroupStatus"] in ("COMPLETE", "COMPLETEDBYPHONE", "NOLONGERREQUIRED"):
         logger.info("The case group status is complete, opening an EQ is forbidden", case_id=case_id, party_id=party_id)
@@ -168,7 +168,7 @@ def get_eq_url(version, case, collection_exercise, party_id, business_party_id, 
     if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey):
         raise NoSurveyPermission(party_id, case_id)
 
-    payload = EqPayload().create_payload(version, case, collection_exercise, party_id, business_party_id, survey)
+    payload = EqPayload().create_payload(case, collection_exercise, party_id, business_party_id, survey)
 
     json_secret_keys = app.config["JSON_SECRET_KEYS"]
     encrypter = Encrypter(json_secret_keys)

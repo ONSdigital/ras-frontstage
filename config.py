@@ -90,6 +90,7 @@ class DevelopmentConfig(Config):
     ACCOUNT_SERVICE_URL = os.getenv("ACCOUNT_SERVICE_URL", "http://localhost:8082/surveys/todo")
     ACCOUNT_SERVICE_LOG_OUT_URL = os.getenv("ACCOUNT_SERVICE_LOG_OUT_URL", "http://localhost:8082/sign-in/logout")
     EQ_URL = os.getenv("EQ_URL", "http://localhost:8086/session?token=")
+    EQ_V3_ENABLED = bool(strtobool(os.getenv("EQ_V3_ENABLED", "True")))
     JSON_SECRET_KEYS = os.getenv("JSON_SECRET_KEYS") or open("./tests/test_data/jwt-test-keys/test_key.json").read()
 
     AUTH_URL = os.getenv("AUTH_URL", "http://localhost:8041")

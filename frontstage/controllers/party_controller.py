@@ -7,7 +7,7 @@ from dateutil.parser import parse
 from flask import current_app as app
 from structlog import wrap_logger
 
-from frontstage.common.redis_cache import RedisCache
+
 from frontstage.common.thread_wrapper import ThreadWrapper
 from frontstage.common.utilities import obfuscate_email
 from frontstage.controllers import (
@@ -134,6 +134,9 @@ def get_party_by_business_id(party_id, party_url, party_auth, collection_exercis
         "Successfully retrieved party by business", party_id=party_id, collection_exercise_id=collection_exercise_id
     )
     return response.json()
+
+
+from frontstage.common.redis_cache import RedisCache
 
 
 def get_respondent_by_email(email):
@@ -361,9 +364,6 @@ def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
         threads.append(
             ThreadWrapper(get_case, cache_data, business_id, app.config["CASE_URL"], app.config["BASIC_AUTH"], tag)
         )
-        threads.append(
-            ThreadWrapper(get_party, cache_data, business_id, app.config["PARTY_URL"], app.config["BASIC_AUTH"])
-        )
 
     for thread in threads:
         thread.start()
@@ -523,10 +523,6 @@ def get_case(cache_data, business_id, case_url, case_auth, tag):
     cache_data["cases"][business_id] = case_controller.get_cases_for_list_type_by_party_id(
         business_id, case_url, case_auth, tag
     )
-
-
-def get_party(cache_data, business_id, party_url, party_auth):
-    cache_data["businesses"][business_id] = get_party_by_business_id(business_id, party_url, party_auth)
 
 
 def display_button(status, ci_type):

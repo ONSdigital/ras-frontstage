@@ -195,8 +195,6 @@ spec:
             {{- end }}
           - name: SEND_EMAIL_TO_GOV_NOTIFY
             value: "{{ .Values.email.enabled }}"
-          - name: TECHNICAL_MESSAGE_ENABLED
-            value: "{{ .Values.features.technicalMessage }}"
           - name: UNDER_MAINTENANCE
             value: "{{- if .Values.maintenancePage.enabled -}}True{{- else -}}False{{- end -}}"
           - name: SURVEY_URL

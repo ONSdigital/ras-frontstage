@@ -9,6 +9,7 @@ from frontstage.controllers import (
     collection_instrument_controller,
     conversation_controller,
     party_controller,
+    survey_controller,
 )
 from frontstage.exceptions.exceptions import CiUploadError, NoSurveyPermission
 from frontstage.views.surveys import surveys_bp
@@ -38,6 +39,8 @@ def upload_survey(session):
         )
 
     # Check if respondent has permission to upload for this case
+    survey = survey_controller.get_survey_by_short_name(survey_short_name)
+    party_controller.is_respondent_enrolled(party_id, business_party_id, survey)
     if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey_short_name):
         raise NoSurveyPermission(party_id, case_id)
 

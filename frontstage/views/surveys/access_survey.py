@@ -4,7 +4,11 @@ from flask import redirect, render_template, request
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
-from frontstage.controllers import case_controller, conversation_controller
+from frontstage.controllers import (
+    case_controller,
+    collection_exercise_controller,
+    conversation_controller,
+)
 from frontstage.views.surveys import surveys_bp
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -18,15 +22,22 @@ def access_survey(session):
     business_party_id = request.args["business_party_id"]
     survey_short_name = request.args["survey_short_name"]
     collection_instrument_type = request.args["ci_type"]
-    case_data = case_controller.get_case_data(case_id, party_id, business_party_id, survey_short_name)
-    eq_version = case_data["collection_exercise"]["eqVersion"]
+
     if collection_instrument_type == "EQ":
         logger.info("Attempting to redirect to EQ", party_id=party_id, case_id=case_id)
+        case = case_controller.get_case_by_case_id(case_id)
+        collection_exercise = collection_exercise_controller.get_collection_exercise(
+            case["caseGroup"]["collectionExerciseId"]
+        )
+        eq_version = collection_exercise["eqVersion"]
         if eq_version != "v3":
-            return redirect(case_controller.get_eq_url(case_id, party_id, business_party_id, survey_short_name))
+            return redirect(
+                case_controller.get_eq_url(case, collection_exercise, party_id, business_party_id, survey_short_name)
+            )
         else:
             return render_template("surveys/surveys-temp-eq-v3-static.html")
     logger.info("Retrieving case data", party_id=party_id, case_id=case_id)
+    case_data = case_controller.get_case_data(case_id, party_id, business_party_id, survey_short_name)
     referer_header = request.headers.get("referer", {})
 
     logger.info("Successfully retrieved case data", party_id=party_id, case_id=case_id)

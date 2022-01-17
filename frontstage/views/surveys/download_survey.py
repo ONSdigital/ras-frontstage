@@ -10,6 +10,7 @@ from frontstage.controllers import (
     party_controller,
     survey_controller,
 )
+from frontstage.exceptions.exceptions import NoSurveyPermission
 from frontstage.views.surveys import surveys_bp
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -28,6 +29,8 @@ def download_survey(session):
     case = case_controller.get_case_by_case_id(case_id)
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
     party_controller.is_respondent_enrolled(party_id, business_party_id, survey)
+    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey_short_name):
+        raise NoSurveyPermission(party_id, case_id)
 
     collection_instrument, headers = collection_instrument_controller.download_collection_instrument(
         case["collectionInstrumentId"], case_id, party_id

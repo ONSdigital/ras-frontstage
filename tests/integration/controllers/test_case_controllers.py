@@ -218,6 +218,20 @@ class TestCaseControllers(unittest.TestCase):
                         survey_eq["shortName"],
                     )
 
+    def test_get_eq_url_unsupported_version(self):
+        with app.app_context():
+            with self.assertRaises(ValueError) as e:
+                case_controller.get_eq_url(
+                    "v1234",
+                    case,
+                    collection_exercise,
+                    respondent_party["id"],
+                    business_party["id"],
+                    survey_eq["shortName"],
+                )
+
+            self.assertEqual(str(e.exception), "The eq version [v1234] is not supported")
+
     @patch("frontstage.controllers.case_controller.validate_case_category")
     def test_post_case_event_success(self, _):
         message = {

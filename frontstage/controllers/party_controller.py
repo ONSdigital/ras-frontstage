@@ -435,7 +435,7 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
 
     # This is a dictionary that will store all the data that is going to be cached instead of making multiple calls
     # inside the for loop for get_respondent_enrolments.
-    cache_data = {"businesses": dict(), "collexes": dict(), "cases": dict()}
+    cache_data = {"collexes": dict(), "cases": dict()}
     redis_cache = RedisCache()
 
     # Populate the cache with all non-instrument data
@@ -443,7 +443,7 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
 
     enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, cache_data["collexes"])
     for enrolment in enrolments:
-        business_party = cache_data["businesses"][enrolment["business_id"]]
+        business_party = redis_cache.get_business_party(enrolment["business_id"])
         survey = redis_cache.get_survey(enrolment["survey_id"])
 
         # Note: If it ever becomes possible to get only live-but-not-ended collection exercises from the

@@ -238,7 +238,6 @@ class TestPartyController(unittest.TestCase):
             self.assertTrue(enrolment["business_id"] is not None)
             self.assertTrue(enrolment["survey_id"] is not None)
 
-    @patch("frontstage.controllers.party_controller.get_party_by_business_id")
     @patch("frontstage.controllers.case_controller.calculate_case_status")
     @patch("frontstage.controllers.collection_instrument_controller.get_collection_instrument")
     @patch("frontstage.controllers.case_controller.get_cases_for_list_type_by_party_id")

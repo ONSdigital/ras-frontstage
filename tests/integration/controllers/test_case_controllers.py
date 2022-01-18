@@ -171,6 +171,27 @@ class TestCaseControllers(unittest.TestCase):
                 self.assertIn("https://eq-v3-test/session?token=", eq_url)
 
     @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
+    @patch("frontstage.controllers.case_controller.post_case_event")
+    @patch("frontstage.common.eq_payload.EqPayload.create_payload")
+    @patch("frontstage.controllers.case_controller.get_case_by_case_id")
+    def test_get_eq_url_blank_eq_version_redirects_to_v2(self, get_case_by_id, create_eq_payload, *_):
+        get_case_by_id.return_value = case
+        create_eq_payload.return_value = eq_payload
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.GET, url_get_survey_by_short_name_eq, json=survey_eq, status=200)
+            with app.app_context():
+                eq_url = case_controller.get_eq_url(
+                    None,
+                    case,
+                    collection_exercise,
+                    respondent_party["id"],
+                    business_party["id"],
+                    survey_eq["shortName"],
+                )
+
+                self.assertIn("https://eq-test/session?token=", eq_url)
+
+    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
     @patch("frontstage.controllers.case_controller.get_case_by_case_id")
     def test_get_eq_url_when_caseGroupStatus_is_complete(self, get_case_by_id, _):
         case_copy = deepcopy(case)

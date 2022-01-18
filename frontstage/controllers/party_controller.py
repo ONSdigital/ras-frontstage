@@ -135,7 +135,7 @@ def get_party_by_business_id(party_id, party_url, party_auth, collection_exercis
     return response.json()
 
 
-from frontstage.common.redis_cache import RedisCache
+from frontstage.common.redis_cache import RedisCache  # NOQA: E402
 
 
 def get_respondent_by_email(email):

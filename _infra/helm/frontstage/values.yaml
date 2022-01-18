@@ -67,6 +67,8 @@ rollingUpdate:
 
 eq:
   url: "http://localhost:8086/session?token="
+  v3url: "http://localhost:8086/session?token="
+  v3enabled: false
 
 dns:
   enabled: false

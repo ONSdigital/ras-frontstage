@@ -35,6 +35,8 @@ class Config(object):
     ACCOUNT_SERVICE_URL = os.getenv("ACCOUNT_SERVICE_URL")
     ACCOUNT_SERVICE_LOG_OUT_URL = os.getenv("ACCOUNT_SERVICE_LOG_OUT_URL")
     EQ_URL = os.getenv("EQ_URL")
+    EQ_V3_URL = os.getenv("EQ_V3_URL")
+    EQ_V3_ENABLED = bool(strtobool(os.getenv("EQ_V3_ENABLED", "False")))
     JSON_SECRET_KEYS = os.getenv("JSON_SECRET_KEYS")
 
     REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
@@ -114,6 +116,7 @@ class TestingConfig(DevelopmentConfig):
     ACCOUNT_SERVICE_URL = "http://frontstage-url/surveys"
     ACCOUNT_SERVICE_LOG_OUT_URL = "http://frontstage-url/sign-in/logout"
     EQ_URL = "https://eq-test/session?token="
+    EQ_V3_URL = "https://eq-v3-test/session?token="
     JSON_SECRET_KEYS = open("./tests/test_data/jwt-test-keys/test_key.json").read()
     SECURITY_USER_NAME = "username"
     SECURITY_USER_PASSWORD = "password"

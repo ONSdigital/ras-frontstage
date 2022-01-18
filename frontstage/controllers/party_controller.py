@@ -7,7 +7,6 @@ from dateutil.parser import parse
 from flask import current_app as app
 from structlog import wrap_logger
 
-
 from frontstage.common.thread_wrapper import ThreadWrapper
 from frontstage.common.utilities import obfuscate_email
 from frontstage.controllers import (

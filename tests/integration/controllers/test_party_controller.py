@@ -251,7 +251,6 @@ class TestPartyController(unittest.TestCase):
         get_cases,
         get_collection_instrument,
         calculate_case_status,
-        get_business,
     ):
         enrolments = [{"business_id": business_party["id"], "survey_id": survey["id"]}]
 
@@ -264,10 +263,10 @@ class TestPartyController(unittest.TestCase):
         get_cases.return_value = case_list
         get_collection_instrument.return_value = collection_instrument_seft
         calculate_case_status.return_value = "In Progress"
-        get_business.return_value = business_party
 
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_survey, json=survey, status=200)
+            rsps.add(rsps.GET, url_get_business_party, json=business_party, status=200)
 
             survey_list = party_controller.get_survey_list_details_for_party(
                 respondent_party["id"], "todo", business_party["id"], survey["id"]

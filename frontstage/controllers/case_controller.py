@@ -158,7 +158,13 @@ def get_eq_url(version, case, collection_exercise, party_id, business_party_id, 
     logger.info("Attempting to generate EQ URL", case_id=case_id, party_id=party_id, version=version)
 
     if version not in ["v2", "v3"]:
-        raise ValueError(f"The eq version [{version}] is not supported")
+        # EQ collection exercises created before the concept of versions might have a null value for the version.
+        # If this is the case, we can safely assume it's v2 as that was the only one availible at the time.
+        if version is None:
+            logger.info("EQ version not set, assuming v2", case_id=case_id, party_id=party_id, version=version)
+            version = "v2"
+        else:
+            raise ValueError(f"The eq version [{version}] is not supported")
 
     if case["caseGroup"]["caseGroupStatus"] in ("COMPLETE", "COMPLETEDBYPHONE", "NOLONGERREQUIRED"):
         logger.info("The case group status is complete, opening an EQ is forbidden", case_id=case_id, party_id=party_id)

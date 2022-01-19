@@ -233,6 +233,16 @@ class TestGenerateEqURL(unittest.TestCase):
         # Then the date is localised to the next day
         self.assertEqual(result, "2007-01-26")
 
+    def test_string_date_time_adjusts_to_local_time_iso_format(self):
+        # Given a valid date in tz -1hr before midnight
+        date = "2007-01-25T23:59:59-0100"
+
+        # When format_date is called
+        result = EqPayload()._format_string_long_date_time_to_iso_format(date)
+
+        # Then the date is localised to the next day
+        self.assertEqual(result, "2007-01-26T00:59:59+00:00")
+
     def test_generate_eq_url_missing_mandatory_event_date(self):
 
         # Given a mandatory event date does not exist

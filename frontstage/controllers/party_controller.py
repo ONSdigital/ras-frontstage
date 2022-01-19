@@ -135,6 +135,10 @@ def get_party_by_business_id(party_id, party_url, party_auth, collection_exercis
     return response.json()
 
 
+"""
+This import had to be moved as redis_cache calls the get_party_by_business_id method which needs to be
+initialised before being used
+"""
 from frontstage.common.redis_cache import RedisCache  # NOQA: E402
 
 

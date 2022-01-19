@@ -14,7 +14,7 @@
                 <a href="{{ url_for('surveys_bp.access_survey', case_id=survey.case_id, ci_type = survey.collection_instrument_type, business_party_id=survey.business_party_id, survey_short_name=survey.survey_short_name) }}" aria-label="Access the {{ survey.survey_long_name }}">{{ survey.survey_long_name }}</a>
             </h1>
         {% else %}
-            <h1 class="u-mb-xs u-fs-m u-mt-s">
+            <h1 id="surveyLongName" class="u-mb-xs u-fs-m u-mt-s">
                 {{ survey.survey_long_name }}
             </h1>
         {% endif %}
@@ -45,7 +45,7 @@
             <div class="grid__col col-3@m u-pt-no u-pb-xs">
                 <dt style="float: left; clear: left;" class="u-vh">Status: </dt>
                 <dd class="u-fs-r u-ml-no u-mb-xs" style="line-height:1">
-                    <span class="status {{ status_class }}">{{ survey.status }}</span>
+                    <span id="surveyStatus" class="status {{ status_class }}">{{ survey.status }}</span>
                 </dd>
                 <dt style="float: left; clear: left;" class="u-vh">Help: </dt>
                 <dd class="u-ml-no u-mb-s">

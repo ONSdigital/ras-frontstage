@@ -7,7 +7,6 @@ from dateutil.parser import parse
 from flask import current_app as app
 from structlog import wrap_logger
 
-from frontstage.common.redis_cache import RedisCache
 from frontstage.common.thread_wrapper import ThreadWrapper
 from frontstage.common.utilities import obfuscate_email
 from frontstage.controllers import (
@@ -134,6 +133,13 @@ def get_party_by_business_id(party_id, party_url, party_auth, collection_exercis
         "Successfully retrieved party by business", party_id=party_id, collection_exercise_id=collection_exercise_id
     )
     return response.json()
+
+
+"""
+This import had to be moved as redis_cache calls the get_party_by_business_id method which needs to be
+initialised before being used
+"""
+from frontstage.common.redis_cache import RedisCache  # NOQA: E402
 
 
 def get_respondent_by_email(email):
@@ -361,9 +367,6 @@ def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
         threads.append(
             ThreadWrapper(get_case, cache_data, business_id, app.config["CASE_URL"], app.config["BASIC_AUTH"], tag)
         )
-        threads.append(
-            ThreadWrapper(get_party, cache_data, business_id, app.config["PARTY_URL"], app.config["BASIC_AUTH"])
-        )
 
     for thread in threads:
         thread.start()
@@ -435,7 +438,7 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
 
     # This is a dictionary that will store all the data that is going to be cached instead of making multiple calls
     # inside the for loop for get_respondent_enrolments.
-    cache_data = {"businesses": dict(), "collexes": dict(), "cases": dict()}
+    cache_data = {"collexes": dict(), "cases": dict()}
     redis_cache = RedisCache()
 
     # Populate the cache with all non-instrument data
@@ -443,7 +446,7 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
 
     enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, cache_data["collexes"])
     for enrolment in enrolments:
-        business_party = cache_data["businesses"][enrolment["business_id"]]
+        business_party = redis_cache.get_business_party(enrolment["business_id"])
         survey = redis_cache.get_survey(enrolment["survey_id"])
 
         # Note: If it ever becomes possible to get only live-but-not-ended collection exercises from the
@@ -523,10 +526,6 @@ def get_case(cache_data, business_id, case_url, case_auth, tag):
     cache_data["cases"][business_id] = case_controller.get_cases_for_list_type_by_party_id(
         business_id, case_url, case_auth, tag
     )
-
-
-def get_party(cache_data, business_id, party_url, party_auth):
-    cache_data["businesses"][business_id] = get_party_by_business_id(business_id, party_url, party_auth)
 
 
 def display_button(status, ci_type):

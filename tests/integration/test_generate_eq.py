@@ -86,7 +86,18 @@ class TestGenerateEqURL(unittest.TestCase):
     def test_generate_eq_url_complete_case(self, mock_request, _):
 
         # Given a mocked case has its caseGroup status as complete
-        mock_request.get(url_get_case, json=completed_case)
+        mock_request.get(
+            f"{app.config['COLLECTION_EXERCISE_URL']}" f"/collectionexercises/14fb3e68-4dca-46db-bf49-04b84e07e77c",
+            json=collection_exercise,
+        )
+        mock_request.get(f"{app.config['CASE_URL']}/cases/8cdc01f9-656a-4715-a148-ffed0dbe1b04", json=completed_case)
+        mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
+        mock_request.get(url_get_business_party, json=business_party)
+        mock_request.get(url_get_survey_by_short_name_eq, json=survey_eq)
+        mock_request.get(url_get_ci, json=collection_instrument_eq)
+        mock_request.get(url_get_case_categories, json=categories)
+        mock_request.post(url_post_case_event_uuid, status_code=201)
+        mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
         mock_request.get(url_banner_api, status_code=404)
 
         # When the generate-eq-url is called
@@ -116,7 +127,11 @@ class TestGenerateEqURL(unittest.TestCase):
         with app.app_context():
             with self.assertRaises(InvalidEqPayLoad) as e:
                 EqPayload().create_payload(
-                    case, party_id=respondent_party["id"], business_party_id=business_party["id"], survey=survey_eq
+                    case,
+                    collection_exercise,
+                    party_id=respondent_party["id"],
+                    business_party_id=business_party["id"],
+                    survey=survey_eq,
                 )
         self.assertEqual(
             e.exception.message, "Collection instrument 68ad4018-2ddd-4894-89e7-33f0135887a2 type is not EQ"
@@ -137,7 +152,11 @@ class TestGenerateEqURL(unittest.TestCase):
         with app.app_context():
             with self.assertRaises(InvalidEqPayLoad) as e:
                 EqPayload().create_payload(
-                    case, party_id=respondent_party["id"], business_party_id=business_party["id"], survey=survey_eq
+                    case,
+                    collection_exercise,
+                    party_id=respondent_party["id"],
+                    business_party_id=business_party["id"],
+                    survey=survey_eq,
                 )
         self.assertEqual(
             e.exception.message,
@@ -159,7 +178,11 @@ class TestGenerateEqURL(unittest.TestCase):
         with app.app_context():
             with self.assertRaises(InvalidEqPayLoad) as e:
                 EqPayload().create_payload(
-                    case, party_id=respondent_party["id"], business_party_id=business_party["id"], survey=survey_eq
+                    case,
+                    collection_exercise,
+                    party_id=respondent_party["id"],
+                    business_party_id=business_party["id"],
+                    survey=survey_eq,
                 )
         self.assertEqual(
             e.exception.message,
@@ -209,6 +232,16 @@ class TestGenerateEqURL(unittest.TestCase):
 
         # Then the date is localised to the next day
         self.assertEqual(result, "2007-01-26")
+
+    def test_string_date_time_adjusts_to_local_time_iso_format(self):
+        # Given a valid date in tz -1hr before midnight
+        date = "2007-01-25T23:59:59-0100"
+
+        # When format_date is called
+        result = EqPayload()._format_string_long_date_time_to_iso_format(date)
+
+        # Then the date is localised to the next day
+        self.assertEqual(result, "2007-01-26T00:59:59+00:00")
 
     def test_generate_eq_url_missing_mandatory_event_date(self):
 

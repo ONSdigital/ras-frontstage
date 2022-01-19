@@ -35,6 +35,8 @@ class Config(object):
     ACCOUNT_SERVICE_URL = os.getenv("ACCOUNT_SERVICE_URL")
     ACCOUNT_SERVICE_LOG_OUT_URL = os.getenv("ACCOUNT_SERVICE_LOG_OUT_URL")
     EQ_URL = os.getenv("EQ_URL")
+    EQ_V3_URL = os.getenv("EQ_V3_URL")
+    EQ_V3_ENABLED = bool(strtobool(os.getenv("EQ_V3_ENABLED", "False")))
     JSON_SECRET_KEYS = os.getenv("JSON_SECRET_KEYS")
 
     REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
@@ -68,11 +70,7 @@ class Config(object):
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "ras-rm-sandbox")
     PUBSUB_TOPIC = os.getenv("PUBSUB_TOPIC", "ras-rm-notify-test")
     CANARY_GENERATE_ERRORS = bool(strtobool(os.getenv("CANARY_GENERATE_ERRORS", "False")))
-    # TODO: to be removed once account change is reworked on.
-    ACCOUNT_EMAIL_CHANGE_ENABLED = bool(strtobool(os.getenv("ACCOUNT_EMAIL_CHANGE_ENABLED", "False")))
-    SHARE_SURVEY_ENABLED = bool(strtobool(os.getenv("SHARE_SURVEY_ENABLED", "True")))
     MAX_SHARED_SURVEY = int(os.getenv("MAX_SHARED_SURVEY", "50"))
-    TECHNICAL_MESSAGE_ENABLED = bool(strtobool(os.getenv("TECHNICAL_MESSAGE_ENABLED", "True")))
     UNDER_MAINTENANCE = bool(strtobool(os.getenv("UNDER_MAINTENANCE", "False")))
 
 
@@ -91,7 +89,7 @@ class DevelopmentConfig(Config):
 
     ACCOUNT_SERVICE_URL = os.getenv("ACCOUNT_SERVICE_URL", "http://localhost:8082/surveys/todo")
     ACCOUNT_SERVICE_LOG_OUT_URL = os.getenv("ACCOUNT_SERVICE_LOG_OUT_URL", "http://localhost:8082/sign-in/logout")
-    EQ_URL = os.getenv("EQ_URL", "https://localhost:5000/session?token=")
+    EQ_URL = os.getenv("EQ_URL", "http://localhost:8086/session?token=")
     JSON_SECRET_KEYS = os.getenv("JSON_SECRET_KEYS") or open("./tests/test_data/jwt-test-keys/test_key.json").read()
 
     AUTH_URL = os.getenv("AUTH_URL", "http://localhost:8041")
@@ -118,10 +116,13 @@ class TestingConfig(DevelopmentConfig):
     ACCOUNT_SERVICE_URL = "http://frontstage-url/surveys"
     ACCOUNT_SERVICE_LOG_OUT_URL = "http://frontstage-url/sign-in/logout"
     EQ_URL = "https://eq-test/session?token="
+    EQ_V3_URL = "https://eq-v3-test/session?token="
     JSON_SECRET_KEYS = open("./tests/test_data/jwt-test-keys/test_key.json").read()
     SECURITY_USER_NAME = "username"
     SECURITY_USER_PASSWORD = "password"
+    SECRET_KEY = os.getenv("SECRET_KEY", "ONS_DUMMY_KEY")
     REQUESTS_POST_TIMEOUT = 99
     WTF_CSRF_TIME_LIMIT = int(os.getenv("WTF_CSRF_TIME_LIMIT", "3200"))
     SECURE_APP = bool(strtobool(os.getenv("SECURE_APP", "False")))
     ACCESS_CONTROL_ALLOW_ORIGIN = os.getenv("ACCESS_CONTROL_ALLOW_ORIGIN", "http://localhost")
+    UNDER_MAINTENANCE = bool(strtobool(os.getenv("UNDER_MAINTENANCE", "False")))

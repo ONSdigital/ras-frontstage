@@ -1,0 +1,59 @@
+{% extends "layouts/_block_content.html" %}
+{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/button/_macro.njk" import onsButton %}
+
+{% set page_title = "Help with how long selected for" %}
+{% set breadcrumbsData = [
+  {
+    "text": "Surveys",
+    "url": "/surveys/todo",
+    "id": "b-item-1"
+  },
+] %}
+
+{% if is_survey_help_page is defined and  is_survey_help_page %}
+{% do breadcrumbsData.append({
+    "text": "Help",
+    "url": "/surveys/surveys-help?survey_ref="~survey_ref~"&ru_ref="~ru_ref,
+    "id": "b-item-2"
+  },) %}
+{% do breadcrumbsData.append({
+    "text": "Something else",
+    "url": "/surveys/help/"~option,
+    "id": "b-item-3"
+  },) %}
+{% endif %}
+{% block breadcrumb %}
+{{
+    onsBreadcrumb({
+        "ariaLabel": "Breadcrumbs",
+        "id": "breadcrumbs",
+        "itemsList": breadcrumbsData
+    })
+}}
+{% endblock breadcrumb %}
+
+{% block main %}
+<h1 class="u-fs-xl">My survey is not listed</h1>
+<p>When you are selected to return a survey we send an enrolment letter to your business's postal address.
+    You should <a href="{{ url_for('surveys_bp.add_survey') }}">add the new survey to your account</a> using the code in the letter.</p>
+<p>
+    {% if is_survey_help_page is defined and  is_survey_help_page %}
+    <a href="{{ url_for('surveys_bp.get_send_help_message_page', option=option,sub_option='my-survey-is-not-listed') }}">
+    {% else %}
+    <a href="{{ url_for('surveys_bp.get_send_help_technical_message_page', option=option) }}">
+    {% endif %} Send us a message</a> if you have not received the enrolment letter.</p>
+<p>If you have received a request from a colleague to access a survey you need to follow the link in the email.
+    The link expires after 72 hours. If the link has expired, you should request access from your colleague again.</p>
+<h2>Did this answer your question?</h2>
+<p></p>
+<div class="btn-group">
+    <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" role="button" class="btn btn--link btn-group__btn"><span class="btn__inner">Yes</span></a>
+    {% if is_survey_help_page is defined and  is_survey_help_page %}
+        <a href="{{ url_for('surveys_bp.get_send_help_message_page', option=option,sub_option='my-survey-is-not-listed') }}" role="button" class="btn btn--link btn--secondary btn-group__btn"><span class="btn__inner">No</span></a>
+    {% else %}
+        <a href="{{ url_for('surveys_bp.get_send_help_technical_message_page', option=option) }}" role="button" class="btn btn--link btn--secondary btn-group__btn"><span class="btn__inner">No</span></a>
+    {% endif %}
+</div>
+
+{% endblock main %}

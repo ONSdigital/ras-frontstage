@@ -62,17 +62,9 @@
             }}
         {% endcall %}
     {% endif %}
-<h1 class="u-fs-xl">Change your contact details</h1>
+<h1 class="u-fs-xl">Enter your new contact details</h1>
 <form action="" method="post">
         {{ form.csrf_token }}
-        
-        {% call onsPanel({}) %}
-            <div>
-                If you need to change your email address you should <a href="{{ url_for('contact_us_bp.contact_us')}}">contact us</a>
-            </div>
-        {% endcall %}
-        
-        
         {% set firstName = respondent.firstName %}
         {% if errors.first_name %}
                 {% set errorFirstName = { "text": errors['first_name'][0],  "id": 'first_name_error' } %}
@@ -101,13 +93,12 @@
                     "name": "last_name",
                     "type": "text",
                     "label": {
-                        "text": 'Surname'
+                        "text": 'Last name'
                     },
                     "error": errorLastName,
                     "value": lastName
                 })
             }}
-    {% if is_email_change_enabled %}
             {% set emailAddress = respondent.emailAddress %}
             {% if errors.email_address %}
                 {% set errorEmailAddress = { "text": errors['email_address'][0],  "id": 'email_address_error' } %}
@@ -125,7 +116,6 @@
                     "value": emailAddress,
                 })
             }}
-    {% endif %}
             {% set phoneNumber = respondent.telephone %}
             {% if errors.phone_number %}
                 {% set errorPhoneNumber = { "text": errors['phone_number'][0],  "id": 'phone_number_error' } %}

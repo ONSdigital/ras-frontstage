@@ -7,6 +7,7 @@ from dateutil.parser import parse
 from flask import current_app as app
 from structlog import wrap_logger
 
+from frontstage.common.redis_cache import RedisCache
 from frontstage.common.thread_wrapper import ThreadWrapper
 from frontstage.common.utilities import obfuscate_email
 from frontstage.controllers import (
@@ -22,7 +23,7 @@ CLOSED_STATE = ["COMPLETE", "COMPLETEDBYPHONE", "NOLONGERREQUIRED"]
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def get_respondent_party_by_id(party_id):
+def get_respondent_party_by_id(party_id: str) -> dict:
     logger.info("Retrieving party from party service by id", party_id=party_id)
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/id/{party_id}"
@@ -295,8 +296,13 @@ def confirm_pending_survey(batch_number):
     return response
 
 
-def get_respondent_enrolments(party_id):
-    respondent = get_respondent_party_by_id(party_id)
+def get_respondent_enrolments(respondent: dict):
+    """
+    Returns a generator containing all the business_id and survey_id for all the active enrolments for the
+    respondent.
+
+    :param respondent: A dict containing respondent data
+    """
     if "associations" in respondent:
         for association in respondent["associations"]:
             for enrolment in association["enrolments"]:
@@ -342,13 +348,9 @@ def get_unique_survey_and_business_ids(enrolment_data):
 def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
     # Creates a list of threads which will call functions to set the survey, case, party and collex responses
     # in the cache_data.
-
     threads = []
 
     for survey_id in surveys_ids:
-        threads.append(
-            ThreadWrapper(get_survey, cache_data, survey_id, app.config["SURVEY_URL"], app.config["BASIC_AUTH"])
-        )
         threads.append(
             ThreadWrapper(
                 get_collex, cache_data, survey_id, app.config["COLLECTION_EXERCISE_URL"], app.config["BASIC_AUTH"]
@@ -371,33 +373,28 @@ def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
         thread.join()
 
 
-def caching_data_for_collection_instrument(cache_data):
-    # This function creates a list of threads from the collection instrument id in the cache_data of the cases.
+def caching_data_for_collection_instrument(cache_data: dict, cases: list):
+    """
+    Adds to the collection instrument part of the cache dictionary.  Given a list of cases, it will get a set of
+    the collectionInstrumentId's, then if the id isn't in the cache already, it'll ask the collection instrument service
+    for it.  This doesn't return a dict with the cached data, this will modify the dictionary as a side-effect.
+
+    :param cache_data: The cache dictionary.
+    :param cases: A list of cases
+    """
     collection_instrument_ids = set()
-    threads = []
-    for _, cases in cache_data["cases"].items():
-        for case in cases:
-            collection_instrument_ids.add(case["collectionInstrumentId"])
+    for case in cases:
+        collection_instrument_ids.add(case["collectionInstrumentId"])
     for collection_instrument_id in collection_instrument_ids:
-        threads.append(
-            ThreadWrapper(
-                get_collection_instrument,
-                cache_data,
-                collection_instrument_id,
-                app.config["COLLECTION_INSTRUMENT_URL"],
-                app.config["BASIC_AUTH"],
+        if not cache_data["instrument"].get(collection_instrument_id):
+            cache_data["instrument"][
+                collection_instrument_id
+            ] = collection_instrument_controller.get_collection_instrument(
+                collection_instrument_id, app.config["COLLECTION_INSTRUMENT_URL"], app.config["BASIC_AUTH"]
             )
-        )
-
-    for thread in threads:
-        thread.start()
-
-    # We do a thread join to make sure that the threads have all terminated before it carries on
-    for thread in threads:
-        thread.join()
 
 
-def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_id):
+def get_survey_list_details_for_party(respondent: dict, tag: str, business_party_id: str, survey_id: str):
     """
     Gets a list of cases (and any useful metadata) for a respondent.  Depending on the tag the list of cases will be
     ones that require action (in the form of an EQ or SEFT submission); Or they will be cases that have been completed
@@ -418,35 +415,36 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
           - Get the business details the enrolment is for
           - Get the live-but-not-ended collection exercises for the survey the enrolment is for
           - Get the cases the business is part of, from the list of collection exercises. Note, this isn't every case
-            against the business; depending if you're looking at the to-do or history page, you'll get a different
+            against the business; depending on if you're looking at the to-do or history page, you'll get a different
             subset of them.
           - For each case in this list:
               - Create an entry in the returned list for each of these cases as the respondent is implicitly part
                 of the case by being enrolled for the survey with that business.
 
-    :party_id: This is the respondents uuid
-    :tag: This is the page that is being called e.g. to-do, history
-    :business_party_id: This is the businesses uuid
-    :survey_id: This is the surveys uuid
+    :param respondent: A dict containing respondent data
+    :param tag: This is the page that is being called e.g. to-do, history
+    :param business_party_id: This is the businesses uuid
+    :param survey_id: This is the surveys uuid
 
     """
-    enrolment_data = list(get_respondent_enrolments(party_id))
+    enrolment_data = list(get_respondent_enrolments(respondent))
 
     # Gets the survey ids and business ids from the enrolment data that has been generated.
     # Converted to list to avoid multiple calls to party (and the list size is small).
     surveys_ids, business_ids = get_unique_survey_and_business_ids(enrolment_data)
 
-    # This is a dictionary that will store all of the data that is going to be cached instead of making multiple calls
-    # inside of the for loop for get_respondent_enrolments.
-    cache_data = {"surveys": dict(), "businesses": dict(), "collexes": dict(), "cases": dict(), "instrument": dict()}
+    # This is a dictionary that will store all the data that is going to be cached instead of making multiple calls
+    # inside the for loop for get_respondent_enrolments.
+    cache_data = {"businesses": dict(), "collexes": dict(), "cases": dict()}
+    redis_cache = RedisCache()
 
-    # These two will call the services to get responses and cache the data for later use.
+    # Populate the cache with all non-instrument data
     caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag)
-    caching_data_for_collection_instrument(cache_data)
+
     enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, cache_data["collexes"])
     for enrolment in enrolments:
         business_party = cache_data["businesses"][enrolment["business_id"]]
-        survey = cache_data["surveys"][enrolment["survey_id"]]
+        survey = redis_cache.get_survey(enrolment["survey_id"])
 
         # Note: If it ever becomes possible to get only live-but-not-ended collection exercises from the
         # collection exercise service, the filter_ended_collection_exercises function will no longer
@@ -465,18 +463,18 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
 
         for case in enrolled_cases:
             collection_exercise = collection_exercises_by_id[case["caseGroup"]["collectionExerciseId"]]
+            collection_instrument = redis_cache.get_collection_instrument(case["collectionInstrumentId"])
+            collection_instrument_type = collection_instrument["type"]
             added_survey = True if business_party_id == business_party["id"] and survey_id == survey["id"] else None
-            display_access_button = display_button(
-                case["caseGroup"]["caseGroupStatus"], cache_data["instrument"][case["collectionInstrumentId"]]["type"]
-            )
+            display_access_button = display_button(case["caseGroup"]["caseGroupStatus"], collection_instrument_type)
 
             yield {
                 "case_id": case["id"],
                 "status": case_controller.calculate_case_status(
                     case["caseGroup"]["caseGroupStatus"],
-                    cache_data["instrument"][case["collectionInstrumentId"]]["type"],
+                    collection_instrument_type,
                 ),
-                "collection_instrument_type": cache_data["instrument"][case["collectionInstrumentId"]]["type"],
+                "collection_instrument_type": collection_instrument_type,
                 "survey_id": survey["id"],
                 "survey_long_name": survey["longName"],
                 "survey_short_name": survey["shortName"],
@@ -495,7 +493,7 @@ def get_survey_list_details_for_party(party_id, tag, business_party_id, survey_i
             }
 
 
-def filter_ended_collection_exercises(collection_exercises):
+def filter_ended_collection_exercises(collection_exercises: dict) -> list:
     """
     Takes the list of collection exercises and returns a list with all the ones that don't have a
     scheduledEndDateTime that is in the past. If a collection exercise is missing a scheduledEndDateTime
@@ -531,25 +529,17 @@ def get_party(cache_data, business_id, party_url, party_auth):
     cache_data["businesses"][business_id] = get_party_by_business_id(business_id, party_url, party_auth)
 
 
-def get_collection_instrument(
-    cache_data, collection_instrument_id, collection_instrument_url, collection_instrument_auth
-):
-    cache_data["instrument"][collection_instrument_id] = collection_instrument_controller.get_collection_instrument(
-        collection_instrument_id, collection_instrument_url, collection_instrument_auth
-    )
-
-
 def display_button(status, ci_type):
     return not (ci_type == "EQ" and status in CLOSED_STATE)
 
 
-def is_respondent_enrolled(party_id, business_party_id, survey_short_name, return_survey=False):
-    survey = survey_controller.get_survey_by_short_name(survey_short_name)
-    for enrolment in get_respondent_enrolments(party_id):
+def is_respondent_enrolled(party_id: str, business_party_id: str, survey: dict) -> bool:
+    respondent = get_respondent_party_by_id(party_id)
+    enrolments = get_respondent_enrolments(respondent)
+    for enrolment in enrolments:
         if enrolment["business_id"] == business_party_id and enrolment["survey_id"] == survey["id"]:
-            if return_survey:
-                return {"survey": survey}
             return True
+    return False
 
 
 def notify_party_and_respondent_account_locked(respondent_id, email_address, status=None):
@@ -580,7 +570,8 @@ def get_list_of_business_for_party(party_id):
     """
     bound_logger = logger.bind(party_id=party_id)
     bound_logger.info("Getting enrolment data for the party")
-    enrolment_data = get_respondent_enrolments(party_id)
+    respondent = get_respondent_party_by_id(party_id)
+    enrolment_data = get_respondent_enrolments(respondent)
     business_ids = {enrolment["business_id"] for enrolment in enrolment_data}
     bound_logger.info("Getting businesses against business ids", business_ids=business_ids)
     return get_business_by_id(business_ids)
@@ -605,15 +596,15 @@ def get_business_by_id(business_ids):
     return response.json()
 
 
-def get_surveys_listed_against_party_and_business_id(business_id, party_id):
+def get_surveys_listed_against_party_and_business_id(business_id, party_id) -> list:
     """
     returns list of surveys associated with a business id and respondent
     :param business_id: business id
     :param party_id: The respondent's party id
     :return: list of surveys
-    :rtype: list
     """
-    enrolment_data = get_respondent_enrolments(party_id)
+    respondent = get_respondent_party_by_id(party_id)
+    enrolment_data = get_respondent_enrolments(respondent)
     survey_ids = {enrolment["survey_id"] for enrolment in enrolment_data if enrolment["business_id"] == business_id}
     surveys = []
     for survey in survey_ids:
@@ -622,14 +613,14 @@ def get_surveys_listed_against_party_and_business_id(business_id, party_id):
     return surveys
 
 
-def get_user_count_registered_against_business_and_survey(business_id, survey_id, is_transfer):
+def get_user_count_registered_against_business_and_survey(business_id, survey_id, is_transfer) -> int:
     """
     returns total number of users registered against a business and survey
+
     :param business_id: business id
     :param survey_id: The survey id
     :param is_transfer: True if the request is for transfer survey
     :return: total number of users
-    :rtype: int
     """
     logger.info("Attempting to get user count", business_ids=business_id, survey_id=survey_id)
     url = f'{app.config["PARTY_URL"]}/party-api/v1/pending-survey-users-count'
@@ -645,6 +636,7 @@ def get_user_count_registered_against_business_and_survey(business_id, survey_id
 def register_pending_shares(payload):
     """
     register new entries to party for pending shares
+
     :param payload: pending shares entries dict
     :return: success if post completed
     :rtype: response object

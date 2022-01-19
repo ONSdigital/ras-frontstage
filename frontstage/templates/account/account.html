@@ -64,37 +64,33 @@
                 "value": "change_password"
             }
             ) %}
-        {% if is_share_survey_enabled %}
-            {% do radios.append(
-            {
-                "id": "share_surveys",
-                "label": {
-                    "text": "Share access to my surveys"
-                },
-                "value": "share_surveys"
-            }
-            ) %}
-        {% endif %}
-            {% do radios.append(
-            {
-                "id": "transfer_surveys",
-                "label": {
-                    "text": "I am no longer required to complete any surveys"
-                },
-                "value": "transfer_surveys"
-            }
-            ) %}
-        {% if is_technical_message_enabled %}
-            {% do radios.append(
-            {
-                "id": "something_else",
-                "label": {
-                    "text": "Something else"
-                },
-                "value": "something_else"
-            }
-            ) %}
-        {% endif %}
+        {% do radios.append(
+        {
+            "id": "share_surveys",
+            "label": {
+                "text": "Share access to my surveys"
+            },
+            "value": "share_surveys"
+        }
+        ) %}
+        {% do radios.append(
+        {
+            "id": "transfer_surveys",
+            "label": {
+                "text": "I am no longer required to complete any surveys"
+            },
+            "value": "transfer_surveys"
+        }
+        ) %}
+        {% do radios.append(
+        {
+            "id": "something_else",
+            "label": {
+                "text": "Something else"
+            },
+            "value": "something_else"
+        }
+        ) %}
         {% do radioComponent | setAttribute("radios", radios) %}
         {{
             onsRadios(radioComponent)

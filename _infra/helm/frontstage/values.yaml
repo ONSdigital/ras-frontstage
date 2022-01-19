@@ -14,6 +14,8 @@ service:
   type: ClusterIP
   port: 9000
 
+config: DevelopmentConfig
+
 database:
   managedRedis: false
 
@@ -21,6 +23,7 @@ ingress:
   enabled: false
   surveysHost: surveys.example.com
   certNameSurveys: surveys-cert
+  timeoutSec: 30
 
 analytics:
   enabled: false
@@ -30,10 +33,6 @@ email:
   expiry: "86400"
   templates:
     passwordChange: 7ba6b103-79d2-4ef1-be2e-979c127fa439
-
-features:
-  shareSurveys: false
-  technicalMessage: true
 
 gcp:
   project: ras-rm-sandbox
@@ -49,11 +48,11 @@ security:
 
 resources:
   requests:
-    memory: "500Mi"
-    cpu: "25m"
+    cpu: "75m"
+    memory: "300Mi"
   limits:
-    cpu: "100m"
-    memory: "1000Mi"
+    cpu: "250m"
+    memory: "700Mi"
 
 autoscaling: false
 scaleAt:
@@ -67,7 +66,9 @@ rollingUpdate:
   maxUnavailable: 1
 
 eq:
-  url: "http://localhost/session?token="
+  url: "http://localhost:8086/session?token="
+  v3url: "http://localhost:8086/session?token="
+  v3enabled: false
 
 dns:
   enabled: false

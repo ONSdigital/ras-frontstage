@@ -75,7 +75,10 @@ def share_survey_survey_select(session):
     for business_id in flask_session["share_survey_data"]:
         selected_business = get_business_by_id(business_id)
         surveys = get_surveys_listed_against_party_and_business_id(business_id, party_id)
-        share_dict[selected_business[0]["id"]] = {"name": selected_business[0]["name"], "surveys": surveys}
+        share_dict[selected_business[0]["id"]] = {
+            "name": selected_business[0]["name"],
+            "surveys": surveys,
+        }
     error = request.args.get("error", "")
     failed_surveys_list = flask_session.get("validation_failure_share_surveys_list")
     selected_survey_list = flask_session.get("share_surveys_selected_list")
@@ -166,7 +169,8 @@ def is_max_share_survey_exceeded(selected_businesses, form):
         share_surveys_selected_against_business = form.getlist(business[0]["id"])
         if not validate_max_shared_survey(business[0]["id"], share_surveys_selected_against_business):
             flash(
-                "You have reached the maximum amount of emails you can enroll on one or more surveys", business[0]["id"]
+                "You have reached the maximum amount of emails you can enroll on one or more surveys",
+                business[0]["id"],
             )
             is_max_share_survey = True
     return is_max_share_survey
@@ -212,12 +216,14 @@ def share_survey_post_email_entry(session):
     form = AccountSurveyShareRecipientEmailForm(request.values)
     party_id = session.get_party_id()
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
-    if not form.validate() or respondent_details["emailAddress"].lower() == form.data["email_address"].lower():
+    if not form.validate():
+        errors = form.errors
+        return render_template("surveys/surveys-share/recipient-email-address.html", form=form, errors=errors)
+
+    if "emailAddress" in respondent_details:
         if respondent_details["emailAddress"].lower() == form.data["email_address"].lower():
             errors = {"email_address": ["You can not share surveys with yourself."]}
-        else:
-            errors = form.errors
-        return render_template("surveys/surveys-share/recipient-email-address.html", form=form, errors=errors)
+            return render_template("surveys/surveys-share/recipient-email-address.html", form=form, errors=errors)
     flask_session["share_survey_recipient_email_address"] = form.data["email_address"]
     return redirect(url_for("account_bp.send_instruction_get"))
 
@@ -232,7 +238,10 @@ def send_instruction_get(session):
         surveys = []
         for survey_id in flask_session["share_survey_data"][business_id]:
             surveys.append(survey_controller.get_survey(app.config["SURVEY_URL"], app.config["BASIC_AUTH"], survey_id))
-        share_dict[selected_business[0]["id"]] = {"name": selected_business[0]["name"], "surveys": surveys}
+        share_dict[selected_business[0]["id"]] = {
+            "name": selected_business[0]["name"],
+            "surveys": surveys,
+        }
     return render_template(
         "surveys/surveys-share/send-instructions.html",
         email=email,

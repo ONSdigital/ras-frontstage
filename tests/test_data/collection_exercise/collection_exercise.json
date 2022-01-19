@@ -18,6 +18,7 @@
         "updated": "2018-07-12T09:01:13.004Z",
         "deleted": null,
         "validationErrors": null,
+        "eqVersion": "v2",
         "events": [
             {
                 "id": "b3651d8b-bb0b-42f7-a2a3-d05d85822226",

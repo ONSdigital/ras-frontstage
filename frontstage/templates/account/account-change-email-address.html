@@ -31,20 +31,39 @@
 }}
 {% endblock breadcrumb %}
 {% block main %}
-{% with messages = get_flashed_messages() %}
+{% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-          <div class="panel panel--simple panel--success u-mb-m">
-              <div class="panel__body" data-qa="error-success">
-                {% for message in messages %}
-                <p class="u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>
-                {% endfor %}
-              </div>
-          </div>
+        {% for category, message in messages %}
+            {% if category == "error" %}
+                {% call onsPanel({
+                "type": 'error',
+                "id": 'error-id',
+                "icon": 'lock',
+                "classes": 'u-mb-m'
+                }) %}
+                    <p class="u-fs-r" id="flashed-error-message-{{ loop.index }}">{{ message }}</p>
+                {% endcall %}
+            {% else %}
+                {% call onsPanel({
+                "type": 'success',
+                "id": 'success-id',
+                "icon": 'check',
+                "classes": 'u-mb-m'
+                }) %}
+                    <p class="u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>
+                {% endcall %}
+            {% endif %}
+        {% endfor %}
     {% endif %}
 {% endwith %}
 <h1 class="u-fs-xl">Change email address</h1>
 <p>You will need to authorise a change of email address.</p>
-<p>We will send a confirmation email to <b>{{ new_email }}</b>.</p>
+<p>We will send a verification email to <b>{{ new_email }}</b>.</p>
+{% call onsPanel({}) %}
+    <div>
+        If you are longer required to respond to your surveys, you can <a href="{{ url_for('account_bp.transfer_survey_overview') }}">transfer your surveys </a>to a colleague.
+    </div>
+{% endcall %}
 <form action="{{ url_for('account_bp.change_email_address')}}" method="post">
         {{ form.csrf_token }}
 
@@ -57,7 +76,7 @@
         <div class="grid__col">
           {{
               onsButton({
-              "text": "Send",
+              "text": "Send verification email",
               "id": "btn-option-send-email",
               "classes": 'btn-group__btn',
               "submitType": "timer"

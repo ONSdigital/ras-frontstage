@@ -1,10 +1,14 @@
 import logging
 
-from flask import redirect, render_template, request
+from flask import current_app, redirect, render_template, request
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
-from frontstage.controllers import case_controller, conversation_controller
+from frontstage.controllers import (
+    case_controller,
+    collection_exercise_controller,
+    conversation_controller,
+)
 from frontstage.views.surveys import surveys_bp
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -21,12 +25,29 @@ def access_survey(session):
 
     if collection_instrument_type == "EQ":
         logger.info("Attempting to redirect to EQ", party_id=party_id, case_id=case_id)
-        return redirect(case_controller.get_eq_url(case_id, party_id, business_party_id, survey_short_name))
+        case = case_controller.get_case_by_case_id(case_id)
+        collection_exercise = collection_exercise_controller.get_collection_exercise(
+            case["caseGroup"]["collectionExerciseId"]
+        )
+        eq_version = collection_exercise["eqVersion"]
+        if eq_version == "v3":
+            if current_app.config["EQ_V3_ENABLED"]:
+                return redirect(
+                    case_controller.get_eq_url(
+                        eq_version, case, collection_exercise, party_id, business_party_id, survey_short_name
+                    )
+                )
+            return render_template("surveys/surveys-temp-eq-v3-static.html")
+        else:
+            return redirect(
+                case_controller.get_eq_url(
+                    eq_version, case, collection_exercise, party_id, business_party_id, survey_short_name
+                )
+            )
 
     logger.info("Retrieving case data", party_id=party_id, case_id=case_id)
-    referer_header = request.headers.get("referer", {})
-
     case_data = case_controller.get_case_data(case_id, party_id, business_party_id, survey_short_name)
+    referer_header = request.headers.get("referer", {})
 
     logger.info("Successfully retrieved case data", party_id=party_id, case_id=case_id)
     unread_message_count = {"unread_message_count": conversation_controller.try_message_count_from_session(session)}

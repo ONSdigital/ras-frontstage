@@ -47,12 +47,21 @@
             <div id="ALREADY_ADDED_NOTIF">You have already added that <a href="#new-survey">survey</a> </div>
     {% endcall %}
 {% endif %}
-
+{% if delete_option_allowed %}
+    {{
+    onsPanel({
+        "body": '<p>There are no surveys registered to your account. If you wish to delete your account <a href="/my-account/delete">click here</a>.</p>'
+        })
+    }}
+{% endif %}
 <p class="u-fs-r u-mt-s u-mb-l">
     Need to add a new survey? Use your enrolment code to <a id="add_survey_button" href="{{ url_for('surveys_bp.add_survey') }}">add a new survey to your account</a>.
 </p>
 
 {% set emptySurveyListLabel = 'You have no surveys to complete' %}
 {% include "surveys/surveys.html" %}
-
+<p class="u-fs-r u-mt-l">
+                <a href="{{ url_for('surveys_bp.get_technical_message_page_option', option='my-survey-is-not-listed') }}"
+                id="survey-not-listed">Survey not listed?</a>
+</p>
 {% endblock content %}

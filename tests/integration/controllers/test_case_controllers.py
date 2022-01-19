@@ -1,4 +1,5 @@
 import unittest
+from copy import deepcopy
 from unittest.mock import patch
 
 import responses
@@ -28,6 +29,8 @@ from tests.integration.mocked_services import (
     url_get_case_by_enrolment_code,
     url_get_case_categories,
     url_get_cases_by_party,
+    url_get_survey_by_short_name,
+    url_get_survey_by_short_name_eq,
     url_post_case_event_uuid,
 )
 
@@ -132,47 +135,111 @@ class TestCaseControllers(unittest.TestCase):
     def test_get_eq_url_case_group_status_not_complete(self, get_case_by_id, create_eq_payload, *_):
         get_case_by_id.return_value = case
         create_eq_payload.return_value = eq_payload
-        with app.app_context():
-            eq_url = case_controller.get_eq_url(
-                case["id"], respondent_party["id"], business_party["id"], survey_eq["shortName"]
-            )
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.GET, url_get_survey_by_short_name_eq, json=survey_eq, status=200)
+            with app.app_context():
+                eq_url = case_controller.get_eq_url(
+                    "v2",
+                    case,
+                    collection_exercise,
+                    respondent_party["id"],
+                    business_party["id"],
+                    survey_eq["shortName"],
+                )
 
-            self.assertIn("https://eq-test/session?token=", eq_url)
+                self.assertIn("https://eq-test/session?token=", eq_url)
+
+    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
+    @patch("frontstage.controllers.case_controller.post_case_event")
+    @patch("frontstage.common.eq_payload.EqPayload.create_payload")
+    @patch("frontstage.controllers.case_controller.get_case_by_case_id")
+    def test_get_eq_v3_url_case_group_status_not_complete(self, get_case_by_id, create_eq_payload, *_):
+        get_case_by_id.return_value = case
+        create_eq_payload.return_value = eq_payload
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.GET, url_get_survey_by_short_name_eq, json=survey_eq, status=200)
+            with app.app_context():
+                eq_url = case_controller.get_eq_url(
+                    "v3",
+                    case,
+                    collection_exercise,
+                    respondent_party["id"],
+                    business_party["id"],
+                    survey_eq["shortName"],
+                )
+
+                self.assertIn("https://eq-v3-test/session?token=", eq_url)
+
+    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
+    @patch("frontstage.controllers.case_controller.post_case_event")
+    @patch("frontstage.common.eq_payload.EqPayload.create_payload")
+    @patch("frontstage.controllers.case_controller.get_case_by_case_id")
+    def test_get_eq_url_blank_eq_version_redirects_to_v2(self, get_case_by_id, create_eq_payload, *_):
+        get_case_by_id.return_value = case
+        create_eq_payload.return_value = eq_payload
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.GET, url_get_survey_by_short_name_eq, json=survey_eq, status=200)
+            with app.app_context():
+                eq_url = case_controller.get_eq_url(
+                    None,
+                    case,
+                    collection_exercise,
+                    respondent_party["id"],
+                    business_party["id"],
+                    survey_eq["shortName"],
+                )
+
+                self.assertIn("https://eq-test/session?token=", eq_url)
 
     @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
     @patch("frontstage.controllers.case_controller.get_case_by_case_id")
     def test_get_eq_url_when_caseGroupStatus_is_complete(self, get_case_by_id, _):
-
-        case["caseGroup"]["caseGroupStatus"] = "COMPLETE"
-        get_case_by_id.return_value = case
+        case_copy = deepcopy(case)
+        case_copy["caseGroup"]["caseGroupStatus"] = "COMPLETE"
+        get_case_by_id.return_value = case_copy
         with app.app_context():
             with self.assertRaises(Forbidden):
                 case_controller.get_eq_url(
-                    case["id"], respondent_party["id"], business_party["id"], survey_eq["shortName"]
+                    "v2",
+                    case_copy,
+                    collection_exercise,
+                    respondent_party["id"],
+                    business_party["id"],
+                    survey_eq["shortName"],
                 )
 
     @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
     @patch("frontstage.controllers.case_controller.get_case_by_case_id")
     def test_get_eq_url_when_caseGroupStatus_is_completed_by_phone(self, get_case_by_id, _):
-
-        case["caseGroup"]["caseGroupStatus"] = "COMPLETEDBYPHONE"
-        get_case_by_id.return_value = case
+        case_copy = deepcopy(case)
+        case_copy["caseGroup"]["caseGroupStatus"] = "COMPLETEDBYPHONE"
+        get_case_by_id.return_value = case_copy
         with app.app_context():
             with self.assertRaises(Forbidden):
                 case_controller.get_eq_url(
-                    case["id"], respondent_party["id"], business_party["id"], survey_eq["shortName"]
+                    "v2",
+                    case_copy,
+                    collection_exercise,
+                    respondent_party["id"],
+                    business_party["id"],
+                    survey_eq["shortName"],
                 )
 
     @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
     @patch("frontstage.controllers.case_controller.get_case_by_case_id")
     def test_get_eq_url_when_caseGroupStatus_is_no_longer_required(self, get_case_by_id, _):
-
-        case["caseGroup"]["caseGroupStatus"] = "NOLONGERREQUIRED"
-        get_case_by_id.return_value = case
+        case_copy = deepcopy(case)
+        case_copy["caseGroup"]["caseGroupStatus"] = "NOLONGERREQUIRED"
+        get_case_by_id.return_value = case_copy
         with app.app_context():
             with self.assertRaises(Forbidden):
                 case_controller.get_eq_url(
-                    case["id"], respondent_party["id"], business_party["id"], survey_eq["shortName"]
+                    "v2",
+                    case_copy,
+                    collection_exercise,
+                    respondent_party["id"],
+                    business_party["id"],
+                    survey_eq["shortName"],
                 )
 
     @patch("frontstage.controllers.case_controller.get_case_by_case_id")
@@ -181,11 +248,32 @@ class TestCaseControllers(unittest.TestCase):
         is_respondent_enrolled.return_value = False
         get_case_by_id.return_value = case
 
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.GET, url_get_survey_by_short_name_eq, json=survey_eq, status=200)
+            with app.app_context():
+                with self.assertRaises(NoSurveyPermission):
+                    case_controller.get_eq_url(
+                        "v2",
+                        case,
+                        collection_exercise,
+                        respondent_party["id"],
+                        business_party["id"],
+                        survey_eq["shortName"],
+                    )
+
+    def test_get_eq_url_unsupported_version(self):
         with app.app_context():
-            with self.assertRaises(NoSurveyPermission):
+            with self.assertRaises(ValueError) as e:
                 case_controller.get_eq_url(
-                    case["id"], respondent_party["id"], business_party["id"], survey_eq["shortName"]
+                    "v1234",
+                    case,
+                    collection_exercise,
+                    respondent_party["id"],
+                    business_party["id"],
+                    survey_eq["shortName"],
                 )
+
+            self.assertEqual(str(e.exception), "The eq version [v1234] is not supported")
 
     @patch("frontstage.controllers.case_controller.validate_case_category")
     def test_post_case_event_success(self, _):
@@ -298,11 +386,13 @@ class TestCaseControllers(unittest.TestCase):
         get_case_by_id.return_value = case
         is_respondent_enrolled.return_value = False
 
-        with app.app_context():
-            with self.assertRaises(NoSurveyPermission):
-                case_controller.get_case_data(
-                    case["id"], respondent_party["id"], business_party["id"], survey["shortName"]
-                )
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.GET, url_get_survey_by_short_name, json=survey, status=200)
+            with app.app_context():
+                with self.assertRaises(NoSurveyPermission):
+                    case_controller.get_case_data(
+                        case["id"], respondent_party["id"], business_party["id"], survey["shortName"]
+                    )
 
     def test_get_cases_by_party_id_with_case_events(self):
         with responses.RequestsMock() as rsps:

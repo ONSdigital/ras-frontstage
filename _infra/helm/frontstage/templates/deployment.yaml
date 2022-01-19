@@ -62,6 +62,8 @@ spec:
             successThreshold: 1
             timeoutSeconds: 5
           env:
+          - name: APP_SETTINGS
+            value: {{ .Values.config }}
           - name: ACCOUNT_SERVICE_URL
             value: "https://{{ .Values.ingress.surveysHost }}/surveys/todo"
           - name: ACCOUNT_SERVICE_LOG_OUT_URL
@@ -116,6 +118,10 @@ spec:
                 key: email-salt
           - name: EQ_URL
             value: "{{ .Values.eq.url }}"
+          - name: EQ_V3_URL
+            value: "{{ .Values.eq.v3url }}"
+          - name: EQ_V3_ENABLED
+            value: "{{ .Values.eq.v3enabled }}"
           {{ if .Values.analytics.enabled }}
           - name: GOOGLE_ANALYTICS_ID
             value: "{{ .Values.analytics.id }}"
@@ -193,10 +199,6 @@ spec:
             {{- end }}
           - name: SEND_EMAIL_TO_GOV_NOTIFY
             value: "{{ .Values.email.enabled }}"
-          - name: SHARE_SURVEY_ENABLED
-            value: "{{ .Values.features.shareSurveys }}"
-          - name: TECHNICAL_MESSAGE_ENABLED
-            value: "{{ .Values.features.technicalMessage }}"
           - name: UNDER_MAINTENANCE
             value: "{{- if .Values.maintenancePage.enabled -}}True{{- else -}}False{{- end -}}"
           - name: SURVEY_URL

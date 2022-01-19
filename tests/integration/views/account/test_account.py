@@ -35,7 +35,6 @@ class TestSurveyList(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         with app.app_context():
-            app.config["ACCOUNT_EMAIL_CHANGE_ENABLED"] = True
             response = self.app.get("/my-account")
 
             self.assertEqual(response.status_code, 200)
@@ -48,7 +47,6 @@ class TestSurveyList(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         with app.app_context():
-            app.config["ACCOUNT_EMAIL_CHANGE_ENABLED"] = True
             response = self.app.get("/my-account")
 
             self.assertEqual(response.status_code, 200)
@@ -78,13 +76,11 @@ class TestSurveyList(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         response = self.app.post("/my-account/change-account-details", data={"first_name": ""}, follow_redirects=True)
-        # TODO: Uncomment the '4 errors' line, the 'email address' line and delete the 3 errors line once the
-        # account change email functionality has been restored
-        self.assertIn("There are 3 errors on this page".encode(), response.data)
-        # self.assertIn("There are 4 errors on this page".encode(), response.data)
+
+        self.assertIn("There are 4 errors on this page".encode(), response.data)
         self.assertIn("Problem with the first name".encode(), response.data)
         self.assertIn("Problem with the phone number".encode(), response.data)
-        # self.assertIn("Problem with the email address".encode(), response.data)
+        self.assertIn("Problem with the email address".encode(), response.data)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
@@ -131,7 +127,7 @@ class TestSurveyList(unittest.TestCase):
         self.assertIn("updated your first name, last name and telephone number".encode(), response.data)
         self.assertIn("Change email address".encode(), response.data)
         self.assertIn("You will need to authorise a change of email address.".encode(), response.data)
-        self.assertIn("We will send a confirmation email to".encode(), response.data)
+        self.assertIn("We will send a verification email to".encode(), response.data)
         self.assertIn("exampleone@example.com".encode(), response.data)
 
     @requests_mock.mock()
@@ -150,8 +146,10 @@ class TestSurveyList(unittest.TestCase):
             follow_redirects=True,
         )
         self.assertIn("Almost done".encode(), response.data)
-        self.assertIn("Once you have received it, you need to follow the link".encode(), response.data)
-        self.assertIn("please call 0300 1234 931".encode(), response.data)
+        self.assertIn("We have sent a verification email to your new email address.".encode(), response.data)
+        self.assertIn("Follow the link in the email to verify the change.".encode(), response.data)
+        self.assertIn("Email not arrived? It may be in your junk folder.".encode(), response.data)
+        self.assertIn("If it does not arrive within 15 minutes, please".encode(), response.data)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
@@ -228,13 +226,17 @@ class TestSurveyList(unittest.TestCase):
         self.assertTrue("Cancel".encode() in response.data)
 
     @requests_mock.mock()
+    @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
     @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
     @patch("frontstage.controllers.conversation_controller.send_message")
     @patch("frontstage.controllers.survey_controller.get_survey_by_short_name")
-    def test_create_message_post_success(self, mock_request, get_survey, send_message, get_survey_list):
+    def test_create_message_post_success(
+        self, mock_request, get_survey, send_message, get_survey_list, get_respondent_party_by_id
+    ):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         get_survey_list.return_value = survey_list_todo
+        get_respondent_party_by_id.return_value = respondent_party
         form = {"body": "something-else"}
         response = self.app.post("/my-account/something-else", data=form, follow_redirects=True)
 

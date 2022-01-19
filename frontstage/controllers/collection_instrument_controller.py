@@ -54,7 +54,7 @@ def download_collection_instrument(collection_instrument_id, case_id, party_id):
 def get_collection_instrument(collection_instrument_id, collection_instrument_url, collection_instrument_auth):
     logger.info("Attempting to retrieve collection instrument", collection_instrument_id=collection_instrument_id)
 
-    url = f"{collection_instrument_url}/collection-instrument-api/1.0.2/collectioninstrument/id/{collection_instrument_id}"
+    url = f"{collection_instrument_url}/collection-instrument-api/1.0.2/{collection_instrument_id}"
     response = requests.get(url, auth=collection_instrument_auth)
 
     try:

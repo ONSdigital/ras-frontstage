@@ -3,7 +3,7 @@
 User interface for Respondent Account Services
 
 ## Setup
-Based on python 3.9
+Based on python 3.10
 
 Use [Pyenv](https://github.com/pyenv/pyenv) to manage installed Python versions
 
@@ -62,6 +62,9 @@ The syntax above will work equally well with the 'docker-test' target
 
 
 Note that this script will fail if there is a `node_modules` folder in the repo
+
+## How to run test in pyCharm
+* Create a new configuration template in edit configuration. Use `autodetect` option and setup Environment Variable to `APP_SETTINGS=TestingConfig`.  
 
 ## Configuration
 Environment variables available for configuration are listed below:

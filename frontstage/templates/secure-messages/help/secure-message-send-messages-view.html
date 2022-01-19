@@ -14,24 +14,24 @@
   },
   {
     "text": "Help",
-    "url": "/surveys/help/"~survey_ref~"/"~ru_ref,
+    "url": "/surveys/surveys-help?survey_ref="~survey_ref~"&ru_ref="~ru_ref,
     "id": "b-item-2"
   }
 
 ] %}
 
 
-{% if breadcrumb_title_one is defined %}
+{% if breadcrumb_title_one is defined and  breadcrumb_title_one != None %}
 {% do breadcrumbsData.append({
         "text": breadcrumb_title_one,
-        "url": "/surveys/help/"~survey_ref~"/"~ru_ref~"/"~option,
+        "url": "/surveys/help/"~option,
         "id": "b-item-8"
     },) %}
 {% endif %}
-{% if breadcrumb_title_two is defined %}
+{% if breadcrumb_title_two is defined and breadcrumb_title_two != None %}
 {% do breadcrumbsData.append({
         "text": breadcrumb_title_two,
-        "url": "/surveys/help/"~survey_ref~"/"~ru_ref~"/"~option~"/"~sub_option,
+        "url": "/surveys/help/"~option~"/"~sub_option,
         "id": "b-item-7"
     },) %}
 {% endif %}
@@ -85,7 +85,7 @@
                   <dd class="metadata__value grid__col col-10@m">{{ subject }}</dd>
     </dl>
     <div class="secure-message-form col-10@m" id="secure-message-form">
-        <form action="{{ url_for('surveys_bp.send_help_message', short_name=short_name, subject=subject, business_id=business_id, option=option, sub_option=sub_option, survey_ref=survey_ref, ru_ref=ru_ref) }}" method="post">
+        <form action="{{ url_for('surveys_bp.send_help_message', option=option, sub_option=sub_option) }}" method="post">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 {% if ns.bodyError %}
                     {% set error = { "text": ns.errorMessage,  "id": 'secure-message-body_error' } %}
@@ -116,11 +116,11 @@
                     }}
                 </div>
                 <div class="grid__col u-ml-m">
-                    {% if sub_option != "not_defined" %}
-                        <a href="{{ url_for('surveys_bp.get_help_option_sub_option_select', short_name=short_name, option=option, sub_option=sub_option, business_id=business_id, survey_ref=survey_ref, ru_ref=ru_ref)}}"
+                    {% if breadcrumb_title_two != None %}
+                        <a href="{{ url_for('surveys_bp.get_help_option_sub_option_select', option=option, sub_option=sub_option)}}"
                     id="btn-sub-option-cancel">Cancel</a>
                     {% else %}
-                        <a href="{{ url_for('surveys_bp.get_help_option_select', short_name=short_name, option=option, business_id=business_id, survey_ref=survey_ref, ru_ref=ru_ref) }}"
+                        <a href="{{ url_for('surveys_bp.get_help_option_select', option=option) }}"
                     id="btn-option-cancel">Cancel</a>
                     {% endif %}
                 </div>

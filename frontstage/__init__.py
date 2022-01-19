@@ -45,7 +45,7 @@ talisman = Talisman(
     strict_transport_security_max_age=31536000,
     frame_options="DENY",
 )
-redis = redis.StrictRedis(host=app.config["REDIS_HOST"], port=app.config["REDIS_PORT"], db=app.config["REDIS_DB"])
+redis = redis.Redis(host=app.config["REDIS_HOST"], port=app.config["REDIS_PORT"], db=app.config["REDIS_DB"])
 
 app.jinja_env.add_extension("jinja2.ext.do")
 

@@ -134,7 +134,13 @@ def _validate_email_address(email):
     :param field:
         Field containing email address for validation.
     """
+
+    if "@" not in email:
+        logger.info("No @ in email address")
+        raise ValidationError(_("Invalid email address"))
+
     local_part, domain_part = email.rsplit("@", 1)
+
     logger.info("Checking if the email address contains a space or quotes in the local part")
     # this extends the email validator to check if there is whitespace in the email or quotes surrounding local part
     if " " in email:
@@ -255,7 +261,7 @@ class HelpCompletingThisSurveyForm(Form):
             ("value", "answer-survey-question"),
             ("value", "do-not-have-specific-figures"),
             ("value", "unable-to-return-by-deadline"),
-            ("value", "something-else"),
+            ("value", "completing-this-survey-something-else"),
         ],
     )
 
@@ -266,6 +272,16 @@ class HelpInfoAboutTheONSForm(Form):
         choices=[
             ("value", "who-is-the-ons"),
             ("value", "how-safe-is-my-data"),
+            ("value", "info-ons-something-else"),
+        ],
+    )
+
+
+class HelpSomethingElseForm(Form):
+    option = RadioField(
+        "Label",
+        choices=[
+            ("value", "my-survey-is-not-listed"),
             ("value", "something-else"),
         ],
     )
@@ -294,14 +310,14 @@ class ContactDetailsChangeForm(FlaskForm):
         ],
         default=None,
     )
-    # TODO: Remove comments and delete the field without validation once email change functionality is enabled.
-    # This was commented out rather then feature flagged as it's difficult to feature flag a model.
-    email_address = StringField(_("Email address"))
-    # email_address = StringField(_('Email address'),
-    #                             validators=[DataRequired(_('Email address is required')),
-    #                                         Email(message=_('Invalid email address')),
-    #                                         Length(max=254,
-    #                                                message=_('Your email must have fewer than 254 characters'))])
+    email_address = StringField(
+        _("Email address"),
+        validators=[
+            DataRequired(_("Email address is required")),
+            Email(message=_("Invalid email address")),
+            Length(max=254, message=_("Your email must have fewer than 254 characters")),
+        ],
+    )
 
 
 class ConfirmEmailChangeForm(FlaskForm):

@@ -11,10 +11,10 @@
     <section class="u-bb {{ highlight }}" id="{{ id }}">
         {% if survey.display_button %}
             <h1 class="u-mb-xs u-fs-m u-mt-s">
-                <a href="{{ url_for('surveys_bp.access_survey', case_id=survey.case_id, ci_type = survey.collection_instrument_type, business_party_id=survey.business_party_id, survey_short_name=survey.survey_short_name) }}" aria-label="Access the {{ survey.survey_long_name }}">{{ survey.survey_long_name }}</a>
+                <a id="surveyLongName" href="{{ url_for('surveys_bp.access_survey', case_id=survey.case_id, ci_type = survey.collection_instrument_type, business_party_id=survey.business_party_id, survey_short_name=survey.survey_short_name) }}" aria-label="Access the {{ survey.survey_long_name }}">{{ survey.survey_long_name }}</a>
             </h1>
         {% else %}
-            <h1 id="surveyLongName" class="u-mb-xs u-fs-m u-mt-s">
+            <h1 class="u-mb-xs u-fs-m u-mt-s">
                 {{ survey.survey_long_name }}
             </h1>
         {% endif %}

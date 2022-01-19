@@ -120,7 +120,11 @@ class EqPayload(object):
 
         for event in collex_events:
             if event["tag"] == search_param and event.get("timestamp"):
-                return self._format_string_long_date_time_to_short_date(event["timestamp"])
+                # Adding this as iso full timestamp is required only for response_expires_at
+                if search_param != "exercise_end":
+                    return self._format_string_long_date_time_to_short_date(event["timestamp"])
+                else:
+                    return self._format_string_long_date_time_to_iso_format(event["timestamp"])
 
         if mandatory:
             raise InvalidEqPayLoad(
@@ -137,5 +141,18 @@ class EqPayload(object):
 
         try:
             return iso8601.parse_date(string_date).astimezone().strftime("%Y-%m-%d")
+        except (ValueError, iso8601.iso8601.ParseError):
+            raise InvalidEqPayLoad(f"Unable to format {string_date}")
+
+    @staticmethod
+    def _format_string_long_date_time_to_iso_format(string_date):
+        """
+        Formats the date from a string to iso format
+        :param string_date: The date string
+        :return formatted date
+        """
+
+        try:
+            return iso8601.parse_date(string_date).astimezone().isoformat()
         except (ValueError, iso8601.iso8601.ParseError):
             raise InvalidEqPayLoad(f"Unable to format {string_date}")

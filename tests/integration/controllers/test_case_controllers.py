@@ -168,7 +168,7 @@ class TestCaseControllers(unittest.TestCase):
                     survey_eq["shortName"],
                 )
 
-                self.assertIn("https://eq-v3-test/session?token=", eq_url)
+                self.assertIn("https://eq-test/v3/session?token=", eq_url)
 
     @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
     @patch("frontstage.controllers.case_controller.post_case_event")

@@ -27,7 +27,7 @@ def register_confirm_organisation_survey():
     # Validate enrolment code before retrieving organisation data
     iac_controller.validate_enrolment_code(enrolment_code)
 
-    logger.info("Attempting to retrieve data for confirm organisation/survey page")
+    logger.info("Attempting to retrieve data for confirm organisation/survey page", enrolment_code=enrolment_code)
     try:
         # Get organisation name
         case = case_controller.get_case_by_enrolment_code(enrolment_code)
@@ -44,7 +44,7 @@ def register_confirm_organisation_survey():
             "longName"
         )
     except ApiError as exc:
-        logger.error("Failed to retrieve data for confirm organisation/survey page", status_code=exc.status_code)
+        logger.error("Failed to retrieve data for confirm organisation/survey page", status_code=exc.status_code, enrolment_code=enrolment_code)
         raise
 
     business_context = {

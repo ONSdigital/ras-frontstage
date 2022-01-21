@@ -431,7 +431,7 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
 
     # This is a dictionary that will store all the data that is going to be cached instead of making multiple calls
     # inside the for loop for get_respondent_enrolments.
-    cache_data = {"collexes": dict(), "cases": dict()}
+    cache_data = {"cases": dict()}
     redis_cache = RedisCache()
 
     # Populate the cache with all non-instrument data

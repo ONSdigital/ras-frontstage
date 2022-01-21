@@ -356,12 +356,12 @@ def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
     # in the cache_data.
     threads = []
 
-    for survey_id in surveys_ids:
-        threads.append(
-            ThreadWrapper(
-                get_collex, cache_data, survey_id, app.config["COLLECTION_EXERCISE_URL"], app.config["BASIC_AUTH"]
-            )
-        )
+    # for survey_id in surveys_ids:
+    #     threads.append(
+    #         ThreadWrapper(
+    #             get_collex, cache_data, survey_id, app.config["COLLECTION_EXERCISE_URL"], app.config["BASIC_AUTH"]
+    #         )
+    #     )
 
     for business_id in business_ids:
         threads.append(
@@ -444,6 +444,10 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
     # Populate the cache with all non-instrument data
     caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag)
 
+    # Creates a dictionary of collection exercises to be used to generate the enrolments
+    for survey_id in surveys_ids:
+        cache_data["collexes"][survey_id] = redis_cache.get_collection_exercise(survey_id)
+
     enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, cache_data["collexes"])
     for enrolment in enrolments:
         business_party = redis_cache.get_business_party(enrolment["business_id"])
@@ -452,7 +456,8 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
         # Note: If it ever becomes possible to get only live-but-not-ended collection exercises from the
         # collection exercise service, the filter_ended_collection_exercises function will no longer
         # be needed as we can request what we want instead of having to filter what we get.
-        live_collection_exercises = filter_ended_collection_exercises(cache_data["collexes"][survey["id"]])
+
+        live_collection_exercises = filter_ended_collection_exercises(redis_cache.get_collection_exercise(survey["id"]))
 
         collection_exercises_by_id = dict((ce["id"], ce) for ce in live_collection_exercises)
         cases_for_business = cache_data["cases"][business_party["id"]]

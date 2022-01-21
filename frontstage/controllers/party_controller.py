@@ -356,13 +356,6 @@ def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
     # in the cache_data.
     threads = []
 
-    # for survey_id in surveys_ids:
-    #     threads.append(
-    #         ThreadWrapper(
-    #             get_collex, cache_data, survey_id, app.config["COLLECTION_EXERCISE_URL"], app.config["BASIC_AUTH"]
-    #         )
-    #     )
-
     for business_id in business_ids:
         threads.append(
             ThreadWrapper(get_case, cache_data, business_id, app.config["CASE_URL"], app.config["BASIC_AUTH"], tag)
@@ -444,11 +437,10 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
     # Populate the cache with all non-instrument data
     caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag)
 
-    # Creates a dictionary of collection exercises to be used to generate the enrolments
-    for survey_id in surveys_ids:
-        cache_data["collexes"][survey_id] = redis_cache.get_collection_exercise(survey_id)
-
-    enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, cache_data["collexes"])
+    #  Populate the enrolments by creating a dictionary using the redis_cache
+    enrolments = get_respondent_enrolments_for_started_collex(enrolment_data,
+                                                              dict((s_id, redis_cache.get_collection_exercise(s_id))
+                                                                   for s_id in surveys_ids))
     for enrolment in enrolments:
         business_party = redis_cache.get_business_party(enrolment["business_id"])
         survey = redis_cache.get_survey(enrolment["survey_id"])
@@ -519,12 +511,6 @@ def filter_ended_collection_exercises(collection_exercises: dict) -> list:
 
 def get_survey(cache_data, survey_id, survey_url, survey_auth):
     cache_data["surveys"][survey_id] = survey_controller.get_survey(survey_url, survey_auth, survey_id)
-
-
-def get_collex(cache_data, survey_id, collex_url, collex_auth):
-    cache_data["collexes"][survey_id] = collection_exercise_controller.get_live_collection_exercises_for_survey(
-        survey_id, collex_url, collex_auth
-    )
 
 
 def get_case(cache_data, business_id, case_url, case_auth, tag):

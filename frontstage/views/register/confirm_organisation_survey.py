@@ -44,8 +44,11 @@ def register_confirm_organisation_survey():
             "longName"
         )
     except ApiError as exc:
-        logger.error("Failed to retrieve data for confirm organisation/survey page", status_code=exc.status_code,
-                     enrolment_code=enrolment_code)
+        logger.error(
+            "Failed to retrieve data for confirm organisation/survey page",
+            status_code=exc.status_code,
+            enrolment_code=enrolment_code,
+        )
         raise
 
     business_context = {

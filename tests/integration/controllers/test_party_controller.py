@@ -28,7 +28,7 @@ from tests.integration.mocked_services import (
     respondent_party,
     survey,
     url_get_business_party,
-    url_get_collection_exercise,
+    url_get_collection_exercises_by_survey,
     url_get_respondent_email,
     url_get_respondent_party,
     url_get_survey,
@@ -264,7 +264,7 @@ class TestPartyController(unittest.TestCase):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_survey, json=survey, status=200)
             rsps.add(rsps.GET, url_get_business_party, json=business_party, status=200)
-            rsps.add(rsps.GET, url_get_collection_exercise, json=collection_exercise, status=200)
+            rsps.add(rsps.GET, url_get_collection_exercises_by_survey, json=collection_exercise_by_survey, status=200)
 
             survey_list = party_controller.get_survey_list_details_for_party(
                 respondent_party["id"], "todo", business_party["id"], survey["id"]

@@ -120,7 +120,7 @@ spec:
             {{- if .Values.dns.enabled }}
             value: "{{ .Values.eq.url }}"
             {{- else }}
-            value: "http://$(MOCK_EQ_SERVICE_HOST):$(MOCK_EQ_SERVICE_PORT)/session?token="
+            value: "http://mock-eq.{{ .Values.namespace }}:8086/session?token="
             {{- end }}
           - name: EQ_V3_URL
             {{- if .Values.dns.enabled }}
@@ -128,8 +128,6 @@ spec:
             {{- else }}
             value: "http://$(MOCK_EQ_SERVICE_HOST):$(MOCK_EQ_SERVICE_PORT)/v3/session?token="
             {{- end}}
-          - name: EQ_V3_ENDPOINT
-            value: "{{ .Values.eq.v3endpoint }}"
           - name: EQ_V3_ENABLED
             value: "{{ .Values.eq.v3enabled }}"
           {{ if .Values.analytics.enabled }}

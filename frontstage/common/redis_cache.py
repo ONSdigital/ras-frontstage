@@ -6,12 +6,14 @@ from redis.exceptions import RedisError
 from structlog import wrap_logger
 
 from frontstage import redis
+from frontstage.controllers.collection_exercise_controller import (
+    get_live_collection_exercises_for_survey,
+)
 from frontstage.controllers.collection_instrument_controller import (
     get_collection_instrument,
 )
 from frontstage.controllers.party_controller import get_party_by_business_id
 from frontstage.controllers.survey_controller import get_survey
-from frontstage.controllers.collection_exercise_controller import get_live_collection_exercises_for_survey
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -104,8 +106,9 @@ class RedisCache:
 
         if not result:
             logger.info("Key not in cache, getting value from collection-exercise service", key=redis_key)
-            result = get_live_collection_exercises_for_survey(key, app.config["COLLECTION_EXERCISE_URL"], app.config["BASIC_AUTH"])
-            # filter_ended_collection_exercises(key, app.config["COLLECTION_EXERCISE_URL"], app.config["BASIC_AUTH"])
+            result = get_live_collection_exercises_for_survey(
+                key, app.config["COLLECTION_EXERCISE_URL"], app.config["BASIC_AUTH"]
+            )
             self.save(redis_key, result, self.COLLECTION_EXERCISE_CATEGORY_EXPIRY)
             return result
 

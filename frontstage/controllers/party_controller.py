@@ -11,7 +11,6 @@ from frontstage.common.thread_wrapper import ThreadWrapper
 from frontstage.common.utilities import obfuscate_email
 from frontstage.controllers import (
     case_controller,
-    collection_exercise_controller,
     collection_instrument_controller,
     survey_controller,
 )
@@ -438,9 +437,9 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
     caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag)
 
     #  Populate the enrolments by creating a dictionary using the redis_cache
-    enrolments = get_respondent_enrolments_for_started_collex(enrolment_data,
-                                                              dict((s_id, redis_cache.get_collection_exercise(s_id))
-                                                                   for s_id in surveys_ids))
+    enrolments = get_respondent_enrolments_for_started_collex(
+        enrolment_data, dict((s_id, redis_cache.get_collection_exercise(s_id)) for s_id in surveys_ids)
+    )
     for enrolment in enrolments:
         business_party = redis_cache.get_business_party(enrolment["business_id"])
         survey = redis_cache.get_survey(enrolment["survey_id"])

@@ -241,7 +241,7 @@ def validate_case_category(category):
     logger.info("Successfully validated case category", category=category)
 
 
-def get_cases_for_list_type_by_party_id(party_id, case_url, case_auth, list_type="todo"):
+def get_cases_for_list_type_by_party_id(party_id, case_url, case_auth, list_type="todo") -> list:
     logger.info("Get cases for party for list", party_id=party_id, list_type=list_type)
 
     cases = get_cases_by_party_id(party_id, case_url, case_auth, iac=False)

@@ -431,7 +431,7 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
 
     """
     enrolment_data = list(get_respondent_enrolments(respondent))
-
+    now = datetime.datetime.now(datetime.timezone.utc)
     # Gets the survey ids and business ids from the enrolment data that has been generated.
     # Converted to list to avoid multiple calls to party (and the list size is small).
     surveys_ids, business_ids = get_unique_survey_and_business_ids(enrolment_data)
@@ -447,27 +447,28 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
     enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, cache_data["collexes"])
     for enrolment in enrolments:
         business_party = redis_cache.get_business_party(enrolment["business_id"])
-        survey = redis_cache.get_survey(enrolment["survey_id"])
 
-        # Note: If it ever becomes possible to get only live-but-not-ended collection exercises from the
-        # collection exercise service, the filter_ended_collection_exercises function will no longer
-        # be needed as we can request what we want instead of having to filter what we get.
-        live_collection_exercises = filter_ended_collection_exercises(cache_data["collexes"][survey["id"]])
-
-        collection_exercises_by_id = dict((ce["id"], ce) for ce in live_collection_exercises)
+        #  When get the cases,the get_cases_for_list_type_by_party_id function filters out all the incomplete state
+        # cases if it's the history page and vise versa. So we'll only have cases that matter here.
         cases_for_business = cache_data["cases"][business_party["id"]]
 
-        # Gets all the cases for reporting unit, and by extension the user (because it's related to the business)
-        enrolled_cases = [
-            case
-            for case in cases_for_business
-            if case["caseGroup"]["collectionExerciseId"] in collection_exercises_by_id.keys()
-        ]
-
-        for case in enrolled_cases:
-            collection_exercise = collection_exercises_by_id[case["caseGroup"]["collectionExerciseId"]]
+        for case in cases_for_business:
+            # First thing we do is check to make sure the case is for a live collection exercise.  There's a chance it
+            # could be for a collection exercise that isn't live yet but the case has been created and is in the
+            # NOTSTARTED state.  This will result in a bit of wasted effort getting collection exercises that aren't
+            # live, but it shouldn't be much.
+            collection_exercise_id = case["caseGroup"]["collectionExerciseId"]
+            collection_exercise = collection_exercise_controller.get_collection_exercise(collection_exercise_id)
+            is_live = (
+                collection_exercise.get("scheduledEndDateTime")
+                and parse(collection_exercise.get("scheduledEndDateTime")) > now
+            )
+            if not is_live:
+                continue
             collection_instrument = redis_cache.get_collection_instrument(case["collectionInstrumentId"])
             collection_instrument_type = collection_instrument["type"]
+
+            survey = redis_cache.get_survey(enrolment["survey_id"])
             added_survey = True if business_party_id == business_party["id"] and survey_id == survey["id"] else None
             display_access_button = display_button(case["caseGroup"]["caseGroupStatus"], collection_instrument_type)
 

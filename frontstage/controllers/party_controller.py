@@ -382,16 +382,12 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
         - the cases and collection exercises the business is involved in
 
     The algorithm for determining this is roughly:
-      - Get all survey enrolments for the respondent
-      - For each enrolment:
-          - Get the business details the enrolment is for
-          - Get the live-but-not-ended collection exercises for the survey the enrolment is for
-          - Get the cases the business is part of, from the list of collection exercises. Note, this isn't every case
-            against the business; depending on if you're looking at the to-do or history page, you'll get a different
-            subset of them.
-          - For each case in this list:
-              - Create an entry in the returned list for each of these cases as the respondent is implicitly part
-                of the case by being enrolled for the survey with that business.
+        - Get all survey enrolments for the respondent
+        - Get all the cases for the businesses the respondent is enrolled in
+        - For each of those cases:
+            - Check if the respondent is enrolled for that survey for that business, next case if not
+            - Check if the collection exercise is live, next case if not
+            - Create a row for the list that will eventually be rendered
 
     :param respondent: A dict containing respondent data
     :param tag: This is the page that is being called e.g. to-do, history

@@ -9,9 +9,6 @@ import responses
 from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import party_controller
-from frontstage.controllers.collection_exercise_controller import (
-    convert_events_to_new_format,
-)
 from frontstage.controllers.party_controller import (
     display_button,
     filter_ended_collection_exercises,
@@ -251,10 +248,6 @@ class TestPartyController(unittest.TestCase):
         calculate_case_status,
     ):
         enrolments = [{"business_id": business_party["id"], "survey_id": survey["id"]}]
-
-        for collection_exercise_index in collection_exercise_by_survey:
-            if collection_exercise_index["events"]:
-                collection_exercise_index["events"] = convert_events_to_new_format(collection_exercise_index["events"])
 
         get_respondent_enrolments.return_value = enrolments
         get_cases.return_value = case_list

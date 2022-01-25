@@ -90,14 +90,14 @@ class RedisCache:
 
         return json.loads(result.decode("utf-8"))
 
-    def get_collection_exercise(self, key):
+    def get_collection_exercises_by_survey(self, key):
         """
         Gets the collection-exercise from redis or the collection-exercise service
 
         :param key: Key in redis (for this example will be a frontstage:collection-exercise:id)
         :return: Result from either the cache or collection-exercise service
         """
-        redis_key = f"frontstage:collection-exercise:{key}"
+        redis_key = f"frontstage:collection-exercise-by-survey-id:{key}"
         try:
             result = redis.get(redis_key)
         except RedisError:

@@ -356,13 +356,6 @@ def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
     # in the cache_data.
     threads = []
 
-    for survey_id in surveys_ids:
-        threads.append(
-            ThreadWrapper(
-                get_collex, cache_data, survey_id, app.config["COLLECTION_EXERCISE_URL"], app.config["BASIC_AUTH"]
-            )
-        )
-
     for business_id in business_ids:
         threads.append(
             ThreadWrapper(get_case, cache_data, business_id, app.config["CASE_URL"], app.config["BASIC_AUTH"], tag)
@@ -438,15 +431,14 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
 
     # This is a dictionary that will store all the data that is going to be cached instead of making multiple calls
     # inside the for loop for get_respondent_enrolments.
-    cache_data = {"collexes": dict(), "cases": dict()}
+    cache_data = {"cases": dict()}
     redis_cache = RedisCache()
 
     # Populate the cache with all non-instrument data
     caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag)
 
-    enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, cache_data["collexes"])
-    for enrolment in enrolments:
-        business_party = redis_cache.get_business_party(enrolment["business_id"])
+    for business_id in business_ids:
+        business_party = redis_cache.get_business_party(business_id)
 
         #  When get the cases,the get_cases_for_list_type_by_party_id function filters out all the incomplete state
         # cases if it's the history page and vise versa. So we'll only have cases that matter here.
@@ -468,7 +460,7 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
             collection_instrument = redis_cache.get_collection_instrument(case["collectionInstrumentId"])
             collection_instrument_type = collection_instrument["type"]
 
-            survey = redis_cache.get_survey(enrolment["survey_id"])
+            survey = redis_cache.get_survey(case['caseGroup']["surveyId"])
             added_survey = True if business_party_id == business_party["id"] and survey_id == survey["id"] else None
             display_access_button = display_button(case["caseGroup"]["caseGroupStatus"], collection_instrument_type)
 
@@ -515,12 +507,6 @@ def filter_ended_collection_exercises(collection_exercises: dict) -> list:
 
 def get_survey(cache_data, survey_id, survey_url, survey_auth):
     cache_data["surveys"][survey_id] = survey_controller.get_survey(survey_url, survey_auth, survey_id)
-
-
-def get_collex(cache_data, survey_id, collex_url, collex_auth):
-    cache_data["collexes"][survey_id] = collection_exercise_controller.get_live_collection_exercises_for_survey(
-        survey_id, collex_url, collex_auth
-    )
 
 
 def get_case(cache_data, business_id, case_url, case_auth, tag):

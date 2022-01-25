@@ -438,7 +438,8 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
 
     #  Populate the enrolments by creating a dictionary using the redis_cache
     enrolments = get_respondent_enrolments_for_started_collex(
-        enrolment_data, dict((survey_id, redis_cache.get_collection_exercises_by_survey(survey_id)) for survey_id in surveys_ids)
+        enrolment_data,
+        dict((survey_id, redis_cache.get_collection_exercises_by_survey(survey_id)) for survey_id in surveys_ids),
     )
     for enrolment in enrolments:
         business_party = redis_cache.get_business_party(enrolment["business_id"])
@@ -448,7 +449,9 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
         # collection exercise service, the filter_ended_collection_exercises function will no longer
         # be needed as we can request what we want instead of having to filter what we get.
 
-        live_collection_exercises = filter_ended_collection_exercises(redis_cache.get_collection_exercises_by_survey(survey["id"]))
+        live_collection_exercises = filter_ended_collection_exercises(
+            redis_cache.get_collection_exercises_by_survey(survey["id"])
+        )
 
         collection_exercises_by_id = dict((ce["id"], ce) for ce in live_collection_exercises)
         cases_for_business = cache_data["cases"][business_party["id"]]

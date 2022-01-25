@@ -120,7 +120,7 @@ spec:
             {{- if .Values.dns.enabled }}
             value: "{{ .Values.eq.url }}"
             {{- else }}
-            value: "http://$(MOCK_EQ_SERVICE_HOST):$(MOCK_EQ_SERVICE_PORT)"
+            value: "http://$(MOCK_EQ_SERVICE_HOST):$(MOCK_EQ_SERVICE_PORT)/session?token="
             {{- end }}
           - name: EQ_V3_URL
             value: "{{ .Values.eq.v3url }}"

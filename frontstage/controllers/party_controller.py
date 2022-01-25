@@ -438,7 +438,7 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
 
     #  Populate the enrolments by creating a dictionary using the redis_cache
     enrolments = get_respondent_enrolments_for_started_collex(
-        enrolment_data, dict((s_id, redis_cache.get_collection_exercise(s_id)) for s_id in surveys_ids)
+        enrolment_data, dict((survey_id, redis_cache.get_collection_exercise(survey_id)) for survey_id in surveys_ids)
     )
     for enrolment in enrolments:
         business_party = redis_cache.get_business_party(enrolment["business_id"])

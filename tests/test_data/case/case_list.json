@@ -14,6 +14,7 @@
             "collectionExerciseId": "'ed5972f6-d17d-4408-bb9a-7af54f13c88b'",
             "id": "40d034cf-5875-4022-b160-506e094b157a",
             "partyId": "be3483c3-f5c9-4b13-bdd7-244db78ff687",
+            "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
             "sampleUnitRef": "49900000001",
             "sampleUnitType": "B",
             "caseGroupStatus": "NOTSTARTED"
@@ -36,6 +37,7 @@
             "collectionExerciseId": "4ec73b0c-c9cf-438e-a8b5-0c4bc2cf922d",
             "id": "40d034cf-5875-4022-b160-506e094b157a",
             "partyId": "be3483c3-f5c9-4b13-bdd7-244db78ff687",
+            "surveyId": "02b9c366-7397-42f7-942a-76dc5876d86d",
             "sampleUnitRef": "49900000001",
             "sampleUnitType": "B",
             "caseGroupStatus": "NOTSTARTED"
@@ -58,6 +60,7 @@
             "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
             "id": "32fc3b86-b696-42ee-b905-a5712648711b",
             "partyId": "be3483c3-f5c9-4b13-bdd7-244db78ff687",
+            "surveyId": "02b9c366-7397-42f7-942a-76dc5876d86d",
             "sampleUnitRef": "49900000001",
             "sampleUnitType": "B",
             "caseGroupStatus": "NOTSTARTED"
@@ -80,6 +83,7 @@
             "collectionExerciseId": "ed5972f6-d17d-4408-bb9a-7af54f13c88b",
             "id": "e3f86bac-e6c3-4a65-82ee-a2217096b283",
             "partyId": "0008279d-9425-4e28-897d-bfd876aa7f3f",
+            "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
             "sampleUnitRef": "49900000001",
             "sampleUnitType": "B",
             "caseGroupStatus": "COMPLETE"

@@ -6,6 +6,9 @@ from redis.exceptions import RedisError
 from structlog import wrap_logger
 
 from frontstage import redis
+from frontstage.controllers.collection_exercise_controller import (
+    get_collection_exercise,
+)
 from frontstage.controllers.collection_instrument_controller import (
     get_collection_instrument,
 )
@@ -19,6 +22,7 @@ class RedisCache:
     SURVEY_CATEGORY_EXPIRY = 600  # 10 mins
     COLLECTION_INSTRUMENT_CATEGORY_EXPIRY = 600  # 10 mins
     BUSINES_PARTY_CATEGORY_EXPIRY = 600
+    COLLECTION_EXERCISE_CATEGORY_EXPIRY = 600
 
     def get_survey(self, key):
         """
@@ -82,6 +86,28 @@ class RedisCache:
             logger.info("Key not in cache, getting value from party service", key=redis_key)
             result = get_party_by_business_id(key, app.config["PARTY_URL"], app.config["BASIC_AUTH"])
             self.save(redis_key, result, self.BUSINES_PARTY_CATEGORY_EXPIRY)
+            return result
+
+        return json.loads(result.decode("utf-8"))
+
+    def get_collection_exercise(self, key):
+        """
+        Gets the business party from redis or the collection exercise service
+
+        :param key: Key in redis (for this example will be a frontstage:collection-exercise:id)
+        :return: Result from either the cache or party service
+        """
+        redis_key = f"frontstage:collection-exercise:{key}"
+        try:
+            result = redis.get(redis_key)
+        except RedisError:
+            logger.error("Error getting value from cache, please investigate", key=redis_key, exc_info=True)
+            result = None
+
+        if not result:
+            logger.info("Key not in cache, getting value from collection exercise service", key=redis_key)
+            result = get_collection_exercise(key)
+            self.save(redis_key, result, self.COLLECTION_EXERCISE_CATEGORY_EXPIRY)
             return result
 
         return json.loads(result.decode("utf-8"))

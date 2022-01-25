@@ -9,11 +9,7 @@ from structlog import wrap_logger
 
 from frontstage.common.thread_wrapper import ThreadWrapper
 from frontstage.common.utilities import obfuscate_email
-from frontstage.controllers import (
-    case_controller,
-    collection_exercise_controller,
-    survey_controller,
-)
+from frontstage.controllers import case_controller, survey_controller
 from frontstage.exceptions.exceptions import ApiError, UserDoesNotExist
 
 CLOSED_STATE = ["COMPLETE", "COMPLETEDBYPHONE", "NOLONGERREQUIRED"]
@@ -430,7 +426,7 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
             # NOTSTARTED state.  This will result in a bit of wasted effort getting collection exercises that aren't
             # live, but it shouldn't be much.
             collection_exercise_id = case["caseGroup"]["collectionExerciseId"]
-            collection_exercise = collection_exercise_controller.get_collection_exercise(collection_exercise_id)
+            collection_exercise = redis_cache.get_collection_exercise(collection_exercise_id)
             is_live = (
                 collection_exercise.get("scheduledEndDateTime")
                 and parse(collection_exercise.get("scheduledEndDateTime")) > now

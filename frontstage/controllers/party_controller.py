@@ -12,7 +12,6 @@ from frontstage.common.utilities import obfuscate_email
 from frontstage.controllers import (
     case_controller,
     collection_exercise_controller,
-    collection_instrument_controller,
     survey_controller,
 )
 from frontstage.exceptions.exceptions import ApiError, UserDoesNotExist
@@ -316,24 +315,23 @@ def get_respondent_enrolments(respondent: dict):
                     yield {"business_id": association["partyId"], "survey_id": enrolment["surveyId"]}
 
 
-def get_respondent_enrolments_for_started_collex(enrolment_data, collection_exercises):
-    """This will only filter out enrolments for surveys that have 0 live collection exercises.
-
-    Needed because enrolment_data includes not started enrolments ,
-    but cache_collex only contains started collex. Hence indexing collex by enrolment[survey] causes a 500
-
-    :param enrolment_data: A list of enrolments.
-    :type enrolment_data: list
-    :param collection_exercises: A list of collection exercises.
-    :type collection_exercises: list
-    :return: list of enrolments corresponding to the known collection exercises
+def get_respondent_enrolments_as_a_dict(respondent) -> dict:
     """
+    Formats the respondent enrollments in a more easily checkable deck
 
-    enrolments = []
-    for enrolment in enrolment_data:
-        if enrolment["survey_id"] in collection_exercises:
-            enrolments.append(enrolment)
-    return enrolments
+    :param respondent: Dict containing respondent data
+    :return: A dictionary keyed by business_ids containing lists of survey_ids
+    """
+    from collections import defaultdict
+
+    result = defaultdict(list)
+    if "associations" in respondent:
+        for association in respondent["associations"]:
+            for enrolment in association["enrolments"]:
+                if enrolment["enrolmentStatus"] == "ENABLED":
+                    result[association["partyId"]].append(enrolment["surveyId"])
+
+    return result
 
 
 def get_unique_survey_and_business_ids(enrolment_data):
@@ -351,9 +349,8 @@ def get_unique_survey_and_business_ids(enrolment_data):
     return surveys_ids, business_ids
 
 
-def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
-    # Creates a list of threads which will call functions to set the survey, case, party and collex responses
-    # in the cache_data.
+def get_data_for_case_cache(cache_data, business_ids, tag):
+    # Creates a list of threads which will call functions to set up the case cache_data.
     threads = []
 
     for business_id in business_ids:
@@ -367,27 +364,6 @@ def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
     # We do a thread join to make sure that the threads have all terminated before it carries on
     for thread in threads:
         thread.join()
-
-
-def caching_data_for_collection_instrument(cache_data: dict, cases: list):
-    """
-    Adds to the collection instrument part of the cache dictionary.  Given a list of cases, it will get a set of
-    the collectionInstrumentId's, then if the id isn't in the cache already, it'll ask the collection instrument service
-    for it.  This doesn't return a dict with the cached data, this will modify the dictionary as a side-effect.
-
-    :param cache_data: The cache dictionary.
-    :param cases: A list of cases
-    """
-    collection_instrument_ids = set()
-    for case in cases:
-        collection_instrument_ids.add(case["collectionInstrumentId"])
-    for collection_instrument_id in collection_instrument_ids:
-        if not cache_data["instrument"].get(collection_instrument_id):
-            cache_data["instrument"][
-                collection_instrument_id
-            ] = collection_instrument_controller.get_collection_instrument(
-                collection_instrument_id, app.config["COLLECTION_INSTRUMENT_URL"], app.config["BASIC_AUTH"]
-            )
 
 
 def get_survey_list_details_for_party(respondent: dict, tag: str, business_party_id: str, survey_id: str):
@@ -424,6 +400,7 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
 
     """
     enrolment_data = list(get_respondent_enrolments(respondent))
+    formatted_enrolments = get_respondent_enrolments_as_a_dict(respondent)
     now = datetime.datetime.now(datetime.timezone.utc)
     # Gets the survey ids and business ids from the enrolment data that has been generated.
     # Converted to list to avoid multiple calls to party (and the list size is small).
@@ -432,10 +409,9 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
     # This is a dictionary that will store all the data that is going to be cached instead of making multiple calls
     # inside the for loop for get_respondent_enrolments.
     cache_data = {"cases": dict()}
-    redis_cache = RedisCache()
+    get_data_for_case_cache(cache_data, business_ids, tag)
 
-    # Populate the cache with all non-instrument data
-    caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag)
+    redis_cache = RedisCache()
 
     for business_id in business_ids:
         business_party = redis_cache.get_business_party(business_id)
@@ -445,7 +421,15 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
         cases_for_business = cache_data["cases"][business_party["id"]]
 
         for case in cases_for_business:
-            # First thing we do is check to make sure the case is for a live collection exercise.  There's a chance it
+            # First we check that the respondent is enrolled for this survey for this business.  If not, we'll just go
+            # to the next case
+            is_respondent_enrolled_in_survey = (
+                case["caseGroup"]["surveyId"] in formatted_enrolments[case["caseGroup"]["partyId"]]
+            )
+            if not is_respondent_enrolled_in_survey:
+                continue
+
+            # Next we do is check to make sure the case is for a live collection exercise.  There's a chance it
             # could be for a collection exercise that isn't live yet but the case has been created and is in the
             # NOTSTARTED state.  This will result in a bit of wasted effort getting collection exercises that aren't
             # live, but it shouldn't be much.
@@ -460,7 +444,7 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
             collection_instrument = redis_cache.get_collection_instrument(case["collectionInstrumentId"])
             collection_instrument_type = collection_instrument["type"]
 
-            survey = redis_cache.get_survey(case['caseGroup']["surveyId"])
+            survey = redis_cache.get_survey(case["caseGroup"]["surveyId"])
             added_survey = True if business_party_id == business_party["id"] and survey_id == survey["id"] else None
             display_access_button = display_button(case["caseGroup"]["caseGroupStatus"], collection_instrument_type)
 

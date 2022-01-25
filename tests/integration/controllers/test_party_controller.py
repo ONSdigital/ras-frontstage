@@ -15,7 +15,6 @@ from frontstage.controllers.collection_exercise_controller import (
 from frontstage.controllers.party_controller import (
     display_button,
     filter_ended_collection_exercises,
-    get_respondent_enrolments_for_started_collex,
 )
 from frontstage.exceptions.exceptions import ApiError
 from tests.integration.mocked_services import (
@@ -213,30 +212,6 @@ class TestPartyController(unittest.TestCase):
                     party_controller.notify_party_and_respondent_account_locked(
                         respondent_party["id"], respondent_party["emailAddress"], status="ACTIVE"
                     )
-
-    def test_get_respondent_enrolments_for_started_collex(self):
-        """test that get_respondent_enrolments_for_started_collex will only return enrolment data
-        if we have a corresponding collex"""
-
-        collex = {"survey1": "collex1", "survey3": "collex3"}
-
-        enrolment_data = [
-            {"survey_id": "survey1", "enrolment_data": "enrolment1"},
-            {"survey_id": "survey2", "enrolment_data": "enrolment2"},
-            {"survey_id": "survey3", "enrolment_data": "enrolment3"},
-        ]
-
-        result = get_respondent_enrolments_for_started_collex(enrolment_data, collex)
-        self.assertEqual(len(result), 2)
-        self.assertDictEqual({"survey_id": "survey1", "enrolment_data": "enrolment1"}, result[0])
-        self.assertDictEqual({"survey_id": "survey3", "enrolment_data": "enrolment3"}, result[1])
-
-    def test_get_respondent_enrolments(self):
-        enrolments = party_controller.get_respondent_enrolments(respondent_party)
-
-        for enrolment in enrolments:
-            self.assertTrue(enrolment["business_id"] is not None)
-            self.assertTrue(enrolment["survey_id"] is not None)
 
     @patch("frontstage.controllers.case_controller.calculate_case_status")
     @patch("frontstage.controllers.collection_instrument_controller.get_collection_instrument")

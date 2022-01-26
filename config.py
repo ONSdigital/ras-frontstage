@@ -90,6 +90,7 @@ class DevelopmentConfig(Config):
     ACCOUNT_SERVICE_URL = os.getenv("ACCOUNT_SERVICE_URL", "http://localhost:8082/surveys/todo")
     ACCOUNT_SERVICE_LOG_OUT_URL = os.getenv("ACCOUNT_SERVICE_LOG_OUT_URL", "http://localhost:8082/sign-in/logout")
     EQ_URL = os.getenv("EQ_URL", "http://localhost:8086/session?token=")
+    EQ_V3_URL = os.getenv("EQ_V3_URL", "http://localhost:8086/v3/session?token=")
     JSON_SECRET_KEYS = os.getenv("JSON_SECRET_KEYS") or open("./tests/test_data/jwt-test-keys/test_key.json").read()
 
     AUTH_URL = os.getenv("AUTH_URL", "http://localhost:8041")
@@ -116,7 +117,7 @@ class TestingConfig(DevelopmentConfig):
     ACCOUNT_SERVICE_URL = "http://frontstage-url/surveys"
     ACCOUNT_SERVICE_LOG_OUT_URL = "http://frontstage-url/sign-in/logout"
     EQ_URL = "https://eq-test/session?token="
-    EQ_V3_URL = "https://eq-v3-test/session?token="
+    EQ_V3_URL = "https://eq-test/v3/session?token="
     JSON_SECRET_KEYS = open("./tests/test_data/jwt-test-keys/test_key.json").read()
     SECURITY_USER_NAME = "username"
     SECURITY_USER_PASSWORD = "password"

@@ -449,9 +449,7 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
         # collection exercise service, the filter_ended_collection_exercises function will no longer
         # be needed as we can request what we want instead of having to filter what we get.
 
-        live_collection_exercises = filter_ended_collection_exercises(
-            redis_cache.get_collection_exercises_by_survey(survey["id"])
-        )
+        live_collection_exercises = filter_ended_collection_exercises(collection_exercises[enrolment["survey_id"]])
 
         collection_exercises_by_id = dict((ce["id"], ce) for ce in live_collection_exercises)
         cases_for_business = cache_data["cases"][business_party["id"]]

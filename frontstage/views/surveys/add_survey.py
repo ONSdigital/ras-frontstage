@@ -51,9 +51,10 @@ def add_survey(_):
                 )
                 raise
 
+        logger.info("Enrolment code validation complete; now attempting encryption", enrolment_code=enrolment_code)
         cryptographer = Cryptographer()
         encrypted_enrolment_code = cryptographer.encrypt(enrolment_code.encode()).decode()
-        logger.info("Successful enrolment code submitted when attempting to add survey", enrolment_code=enrolment_code)
+        logger.info("Enrolment code decoding successful", enrolment_code=enrolment_code)
         return redirect(
             url_for(
                 "surveys_bp.survey_confirm_organisation",

@@ -21,7 +21,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 class RedisCache:
     SURVEY_CATEGORY_EXPIRY = 600  # 10 mins
     COLLECTION_INSTRUMENT_CATEGORY_EXPIRY = 600  # 10 mins
-    BUSINES_PARTY_CATEGORY_EXPIRY = 600  # 10 mins
+    BUSINESS_PARTY_CATEGORY_EXPIRY = 600  # 10 mins
     COLLECTION_EXERCISE_CATEGORY_EXPIRY = 600  # 10 mins
 
     def get_survey(self, key):
@@ -85,7 +85,7 @@ class RedisCache:
         if not result:
             logger.info("Key not in cache, getting value from party service", key=redis_key)
             result = get_party_by_business_id(key, app.config["PARTY_URL"], app.config["BASIC_AUTH"])
-            self.save(redis_key, result, self.BUSINES_PARTY_CATEGORY_EXPIRY)
+            self.save(redis_key, result, self.BUSINESS_PARTY_CATEGORY_EXPIRY)
             return result
 
         return json.loads(result.decode("utf-8"))

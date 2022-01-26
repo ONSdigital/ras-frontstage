@@ -350,9 +350,8 @@ def get_unique_survey_and_business_ids(enrolment_data):
     return surveys_ids, business_ids
 
 
-def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
-    # Creates a list of threads which will call functions to set the survey, case, party and collex responses
-    # in the cache_data.
+def caching_case_data(cache_data, business_ids, tag):
+    # Creates a list of threads which will call functions to set the case in the cache_data.
     threads = []
 
     for business_id in business_ids:
@@ -433,8 +432,8 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
     cache_data = {"cases": dict()}
     redis_cache = RedisCache()
 
-    # Populate the cache with all non-instrument data
-    caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag)
+    # Populate the cache with all case data
+    caching_case_data(cache_data, business_ids, tag)
 
     #  Populate the enrolments by creating a dictionary using the redis_cache
     enrolments = get_respondent_enrolments_for_started_collex(

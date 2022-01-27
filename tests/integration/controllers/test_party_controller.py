@@ -9,9 +9,6 @@ import responses
 from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import party_controller
-from frontstage.controllers.collection_exercise_controller import (
-    convert_events_to_new_format,
-)
 from frontstage.controllers.party_controller import (
     display_button,
     filter_ended_collection_exercises,
@@ -28,6 +25,7 @@ from tests.integration.mocked_services import (
     respondent_party,
     survey,
     url_get_business_party,
+    url_get_collection_exercises_by_survey,
     url_get_respondent_email,
     url_get_respondent_party,
     url_get_survey,
@@ -241,24 +239,17 @@ class TestPartyController(unittest.TestCase):
     @patch("frontstage.controllers.case_controller.calculate_case_status")
     @patch("frontstage.controllers.collection_instrument_controller.get_collection_instrument")
     @patch("frontstage.controllers.case_controller.get_cases_for_list_type_by_party_id")
-    @patch("frontstage.controllers.collection_exercise_controller.get_live_collection_exercises_for_survey")
     @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
     def test_get_survey_list_details_for_party(
         self,
         get_respondent_enrolments,
-        get_collection_exercises,
         get_cases,
         get_collection_instrument,
         calculate_case_status,
     ):
         enrolments = [{"business_id": business_party["id"], "survey_id": survey["id"]}]
 
-        for collection_exercise_index in collection_exercise_by_survey:
-            if collection_exercise_index["events"]:
-                collection_exercise_index["events"] = convert_events_to_new_format(collection_exercise_index["events"])
-
         get_respondent_enrolments.return_value = enrolments
-        get_collection_exercises.return_value = collection_exercise_by_survey
         get_cases.return_value = case_list
         get_collection_instrument.return_value = collection_instrument_seft
         calculate_case_status.return_value = "In Progress"
@@ -266,6 +257,7 @@ class TestPartyController(unittest.TestCase):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_survey, json=survey, status=200)
             rsps.add(rsps.GET, url_get_business_party, json=business_party, status=200)
+            rsps.add(rsps.GET, url_get_collection_exercises_by_survey, json=collection_exercise_by_survey, status=200)
 
             survey_list = party_controller.get_survey_list_details_for_party(
                 respondent_party["id"], "todo", business_party["id"], survey["id"]

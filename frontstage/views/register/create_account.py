@@ -28,21 +28,32 @@ def register():
         try:
             iac = iac_controller.get_iac_from_enrolment(enrolment_code)
             if iac is None:
+                logger.info("Enrolment code not found when attempting to create account", enrolment_code=enrolment_code)
                 template_data = {"error": {"type": "failed"}}
                 return (
                     render_template("register/register.enter-enrolment-code.html", form=form, data=template_data),
                     200,
                 )
+            if not iac["active"]:
+                logger.info(
+                    "Enrolment code not active when attempting to create account", enrolment_code=enrolment_code
+                )
+                template_data = {"error": {"type": "failed"}}
+                return render_template("register/register.enter-enrolment-code.html", form=form, data=template_data)
         except ApiError as exc:
             if exc.status_code == 400:
-                logger.info("Enrolment code already used")
+                logger.info(
+                    "Enrolment code already used when attempting to create account", enrolment_code=enrolment_code
+                )
                 template_data = {"error": {"type": "failed"}}
                 return (
                     render_template("register/register.enter-enrolment-code.html", form=form, data=template_data),
                     200,
                 )
             else:
-                logger.error("Failed to submit enrolment code", enrolment_code=enrolment_code)
+                logger.error(
+                    "Failed to submit enrolment code when attempting to create account", enrolment_code=enrolment_code
+                )
                 raise exc
 
         # This is the initial submission of enrolment code so post a case event for authentication attempt
@@ -57,7 +68,9 @@ def register():
         )
 
         encrypted_enrolment_code = cryptographer.encrypt(enrolment_code.encode()).decode()
-        logger.info("Successful enrolment code submitted", enrolment_code=enrolment_code)
+        logger.info(
+            "Successful enrolment code submitted when attempting to create account", enrolment_code=enrolment_code
+        )
         return redirect(
             url_for(
                 "register_bp.register_confirm_organisation_survey",

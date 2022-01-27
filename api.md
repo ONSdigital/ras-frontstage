@@ -419,25 +419,3 @@ This page documents the Fronstage endpoints that can be hit.
 `SURVEY_URL/surveys/ref/{survey_ref}`
 * GET retrieves a survey by survey ref
 * params `survey_ref`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

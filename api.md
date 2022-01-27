@@ -212,6 +212,8 @@ This page documents the Fronstage endpoints that can be hit.
 * GET Send message page once the option and sub option is selected
 * POST Sends secure message for the help pages
 
+## Frontstage endpoint calls
+
 ## Auth Controller Endpoints
 
 `AUTH_URL/api/v1/tokens/`

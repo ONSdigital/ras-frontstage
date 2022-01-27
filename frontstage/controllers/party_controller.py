@@ -11,6 +11,7 @@ from frontstage.common.thread_wrapper import ThreadWrapper
 from frontstage.common.utilities import obfuscate_email
 from frontstage.controllers import (
     case_controller,
+    collection_exercise_controller,
     collection_instrument_controller,
     survey_controller,
 )
@@ -350,9 +351,17 @@ def get_unique_survey_and_business_ids(enrolment_data):
     return surveys_ids, business_ids
 
 
-def caching_case_data(cache_data, business_ids, tag):
-    # Creates a list of threads which will call functions to set the case in the cache_data.
+def caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag):
+    # Creates a list of threads which will call functions to set the survey, case, party and collex responses
+    # in the cache_data.
     threads = []
+
+    for survey_id in surveys_ids:
+        threads.append(
+            ThreadWrapper(
+                get_collex, cache_data, survey_id, app.config["COLLECTION_EXERCISE_URL"], app.config["BASIC_AUTH"]
+            )
+        )
 
     for business_id in business_ids:
         threads.append(
@@ -429,18 +438,13 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
 
     # This is a dictionary that will store all the data that is going to be cached instead of making multiple calls
     # inside the for loop for get_respondent_enrolments.
-    cache_data = {"cases": dict()}
+    cache_data = {"collexes": dict(), "cases": dict()}
     redis_cache = RedisCache()
 
-    # Populate the cache with all case data
-    caching_case_data(cache_data, business_ids, tag)
+    # Populate the cache with all non-instrument data
+    caching_data_for_survey_list(cache_data, surveys_ids, business_ids, tag)
 
-    #  Populate the enrolments by creating a dictionary using the redis_cache
-    collection_exercises = {
-        survey_id: redis_cache.get_collection_exercises_by_survey(survey_id) for survey_id in surveys_ids
-    }
-    enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, collection_exercises)
-
+    enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, cache_data["collexes"])
     for enrolment in enrolments:
         business_party = redis_cache.get_business_party(enrolment["business_id"])
         survey = redis_cache.get_survey(enrolment["survey_id"])
@@ -448,8 +452,7 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
         # Note: If it ever becomes possible to get only live-but-not-ended collection exercises from the
         # collection exercise service, the filter_ended_collection_exercises function will no longer
         # be needed as we can request what we want instead of having to filter what we get.
-
-        live_collection_exercises = filter_ended_collection_exercises(collection_exercises[enrolment["survey_id"]])
+        live_collection_exercises = filter_ended_collection_exercises(cache_data["collexes"][survey["id"]])
 
         collection_exercises_by_id = dict((ce["id"], ce) for ce in live_collection_exercises)
         cases_for_business = cache_data["cases"][business_party["id"]]
@@ -511,6 +514,12 @@ def filter_ended_collection_exercises(collection_exercises: dict) -> list:
 
 def get_survey(cache_data, survey_id, survey_url, survey_auth):
     cache_data["surveys"][survey_id] = survey_controller.get_survey(survey_url, survey_auth, survey_id)
+
+
+def get_collex(cache_data, survey_id, collex_url, collex_auth):
+    cache_data["collexes"][survey_id] = collection_exercise_controller.get_live_collection_exercises_for_survey(
+        survey_id, collex_url, collex_auth
+    )
 
 
 def get_case(cache_data, business_id, case_url, case_auth, tag):

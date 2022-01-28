@@ -29,7 +29,94 @@ This page documents the Fronstage ui endpoints that can be hit.
 `/contact-us`
 * GET Request to this endpoint allows you to access the contact page.
 
+## Surveys help Endpoints
+
+`/surveys-help`
+* GET Survey Help page provided survey_ref and ru_ref and creates flash session for selection
+
+`/help`
+* GET Survey Help page provided survey_ref and ru_ref are in session
+* POST Help to complete this survey option for respective survey
+
+`/help/<option>`
+* GET For help completing this survey's additional options (sub options)
+* POST Provides additional options once sub options are selected
+* `options`
+
+`/help/<option>/<sub_option>`
+* GET Provides additional options with sub option provided
+* `sub_options`
+
+`/help/<option>/<sub_option>/send-message`
+* GET Send message page once the option and sub option is selected
+* POST Sends secure message for the help pages
+* `options`
+* `sub_option`
+
+## Sign-in Endpoints
+
+`/`
+* GET and POST
+* redirects to /sign-in
+
+`/sign-in`
+* Login page
+
+`/resend-verification/<party_id>`
+* GET Deprecated: to be removed when not in use
+* `party_id`
+
+`/resend-verification-expired-token/<token>`
+* GET
+* `token`
+
+`/logout`
+* logs the user out
+
+## Register Endpoints
+
+`/create-account`
+* GET and POST
+
+`/create-account/enter-account-details`
+* GET and POST
+
+`/pending-surveys/create-account/enter-account-details`
+* GET and POST Registration endpoint for account creation and verification against share surveys  and transfer surveys (Account does not exist)
+
+`/create-account/check-email`
+
+`/activate-account/<token>`
+* GET
+* `token`
+
+`/create-account/confirm-organisation-survey`
+* GET
+
+## Passwords Endpoints
+
+`/forgot-password`
+* GET and POST
+
+`/forgot-password/check-email`
+* GET
+
+`/reset-password/<token>`
+* GET and POST
+* `token`
+
+`/reset-password/confirmation`
+* GET
+
+`/reset-password/check-email`
+* GET
+
+`/resend-password-email-expired-token/<token>`
+* GET
+* `token`
+
 ## Account Endpoints
+* requires login
 
 `/account`
 * GET and POST
@@ -44,9 +131,11 @@ This page documents the Fronstage ui endpoints that can be hit.
 
 `/confirm-account-email-change/<token>`
 * GET 
+* `token`
 
 `/resend-account-email-change-expired-token/<token>`
 * GET
+* `token`
 
 `/share-surveys`
 * GET
@@ -86,86 +175,42 @@ This page documents the Fronstage ui endpoints that can be hit.
 
 `/share-surveys/accept-share-surveys/<token>`
 * GET Endpoint to verify token and retrieve the summary page
+* `token`
 
 `/confirm-share-surveys/<batch>`
 * GET Accept endpoint when a share survey summary is accepted
+* `batch` is the batch number
 
 `/confirm-share-surveys/<batch>/existing-account`
 * GET Accept redirect endpoint for accepting share surveys for existing account
 
 `/transfer-surveys/accept-transfer-surveys/<token>`
 * GET Endpoint to verify transfer token and retrieve the summary page
+* `token`
 
 `/confirm-transfer-surveys/<batch>`
 * GET Accept endpoint when a transfer survey summary is accepted
+* `batch` is the batch number
 
 `/confirm-transfer-surveys/<batch>/existing-account`
 * GET Accept redirect endpoint for accepting transfer surveys for existing account
-
-## Register Endpoints
-
-`/create-account`
-* GET and POST
-
-`/create-account/enter-account-details`
-* GET and POST
-
-`/pending-surveys/create-account/enter-account-details`
-* GET and POST Registration endpoint for account creation and verification against share surveys  and transfer surveys (Account does not exist)
-
-`/create-account/check-email`
-
-`/activate-account/<token>`
-* GET
-
-`/create-account/confirm-organisation-survey`
-* GET
-
-## Passwords Endpoints
-
-`/forgot-password`
-* GET and POST
-
-`/forgot-password/check-email`
-* GET
-
-`/reset-password/<token>`
-* GET and POST
-
-`/reset-password/confirmation`
-* GET
-
-`/reset-password/check-email`
-* GET
-
-`/resend-password-email-expired-token/<token>`
-* GET
+* `batch` is the batch number
 
 ## Secure Messaging Endpoints
+* requires login
 
 `/create-message/`
 * GET and POST
 
 `/threads/<thread_id>`
 * GET and POST Endpoint to view conversations by thread_id
+* `thread_id`
 
 `/threads`
 * GET
 
-## Sign-in Endpoints
-
-`/`
-* GET and POST 
-
-`/resend-verification/<party_id>`
-* GET Deprecated: to be removed when not in use
-
-`/resend-verification-expired-token/<token>`
-* GET 
-
-`/logout`
-
 ## Surveys Endpoints
+* requires login
 
 `/access-survey`
 * GET 
@@ -191,23 +236,3 @@ This page documents the Fronstage ui endpoints that can be hit.
 
 `/upload-failed`
 * GET
-
-## Surveys help Endpoints
-
-`/surveys-help`
-* GET Survey Help page provided survey_ref and ru_ref and creates flash session for selection
-
-`/help`
-* GET Survey Help page provided survey_ref and ru_ref are in session
-* POST Help to complete this survey option for respective survey
-
-`/help/<option>`
-* GET For help completing this survey's additional options (sub options)
-* POST Provides additional options once sub options are selected
-
-`/help/<option>/<sub_option>`
-* GET Provides additional options with sub option provided
-
-`/help/<option>/<sub_option>/send-message`
-* GET Send message page once the option and sub option is selected
-* POST Sends secure message for the help pages

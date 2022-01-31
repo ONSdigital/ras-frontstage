@@ -117,7 +117,7 @@ spec:
                 name: {{ .Chart.Name }}
                 key: email-salt
           - name: EQ_URL
-            value: "http://mock-eq.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"
+            value: "http://mock-eq.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}/session?token="
           - name: EQ_V3_URL
             value: "{{ .Values.eq.v3url }}"
           - name: EQ_V3_ENABLED

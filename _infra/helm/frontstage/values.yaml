@@ -9,10 +9,10 @@ image:
   pullPolicy: Always
 
 container:
-  port: 8080
+  port: 9000
 service:
   type: ClusterIP
-  port: 8080
+  port: 9000
 
 config: DevelopmentConfig
 
@@ -48,11 +48,11 @@ security:
 
 resources:
   requests:
-    cpu: "75m"
-    memory: "300Mi"
+    cpu: "150m"
+    memory: "400Mi"
   limits:
-    cpu: "250m"
-    memory: "700Mi"
+    cpu: "300m"
+    memory: "800Mi"
 
 autoscaling: false
 scaleAt:

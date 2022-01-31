@@ -1,15 +1,10 @@
-import logging
-
 import redis
 from flask import render_template
 from flask_talisman import Talisman
-from structlog import wrap_logger  # NOQA
 
 from frontstage.common.jinja_filters import filter_blueprint
 from frontstage.controllers.banner_controller import current_banner
 from frontstage.create_app import create_app_object
-
-logger = wrap_logger(logging.getLogger(__name__))
 
 # TODO: review https://content-security-policy.com/, remove this comment if we're covered.
 CSP_POLICY = {
@@ -40,11 +35,8 @@ CSP_POLICY = {
     ],
 }
 
-logger.info("Before app creation")
-
 app = create_app_object()
 
-logger.info("After app creation")
 talisman = Talisman(
     app,
     content_security_policy=CSP_POLICY,
@@ -59,8 +51,6 @@ redis = redis.Redis(host=app.config["REDIS_HOST"], port=app.config["REDIS_PORT"]
 app.jinja_env.add_extension("jinja2.ext.do")
 
 app.register_blueprint(filter_blueprint)
-
-logger.info("At the end of the app creation process")
 
 
 @app.context_processor

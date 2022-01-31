@@ -66,6 +66,11 @@ def get_collection_exercises_for_survey(survey_id, collex_url, collex_auth, live
         logger.error("Failed to retrieve collection exercises for survey", survey_id=survey_id)
         raise ApiError(logger, response)
 
+    if response.status_code == 204:
+        logger.info(
+            "No live exercises found, returning empty list for collection exercises by survey", survey_id=survey_id
+        )
+        return []
     logger.info("Successfully retrieved collection exercises for survey", survey_id=survey_id)
     collection_exercises = response.json()
 

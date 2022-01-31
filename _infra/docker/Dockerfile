@@ -9,6 +9,5 @@ WORKDIR /app
 COPY . /app
 RUN pipenv install --deploy --system
 
-EXPOSE 8082
-CMD ["gunicorn", "-b", "0.0.0.0:8000", "--workers", "4", "--timeout", "300", "frontstage:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:8080", "--workers", "4", "--timeout", "300", "frontstage:app"]
 

@@ -11,26 +11,18 @@ from frontstage.exceptions.exceptions import ApiError, InvalidEqPayLoad
 from tests.integration.mocked_services import (
     business_party,
     case,
-    categories,
     collection_exercise,
     collection_exercise_events,
-    collection_instrument_eq,
     collection_instrument_seft,
-    completed_case,
     respondent_party,
     survey,
     survey_eq,
     url_banner_api,
     url_get_business_party,
-    url_get_case,
-    url_get_case_categories,
     url_get_ci,
     url_get_collection_exercise,
     url_get_collection_exercise_events,
-    url_get_respondent_party,
     url_get_survey,
-    url_get_survey_by_short_name_eq,
-    url_post_case_event_uuid, collection_exercise_v3,
 )
 
 encoded_jwt_token = (
@@ -47,7 +39,9 @@ class TestGenerateEqURL(unittest.TestCase):
         self.app = app.test_client()
         self.app.set_cookie("localhost", "authorization", "session_key")
         self.headers = {
-            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"
+            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLC"
+            "J1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8"
+            "Q5U9VVdy54"
             # NOQA
         }
         self.patcher = patch("redis.StrictRedis.get", return_value=encoded_jwt_token)

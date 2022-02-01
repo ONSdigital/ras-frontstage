@@ -7,15 +7,29 @@ import requests_mock
 from frontstage import app
 from tests.integration.mocked_services import (
     business_party,
+    case,
+    categories,
     collection_exercise,
+    collection_exercise_events,
+    collection_exercise_v3,
+    collection_instrument_eq,
     collection_instrument_seft,
+    completed_case,
     encoded_jwt_token,
     encrypted_enrolment_code,
+    respondent_party,
     survey,
-    url_banner_api, url_get_case, case, url_get_collection_exercise, collection_exercise_v3,
-    url_get_collection_exercise_events, collection_exercise_events, url_get_business_party,
-    url_get_survey_by_short_name_eq, survey_eq, url_get_ci, collection_instrument_eq, url_get_case_categories,
-    categories, url_post_case_event_uuid, url_get_respondent_party, respondent_party, completed_case,
+    survey_eq,
+    url_banner_api,
+    url_get_business_party,
+    url_get_case,
+    url_get_case_categories,
+    url_get_ci,
+    url_get_collection_exercise,
+    url_get_collection_exercise_events,
+    url_get_respondent_party,
+    url_get_survey_by_short_name_eq,
+    url_post_case_event_uuid,
 )
 
 party_id = "0008279d-9425-4e28-897d-bfd876aa7f3f"
@@ -28,7 +42,9 @@ class TestAccessSurvey(unittest.TestCase):
         self.app = app.test_client()
         self.app.set_cookie("localhost", "authorization", "session_key")
         self.headers = {
-            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"
+            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb"
+            "20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnX"
+            "zRbEKoqXb8Q5U9VVdy54"
             # NOQA
         }
         self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))

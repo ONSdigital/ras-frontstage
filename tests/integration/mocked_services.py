@@ -31,6 +31,9 @@ with open("tests/test_data/case/categories.json") as fp:
 with open("tests/test_data/collection_exercise/collection_exercise.json") as fp:
     collection_exercise = json.load(fp)
 
+with open("tests/test_data/collection_exercise/collection_exercise_v3.json") as fp:
+    collection_exercise_v3 = json.load(fp)
+
 with open("tests/test_data/collection_exercise/collection_exercise_list_by_survey.json") as fp:
     collection_exercise_by_survey = json.load(fp)
 

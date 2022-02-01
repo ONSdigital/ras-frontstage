@@ -89,7 +89,7 @@ class DevelopmentConfig(Config):
 
     ACCOUNT_SERVICE_URL = os.getenv("ACCOUNT_SERVICE_URL", "http://localhost:8082/surveys/todo")
     ACCOUNT_SERVICE_LOG_OUT_URL = os.getenv("ACCOUNT_SERVICE_LOG_OUT_URL", "http://localhost:8082/sign-in/logout")
-    EQ_URL = os.getenv("EQ_URL", "http://localhost:8086/session?token=")
+    EQ_URL = os.getenv("EQ_URL", "http://localhost:8086/complete-eq?token=")
     EQ_V3_URL = os.getenv("EQ_V3_URL", "http://localhost:8086/v3/session?token=")
     JSON_SECRET_KEYS = os.getenv("JSON_SECRET_KEYS") or open("./tests/test_data/jwt-test-keys/test_key.json").read()
 
@@ -127,3 +127,4 @@ class TestingConfig(DevelopmentConfig):
     SECURE_APP = bool(strtobool(os.getenv("SECURE_APP", "False")))
     ACCESS_CONTROL_ALLOW_ORIGIN = os.getenv("ACCESS_CONTROL_ALLOW_ORIGIN", "http://localhost")
     UNDER_MAINTENANCE = bool(strtobool(os.getenv("UNDER_MAINTENANCE", "False")))
+    EQ_V3_ENABLED = bool(strtobool(os.getenv("EQ_V3_ENABLED", "True")))

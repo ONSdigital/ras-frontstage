@@ -30,7 +30,7 @@ from tests.integration.mocked_services import (
     url_get_respondent_party,
     url_get_survey,
     url_get_survey_by_short_name_eq,
-    url_post_case_event_uuid,
+    url_post_case_event_uuid, collection_exercise_v3,
 )
 
 encoded_jwt_token = (
@@ -47,7 +47,8 @@ class TestGenerateEqURL(unittest.TestCase):
         self.app = app.test_client()
         self.app.set_cookie("localhost", "authorization", "session_key")
         self.headers = {
-            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"  # NOQA
+            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"
+            # NOQA
         }
         self.patcher = patch("redis.StrictRedis.get", return_value=encoded_jwt_token)
         self.patcher.start()
@@ -56,64 +57,7 @@ class TestGenerateEqURL(unittest.TestCase):
         self.patcher.stop()
 
     @requests_mock.mock()
-    def test_generate_eq_url(self, mock_request):
-
-        # Given all external services are mocked and we have an EQ collection instrument
-        mock_request.get(url_get_case, json=case)
-        mock_request.get(url_get_collection_exercise, json=collection_exercise)
-        mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
-        mock_request.get(url_get_business_party, json=business_party)
-        mock_request.get(url_get_survey_by_short_name_eq, json=survey_eq)
-        mock_request.get(url_get_ci, json=collection_instrument_eq)
-        mock_request.get(url_get_case_categories, json=categories)
-        mock_request.post(url_post_case_event_uuid, status_code=201)
-        mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_banner_api, status_code=404)
-
-        # When the generate-eq-url is called
-        response = self.app.get(
-            f"/surveys/access-survey?case_id={case['id']}&business_party_id={business_party['id']}"
-            f"&survey_short_name={survey_eq['shortName']}&ci_type=EQ",
-            headers=self.headers,
-        )
-
-        # An eq url is generated
-        self.assertEqual(response.status_code, 302)
-        self.assertIn("https://eq-test/session?token=", response.location)
-
-    @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
-    def test_generate_eq_url_complete_case(self, mock_request, _):
-
-        # Given a mocked case has its caseGroup status as complete
-        mock_request.get(
-            f"{app.config['COLLECTION_EXERCISE_URL']}" f"/collectionexercises/14fb3e68-4dca-46db-bf49-04b84e07e77c",
-            json=collection_exercise,
-        )
-        mock_request.get(f"{app.config['CASE_URL']}/cases/8cdc01f9-656a-4715-a148-ffed0dbe1b04", json=completed_case)
-        mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
-        mock_request.get(url_get_business_party, json=business_party)
-        mock_request.get(url_get_survey_by_short_name_eq, json=survey_eq)
-        mock_request.get(url_get_ci, json=collection_instrument_eq)
-        mock_request.get(url_get_case_categories, json=categories)
-        mock_request.post(url_post_case_event_uuid, status_code=201)
-        mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_banner_api, status_code=404)
-
-        # When the generate-eq-url is called
-        response = self.app.get(
-            f"/surveys/access-survey?case_id={completed_case['id']}&business_party_id={business_party['id']}"
-            f"&survey_short_name={survey_eq['shortName']}&ci_type=EQ",
-            headers=self.headers,
-            follow_redirects=True,
-        )
-
-        # A 403 is returned
-        self.assertEqual(response.status_code, 403)
-
-    @requests_mock.mock()
     def test_generate_eq_url_seft(self, mock_request):
-
         # Given all external services are mocked and we have seft collection instrument
         mock_request.get(url_get_collection_exercise, json=collection_exercise)
         mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
@@ -139,7 +83,6 @@ class TestGenerateEqURL(unittest.TestCase):
 
     @requests_mock.mock()
     def test_generate_eq_url_no_eq_id(self, mock_request):
-
         # Given all external services are mocked and we have an EQ collection instrument without an EQ ID
         with open("tests/test_data/collection_instrument/collection_instrument_eq_no_eq_id.json") as json_data:
             collection_instrument_eq_no_eq_id = json.load(json_data)
@@ -165,7 +108,6 @@ class TestGenerateEqURL(unittest.TestCase):
 
     @requests_mock.mock()
     def test_generate_eq_url_no_form_type(self, mock_request):
-
         # Given all external services are mocked and we have an EQ collection instrument without a Form_type
         with open("tests/test_data/collection_instrument/collection_instrument_eq_no_form_type.json") as json_data:
             collection_instrument_eq_no_form_type = json.load(json_data)
@@ -191,7 +133,6 @@ class TestGenerateEqURL(unittest.TestCase):
 
     @requests_mock.mock()
     def test_access_collection_exercise_events_fail(self, mock_request):
-
         # Given a failing collection exercise events service
         mock_request.get(url_get_collection_exercise_events, status_code=500)
         mock_request.get(url_banner_api, status_code=404)
@@ -203,7 +144,6 @@ class TestGenerateEqURL(unittest.TestCase):
                 collection_exercise_controller.get_collection_exercise_events(collection_exercise["id"])
 
     def test_generate_eq_url_incorrect_date_format(self):
-
         # Given an invalid date
         date = "invalid"
 
@@ -214,7 +154,6 @@ class TestGenerateEqURL(unittest.TestCase):
         self.assertEqual(e.exception.message, "Unable to format invalid")
 
     def test_generate_eq_url_iso8601_date_format(self):
-
         # Given a valid date
         date = "2007-01-25T12:00:00Z"
 
@@ -244,7 +183,6 @@ class TestGenerateEqURL(unittest.TestCase):
         self.assertEqual(result, "2007-01-26T00:59:59+00:00")
 
     def test_generate_eq_url_missing_mandatory_event_date(self):
-
         # Given a mandatory event date does not exist
         collex_events_dates = [
             {
@@ -269,7 +207,6 @@ class TestGenerateEqURL(unittest.TestCase):
         self.assertEqual(e.exception.message, "Mandatory event not found for collection 123 for search param return by")
 
     def test_generate_eq_url_non_mandatory_event_date_is_none(self):
-
         # Given a non mandatory event date does not exist
         collex_events_dates = []
         # When find_event_date_by_tag is called with a search param
@@ -279,7 +216,6 @@ class TestGenerateEqURL(unittest.TestCase):
         self.assertEqual(response, None)
 
     def test_generate_eq_url_non_mandatory_event_date_is_returned(self):
-
         # Given a non mandatory event date exists
         collex_events_dates = [
             {

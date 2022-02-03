@@ -36,6 +36,7 @@ CSP_POLICY = {
 }
 
 app = create_app_object()
+
 talisman = Talisman(
     app,
     content_security_policy=CSP_POLICY,

@@ -67,6 +67,35 @@ def get_collection_instrument(collection_instrument_id, collection_instrument_ur
     return response.json()
 
 
+def upload_collection_instrument_new(upload_file, case_id, party_id):
+    file = request.files.get("file")
+
+    if case_id and file and hasattr(file, "filename"):
+        file_name, file_extension = os.path.splitext(secure_filename(file.filename))
+        gcp_survey_response = GcpSurveyResponse(current_app.config)
+        is_valid_file, msg = gcp_survey_response.is_valid_file(file_name, file_extension)
+
+        if not is_valid_file:
+            return make_response(msg, 400)
+
+        file_name, survey_ref = gcp_survey_response.get_file_name_and_survey_ref(case_id, file_extension)
+
+        if not file_name:
+            return make_response(MISSING_DATA, 404)
+        try:
+            file_contents = file.read()
+            gcp_survey_response.add_survey_response(case_id, file_contents, file_name, survey_ref)
+
+            return make_response(UPLOAD_SUCCESSFUL, 200)
+        except FileTooSmallError:
+            return make_response(FILE_TOO_SMALL, 400)
+        except SurveyResponseError:
+            return make_response(UPLOAD_UNSUCCESSFUL, 500)
+
+    else:
+        log.info("Either case_id, file or file attributes are missing.")
+        return make_response(INVALID_UPLOAD, 400)
+
 def upload_collection_instrument(upload_file, case_id, party_id):
     logger.info("Attempting to upload collection instrument", case_id=case_id, party_id=party_id)
 

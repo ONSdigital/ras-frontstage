@@ -50,7 +50,7 @@ def upload_survey(session):
 
     try:
         # Upload the file to the collection instrument service
-        collection_instrument_controller.upload_collection_instrument(upload_file, case_id, party_id)
+        collection_instrument_controller.upload_collection_instrument_new(upload_file, case_id, party_id)
     except CiUploadError as ex:
         if ".xlsx format" in ex.error_message:
             error_info = "type"

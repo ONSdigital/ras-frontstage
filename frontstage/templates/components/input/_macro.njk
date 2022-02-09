@@ -1,31 +1,32 @@
 {% macro onsInput(params) %}
     {% from "components/mutually-exclusive/_macro.njk" import onsMutuallyExclusive %}
     {% from "components/char-check-limit/_macro.njk" import onsCharLimit %}
-    {% from "components/input/_autosuggest-macro.njk" import onsAutosuggest%}
     {% from "components/search/_macro.njk" import onsSearch %}
     {% from "components/field/_macro.njk" import onsField %}
     {% from "components/label/_macro.njk" import onsLabel %}
 
     {% if params.type == "number" %}
         {# Type must be "text" or Firefox and Safari will set a blank value to the server if non numeric characters are entered -
-        they don't block non numeric characters: https://bugzilla.mozilla.org/show_bug.cgi?id=1398528 #}
+        they don’t block non numeric characters: https://bugzilla.mozilla.org/show_bug.cgi?id=1398528 #}
         {% set type = "text" %}
         {% set pattern = "[0-9]*" %}
         {% set inputmode = "numeric" %}
     {% elif params.type is defined and params.type %}
         {% set type = params.type %}
+    {% elif params.searchButton is defined and params.searchButton %}
+        {% set type = "search" %}
     {% else %}
         {% set type = "text" %}
     {% endif %}
 
-    {% set exclusiveClass = " js-exclusive-group-item" if params.mutuallyExclusive else "" %}
-    {% set inputPlaceholder = ' input--placeholder ' if params.accessiblePlaceholder else "" %}
+    {% set exclusiveClass = " ons-js-exclusive-group-item" if params.mutuallyExclusive else "" %}
+    {% set inputPlaceholder = ' ons-input--placeholder' if params.accessiblePlaceholder else "" %}
 
     {% set input %}
         <input
             type="{{ type }}"
             id="{{ params.id }}"
-            class="input input--text input-type__input {% if params.error is defined and params.error %} input--error {% endif %}{% if params.autosuggest is defined and params.autosuggest %} js-autosuggest-input {% endif %} {% if params.searchButton is defined and params.searchButton %}u-mr-xs@s u-mb-xs@xxs@s{% endif %} {{ params.classes }}{{ exclusiveClass }}{{ inputPlaceholder }}"
+            class="ons-input ons-input--text ons-input-type__input{% if params.error is defined and params.error %} ons-input--error{% endif %}{% if params.searchButton is defined and params.searchButton %} ons-search__input{% endif %}{% if params.classes is defined and params.classes %} {{ params.classes }}{% endif %}{% if params.width is defined and params.width %} ons-input{% if params.type is defined and (params.type == 'number' or params.type == 'tel') %}-number{% endif %}--w-{{ params.width }}{% endif %}{{ exclusiveClass }}{{ inputPlaceholder }}"
             {% if params.prefix is defined and params.prefix or params.suffix is defined and params.suffix %}title="{{ params.prefix.title if params.prefix }}{{ params.suffix.title if params.suffix }}"{% endif %}
             {% if params.name is defined and params.name %}name="{{ params.name }}"{% endif %}
             {% if params.value is defined and params.value %}value="{{ params.value }}"{% endif %}
@@ -35,7 +36,6 @@
             {% if params.minLength is defined and params.minLength %}minlength="{{ params.minLength }}"{% endif %}
             {% if params.maxLength is defined and params.maxLength %}maxlength="{{ params.maxLength }}"{% endif %}
             {% if pattern is defined and pattern %}pattern="{{ pattern }}"{% endif %}
-            {% if params.accessiblePlaceholder is defined and params.accessiblePlaceholder %}placeholder="{{ params.label.text }}"{% endif %}
             {% if inputmode is defined and inputmode %}inputmode="{{ inputmode }}"{% endif %}
             {% if params.autocomplete is defined and params.autocomplete %}autocomplete="{{ params.autocomplete }}"{% endif %}
             {% if params.accessiblePlaceholder is defined and params.accessiblePlaceholder %}placeholder="{{ params.label.text }}"{% endif %}
@@ -43,6 +43,7 @@
             {% if params.charCheckLimit is defined and params.charCheckLimit and params.charCheckLimit.charcheckCountdown is defined and params.charCheckLimit.charcheckCountdown %}data-char-check-countdown="true"{% endif %}
             {% if params.attributes is defined and params.attributes %}{% for attribute, value in (params.attributes.items() if params.attributes is mapping and params.attributes.items else params.attributes) %}{{ attribute }}{% if value is defined and value %}="{{ value }}"{% endif %} {% endfor %}{% endif %}
             {% if params.label is defined and params.label and params.label.description is defined and params.label.description %}{% if params.label.id is defined and params.label.id %}aria-describedby="{{ params.label.id }}-description-hint"{% else %}aria-describedby="description-hint"{% endif %}{% endif %}
+            {% if params.required is defined and params.required == true %}required="required"{% endif %}
         />
         {% if params.listeners %}
             <script{% if csp_nonce %} nonce="{{ csp_nonce() }}"{% endif %}>
@@ -52,11 +53,11 @@
             </script>
         {% endif %}
         {% if params.postTextboxLinkText is defined and params.postTextboxLinkText %}
-            <a class="u-fs-s" href="{{ params.postTextboxLinkUrl }}">{{ params.postTextboxLinkText }}</a>
+            <a class="ons-u-fs-s" href="{{ params.postTextboxLinkUrl }}">{{ params.postTextboxLinkText }}</a>
         {% endif %}
     {% endset %}
     {% set field %}
-        {% if params.label is defined and params.label %}
+        {% if params.label is defined and params.label and params.label.text is defined and params.label.text %}
             {{ onsLabel({
                 "for": params.id,
                 "id": params.label.id,
@@ -64,21 +65,22 @@
                 "classes": params.label.classes,
                 "description": params.label.description,
                 "attributes": params.label.attributes,
-                "accessiblePlaceholder": params.accessiblePlaceholder
+                "accessiblePlaceholder": params.accessiblePlaceholder,
+                "inline": params.label.inline
             }) }}
         {% endif %}
 
         {% if params.prefix is defined and params.prefix or params.suffix is defined and params.suffix %}
             {% if params.prefix is defined and params.prefix %}
-                {% set prefixClass = " input-type--prefix" %}
+                {% set prefixClass = " ons-input-type--prefix" %}
             {% endif %}
 
-            <span class="input-type{{ prefixClass }}">
-                <span class="input-type__inner">
+            <span class="ons-input-type{{ prefixClass }}">
+                <span class="ons-input-type__inner">
                     {{ input | safe }}
                     {% set abbr = params.prefix or params.suffix %}
                     <abbr
-                        class="input-type__type js-input-abbr"
+                        class="ons-input-type__type ons-js-input-abbr"
                         aria-hidden="true"
                         title="{{ abbr.title }}"
                         {% if abbr.id is defined and abbr.id %} id="{{ abbr.id }}"{% endif %}
@@ -86,52 +88,21 @@
                 </span>
             </span>
         {% elif params.searchButton is defined and params.searchButton %}
-            {% call onsSearch({
-                "accessiblePlaceholder": params.accessiblePlaceholder,
-                "searchButton": {
-                    "type": params.searchButton.type,
-                    "text": params.searchButton.text,
-                    "id": params.searchButton.id
-                }
-            }) %}
-                {{ input | safe }}
-            {% endcall %}
-        {% elif params.autosuggest is defined and params.autosuggest %}
-            {% call onsAutosuggest({
-                "id": params.id,
-                "labelId": params.label.id,
-                "classes": params.autosuggest.classes,
-                "APIDomain": params.autosuggest.APIDomain,
-                "APIDomainBearerToken": params.autosuggest.APIDomainBearerToken,
-                "allowMultiple": params.autosuggest.allowMultiple,
-                "mandatory": params.autosuggest.mandatory,
-                "isEditable": params.autosuggest.isEditable,
-                "instructions": params.autosuggest.instructions,
-                "ariaYouHaveSelected": params.autosuggest.ariaYouHaveSelected,
-                "ariaMinChars": params.autosuggest.ariaMinChars,
-                "ariaResultsLabel": params.autosuggest.ariaResultsLabel,
-                "ariaOneResult": params.autosuggest.ariaOneResult,
-                "ariaNResults": params.autosuggest.ariaNResults,
-                "ariaLimitedResults": params.autosuggest.ariaLimitedResults,
-                "ariaGroupedResults": params.autosuggest.ariaGroupedResults,
-                "groupCount": params.autosuggest.groupCount,
-                "moreResults": params.autosuggest.moreResults,
-                "resultsTitle": params.autosuggest.resultsTitle,
-                "autosuggestData": params.autosuggest.autosuggestData,
-                "noResults": params.autosuggest.noResults,
-                "tooManyResults": params.autosuggest.tooManyResults,
-                "typeMore": params.autosuggest.typeMore,
-                "resultsTitle": params.autosuggest.resultsTitle,
-                "externalInitialiser": params.autosuggest.externalInitialiser,
-                "errorTitle": params.autosuggest.errorTitle,
-                "errorMessageEnter": params.autosuggest.errorMessageEnter,
-                "errorMessageSelect": params.autosuggest.errorMessageSelect,
-                "errorMessageAPI": params.autosuggest.errorMessageAPI,
-                "errorMessageAPILinkText": params.autosuggest.errorMessageAPILinkText,
-                "options": params.autosuggest.options
-            }) %}
-                {{ input | safe }}
-            {% endcall %}
+            <span class="ons-grid--flex ons-search">
+                {% call onsSearch({
+                    "accessiblePlaceholder": params.accessiblePlaceholder,
+                    "searchButton": {
+                        "type": params.searchButton.type,
+                        "text": params.searchButton.text,
+                        "id": params.searchButton.id,
+                        "attributes": params.searchButton.attributes,
+                        "classes": params.searchButton.classes,
+                        "iconType": params.searchButton.iconType
+                    }
+                }) %}
+                    {{ input | safe }}
+                {% endcall %}
+            </span>
         {% else %}
             {{ input | safe }}
         {% endif %}
@@ -157,15 +128,17 @@
         {% call onsMutuallyExclusive({
             "id": params.fieldId,
             "legend": params.legend,
-            "legendClasses": params.legendClasses ~ " js-input-legend",
+            "legendClasses": params.legendClasses ~ " ons-js-input-legend",
             "description": params.description,
             "dontWrap": params.dontWrap,
+            "legendIsQuestionTitle": params.legendIsQuestionTitle,
             "checkbox": params.mutuallyExclusive.checkbox,
             "or": params.mutuallyExclusive.or,
             "deselectMessage": params.mutuallyExclusive.deselectMessage,
             "deselectGroupAdjective": params.mutuallyExclusive.deselectGroupAdjective,
             "deselectCheckboxAdjective": params.mutuallyExclusive.deselectCheckboxAdjective,
-            "error": params.error
+            "error": params.error,
+            "autosuggestResults": params.autosuggestResults
         }) %}
             {% if charCheckField is defined and charCheckField %}
                 {{ charCheckField | safe }}
@@ -180,7 +153,9 @@
             "id": params.fieldId,
             "classes": params.fieldClasses,
             "dontWrap": params.dontWrap,
-            "error": params.error
+            "legendIsQuestionTitle": params.legendIsQuestionTitle,
+            "error": params.error,
+            "inline": params.label.inline
         }) %}
             {% if charCheckField is defined and charCheckField %}
                 {{ charCheckField | safe }}

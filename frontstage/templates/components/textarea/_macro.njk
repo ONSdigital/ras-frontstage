@@ -6,29 +6,31 @@
 
 
     {% set field %}
-        {% set textareaExlusiveClass = " js-exclusive-group-item" if params.mutuallyExclusive else "" %}
+        {% set textareaExclusiveClass = " ons-js-exclusive-group-item" if params.mutuallyExclusive else "" %}
 
-        {{ onsLabel({
-            "for": params.id,
-            "text": params.label.text,
-            "description": params.label.description,
-            "classes": params.label.classes
-        }) }}
+        {% if params.label is defined and params.label %}
+            {{ onsLabel({
+                "for": params.id,
+                "text": params.label.text,
+                "description": params.label.description,
+                "classes": params.label.classes
+            }) }}
+        {% endif %}
 
         <textarea
             id="{{ params.id }}"
-            class="input input--textarea {% if params.error is defined and params.error %} input--error {% endif %}{% if params.charCheckLimit.limit is defined and params.charCheckLimit.limit %} js-char-limit-input{% endif %}{{ textareaExlusiveClass }} {{ params.classes }}"
+            class="ons-input ons-input--textarea {% if params.error is defined and params.error %} ons-input--error {% endif %}{% if params.charCheckLimit is defined and params.charCheckLimit and params.charCheckLimit.limit is defined and params.charCheckLimit.limit %} ons-js-char-limit-input{% endif %}{{ textareaExclusiveClass }} {{ params.classes }} {% if params.width is defined and params.width %}ons-input--w-{{ params.width }}{% endif %}"
             name="{{ params.name }}"
             rows="{{ params.rows | default(8) }}"
-            {% if params.charCheckLimit.limit is defined and params.charCheckLimit.limit %}
-            maxlength="{{ params.charCheckLimit.limit }}"
-            data-char-limit-ref="{{ params.id }}-lim-remaining"
-            aria-describedby="{{ params.id }}-lim-remaining"
+            {% if params.charCheckLimit is defined and params.charCheckLimit and params.charCheckLimit.limit is defined and params.charCheckLimit.limit %}
+                maxlength="{{ params.charCheckLimit.limit }}"
+                data-char-limit-ref="{{ params.id }}-lim-remaining"
+                aria-describedby="{{ params.id }}-lim-remaining"
             {% endif %}
             {% if params.attributes is defined and params.attributes %}{% for attribute, value in (params.attributes.items() if params.attributes is mapping and params.attributes.items else params.attributes) %}{{ attribute }}{% if value is defined and value %}="{{ value }}"{% endif %} {% endfor %}{% endif %}
         >{{ params.value }}</textarea>
 
-        {% if params.charCheckLimit.limit is defined and params.charCheckLimit.limit %}
+        {% if params.charCheckLimit is defined and params.charCheckLimit and params.charCheckLimit.limit is defined and params.charCheckLimit.limit %}
             {% call onsCharLimit({
                 "id": params.id ~ "-lim",
                 "limit": params.charCheckLimit.limit,
@@ -47,6 +49,7 @@
             "legendClasses": params.legendClasses,
             "description": params.description,
             "dontWrap": params.dontWrap,
+            "legendIsQuestionTitle": params.legendIsQuestionTitle,
             "checkbox": params.mutuallyExclusive.checkbox,
             "or": params.mutuallyExclusive.or,
             "deselectMessage": params.mutuallyExclusive.deselectMessage,
@@ -65,6 +68,7 @@
             "id": params.fieldId,
             "classes": params.fieldClasses,
             "dontWrap": params.dontWrap,
+            "legendIsQuestionTitle": params.legendIsQuestionTitle,
             "error": params.error
         }) %}
             {{ field | safe }}

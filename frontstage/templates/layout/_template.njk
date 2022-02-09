@@ -15,18 +15,20 @@
 {# Meta icons #}
 {% if pageConfig is defined and pageConfig and pageConfig.theme is defined and pageConfig.theme %}
     {% set metaicons = pageConfig.theme + "/" + currentLanguageISOCode + "/" %}
+{% else %}
+    {% set metaicons = "" %}
 {% endif %}
 
 {% set pageColNumber = pageConfig.pageColNumber | default("8") %}
 
 {% if pageConfig.cdn is defined and pageConfig.cdn or release_version is defined and release_version %}
     {# Production #}
-    {% set cdn_url = (pageConfig.cdn.url if pageConfig.cdn is defined and pageConfig.cdn) or "https://cdn.ons.gov.uk/sdc/design-system" %}
+    {% set cdn_url = (pageConfig.cdn.url if pageConfig.cdn is defined and pageConfig.cdn and pageConfig.cdn.url is defined and pageConfig.cdn.url) or "https://cdn.ons.gov.uk/sdc/design-system" %}
     {% set slash = "" if cdn_url | last == "/" else "/" %}
-    {% set assetsURL = cdn_url + slash + ((pageConfig.cdn.version  if pageConfig.cdn is defined and pageConfig.cdn) or release_version) %}
-{% elif data is defined and data and data.version is defined and data.version %}
+    {% set assetsURL = cdn_url + slash + ((pageConfig.cdn.version  if pageConfig.cdn is defined and pageConfig.cdn and pageConfig.cdn.version is defined and pageConfig.cdn.version) or release_version) %}
+{% elif pageInfo is defined and pageInfo and pageInfo.version is defined and pageInfo.version %}
     {# Prototype kits #}
-    {% set assetsURL = "/" + data.version %}
+    {% set assetsURL = "/" + pageInfo.version %}
 {% elif pageConfig.assetsURL is defined and pageConfig.assetsURL %}
     {# Runner Dev #}
     {% set assetsURL = pageConfig.assetsURL %}
@@ -37,10 +39,10 @@
 
 {% if pageConfig is defined and pageConfig and pageConfig.title is defined and pageConfig.title %}
     {% set page_title = pageConfig.title %}
-{% elif data is defined and data and data.title is defined and data.title %}
-    {% set page_title = data.title %}
+{% elif pageInfo is defined and pageInfo and pageInfo.title is defined and pageInfo.title %}
+    {% set page_title = pageInfo.title %}
 {% else %}
-    {% set page_title = "" %}
+    {% set page_title = "ONS Design System" %}
 {% endif %}
 
 <!doctype html>
@@ -52,12 +54,13 @@
         <title>{{ page_title }}</title>
         <link rel="stylesheet" href="{{ assetsURL }}/css/{{ pageConfig.theme | default('main') }}.css">
         <link rel="stylesheet" media="print" href="{{ assetsURL }}/css/print.css">
-        <meta name="theme-color" content="{% if pageConfig.theme == 'census' %}#902082{% else %}#3b7a9e{% endif %}"/>
-        {% if pageConfig.headMeta and pageConfig.headMeta.description is defined and pageConfig.headMeta.description or pageConfig.description is defined and pageConfig.description %}
-            <meta name="description" content="{{ pageConfig.headMeta.description | default(pageConfig.description) }}">
-        {% endif %}
+        <meta name="theme-color" content="{% if pageConfig.theme == 'census' %}#902082{% else %}#206095{% endif %}"/>
 
         {% if pageConfig.headMeta is defined and pageConfig.headMeta %}
+
+            {% if pageConfig.headMeta.description is defined and pageConfig.headMeta.description or pageConfig.description is defined and pageConfig.description %}
+                <meta name="description" content="{{ pageConfig.headMeta.description | default(pageConfig.description) }}">
+            {% endif %}
 
             <!-- Open Graph -->
             <meta property="og:type" content="website">
@@ -85,8 +88,8 @@
             <!-- Canonical -->
             <link rel="canonical" href="{{ pageConfig.headMeta.canonicalUrl | default(pageConfig.absoluteUrl) }}">
 
-            {% if pageConfig.headMeta.hreflangs is defined and pageConfig.headMeta.hreflangs %}
-                {% for item in pageConfig.headMeta.hreflangs %}
+            {% if pageConfig.headMeta.hrefLangs is defined and pageConfig.headMeta.hrefLangs %}
+                {% for item in pageConfig.headMeta.hrefLangs %}
                     <link rel="alternate" href="{{ item.url }}" hreflang="{{ item.lang }}">
                 {% endfor %}
             {% endif %}
@@ -108,11 +111,11 @@
 
     </head>
     <body{% if pageConfig.bodyClasses is defined and pageConfig.bodyClasses %} class="{{ pageConfig.bodyClasses }}"{% endif %}>
-        <script{% if pageConfig.cspNonce is defined and pageConfig.cspNonce %} nonce="{{ pageConfig.cspNonce }}"{% elif pageConfig.cspNonce is not defined and csp_nonce is defined and csp_nonce %} nonce="{{ csp_nonce() }}"{% endif %}>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
+        <script{% if pageConfig.cspNonce is defined and pageConfig.cspNonce %} nonce="{{ pageConfig.cspNonce }}"{% elif pageConfig.cspNonce is not defined and csp_nonce is defined and csp_nonce %} nonce="{{ csp_nonce() }}"{% endif %}>document.body.className = ((document.body.className) ? document.body.className + ' ons-js-enabled' : 'ons-js-enabled');</script>
         {% block bodyStart %}{% endblock %}
         {% block body %}
-            <div class="page">
-                <div class="page__content">
+            <div class="ons-page">
+                <div class="ons-page__content">
                     {% block skipLink %}
                         {{
                             onsSkipToContent({
@@ -154,11 +157,11 @@
                         }}
                     {% endblock %}
                     {% block pageContent %}
-                        <div class="page__container container {{ containerClasses }}">
+                        <div class="ons-page__container ons-container {{ containerClasses }}">
                             {% if pageConfig.breadcrumbs is defined and pageConfig.breadcrumbs %}
-                                {% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+                                {% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
                                 {{
-                                    onsBreadcrumb({
+                                    onsBreadcrumbs({
                                         "id": pageConfig.breadcrumbs.id,
                                         "ariaLabel": pageConfig.breadcrumbs.ariaLabel,
                                         "itemsList": pageConfig.breadcrumbs.itemsList
@@ -166,9 +169,9 @@
                                 }}
                             {% endif %}
                             {% block preMain %}{% endblock %}
-                            <div class="grid">
-                                <div class="grid__col col-{{ pageColNumber }}@m">
-                                    <main id="main-content" class="page__main {{ pageClasses }}">
+                            <div class="ons-grid">
+                                <div class="ons-grid__col ons-col-{{ pageColNumber }}@m">
+                                    <main id="main-content" class="ons-page__main {{ pageClasses }}">
                                         {% block main %}{% endblock %}
                                     </main>
                                 </div>
@@ -187,7 +190,7 @@
                             onsFooter({
                                 "assetsURL": assetsURL,
                                 "wide": pageConfig.wide,
-                                "classes": "page__footer",
+                                "classes": "ons-page__footer",
                                 "language": pageConfig.language,
                                 "lang": currentLanguageISOCode,
                                 "rows": pageConfig.footer.rows,
@@ -216,7 +219,6 @@
 
         <script{% if pageConfig.cspNonce is defined and pageConfig.cspNonce %} nonce="{{ pageConfig.cspNonce }}"{% elif pageConfig.cspNonce is not defined and csp_nonce is defined and csp_nonce %} nonce="{{ csp_nonce() }}"{% endif %}>
             (function() {
-                {% if assetsURL is defined and assetsURL -%}window.ONS_assets_base_URL = "{{ assetsURL }}/";{%- endif %}
                 var s = '{{ scripts | safe }}'.split(','),
                 c = document.createElement('script');
 
@@ -235,10 +237,6 @@
                 }
             })();
         </script>
-
-        {% if devMode is defined and devMode %}
-            <script>document.write('<script src="//' + (location.hostname || 'localhost').split(':')[0] + ':35729/livereload.js" defer><\/script>');</script>
-        {% endif %}
 
         {% block scripts %}{% endblock %}
     </body>

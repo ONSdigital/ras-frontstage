@@ -69,6 +69,7 @@ class TestSurveyList(unittest.TestCase):
             "There are no surveys registered to your account. If you wish to delete your account".encode()
             in response.data
         )
+        self.assertTrue("Click on the survey name to complete your questionnaire.".encode() in response.data)
         self.assertTrue("Need to add a new survey? Use your enrolment code to".encode() in response.data)
 
     @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
@@ -84,4 +85,5 @@ class TestSurveyList(unittest.TestCase):
             "There are no surveys registered to your account. If you wish to delete your account".encode()
             in response.data
         )
+        self.assertTrue("Click on the survey name to complete your questionnaire.".encode() in response.data)
         self.assertTrue("Need to add a new survey? Use your enrolment code to".encode() in response.data)

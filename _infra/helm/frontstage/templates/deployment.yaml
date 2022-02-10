@@ -222,5 +222,9 @@ spec:
                 key: email-secret-key
           - name: SEFT_UPLOAD_PUBSUB_TOPIC
             value: "{{ .Values.gcp.seftUpload.topic }}"
+          - name: SEFT_UPLOAD_BUCKET_NAME
+            value: "{{ .Values.gcp.seftUpload.bucket.name }}"
+          - name: SEFT_UPLOAD_BUCKET_FILE_PREFIX
+            value: "{{ .Values.gcp.seftUpload.bucket.prefix }}"
           resources:
             {{ toYaml .Values.resources | nindent 12 }}

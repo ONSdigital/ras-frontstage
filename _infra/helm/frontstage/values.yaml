@@ -39,6 +39,9 @@ gcp:
   topic: ras-rm-notify-test
   seftUpload:
     topic: topic
+    bucket:
+      name: bucket
+      prefix: ""
 
 scheme: http
 

@@ -67,9 +67,14 @@ class Config(object):
     SECURE_APP = bool(strtobool(os.getenv("SECURE_APP", "True")))
     WTF_CSRF_ENABLED = bool(strtobool(os.getenv("WTF_CSRF_ENABLED", str(SECURE_APP))))
     WTF_CSRF_TIME_LIMIT = int(os.getenv("WTF_CSRF_TIME_LIMIT", "7200"))
+
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "ras-rm-sandbox")
     PUBSUB_TOPIC = os.getenv("PUBSUB_TOPIC", "ras-rm-notify-test")
     SEFT_UPLOAD_PUBSUB_TOPIC = os.getenv("SEFT_UPLOAD_PUBSUB_TOPIC", "ras-rm-notify-test")
+    SEFT_UPLOAD_BUCKET_NAME = os.getenv("SEFT_UPLOAD_BUCKET_NAME", "test-bucket")
+    # Prefix only used for dev environments to file in folders within the bucket
+    SEFT_UPLOAD_BUCKET_FILE_PREFIX = os.getenv("SEFT_UPLOAD_BUCKET_FILE_PREFIX")
+
     CANARY_GENERATE_ERRORS = bool(strtobool(os.getenv("CANARY_GENERATE_ERRORS", "False")))
     MAX_SHARED_SURVEY = int(os.getenv("MAX_SHARED_SURVEY", "50"))
     UNDER_MAINTENANCE = bool(strtobool(os.getenv("UNDER_MAINTENANCE", "False")))

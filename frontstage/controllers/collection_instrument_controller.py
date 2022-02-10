@@ -7,7 +7,11 @@ from structlog import wrap_logger
 from werkzeug.utils import secure_filename
 
 from frontstage.controllers import case_controller
-from frontstage.controllers.gcp_survey_response import GcpSurveyResponse, FileTooSmallError, SurveyResponseError
+from frontstage.controllers.gcp_survey_response import (
+    FileTooSmallError,
+    GcpSurveyResponse,
+    SurveyResponseError,
+)
 from frontstage.exceptions.exceptions import ApiError, CiUploadError, CiUploadErrorNew
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -94,12 +98,12 @@ def upload_collection_instrument_new(upload_file: dict, case_id: str, party_id: 
 
         if not is_valid_file:
             ci_post_case_event(case_id, party_id, "UNSUCCESSFUL_RESPONSE_UPLOAD")
-            raise CiUploadErrorNew(msg, 400)
+            raise CiUploadErrorNew(msg)
 
         file_name, survey_ref = gcp_survey_response.get_file_name_and_survey_ref(case_id, file_extension)
 
         if not file_name:
-            raise CiUploadErrorNew(MISSING_DATA, 404)
+            raise CiUploadErrorNew(MISSING_DATA)
         try:
             file_contents = file.read()
             gcp_survey_response.add_survey_response(case_id, file_contents, file_name, survey_ref)
@@ -107,17 +111,17 @@ def upload_collection_instrument_new(upload_file: dict, case_id: str, party_id: 
             logger.info("Successfully uploaded collection instrument", case_id=case_id, party_id=party_id)
         except FileTooSmallError:
             ci_post_case_event(case_id, party_id, "UNSUCCESSFUL_RESPONSE_UPLOAD")
-            raise CiUploadErrorNew(FILE_TOO_SMALL, 400)
+            raise CiUploadErrorNew(FILE_TOO_SMALL)
         except SurveyResponseError:
             ci_post_case_event(case_id, party_id, "UNSUCCESSFUL_RESPONSE_UPLOAD")
-            raise CiUploadErrorNew(UPLOAD_UNSUCCESSFUL, 400)
+            raise CiUploadErrorNew(UPLOAD_UNSUCCESSFUL)
     else:
         logger.info("Either case_id, file or file attributes are missing.")
         ci_post_case_event(case_id, party_id, "UNSUCCESSFUL_RESPONSE_UPLOAD")
-        raise CiUploadErrorNew(INVALID_UPLOAD, 400)
+        raise CiUploadErrorNew(INVALID_UPLOAD)
 
 
-def ci_post_case_event(case_id, party_id,  category):
+def ci_post_case_event(case_id, party_id, category):
     # Post relevant upload case event
     case_controller.post_case_event(
         case_id,
@@ -125,7 +129,6 @@ def ci_post_case_event(case_id, party_id,  category):
         category=category,
         description=f"Survey response for case {case_id} uploaded by {party_id}",
     )
-
 
 
 def upload_collection_instrument(upload_file, case_id, party_id):

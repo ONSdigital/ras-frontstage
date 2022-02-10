@@ -5,10 +5,6 @@ import time
 import uuid
 
 import structlog
-from flask import current_app
-from google.cloud import pubsub_v1, storage
-from google.cloud.exceptions import GoogleCloudError
-
 from application.controllers.gnu_encryptor import GNUEncrypter
 from application.controllers.helper import (
     is_valid_file_extension,
@@ -20,6 +16,9 @@ from application.controllers.service_helper import (
     get_collection_exercise,
     get_survey_ref,
 )
+from flask import current_app
+from google.cloud import pubsub_v1, storage
+from google.cloud.exceptions import GoogleCloudError
 
 log = structlog.wrap_logger(logging.getLogger(__name__))
 

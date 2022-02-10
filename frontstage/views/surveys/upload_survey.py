@@ -46,29 +46,21 @@ def upload_survey(session):
     # Get the uploaded file
     upload_file = request.files["file"]
     upload_filename = upload_file.filename
-    upload_file = {"file": (upload_filename, upload_file.stream, upload_file.mimetype, {"Expires": 0})}
+    upload_file_dict = {"file": (upload_filename, upload_file.stream, upload_file.mimetype, {"Expires": 0})}
 
     try:
         # Upload the file to the collection instrument service
-        collection_instrument_controller.upload_collection_instrument_new(upload_file, case_id, party_id)
+        collection_instrument_controller.upload_collection_instrument_new(upload_file_dict, case_id, party_id)
     except CiUploadErrorNew as ex:
-        if ".xlsx format" in ex.error_message:
-            error_info = "type"
-        elif "50 characters" in ex.error_message:
-            error_info = "charLimit"
-        elif "File too large" in ex.error_message:
-            error_info = "size"
-        elif "File too small" in ex.error_message:
-            error_info = "sizeSmall"
-        else:
+        error_type = determine_error_type(ex)
+        if not error_type:
             logger.error(
                 "Unexpected error message returned from collection instrument service",
-                status=ex.status_code,
                 error_message=ex.error_message,
                 party_id=party_id,
                 case_id=case_id,
             )
-            error_info = "unexpected"
+            error_type = "unexpected"
         return redirect(
             url_for(
                 "surveys_bp.upload_failed",
@@ -76,7 +68,7 @@ def upload_survey(session):
                 case_id=case_id,
                 business_party_id=business_party_id,
                 survey_short_name=survey_short_name,
-                error_info=error_info,
+                error_info=error_type,
             )
         )
 
@@ -87,3 +79,16 @@ def upload_survey(session):
         upload_filename=upload_filename,
         unread_message_count=unread_message_count,
     )
+
+
+def determine_error_type(ex):
+    error_type = ""
+    if ".xlsx format" in ex.error_message:
+        error_type = "type"
+    elif "50 characters" in ex.error_message:
+        error_type = "charLimit"
+    elif "File too large" in ex.error_message:
+        error_type = "size"
+    elif "File too small" in ex.error_message:
+        error_type = "sizeSmall"
+    return error_type

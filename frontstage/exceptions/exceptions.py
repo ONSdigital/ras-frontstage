@@ -17,9 +17,8 @@ class CiUploadError(ApiError):
 
 
 class CiUploadErrorNew(Exception):
-    def __init__(self, error_message, status_code):
+    def __init__(self, error_message):
         self.error_message = error_message
-        self.status_code = status_code
 
 
 class AuthError(ApiError):

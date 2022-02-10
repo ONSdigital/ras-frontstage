@@ -37,6 +37,8 @@ email:
 gcp:
   project: ras-rm-sandbox
   topic: ras-rm-notify-test
+  seftUpload:
+    topic: topic
 
 scheme: http
 

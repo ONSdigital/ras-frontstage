@@ -27,6 +27,7 @@ pycryptodome = "*"
 flask-talisman = "*"
 email_validator = "*"
 google-cloud-pubsub = "==1.7.0"
+python-gnupg = "==0.4.7"
 
 [dev-packages]
 black = "==21.12b0"

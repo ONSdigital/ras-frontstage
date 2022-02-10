@@ -11,7 +11,7 @@ from frontstage.controllers import (
     party_controller,
     survey_controller,
 )
-from frontstage.exceptions.exceptions import CiUploadError, NoSurveyPermission
+from frontstage.exceptions.exceptions import CiUploadErrorNew, NoSurveyPermission
 from frontstage.views.surveys import surveys_bp
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -51,7 +51,7 @@ def upload_survey(session):
     try:
         # Upload the file to the collection instrument service
         collection_instrument_controller.upload_collection_instrument_new(upload_file, case_id, party_id)
-    except CiUploadError as ex:
+    except CiUploadErrorNew as ex:
         if ".xlsx format" in ex.error_message:
             error_info = "type"
         elif "50 characters" in ex.error_message:

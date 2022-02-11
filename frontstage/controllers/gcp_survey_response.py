@@ -5,25 +5,24 @@ import time
 import uuid
 
 import structlog
-from application.controllers.gnu_encryptor import GNUEncrypter
-from application.controllers.helper import (
-    is_valid_file_extension,
-    is_valid_file_name_length,
-)
-from application.controllers.service_helper import (
-    get_business_party,
-    get_case_group,
-    get_collection_exercise,
-    get_survey_ref,
-)
 from flask import current_app
 from google.cloud import pubsub_v1, storage
 from google.cloud.exceptions import GoogleCloudError
+
+from frontstage.controllers.case_controller import get_case_by_case_id
+from frontstage.controllers.collection_exercise_controller import (
+    get_collection_exercise,
+)
+from frontstage.controllers.gnu_encryptor import GNUEncrypter
+from frontstage.controllers.party_controller import get_party_by_business_id
+from frontstage.controllers.survey_controller import get_survey
 
 log = structlog.wrap_logger(logging.getLogger(__name__))
 
 FILE_EXTENSION_ERROR = "The spreadsheet must be in .xls or .xlsx format"
 FILE_NAME_LENGTH_ERROR = "The file name of your spreadsheet must be less than 50 characters long"
+UPLOAD_FILE_EXTENSIONS = "xls,xlsx"
+MAX_UPLOAD_FILE_NAME_LENGTH = 50
 
 
 class FileTooSmallError(Exception):
@@ -127,10 +126,10 @@ class GcpSurveyResponse:
         encrypter = GNUEncrypter(gnugpg_secret_keys)
         encrypted_message = encrypter.encrypt(file_contents, ons_gnu_fingerprint)
         md5sum = hashlib.md5(str(encrypted_message).encode()).hexdigest()
-        sizeInBytes = len(encrypted_message)
+        size_in_bytes = len(encrypted_message)
         blob.upload_from_string(encrypted_message)
         bound_log.info("Successfully put file in bucket", filename=filename)
-        results = {"md5sum": md5sum, "fileSizeInBytes": sizeInBytes}
+        results = {"md5sum": md5sum, "fileSizeInBytes": size_in_bytes}
 
         return results
 
@@ -156,7 +155,8 @@ class GcpSurveyResponse:
     def create_pubsub_payload(self, case_id, md5sum, size_bytes, file_name, tx_id: str) -> dict:
         log.info("Creating pubsub payload", case_id=case_id)
 
-        case_group = get_case_group(case_id)
+        case = get_case_by_case_id(case_id)
+        case_group = case.get("caseGroup")
         if not case_group:
             raise SurveyResponseError("Case group not found")
 
@@ -167,18 +167,13 @@ class GcpSurveyResponse:
 
         exercise_ref = collection_exercise.get("exerciseRef")
         survey_id = collection_exercise.get("surveyId")
-        survey_ref = get_survey_ref(survey_id)
+        survey = get_survey(current_app.config["SURVEY_URL"], current_app.config["BASIC_AUTH"], survey_id)
+        survey_ref = survey.get("surveyRef")
         if not survey_ref:
             raise SurveyResponseError("Survey ref not found")
 
         ru = case_group.get("sampleUnitRef")
         exercise_ref = self._format_exercise_ref(exercise_ref)
-
-        business_party = get_business_party(
-            case_group["partyId"], collection_exercise_id=collection_exercise_id, verbose=True
-        )
-        if not business_party:
-            raise SurveyResponseError("Business not found in party")
 
         payload = {
             "filename": file_name,
@@ -210,7 +205,8 @@ class GcpSurveyResponse:
 
         log.info("Generating file name", case_id=case_id)
 
-        case_group = get_case_group(case_id)
+        case = get_case_by_case_id(case_id)
+        case_group = case.get("caseGroup")
         if not case_group:
             return None, None
 
@@ -221,15 +217,20 @@ class GcpSurveyResponse:
 
         exercise_ref = collection_exercise.get("exerciseRef")
         survey_id = collection_exercise.get("surveyId")
-        survey_ref = get_survey_ref(survey_id)
+        survey = get_survey(current_app.config["SURVEY_URL"], current_app.config["BASIC_AUTH"], survey_id)
+        survey_ref = survey.get("surveyRef")
         if not survey_ref:
             return None, None
 
         ru = case_group.get("sampleUnitRef")
         exercise_ref = self._format_exercise_ref(exercise_ref)
 
-        business_party = get_business_party(
-            case_group["partyId"], collection_exercise_id=collection_exercise_id, verbose=True
+        business_party = get_party_by_business_id(
+            case_group["partyId"],
+            current_app.config["PARTY_URL"],
+            current_app.config["BASIC_AUTH"],
+            collection_exercise_id=collection_exercise_id,
+            verbose=True,
         )
         if not business_party:
             return None, None
@@ -249,8 +250,7 @@ class GcpSurveyResponse:
 
         return file_name, survey_ref
 
-    @staticmethod
-    def is_valid_file(file_name, file_extension):
+    def is_valid_file(self, file_name, file_extension):
         """
         Check a file is valid
 
@@ -260,11 +260,12 @@ class GcpSurveyResponse:
         """
 
         log.info("Checking if file is valid")
-        if not is_valid_file_extension(file_extension, current_app.config.get("UPLOAD_FILE_EXTENSIONS")):
+
+        if not self.is_valid_file_extension(file_extension, UPLOAD_FILE_EXTENSIONS):
             log.info("File extension not valid", file_extension=file_extension)
             return False, FILE_EXTENSION_ERROR
 
-        if not is_valid_file_name_length(file_name, current_app.config.get("MAX_UPLOAD_FILE_NAME_LENGTH")):
+        if not self.is_valid_file_name_length(file_name, MAX_UPLOAD_FILE_NAME_LENGTH):
             log.info("File name too long", file_name=file_name)
             return False, FILE_NAME_LENGTH_ERROR
 
@@ -287,3 +288,25 @@ class GcpSurveyResponse:
             return exercise_ref.split("_")[1]
         except IndexError:
             return exercise_ref
+
+    @staticmethod
+    def is_valid_file_extension(file_name, extensions):
+        """
+        Check the file format is valid
+
+        :param file_name: The file name to be checked
+        :param extensions: The list of extensions that are valid
+        :return: boolean
+        """
+        return file_name.endswith(tuple(ext.strip() for ext in extensions.split(",")))
+
+    @staticmethod
+    def is_valid_file_name_length(file_name, length):
+        """
+        Check the file name length is valid
+
+        :param file_name: The file name to be checked
+        :param length: The length of file name which is valid
+        :return: boolean
+        """
+        return len(file_name) <= int(length)

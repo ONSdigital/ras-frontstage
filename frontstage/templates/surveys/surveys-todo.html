@@ -54,14 +54,14 @@
         })
     }}
 {% endif %}
+
 <p class="u-fs-r u-mt-s u-mb-l">
-    Need to add a new survey? Use your enrolment code to <a id="add_survey_button" href="{{ url_for('surveys_bp.add_survey') }}">add a new survey to your account</a>.
+    Click on the survey name to complete your questionnaire.
 </p>
 
 {% set emptySurveyListLabel = 'You have no surveys to complete' %}
 {% include "surveys/surveys.html" %}
-<p class="u-fs-r u-mt-l">
-                <a href="{{ url_for('surveys_bp.get_technical_message_page_option', option='my-survey-is-not-listed') }}"
-                id="survey-not-listed">Survey not listed?</a>
+<p class="u-fs-r u-mt-s u-mb-l">
+    Need to add a new survey? Use your enrolment code to <a id="add_survey_button" href="{{ url_for('surveys_bp.add_survey') }}">add a new survey to your account</a>.
 </p>
 {% endblock content %}

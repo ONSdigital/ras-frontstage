@@ -226,5 +226,14 @@ spec:
             value: "{{ .Values.gcp.seftUpload.bucket.name }}"
           - name: SEFT_UPLOAD_BUCKET_FILE_PREFIX
             value: "{{ .Values.gcp.seftUpload.bucket.prefix }}"
+          - name: ONS_GNU_PUBLIC_CRYPTOKEY
+            valueFrom:
+              secretKeyRef:
+                name: seft-collection-instrument-key
+                key: gpg-public-crypto-key
+          - name: ONS_GNU_FINGERPRINT
+            value: "{{ .Values.gnu.fingerprint }}"
+          - name: ONS_GNU_RECIPIENT
+            value: "{{ .Values.gnu.recipient }}"
           resources:
             {{ toYaml .Values.resources | nindent 12 }}

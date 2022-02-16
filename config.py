@@ -74,6 +74,9 @@ class Config(object):
     SEFT_UPLOAD_BUCKET_NAME = os.getenv("SEFT_UPLOAD_BUCKET_NAME", "test-bucket")
     # Prefix only used for dev environments to file in folders within the bucket
     SEFT_UPLOAD_BUCKET_FILE_PREFIX = os.getenv("SEFT_UPLOAD_BUCKET_FILE_PREFIX")
+    ONS_GNU_RECIPIENT = os.getenv("ONS_GNU_RECIPIENT")
+    ONS_GNU_FINGERPRINT = os.getenv("ONS_GNU_FINGERPRINT")
+    ONS_GNU_PUBLIC_CRYPTOKEY = os.getenv("ONS_GNU_PUBLIC_CRYPTOKEY")
 
     CANARY_GENERATE_ERRORS = bool(strtobool(os.getenv("CANARY_GENERATE_ERRORS", "False")))
     MAX_SHARED_SURVEY = int(os.getenv("MAX_SHARED_SURVEY", "50"))

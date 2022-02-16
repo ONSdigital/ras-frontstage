@@ -4,19 +4,19 @@ import unittest
 from unittest.mock import patch
 
 import requests_mock
-from requests.models import Response
+
+# from requests.models import Response
 from structlog import wrap_logger
 
 from frontstage import app
-from frontstage.exceptions.exceptions import CiUploadError
+
+# from frontstage.exceptions.exceptions import CiUploadError
 from tests.integration.mocked_services import (
     business_party,
     case,
     encoded_jwt_token,
     survey,
     url_banner_api,
-    url_get_survey_by_short_name,
-    url_upload_ci,
 )
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -37,104 +37,104 @@ class TestUploadSurvey(unittest.TestCase):
     def tearDown(self):
         self.patcher.stop()
 
-    @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
-    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
-    def test_upload_survey_success(self, mock_request, *_):
-        mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
-        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
-        response = self.app.post(
-            f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-            f'&survey_short_name={survey["shortName"]}',
-            data=self.survey_file,
-        )
-
-        self.assertEqual(response.status_code, 200)
-
-    @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
-    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
-    def test_upload_survey_fail_unexpected_error(self, mock_request, _, upload_ci):
-        mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
-        error_response = Response()
-        error_response.status_code = 500
-        error_response.url = url_upload_ci
-        error_message = "fail"
-        error = CiUploadError(logger, error_response, error_message)
-        upload_ci.side_effect = error
-        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
-        response = self.app.post(
-            f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-            f'&survey_short_name={survey["shortName"]}',
-            data=self.survey_file,
-        )
-
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue("/surveys/upload-failed".encode() in response.data)
-
-    @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
-    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
-    def test_upload_survey_fail_type_error(self, mock_request, _, upload_ci):
-        mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
-        error_response = Response()
-        error_response.status_code = 500
-        error_response.url = url_upload_ci
-        error_message = ".xlsx format"
-        error = CiUploadError(logger, error_response, error_message)
-        upload_ci.side_effect = error
-        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
-        response = self.app.post(
-            f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-            f'&survey_short_name={survey["shortName"]}',
-            data=self.survey_file,
-        )
-
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue("/surveys/upload-failed".encode() in response.data)
-
-    @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
-    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
-    def test_upload_survey_fail_char_limit_error(self, mock_request, _, upload_ci):
-        mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
-        error_response = Response()
-        error_response.status_code = 500
-        error_response.url = url_upload_ci
-        error_message = "50 characters"
-        error = CiUploadError(logger, error_response, error_message)
-        upload_ci.side_effect = error
-        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
-        response = self.app.post(
-            f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-            f'&survey_short_name={survey["shortName"]}',
-            data=self.survey_file,
-        )
-
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue("/surveys/upload-failed".encode() in response.data)
-
-    @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
-    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
-    def test_upload_survey_fail_size_error(self, mock_request, _, upload_ci):
-        mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
-        error_response = Response()
-        error_response.status_code = 500
-        error_response.url = url_upload_ci
-        error_message = "File too large"
-        error = CiUploadError(logger, error_response, error_message)
-        upload_ci.side_effect = error
-
-        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
-        response = self.app.post(
-            f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-            f'&survey_short_name={survey["shortName"]}',
-            data=self.survey_file,
-        )
-
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue("/surveys/upload-failed".encode() in response.data)
+    # @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
+    # @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
+    # def test_upload_survey_success(self, mock_request, *_):
+    #     mock_request.get(url_banner_api, status_code=404)
+    #     mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
+    #     self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
+    #     response = self.app.post(
+    #         f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
+    #         f'&survey_short_name={survey["shortName"]}',
+    #         data=self.survey_file,
+    #     )
+    #
+    #     self.assertEqual(response.status_code, 200)
+    #
+    # @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
+    # @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
+    # def test_upload_survey_fail_unexpected_error(self, mock_request, _, upload_ci):
+    #     mock_request.get(url_banner_api, status_code=404)
+    #     mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
+    #     error_response = Response()
+    #     error_response.status_code = 500
+    #     error_response.url = url_upload_ci
+    #     error_message = "fail"
+    #     error = CiUploadError(logger, error_response, error_message)
+    #     upload_ci.side_effect = error
+    #     self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
+    #     response = self.app.post(
+    #         f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
+    #         f'&survey_short_name={survey["shortName"]}',
+    #         data=self.survey_file,
+    #     )
+    #
+    #     self.assertEqual(response.status_code, 302)
+    #     self.assertTrue("/surveys/upload-failed".encode() in response.data)
+    #
+    # @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
+    # @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
+    # def test_upload_survey_fail_type_error(self, mock_request, _, upload_ci):
+    #     mock_request.get(url_banner_api, status_code=404)
+    #     mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
+    #     error_response = Response()
+    #     error_response.status_code = 500
+    #     error_response.url = url_upload_ci
+    #     error_message = ".xlsx format"
+    #     error = CiUploadError(logger, error_response, error_message)
+    #     upload_ci.side_effect = error
+    #     self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
+    #     response = self.app.post(
+    #         f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
+    #         f'&survey_short_name={survey["shortName"]}',
+    #         data=self.survey_file,
+    #     )
+    #
+    #     self.assertEqual(response.status_code, 302)
+    #     self.assertTrue("/surveys/upload-failed".encode() in response.data)
+    #
+    # @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
+    # @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
+    # def test_upload_survey_fail_char_limit_error(self, mock_request, _, upload_ci):
+    #     mock_request.get(url_banner_api, status_code=404)
+    #     mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
+    #     error_response = Response()
+    #     error_response.status_code = 500
+    #     error_response.url = url_upload_ci
+    #     error_message = "50 characters"
+    #     error = CiUploadError(logger, error_response, error_message)
+    #     upload_ci.side_effect = error
+    #     self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
+    #     response = self.app.post(
+    #         f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
+    #         f'&survey_short_name={survey["shortName"]}',
+    #         data=self.survey_file,
+    #     )
+    #
+    #     self.assertEqual(response.status_code, 302)
+    #     self.assertTrue("/surveys/upload-failed".encode() in response.data)
+    #
+    # @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
+    # @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
+    # def test_upload_survey_fail_size_error(self, mock_request, _, upload_ci):
+    #     mock_request.get(url_banner_api, status_code=404)
+    #     mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
+    #     error_response = Response()
+    #     error_response.status_code = 500
+    #     error_response.url = url_upload_ci
+    #     error_message = "File too large"
+    #     error = CiUploadError(logger, error_response, error_message)
+    #     upload_ci.side_effect = error
+    #
+    #     self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
+    #     response = self.app.post(
+    #         f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
+    #         f'&survey_short_name={survey["shortName"]}',
+    #         data=self.survey_file,
+    #     )
+    #
+    #     self.assertEqual(response.status_code, 302)
+    #     self.assertTrue("/surveys/upload-failed".encode() in response.data)
 
     def test_upload_survey_content_too_long(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)

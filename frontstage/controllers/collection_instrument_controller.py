@@ -80,17 +80,18 @@ def get_collection_instrument(collection_instrument_id, collection_instrument_ur
     return response.json()
 
 
-def upload_collection_instrument_new(upload_file: dict, case_id: str, party_id: str):
+def upload_collection_instrument_new(upload_file: dict, case: dict, business_party: dict, party_id: str):
     """
 
     :param upload_file: A dict containing the
-    :param case_id: The case id that relates to the upload
+    :param case: The case that relates to the upload
+    :param business_party: The record of the business the upload is for
     :param party_id: The party id of the respondent that uploaded the instrument
     :raises CiUploadErrorNew: Raised on a validation error
     """
+    case_id = case["id"]
     logger.info("Attempting to upload collection instrument", case_id=case_id, party_id=party_id)
     file = upload_file.get("file")
-
     if case_id and file and hasattr(file, "filename"):
         file_name, file_extension = os.path.splitext(secure_filename(file.filename))
         gcp_survey_response = GcpSurveyResponse(app.config)
@@ -100,13 +101,13 @@ def upload_collection_instrument_new(upload_file: dict, case_id: str, party_id: 
             ci_post_case_event(case_id, party_id, "UNSUCCESSFUL_RESPONSE_UPLOAD")
             raise CiUploadErrorNew(msg)
 
-        file_name, survey_ref = gcp_survey_response.get_file_name_and_survey_ref(case_id, file_extension)
+        file_name, survey_ref = gcp_survey_response.get_file_name_and_survey_ref(case, business_party, file_extension)
 
         if not file_name:
             raise CiUploadErrorNew(MISSING_DATA)
         try:
             file_contents = file.read()
-            gcp_survey_response.add_survey_response(case_id, file_contents, file_name, survey_ref)
+            gcp_survey_response.add_survey_response(case, file_contents, file_name, survey_ref)
             ci_post_case_event(case_id, party_id, "SUCCESSFUL_RESPONSE_UPLOAD")
             logger.info("Successfully uploaded collection instrument", case_id=case_id, party_id=party_id)
         except FileTooSmallError:

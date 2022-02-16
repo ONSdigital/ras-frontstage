@@ -9,12 +9,10 @@ from flask import current_app
 from google.cloud import pubsub_v1, storage
 from google.cloud.exceptions import GoogleCloudError
 
-from frontstage.controllers.case_controller import get_case_by_case_id
 from frontstage.controllers.collection_exercise_controller import (
     get_collection_exercise,
 )
 from frontstage.controllers.gnu_encryptor import GNUEncrypter
-from frontstage.controllers.party_controller import get_party_by_business_id
 from frontstage.controllers.survey_controller import get_survey
 
 log = structlog.wrap_logger(logging.getLogger(__name__))
@@ -51,11 +49,11 @@ class GcpSurveyResponse:
     The survey response from a respondent
     """
 
-    def add_survey_response(self, case_id: str, file_contents, file_name: str, survey_ref: str):
+    def add_survey_response(self, case: dict, file_contents, file_name: str, survey_ref: str):
         """
         Encrypt and upload survey response to gcp bucket, and put metadata about it in pubsub.
 
-        :param case_id: A case id
+        :param case: A case
         :param file_contents: The contents of the file that has been uploaded
         :param file_name: The filename
         :param survey_ref: The survey ref e.g 134 MWSS
@@ -63,7 +61,7 @@ class GcpSurveyResponse:
 
         file_name = file_name + ".gpg"
         tx_id = str(uuid.uuid4())
-        bound_log = log.bind(filename=file_name, case_id=case_id, survey_id=survey_ref, tx_id=tx_id)
+        bound_log = log.bind(filename=file_name, case_id=case["id"], survey_id=survey_ref, tx_id=tx_id)
         bound_log.info("Putting response into bucket and sending pubsub message")
         file_size = len(file_contents)
 
@@ -79,7 +77,7 @@ class GcpSurveyResponse:
 
             try:
                 payload = self.create_pubsub_payload(
-                    case_id, results["md5sum"], results["fileSizeInBytes"], file_name, tx_id
+                    case, results["md5sum"], results["fileSizeInBytes"], file_name, tx_id
                 )
             except SurveyResponseError:
                 bound_log.error("Something went wrong creating the payload", exc_info=True)
@@ -152,10 +150,9 @@ class GcpSurveyResponse:
         message = future.result(timeout=15)
         log.info("Publish succeeded", msg_id=message)
 
-    def create_pubsub_payload(self, case_id, md5sum, size_bytes, file_name, tx_id: str) -> dict:
-        log.info("Creating pubsub payload", case_id=case_id)
+    def create_pubsub_payload(self, case, md5sum, size_bytes, file_name, tx_id: str) -> dict:
+        log.info("Creating pubsub payload", case_id=case["id"])
 
-        case = get_case_by_case_id(case_id)
         case_group = case.get("caseGroup")
         if not case_group:
             raise SurveyResponseError("Case group not found")
@@ -188,7 +185,7 @@ class GcpSurveyResponse:
 
         return payload
 
-    def get_file_name_and_survey_ref(self, case_id, file_extension):
+    def get_file_name_and_survey_ref(self, case, business_party, file_extension):
         """
         Generate the file name for the upload, if an external service can't find the relevant information
         a None is returned instead.
@@ -198,17 +195,15 @@ class GcpSurveyResponse:
             survey_id as returned by collection exercise is a uuid, this is resolved by a call to
             survey which returns it as surveyRef which is the 3 digit id that other services refer to as survey_id
 
-        :param case_id: The case id of the upload
+        :param case: The case
         :param file_extension: The upload file extension
         :return: file name and survey_ref or None
         """
 
-        log.info("Generating file name", case_id=case_id)
-
-        case = get_case_by_case_id(case_id)
         case_group = case.get("caseGroup")
         if not case_group:
             return None, None
+        log.info("Generating file name", case_id=case["id"])
 
         collection_exercise_id = case_group.get("collectionExerciseId")
         collection_exercise = get_collection_exercise(collection_exercise_id)
@@ -225,15 +220,9 @@ class GcpSurveyResponse:
         ru = case_group.get("sampleUnitRef")
         exercise_ref = self._format_exercise_ref(exercise_ref)
 
-        business_party = get_party_by_business_id(
-            case_group["partyId"],
-            current_app.config["PARTY_URL"],
-            current_app.config["BASIC_AUTH"],
-            collection_exercise_id=collection_exercise_id,
-            verbose=True,
-        )
         if not business_party:
             return None, None
+
         check_letter = business_party["checkletter"]
 
         time_date_stamp = time.strftime("%Y%m%d%H%M%S")

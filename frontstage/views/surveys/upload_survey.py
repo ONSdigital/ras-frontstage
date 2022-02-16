@@ -6,6 +6,7 @@ from structlog import wrap_logger
 from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import (
+    case_controller,
     collection_instrument_controller,
     conversation_controller,
     party_controller,
@@ -43,6 +44,18 @@ def upload_survey(session):
     if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey):
         raise NoSurveyPermission(party_id, case_id)
 
+    case = case_controller.get_case_by_case_id(case_id)
+
+    case_group = case.get("caseGroup")
+    collection_exercise_id = case_group.get("collectionExerciseId")
+    business_party = party_controller.get_party_by_business_id(
+        case_group["partyId"],
+        app.config["PARTY_URL"],
+        app.config["BASIC_AUTH"],
+        collection_exercise_id=collection_exercise_id,
+        verbose=True,
+    )
+
     # Get the uploaded file
     upload_file = request.files["file"]
     upload_filename = upload_file.filename
@@ -50,7 +63,9 @@ def upload_survey(session):
 
     try:
         # Upload the file to the collection instrument service
-        collection_instrument_controller.upload_collection_instrument_new(upload_file_dict, case_id, party_id)
+        collection_instrument_controller.upload_collection_instrument_new(
+            upload_file_dict, case, business_party, party_id
+        )
     except CiUploadErrorNew as ex:
         error_type = determine_error_type(ex)
         if not error_type:

@@ -22,7 +22,6 @@ if Path("git_info").exists():
 def get_info():
     info = {
         "name": "ras-frontstage",
-        "version": app.config["VERSION"],
     }
     info = dict(_health_check, **info)
 

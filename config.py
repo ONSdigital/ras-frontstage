@@ -8,7 +8,6 @@ from distutils.util import strtobool
 class Config(object):
     DEBUG = False
     TESTING = False
-    VERSION = "1.21.0"
     PREFERRED_URL_SCHEME = "https"
     PORT = os.getenv("PORT", 8082)
     MAX_UPLOAD_LENGTH = os.getenv("MAX_UPLOAD_LENGTH", 20 * 1024 * 1024)

@@ -5,7 +5,7 @@ from pathlib import Path
 from flask import Blueprint, jsonify, make_response
 from structlog import wrap_logger
 
-from frontstage import app, talisman
+from frontstage import talisman
 
 logger = wrap_logger(logging.getLogger(__name__))
 

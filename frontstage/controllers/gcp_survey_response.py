@@ -141,9 +141,7 @@ class GcpSurveyResponse:
         if self.publisher is None:
             self.publisher = pubsub_v1.PublisherClient()
 
-        topic_path = self.publisher.topic_path(
-            self.seft_upload_project, self.seft_upload_pubsub_topic
-        )  # NOQA pylint:disable=no-member
+        topic_path = self.publisher.topic_path(self.seft_upload_project, self.seft_upload_pubsub_topic)
         payload_bytes = json.dumps(payload).encode()
         log.info("About to publish to pubsub", topic_path=topic_path)
         future = self.publisher.publish(topic_path, data=payload_bytes, tx_id=tx_id)

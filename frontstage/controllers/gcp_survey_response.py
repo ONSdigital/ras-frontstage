@@ -94,7 +94,7 @@ class GcpSurveyResponse:
 
     def put_file_into_gcp_bucket(self, file_contents, filename: str):
         """
-        Takes the file_contents  and puts it into a GCP bucket in encrypted form to be later used by SDX.
+        Takes the file_contents and puts it into a GCP bucket in encrypted form to be later used by SDX.
 
         Note: The payload will almost certainly change once the encryption method between us and SDX is decided.
 
@@ -183,7 +183,9 @@ class GcpSurveyResponse:
 
         return payload
 
-    def get_file_name_and_survey_ref(self, case, business_party, file_extension):
+    def create_file_name_for_upload(
+        self, case: dict, business_party: dict, file_extension: str, survey_ref: str
+    ) -> str | None:
         """
         Generate the file name for the upload, if an external service can't find the relevant information
         a None is returned instead.
@@ -194,48 +196,34 @@ class GcpSurveyResponse:
             survey which returns it as surveyRef which is the 3 digit id that other services refer to as survey_id
 
         :param case: The case
+        :param business_party: A dict representing the business
         :param file_extension: The upload file extension
-        :return: file name and survey_ref or None
+        :param survey_ref
+        :return: The file name or None
         """
+        log.info("Generating file name", case_id=case["id"])
+        if not business_party:
+            return None
 
         case_group = case.get("caseGroup")
         if not case_group:
-            return None, None
-        log.info("Generating file name", case_id=case["id"])
+            return None
 
         collection_exercise_id = case_group.get("collectionExerciseId")
         collection_exercise = get_collection_exercise(collection_exercise_id)
         if not collection_exercise:
-            return None, None
-
-        exercise_ref = collection_exercise.get("exerciseRef")
-        survey_id = collection_exercise.get("surveyId")
-        survey = get_survey(current_app.config["SURVEY_URL"], current_app.config["BASIC_AUTH"], survey_id)
-        survey_ref = survey.get("surveyRef")
-        if not survey_ref:
-            return None, None
+            return None
 
         ru = case_group.get("sampleUnitRef")
-        exercise_ref = self._format_exercise_ref(exercise_ref)
-
-        if not business_party:
-            return None, None
-
         check_letter = business_party["checkletter"]
-
+        exercise_ref = collection_exercise.get("exerciseRef")
+        exercise_ref = self._format_exercise_ref(exercise_ref)
         time_date_stamp = time.strftime("%Y%m%d%H%M%S")
-        file_name = "{ru}{check_letter}_{exercise_ref}_{survey_ref}_{time_date_stamp}{file_format}".format(
-            ru=ru,
-            check_letter=check_letter,
-            exercise_ref=exercise_ref,
-            survey_ref=survey_ref,
-            time_date_stamp=time_date_stamp,
-            file_format=file_extension,
-        )
 
+        file_name = f"{ru}{check_letter}_{exercise_ref}_{survey_ref}_{time_date_stamp}{file_extension}"
         log.info("Generated file name for upload", filename=file_name)
 
-        return file_name, survey_ref
+        return file_name
 
     def is_valid_file(self, file_name, file_extension):
         """
@@ -266,7 +254,7 @@ class GcpSurveyResponse:
     def _format_exercise_ref(exercise_ref: str) -> str:
         """
         There is currently data inconsistency in the code, exercise_ref should look like 201712 not '221_201712',
-        this is a work around until the data is corrected
+        this is a workaround until the data is corrected
 
         :param exercise_ref: exercise reference
         :return: formatted exercise reference

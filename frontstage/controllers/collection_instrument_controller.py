@@ -80,13 +80,14 @@ def get_collection_instrument(collection_instrument_id, collection_instrument_ur
     return response.json()
 
 
-def upload_collection_instrument_new(file, case: dict, business_party: dict, party_id: str):
+def upload_collection_instrument_new(file, case: dict, business_party: dict, party_id: str, survey: dict):
     """
 
     :param file: A dict containing the
     :param case: The case that relates to the upload
     :param business_party: The record of the business the upload is for
     :param party_id: The party id of the respondent that uploaded the instrument
+    :param survey:  A dict containing information about the survey
     :raises CiUploadErrorNew: Raised on a validation error
     """
     case_id = case["id"]
@@ -100,7 +101,8 @@ def upload_collection_instrument_new(file, case: dict, business_party: dict, par
             ci_post_case_event(case_id, party_id, "UNSUCCESSFUL_RESPONSE_UPLOAD")
             raise CiUploadErrorNew(msg)
 
-        file_name, survey_ref = gcp_survey_response.get_file_name_and_survey_ref(case, business_party, file_extension)
+        survey_ref = survey.get("surveyRef")
+        file_name = gcp_survey_response.create_file_name_for_upload(case, business_party, file_extension, survey_ref)
 
         if not file_name:
             raise CiUploadErrorNew(MISSING_DATA)

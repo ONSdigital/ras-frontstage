@@ -80,10 +80,10 @@ def get_collection_instrument(collection_instrument_id, collection_instrument_ur
     return response.json()
 
 
-def upload_collection_instrument_new(upload_file: dict, case: dict, business_party: dict, party_id: str):
+def upload_collection_instrument_new(file, case: dict, business_party: dict, party_id: str):
     """
 
-    :param upload_file: A dict containing the
+    :param file: A dict containing the
     :param case: The case that relates to the upload
     :param business_party: The record of the business the upload is for
     :param party_id: The party id of the respondent that uploaded the instrument
@@ -91,8 +91,7 @@ def upload_collection_instrument_new(upload_file: dict, case: dict, business_par
     """
     case_id = case["id"]
     logger.info("Attempting to upload collection instrument", case_id=case_id, party_id=party_id)
-    file = upload_file.get("file")
-    if case_id and file and hasattr(file, "filename"):
+    if case_id and file and file.filename:
         file_name, file_extension = os.path.splitext(secure_filename(file.filename))
         gcp_survey_response = GcpSurveyResponse(app.config)
         is_valid_file, msg = gcp_survey_response.is_valid_file(file_name, file_extension)

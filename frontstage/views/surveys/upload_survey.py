@@ -58,14 +58,10 @@ def upload_survey(session):
 
     # Get the uploaded file
     upload_file = request.files["file"]
-    upload_filename = upload_file.filename
-    upload_file_dict = {"file": (upload_filename, upload_file.stream, upload_file.mimetype, {"Expires": 0})}
 
     try:
         # Upload the file to the collection instrument service
-        collection_instrument_controller.upload_collection_instrument_new(
-            upload_file_dict, case, business_party, party_id
-        )
+        collection_instrument_controller.upload_collection_instrument_new(upload_file, case, business_party, party_id)
     except CiUploadErrorNew as ex:
         error_type = determine_error_type(ex)
         if not error_type:
@@ -91,7 +87,7 @@ def upload_survey(session):
     unread_message_count = {"unread_message_count": conversation_controller.try_message_count_from_session(session)}
     return render_template(
         "surveys/surveys-upload-success.html",
-        upload_filename=upload_filename,
+        upload_filename=upload_file.filename,
         unread_message_count=unread_message_count,
     )
 

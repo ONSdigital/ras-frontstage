@@ -220,6 +220,8 @@ spec:
               secretKeyRef:
                 name: {{ .Chart.Name }}
                 key: email-secret-key
+          - name: SEFT_UPLOAD_PROJECT
+            value: "{{ .Values.gcp.seftUpload.project }}"
           - name: SEFT_UPLOAD_PUBSUB_TOPIC
             value: "{{ .Values.gcp.seftUpload.topic }}"
           - name: SEFT_UPLOAD_BUCKET_NAME

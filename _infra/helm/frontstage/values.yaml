@@ -38,6 +38,7 @@ gcp:
   project: ras-rm-sandbox
   topic: ras-rm-notify-test
   seftUpload:
+    project: ras-rm-sandbox
     topic: topic
     bucket:
       name: bucket

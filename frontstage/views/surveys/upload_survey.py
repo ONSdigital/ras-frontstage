@@ -61,7 +61,7 @@ def upload_survey(session):
 
     try:
         # Upload the file to the collection instrument service
-        collection_instrument_controller.upload_collection_instrument_new(
+        collection_instrument_controller.upload_collection_instrument(
             upload_file, case, business_party, party_id, survey
         )
     except CiUploadErrorNew as ex:

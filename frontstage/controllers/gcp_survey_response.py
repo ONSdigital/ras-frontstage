@@ -49,7 +49,7 @@ class GcpSurveyResponse:
     The survey response from a respondent
     """
 
-    def add_survey_response(self, case: dict, file_contents, file_name: str, survey_ref: str):
+    def upload_seft_survey_response(self, case: dict, file_contents, file_name: str, survey_ref: str):
         """
         Encrypt and upload survey response to gcp bucket, and put metadata about it in pubsub.
 

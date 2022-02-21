@@ -12,7 +12,7 @@ from frontstage.controllers.gcp_survey_response import (
     GcpSurveyResponse,
     SurveyResponseError,
 )
-from frontstage.exceptions.exceptions import ApiError, CiUploadError, CiUploadErrorNew
+from frontstage.exceptions.exceptions import ApiError, CiUploadErrorNew
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -80,7 +80,7 @@ def get_collection_instrument(collection_instrument_id, collection_instrument_ur
     return response.json()
 
 
-def upload_collection_instrument_new(file, case: dict, business_party: dict, party_id: str, survey: dict):
+def upload_collection_instrument(file, case: dict, business_party: dict, party_id: str, survey: dict):
     """
 
     :param file: A dict containing the
@@ -108,7 +108,7 @@ def upload_collection_instrument_new(file, case: dict, business_party: dict, par
             raise CiUploadErrorNew(MISSING_DATA)
         try:
             file_contents = file.read()
-            gcp_survey_response.add_survey_response(case, file_contents, file_name, survey_ref)
+            gcp_survey_response.upload_seft_survey_response(case, file_contents, file_name, survey_ref)
             ci_post_case_event(case_id, party_id, "SUCCESSFUL_RESPONSE_UPLOAD")
             logger.info("Successfully uploaded collection instrument", case_id=case_id, party_id=party_id)
         except FileTooSmallError:
@@ -131,30 +131,3 @@ def ci_post_case_event(case_id, party_id, category):
         category=category,
         description=f"Survey response for case {case_id} uploaded by {party_id}",
     )
-
-
-def upload_collection_instrument(upload_file, case_id, party_id):
-    logger.info("Attempting to upload collection instrument", case_id=case_id, party_id=party_id)
-
-    url = f"{app.config['COLLECTION_INSTRUMENT_URL']}/survey_response-api/v1/survey_responses/{case_id}"
-    response = requests.post(url, auth=app.config["BASIC_AUTH"], files=upload_file)
-
-    # Post relevant upload case event
-    category = "SUCCESSFUL_RESPONSE_UPLOAD" if response.ok else "UNSUCCESSFUL_RESPONSE_UPLOAD"
-    case_controller.post_case_event(
-        case_id,
-        party_id=party_id,
-        category=category,
-        description=f"Survey response for case {case_id} uploaded by {party_id}",
-    )
-
-    if response.status_code == 400:
-        raise CiUploadError(logger, response, case_id=case_id, error_message=response.text, party_id=party_id)
-
-    try:
-        response.raise_for_status()
-    except requests.exceptions.HTTPError:
-        logger.error("Failed to upload collection instrument", case_id=case_id, party_id=party_id)
-        raise ApiError(logger, response)
-
-    logger.info("Successfully uploaded collection instrument", case_id=case_id, party_id=party_id)

@@ -1,0 +1,14 @@
+{
+  "state": "ACTIONABLE",
+  "id": "10b04906-f478-47f9-a985-783400dd8482",
+  "actionPlanId": "878c3462-766a-4cf6-8fb3-867d5124cc0f",
+  "collectionInstrumentId": "a227b807-d475-4fa0-bc47-e8d8f6243e84",
+  "partyId": "cc1a1dc2-89a8-486f-9b9b-0fcfb3d33196",
+  "iac": "jkbvyklkwj88",
+  "caseRef": "1000000000000010",
+  "createdBy": "SYSTEM",
+  "sampleUnitType": "B",
+  "createdDateTime": "2018-02-13T15:45:13.328Z",
+  "responses": [],
+  "caseEvents": null
+}

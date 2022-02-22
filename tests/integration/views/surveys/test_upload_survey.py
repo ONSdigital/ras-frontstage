@@ -14,9 +14,13 @@ from frontstage import app
 from tests.integration.mocked_services import (
     business_party,
     case,
+    collection_exercise,
     encoded_jwt_token,
     survey,
     url_banner_api,
+    url_get_business_party,
+    url_get_case,
+    url_get_survey_by_short_name,
 )
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -37,19 +41,26 @@ class TestUploadSurvey(unittest.TestCase):
     def tearDown(self):
         self.patcher.stop()
 
-    # @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
-    # @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
-    # def test_upload_survey_success(self, mock_request, *_):
-    #     mock_request.get(url_banner_api, status_code=404)
-    #     mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
-    #     self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
-    #     response = self.app.post(
-    #         f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-    #         f'&survey_short_name={survey["shortName"]}',
-    #         data=self.survey_file,
-    #     )
-    #
-    #     self.assertEqual(response.status_code, 200)
+    @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
+    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
+    def test_upload_survey_success(self, mock_request, *_):
+        mock_request.get(
+            f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True",
+            json=business_party,
+            status_code=200,
+        )
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
+        mock_request.get(url_get_case, json=case, status_code=200)
+        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
+        response = self.app.post(
+            f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
+            f'&survey_short_name={survey["shortName"]}',
+            data=self.survey_file,
+        )
+
+        self.assertEqual(response.status_code, 200)
+
     #
     # @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
     # @patch("frontstage.controllers.party_controller.is_respondent_enrolled")

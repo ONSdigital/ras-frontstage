@@ -225,7 +225,7 @@ class GcpSurveyResponse:
 
         return file_name
 
-    def is_valid_file(self, file_name, file_extension):
+    def is_valid_file(self, file_name: str, file_extension: str) -> tuple[bool, str]:
         """
         Check a file is valid
 

@@ -12,7 +12,7 @@ from frontstage.controllers import (
     party_controller,
     survey_controller,
 )
-from frontstage.exceptions.exceptions import CiUploadErrorNew, NoSurveyPermission
+from frontstage.exceptions.exceptions import CiUploadError, NoSurveyPermission
 from frontstage.views.surveys import surveys_bp
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -64,7 +64,7 @@ def upload_survey(session):
         collection_instrument_controller.upload_collection_instrument(
             upload_file, case, business_party, party_id, survey
         )
-    except CiUploadErrorNew as ex:
+    except CiUploadError as ex:
         error_type = determine_error_type(ex)
         if not error_type:
             logger.error(

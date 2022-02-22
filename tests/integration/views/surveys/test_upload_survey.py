@@ -7,7 +7,7 @@ import requests_mock
 from structlog import wrap_logger
 
 from frontstage import app
-from frontstage.exceptions.exceptions import CiUploadErrorNew
+from frontstage.exceptions.exceptions import CiUploadError
 from tests.integration.mocked_services import (
     business_party,
     case,
@@ -70,7 +70,7 @@ class TestUploadSurvey(unittest.TestCase):
         mock_request.get(url_get_case, json=case, status_code=200)
         mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
         error_message = "fail"
-        error = CiUploadErrorNew(error_message)
+        error = CiUploadError(error_message)
         upload_ci.side_effect = error
         self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
         response = self.app.post(
@@ -95,7 +95,7 @@ class TestUploadSurvey(unittest.TestCase):
         mock_request.get(url_get_case, json=case, status_code=200)
 
         error_message = ".xlsx format"
-        error = CiUploadErrorNew(error_message)
+        error = CiUploadError(error_message)
         upload_ci.side_effect = error
         self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
         response = self.app.post(
@@ -119,7 +119,7 @@ class TestUploadSurvey(unittest.TestCase):
         mock_request.get(url_get_case, json=case, status_code=200)
         mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
         error_message = "50 characters"
-        error = CiUploadErrorNew(error_message)
+        error = CiUploadError(error_message)
         upload_ci.side_effect = error
         self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
         response = self.app.post(
@@ -143,7 +143,7 @@ class TestUploadSurvey(unittest.TestCase):
         mock_request.get(url_get_case, json=case, status_code=200)
         mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
         error_message = "File too large"
-        error = CiUploadErrorNew(error_message)
+        error = CiUploadError(error_message)
         upload_ci.side_effect = error
 
         self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))

@@ -4,17 +4,22 @@ import unittest
 from unittest.mock import patch
 
 import responses
+from werkzeug.datastructures import FileStorage
 
 from config import TestingConfig
 from frontstage import app
 from frontstage.controllers import collection_instrument_controller
-from frontstage.exceptions.exceptions import ApiError
+from frontstage.exceptions.exceptions import ApiError, CiUploadError
 from tests.integration.mocked_services import (
     business_party,
     case,
+    collection_exercise,
     collection_instrument_seft,
+    party,
+    survey,
     url_download_ci,
     url_get_ci,
+    url_get_collection_exercise,
 )
 
 
@@ -24,7 +29,7 @@ class TestCollectionInstrumentController(unittest.TestCase):
         app.config.from_object(app_config)
         self.app = app.test_client()
         self.app_config = self.app.application.config
-        self.survey_file = {"file": ["testfile.xlsx", io.BytesIO(b"my file contents")]}
+        self.survey_file = FileStorage(io.BytesIO(b"my file contents"), "testfile.xlsx")
 
     @patch("frontstage.controllers.case_controller.post_case_event")
     def test_download_collection_instrument_success(self, _):
@@ -84,34 +89,36 @@ class TestCollectionInstrumentController(unittest.TestCase):
                         self.app_config["BASIC_AUTH"],
                     )
 
-    # @patch("frontstage.controllers.case_controller.post_case_event")
-    # def test_upload_collection_instrument_success(self, _):
-    #     with responses.RequestsMock() as rsps:
-    #         rsps.add(rsps.POST, url_upload_ci, status=200)
-    #         with app.app_context():
-    #             try:
-    #                 collection_instrument_controller.upload_collection_instrument(
-    #                     self.survey_file, case["id"], business_party["id"], party["id"], survey["surveyRef"]
-    #                 )
-    #             except (ApiError, CiUploadError):
-    #                 self.fail("Unexpected error thrown when uploading collection instrument")
-    #
-    # @patch("frontstage.controllers.case_controller.post_case_event")
-    # def test_upload_collection_instrument_ci_upload_error(self, _):
-    #     with responses.RequestsMock() as rsps:
-    #         rsps.add(rsps.POST, url_upload_ci, status=400)
-    #         with app.app_context():
-    #             with self.assertRaises(CiUploadError):
-    #                 collection_instrument_controller.upload_collection_instrument(
-    #                     self.survey_file, case["id"], business_party["id"], party["id"], survey["surveyRef"]
-    #                 )
-    #
-    # @patch("frontstage.controllers.case_controller.post_case_event")
-    # def test_upload_collection_instrument_api_error(self, _):
-    #     with responses.RequestsMock() as rsps:
-    #         rsps.add(rsps.POST, url_upload_ci, status=500)
-    #         with app.app_context():
-    #             with self.assertRaises(ApiError):
-    #                 collection_instrument_controller.upload_collection_instrument(
-    #                     self.survey_file, case["id"], business_party["id"], party["id"], survey["surveyRef"]
-    #                )
+    @patch("frontstage.controllers.case_controller.post_case_event")
+    @patch("frontstage.controllers.gcp_survey_response.GcpSurveyResponse.upload_seft_survey_response")
+    def test_upload_collection_instrument_success(self, *_):
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.GET, url_get_collection_exercise, json=collection_exercise, status=200)
+
+            with app.app_context():
+                try:
+                    collection_instrument_controller.upload_collection_instrument(
+                        self.survey_file, case, business_party, party["id"], survey
+                    )
+                except (ApiError, CiUploadError):
+                    self.fail("Unexpected error thrown when uploading collection instrument")
+
+    @patch("frontstage.controllers.case_controller.post_case_event")
+    def test_upload_collection_instrument_ci_missing_filename(self, _):
+        file = FileStorage(io.BytesIO(b"my file contents"))
+        with app.app_context():
+            with self.assertRaises(CiUploadError) as e:
+                collection_instrument_controller.upload_collection_instrument(
+                    file, case, business_party, party["id"], survey
+                )
+            self.assertEqual(e.exception.error_message, "The upload must have valid case_id and a file attached")
+
+    @patch("frontstage.controllers.case_controller.post_case_event")
+    def test_upload_collection_instrument_missing_business_party(self, _):
+        FileStorage(filename="testfile.xlsx")
+        with app.app_context():
+            with self.assertRaises(CiUploadError) as e:
+                collection_instrument_controller.upload_collection_instrument(
+                    self.survey_file, case, None, party["id"], survey
+                )
+        self.assertEqual(e.exception.error_message, "Data needed to create the file name is missing")

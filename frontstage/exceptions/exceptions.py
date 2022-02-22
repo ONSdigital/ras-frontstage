@@ -10,13 +10,7 @@ class ApiError(Exception):
         self.url = response.url
 
 
-class CiUploadError(ApiError):
-    def __init__(self, logger, response, error_message, **kwargs):
-        super(CiUploadError, self).__init__(logger, response, **kwargs)
-        self.error_message = error_message
-
-
-class CiUploadErrorNew(Exception):
+class CiUploadError(Exception):
     def __init__(self, error_message):
         self.error_message = error_message
 

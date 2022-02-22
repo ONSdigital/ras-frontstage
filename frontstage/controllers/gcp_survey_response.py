@@ -68,29 +68,27 @@ class GcpSurveyResponse:
         if self.check_if_file_size_too_small(file_size):
             bound_log.info("File size is too small")
             raise FileTooSmallError()
-        else:
-            try:
-                results = self.put_file_into_gcp_bucket(file_contents, file_name)
-            except (GoogleCloudError, KeyError):
-                bound_log.exception("Something went wrong putting into the bucket")
-                raise SurveyResponseError()
 
-            try:
-                payload = self.create_pubsub_payload(
-                    case, results["md5sum"], results["fileSizeInBytes"], file_name, tx_id
-                )
-            except SurveyResponseError:
-                bound_log.error("Something went wrong creating the payload", exc_info=True)
-                raise
+        try:
+            results = self.put_file_into_gcp_bucket(file_contents, file_name)
+        except (GoogleCloudError, KeyError):
+            bound_log.exception("Something went wrong putting into the bucket")
+            raise SurveyResponseError()
 
-            try:
-                self.put_message_into_pubsub(payload, tx_id)
-            except TimeoutError:
-                bound_log.exception("Publish to pubsub timed out", payload=payload)
-                raise SurveyResponseError()
-            except Exception as e:  # noqa
-                bound_log.exception("A non-timeout error was raised when publishing to pubsub", payload=payload)
-                raise SurveyResponseError()
+        try:
+            payload = self.create_pubsub_payload(case, results["md5sum"], results["fileSizeInBytes"], file_name, tx_id)
+        except SurveyResponseError:
+            bound_log.error("Something went wrong creating the payload", exc_info=True)
+            raise
+
+        try:
+            self.put_message_into_pubsub(payload, tx_id)
+        except TimeoutError:
+            bound_log.exception("Publish to pubsub timed out", payload=payload)
+            raise SurveyResponseError()
+        except Exception as e:  # noqa
+            bound_log.exception("A non-timeout error was raised when publishing to pubsub", payload=payload)
+            raise SurveyResponseError()
 
     def put_file_into_gcp_bucket(self, file_contents, filename: str):
         """
@@ -105,12 +103,10 @@ class GcpSurveyResponse:
         """
         bound_log = log.bind(project=self.seft_upload_project, bucket=self.seft_upload_bucket_name)
         bound_log.info("Starting to put file in bucket")
-        try:
-            if not filename.strip():
-                raise ValueError("Error with filename for bucket ")
-        except ValueError as e:
-            bound_log.info(e, filename=filename)
-            raise
+
+        if not filename.strip():
+            bound_log.info("Error with filename for bucket", filename=filename)
+            raise ValueError("Error with filename for bucket")
 
         if self.storage_client is None:
             self.storage_client = storage.Client(project=self.seft_upload_project)

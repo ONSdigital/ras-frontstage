@@ -55,7 +55,7 @@ def download_collection_instrument(collection_instrument_id, case_id, party_id):
         bound_logger.error("Failed to download collection instrument")
         raise ApiError(logger, response)
 
-    logger.info("Successfully downloaded collection instrument")
+    bound_logger.info("Successfully downloaded collection instrument")
 
     headers = response.headers
     acao = app.config["ACCESS_CONTROL_ALLOW_ORIGIN"]

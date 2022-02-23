@@ -14,8 +14,11 @@ from frontstage.controllers.gcp_survey_response import (
 )
 from frontstage.exceptions.exceptions import ApiError
 from tests.integration.mocked_services import (
+    business_party,
     case,
     case_without_case_group,
+    collection_exercise,
+    survey,
     url_get_collection_exercise,
 )
 
@@ -115,3 +118,27 @@ class TestGcpSurveyResponse(TestCase):
             publisher.publish.assert_called()
             publisher.publish.assert_called_with("projects/test-project/topics/test-topic", data=data, tx_id=self.tx_id)
             self.assertIsNone(result)
+
+    @responses.activate
+    def test_create_file_name_success(self):
+        responses.add(responses.GET, url_get_collection_exercise, json=collection_exercise, status=200)
+        expected_ru_with_checkletter = "49900000001F"
+        expected_exercise_ref = "204901"
+        expected_survey_ref = "074"
+        expected_file_extension = "xlsx"
+        with app.app_context():
+            survey_response = GcpSurveyResponse(self.config)
+            output = survey_response.create_file_name_for_upload(case, business_party, ".xlsx", survey["surveyRef"])
+
+            # Output looks like '49900000001F_204901_074_20220223125323.xlsx' but because of the timestamp always
+            # changing, we'll test each bit
+            split_filename = output.split("_")
+            split_on_dot = split_filename[3].split(".")
+            self.assertEqual(split_filename[0], expected_ru_with_checkletter)
+            self.assertEqual(split_filename[1], expected_exercise_ref)
+            self.assertEqual(split_filename[2], expected_survey_ref)
+
+            # Tests the timestamp format instead of the value as it is always changing
+            self.assertTrue(split_on_dot[0].isdigit())
+            self.assertTrue(len(split_on_dot[0]), 14)
+            self.assertEqual(split_on_dot[1], expected_file_extension)

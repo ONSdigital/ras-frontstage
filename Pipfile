@@ -29,6 +29,7 @@ email_validator = "*"
 google-cloud-pubsub = "*"
 google-cloud-storage = "*"
 python-gnupg = "==0.4.7"
+werkzeug = "*"
 
 [dev-packages]
 black = "==21.12b0"

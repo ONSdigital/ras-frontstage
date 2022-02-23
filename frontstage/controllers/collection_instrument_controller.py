@@ -87,7 +87,7 @@ def upload_collection_instrument(file, case: dict, business_party: dict, party_i
     :param case: The case that relates to the upload
     :param business_party: The record of the business the upload is for
     :param party_id: The party id of the respondent that uploaded the instrument
-    :param survey:  A dict containing information about the survey
+    :param survey: A dict containing information about the survey
     :raises CiUploadError: Raised on a validation error
     """
     case_id = case["id"]

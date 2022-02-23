@@ -36,7 +36,6 @@ class Config(object):
     ACCOUNT_SERVICE_LOG_OUT_URL = os.getenv("ACCOUNT_SERVICE_LOG_OUT_URL")
     EQ_URL = os.getenv("EQ_URL")
     EQ_V3_URL = os.getenv("EQ_V3_URL")
-    EQ_V3_ENABLED = bool(strtobool(os.getenv("EQ_V3_ENABLED", "False")))
     JSON_SECRET_KEYS = os.getenv("JSON_SECRET_KEYS")
 
     REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
@@ -127,4 +126,3 @@ class TestingConfig(DevelopmentConfig):
     SECURE_APP = bool(strtobool(os.getenv("SECURE_APP", "False")))
     ACCESS_CONTROL_ALLOW_ORIGIN = os.getenv("ACCESS_CONTROL_ALLOW_ORIGIN", "http://localhost")
     UNDER_MAINTENANCE = bool(strtobool(os.getenv("UNDER_MAINTENANCE", "False")))
-    EQ_V3_ENABLED = bool(strtobool(os.getenv("EQ_V3_ENABLED", "True")))

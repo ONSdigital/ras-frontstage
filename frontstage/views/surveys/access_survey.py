@@ -1,6 +1,6 @@
 import logging
 
-from flask import current_app, redirect, render_template, request
+from flask import redirect, render_template, request
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
@@ -31,13 +31,11 @@ def access_survey(session):
         )
         eq_version = collection_exercise["eqVersion"]
         if eq_version == "v3":
-            if current_app.config["EQ_V3_ENABLED"]:
-                return redirect(
-                    case_controller.get_eq_url(
-                        eq_version, case, collection_exercise, party_id, business_party_id, survey_short_name
-                    )
+            return redirect(
+                case_controller.get_eq_url(
+                    eq_version, case, collection_exercise, party_id, business_party_id, survey_short_name
                 )
-            return render_template("surveys/surveys-temp-eq-v3-static.html")
+            )
         else:
             return redirect(
                 case_controller.get_eq_url(

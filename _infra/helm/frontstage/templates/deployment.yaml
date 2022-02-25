@@ -120,8 +120,6 @@ spec:
             value: "{{ .Values.eq.url }}"
           - name: EQ_V3_URL
             value: "{{ .Values.eq.v3url }}"
-          - name: EQ_V3_ENABLED
-            value: "{{ .Values.eq.v3enabled }}"
           {{ if .Values.analytics.enabled }}
           - name: GOOGLE_ANALYTICS_ID
             value: "{{ .Values.analytics.id }}"

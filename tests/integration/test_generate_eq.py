@@ -70,6 +70,7 @@ class TestGenerateEqURL(unittest.TestCase):
                     party_id=respondent_party["id"],
                     business_party_id=business_party["id"],
                     survey=survey_eq,
+                    version=None,
                 )
         self.assertEqual(
             e.exception.message, "Collection instrument 68ad4018-2ddd-4894-89e7-33f0135887a2 type is not EQ"
@@ -94,11 +95,60 @@ class TestGenerateEqURL(unittest.TestCase):
                     party_id=respondent_party["id"],
                     business_party_id=business_party["id"],
                     survey=survey_eq,
+                    version=None,
                 )
         self.assertEqual(
             e.exception.message,
             "Collection instrument 68ad4018-2ddd-4894-89e7-33f0135887a2 " "classifiers are incorrect or missing",
         )
+
+    @requests_mock.mock()
+    def test_generate_eq_url_contains_response_id_for_v3(self, mock_request):
+        # Given all external services are mocked and we have an EQ collection instrument without an EQ ID
+        mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
+        mock_request.get(url_get_business_party, json=business_party)
+        with open("tests/test_data/collection_instrument/collection_instrument_eq.json") as json_data:
+            collection_instrument_eq = json.load(json_data)
+
+        mock_request.get(url_get_ci, json=collection_instrument_eq)
+        mock_request.get(url_banner_api, status_code=404)
+
+        # When create_payload is called
+        # Then an InvalidEqPayLoad is raised
+        with app.app_context():
+            payload = EqPayload().create_payload(
+                case,
+                collection_exercise,
+                party_id=respondent_party["id"],
+                business_party_id=business_party["id"],
+                survey=survey_eq,
+                version="v3",
+            )
+        self.assertTrue("response_id" in payload)
+
+    @requests_mock.mock()
+    def test_generate_eq_url_for_response_id_for_v2(self, mock_request):
+        # Given all external services are mocked and we have an EQ collection instrument without an EQ ID
+        mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
+        mock_request.get(url_get_business_party, json=business_party)
+        with open("tests/test_data/collection_instrument/collection_instrument_eq.json") as json_data:
+            collection_instrument_eq = json.load(json_data)
+
+        mock_request.get(url_get_ci, json=collection_instrument_eq)
+        mock_request.get(url_banner_api, status_code=404)
+
+        # When create_payload is called
+        # Then an InvalidEqPayLoad is raised
+        with app.app_context():
+            payload = EqPayload().create_payload(
+                case,
+                collection_exercise,
+                party_id=respondent_party["id"],
+                business_party_id=business_party["id"],
+                survey=survey_eq,
+                version="v2",
+            )
+        self.assertFalse("response_id" in payload)
 
     @requests_mock.mock()
     def test_generate_eq_url_no_form_type(self, mock_request):
@@ -119,6 +169,7 @@ class TestGenerateEqURL(unittest.TestCase):
                     party_id=respondent_party["id"],
                     business_party_id=business_party["id"],
                     survey=survey_eq,
+                    version=None,
                 )
         self.assertEqual(
             e.exception.message,

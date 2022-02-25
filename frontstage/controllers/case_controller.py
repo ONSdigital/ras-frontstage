@@ -174,7 +174,7 @@ def get_eq_url(version, case, collection_exercise, party_id, business_party_id, 
     if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey):
         raise NoSurveyPermission(party_id, case_id)
 
-    payload = EqPayload().create_payload(case, collection_exercise, party_id, business_party_id, survey)
+    payload = EqPayload().create_payload(case, collection_exercise, party_id, business_party_id, survey, version)
 
     json_secret_keys = app.config["JSON_SECRET_KEYS"]
     encrypter = Encrypter(json_secret_keys)

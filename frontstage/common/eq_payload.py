@@ -17,7 +17,9 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 class EqPayload(object):
-    def create_payload(self, case, collection_exercise, party_id: str, business_party_id: str, survey) -> dict:
+    def create_payload(
+        self, case, collection_exercise, party_id: str, business_party_id: str, survey, version: str
+    ) -> dict:
         """
         Creates the payload needed to communicate with EQ, built from the Case, Collection Exercise, Party,
         Survey and Collection Instrument services
@@ -26,6 +28,7 @@ class EqPayload(object):
         :param party_id: The uuid of the respondent
         :param business_party_id: The uuid of the reporting unit
         :param survey: A dict containing information about the survey
+        :param version: EQ version
         :returns: Payload for EQ
         """
 
@@ -87,6 +90,15 @@ class EqPayload(object):
 
         # Add any non null event dates that exist for this collection exercise
         payload.update([(key, value) for key, value in collex_event_dates.items() if value is not None])
+
+        # Add response_id for v3
+        if version == "v3":
+            payload.update(
+                {
+                    "response_id": f"{party['sampleUnitRef'] + party['checkletter']}"
+                    f"{collection_exercise['id']}{eq_id}{form_type}"
+                }
+            )
 
         logger.debug(payload)
 

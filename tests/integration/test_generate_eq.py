@@ -125,6 +125,7 @@ class TestGenerateEqURL(unittest.TestCase):
                 version="v3",
             )
         self.assertTrue("response_id" in payload)
+        self.assertEqual("49900000001F8d990a74-5f07-4765-ac66-df7e1a96505b20001", payload["response_id"])
 
     @requests_mock.mock()
     def test_generate_eq_url_for_response_id_for_v2(self, mock_request):

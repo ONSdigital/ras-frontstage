@@ -25,6 +25,9 @@ with open("tests/test_data/case/case_list.json") as fp:
 with open("tests/test_data/case/case_list_without_iac_and_with_case_events.json") as fp:
     case_list_with_iac_and_case_events = json.load(fp)
 
+with open("tests/test_data/case/case_without_case_group.json") as fp:
+    case_without_case_group = json.load(fp)
+
 with open("tests/test_data/case/categories.json") as fp:
     categories = json.load(fp)
 
@@ -148,7 +151,6 @@ url_post_add_survey = f"{app.config['PARTY_URL']}/party-api/v1/respondents/add_s
 url_post_case_event_uuid = f"{app.config['CASE_URL']}/cases/{case['id']}/events"
 url_reset_password_request = f"{app.config['PARTY_URL']}/party-api/v1/respondents/request_password_change"
 url_send_message = app.config["SECURE_MESSAGE_URL"] + "/messages"
-url_upload_ci = f"{app.config['COLLECTION_INSTRUMENT_URL']}/survey_response-api/v1/survey_responses/{case['id']}"
 url_validate_enrolment = f"{app.config['IAC_URL']}/iacs/{enrolment_code}"
 url_verify_email = f"{app.config['PARTY_URL']}/party-api/v1/emailverification/{token}"
 url_verify_token = f"{app.config['PARTY_URL']}/party-api/v1/tokens/verify/{token}"

@@ -37,6 +37,12 @@ email:
 gcp:
   project: ras-rm-sandbox
   topic: ras-rm-notify-test
+  seftUpload:
+    project: ras-rm-sandbox
+    topic: topic
+    bucket:
+      name: bucket
+      prefix: ""
 
 scheme: http
 
@@ -80,3 +86,7 @@ canary:
 
 maintenancePage:
   enabled: false
+
+gnu:
+  recipient: dev@example.com
+  fingerprint: ED1B7A3EADF95687

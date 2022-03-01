@@ -8,7 +8,6 @@ from distutils.util import strtobool
 class Config(object):
     DEBUG = False
     TESTING = False
-    VERSION = "1.21.0"
     PREFERRED_URL_SCHEME = "https"
     PORT = os.getenv("PORT", 8082)
     MAX_UPLOAD_LENGTH = os.getenv("MAX_UPLOAD_LENGTH", 20 * 1024 * 1024)
@@ -66,8 +65,21 @@ class Config(object):
     SECURE_APP = bool(strtobool(os.getenv("SECURE_APP", "True")))
     WTF_CSRF_ENABLED = bool(strtobool(os.getenv("WTF_CSRF_ENABLED", str(SECURE_APP))))
     WTF_CSRF_TIME_LIMIT = int(os.getenv("WTF_CSRF_TIME_LIMIT", "7200"))
+
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "ras-rm-sandbox")
     PUBSUB_TOPIC = os.getenv("PUBSUB_TOPIC", "ras-rm-notify-test")
+
+    # In preprod and prod, this project will point to the SDX project as they own the topic.  In dev environments
+    # this will be our ras-rm project as we create the topic ourselves.
+    SEFT_UPLOAD_PROJECT = os.getenv("SEFT_UPLOAD_PROJECT", "ras-rm-sandbox")
+    SEFT_UPLOAD_PUBSUB_TOPIC = os.getenv("SEFT_UPLOAD_PUBSUB_TOPIC", "ras-rm-notify-test")
+    SEFT_UPLOAD_BUCKET_NAME = os.getenv("SEFT_UPLOAD_BUCKET_NAME", "test-bucket")
+    # Prefix only used for dev environments to file in folders within the bucket
+    SEFT_UPLOAD_BUCKET_FILE_PREFIX = os.getenv("SEFT_UPLOAD_BUCKET_FILE_PREFIX")
+    ONS_GNU_RECIPIENT = os.getenv("ONS_GNU_RECIPIENT")
+    ONS_GNU_FINGERPRINT = os.getenv("ONS_GNU_FINGERPRINT")
+    ONS_GNU_PUBLIC_CRYPTOKEY = os.getenv("ONS_GNU_PUBLIC_CRYPTOKEY")
+
     CANARY_GENERATE_ERRORS = bool(strtobool(os.getenv("CANARY_GENERATE_ERRORS", "False")))
     MAX_SHARED_SURVEY = int(os.getenv("MAX_SHARED_SURVEY", "50"))
     UNDER_MAINTENANCE = bool(strtobool(os.getenv("UNDER_MAINTENANCE", "False")))

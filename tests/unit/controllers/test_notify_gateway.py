@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import MagicMock
 
 from config import TestingConfig
 from frontstage import app
@@ -19,7 +20,7 @@ class TestNotifyController(unittest.TestCase):
 
     def test_request_to_notify_with_pubsub_no_personalisation(self):
         """Tests what is sent to pubsub when no personalisation is added"""
-        publisher = unittest.mock.MagicMock()
+        publisher = MagicMock()
         publisher.topic_path.return_value = "projects/test-project-id/topics/ras-rm-notify-test"
         # Given a mocked notify gateway
         notify = NotifyGateway(self.app_config)
@@ -33,7 +34,7 @@ class TestNotifyController(unittest.TestCase):
 
     def test_a_successful_send_with_personalisation(self):
         """Tests what is sent to pubsub when personalisation is added"""
-        publisher = unittest.mock.MagicMock()
+        publisher = MagicMock()
         publisher.topic_path.return_value = "projects/test-project-id/topics/ras-rm-notify-test"
         # Given a mocked notify gateway
         notify = NotifyGateway(self.app_config)

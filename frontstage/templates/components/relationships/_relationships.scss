@@ -1,0 +1,13 @@
+.relationships {
+  &__playback {
+    border-bottom: 1px solid $color-input;
+    border-top: 1px solid $color-input;
+    margin: 2rem 0 0;
+    padding: 1rem 0;
+
+    @include mq('m') {
+      display: inline-block;
+      min-width: 20rem;
+    }
+  }
+}

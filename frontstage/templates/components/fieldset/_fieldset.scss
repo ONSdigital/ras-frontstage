@@ -1,0 +1,13 @@
+.fieldset {
+  &__legend {
+    @extend .label;
+  }
+
+  &__description:not(&__description--title) {
+    @extend .label__description;
+  }
+
+  &__description--title {
+    font-weight: normal;
+  }
+}

@@ -4,7 +4,11 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "${DIR}"/.. || exit
 
-DESIGN_SYSTEM_VERSION="33.1.4"
+if [ $# -eq 0 ] || [ "$1" == "" ]; then
+    echo "Usage: load_release.sh Design System {TAG_NAME}"
+else
+    DESIGN_SYSTEM_VERSION="$1"
+fi
 
 TEMP_DIR=$(mktemp -d)
 

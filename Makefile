@@ -1,3 +1,7 @@
+DESIGN_SYSTEM_VERSION=`cat .design-system-version`
+UNIT_TESTS=tests/unit
+INTEGRATION_TESTS=tests/integration
+
 build:
 	pipenv install --dev
 
@@ -7,11 +11,11 @@ build-docker:
 build-kubernetes:
 	docker build -f _infra/docker/Dockerfile .
 
-start:
-	pipenv run python run.py
+load-design-system-templates:
+	pipenv run ./scripts/load_templates.sh $(DESIGN_SYSTEM_VERSION)
 
-UNIT_TESTS=tests/unit
-INTEGRATION_TESTS=tests/integration
+start: load-design-system-templates
+	pipenv run python run.py
 
 docker-test: REDIS_PORT=6379
 docker-test: unit-tests integration-tests
@@ -35,6 +39,3 @@ unit-tests:
 
 integration-tests:
 	APP_SETTINGS=TestingConfig pipenv run pytest $(INTEGRATION_TESTS) --cov frontstage --cov-report term-missing
-
-load-templates:
-	pipenv run ./scripts/load_templates.sh

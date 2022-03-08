@@ -34,7 +34,7 @@ lint-check:
 
 test: lint-check unit-tests integration-tests
 
-unit-tests:
+unit-tests: load-design-system-templates
 	APP_SETTINGS=TestingConfig pipenv run pytest $(UNIT_TESTS) --cov frontstage --cov-report term-missing
 
 integration-tests:

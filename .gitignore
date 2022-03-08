@@ -102,6 +102,6 @@ ENV/
 # pyenv
 .python-version
 
-# Ignore Design-System templates
+# Design System templates
 frontstage/templates/components
 frontstage/templates/layout

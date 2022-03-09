@@ -5,7 +5,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "${DIR}"/.. || exit
 
 if [ $# -eq 0 ] || [ "$1" == "" ]; then
-    echo "The design system version must be passed in as an argument."
+    echo "The Design System version must be passed in as an argument."
     echo "Usage: load_templates.sh {DESIGN_SYSTEM_VERSION}"
     exit 1
 else

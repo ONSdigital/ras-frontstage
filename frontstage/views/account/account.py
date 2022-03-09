@@ -80,8 +80,8 @@ def change_password(session):
             bound_logger.info("Attempting to change password via party service")
             party_controller.change_password(username, new_password)
             bound_logger.info("password changed via party service")
-            flash("Your password has been changed.")
-            return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
+            flash("Your password has been changed. Please login with your new password.", "success")
+            return redirect(url_for("sign_in_bp.logout"))
         except AuthError as exc:
             error_message = exc.auth_error
             if BAD_CREDENTIALS_ERROR in error_message:

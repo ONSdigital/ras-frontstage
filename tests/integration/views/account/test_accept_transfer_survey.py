@@ -217,8 +217,8 @@ class TestAcceptTransferSurvey(unittest.TestCase):
         data = {
             "first_name": "test",
             "last_name": "test",
-            "password": "Test!129",
-            "password_confirm": "Test!129",
+            "password": "Testtest!129",
+            "password_confirm": "Testtest!129",
             "phone_number": "07456534567",
         }
 

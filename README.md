@@ -42,7 +42,7 @@ Install test dependencies with
 ```bash
 pipenv install --dev
 ```
-The Makefile will run the tests in the unit or integration tests folder using pytest, and present a coverage report.  
+The Makefile will run the tests in the unit or integration tests folder using pytest, and present a coverage report.
 These can be easily run via the following commands:
 ```bash
 make unit-tests
@@ -63,8 +63,19 @@ The syntax above will work equally well with the 'docker-test' target
 
 Note that this script will fail if there is a `node_modules` folder in the repo
 
+## Load the ONS Design System Templates
+```
+make load-design-system-templates
+```
+
+This command will take the version number defined in the `.design-system-version` file and download the templates for that version of the Design System. It will also be automatically run when running `make start`.
+
+To update to a different version of the Design System:
+- update the version number in the `.design-system-version` file
+- run `make load-design-system-templates` script
+
 ## How to run test in pyCharm
-* Create a new configuration template in edit configuration. Use `autodetect` option and setup Environment Variable to `APP_SETTINGS=TestingConfig`.  
+* Create a new configuration template in edit configuration. Use `autodetect` option and setup Environment Variable to `APP_SETTINGS=TestingConfig`.
 
 ## Configuration
 Environment variables available for configuration are listed below:

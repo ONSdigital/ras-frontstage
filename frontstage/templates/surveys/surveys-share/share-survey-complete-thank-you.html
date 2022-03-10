@@ -1,19 +1,20 @@
 {% extends "layouts/_block_content.html" %}
-{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/input/_macro.njk" import onsInput %}
 {% from "components/lists/_macro.njk" import onsList %}
 {% from "components/button/_macro.njk" import onsButton %}
+
 {% set page_title = "Share survey complete" %}
+
 {% block main %}
-<h1 class="u-fs-xl">Thank you</h1>
-<p>You are now able to access and return the shared surveys.</p>
-<p>The new surveys will now appear in your survey list.</p>
+    <h1 class="u-fs-xl">Thank you</h1>
+    <p>You are now able to access and return the shared surveys.</p>
+    <p>The new surveys will now appear in your survey list.</p>
 
-<p class="field u-mt-l">
-    <div class="btn-group">
-        <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" role="button" class="btn btn--primary" id="btn-sign-in"><span class="btn__inner">Back to surveys</span></a>
+    <div class="field u-mt-l">
+        <div class="btn-group">
+            <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" role="button" class="btn btn--primary" id="btn-sign-in"><span class="btn__inner">Back to surveys</span></a>
+        </div>
     </div>
-</p>
-
 {% endblock main %}

@@ -6,28 +6,25 @@
 
 {% block content %}
 
-<h1 id="confirm-org-title" class="u-fs-xl">Confirm organisation and survey details</h1>
+    <h1 id="confirm-org-title" class="u-fs-xl">Confirm organisation and survey details</h1>
 
- {% include('partials/business_survey_credentials.html') %}
+    {% include('partials/business_survey_credentials.html') %}
 
-{{
-    onsButton({
-        "url": url_for('surveys_bp.add_survey_submit', encrypted_enrolment_code=context.encrypted_enrolment_code) ,
-        "text": "Confirm",
-        "type": "submit",
-        "classes": "u-mt-l u-mb-s",
-        "id": "confirm_survey_button",
-        "submitType": "timer"
-    })
-}}
+    {{
+        onsButton({
+            "url": url_for('surveys_bp.add_survey_submit', encrypted_enrolment_code=context.encrypted_enrolment_code) ,
+            "text": "Confirm",
+            "type": "submit",
+            "classes": "u-mt-l u-mb-s",
+            "id": "confirm_survey_button",
+            "submitType": "timer"
+        })
+    }}
 
-<p>
-  <a id="cancel_button" href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}">Cancel</a>
-</p>
-<p>If the organisation or survey details aren't what you were expecting, please contact us on <a class="nowrap" href="tel:+44-300-1234-931">0300 1234 931</a>
-    or send an <br/>
-    email to <a href="mailto:surveys@ons.gov.uk">surveys@ons.gov.uk</a>
+    <p><a id="cancel_button" href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}">Cancel</a></p>
+    <p>If the organisation or survey details aren't what you were expecting, please contact us on <a class="nowrap" href="tel:+44-300-1234-931">0300 1234 931</a>
+        or send an <br/>
+        email to <a href="mailto:surveys@ons.gov.uk">surveys@ons.gov.uk</a>
     </p>
-</p>
 
 {% endblock content %}

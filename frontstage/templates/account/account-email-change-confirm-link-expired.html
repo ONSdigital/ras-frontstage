@@ -4,15 +4,15 @@
 
 {% block main %}
 
-<h1 class="u-fs-xl">Your verification link has expired</h1>
+    <h1 class="u-fs-xl">Your verification link has expired</h1>
 
-<div>
-    <p>
-        You will need to sign back into your account and <a href="{{ url_for('account_bp.resend_account_email_change_expired_token', token=token) }}">request another verification email</a>.
-    </p>
-    <p>
-        <p>If you need help, please <a href="{{ url_for('contact_us_bp.contact_us') }}" rel="noopener">contact us</a>.</p>
-    </p>
-</div>
+    <div>
+        <p>
+            You will need to sign back into your account and <a href="{{ url_for('account_bp.resend_account_email_change_expired_token', token=token) }}">request another verification email</a>.
+        </p>
+        <p>
+            <p>If you need help, please <a href="{{ url_for('contact_us_bp.contact_us') }}" rel="noopener">contact us</a>.</p>
+        </p>
+    </div>
 
 {% endblock main %}

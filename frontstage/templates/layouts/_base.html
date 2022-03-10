@@ -2,71 +2,75 @@
 {% from "components/cookies-banner/_macro.njk" import onsCookiesBanner %}
 
 {% block head %}
-    {% set css_theme = "css/"~_theme~"/theme.css" %}
+    {% set css_theme = "css"~_theme~"/theme.css" %}
     <link href="{{ url_for('static', filename=css_theme) }}" rel="stylesheet" />
-      
+
     {% if config.GOOGLE_TAG_MANAGER %}
-      <!-- Google Tag Manager -->	
-      <script{% if csp_nonce %} nonce="{{ csp_nonce() }}"{% endif %}>
-        var testCookies = /^(.*)?\s*'usage':true\s*[^;]+(.*)?$/;
-        if (document.cookie.match(testCookies)) {
-          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':	
-          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],	
-          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=	
-          'https://www.googletagmanager.com/gtm.js?id='+i+dl+'&gtm_auth={{ config.GOOGLE_TAG_MANAGER_PROP }}&gtm_cookies_win=x';f.parentNode.insertBefore(j,f);	
-          })(window,document,'script','dataLayer','{{ config.GOOGLE_TAG_MANAGER }}');
-        }
-      </script>	
-      <!-- End Google Tag Manager -->
+        <!-- Google Tag Manager -->	
+        <script{% if csp_nonce %} nonce="{{ csp_nonce() }}"{% endif %}>
+            var testCookies = /^(.*)?\s*'usage':true\s*[^;]+(.*)?$/;
+            if (document.cookie.match(testCookies)) {
+                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':	
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],	
+                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=	
+                'https://www.googletagmanager.com/gtm.js?id='+i+dl+'&gtm_auth={{ config.GOOGLE_TAG_MANAGER_PROP }}&gtm_cookies_win=x';f.parentNode.insertBefore(j,f);	
+                })(window,document,'script','dataLayer','{{ config.GOOGLE_TAG_MANAGER }}');
+            }
+        </script>	
+        <!-- End Google Tag Manager -->
     {% endif %}
 {% endblock %}
 {% block bodyStart %}	
-  {% if config.GOOGLE_TAG_MANAGER %}
-    <!-- Google Tag Manager (noscript) -->	
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ config.GOOGLE_TAG_MANAGER }}&gtm_auth={{ config.GOOGLE_TAG_MANAGER_PROP }}&gtm_cookies_win=x"	
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>	
-    <!-- End Google Tag Manager (noscript) -->	
-   {% endif %}
+    {% if config.GOOGLE_TAG_MANAGER %}
+        <!-- Google Tag Manager (noscript) -->	
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ config.GOOGLE_TAG_MANAGER }}&gtm_auth={{ config.GOOGLE_TAG_MANAGER_PROP }}&gtm_cookies_win=x"	
+        height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>	
+        <!-- End Google Tag Manager (noscript) -->	
+    {% endif %}
 {% endblock %}
+
 {% block preHeader %}
-  {{
-      onsCookiesBanner({
-          "statementTitle": 'Tell us whether you accept cookies',
-          "statementText": 'We use <a href="/cookies">cookies to collect information</a> about how you use surveys.ons.gov.uk. We use this information to make the website work as well as possible and improve our services.',
-          "confirmationText": 'You’ve accepted all cookies. You can <a href="/cookies">change your cookie preferences</a> at any time.',
-          "secondaryButtonUrl": '/cookies'
-      })
-  }}
+    {{
+        onsCookiesBanner({
+            "statementTitle": 'Tell us whether you accept cookies',
+            "statementText": 'We use <a href="/cookies">cookies to collect information</a> about how you use surveys.ons.gov.uk. We use this information to make the website work as well as possible and improve our services.',
+            "confirmationText": 'You’ve accepted all cookies. You can <a href="/cookies">change your cookie preferences</a> at any time.',
+            "secondaryButtonUrl": '/cookies'
+        })
+    }}
 {% endblock %}
-{% set pageConfig = { 
-  "title": page_title + " | ONS Business Surveys" if page_title else "ONS Business Surveys",
-  "header": {
-    "title": "ONS Business Surveys",
-  }
+
+{% set pageConfig = {
+    "title": page_title + " | ONS Business Surveys" if page_title else "ONS Business Surveys",
+    "header": {
+        "title": "ONS Business Surveys",
+    }
 } %}
 
 {% include 'layouts/configs/service-links.html' %}
 {% include 'layouts/configs/footer.html' %}
 {% from "components/panel/_macro.njk" import onsPanel %}
+
 {%- block pageContent %}
-  <div class="page__container container">
-   {% block breadcrumb %}{% endblock breadcrumb %}
-    {% if availability_message %}
-      {{ 
-          onsPanel({
-              "body": availability_message,
-              "classes": "u-mt-l"
-          }) 
-      }}
-    {% endif %}
-    <div class="grid">
-      <div class="grid__col col-12@m u-pt-no">
-        <main id="main-content" class="page__main {{ pageClasses }}">
-          {%- block content %}{% endblock content -%}
-        </main>
-      </div>
+    <div class="page__container container">
+        {% block breadcrumb %}{% endblock breadcrumb %}
+        {% if availability_message %}
+            {{
+                onsPanel({
+                    "body": availability_message,
+                    "classes": "u-mt-l"
+                })
+            }}
+        {% endif %}
+        <div class="grid">
+            <div class="grid__col col-12@m u-pt-no">
+                <main id="main-content" class="page__main {{ pageClasses }}">
+                    {%- block content %}{% endblock content -%}
+                </main>
+            </div>
+        </div>
     </div>
-  </div>  
 {% endblock pageContent -%}
+
 {% block bodyEnd %}
 {% endblock %}

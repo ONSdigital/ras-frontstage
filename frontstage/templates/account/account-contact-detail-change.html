@@ -1,5 +1,5 @@
 {% extends "layouts/_block_content.html" %}
-{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/input/_macro.njk" import onsInput %}
 {% from "components/button/_macro.njk" import onsButton %}
@@ -7,28 +7,30 @@
 
 {% set page_title = "Change contact details" %}
 {% set breadcrumbsData = [
-  {
-    "text": "Surveys",
-    "url": "/surveys/todo",
-    "id": "b-item-1"
-  },
-  {
-    "text": "Account",
-    "url": "/my-account",
-    "id": "b-item-2"
-  }
+    {
+        "text": "Surveys",
+        "url": "/surveys/todo",
+        "id": "b-item-1"
+    },
+    {
+        "text": "Account",
+        "url": "/my-account",
+        "id": "b-item-2"
+    }
 ] %}
-{% block breadcrumb %}
-{{
-    onsBreadcrumb({
-        "ariaLabel": "Breadcrumbs",
-        "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
-    })
-}}
-{% endblock breadcrumb %}
+
+{% block breadcrumbs %}
+    {{
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
+    }}
+{% endblock breadcrumbs %}
+
 {% block main %}
-{% if errors|length > 0 %}
+    {% if errors|length > 0 %}
         {% if errors|length == 1 %}
             {% set errorTitle = 'There is 1 error on this page' %}
         {% elif errors|length > 1 %}
@@ -62,100 +64,94 @@
             }}
         {% endcall %}
     {% endif %}
-<h1 class="u-fs-xl">Enter your new contact details</h1>
-<form action="" method="post">
+    <h1 class="u-fs-xl">Enter your new contact details</h1>
+    <form action="" method="post">
         {{ form.csrf_token }}
         {% set firstName = respondent.firstName %}
         {% if errors.first_name %}
-                {% set errorFirstName = { "text": errors['first_name'][0],  "id": 'first_name_error' } %}
-                {% set firstName = form.first_name.data %}
+            {% set errorFirstName = { "text": errors['first_name'][0],  "id": 'first_name_error' } %}
+            {% set firstName = form.first_name.data %}
         {% endif %}
-            {{
-                onsInput({
-                    "id": "first_name",
-                    "name": "first_name",
-                    "type": "text",
-                    "label": {
-                        "text": 'First name'
-                    },
-                    "error": errorFirstName,
-                    "value": firstName
-                })
-            }}
-            {% set lastName = respondent.lastName %}
-            {% if errors.last_name %}
-                {% set errorLastName = { "text": errors['last_name'][0],  "id": 'last_name_error' } %}
-                {% set lastName = form.last_name.data %}
-            {% endif %}
-            {{
-                onsInput({
-                    "id": "last_name",
-                    "name": "last_name",
-                    "type": "text",
-                    "label": {
-                        "text": 'Last name'
-                    },
-                    "error": errorLastName,
-                    "value": lastName
-                })
-            }}
-            {% set emailAddress = respondent.emailAddress %}
-            {% if errors.email_address %}
-                {% set errorEmailAddress = { "text": errors['email_address'][0],  "id": 'email_address_error' } %}
-                {% set emailAddress = form.email_address.data %}
-            {% endif %}
-            {{
-                onsInput({
-                    "id": "email_address",
-                    "name": "email_address",
-                    "type": "text",
-                    "label": {
-                        "text": 'Email address'
-                    },
-                    "error": errorEmailAddress,
-                    "value": emailAddress,
-                })
-            }}
-            {% set phoneNumber = respondent.telephone %}
-            {% if errors.phone_number %}
-                {% set errorPhoneNumber = { "text": errors['phone_number'][0],  "id": 'phone_number_error' } %}
-                {% set phoneNumber = form.phone_number.data %}
-            {% endif %}
-            {{
-                onsInput({
-                    "id": "phone_number",
-                    "name": "phone_number",
-                    "type": "tel",
-                    "autocomplete": "tel",
-                    "classes": "input--w-8",
-                    "label": {
-                        "text": 'Phone number'
-                    },
-                    "error": errorPhoneNumber,
-                    "value": phoneNumber
-                })
-            }}
+        {{
+            onsInput({
+                "id": "first_name",
+                "name": "first_name",
+                "type": "text",
+                "label": {
+                    "text": 'First name'
+                },
+                "error": errorFirstName,
+                "value": firstName
+            })
+        }}
+        {% set lastName = respondent.lastName %}
+        {% if errors.last_name %}
+            {% set errorLastName = { "text": errors['last_name'][0],  "id": 'last_name_error' } %}
+            {% set lastName = form.last_name.data %}
+        {% endif %}
+        {{
+            onsInput({
+                "id": "last_name",
+                "name": "last_name",
+                "type": "text",
+                "label": {
+                    "text": 'Last name'
+                },
+                "error": errorLastName,
+                "value": lastName
+            })
+        }}
+        {% set emailAddress = respondent.emailAddress %}
+        {% if errors.email_address %}
+            {% set errorEmailAddress = { "text": errors['email_address'][0],  "id": 'email_address_error' } %}
+            {% set emailAddress = form.email_address.data %}
+        {% endif %}
+        {{
+            onsInput({
+                "id": "email_address",
+                "name": "email_address",
+                "type": "text",
+                "label": {
+                    "text": 'Email address'
+                },
+                "error": errorEmailAddress,
+                "value": emailAddress,
+            })
+        }}
+        {% set phoneNumber = respondent.telephone %}
+        {% if errors.phone_number %}
+            {% set errorPhoneNumber = { "text": errors['phone_number'][0],  "id": 'phone_number_error' } %}
+            {% set phoneNumber = form.phone_number.data %}
+        {% endif %}
+        {{
+            onsInput({
+                "id": "phone_number",
+                "name": "phone_number",
+                "type": "tel",
+                "autocomplete": "tel",
+                "classes": "input--w-8",
+                "label": {
+                    "text": 'Phone number'
+                },
+                "error": errorPhoneNumber,
+                "value": phoneNumber
+            })
+        }}
 
-
-
-
-
-
-    <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
-        <div class="grid__col">
-            {{
-                onsButton({
-                "text": "Save",
-                "id": "btn-option-save",
-                "classes": 'btn-group__btn',
-                "submitType": "timer"
-                })
-            }}
+        <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
+            <div class="grid__col">
+                {{
+                    onsButton({
+                    "text": "Save",
+                    "id": "btn-option-save",
+                    "classes": 'btn-group__btn',
+                    "submitType": "timer"
+                    })
+                }}
+            </div>
+            <div class="grid__col u-ml-m">
+                <a href="{{ url_for('account_bp.get_account') }}" id="btn-account-change-detail-cancel">Cancel</a>
+            </div>
         </div>
-        <div class="grid__col u-ml-m">
-            <a href="{{ url_for('account_bp.get_account') }}" id="btn-account-change-detail-cancel">Cancel</a>
-        </div>
-    </div>
-</form>
-
+    </form>
 {% endblock main %}

@@ -1,46 +1,48 @@
 {% extends "layouts/_block_content.html" %}
-{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/checkboxes/_macro.njk" import onsCheckboxes %}
 {% from "components/button/_macro.njk" import onsButton %}
 {% set page_title = "Survey transfer business select" %}
 {% set breadcrumbsData = [
-  {
-    "text": "Surveys",
-    "url": "/surveys/todo",
-    "id": "b-item-1"
-  },
-  {
-    "text": "Account",
-    "url": "/my-account",
-    "id": "b-item-2"
-  },
-  {
-    "text": "Transfer Surveys",
-    "url": "/my-account/transfer-surveys",
-    "id": "b-item-3"
-  }
+    {
+        "text": "Surveys",
+        "url": "/surveys/todo",
+        "id": "b-item-1"
+    },
+    {
+        "text": "Account",
+        "url": "/my-account",
+        "id": "b-item-2"
+    },
+    {
+        "text": "Transfer Surveys",
+        "url": "/my-account/transfer-surveys",
+        "id": "b-item-3"
+    }
 ] %}
-{% block breadcrumb %}
-{{
-    onsBreadcrumb({
-        "ariaLabel": "Breadcrumbs",
-        "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
-    })
-}}
-{% endblock breadcrumb %}
-{% block main %}
-{% set ns = namespace() %}
-{% set ns.optionErrorMessage = 'You need to choose a business' %}
-{% include "radio-option-select-error-panel.html" %}
 
-<h1>For which businesses do you want to transfer your surveys?</h1>
-{% set checkboxData = [] %}
-<form action="" method="post">
-    {{ form.csrf_token }}
+{% block breadcrumbs %}
+    {{
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
+    }}
+{% endblock breadcrumbs %}
+
+{% block main %}
+    {% set ns = namespace() %}
+    {% set ns.optionErrorMessage = 'You need to choose a business' %}
+    {% include "radio-option-select-error-panel.html" %}
+
+    <h1>For which businesses do you want to transfer your surveys?</h1>
+    {% set checkboxData = [] %}
+    <form action="" method="post">
+        {{ form.csrf_token }}
         {% if ns.optionError %}
-                {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
+            {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
         {% endif %}
         {% set checkboxesData = {
             "id": "option",
@@ -51,34 +53,34 @@
         {% set radios = [] %}
         {% for business in businesses %}
             {% do checkboxData.append(
-                  {
+                {
                     "id": business['id']|string,
                     "name": "checkbox-answer",
                     "label": {
                         "text": business['name']
                     },
-                     "value": business['id']|string
-                  }
-                ) %}
+                    "value": business['id']|string
+                }
+            ) %}
         {% endfor %}
         {% do checkboxesData | setAttribute("checkboxes", checkboxData) %}
         {{ onsCheckboxes(checkboxesData) }}
-        <p class="field u-mt-l">
-        <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
-            <div class="grid__col">
-                {{
-                    onsButton({
-                    "text": "Continue",
-                    "classes": 'btn btn-group__btn',
-                    "submitType": "timer"
-                    })
-                }}
-            </div>
-            <div class="grid__col u-ml-m">
-                <a href="{{ url_for('account_bp.transfer_survey_overview') }}">Cancel</a>
+        <div class="field u-mt-l">
+            <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
+                <div class="grid__col">
+                    {{
+                        onsButton({
+                        "text": "Continue",
+                        "classes": 'btn btn-group__btn',
+                        "submitType": "timer"
+                        })
+                    }}
+                </div>
+                <div class="grid__col u-ml-m">
+                    <a href="{{ url_for('account_bp.transfer_survey_overview') }}">Cancel</a>
+                </div>
             </div>
         </div>
-    </p>
-</form>
+    </form>
 
 {% endblock main %}

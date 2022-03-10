@@ -1,5 +1,5 @@
 {% extends "layouts/_block_content.html" %}
-{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/input/_macro.njk" import onsInput %}
 {% from "components/lists/_macro.njk" import onsList %}
@@ -9,104 +9,101 @@
 {% set page_title = "Survey share email send instructions" %}
 
 {% set breadcrumbsData = [
-  {
-    "text": "Surveys",
-    "url": "/surveys/todo",
-    "id": "b-item-1"
-  },
-  {
-    "text": "Account",
-    "url": "/my-account",
-    "id": "b-item-2"
-  },
-  {
-    "text": "Share Surveys",
-    "url": "/my-account/share-surveys",
-    "id": "b-item-3"
-  },
-  {
-    "text": "Select business",
-    "url": "/my-account/share-surveys/business-selection",
-    "id": "b-item-4"
-  },
- {
-    "text": "Select survey",
-    "url": "/my-account/share-surveys/survey-selection",
-    "id": "b-item-5"
-  },
- {
-    "text": "Enter email address",
-    "url": "/my-account/share-surveys/recipient-email-address"
-  }
+    {
+        "text": "Surveys",
+        "url": "/surveys/todo",
+        "id": "b-item-1"
+    },
+    {
+        "text": "Account",
+        "url": "/my-account",
+        "id": "b-item-2"
+    },
+    {
+        "text": "Share Surveys",
+        "url": "/my-account/share-surveys",
+        "id": "b-item-3"
+    },
+    {
+        "text": "Select business",
+        "url": "/my-account/share-surveys/business-selection",
+        "id": "b-item-4"
+    },
+    {
+        "text": "Select survey",
+        "url": "/my-account/share-surveys/survey-selection",
+        "id": "b-item-5"
+    },
+    {
+        "text": "Enter email address",
+        "url": "/my-account/share-surveys/recipient-email-address"
+    }
 ] %}
 
-{% block breadcrumb %}
-{{
-    onsBreadcrumb({
-        "ariaLabel": "Breadcrumbs",
-        "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
-    })
-}}
-{% endblock breadcrumb %}
-
+{% block breadcrumbs %}
+    {{
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
+    }}
+{% endblock breadcrumbs %}
 
 {% block main %}
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            {% if category == "error" %}
-                {% call onsPanel({
-                "type": 'error',
-                "id": 'error-id',
-                "icon": 'error',
-                "classes": 'u-mb-m'
-                }) %}
-                    <p class="u-fs-r" id="flashed-error-message-{{ loop.index }}">{{ message }}</p>
-                {% endcall %}
-            {% else %}
-                {% call onsPanel({
-                "type": 'success',
-                "id": 'success-id',
-                "icon": 'check',
-                "classes": 'u-mb-m'
-                }) %}
-                    <p class="u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>
-                {% endcall %}
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-<h1 class="u-fs-xl">Send instructions</h1>
-<p>We will send an email to <b>{{ email }}</b> with instructions to access the following surveys:</p>
-{% for business in share_dict %}
-    <h2 class="u-fs-m">{{ share_dict[business].name }}</h2>
-    {% if share_dict[business] | length > 0 %}
-    <div class="text-indent">
-        <ul class="list list--bare">
-            {% for survey in share_dict[business].surveys %}
-                <li>{{ survey['longName'] }}</li>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category == "error" %}
+                    {% call onsPanel({
+                        "type": 'error',
+                        "id": 'error-id',
+                        "icon": 'error',
+                        "classes": 'u-mb-m'
+                    }) %}
+                        <p class="u-fs-r" id="flashed-error-message-{{ loop.index }}">{{ message }}</p>
+                    {% endcall %}
+                {% else %}
+                    {% call onsPanel({
+                        "type": 'success',
+                        "id": 'success-id',
+                        "icon": 'check',
+                        "classes": 'u-mb-m'
+                    }) %}
+                        <p class="u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>
+                    {% endcall %}
+                {% endif %}
             {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
-{% endfor %}
-<form action="" method="post">
+        {% endif %}
+    {% endwith %}
+    <h1 class="u-fs-xl">Send instructions</h1>
+    <p>We will send an email to <strong>{{ email }}</strong> with instructions to access the following surveys:</p>
+    {% for business in share_dict %}
+        <h2 class="u-fs-m">{{ share_dict[business].name }}</h2>
+        {% if share_dict[business] | length > 0 %}
+        <div class="text-indent">
+            <ul class="list list--bare">
+                {% for survey in share_dict[business].surveys %}
+                    <li>{{ survey['longName'] }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    {% endfor %}
+    <form action="" method="post">
         {{ form.csrf_token }}
         <input type="hidden" name="email_address" value="{{ email }}"/>
-        <p class="field u-mt-l">
-        <div class="btn-group">
-        {{
-            onsButton({
-            "text": "Send email",
-            "classes": 'btn-group__btn',
-            "submitType": "timer"
-            })
-        }}
-        <a href="{{ url_for('account_bp.share_survey_email_entry') }}"
-      role="button" class="btn btn--link btn--secondary"><span class="btn__inner">Cancel</span></a>
+        <div class="field u-mt-l">
+            <div class="btn-group">
+                {{ onsButton({
+                    "text": "Send email",
+                    "classes": 'btn-group__btn',
+                    "submitType": "timer"
+                    })
+                }}
+                <a href="{{ url_for('account_bp.share_survey_email_entry') }}"
+                    role="button" class="btn btn--link btn--secondary"><span class="btn__inner">Cancel</span></a>
+            </div>
         </div>
-    </p>
-</form>
-
+    </form>
 {% endblock main %}

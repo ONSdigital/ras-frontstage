@@ -31,8 +31,7 @@
             {% set errorTitle = 'This page has ' ~ form.errors|length ~' '~ 'error' %}
         {% endif %}
 
-        {% call
-            onsPanel({
+        {% call onsPanel({
                 "type": "error",
                 "classes": "u-mb-s",
                 "title":  errorTitle

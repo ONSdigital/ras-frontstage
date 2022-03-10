@@ -1,11 +1,12 @@
 
 {% from "components/lists/_macro.njk" import onsList %}
 {% from "components/panel/_macro.njk" import onsPanel %}
+
 {% set ns.optionError = false %}
+
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         {% for category, message in messages %}
-
             {% set ns.optionError = true %}
             {% if not ns.optionErrorMessage %}
                 {% if not ns.checkbox %}

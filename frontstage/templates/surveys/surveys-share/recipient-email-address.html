@@ -1,48 +1,51 @@
 {% extends "layouts/_block_content.html" %}
-{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/input/_macro.njk" import onsInput %}
 {% from "components/lists/_macro.njk" import onsList %}
+{% from "components/panel/_macro.njk" import onsPanel %}
 {% from "components/button/_macro.njk" import onsButton %}
 {% set page_title = "Survey share email entry" %}
 {% set breadcrumbsData = [
-  {
-    "text": "Surveys",
-    "url": "/surveys/todo",
-    "id": "b-item-1"
-  },
-  {
-    "text": "Account",
-    "url": "/my-account",
-    "id": "b-item-2"
-  },
-  {
-    "text": "Share Surveys",
-    "url": "/my-account/share-surveys",
-    "id": "b-item-3"
-  },
-  {
-    "text": "Select business",
-    "url": "/my-account/share-surveys/business-selection",
-    "id": "b-item-4"
-  },
- {
-    "text": "Select survey",
-    "url": "/my-account/share-surveys/survey-selection",
-    "id": "b-item-5"
-  }
+    {
+        "text": "Surveys",
+        "url": "/surveys/todo",
+        "id": "b-item-1"
+    },
+    {
+        "text": "Account",
+        "url": "/my-account",
+        "id": "b-item-2"
+    },
+    {
+        "text": "Share Surveys",
+        "url": "/my-account/share-surveys",
+        "id": "b-item-3"
+    },
+    {
+        "text": "Select business",
+        "url": "/my-account/share-surveys/business-selection",
+        "id": "b-item-4"
+    },
+    {
+        "text": "Select survey",
+        "url": "/my-account/share-surveys/survey-selection",
+        "id": "b-item-5"
+    }
 ] %}
-{% block breadcrumb %}
-{{
-    onsBreadcrumb({
-        "ariaLabel": "Breadcrumbs",
-        "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
-    })
-}}
-{% endblock breadcrumb %}
+
+{% block breadcrumbs %}
+    {{
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
+    }}
+{% endblock breadcrumbs %}
+
 {% block main %}
-{% if errors|length > 0 %}
+    {% if errors|length > 0 %}
         {% if errors|length == 1 %}
             {% set errorTitle = 'There is 1 error on this page' %}
         {% elif errors|length > 1 %}
@@ -76,48 +79,47 @@
         {% endcall %}
     {% endif %}
 
-<h1>Enter recipient's email address</h1>
-<p>We need the email address of the person who will be responding to your surveys.</p>
-{% set checkboxData = [] %}
-<form action="" method="post">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-        {% call onsPanel({}) %}
-            <div>
-                Make sure you have their permission to give us their email address.
-            </div>
-        {% endcall %}
+    <h1>Enter recipient's email address</h1>
+    <p>We need the email address of the person who will be responding to your surveys.</p>
+    {% set checkboxData = [] %}
+    <form action="" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        {{
+            onsPanel({
+                "body": '<p>Make sure you have their permission to give us their email address.</p>'
+            })
+        }}
         {% if errors.email_address %}
             {% set errorEmailAddress = { "text": errors['email_address'][0],  "id": 'email_address_error' } %}
             {% set emailAddress = form.email_address.data %}
-            {% endif %}
-            {{
-                onsInput({
-                    "id": "email_address",
-                    "name": "email_address",
-                    "type": "text",
-                    "label": {
-                        "text": "Enter email address"
-                    },
-                    "error": errorEmailAddress,
-                    "value": emailAddress,
-                })
-            }}
-        <p class="field u-mt-l">
-        <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
-            <div class="grid__col">
-                {{
-                    onsButton({
-                    "text": "Continue",
-                    "classes": 'btn btn-group__btn',
-                    "submitType": "timer"
-                    })
-                }}
-            </div>
-            <div class="grid__col u-ml-m">
-                <a href="{{ url_for('account_bp.share_survey_survey_select') }}">Cancel</a>
+        {% endif %}
+        {{
+            onsInput({
+                "id": "email_address",
+                "name": "email_address",
+                "type": "text",
+                "label": {
+                    "text": "Enter email address"
+                },
+                "error": errorEmailAddress,
+                "value": emailAddress,
+            })
+        }}
+        <div class="field u-mt-l">
+            <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
+                <div class="grid__col">
+                    {{
+                        onsButton({
+                        "text": "Continue",
+                        "classes": 'btn btn-group__btn',
+                        "submitType": "timer"
+                        })
+                    }}
+                </div>
+                <div class="grid__col u-ml-m">
+                    <a href="{{ url_for('account_bp.share_survey_survey_select') }}">Cancel</a>
+                </div>
             </div>
         </div>
-    </p>
-</form>
-
+    </form>
 {% endblock main %}

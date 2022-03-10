@@ -1,45 +1,47 @@
 {% extends "layouts/_block_content.html" %}
-{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/button/_macro.njk" import onsButton %}
 
 {% set page_title = "Share surveys overview" %}
 {% set breadcrumbsData = [
-  {
-    "text": "Surveys",
-    "url": "/surveys/todo",
-    "id": "b-item-1"
-  },
-  {
-    "text": "Account",
-    "url": "/my-account",
-    "id": "b-item-2"
-  },
+    {
+        "text": "Surveys",
+        "url": "/surveys/todo",
+        "id": "b-item-1"
+    },
+    {
+        "text": "Account",
+        "url": "/my-account",
+        "id": "b-item-2"
+    },
 ] %}
-{% block breadcrumb %}
-{{
-    onsBreadcrumb({
-        "ariaLabel": "Breadcrumbs",
-        "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
-    })
-}}
-{% endblock breadcrumb %}
+
+{% block breadcrumbs %}
+    {{
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
+    }}
+{% endblock breadcrumbs %}
+
 {% block main %}
-<h1>Share access to your surveys</h1>
-{% call onsPanel({}) %}
-    <div>
-       If you no longer want access to the surveys once you share them, you should  <a href="{{ url_for('account_bp.transfer_survey_overview') }}">transfer your surveys</a>.
-    </div>
-{% endcall %}
-<h2 class="u-fs-m u-mt-m">What will happen</h2>
-<ul>
-    <li>Select which surveys you want to share.</li>
-    <li>Enter the email address of the person who will be responding to these surveys.</li>
-    <li>We will email them the instructions to access the surveys.</li>
-    <li>Once we confirm their access, they will be able to respond to surveys on your behalf and share access with colleagues.</li>
-</ul>
-<p></p>
-<p class="field u-mt-l">
+    <h1>Share access to your surveys</h1>
+    {% call onsPanel({}) %}
+        <p>
+            If you no longer want access to the surveys once you share them, you should <a href="{{ url_for('account_bp.transfer_survey_overview') }}">transfer your surveys</a>.
+        </p>
+    {% endcall %}
+    <h2 class="u-fs-m u-mt-m">What will happen</h2>
+    <ul>
+        <li>Select which surveys you want to share.</li>
+        <li>Enter the email address of the person who will be responding to these surveys.</li>
+        <li>We will email them the instructions to access the surveys.</li>
+        <li>Once we confirm their access, they will be able to respond to surveys on your behalf and share access with colleagues.</li>
+    </ul>
+
+    <div class="field u-mt-l">
         <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
             <div class="grid__col">
                 <a href="{{ url_for('account_bp.share_survey_business_select') }}" role="button" class="btn btn--link btn-group__btn"><span class="btn__inner">Continue</span></a>
@@ -48,6 +50,5 @@
                 <a href="{{ url_for('account_bp.get_account') }}">Cancel</a>
             </div>
         </div>
-</p>
-
+    </div>
 {% endblock main %}

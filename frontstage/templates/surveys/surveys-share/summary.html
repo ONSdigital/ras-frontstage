@@ -1,34 +1,35 @@
 {% extends "layouts/_block_content.html" %}
-{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/input/_macro.njk" import onsInput %}
 {% from "components/lists/_macro.njk" import onsList %}
 {% from "components/button/_macro.njk" import onsButton %}
+
 {% set page_title = "Confirm survey access" %}
+
 {% block main %}
-<h1 class="u-fs-xl">Confirm survey access</h1>
-<p>Your colleague {{ shared_by }} wants to share access to the following surveys with you.
-You need to check the details are correct and then confirm access.</p>
-{% for business in share_dict %}
-<section class="u-mt-l u-mb-l">
-    <h2 class="u-fs-m u-mb-xs">{{ share_dict[business].name }}</h2>
-    <p class="u-mb-s">Trading as {{ share_dict[business]['trading_as'] }}</p>
-    <div class="text-indent">
-        <ul class="list list--bare">
-            {% for survey in share_dict[business]['surveys'] %}
-                <li>{{ survey['longName'] }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-</section>
-{% endfor %}
-<p>If there is an error please refer to the colleague who shared access.</p>
-<p>If you ignore this request the invitation will expire after 72 hours.</p>
+    <h1 class="u-fs-xl">Confirm survey access</h1>
+    <p>Your colleague {{ shared_by }} wants to share access to the following surveys with you.
+    You need to check the details are correct and then confirm access.</p>
+    {% for business in share_dict %}
+    <section class="u-mt-l u-mb-l">
+        <h2 class="u-fs-m u-mb-xs">{{ share_dict[business].name }}</h2>
+        <p class="u-mb-s">Trading as {{ share_dict[business]['trading_as'] }}</p>
+        <div class="text-indent">
+            <ul class="list list--bare">
+                {% for survey in share_dict[business]['surveys'] %}
+                    <li>{{ survey['longName'] }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+    {% endfor %}
+    <p>If there is an error please refer to the colleague who shared access.</p>
+    <p>If you ignore this request the invitation will expire after 72 hours.</p>
 
-<p class="field u-mt-l">
-    <div class="btn-group">
-        <a href="{{ url_for('account_bp.accept_share_surveys', batch=batch_no) }}" role="button" class="btn btn--primary" id="btn-accept-share-survey"><span class="btn__inner">Confirm access</span></a>
+    <div class="field u-mt-l">
+        <div class="btn-group">
+            <a href="{{ url_for('account_bp.accept_share_surveys', batch=batch_no) }}" role="button" class="btn btn--primary" id="btn-accept-share-survey"><span class="btn__inner">Confirm access</span></a>
+        </div>
     </div>
-</p>
-
 {% endblock main %}

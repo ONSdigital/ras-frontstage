@@ -10,15 +10,14 @@
 {% block content %}
 
 {% if errorType == "failed" %}
-        {% set errorMsg = 'Enter a valid enrolment code' %}
-        {% set errorMsgText = { "text": errorMsg, "id": 'enrolment_code_error' } %}
-        {% call
-            onsPanel({
-                "type": "error",
-                "classes": "u-mb-s",
-                "title":  "This page has 1 error"
-            })
-        %}
+    {% set errorMsg = 'Enter a valid enrolment code' %}
+    {% set errorMsgText = { "text": errorMsg, "id": 'enrolment_code_error' } %}
+    {% call onsPanel({
+            "type": "error",
+            "classes": "u-mb-s",
+            "title":  "This page has 1 error"
+        })
+    %}
         <p>This <strong>must be corrected</strong> to continue.</p>
         {% from "components/lists/_macro.njk" import onsList %}
         {{
@@ -34,8 +33,7 @@
                 ]
             })
         }}
-        {% endcall %}
-
+    {% endcall %}
 {% endif %}
 
 <section>
@@ -67,7 +65,7 @@
                 "id": "continue_button",
                 "submitType": "timer"
             })
-        }}        
+        }}
 
         <p>
             <a id="cancel_button" href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}">Cancel</a>

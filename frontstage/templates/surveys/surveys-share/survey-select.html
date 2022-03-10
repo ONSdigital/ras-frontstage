@@ -1,139 +1,142 @@
 {% extends "layouts/_block_content.html" %}
-{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/checkboxes/_macro.njk" import onsCheckboxes %}
 {% from "components/button/_macro.njk" import onsButton %}
 {% from "components/lists/_macro.njk" import onsList %}
-{% set page_title = "Survey share survey select" %}
-{% set breadcrumbsData = [
-  {
-    "text": "Surveys",
-    "url": "/surveys/todo",
-    "id": "b-item-1"
-  },
-  {
-    "text": "Account",
-    "url": "/my-account",
-    "id": "b-item-2"
-  },
-  {
-    "text": "Share Surveys",
-    "url": "/my-account/share-surveys",
-    "id": "b-item-3"
-  },
-  {
-    "text": "Select business",
-    "url": "/my-account/share-surveys/business-selection",
-    "id": "b-item-4"
-  }
-] %}
-{% block breadcrumb %}
-{{
-    onsBreadcrumb({
-        "ariaLabel": "Breadcrumbs",
-        "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
-    })
-}}
-{% endblock breadcrumb %}
-{% block main %}
-{% set ns = namespace (businesses = []) %}
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% if messages|length == 1 %}
-            {% set errorTitle = 'There is 1 error on this page' %}
-        {% elif messages|length > 1 %}
-            {% set errorTitle = 'There are ' ~ messages|length ~ ' errors on this page' %}
-        {% endif %}
-        {% call
-            onsPanel({
-                "type": "error",
-                "classes": "u-mb-s",
-                "title":  errorTitle
-            })
-        %}
-            {% set errorData = [] %}
-            {% for category, message in messages %}
-                {% do ns.businesses.append(category) %}
-                {% do errorData.append(
-                    {
-                        "text": message,
-                        "index": true,
-                        "url": "#option_error_"~category,
-                        "classes": "js-inpagelink"
-                    }
-                ) %}
-            {% endfor %}
-            {{
-                onsList({
-                    "classes": "list--bare",
-                    "itemsList": errorData
-                })
-            }}
-        {% endcall %}
-    {% endif %}
-{% endwith %}
 
-<h1>Which surveys do you want to share?</h1>
-<form action="" method="post">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-    {% for business in share_dict %}
-        {% set checkboxData = [] %}
-        {% if error == 'surveys_not_selected' and business in ns.businesses %}
-            {% set errorOption = { "text": 'You need to select a survey',  "id": 'option_error_'~business } %}
-        {% endif %}
-        {% if error == 'max_share_survey_exceeded' and business in ns.businesses %}
-            {% set errorOption = { "text": 'You have reached the maximum amount of emails you can enroll on one or more surveys.<br><br>
-        Deselect the survey/s to continue or call 0300 1234 931 to discuss your options.',  "id": 'option_error_'~business } %}
-        {% endif %}
-        {% set checkboxesData = {
-            "legend": share_dict[business].name,
-            "checkboxesLabel": "Select all that apply",
-            "error": errorOption,
-        } %}
-        {% for survey in share_dict[business].surveys %}
-            {% if survey['id'] in failed_surveys_list %}
-                {% set params = 'input--error' %}
-            {% else %}
-                {% set params = '' %}
+{% set page_title = "Survey share survey select" %}
+
+{% set breadcrumbsData = [
+    {
+        "text": "Surveys",
+        "url": "/surveys/todo",
+        "id": "b-item-1"
+    },
+    {
+        "text": "Account",
+        "url": "/my-account",
+        "id": "b-item-2"
+    },
+    {
+        "text": "Share Surveys",
+        "url": "/my-account/share-surveys",
+        "id": "b-item-3"
+    },
+    {
+        "text": "Select business",
+        "url": "/my-account/share-surveys/business-selection",
+        "id": "b-item-4"
+    }
+] %}
+
+{% block breadcrumbs %}
+    {{
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
+    }}
+{% endblock breadcrumbs %}
+
+{% block main %}
+    {% set ns = namespace (businesses = []) %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% if messages|length == 1 %}
+                {% set errorTitle = 'There is 1 error on this page' %}
+            {% elif messages|length > 1 %}
+                {% set errorTitle = 'There are ' ~ messages|length ~ ' errors on this page' %}
             {% endif %}
-            {% if survey['id'] in selected_survey_list %}
-                {% set checked = true %}
-            {% else %}
-                {% set checked = false %}
-            {% endif %}
-              {% do checkboxData.append(
-                  {
-                    "id": range(1, 10000) | random | string,
-                    "name": business,
-                    "label": {
-                        "text": survey['longName']
-                    },
-                    "value": survey['id'],
-                    "classes": params,
-                    "checked": checked
-                  }
-                ) %}
-            {% endfor %}
-            {% do checkboxesData | setAttribute("checkboxes", checkboxData) %}
-        {{ onsCheckboxes(checkboxesData) }}
-    {% endfor %}
-        <p class="field u-mt-l">
-        <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
-            <div class="grid__col">
+            {% call
+                onsPanel({
+                    "type": "error",
+                    "classes": "u-mb-s",
+                    "title":  errorTitle
+                })
+            %}
+                {% set errorData = [] %}
+                {% for category, message in messages %}
+                    {% do ns.businesses.append(category) %}
+                    {% do errorData.append(
+                        {
+                            "text": message,
+                            "index": true,
+                            "url": "#option_error_"~category,
+                            "classes": "js-inpagelink"
+                        }
+                    ) %}
+                {% endfor %}
                 {{
-                    onsButton({
-                    "text": "Continue",
-                    "classes": 'btn btn-group__btn',
-                    "submitType": "timer"
+                    onsList({
+                        "classes": "list--bare",
+                        "itemsList": errorData
                     })
                 }}
-            </div>
-            <div class="grid__col u-ml-m">
-                <a href="{{ url_for('account_bp.share_survey_business_select') }}">Cancel</a>
+            {% endcall %}
+        {% endif %}
+    {% endwith %}
+
+    <h1>Which surveys do you want to share?</h1>
+    <form action="" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        {% for business in share_dict %}
+            {% set checkboxData = [] %}
+            {% if error == 'surveys_not_selected' and business in ns.businesses %}
+                {% set errorOption = { "text": 'You need to select a survey',  "id": 'option_error_'~business } %}
+            {% endif %}
+            {% if error == 'max_share_survey_exceeded' and business in ns.businesses %}
+                {% set errorOption = { "text": 'You have reached the maximum amount of emails you can enroll on one or more surveys.<br><br>
+            Deselect the survey/s to continue or call 0300 1234 931 to discuss your options.',  "id": 'option_error_'~business } %}
+            {% endif %}
+            {% set checkboxesData = {
+                "legend": share_dict[business].name,
+                "checkboxesLabel": "Select all that apply",
+                "error": errorOption,
+            } %}
+            {% for survey in share_dict[business].surveys %}
+                {% if survey['id'] in failed_surveys_list %}
+                    {% set params = 'input--error' %}
+                {% else %}
+                    {% set params = '' %}
+                {% endif %}
+                {% if survey['id'] in selected_survey_list %}
+                    {% set checked = true %}
+                {% else %}
+                    {% set checked = false %}
+                {% endif %}
+                {% do checkboxData.append(
+                    {
+                        "id": range(1, 10000) | random | string,
+                        "name": business,
+                        "label": {
+                            "text": survey['longName']
+                        },
+                        "value": survey['id'],
+                        "classes": params,
+                        "checked": checked
+                    }
+                    ) %}
+                {% endfor %}
+                {% do checkboxesData | setAttribute("checkboxes", checkboxData) %}
+            {{ onsCheckboxes(checkboxesData) }}
+        {% endfor %}
+        <div class="field u-mt-l">
+            <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
+                <div class="grid__col">
+                    {{
+                        onsButton({
+                        "text": "Continue",
+                        "classes": 'btn btn-group__btn',
+                        "submitType": "timer"
+                        })
+                    }}
+                </div>
+                <div class="grid__col u-ml-m">
+                    <a href="{{ url_for('account_bp.share_survey_business_select') }}">Cancel</a>
+                </div>
             </div>
         </div>
-    </p>
-</form>
-
+    </form>
 {% endblock main %}

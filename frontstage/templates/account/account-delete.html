@@ -1,28 +1,30 @@
 {% extends "layouts/_block_content.html" %}
-{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/button/_macro.njk" import onsButton %}
 {% from "components/panel/_macro.njk" import onsPanel %}
 
 {% set page_title = "Account delete" %}
 {% set breadcrumbsData = [
-  {
-    "text": "Surveys",
-    "url": "/surveys/todo",
-    "id": "b-item"
-  }
+    {
+        "text": "Surveys",
+        "url": "/surveys/todo",
+        "id": "b-item"
+    }
 ] %}
-{% block breadcrumb %}
-{{
-    onsBreadcrumb({
-        "ariaLabel": "Breadcrumbs",
-        "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
-    })
-}}
-{% endblock breadcrumb %}
+
+{% block breadcrumbs %}
+    {{
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
+    }}
+{% endblock breadcrumbs %}
+
 {% block main %}
-{%- with messages = get_flashed_messages(category_filter=["info"]) -%}
+    {%- with messages = get_flashed_messages(category_filter=["info"]) -%}
         {%- if messages -%}
             {% call
                 onsPanel({
@@ -38,35 +40,35 @@
             {% endcall %}
         {%- endif -%}
     {%- endwith -%}
-{% if is_validated %}
-<h1 class="u-fs-xl">Delete account</h1>
-{% call onsPanel({
-        "type": 'warn'
-    })
-%}
-    <p>All of the information about your account will be deleted.</p>
-    <p>Once your data has been removed, it cannot be recovered.</p>
-    <p>You will not be able to set up a new account until you are selected for a new survey.</p>
-{% endcall %}
-{% endif %}
-<form action="" method="post">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-    <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
-        {% if is_validated %}
-        <div class="grid__col">
-            {{
-                onsButton({
-                "text": "Delete account",
-                "id": "btn-option-delete-account",
-                "classes": 'btn-group__btn',
-                "submitType": "timer",
-                })
-            }}
+    {% if is_validated %}
+        <h1 class="u-fs-xl">Delete account</h1>
+        {% call onsPanel({
+                "type": 'warn'
+            })
+        %}
+            <p>All of the information about your account will be deleted.</p>
+            <p>Once your data has been removed, it cannot be recovered.</p>
+            <p>You will not be able to set up a new account until you are selected for a new survey.</p>
+        {% endcall %}
+    {% endif %}
+    <form action="" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
+            {% if is_validated %}
+            <div class="grid__col">
+                {{
+                    onsButton({
+                    "text": "Delete account",
+                    "id": "btn-option-delete-account",
+                    "classes": 'btn-group__btn',
+                    "submitType": "timer",
+                    })
+                }}
+            </div>
+            {% endif %}
+            <div class="grid__col u-ml-m">
+                <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" id="btn-option-cancel">Cancel</a>
+            </div>
         </div>
-        {% endif %}
-        <div class="grid__col u-ml-m">
-            <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" id="btn-option-cancel">Cancel</a>
-        </div>
-    </div>
-</form>
+    </form>
 {% endblock main %}

@@ -1,92 +1,88 @@
 {% extends "layouts/_block_content.html" %}
-{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/button/_macro.njk" import onsButton %}
 
 {% set page_title = "Change email address" %}
 {% set breadcrumbsData = [
-  {
-    "text": "Surveys",
-    "url": "/surveys/todo",
-    "id": "b-item-1"
-  },
-  {
-    "text": "Account",
-    "url": "/my-account",
-    "id": "b-item-2"
-  },
-  {
-    "text": "Change your contact details",
-    "url": "/my-account/change-account-details",
-    "id": "b-item-3"
-  },
+    {
+        "text": "Surveys",
+        "url": "/surveys/todo",
+        "id": "b-item-1"
+    },
+    {
+        "text": "Account",
+        "url": "/my-account",
+        "id": "b-item-2"
+    },
+    {
+        "text": "Change your contact details",
+        "url": "/my-account/change-account-details",
+        "id": "b-item-3"
+    },
 ] %}
-{% block breadcrumb %}
-{{
-    onsBreadcrumb({
-        "ariaLabel": "Breadcrumbs",
-        "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
-    })
-}}
-{% endblock breadcrumb %}
+
+{% block breadcrumbs %}
+    {{
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
+    }}
+{% endblock breadcrumbs %}
+
 {% block main %}
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            {% if category == "error" %}
-                {% call onsPanel({
-                "type": 'error',
-                "id": 'error-id',
-                "icon": 'lock',
-                "classes": 'u-mb-m'
-                }) %}
-                    <p class="u-fs-r" id="flashed-error-message-{{ loop.index }}">{{ message }}</p>
-                {% endcall %}
-            {% else %}
-                {% call onsPanel({
-                "type": 'success',
-                "id": 'success-id',
-                "icon": 'check',
-                "classes": 'u-mb-m'
-                }) %}
-                    <p class="u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>
-                {% endcall %}
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-<h1 class="u-fs-xl">Change email address</h1>
-<p>You will need to authorise a change of email address.</p>
-<p>We will send a verification email to <b>{{ new_email }}</b>.</p>
-{% call onsPanel({}) %}
-    <div>
-        If you are longer required to respond to your surveys, you can <a href="{{ url_for('account_bp.transfer_survey_overview') }}">transfer your surveys </a>to a colleague.
-    </div>
-{% endcall %}
-<form action="{{ url_for('account_bp.change_email_address')}}" method="post">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category == "error" %}
+                    {% call onsPanel({
+                        "type": 'error',
+                        "id": 'error-id',
+                        "icon": 'lock',
+                        "classes": 'u-mb-m'
+                    }) %}
+                        <p class="u-fs-r" id="flashed-error-message-{{ loop.index }}">{{ message }}</p>
+                    {% endcall %}
+                {% else %}
+                    {% call onsPanel({
+                        "type": 'success',
+                        "id": 'success-id',
+                        "icon": 'check',
+                        "classes": 'u-mb-m'
+                    }) %}
+                        <p class="u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>
+                    {% endcall %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <h1 class="u-fs-xl">Change email address</h1>
+    <p>You will need to authorise a change of email address.</p>
+    <p>We will send a verification email to <strong>{{ new_email }}</strong>.</p>
+    {% call onsPanel({}) %}
+        <p>
+            If you are longer required to respond to your surveys, you can <a href="{{ url_for('account_bp.transfer_survey_overview') }}">transfer your surveys</a> to a colleague.
+        </p>
+    {% endcall %}
+    <form action="{{ url_for('account_bp.change_email_address')}}" method="post">
         {{ form.csrf_token }}
-
         <input type="hidden" name="email_address" value="{{ new_email }}"/>
-
-
-
-
-    <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
-        <div class="grid__col">
-          {{
-              onsButton({
-              "text": "Send verification email",
-              "id": "btn-option-send-email",
-              "classes": 'btn-group__btn',
-              "submitType": "timer"
-              })
-          }}
+        <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
+            <div class="grid__col">
+                {{
+                    onsButton({
+                    "text": "Send verification email",
+                    "id": "btn-option-send-email",
+                    "classes": 'btn-group__btn',
+                    "submitType": "timer"
+                    })
+                }}
+            </div>
+            <div class="grid__col u-ml-m">
+                <a href="{{ url_for('account_bp.change_account_details') }}" id="btn-option-send-email-cancel">Cancel</a>
+            </div>
         </div>
-        <div class="grid__col u-ml-m">
-        <a href="{{ url_for('account_bp.change_account_details') }}" id="btn-option-send-email-cancel">Cancel</a>
-        </div>
-    </div>
-</form>
-
+    </form>
 {% endblock main %}

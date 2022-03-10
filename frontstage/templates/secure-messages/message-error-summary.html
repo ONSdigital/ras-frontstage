@@ -10,7 +10,7 @@
         })
     %}
     <p>These <strong>must be corrected</strong> to continue.</p>
-    {% for error in errors %}        
+    {% for error in errors %}
         {% do errorData.append(
             {
                 "text": error,
@@ -25,7 +25,7 @@
         onsList({
             "classes": "list--bare",
             "itemsList": errorData
-        }) 
+        })
     }}
     {% endcall %}
 {% endif %}

@@ -108,7 +108,6 @@ def login():  # noqa: C901
         session.set_unread_message_total(count)
         bound_logger.info("Successfully created session", session_key=session.session_key)
         return response
-
     template_data = {"error": {"type": form.errors, "logged_in": "False"}, "account_activated": account_activated}
     if request.args.get("next"):
         return render_template("sign-in/sign-in.html", form=form, data=template_data, next=request.args.get("next"))

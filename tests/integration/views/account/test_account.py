@@ -161,7 +161,7 @@ class TestSurveyList(unittest.TestCase):
         self.assertTrue("Change your password".encode() in response.data)
         self.assertTrue("Enter your current password".encode() in response.data)
         self.assertTrue("Your password must have:".encode() in response.data)
-        self.assertTrue("at least 8 characters".encode() in response.data)
+        self.assertTrue("at least 12 characters".encode() in response.data)
         self.assertTrue("at least 1 uppercase letter".encode() in response.data)
         self.assertTrue("at least 1 symbol (eg: ?!£%)".encode() in response.data)
         self.assertTrue("at least 1 number".encode() in response.data)

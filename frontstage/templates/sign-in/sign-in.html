@@ -83,6 +83,22 @@
         {%- endif -%}
     {%- endwith -%}
 
+    {%- with messages = get_flashed_messages(category_filter=["success"]) -%}
+        {%- if messages -%}
+            {% call
+                onsPanel({
+                    "type": 'success',
+                    "classes": "u-mb-s",
+                    "icon": "check",
+                })
+            %}
+                    {%- for message in messages -%}
+                        <p>{{ message }}</p>
+                    {%- endfor -%}
+            {% endcall %}
+        {%- endif -%}
+    {%- endwith -%}
+
     <form method="post" class="form" action="{{ url_for('sign_in_bp.login', next=next) }}" role="form">
         {{ form.csrf_token }}
 

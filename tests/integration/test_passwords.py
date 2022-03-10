@@ -21,6 +21,7 @@ encoded_invalid_email = "abcd"
 url_resend_password_email_expired_token = (
     f"{TestingConfig.PARTY_URL}/party-api/v1" f"/resend-password-email-expired-token/{token}"
 )
+url_update_verification_token = f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/update_verification_tokens"
 
 
 class TestPasswords(unittest.TestCase):
@@ -45,6 +46,9 @@ class TestPasswords(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.post(url_reset_password_request, status_code=200)
         mock_request.get(url_get_respondent_by_email, status_code=200, json={"firstName": "Bob", "id": "123456"})
+        mock_request.post(
+            url_update_verification_token, status_code=200, json={"message": "Successfully updated token"}
+        )
 
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
 
@@ -261,6 +265,9 @@ class TestPasswords(unittest.TestCase):
         )
         with app.app_context():
             token = verification.generate_email_token("test@test.com")
+        mock_request.post(
+            url_update_verification_token, status_code=200, json={"message": "Successfully updated token"}
+        )
         response = self.app.get(f"passwords/resend-password-email-expired-token/{token}", follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         mock_notify.assert_called_once()

@@ -56,7 +56,7 @@ def add_survey(party_id, enrolment_code):
     logger.info("Successfully added a survey", party_id=party_id)
 
 
-def change_password(email, password, token):
+def change_password(email, password, token=None):
     bound_logger = logger.bind(email=obfuscate_email(email))
     bound_logger.info("Attempting to change password through the party service")
 

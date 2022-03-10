@@ -3,10 +3,8 @@ kind: BackendConfig
 metadata:
   name: frontstage-backend-config
 spec:
-  {{- if not .Values.public }}
   securityPolicy:
-    name: "ras-cloud-armor-policy"
+    name: {{ .Values.armorPolicy }}
   sessionAffinity: 
     affinityType: CLIENT_IP
-  {{- end }}
   timeoutSec: {{ .Values.ingress.timeoutSec }}

@@ -1,6 +1,6 @@
 import logging
 
-from flask import flash, make_response, redirect, request, url_for
+from flask import flash, get_flashed_messages, make_response, redirect, request, url_for
 from structlog import wrap_logger
 
 from frontstage.common.session import Session
@@ -11,13 +11,17 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 @sign_in_bp.route("/logout")
 def logout():
+    flashed_messages = get_flashed_messages(with_categories=True)
     # Delete user session in redis
     session_key = request.cookies.get("authorization")
     session = Session.from_session_key(session_key)
     session.delete_session()
+    if len(flashed_messages) > 0:
+        for category, message in flashed_messages:
+            flash(message=message, category=category)
     if request.args.get("csrf_error"):
         flash("To help protect your information we have signed you out.", "info")
     # Delete session cookie
     response = make_response(redirect(url_for("sign_in_bp.login", next=request.args.get("next"))))
-    response.set_cookie("authorization", value="", expires=0)
+    response.delete_cookie("authorization")
     return response

@@ -26,7 +26,7 @@ lint:
 	pipenv run black --line-length 120 .
 	pipenv run flake8
 
-lint-check:
+lint-check: load-design-system-templates
 	pipenv check
 	pipenv run isort . --check-only
 	pipenv run black --line-length 120 --check .
@@ -34,7 +34,7 @@ lint-check:
 
 test: lint-check unit-tests integration-tests
 
-unit-tests: load-design-system-templates
+unit-tests:
 	APP_SETTINGS=TestingConfig pipenv run pytest $(UNIT_TESTS) --cov frontstage --cov-report term-missing
 
 integration-tests:

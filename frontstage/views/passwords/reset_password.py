@@ -46,7 +46,8 @@ def post_reset_password(token):
     try:
         duration = app.config["EMAIL_TOKEN_EXPIRY"]
         email = verification.decode_email_token(token, duration)
-        party_controller.change_password(email, password)
+        party_controller.change_password(email, password, token)
+    #     TODO: remove old token
     except ApiError as exc:
         if exc.status_code == 409:
             logger.warning("Token expired", api_url=exc.url, api_status_code=exc.status_code, token=token)
@@ -76,6 +77,7 @@ def reset_password_check_email():
 @passwords_bp.route("/resend-password-email-expired-token/<token>", methods=["GET"])
 def resend_password_email_expired_token(token):
     email = verification.decode_email_token(token)
+    # TODO: remove old token
     return request_password_change(email)
 
 
@@ -101,6 +103,8 @@ def request_password_change(email):
     personalisation = {"RESET_PASSWORD_URL": verification_url, "FIRST_NAME": respondent["firstName"]}
 
     logger.info("Reset password url", url=verification_url, party_id=party_id)
+
+    party_controller.update_verification_token(party_id, token)
 
     try:
         NotifyGateway(app.config).request_to_notify(email=email, personalisation=personalisation, reference=party_id)

@@ -56,11 +56,11 @@ def add_survey(party_id, enrolment_code):
     logger.info("Successfully added a survey", party_id=party_id)
 
 
-def change_password(email, password):
+def change_password(email, password, token):
     bound_logger = logger.bind(email=obfuscate_email(email))
     bound_logger.info("Attempting to change password through the party service")
 
-    data = {"email_address": email, "new_password": password}
+    data = {"email_address": email, "new_password": password, "token": token}
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/change_password"
     response = requests.put(url, auth=app.config["BASIC_AUTH"], json=data)
 
@@ -201,12 +201,12 @@ def resend_account_email_change_expired_token(token):
     logger.info("Successfully re-sent verification email", token=token)
 
 
-def reset_password_request(username):
+def reset_password_request(username, token):
     bound_logger = logger.bind(email=obfuscate_email(username))
     bound_logger.info("Attempting to send reset password request to party service")
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/request_password_change"
-    data = {"email_address": username}
+    data = {"email_address": username, "token": token}
     response = requests.post(url, auth=app.config["BASIC_AUTH"], json=data)
 
     try:
@@ -713,5 +713,31 @@ def get_business_by_ru_ref(ru_ref: str):
         raise ApiError(logger, response)
 
     logger.info("Successfully retrieved business by ru_ref", ru_ref=ru_ref)
+
+    return response.json()
+
+
+def update_verification_token(party_id, token):
+    """
+    Gives call to party service to link a respondent to their email verification token
+    :param party_id: the respondent's id
+    :param token: the verification token
+    """
+    logger.info("Attempting to update respondent verification token", party_id=party_id)
+
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/update_verification_tokens"
+    payload = {
+        "party_id": party_id,
+        "token": token,
+    }
+    response = requests.post(url, auth=app.config["BASIC_AUTH"], json=payload)
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        logger.error("Failed to update respondent verification token", party_id=party_id)
+        raise ApiError(logger, response)
+
+    logger.info("Successfully updated respondent verification token", party_id=party_id)
 
     return response.json()

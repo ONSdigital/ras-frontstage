@@ -44,8 +44,10 @@
       </svg></a></p>
 
     <h2>Did this answer your question?</h2>
-    <div class="ons-btn-group">
-        <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" role="button" class="ons-btn ons-btn--link ons-btn-group__btn"><span class="ons-btn_inner">Yes</span></a>
-        <a href="{{ url_for('surveys_bp.get_send_help_message_page', option=option,sub_option='exemption-completing-survey') }}" role="button" class="ons-btn ons-btn--link ons-btn--secondary ons-btn-group__btn"><span class="ons-btn_inner">No</span></a>
-    </div>
+    <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" role="button" class="ons-btn ons-btn--link ons-js-submit-btn">
+        <span class="ons-btn__inner">Yes</span>
+    </a>
+    <a href="{{ url_for('surveys_bp.get_send_help_message_page', option=option, sub_option='exemption-completing-survey') }}" role="button" class="ons-btn ons-btn--link ons-btn--secondary">
+        <span class="ons-btn__inner">No</span>
+    </a>
 {% endblock main %}

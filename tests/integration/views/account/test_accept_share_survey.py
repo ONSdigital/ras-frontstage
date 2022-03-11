@@ -216,8 +216,8 @@ class TestAcceptShareSurvey(unittest.TestCase):
         data = {
             "first_name": "test",
             "last_name": "test",
-            "password": "Test!129",
-            "password_confirm": "Test!129",
+            "password": "Test!129Test",
+            "password_confirm": "Test!129Test",
             "phone_number": "07456534567",
         }
 

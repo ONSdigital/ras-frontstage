@@ -101,3 +101,7 @@ ENV/
 
 # pyenv
 .python-version
+
+# Design System templates
+frontstage/templates/components
+frontstage/templates/layout

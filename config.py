@@ -43,7 +43,7 @@ class Config(object):
 
     PASSWORD_MATCH_ERROR_TEXT = "Your passwords do not match"
     PASSWORD_CRITERIA_ERROR_TEXT = "Your password doesn't meet the requirements"
-    PASSWORD_MIN_LENGTH = 8
+    PASSWORD_MIN_LENGTH = 12
     PASSWORD_MAX_LENGTH = 160
 
     AUTH_URL = os.getenv("AUTH_URL")

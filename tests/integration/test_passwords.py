@@ -46,9 +46,7 @@ class TestPasswords(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.post(url_reset_password_request, status_code=200)
         mock_request.get(url_get_respondent_by_email, status_code=200, json={"firstName": "Bob", "id": "123456"})
-        mock_request.post(
-            url_update_verification_token, status_code=200, json={"message": "Successfully updated token"}
-        )
+        mock_request.put(url_update_verification_token, status_code=200, json={"message": "Successfully updated token"})
 
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
 
@@ -265,9 +263,8 @@ class TestPasswords(unittest.TestCase):
         )
         with app.app_context():
             token = verification.generate_email_token("test@test.com")
-        mock_request.post(
-            url_update_verification_token, status_code=200, json={"message": "Successfully updated token"}
-        )
+        mock_request.put(url_update_verification_token, status_code=200, json={"message": "Successfully updated token"})
+        # mock_request.put(url_update_verification_token_update_verification_token, status_code=200, )
         response = self.app.get(f"passwords/resend-password-email-expired-token/{token}", follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         mock_notify.assert_called_once()

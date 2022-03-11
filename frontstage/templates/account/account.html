@@ -25,17 +25,17 @@
 {% block main %}
     {% set ns = namespace() %}
     {% include "radio-option-select-error-panel.html" %}
-    <h1 class="u-fs-xl">Account details</h1>
-    <dl class="metadata metadata__list grid grid--gutterless u-cf u-mb-l" title="" aria-label="">
-    <dt class="metadata__term grid__col col-4@m">Name:</dt>
-    <dd class="metadata__value grid__col col-8@m">{{ respondent.firstName }} {{ respondent.lastName }}</dd>
-    <dt class="metadata__term grid__col col-4@m">Email address:</dt>
-    <dd class="metadata__value grid__col col-8@m">{{ respondent.emailAddress }}</dd>
-    <dt class="metadata__term grid__col col-4@m">Phone number:</dt>
-    <dd class="metadata__value grid__col col-8@m">{{ respondent.telephone }}</dd>
+    <h1 class="ons-u-fs-xl">Account details</h1>
+    <dl class="ons-metadata ons-metadata__list ons-grid ons-grid--gutterless ons-u-cf ons-u-mb-l" title="" aria-label="">
+    <dt class="ons-metadata__term ons-grid__col ons-col-4@m">Name:</dt>
+    <dd class="ons-metadata__value ons-grid__col ons-col-8@m">{{ respondent.firstName }} {{ respondent.lastName }}</dd>
+    <dt class="ons-metadata__term ons-grid__col ons-col-4@m">Email address:</dt>
+    <dd class="ons-metadata__value ons-grid__col ons-col-8@m">{{ respondent.emailAddress }}</dd>
+    <dt class="ons-metadata__term ons-grid__col ons-col-4@m">Phone number:</dt>
+    <dd class="ons-metadata__value ons-grid__col ons-col-8@m">{{ respondent.telephone }}</dd>
     </dl>
-        <hr class="u-mb-l">
-    <h1 class="u-fs-xl">Help with your account</h1>
+        <hr class="ons-u-mb-l">
+    <h1 class="ons-u-fs-xl">Help with your account</h1>
     <form action="{{ url_for('account_bp.update_account')}}" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             {% if ns.optionError %}
@@ -97,18 +97,18 @@
                 onsRadios(radioComponent)
             }}
 
-        <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
-            <div class="grid__col">
+        <div class="ons-grid ons-grid--flex ons-grid--gutterless ons-grid--vertical-center ons-grid--no-wrap@s ons-u-mt-m ons-u-mb-m">
+            <div class="ons-grid__col">
                 {{
                     onsButton({
-                    "text": "Continue",
-                    "id": "btn-option-continue",
-                    "classes": 'btn-group__btn',
-                    "submitType": "timer"
+                        "text": "Continue",
+                        "id": "btn-option-continue",
+                        "classes": 'ons-btn-group__btn',
+                        "submitType": "timer"
                     })
                 }}
             </div>
-            <div class="grid__col u-ml-m">
+            <div class="ons-grid__col ons-u-ml-m">
                 <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" id="btn-option-cancel">Cancel</a>
             </div>
         </div>

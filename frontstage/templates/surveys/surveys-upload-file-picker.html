@@ -5,7 +5,6 @@
         method="post"
         action="{{ url_for('surveys_bp.upload_survey', case_id=case_id, business_party_id=business_info.id, survey_short_name=survey_info.shortName) }}"
         id="surveys_upload_form"
-        class="form"
         role="form"
         enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -36,7 +35,7 @@
         onsButton({
             "text": "Upload",
             "type": "submit",
-            "classes": "u-mt-s",
+            "classes": "ons-u-mt-s",
             "id": "upload_survey_button",
             "submitType": "loader",
             "attributes": {

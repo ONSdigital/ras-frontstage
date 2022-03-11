@@ -9,18 +9,18 @@
 
 {% block main %}
     {% call onsPanel({
-            "classes": "u-mb-s u-d-no cookies-confirmation-message",
+            "classes": "ons-u-mb-s ons-u-d-no cookies-confirmation-message",
             "type": "success"
         })
     %}
-        <p class="u-fs-r-b">Your cookie settings have been saved</p>
+        <p class="ons-u-fs-r-b">Your cookie settings have been saved</p>
         <p>Some parts of surveys.ons.gov.uk may use additional cookies and will have their own cookie policy and banner.</p>
     {% endcall %}
-    <h1 class="u-fs-xxl">Cookies on surveys.ons.gov.uk</h1>
+    <h1 class="ons-u-fs-xxl">Cookies on surveys.ons.gov.uk</h1>
     <p>Cookies are small files saved on your phone, tablet or computer when you visit a website.</p>
     <p>We use cookies to store information about how you use this service, such as the pages you visit.</p>
     <h2>Cookie settings</h2>
-    <div class="u-db-no-js_enabled">
+    <div class="ons-u-db-no-js_enabled">
         <p>We use JavaScript to set our cookies. Javascript is not running on your browser so you cannot change your settings.</p>
         <p>You can try:</p>
         <ul>
@@ -28,7 +28,7 @@
             <li>reloading the page in case there was a temporary fault with JavaScript</li>
         </ul>
     </div>
-    <div class="u-db-no-js_disabled">
+    <div class="ons-u-db-no-js_disabled">
         <p>We use three types of cookie. You can choose which cookies you're happy for us to use.</p>
         <form data-module="cookie-settings">
             <h3>Cookies that measure website use</h3>
@@ -40,7 +40,7 @@
             </ul>
             {% call onsCollapsible({
                 "id": "cookies-measure-website-use-details",
-                "classes": "u-mb-s",
+                "classes": "ons-u-mb-s",
                 "title": "Learn more about these Google Analytics cookies",
                 "button": {
                     "close": "Hide this",
@@ -105,12 +105,12 @@
                 }}
             {% endcall %}
             <p>We do not allow Google to use or share the data about how you use this site.</p>
-            <div class="u-mb-s">
+            <div class="ons-u-mb-s">
                 {{ onsRadios({
                     "id": "cookies-measure-website-use",
                     "name": "cookies-usage",
                     "legend": "Do you want to allow usage tracking?",
-                    "legendClasses": "u-vh",
+                    "legendClasses": "ons-u-vh",
                     "radios": [
                         {
                             "id": "on-1",
@@ -137,7 +137,7 @@
                 "id": "cookies-measure-website-comms",
                 "name": "cookies-campaigns",
                 "legend": "Do you want to allow communications tracking?",
-                "legendClasses": "u-vh",
+                "legendClasses": "ons-u-vh",
                 "radios": [
                     {
                         "id": "on-2",
@@ -155,13 +155,13 @@
                     }
                 ]
             }) }}
-            <h3 class="u-mt-l">Cookies that remember your settings</h3>
+            <h3 class="ons-u-mt-l">Cookies that remember your settings</h3>
             <p>These cookies do things like remember your preferences and the choices you make, to personalise your experience of using the site.</p>
             {{ onsRadios({
                 "id": "cookies-measure-website-settings",
                 "name": "cookies-settings",
                 "legend": "Do you want to allow settings?",
-                "legendClasses": "u-vh",
+                "legendClasses": "ons-u-vh",
                 "radios": [
                     {
                         "id": "on-3",
@@ -179,7 +179,7 @@
                     }
                 ]
             }) }}
-            <h3 class="u-mt-l">Strictly necessary cookies</h3>
+            <h3 class="ons-u-mt-l">Strictly necessary cookies</h3>
             <p>These essential cookies do things like:</p>
             <ul>
                 <li>remember the notifications you've seen so we do not show them to you again</li>
@@ -188,7 +188,7 @@
             <p>They always need to be on.</p>
             {% call onsCollapsible({
                 "id": "cookies-essential-details",
-                "classes": "u-mb-l",
+                "classes": "ons-u-mb-l",
                 "title": "Learn more about these essential cookies",
                 "button": {
                     "close": "Hide this",

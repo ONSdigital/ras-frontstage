@@ -28,7 +28,7 @@
         {%- if messages -%}
             {% call
                 onsPanel({
-                    "classes": "u-mb-s",
+                    "classes": "ons-u-mb-s",
                 })
             %}
                 <div id="delete-error">
@@ -41,7 +41,7 @@
         {%- endif -%}
     {%- endwith -%}
     {% if is_validated %}
-        <h1 class="u-fs-xl">Delete account</h1>
+        <h1 class="ons-u-fs-xl">Delete account</h1>
         {% call onsPanel({
                 "type": 'warn'
             })
@@ -53,20 +53,20 @@
     {% endif %}
     <form action="" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-        <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
+        <div class="ons-grid ons-grid--flex ons-grid--gutterless ons-grid--vertical-center ons-grid--no-wrap@s ons-u-mt-m ons-u-mb-m">
             {% if is_validated %}
-            <div class="grid__col">
+            <div class="ons-grid__col">
                 {{
                     onsButton({
-                    "text": "Delete account",
-                    "id": "btn-option-delete-account",
-                    "classes": 'btn-group__btn',
-                    "submitType": "timer",
+                        "text": "Delete account",
+                        "id": "btn-option-delete-account",
+                        "classes": 'ons-btn-group__btn',
+                        "submitType": "timer"
                     })
                 }}
             </div>
             {% endif %}
-            <div class="grid__col u-ml-m">
+            <div class="ons-grid__col ons-u-ml-m">
                 <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" id="btn-option-cancel">Cancel</a>
             </div>
         </div>

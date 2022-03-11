@@ -11,18 +11,18 @@
                         "type": 'error',
                         "id": 'error-id',
                         "icon": 'lock',
-                        "classes": 'u-mb-m'
+                        "classes": 'ons-u-mb-m'
                     }) %}
-                        <p class="u-fs-r" id="flashed-error-message-{{ loop.index }}">{{ message }}</p>
+                        <p class="ons-u-fs-r" id="flashed-error-message-{{ loop.index }}">{{ message }}</p>
                     {% endcall %}
                 {% else %}
                     {% call onsPanel({
                         "type": 'success',
                         "id": 'success-id',
                         "icon": 'check',
-                        "classes": 'u-mb-m'
+                        "classes": 'ons-u-mb-m'
                     }) %}
-                        <p class="u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>
+                        <p class="ons-u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>
                     {% endcall %}
                 {% endif %}
             {% endfor %}
@@ -33,7 +33,7 @@
     {% if added_survey %}
         {% call onsPanel({
             "type": "success",
-            "classes": "u-mb-s"
+            "classes": "ons-u-mb-s"
         }) %}
                 Your <a id="NEW_SURVEY_NOTIF" href="#new-survey">new survey</a> has been added.
         {% endcall %}
@@ -41,7 +41,7 @@
 
     {% if already_enrolled %}
         {% call onsPanel({
-            "classes": "u-mb-s"
+            "classes": "ons-u-mb-s"
         }) %}
                 <div id="ALREADY_ADDED_NOTIF">You have already added that <a href="#new-survey">survey</a> </div>
         {% endcall %}
@@ -54,13 +54,13 @@
         }}
     {% endif %}
 
-    <p class="u-fs-r u-mt-s u-mb-l">
+    <p class="ons-u-fs-r ons-u-mt-s ons-u-mb-l">
         Click on the survey name to complete your questionnaire.
     </p>
 
     {% set emptySurveyListLabel = 'You have no surveys to complete' %}
     {% include "surveys/surveys.html" %}
-    <p class="u-fs-r u-mt-s u-mb-l">
+    <p class="ons-u-fs-r ons-u-mt-s ons-u-mb-l">
         Need to add a new survey? Use your enrolment code to <a id="add_survey_button" href="{{ url_for('surveys_bp.add_survey') }}">add a new survey to your account</a>.
     </p>
 {% endblock content %}

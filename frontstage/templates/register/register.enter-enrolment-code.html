@@ -14,7 +14,7 @@
         {% call
             onsPanel({
                 "type": "error",
-                "classes": "u-mb-s",
+                "classes": "ons-u-mb-s",
                 "title":  "This page has 1 error"
             })
         %}
@@ -22,13 +22,13 @@
         {% from "components/lists/_macro.njk" import onsList %}
         {{
             onsList({
-                "classes": "list--bare",
+                "classes": "ons-list--bare",
                 "itemsList": [
                     {
                         "text": errorMsg,
                         "index": true,
                         "url": "#enrolment_code_error",
-                        "classes": "js-inpagelink"
+                        "classes": "ons-js-inpagelink"
                     }
                 ]
             })
@@ -39,11 +39,10 @@
     <form
             method="post"
             action="{{ url_for('register_bp.register') }}"
-            class="form"
             role="form">
         {{ form.csrf_token }}
 
-        <h1 class="u-fs-xl">Create an account</h1>
+        <h1 class="ons-u-fs-xl">Create an account</h1>
 
         {{
             onsInput({
@@ -62,7 +61,7 @@
             onsButton({
                 "text": "Continue",
                 "type": "submit",
-                "classes": "u-mt-l u-mb-s",
+                "classes": "ons-u-mt-l ons-u-mb-s",
                 "id": "continue_button",
                 "submitType": "timer"
             })

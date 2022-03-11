@@ -18,7 +18,7 @@
         {% call
             onsPanel({
                 "type": "error",
-                "classes": "u-mb-s",
+                "classes": "ons-u-mb-s",
                 "title":  errorTitle
             })
         %}
@@ -31,13 +31,13 @@
                         "text": 'Problem with the ' ~ error_text.replace('_', ' '),
                         "index": true,
                         "url": "#" ~ error ~ '_error',
-                        "classes": "js-inpagelink"
+                        "classes": "ons-js-inpagelink"
                     }
                 ) %}
             {% endfor %}
             {{
                 onsList({
-                    "classes": "list--bare",
+                    "classes": "ons-list--bare",
                     "itemsList": errorData
                 })
             }}
@@ -45,12 +45,11 @@
     {% endif %}
         <form
             method="post"
-            class="form"
             role="form"
             onsubmit="formSubmitted(event);">
             {{ form.csrf_token }}
 
-        <h1 class="u-fs-xl">Create an account</h1>
+        <h1 class="ons-u-fs-xl">Create an account</h1>
         <p>Enter your account details for <strong>{{ email }}</strong>.</p>
         {{ form.email }}
         {{ form.batch_no }}
@@ -59,7 +58,7 @@
 
         {%- call onsFieldset({
             "legend": "Your name",
-            "legendClasses": "u-vh"
+            "legendClasses": "ons-u-vh"
         }) -%}
             {% if errors.first_name %}
                 {% set errorFirstName = { "text": errors['first_name'][0],  "id": 'first_name_error' } %}
@@ -92,7 +91,7 @@
                 })
             }}
         {% endcall %}
-        <h2 class="u-mt-l">Create a password</h2>
+        <h2 class="ons-u-mt-l">Create a password</h2>
         <p>Your password must have:</p>
         <ul>
             <li>at least 12 characters </li>
@@ -102,7 +101,7 @@
         </ul>
         {%- call onsFieldset({
             "legend": "Create a password",
-            "legendClasses": "u-vh"
+            "legendClasses": "ons-u-vh"
         }) -%}
             {% if errors.password %}
                 {% set errorPassword = { "text": errors['password'][0],  "id": 'password_error' } %}
@@ -134,11 +133,11 @@
 
         {% endcall %}
         
-        <h2 class="u-mt-l">Contact telephone number</h2>
+        <h2 class="ons-u-mt-l">Contact telephone number</h2>
         <p>We'll use this number if we need to discuss any survey information provided</p>
         {%- call onsFieldset({
             "legend": "Create a password",
-            "legendClasses": "u-vh"
+            "legendClasses": "ons-u-vh"
         }) -%}
             {% if errors.phone_number %}
                 {% set errorPhoneNumber = { "text": errors['phone_number'][0],  "id": 'phone_number_error' } %}
@@ -159,13 +158,13 @@
                 })
             }}
         {% endcall %}
-        <h3 class="u-mt-l">Privacy notice</h3>
+        <h3 class="ons-u-mt-l">Privacy notice</h3>
             <p>Your user account will be deleted after 36 months of inactivity</p>
         {{
             onsButton({
                 "text": "Continue",
                 "type": "submit",
-                "classes": "u-mt-l u-mb-s",
+                "classes": "ons-u-mt-l ons-u-mb-s",
                 "id": "continue_button",
                 "submitType": "timer"
             })

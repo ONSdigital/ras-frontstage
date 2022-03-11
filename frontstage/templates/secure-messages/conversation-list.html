@@ -9,7 +9,7 @@
         {% if messages %}
             {% call onsPanel ({
                 "type":"success",
-                "classes": "u-mb-s",
+                "classes": "ons-u-mb-s",
                 "bodyAttributes": {
                     "data-qa": "success-body"
                 }
@@ -20,7 +20,7 @@
             {% endcall %}
         {% endif %}
     {% endwith %}
-    <section class="u-mb-s">
+    <section class="ons-u-mb-s">
         {% from "components/section-navigation/_macro.njk" import onsSectionNavigation %}
         {{
             onsSectionNavigation({

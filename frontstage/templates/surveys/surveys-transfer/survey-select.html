@@ -49,7 +49,7 @@
             {% call
                 onsPanel({
                     "type": "error",
-                    "classes": "u-mb-s",
+                    "classes": "ons-u-mb-s",
                     "title":  errorTitle
                 })
             %}
@@ -61,13 +61,13 @@
                             "text": message,
                             "index": true,
                             "url": "#option_error_"~category,
-                            "classes": "js-inpagelink"
+                            "classes": "ons-js-inpagelink"
                         }
                     ) %}
                 {% endfor %}
                 {{
                     onsList({
-                        "classes": "list--bare",
+                        "classes": "ons-list--bare",
                         "itemsList": errorData
                     })
                 }}
@@ -119,18 +119,18 @@
                 {% do checkboxesData | setAttribute("checkboxes", checkboxData) %}
             {{ onsCheckboxes(checkboxesData) }}
         {% endfor %}
-        <div class="field u-mt-l">
-            <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
-                <div class="grid__col">
+        <div class="ons-field ons-u-mt-l">
+            <div class="ons-grid ons-grid--flex ons-grid--gutterless ons-grid--vertical-center ons-grid--no-wrap@s ons-u-mt-m ons-u-mb-m">
+                <div class="ons-grid__col">
                     {{
                         onsButton({
                             "text": "Continue",
-                            "classes": 'btn btn-group__btn',
+                            "classes": 'ons-btn ons-btn-group__btn',
                             "submitType": "timer"
                         })
                     }}
                 </div>
-                <div class="grid__col u-ml-m">
+                <div class="ons-grid__col ons-u-ml-m">
                     <a href="{{ url_for('account_bp.transfer_survey_business_select') }}">Cancel</a>
                 </div>
             </div>

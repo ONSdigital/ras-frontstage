@@ -18,7 +18,7 @@
                     "text": "Incorrect email or password",
                     "index": true,
                     "url": "#username_error",
-                    "classes": "js-inpagelink"
+                    "classes": "ons-js-inpagelink"
                 }
             ) %}
         {% elif errorType|length > 1 %}
@@ -29,7 +29,7 @@
                         "text": errorType[error][0],
                         "index": true,
                         "url": "#username_error",
-                        "classes": "js-inpagelink"
+                        "classes": "ons-js-inpagelink"
                     }
                 ) %}
             {% endfor %}
@@ -41,7 +41,7 @@
                         "text": errorType[error][0],
                         "index": true,
                         "url": "#username_error",
-                        "classes": "js-inpagelink"
+                        "classes": "ons-js-inpagelink"
                     }
                 ) %}
             {% endfor %}
@@ -50,7 +50,7 @@
         {% call
             onsPanel({
                 "type": "error",
-                "classes": "u-mb-s",
+                "classes": "ons-u-mb-s",
                 "title":  errorTitle
             })
         %}
@@ -59,7 +59,7 @@
             {% from "components/lists/_macro.njk" import onsList %}
             {{
                 onsList({
-                    "classes": "list--bare",
+                    "classes": "ons-list--bare",
                     "itemsList": errorData
                 })
             }}
@@ -70,7 +70,7 @@
         {%- if messages -%}
             {% call
                 onsPanel({
-                    "classes": "u-mb-s"
+                    "classes": "ons-u-mb-s"
                 })
             %}
                 <div id="session-expired">
@@ -88,7 +88,7 @@
             {% call
                 onsPanel({
                     "type": 'success',
-                    "classes": "u-mb-s",
+                    "classes": "ons-u-mb-s",
                     "icon": "check",
                 })
             %}
@@ -99,22 +99,22 @@
         {%- endif -%}
     {%- endwith -%}
 
-    <form method="post" class="form" action="{{ url_for('sign_in_bp.login', next=next) }}" role="form">
+    <form method="post" action="{{ url_for('sign_in_bp.login', next=next) }}" role="form">
         {{ form.csrf_token }}
 
         {% if data['account_activated'] %}
-            <h1 class="u-fs-xl">You've activated your account</h1>
+            <h1 class="ons-u-fs-xl">You've activated your account</h1>
             <p>You may now sign in.</p>
         {% else %}
 
         {% if config.AVAILABILITY_BANNER and config.AVAILABILITY_BANNER != 'False' %}
             {% call
                 onsPanel({
-                    "classes": "u-mb-s"
+                    "classes": "ons-u-mb-s"
                 })
             %}
-                <strong class="u-d-b">Service Availability</strong>
-                <p class="u-fs-r u-mt-xs">Thank you for visiting the Office for National Statistics Secure Data Collection website.</p>
+                <strong class="ons-u-d-b">Service Availability</strong>
+                <p class="ons-u-fs-r ons-u-mt-xs">Thank you for visiting the Office for National Statistics Secure Data Collection website.</p>
                 <p>We are carrying out essential maintenance on our internal systems.</p>
                 <p>You are able to use the system and submit data during this period however your response status may not display as completed until after the maintenance has been completed.</p>
             {% endcall %}
@@ -123,7 +123,7 @@
         <p>New to this service?
            <a id="create-account" href="/register/create-account/">Create an account</a>
         </p>
-        <h1 class="u-fs-xl">Sign in</h1>
+        <h1 class="ons-u-fs-xl">Sign in</h1>
         {% endif %}
 
         {% if errorType == 'failed' %}
@@ -133,7 +133,7 @@
         {% endif %}
         {%- call onsFieldset({
             "legend": "Sign in",
-            "legendClasses": "u-vh",
+            "legendClasses": "ons-u-vh",
             "id": "sign-in-details"
         }) -%}
             {{
@@ -169,12 +169,12 @@
             onsButton({
                 "text": "Sign in",
                 "type": "submit",
-                "classes": "u-mt-l",
+                "classes": "ons-u-mt-l",
                 "id": "sign_in_button",
                 "submitType": "timer"
             })
         }}
-        <div class="u-mt-m">
+        <div class="ons-u-mt-m">
             <a href="/passwords/forgot-password">Forgot password?</a>
         </div>
     </form>

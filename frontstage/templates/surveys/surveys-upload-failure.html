@@ -6,24 +6,22 @@
     {% call
         onsPanel({
             "type": "error",
-            "classes": "u-mb-s",
+            "classes": "ons-u-mb-s",
             "title":  error_info.header
         })
     %}
 
-    <p class="error-message">{{ error_info.body }}</p>
-    <div class="upload--response">
-
-        {% include "surveys/surveys-upload-file-picker.html" %}
-
-    </div>
+        <p>{{ error_info.body }}</p>
+        <div>
+            {% include "surveys/surveys-upload-file-picker.html" %}
+        </div>
     {% endcall %}
-    <div class="lock u-mb-s u-mb-m@s">
-        <p class="u-fs-r--b"><i class="fa fa-lock" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;We will treat your data securely and confidentially</p>
+    <div class="ons-u-mb-s ons-u-mb-m@s">
+        <p class="ons-u-fs-r--b">We will treat your data securely and confidentially</p>
     </div>
 
-<div>
-    <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}">Back</a>
-</div>
+    <div>
+        <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}">Back</a>
+    </div>
 
 {% endblock content %}

@@ -39,7 +39,7 @@
         {% call
             onsPanel({
                 "type": "error",
-                "classes": "u-mb-s",
+                "classes": "ons-u-mb-s",
                 "title":  errorTitle
             })
         %}
@@ -52,19 +52,19 @@
                         "text": 'Problem with the ' ~ error_text.replace('_', ' '),
                         "index": true,
                         "url": "#" ~ error ~ '_error',
-                        "classes": "js-inpagelink"
+                        "classes": "ons-js-inpagelink"
                     }
                 ) %}
             {% endfor %}
             {{
                 onsList({
-                    "classes": "list--bare",
+                    "classes": "ons-list--bare",
                     "itemsList": errorData
                 })
             }}
         {% endcall %}
     {% endif %}
-    <h1 class="u-fs-xl">Enter your new contact details</h1>
+    <h1 class="ons-u-fs-xl">Enter your new contact details</h1>
     <form action="" method="post">
         {{ form.csrf_token }}
         {% set firstName = respondent.firstName %}
@@ -138,18 +138,18 @@
             })
         }}
 
-        <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
-            <div class="grid__col">
+        <div class="ons-grid ons-grid--flex ons-grid--gutterless ons-grid--vertical-center ons-grid--no-wrap@s ons-u-mt-m ons-u-mb-m">
+            <div class="ons-grid__col">
                 {{
                     onsButton({
-                    "text": "Save",
-                    "id": "btn-option-save",
-                    "classes": 'btn-group__btn',
-                    "submitType": "timer"
+                        "text": "Save",
+                        "id": "btn-option-save",
+                        "classes": 'ons-btn-group__btn',
+                        "submitType": "timer"
                     })
                 }}
             </div>
-            <div class="grid__col u-ml-m">
+            <div class="ons-grid__col ons-u-ml-m">
                 <a href="{{ url_for('account_bp.get_account') }}" id="btn-account-change-detail-cancel">Cancel</a>
             </div>
         </div>

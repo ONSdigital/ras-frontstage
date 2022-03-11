@@ -52,19 +52,19 @@
 {% from "components/panel/_macro.njk" import onsPanel %}
 
 {%- block pageContent %}
-    <div class="page__container container">
+    <div class="ons-page__container ons-container">
         {% block breadcrumbs %}{% endblock breadcrumbs %}
         {% if availability_message %}
             {{
                 onsPanel({
                     "body": availability_message,
-                    "classes": "u-mt-l"
+                    "classes": "ons-u-mt-l"
                 })
             }}
         {% endif %}
-        <div class="grid">
-            <div class="grid__col col-12@m u-pt-no">
-                <main id="main-content" class="page__main {{ pageClasses }}">
+        <div class="ons-grid">
+            <div class="ons-grid__col ons-col-12@m ons-u-pt-no">
+                <main id="main-content" class="ons-page__main {{ pageClasses }}">
                     {%- block content %}{% endblock content -%}
                 </main>
             </div>

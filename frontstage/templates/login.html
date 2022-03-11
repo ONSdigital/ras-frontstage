@@ -7,21 +7,21 @@
 {% set page_title = "Sign in" %}
 
 {% block main %}
-    <div class="top-pad">
+    <div>
         <form
             method="POST"
             action="{{ url_for('sign_in_bp.login') }}"
             role="form">
 
             {{ form.csrf_token}}
-            <div class="form-group">{{ form.username.label }}: {{ form.username() }}</div>
-            <div class="form-group">{{ form.password.label }}: {{ form.password() }}</div>
+            <div>{{ form.username.label }}: {{ form.username() }}</div>
+            <div>{{ form.password.label }}: {{ form.password() }}</div>
 
             {{
                 onsButton({
                     "text": "Sign in",
                     "type": "submit",
-                    "classes": "u-mt-l",
+                    "classes": "ons-u-mt-l",
                     "id": "login_button",
                     "submitType": "timer"
                 })

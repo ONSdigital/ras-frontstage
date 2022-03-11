@@ -6,7 +6,7 @@
         onsPanel({
             "title": "This page has 1 error" if errors|length == 1 else "There are " + errors|length|string + " errors on this page",
             "type": "error",
-            "classes": "u-mb-l"
+            "classes": "ons-u-mb-l"
         })
     %}
     <p>These <strong>must be corrected</strong> to continue.</p>
@@ -16,14 +16,14 @@
                 "text": error,
                 "index": true,
                 "url": "#" ~ error ~ "_error",
-                "classes": "js-inpagelink"
+                "classes": "ons-js-inpagelink"
             }
         ) %}
     {% endfor %}
 
     {{
         onsList({
-            "classes": "list--bare",
+            "classes": "ons-list--bare",
             "itemsList": errorData
         })
     }}

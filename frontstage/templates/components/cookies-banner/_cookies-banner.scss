@@ -1,0 +1,22 @@
+.cookies-banner {
+  background: $color-banner-bg;
+  display: none;
+  padding: 1rem 0;
+
+  &__title {
+    color: $color-text;
+  }
+
+  &__desc {
+    color: $color-text;
+    margin-bottom: 1rem;
+    word-break: break-word;
+  }
+
+  &__btn {
+    @include mq(xxs, 499px) {
+      display: block;
+      width: 100%;
+    }
+  }
+}

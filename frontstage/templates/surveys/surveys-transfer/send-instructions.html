@@ -55,7 +55,7 @@
                     {% call onsPanel({
                         "type": 'error',
                         "id": 'error-id',
-                        "icon": 'error',
+                        "iconType": 'error',
                         "classes": 'ons-u-mb-m'
                     }) %}
                         <p class="ons-u-fs-r" id="flashed-error-message-{{ loop.index }}">{{ message }}</p>
@@ -64,7 +64,7 @@
                     {% call onsPanel({
                         "type": 'success',
                         "id": 'success-id',
-                        "icon": 'check',
+                        "iconType": 'check',
                         "classes": 'ons-u-mb-m'
                     }) %}
                         <p class="ons-u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>

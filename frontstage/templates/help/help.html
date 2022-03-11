@@ -73,8 +73,7 @@
                         "submitType": "timer"
                     })
                 }}
-                {% set cancelUrl = url_for('sign_in_bp.login') %}
-                <a href="{{ cancelUrl }}"
+                <a href="{{ url_for('sign_in_bp.login') }}"
                     role="button" class="ons-btn ons-btn--link ons-btn--secondary" id="btn-help-option-cancel"><span class="ons-btn_inner">Cancel</span>
                 </a>
             </div>

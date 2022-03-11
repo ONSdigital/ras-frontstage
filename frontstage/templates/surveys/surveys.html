@@ -1,5 +1,4 @@
 {% from "components/button/_macro.njk" import onsButton %}
-{% from "components/table/_macro.njk" import onsTable %}
 {% for survey in sorted_surveys_list %}
     {% if survey.added_survey %}
         {% set highlight = 'table__row--highlight' %}

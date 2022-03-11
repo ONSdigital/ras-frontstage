@@ -730,7 +730,7 @@ def update_verification_token(party_id, token):
         "party_id": party_id,
         "token": token,
     }
-    response = requests.post(url, auth=app.config["BASIC_AUTH"], json=payload)
+    response = requests.put(url, auth=app.config["BASIC_AUTH"], json=payload)
 
     try:
         response.raise_for_status()

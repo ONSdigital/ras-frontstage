@@ -23,14 +23,11 @@ def get_reset_password(token, form_errors=None):
     try:
         duration = app.config["EMAIL_TOKEN_EXPIRY"]
         _ = verification.decode_email_token(token, duration)
-        # email = verification.decode_email_token(token, duration)
-        # respondent = party_controller.get_respondent_by_email(email)
-        # print("\n\n\n\n\n\n\n\n")
-        # print(respondent)
-        # print("\n\n\n\n\n\n\n\n")
-        # party_id = str(respondent["id"])
-        # if token not in respondent["email_token"]:
-        #     raise BadData
+        email = verification.decode_email_token(token, duration)
+        respondent = party_controller.get_respondent_by_email(email)
+        if token not in respondent["verification_tokens"]:
+            logger.warning("Token not found for respondent", token=token, respondent_id=respondent["id"])
+            raise BadData("Token not found for respondent")
     except SignatureExpired:
         logger.warning("Token expired for frontstage reset", token=token, exc_info=True)
         return render_template("passwords/password-expired.html", token=token)

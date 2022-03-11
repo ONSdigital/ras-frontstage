@@ -725,7 +725,7 @@ def update_verification_token(email, token):
     """
     logger.info("Attempting to update respondent verification token", email=obfuscate_email(email))
 
-    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/update_verification_tokens"
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/update-verification-tokens"
     payload = {
         "email": email,
         "token": token,

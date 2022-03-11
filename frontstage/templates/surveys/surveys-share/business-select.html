@@ -46,6 +46,7 @@
         {% endif %}
         {% set checkboxesData = {
             "id": "option",
+            "legend": "Select all that apply",
             "name": "option",
             "error": errorOption,
         } %}
@@ -62,11 +63,7 @@
             ) %}
         {% endfor %}
         {% do checkboxesData | setAttribute("checkboxes", checkboxData) %}
-        {% call onsFieldset({
-            "legend": "Select all that apply",
-        }) %}
-            {{ onsCheckboxes(checkboxesData) }}
-        {% endcall %}
+        {{ onsCheckboxes(checkboxesData) }}
         <div class="field u-mt-l">
             <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
                 <div class="grid__col">

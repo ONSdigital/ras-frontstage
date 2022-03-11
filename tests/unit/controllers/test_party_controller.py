@@ -205,7 +205,7 @@ class TestPartyController(unittest.TestCase):
             rsps.add(rsps.POST, url_reset_password_request, status=500)
             with app.app_context():
                 with self.assertRaises(ApiError):
-                    party_controller.reset_password_request(respondent_party["emailAddress"], "tmp")
+                    party_controller.reset_password_request(respondent_party["emailAddress"])
 
     #                 TODO: fix test
 

@@ -28,7 +28,7 @@ flask-talisman = "*"
 email_validator = "*"
 google-cloud-pubsub = "*"
 google-cloud-storage = "*"
-python-gnupg = "==0.4.7"
+python-gnupg = "*"
 werkzeug = "*"
 
 [dev-packages]

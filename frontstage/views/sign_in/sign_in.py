@@ -1,7 +1,7 @@
 import logging
 from os import getenv
 
-from flask import make_response, redirect, render_template, request, url_for
+from flask import make_response, redirect, render_template, request, session, url_for
 from structlog import wrap_logger
 
 from frontstage import app
@@ -38,9 +38,6 @@ def login():  # noqa: C901
     form = LoginForm(request.form)
     if form.username.data is not None:
         form.username.data = form.username.data.strip()
-    account_activated = request.args.get("account_activated", None)
-
-    secure = app.config["WTF_CSRF_ENABLED"]
 
     if request.method == "POST" and form.validate():
         username = form.username.data
@@ -55,7 +52,7 @@ def login():  # noqa: C901
             party_id = party_json.get("id") if party_json else None
             bound_logger = bound_logger.bind(party_id=party_id)
 
-            if USER_ACCOUNT_LOCKED in error_message:  # pylint: disable=no-else-return
+            if USER_ACCOUNT_LOCKED in error_message:
                 if not party_id:
                     bound_logger.error("Respondent account locked in auth but doesn't exist in party")
                     return render_template("sign-in/sign-in.html", form=form, data={"error": {"type": "failed"}})
@@ -78,7 +75,7 @@ def login():  # noqa: C901
                 bound_logger.error("Unexpected error was returned from Auth service", auth_error=error_message)
 
             return render_template(
-                "sign-in/sign-in.html", form=form, data={"error": {"type": "failed"}}, next=request.args.get("next")
+                "sign-in/sign-in.html", form=form, data={"error": {"type": "failed"}}
             )
 
         bound_logger.info("Successfully found user in auth service.  Attempting to find user in party service")
@@ -89,8 +86,8 @@ def login():  # noqa: C901
         party_id = party_json["id"]
         bound_logger = bound_logger.bind(party_id=party_id)
 
-        if request.args.get("next"):
-            response = make_response(redirect(request.args.get("next")))
+        if session.get('next'):
+            response = make_response(redirect(session.get('next')))
         else:
             response = make_response(
                 redirect(
@@ -100,18 +97,19 @@ def login():  # noqa: C901
 
         bound_logger.info("Successfully found user in party service")
         bound_logger.info("Creating session")
-        session = Session.from_party_id(party_id)
+        redis_session = Session.from_party_id(party_id)
+        secure = app.config["WTF_CSRF_ENABLED"]
         response.set_cookie(
-            "authorization", value=session.session_key, expires=session.get_expires_in(), secure=secure, httponly=secure
+            "authorization", value=redis_session.session_key, expires=redis_session.get_expires_in(), secure=secure, httponly=secure
         )
-        count = conversation_controller.get_message_count_from_api(session)
-        session.set_unread_message_total(count)
-        bound_logger.info("Successfully created session", session_key=session.session_key)
+        count = conversation_controller.get_message_count_from_api(redis_session)
+        redis_session.set_unread_message_total(count)
+        bound_logger.info("Successfully created session", session_key=redis_session.session_key)
         bound_logger.unbind("email")
         return response
+
+    account_activated = request.args.get("account_activated", None)
     template_data = {"error": {"type": form.errors, "logged_in": "False"}, "account_activated": account_activated}
-    if request.args.get("next"):
-        return render_template("sign-in/sign-in.html", form=form, data=template_data, next=request.args.get("next"))
     return render_template("sign-in/sign-in.html", form=form, data=template_data)
 
 

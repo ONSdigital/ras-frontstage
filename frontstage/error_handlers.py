@@ -1,6 +1,6 @@
 import logging
 
-from flask import render_template, request, url_for
+from flask import render_template, request, session, url_for
 from flask_wtf.csrf import CSRFError
 from requests.exceptions import ConnectionError
 from structlog import wrap_logger

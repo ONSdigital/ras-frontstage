@@ -19,8 +19,7 @@ def get_iac_from_enrolment(enrolment_code):
     :raises ApiError: Raised when IAC service returns a 401 status
     :return: A dict with the IAC details if it exists and is active, and None otherwise
     """
-    bound_logger = logger.bind(enrolment_code=enrolment_code)
-    bound_logger.info("Attempting to retrieve IAC")
+    logger.info("Attempting to retrieve IAC", enrolment_code=enrolment_code)
     url = f"{app.config['IAC_URL']}/iacs/{enrolment_code}"
     response = requests.get(url, auth=app.config["BASIC_AUTH"])
 
@@ -28,18 +27,18 @@ def get_iac_from_enrolment(enrolment_code):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         if response.status_code == 404:
-            bound_logger.info("IAC not found", status_code=response.status_code)
+            logger.info("IAC not found", enrolment_code=enrolment_code, status_code=response.status_code)
             return
         # 401s may include error context in the JSON response
         if response.status_code != 401:
-            bound_logger.error("Failed to retrieve IAC")
+            logger.error("Failed to retrieve IAC", enrolment_code=enrolment_code)
             raise ApiError(logger, response)
 
     if response.json().get("active") is False:
-        bound_logger.info("IAC is not active")
+        logger.info("IAC is not active", enrolment_code=enrolment_code)
         return
 
-    bound_logger.info("Successfully retrieved IAC")
+    logger.info("Successfully retrieved IAC")
     return response.json()
 
 

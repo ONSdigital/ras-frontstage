@@ -25,14 +25,15 @@ def get_reset_password(token, form_errors=None):
         _ = verification.decode_email_token(token, duration)
         email = verification.decode_email_token(token, duration)
         respondent = party_controller.get_respondent_by_email(email)
-        try:
-            tokens = respondent["verification_tokens"]
-        except KeyError:
-            tokens = []
+        tokens = respondent["verification_tokens"]
         if token not in tokens:
             logger.warning("Token not found for respondent", token=token, respondent_id=respondent["id"])
             return render_template("passwords/password-token-not-found.html", token=token)
+    except KeyError:
+        logger.warning("Token not found for respondent", token=token, exc_info=True)
+        return render_template("passwords/password-token-not-found.html", token=token)
     except SignatureExpired:
+        party_controller.update_verification_token(email, token)
         logger.warning("Token expired for frontstage reset", token=token, exc_info=True)
         return render_template("passwords/password-expired.html", token=token)
     except (BadSignature, BadData):

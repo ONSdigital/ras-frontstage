@@ -34,20 +34,6 @@ from tests.integration.mocked_services import (
     url_reset_password_request,
 )
 
-# from tests.integration.mocked_services import (
-#     business_party,
-#     case,
-#     collection_exercise,
-#     respondent_party,
-#     url_get_business_party,
-#     url_get_respondent_email,
-#     url_get_respondent_party,
-#     url_notify_party_and_respondent_account_locked,
-#     url_post_add_survey,
-#     url_reset_password_request,
-# )
-
-
 registration_data = {
     "emailAddress": respondent_party["emailAddress"],
     "firstName": respondent_party["firstName"],
@@ -205,8 +191,6 @@ class TestPartyController(unittest.TestCase):
             with app.app_context():
                 with self.assertRaises(ApiError):
                     party_controller.reset_password_request(respondent_party["emailAddress"])
-
-    #                 TODO: fix test
 
     def test_lock_respondent_account_success(self):
         with responses.RequestsMock() as rsps:

@@ -172,6 +172,23 @@ class TestPasswords(unittest.TestCase):
         self.assertTrue("Your link has expired".encode() in response.data)
 
     @requests_mock.mock()
+    def test_reset_password_get_token_not_found(self, mock_request):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_verify_token, status_code=200)
+        with app.app_context():
+            token = verification.generate_email_token("failing_email_token.com")
+        mock_request.get(
+            url_get_respondent_by_email,
+            status_code=200,
+            json={"firstName": "Bob", "id": "123456", "verification_tokens": []},
+        )
+        response = self.app.get(f"passwords/reset-password/{token}", follow_redirects=True)
+        print(response.data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("Your link is invalid or has already been used".encode() in response.data)
+
+    @requests_mock.mock()
     def test_reset_password_post_success(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.put(url_password_change, status_code=200)

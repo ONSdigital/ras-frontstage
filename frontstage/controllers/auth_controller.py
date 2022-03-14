@@ -50,6 +50,7 @@ def sign_in(username, password):
             raise ApiError(logger, response)
 
     bound_logger.info("Successfully signed in")
+    bound_logger.unbind("email")
     return {}
 
 
@@ -65,7 +66,9 @@ def delete_account(username: str):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         bound_logger.error("Failed to delete account")
+        bound_logger.unbind("email")
         raise ApiError(logger, response)
 
     bound_logger.info("Successfully deleted account")
+    bound_logger.unbind("email")
     return response

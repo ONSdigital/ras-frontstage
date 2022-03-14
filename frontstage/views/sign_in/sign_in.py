@@ -107,6 +107,7 @@ def login():  # noqa: C901
         count = conversation_controller.get_message_count_from_api(session)
         session.set_unread_message_total(count)
         bound_logger.info("Successfully created session", session_key=session.session_key)
+        bound_logger.unbind("email")
         return response
     template_data = {"error": {"type": form.errors, "logged_in": "False"}, "account_activated": account_activated}
     if request.args.get("next"):

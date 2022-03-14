@@ -88,7 +88,10 @@ class GcpSurveyResponse:
             raise SurveyResponseError()
         except Exception as e:  # noqa
             bound_log.exception("A non-timeout error was raised when publishing to pubsub", payload=payload)
+
             raise SurveyResponseError()
+
+        bound_log.unbind("filename", "case_id", "survey_id", "tx_id")
 
     def put_file_into_gcp_bucket(self, file_contents, filename: str):
         """
@@ -123,8 +126,9 @@ class GcpSurveyResponse:
         size_in_bytes = len(encrypted_message)
         blob.upload_from_string(encrypted_message)
         bound_log.info("Successfully put file in bucket", filename=filename)
-        results = {"md5sum": md5sum, "fileSizeInBytes": size_in_bytes}
+        bound_log.unbind("project", "bucket")
 
+        results = {"md5sum": md5sum, "fileSizeInBytes": size_in_bytes}
         return results
 
     def put_message_into_pubsub(self, payload: dict, tx_id: str):

@@ -74,9 +74,7 @@ def login():  # noqa: C901
             else:
                 bound_logger.error("Unexpected error was returned from Auth service", auth_error=error_message)
 
-            return render_template(
-                "sign-in/sign-in.html", form=form, data={"error": {"type": "failed"}}
-            )
+            return render_template("sign-in/sign-in.html", form=form, data={"error": {"type": "failed"}})
 
         bound_logger.info("Successfully found user in auth service.  Attempting to find user in party service")
         party_json = party_controller.get_respondent_by_email(username)
@@ -86,8 +84,9 @@ def login():  # noqa: C901
         party_id = party_json["id"]
         bound_logger = bound_logger.bind(party_id=party_id)
 
-        if session.get('next'):
-            response = make_response(redirect(session.get('next')))
+        if session.get("next"):
+            session.pop("next")
+            response = make_response(redirect(session.get("next")))
         else:
             response = make_response(
                 redirect(
@@ -100,7 +99,11 @@ def login():  # noqa: C901
         redis_session = Session.from_party_id(party_id)
         secure = app.config["WTF_CSRF_ENABLED"]
         response.set_cookie(
-            "authorization", value=redis_session.session_key, expires=redis_session.get_expires_in(), secure=secure, httponly=secure
+            "authorization",
+            value=redis_session.session_key,
+            expires=redis_session.get_expires_in(),
+            secure=secure,
+            httponly=secure,
         )
         count = conversation_controller.get_message_count_from_api(redis_session)
         redis_session.set_unread_message_total(count)

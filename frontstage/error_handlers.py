@@ -40,7 +40,8 @@ def handle_csrf_error(error):
     if not encoded_jwt:
         return render_template("errors/400-error.html"), 400
     else:
-        return redirect(url_for("sign_in_bp.logout", csrf_error=True, next=request.url))
+        session["next"] = request.url
+        return redirect(url_for("sign_in_bp.logout", csrf_error=True))
 
 
 @app.errorhandler(ApiError)

@@ -1,6 +1,6 @@
 env: minikube
 namespace: minikube
-public: false
+armorPolicy: "ras-cloud-armor-policy"
 
 image:
   devRepo: eu.gcr.io/ons-rasrmbs-management

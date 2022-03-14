@@ -545,35 +545,32 @@ def notify_party_and_respondent_account_locked(respondent_id, email_address, sta
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         bound_logger.error("Failed to notify party")
+        bound_logger.unbind("respondent_id", "email", "status")
         raise ApiError(logger, response)
 
     bound_logger.info("Successfully notified respondent and party service that account is locked")
+    bound_logger.unbind("respondent_id", "email", "status")
 
 
-def get_list_of_business_for_party(party_id):
+def get_list_of_business_for_party(party_id: str) -> list:
     """
     Gets the details for the businesses associated with a respondent
     :param party_id: respondent party id
-    :type party_id: str
     :return: list of businesses
-    :rtype: dict
     """
-    bound_logger = logger.bind(party_id=party_id)
-    bound_logger.info("Getting enrolment data for the party")
+    logger.info("Getting enrolment data for the party", party_id=party_id)
     respondent = get_respondent_party_by_id(party_id)
     enrolment_data = get_respondent_enrolments(respondent)
     business_ids = {enrolment["business_id"] for enrolment in enrolment_data}
-    bound_logger.info("Getting businesses against business ids", business_ids=business_ids)
+    logger.info("Getting businesses against business ids", business_ids=business_ids, party_id=party_id)
     return get_business_by_id(business_ids)
 
 
-def get_business_by_id(business_ids):
+def get_business_by_id(business_ids: list) -> list:
     """
     Gets the business details for all the business_id's that are provided (
     :param business_ids: This takes a single business id or a list of business ids
-    :type business_ids: list
-    :return: business
-    :rtype: dict
+    :return: List of business
     """
     logger.info("Attempting to fetch businesses", business_ids=business_ids)
     params = {"id": business_ids}
@@ -586,7 +583,7 @@ def get_business_by_id(business_ids):
     return response.json()
 
 
-def get_surveys_listed_against_party_and_business_id(business_id, party_id) -> list:
+def get_surveys_listed_against_party_and_business_id(business_id: str, party_id: str) -> list:
     """
     returns list of surveys associated with a business id and respondent
     :param business_id: business id
@@ -603,7 +600,7 @@ def get_surveys_listed_against_party_and_business_id(business_id, party_id) -> l
     return surveys
 
 
-def get_user_count_registered_against_business_and_survey(business_id, survey_id, is_transfer) -> int:
+def get_user_count_registered_against_business_and_survey(business_id: str, survey_id: str, is_transfer) -> int:
     """
     returns total number of users registered against a business and survey
 
@@ -653,18 +650,17 @@ def get_pending_surveys_batch_number(batch_no):
     :raises ApiError: Raised when party returns api error
     :return: list share surveys
     """
-    bound_logger = logger.bind(batch_no=batch_no)
-    bound_logger.info("Attempting to retrieve share surveys by batch number")
+    logger.info("Attempting to retrieve share surveys by batch number", batch_no=batch_no)
     url = f"{app.config['PARTY_URL']}/party-api/v1/pending-surveys/{batch_no}"
     response = requests.get(url, auth=app.config["BASIC_AUTH"])
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        bound_logger.error("Failed to retrieve share surveys by batch number")
+        logger.error("Failed to retrieve share surveys by batch number", batch_no=batch_no)
         raise ApiError(logger, response)
 
-    bound_logger.info("Successfully retrieved share surveys by batch number")
+    logger.info("Successfully retrieved share surveys by batch number", batch_no=batch_no)
     return response
 
 

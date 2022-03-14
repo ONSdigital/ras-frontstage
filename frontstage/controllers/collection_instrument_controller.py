@@ -53,6 +53,7 @@ def download_collection_instrument(collection_instrument_id, case_id, party_id):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         bound_logger.error("Failed to download collection instrument")
+        bound_logger.unbind("collection_instrument_id", "party_id", "case_id")
         raise ApiError(logger, response)
 
     bound_logger.info("Successfully downloaded collection instrument")
@@ -61,6 +62,7 @@ def download_collection_instrument(collection_instrument_id, case_id, party_id):
     acao = app.config["ACCESS_CONTROL_ALLOW_ORIGIN"]
     bound_logger.debug(f"Setting Access-Control-Allow-Origin header to {acao}")
     headers["Access-Control-Allow-Origin"] = acao
+    bound_logger.unbind("collection_instrument_id", "party_id", "case_id")
     return response.content, headers.items()
 
 

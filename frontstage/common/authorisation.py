@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from functools import wraps
 
-from flask import flash, session, url_for
+from flask import flash, url_for
 from jose import JWTError
 from jose.jwt import decode
 from structlog import wrap_logger
@@ -40,8 +40,8 @@ def jwt_authorization(request):
         @wraps(original_function)
         def extract_session_wrapper(*args, **kwargs):
             session_key = request.cookies.get("authorization")
-            redis_session = Session.from_session_key(session_key)
-            encoded_jwt = redis_session.get_encoded_jwt()
+            session = Session.from_session_key(session_key)
+            encoded_jwt = session.get_encoded_jwt()
             if encoded_jwt:
                 logger.debug("Attempting to authorize token")
                 try:
@@ -53,13 +53,12 @@ def jwt_authorization(request):
             else:
                 logger.warning("No authorization token provided")
                 flash("To help protect your information we have signed you out.", "info")
-                session["next"] = request.url
-                return redirect(url_for("sign_in_bp.login"))
+                return redirect(url_for("sign_in_bp.login", next=request.url))
 
             if app.config["VALIDATE_JWT"]:
                 if validate(jwt):
-                    redis_session.refresh_session()
-                    return original_function(redis_session, *args, **kwargs)
+                    session.refresh_session()
+                    return original_function(session, *args, **kwargs)
                 else:
                     logger.warning("Token is not valid for this request")
                     raise JWTValidationError

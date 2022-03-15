@@ -1,6 +1,6 @@
 import logging
 
-from flask import render_template, request, session, url_for
+from flask import render_template, request, url_for
 from flask_wtf.csrf import CSRFError
 from requests.exceptions import ConnectionError
 from structlog import wrap_logger
@@ -40,8 +40,7 @@ def handle_csrf_error(error):
     if not encoded_jwt:
         return render_template("errors/400-error.html"), 400
     else:
-        session["next"] = request.url
-        return redirect(url_for("sign_in_bp.logout", csrf_error=True))
+        return redirect(url_for("sign_in_bp.logout", csrf_error=True, next=request.url))
 
 
 @app.errorhandler(ApiError)

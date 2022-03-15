@@ -85,8 +85,8 @@ def login():  # noqa: C901
         bound_logger = bound_logger.bind(party_id=party_id)
 
         if session.get("next"):
-            session.pop("next")
             response = make_response(redirect(session.get("next")))
+            session.pop("next")
         else:
             response = make_response(
                 redirect(

@@ -126,9 +126,9 @@ class TestSignIn(unittest.TestCase):
         mock_request.get(url_get_respondent_email, json=party)
         mock_request.post(url_auth_token, status_code=200, json=self.auth_response)
         mock_request.get(url_get_conversation_count, json=message_count)
-        response = self.app.post(
-            "/sign-in/", data=self.sign_in_form, query_string={"next": "http://localhost:8082/secure-message/threads"}
-        )
+        with self.app.session_transaction() as mock_session:
+            mock_session["next"] = "http://localhost:8082/secure-message/threads"
+        response = self.app.post("/sign-in/", data=self.sign_in_form)
         self.assertEqual(response.status_code, 302)
         self.assertTrue("/secure-message/threads".encode() in response.data)
 

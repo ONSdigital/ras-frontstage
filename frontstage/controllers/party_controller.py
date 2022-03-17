@@ -9,6 +9,7 @@ from structlog import wrap_logger
 
 from frontstage.common.thread_wrapper import ThreadWrapper
 from frontstage.common.utilities import obfuscate_email
+from frontstage.common.verification import decode_email_token
 from frontstage.controllers import (
     case_controller,
     collection_instrument_controller,
@@ -713,27 +714,50 @@ def get_business_by_ru_ref(ru_ref: str):
     return response.json()
 
 
-def update_verification_token(email, token):
+def post_verification_token(email, token):
     """
-    Gives call to party service to link a respondent to their email verification token
+    Gives call to party service to add a verification token for the respondent
     :param email: the respondent's email
     :param token: the verification token
     """
-    logger.info("Attempting to update respondent verification token", email=obfuscate_email(email))
+    logger.info("Attempting to add respondent verification token", email=obfuscate_email(email))
 
-    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/update-verification-tokens"
+    party_id = get_respondent_by_email(email)["id"]
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-verification-tokens"
     payload = {
-        "email": email,
         "token": token,
     }
-    response = requests.put(url, auth=app.config["BASIC_AUTH"], json=payload)
+    response = requests.post(url, auth=app.config["BASIC_AUTH"], json=payload)
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error("Failed to update respondent verification token", email=obfuscate_email(email))
+        logger.error("Failed to add respondent verification token", email=obfuscate_email(email))
         raise ApiError(logger, response)
 
-    logger.info("Successfully updated respondent verification token", email=obfuscate_email(email))
+    logger.info("Successfully added respondent verification token", email=obfuscate_email(email))
+
+    return response.json()
+
+
+def delete_verification_token(token):
+    """
+    Gives call to party service to delete a verification token for the respondent
+    :param token: the verification token
+    """
+    email = decode_email_token(token)
+    logger.info("Attempting to delete respondent verification token", email=obfuscate_email(email))
+
+    party_id = get_respondent_by_email(email)["id"]
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-verification-tokens/{token}"
+    response = requests.delete(url, auth=app.config["BASIC_AUTH"])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        logger.error("Failed to delete respondent verification token", email=obfuscate_email(email))
+        raise ApiError(logger, response)
+
+    logger.info("Successfully deleted respondent verification token", email=obfuscate_email(email))
 
     return response.json()

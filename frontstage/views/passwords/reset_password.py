@@ -24,15 +24,15 @@ def get_reset_password(token, form_errors=None):
         duration = app.config["EMAIL_TOKEN_EXPIRY"]
         email = verification.decode_email_token(token, duration)
         respondent = party_controller.get_respondent_by_email(email)
-        tokens = respondent["verification_tokens"]
-        if token not in tokens:
+        db_token = respondent["password_verification_token"]
+        if not token == db_token:
             logger.warning("Token not found for respondent", token=token, respondent_id=respondent["id"])
             return render_template("passwords/password-token-not-found.html", token=token)
     except KeyError:
         logger.warning("Token not found for respondent", token=token, exc_info=True)
         return render_template("passwords/password-token-not-found.html", token=token)
     except SignatureExpired:
-        party_controller.update_verification_token(email, token)
+        party_controller.delete_verification_token(token)
         logger.warning("Token expired for frontstage reset", token=token, exc_info=True)
         return render_template("passwords/password-expired.html", token=token)
     except (BadSignature, BadData):
@@ -56,7 +56,7 @@ def post_reset_password(token):
         duration = app.config["EMAIL_TOKEN_EXPIRY"]
         email = verification.decode_email_token(token, duration)
         party_controller.change_password(email, password)
-        party_controller.update_verification_token(email, token)
+        party_controller.delete_verification_token(token)
     except ApiError as exc:
         if exc.status_code == 409:
             logger.warning("Token expired", api_url=exc.url, api_status_code=exc.status_code, token=token)
@@ -86,7 +86,7 @@ def reset_password_check_email():
 @passwords_bp.route("/resend-password-email-expired-token/<token>", methods=["GET"])
 def resend_password_email_expired_token(token):
     email = verification.decode_email_token(token)
-    party_controller.update_verification_token(email, token)
+    party_controller.post_verification_token(email, token)
     return request_password_change(email)
 
 
@@ -113,7 +113,7 @@ def request_password_change(email):
 
     logger.info("Reset password url", url=verification_url, party_id=party_id)
 
-    party_controller.update_verification_token(email, token)
+    party_controller.post_verification_token(email, token)
 
     try:
         NotifyGateway(app.config).request_to_notify(email=email, personalisation=personalisation, reference=party_id)

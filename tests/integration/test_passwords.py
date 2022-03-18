@@ -45,6 +45,11 @@ class TestPasswords(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.post(url_reset_password_request, status_code=200)
         mock_request.get(url_get_respondent_by_email, status_code=200, json={"firstName": "Bob", "id": "123456"})
+        mock_request.post(
+            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-tokens",
+            status_code=200,
+            json={"message": "Successfully added token"},
+        )
 
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
 
@@ -129,6 +134,11 @@ class TestPasswords(unittest.TestCase):
         mock_request.get(url_verify_token, status_code=200)
         with app.app_context():
             token = verification.generate_email_token("test.com")
+        mock_request.get(
+            url_get_respondent_by_email,
+            status_code=200,
+            json={"firstName": "Bob", "id": "123456", "password_verification_token": token},
+        )
         response = self.app.get(f"passwords/reset-password/{token}", follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -165,12 +175,38 @@ class TestPasswords(unittest.TestCase):
         self.assertTrue("Your link has expired".encode() in response.data)
 
     @requests_mock.mock()
+    def test_reset_password_get_token_not_found(self, mock_request):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_verify_token, status_code=200)
+        with app.app_context():
+            token = verification.generate_email_token("failing_email_token.com")
+        mock_request.get(
+            url_get_respondent_by_email,
+            status_code=200,
+            json={"firstName": "Bob", "id": "123456", "password_verification_token": []},
+        )
+        response = self.app.get(f"passwords/reset-password/{token}", follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("Your link is invalid or has already been used".encode() in response.data)
+
+    @requests_mock.mock()
     def test_reset_password_post_success(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.put(url_password_change, status_code=200)
         password_form = {"password": "Gizmo007!Gizmo", "password_confirm": "Gizmo007!Gizmo"}
         with app.app_context():
             token = verification.generate_email_token("test.com")
+        mock_request.get(
+            url_get_respondent_by_email,
+            status_code=200,
+            json={"firstName": "Bob", "id": "123456", "password_verification_token": token},
+        )
+        mock_request.delete(
+            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-tokens/{token}",
+            status_code=200,
+            json={"message": "Successfully removed token"},
+        )
         response = self.app.post(f"passwords/reset-password/{token}", data=password_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -207,6 +243,11 @@ class TestPasswords(unittest.TestCase):
         password_form = {"password": "Gizmo008!", "password_confirm": "Gizmo007!"}
         with app.app_context():
             token = verification.generate_email_token("test.com")
+        mock_request.get(
+            url_get_respondent_by_email,
+            status_code=200,
+            json={"firstName": "Bob", "id": "123456", "password_verification_token": token},
+        )
         response = self.app.post(f"passwords/reset-password/{token}", data=password_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -219,10 +260,14 @@ class TestPasswords(unittest.TestCase):
         password_form = {"password": "Gizmo007a", "password_confirm": "Gizmo007a"}
         with app.app_context():
             token = verification.generate_email_token("test.com")
+        mock_request.get(
+            url_get_respondent_by_email,
+            status_code=200,
+            json={"firstName": "Bob", "id": "123456", "password_verification_token": token},
+        )
         response = self.app.post(f"passwords/reset-password/{token}", data=password_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        print(response.data)
         self.assertTrue("Your password doesn't meet the requirements".encode() in response.data)
 
     @requests_mock.mock()
@@ -232,6 +277,11 @@ class TestPasswords(unittest.TestCase):
         password_form = {}
         with app.app_context():
             token = verification.generate_email_token("test.com")
+        mock_request.get(
+            url_get_respondent_by_email,
+            status_code=200,
+            json={"firstName": "Bob", "id": "123456", "password_verification_token": token},
+        )
         response = self.app.post(f"passwords/reset-password/{token}", data=password_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -261,6 +311,11 @@ class TestPasswords(unittest.TestCase):
         )
         with app.app_context():
             token = verification.generate_email_token("test@test.com")
+        mock_request.post(
+            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-tokens",
+            status_code=200,
+            json={"message": "Successfully added token"},
+        )
         response = self.app.get(f"passwords/resend-password-email-expired-token/{token}", follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         mock_notify.assert_called_once()

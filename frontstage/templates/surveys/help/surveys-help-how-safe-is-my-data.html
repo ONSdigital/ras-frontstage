@@ -1,6 +1,7 @@
 {% extends "layouts/_block_content.html" %}
 {% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/button/_macro.njk" import onsButton %}
+{% from "components/lists/_macro.njk" import onsList %}
 
 {% set page_title = "Help with how long selected for" %}
 {% set breadcrumbsData = [
@@ -34,11 +35,21 @@
     <h1 class="ons-u-fs-xl">How safe is my data?</h1>
     <p>We uphold our legal obligation to protect data in both the staff we employ, their training, the procedures we adopt and the IT equipment we use.</p>
     <p>We treat your data in strict confidence in line with the provisions of:</p>
-    <ul class="ons-list">
-        <li class="ons-list__item">Section 39 of the Statistics and Registration Services Act 2007</li>
-        <li class="ons-list__item">Data Protection Legislation (including the General Data Protection Regulation and the Data Protection Act 2018)</li>
-        <li class="ons-list__item">Code of Practice for Statistics.</li>
-    </ul>
+    {{
+        onsList({
+            "itemsList": [
+                {
+                    "text": 'Section 39 of the Statistics and Registration Services Act 2007'
+                },
+                {
+                    "text": 'Data Protection Legislation (including the General Data Protection Regulation and the Data Protection Act 2018)'
+                },
+                {
+                    "text": 'Code of Practice for Statistics.'
+                }
+            ]
+        })
+    }}
     <p>We will not disclose the data you send to us to any unauthorised personnel.</p>
     <p>We will show it only to those who need to be aware of them for compiling statistical data.</p>
     <p>Unauthorised disclosure of data would be a disciplinary and, in some cases, a criminal offence. </p>

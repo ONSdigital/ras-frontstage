@@ -1,6 +1,7 @@
 {% extends "layouts/_block_content.html" %}
 {% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/button/_macro.njk" import onsButton %}
+{% from "components/lists/_macro.njk" import onsList %}
 
 {% set page_title = "Transfer surveys overview" %}
 {% set breadcrumbsData = [
@@ -34,12 +35,24 @@
         </p>
     {% endcall %}
     <h2 class="ons-u-fs-m ons-u-mt-m">What will happen</h2>
-    <ul>
-        <li>Select which surveys you want to transfer.</li>
-        <li>Enter the email address of the person who will be responding to these surveys.</li>
-        <li>We will email them the instructions to access the surveys.</li>
-        <li>Once we confirm their access, they will be able to respond to the surveys and share access with their colleagues.</li>
-    </ul>
+    {{
+        onsList({
+            "itemsList": [
+                {
+                    "text": 'Select which surveys you want to share'
+                },
+                {
+                    "text": 'Enter the email address of the person who will be responding to these surveys'
+                },
+                {
+                    "text": 'We will email them the instructions to access the surveys'
+                },
+                {
+                    "text": 'Once we confirm their access, they will be able to respond to surveys on your behalf and share access with colleagues'
+                }
+            ]
+        })
+    }}
 
     <div class="ons-field ons-u-mt-l">
         {{

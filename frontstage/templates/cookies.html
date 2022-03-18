@@ -4,6 +4,7 @@
 {% from "components/panel/_macro.njk" import onsPanel %}
 {% from "components/collapsible/_macro.njk" import onsCollapsible %}
 {% from "components/table/_macro.njk" import onsTable %}
+{% from "components/lists/_macro.njk" import onsList %}
 
 {% set page_title = "Cookies on surveys.ons.gov.uk" %}
 
@@ -23,21 +24,39 @@
     <div class="ons-u-db-no-js_enabled">
         <p>We use JavaScript to set our cookies. Javascript is not running on your browser so you cannot change your settings.</p>
         <p>You can try:</p>
-        <ul>
-            <li>turning on JavaScript in your browser</li>
-            <li>reloading the page in case there was a temporary fault with JavaScript</li>
-        </ul>
+        {{
+            onsList({
+                "itemsList": [
+                    {
+                        "text": 'turning on JavaScript in your browser'
+                    },
+                    {
+                        "text": 'reloading the page in case there was a temporary fault with JavaScript'
+                    }
+                ]
+            })
+        }}
     </div>
     <div class="ons-u-db-no-js_disabled">
         <p>We use three types of cookie. You can choose which cookies you're happy for us to use.</p>
         <form data-module="cookie-settings">
             <h3>Cookies that measure website use</h3>
             <p>We use Google Analytics to measure how you use the website so we can improve it based on user needs. Google Analytics sets cookies that store anonymised information about:</p>
-            <ul>
-                <li>how you got to the site</li>
-                <li>the pages you visit on surveys.ons.gov.uk and how long you spend on each page</li>
-                <li>what you click on while you're visiting the site</li>
-            </ul>
+            {{
+                onsList({
+                    "itemsList": [
+                        {
+                            "text": 'how you got to the site'
+                        },
+                        {
+                            "text": 'the pages you visit on surveys.ons.gov.uk and how long you spend on each page'
+                        },
+                        {
+                            "text": "what you click on while you're visiting the site"
+                        }
+                    ]
+                })
+            }}
             {% call onsCollapsible({
                 "id": "cookies-measure-website-use-details",
                 "classes": "ons-u-mb-s",
@@ -181,10 +200,18 @@
             }) }}
             <h3 class="ons-u-mt-l">Strictly necessary cookies</h3>
             <p>These essential cookies do things like:</p>
-            <ul>
-                <li>remember the notifications you've seen so we do not show them to you again</li>
-                <li>remember your progress through a form (for example, online business surveys)</li>
-            </ul>
+            {{
+                onsList({
+                    "itemsList": [
+                        {
+                            "text": "remember the notifications you've seen so we do not show them to you again"
+                        },
+                        {
+                            "text": 'remember your progress through a form (for example, online business surveys)'
+                        }
+                    ]
+                })
+            }}
             <p>They always need to be on.</p>
             {% call onsCollapsible({
                 "id": "cookies-essential-details",

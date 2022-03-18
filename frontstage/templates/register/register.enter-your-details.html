@@ -125,12 +125,24 @@
         {% endcall %}
         <h2 class="ons-u-mt-l">Create a password</h2>
         <p>Your password must have:</p>
-        <ul>
-            <li>at least 12 characters </li>
-            <li>at least one symbol (eg ?!£%) </li>
-            <li>at least one capital letter</li>
-            <li>at least one number</li>
-        </ul>
+        {{
+            onsList({
+                "itemsList": [
+                    {
+                        "text": 'at least 12 characters'
+                    },
+                    {
+                        "text": 'at least one symbol (eg ?!£%)'
+                    },
+                    {
+                        "text": 'at least one capital letter'
+                    },
+                    {
+                        "text": 'at least one number'
+                    }
+                ]
+            })
+        }}
         {%- call onsFieldset({
             "legend": "Create a password",
             "legendClasses": "ons-u-vh"

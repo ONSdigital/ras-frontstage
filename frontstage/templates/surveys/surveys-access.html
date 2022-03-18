@@ -1,6 +1,7 @@
 {% extends 'layouts/_base.html' %}
 {% from "components/button/_macro.njk" import onsButton %}
 {% from "components/collapsible/_macro.njk" import onsCollapsible %}
+{% from "components/lists/_macro.njk" import onsList %}
 
 {% set page_title = survey_info.longName ~ ' ' ~ collection_exercise_info.userDescription %}
 
@@ -57,10 +58,18 @@
     }
 }) %}
     <h3 class="ons-u-mb-s">Your file needs to be:</h3>
-    <ul>
-        <li>.xls or .xlsx format</li>
-        <li>smaller than 20MB</li>
-    </ul>
+    {{
+        onsList({
+            "itemsList": [
+                {
+                    "text": '.xls or .xlsx format'
+                },
+                {
+                    "text": 'smaller than 20MB'
+                }
+            ]
+        })
+    }}
 {% endcall %}
 <p class="ons-u-fs-r--b icon--lock">We will treat your data securely and confidentially</p>
 

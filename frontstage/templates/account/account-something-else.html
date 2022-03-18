@@ -41,18 +41,18 @@
                         onsPanel({
                             "type": "error",
                             "classes": "ons-u-mb-s",
-                            "title":  errorTitle
+                            "title": errorTitle
                         })
                     %}
                         {{
                             onsList({
                                 "element": "ol",
                                 "itemsList": [
-                                {
-                                    "text": message,
-                                    "url": "#secure-message-body_error",
-                                    "classes": "ons-js-inpagelink"
-                                }
+                                    {
+                                        "text": message,
+                                        "url": "#secure-message-body_error",
+                                        "classes": "ons-js-inpagelink"
+                                    }
                                 ]
                             })
                         }}
@@ -69,36 +69,39 @@
     <div class="ons-col-12@m" id="secure-message-form">
         <form action="{{ url_for('account_bp.something_else_post', subject=subject) }}" method="post">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                {% if ns.bodyError %}
-                    {% set error = { "text": ns.errorMessage,  "id": 'secure-message-body_error' } %}
-                {% endif %}
+            {% if ns.bodyError %}
+                {% set error = { "text": ns.errorMessage,  "id": 'secure-message-body_error' } %}
+            {% endif %}
 
+            {{
+                onsTextarea({
+                    "id": "secure-message-body",
+                    "name": "body",
+                    "label": {
+                        "text": "Create message",
+                    },
+                    "charCheckLimit": false,
+                    "error": error,
+                })
+            }}
+
+            <div class="ons-field ons-u-mt-l">
                 {{
-                    onsTextarea({
-                        "id": "secure-message-body",
-                        "name": "body",
-                        "label": {
-                            "text": "Create message",
-                        },
-                        "charCheckLimit": false,
-                        "error": error,
-                    })
-                }}
-
-            <div class="ons-grid ons-grid--flex ons-grid--gutterless ons-grid--vertical-center ons-grid--no-wrap@s ons-u-mt-m ons-u-mb-m">
-                <div class="ons-grid__col">
-                    {{
-                        onsButton({
+                    onsButton({
                         "text": "Send",
                         "id": "send-message-ons-btn",
-                        "submitType": "timer",
-                        })
-                    }}
-                </div>
-                <div class="ons-grid__col ons-u-ml-m">
-                    <a href="{{ url_for('account_bp.get_account') }}"
-                    id="btn-option-cancel">Cancel</a>
-                </div>
+                        "submitType": "timer"
+                    })
+                }}
+                {{
+                    onsButton({
+                        "id": "btn-option-cancel",
+                        "url": url_for('account_bp.get_account'),
+                        "text": 'Cancel',
+                        "variants": 'secondary',
+                        "noIcon": true
+                    })
+                }}
             </div>
         </form>
     </div>

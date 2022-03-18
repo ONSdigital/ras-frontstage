@@ -66,19 +66,20 @@
         {% do checkboxesData | setAttribute("checkboxes", checkboxData) %}
         {{ onsCheckboxes(checkboxesData) }}
         <div class="ons-field ons-u-mt-l">
-            <div class="ons-grid ons-grid--flex ons-grid--gutterless ons-grid--vertical-center ons-grid--no-wrap@s ons-u-mt-m ons-u-mb-m">
-                <div class="ons-grid__col">
-                    {{
-                        onsButton({
-                            "text": "Continue",
-                            "submitType": "timer"
-                        })
-                    }}
-                </div>
-                <div class="ons-grid__col ons-u-ml-m">
-                    <a href="{{ url_for('account_bp.transfer_survey_overview') }}">Cancel</a>
-                </div>
-            </div>
+            {{
+                onsButton({
+                    "text": "Continue",
+                    "submitType": "timer"
+                })
+            }}
+            {{
+                onsButton({
+                    "url": url_for('account_bp.transfer_survey_overview'),
+                    "text": 'Cancel',
+                    "variants": 'secondary',
+                    "noIcon": true
+                })
+            }}
         </div>
     </form>
 

@@ -79,21 +79,22 @@
             })
         }}
         <div class="ons-field ons-u-mt-l">
-            <div class="ons-grid ons-grid--flex ons-grid--gutterless ons-grid--vertical-center ons-grid--no-wrap@s ons-u-mt-m ons-u-mb-m">
-                <div class="ons-grid__col">
-                    {{
-                        onsButton({
-                            "text": "Continue",
-                            "id": "btn-help-this-survey-option-continue",
-                            "submitType": "timer"
-                        })
-                    }}
-                </div>
-                <div class="ons-grid__col ons-u-ml-m">
-                    <a href="{{ url_for('surveys_bp.get_surveys_help_page', survey_ref=survey_ref, ru_ref=ru_ref) }}"
-                    id="btn-help-this-survey-option-cancel">Cancel</a>
-                </div>
-            </div>
+            {{
+                onsButton({
+                    "text": "Continue",
+                    "id": "btn-help-this-survey-option-continue",
+                    "submitType": "timer"
+                })
+            }}
+            {{
+                onsButton({
+                    "id": "btn-help-this-survey-option-cancel",
+                    "url": url_for('surveys_bp.get_surveys_help_page', survey_ref=survey_ref, ru_ref=ru_ref),
+                    "text": 'Cancel',
+                    "variants": 'secondary',
+                    "noIcon": true
+                })
+            }}
         </div>
     </form>
 

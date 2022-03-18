@@ -52,7 +52,7 @@
                 {
                     "id": "contact_details",
                     "label": {
-                    "text": "Change my contact details"
+                        "text": "Change my contact details"
                     },
                     "value": "contact_details"
                 }) %}
@@ -96,20 +96,23 @@
             {{
                 onsRadios(radioComponent)
             }}
-
-        <div class="ons-grid ons-grid--flex ons-grid--gutterless ons-grid--vertical-center ons-grid--no-wrap@s ons-u-mt-m ons-u-mb-m">
-            <div class="ons-grid__col">
-                {{
-                    onsButton({
-                        "text": "Continue",
-                        "id": "btn-option-continue",
-                        "submitType": "timer"
-                    })
-                }}
-            </div>
-            <div class="ons-grid__col ons-u-ml-m">
-                <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" id="btn-option-cancel">Cancel</a>
-            </div>
+        <div class="ons-field ons-u-mt-l">
+            {{
+                onsButton({
+                    "text": "Continue",
+                    "id": "btn-option-continue",
+                    "submitType": "timer"
+                })
+            }}
+            {{
+                onsButton({
+                    "id": "btn-option-cancel",
+                    "url": url_for('surveys_bp.get_survey_list', tag='todo'),
+                    "text": 'Cancel',
+                    "variants": 'secondary',
+                    "noIcon": true
+                })
+            }}
         </div>
     </form>
 {% endblock main %}

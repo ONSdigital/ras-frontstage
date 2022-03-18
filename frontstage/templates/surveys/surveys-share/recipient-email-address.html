@@ -55,7 +55,7 @@
             onsPanel({
                 "type": "error",
                 "classes": "ons-u-mb-s",
-                "title":  errorTitle
+                "title": errorTitle
             })
         %}
             {% set errorData = [] %}
@@ -106,19 +106,20 @@
             })
         }}
         <div class="ons-field ons-u-mt-l">
-            <div class="ons-grid ons-grid--flex ons-grid--gutterless ons-grid--vertical-center ons-grid--no-wrap@s ons-u-mt-m ons-u-mb-m">
-                <div class="ons-grid__col">
-                    {{
-                        onsButton({
-                        "text": "Continue",
-                        "submitType": "timer"
-                        })
-                    }}
-                </div>
-                <div class="ons-grid__col ons-u-ml-m">
-                    <a href="{{ url_for('account_bp.share_survey_survey_select') }}">Cancel</a>
-                </div>
-            </div>
+            {{
+                onsButton({
+                    "text": "Send message",
+                    "submitType": "timer"
+                })
+            }}
+            {{
+                onsButton({
+                    "url": url_for('account_bp.share_survey_survey_select'),
+                    "text": 'Cancel',
+                    "variants": 'secondary',
+                    "noIcon": true
+                })
+            }}
         </div>
     </form>
 {% endblock main %}

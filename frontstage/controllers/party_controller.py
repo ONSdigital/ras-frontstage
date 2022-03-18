@@ -6,6 +6,7 @@ import requests
 from dateutil.parser import parse
 from flask import current_app as app
 from structlog import wrap_logger
+from werkzeug.exceptions import NotFound
 
 from frontstage.common.thread_wrapper import ThreadWrapper
 from frontstage.common.utilities import obfuscate_email
@@ -755,6 +756,9 @@ def delete_verification_token(token):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
+        if response.status_code == 404:
+            logger.error("Verification token not found")
+            raise NotFound("Token not found")
         logger.error("Failed to delete respondent verification token", email=obfuscate_email(email))
         raise ApiError(logger, response)
 

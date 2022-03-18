@@ -5,6 +5,7 @@ from flask import current_app as app
 from flask import redirect, render_template, request, url_for
 from itsdangerous import BadData, BadSignature, SignatureExpired
 from structlog import wrap_logger
+from werkzeug.exceptions import NotFound
 
 from frontstage.common import verification
 from frontstage.controllers import party_controller
@@ -32,7 +33,10 @@ def get_reset_password(token, form_errors=None):
         logger.warning("Token not found for respondent", token=token, exc_info=True)
         return render_template("passwords/password-token-not-found.html", token=token)
     except SignatureExpired:
-        party_controller.delete_verification_token(token)
+        try:
+            party_controller.delete_verification_token(token)
+        except NotFound:
+            return render_template("passwords/password-token-not-found.html", token=token)
         logger.warning("Token expired for frontstage reset", token=token, exc_info=True)
         return render_template("passwords/password-expired.html", token=token)
     except (BadSignature, BadData):

@@ -58,20 +58,22 @@
                     "error": errorMsgText
                 })
             }}
-            {{
-                onsButton({
-                    "text": "Continue",
-                    "type": "submit",
-                    "classes": "u-mt-l u-mb-s",
-                    "id": "continue_button",
-                    "submitType": "timer"
-                })
-            }}
-
-            <p>
-                <a id="cancel_button" href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}">Cancel</a>
-            </p>
-
+            <div class="ons-field ons-u-mt-l">
+                <div class="ons-btn-group">
+                    {{
+                        onsButton({
+                            "text": "Continue",
+                            "type": "submit",
+                            "classes": "u-mt-l u-mb-s",
+                            "id": "continue_button",
+                            "submitType": "timer"
+                        })
+                    }}
+                    <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}"
+                        id="cancel_button" role="button" class="ons-btn ons-btn--link ons-btn--secondary"><span class="ons-btn__inner">Cancel</span>
+                    </a>
+                </div>
+            </div>
         </form>
     </section>
 

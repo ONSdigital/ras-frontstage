@@ -79,11 +79,20 @@
         <h2 class="ons-u-fs-m">{{ share_dict[business].name }}</h2>
         {% if share_dict[business] | length > 0 %}
         <div class="ons-text-indent">
-            <ul class="ons-list ons-list--bare">
-                {% for survey in share_dict[business].surveys %}
-                    <li>{{ survey['longName'] }}</li>
-                {% endfor %}
-            </ul>
+            {% set surveyList = [] %}
+            {% for survey in share_dict[business].surveys %}
+                {% do surveyList.append(
+                    {
+                        "text": survey['longName']
+                    }
+                ) %}
+            {% endfor %}
+            {{
+                onsList({
+                    "variants": 'bare',
+                    "itemsList": surveyList
+                })
+            }}
         </div>
         {% endif %}
     {% endfor %}

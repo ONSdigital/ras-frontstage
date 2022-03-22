@@ -60,7 +60,7 @@
                 "subject": message.subject,
                 "fromText": message.from or 'Unavailable',
                 "dateText": message.sent_date or 'Unavailable',
-                "body": message['body']|truncate(80, False, '...', 0)
+                "body": '<xmp>'+ message['body']|truncate(80, False, '...', 0) +'</xmp>'
               }
           ) %}
       {% endfor %}

@@ -52,17 +52,16 @@
         {% for message in messages %}
             {% do messageList.append(
                 {
-                    "id": "message-link-" ~ loop.index,
-                    "unread": true if message['unread'] else false,
-                    "url": url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) ~ "#latest-message",
-                    "subject": message.subject,
-                    "fromText": message.from or 'Unavailable',
-                    "dateText": message.sent_date or 'Unavailable',
-                    "body": message['body']|truncate(80, False, '...', 0)
+                  "id": "message-link-" ~ loop.index,
+                  "unread": true if message['unread'] else false,
+                  "url": url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) ~ "#latest-message",
+                  "subject": message.subject,
+                  "fromText": message.from or 'Unavailable',
+                  "dateText": message.sent_date or 'Unavailable',
+                  "body": '<xmp>'+ message['body']|truncate(80, False, '...', 0) +'</xmp>'
                 }
             ) %}
         {% endfor %}
-
         {{
             onsMessageList({
                 "ariaLabel": "Message list for ONS Business Surveys",

@@ -22,7 +22,7 @@ def register():
 
     if request.method == "POST" and form.validate():
         enrolment_code = form.enrolment_code.data.lower()
-        logger.info("Enrolment code submitted", enrolment_code=enrolment_code)
+        logger.info("Enrolment code submitted when attempting to create account", enrolment_code=enrolment_code)
 
         # Validate the enrolment code
         try:

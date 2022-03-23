@@ -20,9 +20,8 @@ def add_survey(_):
     form = EnrolmentCodeForm(request.form)
 
     if request.method == "POST" and form.validate():
-        logger.info("Enrolment code submitted")
         enrolment_code = request.form.get("enrolment_code").lower()
-
+        logger.info("Enrolment code submitted when attempting to add survey", enrolment_code=enrolment_code)
         # Validate the enrolment code
         try:
             iac = iac_controller.get_iac_from_enrolment(enrolment_code)

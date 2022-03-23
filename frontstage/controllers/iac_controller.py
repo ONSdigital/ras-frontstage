@@ -38,7 +38,7 @@ def get_iac_from_enrolment(enrolment_code):
         logger.info("IAC is not active", enrolment_code=enrolment_code)
         return
 
-    logger.info("Successfully retrieved IAC")
+    logger.info("Successfully retrieved IAC", enrolment_code=enrolment_code)
     return response.json()
 
 

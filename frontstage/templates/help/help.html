@@ -1,35 +1,36 @@
 {% extends "layouts/_block_content.html" %}
-{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/radios/_macro.njk" import onsRadios %}
 {% from "components/button/_macro.njk" import onsButton %}
 {% set page_title = "Help" %}
 {% set breadcrumbsData = [
-  {
-    "text": "Sign in",
-    "url": "/sign-in"
-  }
+    {
+        "text": "Sign in",
+        "url": "/sign-in"
+    }
 ] %}
 
-{% block breadcrumb %}
-{{
-    onsBreadcrumb({
-        "ariaLabel": "Breadcrumbs",
-        "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
-    })
-}}
-{% endblock breadcrumb %}
+{% block breadcrumbs %}
+    {{
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
+    }}
+{% endblock breadcrumbs %}
+
 {% block main %}
-{% set ns = namespace() %}
-{% include "radio-option-select-error-panel.html" %}
+    {% set ns = namespace() %}
+    {% include "radio-option-select-error-panel.html" %}
 
-<h1 class="u-fs-xl">Help</h1>
+    <h1 class="ons-u-fs-xl">Help</h1>
 
-<form action="{{ url_for('help_bp.help_submit')}}" method="post">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <form action="{{ url_for('help_bp.help_submit')}}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         {% if ns.optionError %}
-                {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
+            {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
         {% endif %}
         {{
             onsRadios({
@@ -62,20 +63,19 @@
                 ]
             })
         }}
-    <p class="field u-mt-l">
-        <div class="btn-group">
-        {{
+        <div class="ons-field ons-u-mt-l">
+            <div class="ons-btn-group">
+                {{
                     onsButton({
-                    "text": "Continue",
-                    "id": "btn-ons-help-option-continue",
-                    "classes": 'btn btn-group__btn',
-                    "submitType": "timer"
+                        "text": "Continue",
+                        "id": "btn-ons-help-option-continue",
+                        "submitType": "timer"
                     })
                 }}
-        <a href="{{ url_for('sign_in_bp.login') }}"
-      role="button" class="btn btn--link btn--secondary" id="btn-help-option-cancel"><span class="btn__inner">Cancel</span></a>
+                <a href="{{ url_for('sign_in_bp.login') }}"
+                    role="button" class="ons-btn ons-btn--link ons-btn--secondary" id="btn-help-option-cancel"><span class="ons-btn__inner">Cancel</span>
+                </a>
+            </div>
         </div>
-    </p>
-</form>
-
+    </form>
 {% endblock main %}

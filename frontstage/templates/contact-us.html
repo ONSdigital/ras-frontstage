@@ -1,33 +1,36 @@
 
 {% extends "layouts/_block_content.html" %}
+{% from "components/address-output/_macro.njk" import onsAddressOutput %}
 
 {% set page_title = "Contact us" %}
 
 {% block main %}
 
-    <h1 class="u-fs-xl">Contact us</h1>
-    
-    <h2 class="neptune">
+    <h1 class="ons-u-fs-xl">Contact us</h1>
+
+    <h2>
         Telephone
     </h2>
-    <div class="u-fs-r">
-        <p><a class="nowrap" href="tel:+44-300-1234-931">0300 1234 931</a></p>        
+    <div class="ons-u-fs-r">
+        <p><a href="tel:+44-300-1234-931">0300 1234 931</a></p>
     </div>
-    <div class="u-fs-r">
-        <p class="u-mb-l">Opening hours:<br />
+    <div class="ons-u-fs-r">
+        <p class="ons-u-mb-l">Opening hours:<br />
             Monday to Thursday 8:30am – 5pm<br/>
             Friday 8:30am - 4:30pm</p>
     </div>
-    <h2 class="neptune">
+    <h2>
         Post
     </h2>
-    <div class="u-fs-r">
-        <p>Office for National Statistics<br />
-            Government Buildings<br />
-            Cardiff Road<br />
-            Newport<br />
-            South Wales<br />
-            NP10 8XG</p>
-    </div>
+    {{
+        onsAddressOutput({
+            "unit": 'Office for National Statistics',
+            "organisation": 'Government Buildings',
+            "line1": 'Cardiff Road',
+            "line2": 'Newport',
+            "town": 'South Wales',
+            "postcode": 'NP10 8XG'
+        })
+    }}
 
 {% endblock main %}

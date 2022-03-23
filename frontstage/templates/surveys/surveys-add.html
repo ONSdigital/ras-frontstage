@@ -9,71 +9,70 @@
 
 {% block content %}
 
-{% if errorType == "failed" %}
+    {% if errorType == "failed" %}
         {% set errorMsg = 'Enter a valid enrolment code' %}
         {% set errorMsgText = { "text": errorMsg, "id": 'enrolment_code_error' } %}
         {% call
             onsPanel({
                 "type": "error",
                 "classes": "u-mb-s",
-                "title":  "This page has 1 error"
+                "title": "This page has 1 error"
             })
         %}
-        <p>This <strong>must be corrected</strong> to continue.</p>
-        {% from "components/lists/_macro.njk" import onsList %}
-        {{
-            onsList({
-                "classes": "list--bare",
-                "itemsList": [
-                    {
-                        "text": errorMsg,
-                        "index": true,
-                        "url": "#enrolment_code_error",
-                        "classes": "js-inpagelink"
-                    }
-                ]
-            })
-        }}
+            <p>This <strong>must be corrected</strong> to continue.</p>
+            {% from "components/lists/_macro.njk" import onsList %}
+            {{
+                onsList({
+                    "element": "ol",
+                    "itemsList": [
+                        {
+                            "text": errorMsg,
+                            "url": "#enrolment_code_error",
+                            "classes": "js-inpagelink"
+                        }
+                    ]
+                })
+            }}
         {% endcall %}
+    {% endif %}
 
-{% endif %}
+    <section>
+        <form id="enrolment-code"
+            action="{{ url_for('surveys_bp.add_survey') }}"
+            method="POST"
+            class="form">
+            {{ form.csrf_token }}
 
-<section>
-    <form id="enrolment-code"
-          action="{{ url_for('surveys_bp.add_survey') }}"
-          method="POST"
-          class="form">
-        {{ form.csrf_token }}
+            <h1 class="u-fs-xl ons-u-mt-s">Add a survey</h1>
 
-        <h1 class="u-fs-xl">Add a survey</h1>
-
-        {{
-            onsInput({
-                "id": "enrolment_code",
-                "name": "enrolment_code",
-                "type": "text",
-                "label": {
-                    "text": "Enrolment Code",
-                    "description": "You'll find this in the letter we sent you"
-                },
-                "error": errorMsgText
-            })
-        }}
-        {{
-            onsButton({
-                "text": "Continue",
-                "type": "submit",
-                "classes": "u-mt-l u-mb-s",
-                "id": "continue_button",
-                "submitType": "timer"
-            })
-        }}        
-
-        <p>
-            <a id="cancel_button" href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}">Cancel</a>
-        </p>
-
-    </form>
-</section>
+            {{
+                onsInput({
+                    "id": "enrolment_code",
+                    "name": "enrolment_code",
+                    "type": "text",
+                    "label": {
+                        "text": "Enrolment Code",
+                        "description": "You'll find this in the letter we sent you"
+                    },
+                    "error": errorMsgText
+                })
+            }}
+            <div class="ons-grid ons-grid--flex ons-grid--gutterless ons-grid--vertical-center ons-grid--no-wrap@s ons-u-mt-m ons-u-mb-m">
+                    <div class="ons-grid__col">
+                        {{
+                            onsButton({
+                                "text": "Continue",
+                                "type": "submit",
+                                "id": "continue_button",
+                                "submitType": "timer"
+                            })
+                        }}
+                    </div>
+                    <div class="ons-grid__col ons-u-ml-m">
+                        <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" id="cancel_button" role="button">Cancel</a>
+                    </div>
+                </div>
+        </form>
+    </section>
 
 {% endblock content %}

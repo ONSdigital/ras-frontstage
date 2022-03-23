@@ -14,21 +14,20 @@
         {% call
             onsPanel({
                 "type": "error",
-                "classes": "u-mb-s",
-                "title":  "This page has 1 error"
+                "classes": "ons-u-mb-s",
+                "title": "This page has 1 error"
             })
         %}
         <p>This <strong>must be corrected</strong> to continue.</p>
         {% from "components/lists/_macro.njk" import onsList %}
         {{
             onsList({
-                "classes": "list--bare",
+                "element": "ol",
                 "itemsList": [
                     {
                         "text": errorMsg,
-                        "index": true,
                         "url": "#enrolment_code_error",
-                        "classes": "js-inpagelink"
+                        "classes": "ons-js-inpagelink"
                     }
                 ]
             })
@@ -37,13 +36,12 @@
     {% endif %}
 
     <form
-            method="post"
-            action="{{ url_for('register_bp.register') }}"
-            class="form"
-            role="form">
+        method="post"
+        action="{{ url_for('register_bp.register') }}"
+        role="form">
         {{ form.csrf_token }}
 
-        <h1 class="u-fs-xl">Create an account</h1>
+        <h1 class="ons-u-fs-xl">Create an account</h1>
 
         {{
             onsInput({
@@ -62,11 +60,11 @@
             onsButton({
                 "text": "Continue",
                 "type": "submit",
-                "classes": "u-mt-l u-mb-s",
+                "classes": "ons-u-mt-l ons-u-mb-s",
                 "id": "continue_button",
                 "submitType": "timer"
             })
-        }}        
+        }}
     </form>
 
 {% endblock main %}

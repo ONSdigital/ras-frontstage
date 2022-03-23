@@ -6,27 +6,24 @@
 
 {% block main %}
     <form
-            method="post"
-            action="{{ url_for('register_bp.register_activate_account') }}"
-            class="form"
-            role="form">
-        <h1 class="u-fs-xl">Activate your account</h1>
-        {{ form.csrf_token }}
+        method="post"
+        action="{{ url_for('register_bp.register_activate_account') }}"
+        role="form">
+            <h1 class="ons-u-fs-xl">Activate your account</h1>
+            {{ form.csrf_token }}
 
-        <div class="label__description label__inner u-fs-s">Thanks for confirming your email address</div>
+            <div class="ons-label__description ons-label__inner ons-u-fs-s">Thanks for confirming your email address</div>
+            <br />
+            <div class="ons-label__description ons-label__inner ons-u-fs-s">Please now activate your account</div>
 
-        <br />
-
-        <div class="label__description label__inner u-fs-s">Please now activate your account</div>
-
-    {{
-        onsButton({
-            "text": "Activate account",
-            "type": "submit",
-            "classes": "u-mt-l u-mb-s",
-            "id": "activate_account_button",
-            "submitType": "timer"
-        })
-    }}        
+            {{
+                onsButton({
+                    "text": "Activate account",
+                    "type": "submit",
+                    "classes": "ons-u-mt-l ons-u-mb-s",
+                    "id": "activate_account_button",
+                    "submitType": "timer"
+                })
+            }}
     </form>
 {% endblock main %}

@@ -17,7 +17,7 @@ jobs:
           project_id: ${{ secrets.GOOGLE_PROJECT_ID }}
           service_account_key: ${{ secrets.GCR_KEY }}
           export_default_credentials: true
-          
+
       - uses: onsdigital/ras-rm-spinnaker-action@main
         with:
           comment-body: ${{ github.event.comment.body }}

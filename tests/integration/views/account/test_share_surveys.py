@@ -228,7 +228,7 @@ class TestShareSurvey(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Send instructions".encode(), response.data)
         self.assertIn(
-            "will send an email to <b>a@a.com</b> with instructions to access the following surveys:".encode(),
+            "will send an email to <strong>a@a.com</strong> with instructions to access the following surveys:".encode(),
             response.data,
         )
         self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)

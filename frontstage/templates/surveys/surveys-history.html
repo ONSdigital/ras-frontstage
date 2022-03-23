@@ -3,9 +3,8 @@
 {% set page_title = "Completed surveys" %}
 
 {% block content %}
-{% include "partials/tab_list.html" %}
+    {% include "partials/tab_list.html" %}
 
-{% set emptySurveyListLabel = 'No items to show' %}
-{% include "surveys/surveys.html" %}
-
+    {% set emptySurveyListLabel = 'No items to show' %}
+    {% include "surveys/surveys.html" %}
 {% endblock content %}

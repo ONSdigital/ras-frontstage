@@ -5,12 +5,12 @@
     {% set signInOutText = "Sign out" %}
     {% do serviceLinks | setAttribute("itemsList", [
         {
-          "text": "My account",
-          "url": "/my-account"
+            "title": "My account",
+            "url": "/my-account"
         },
         {
-          "text": signInOutText,
-          "url": signInOutURL
+            "title": signInOutText,
+            "url": signInOutURL
         }
     ])%}
 {% else %}
@@ -18,16 +18,15 @@
     {% set signInOutText = "Sign in" %}
     {% do serviceLinks | setAttribute("itemsList", [
         {
-          "text": "Help",
-          "url": "/help"
+            "title": "Help",
+            "url": "/help"
         },
         {
-          "text": signInOutText,
-          "url": signInOutURL
+            "title": signInOutText,
+            "url": signInOutURL
         }
       ])
     %}
 {% endif %}
-
 
 {% do pageConfig | setAttribute("serviceLinks", serviceLinks) %}

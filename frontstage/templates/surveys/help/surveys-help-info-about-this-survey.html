@@ -1,39 +1,41 @@
 {% extends "layouts/_block_content.html" %}
-{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/radios/_macro.njk" import onsRadios %}
 {% from "components/button/_macro.njk" import onsButton %}
 
 {% set page_title = "Help Information about this survey" %}
 {% set breadcrumbsData = [
-  {
-    "text": "Surveys",
-    "url": "/surveys/todo",
-    "id": "b-item-1"
-  },
-  {
-    "text": "Help",
-    "url": "/surveys/surveys-help?survey_ref="~survey_ref~"&ru_ref="~ru_ref,
-    "id": "b-item-2"
-  }
+    {
+        "text": "Surveys",
+        "url": "/surveys/todo",
+        "id": "b-item-1"
+    },
+    {
+        "text": "Help",
+        "url": "/surveys/surveys-help?survey_ref="~survey_ref~"&ru_ref="~ru_ref,
+        "id": "b-item-2"
+    }
 ] %}
-{% block breadcrumb %}
-{{
-    onsBreadcrumb({
-        "ariaLabel": "Breadcrumbs",
-        "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
-    })
-}}
-{% endblock breadcrumb %}
+
+{% block breadcrumbs %}
+    {{
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
+    }}
+{% endblock breadcrumbs %}
+
 {% block main %}
-{% set ns = namespace() %}
-{% include "radio-option-select-error-panel.html" %}
-<h1 class="u-fs-xl">Information about the {{ survey_name }}</h1>
-<form action="{{ url_for('surveys_bp.post_help_option_select', short_name=short_name, business_id=business_id, option=option, survey_ref=survey_ref, ru_ref=ru_ref)}}" method="post">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    {% set ns = namespace() %}
+    {% include "radio-option-select-error-panel.html" %}
+    <h1 class="ons-u-fs-xl">Information about the {{ survey_name }}</h1>
+    <form action="{{ url_for('surveys_bp.post_help_option_select', short_name=short_name, business_id=business_id, option=option, survey_ref=survey_ref, ru_ref=ru_ref)}}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         {% if ns.optionError %}
-                {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
+            {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
         {% endif %}
         {{
             onsRadios({
@@ -87,24 +89,23 @@
                 ]
             })
         }}
-    <p class="field u-mt-l">
-        <div class="grid grid--flex grid--gutterless grid--vertical-center grid--no-wrap@s u-mt-m u-mb-m">
-            <div class="grid__col">
-                {{
-                    onsButton({
+        <div class="ons-field ons-u-mt-l">
+            {{
+                onsButton({
                     "text": "Continue",
                     "id": "btn-help-info-survey-option-continue",
-                    "classes": 'btn btn-group__btn',
                     "submitType": "timer"
-                    })
-                }}
-            </div>
-            <div class="grid__col u-ml-m">
-                <a href="{{ url_for('surveys_bp.get_surveys_help_page', survey_ref=survey_ref, ru_ref=ru_ref) }}"
-                id="btn-help-info-survey-option-cancel">Cancel</a>
-            </div>
+                })
+            }}
+            {{
+                onsButton({
+                    "id": "btn-help-info-survey-option-cancel",
+                    "url": url_for('surveys_bp.get_surveys_help_page', survey_ref=survey_ref, ru_ref=ru_ref),
+                    "text": 'Cancel',
+                    "variants": 'secondary',
+                    "noIcon": true
+                })
+            }}
         </div>
-    </p>
-</form>
-
+    </form>
 {% endblock main %}

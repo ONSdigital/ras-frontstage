@@ -18,8 +18,8 @@
         {% call
             onsPanel({
                 "type": "error",
-                "classes": "u-mb-s",    
-                "title":  errorTitle
+                "classes": "ons-u-mb-s",
+                "title": errorTitle
             })
         %}
             <p>These <strong>must be corrected</strong> to continue.</p>
@@ -29,34 +29,32 @@
                 {% do errorData.append(
                     {
                         "text": 'Problem with the ' ~ error_text.replace('_', ' '),
-                        "index": true,
                         "url": "#" ~ error ~ '_error',
-                        "classes": "js-inpagelink"
+                        "classes": "ons-js-inpagelink"
                     }
                 ) %}
             {% endfor %}
             {{
                 onsList({
-                    "classes": "list--bare",
+                    "element": "ol",
                     "itemsList": errorData
-                }) 
+                })
             }}
         {% endcall %}
     {% endif %}
         <form
             method="post"
-            class="form"
             role="form"
             onsubmit="formSubmitted(event);">
             {{ form.csrf_token }}
 
-        <h1 class="u-fs-xl">Enter your account details</h1>
+        <h1 class="ons-u-fs-xl">Enter your account details</h1>
         {{ form.enrolment_code }}
 
         <h2>Your name</h2>
         {%- call onsFieldset({
             "legend": "Your name",
-            "legendClasses": "u-vh"
+            "legendClasses": "ons-u-vh"
         }) -%}
             {% if errors.first_name %}
                 {% set errorFirstName = { "text": errors['first_name'][0],  "id": 'first_name_error' } %}
@@ -91,11 +89,11 @@
             }}
         {% endcall %}
         
-        <h2 class="u-mt-l">Email address</h2>
+        <h2 class="ons-u-mt-l">Email address</h2>
         <p>We'll send you an email so you can activate your account</p>
         {%- call onsFieldset({
             "legend": "Email address",
-            "legendClasses": "u-vh"
+            "legendClasses": "ons-u-vh"
         }) -%}
             {% if errors.email_address %}
                 {% set errorEmailAddress = { "text": errors['email_address'][0],  "id": 'email_address_error' } %}
@@ -124,17 +122,29 @@
                 })
             }}
         {% endcall %}
-        <h2 class="u-mt-l">Create a password</h2>
+        <h2 class="ons-u-mt-l">Create a password</h2>
         <p>Your password must have:</p>
-        <ul>
-            <li>at least 12 characters </li>
-            <li>at least one symbol (eg ?!£%) </li>
-            <li>at least one capital letter</li>
-            <li>at least one number</li>
-        </ul>
+        {{
+            onsList({
+                "itemsList": [
+                    {
+                        "text": 'at least 12 characters'
+                    },
+                    {
+                        "text": 'at least one symbol (eg ?!£%)'
+                    },
+                    {
+                        "text": 'at least one capital letter'
+                    },
+                    {
+                        "text": 'at least one number'
+                    }
+                ]
+            })
+        }}
         {%- call onsFieldset({
             "legend": "Create a password",
-            "legendClasses": "u-vh"
+            "legendClasses": "ons-u-vh"
         }) -%}
             {% if errors.password %}
                 {% set errorPassword = { "text": errors['password'][0],  "id": 'password_error' } %}
@@ -166,11 +176,11 @@
 
         {% endcall %}
         
-        <h2 class="u-mt-l">Contact telephone number</h2>
+        <h2 class="ons-u-mt-l">Contact telephone number</h2>
         <p>We'll use this number if we need to discuss any survey information provided</p>
         {%- call onsFieldset({
             "legend": "Create a password",
-            "legendClasses": "u-vh"
+            "legendClasses": "ons-u-vh"
         }) -%}
             {% if errors.phone_number %}
                 {% set errorPhoneNumber = { "text": errors['phone_number'][0],  "id": 'phone_number_error' } %}
@@ -189,19 +199,19 @@
                     "error": errorPhoneNumber,
                     "value": form.phone_number.data
                 })
-            }}        
+            }}
         {% endcall %}
-        <h3 class="u-mt-l">Privacy notice</h3>
+        <h3 class="ons-u-mt-l">Privacy notice</h3>
             <p>Your user account will be deleted after 36 months of inactivity</p>
         {{
             onsButton({
                 "text": "Continue",
                 "type": "submit",
-                "classes": "u-mt-l u-mb-s",
+                "classes": "ons-u-mt-l ons-u-mb-s",
                 "id": "continue_button",
                 "submitType": "timer"
             })
-        }}        
+        }}
 
     </form>
 

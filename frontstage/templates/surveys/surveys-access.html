@@ -1,6 +1,7 @@
 {% extends 'layouts/_base.html' %}
 {% from "components/button/_macro.njk" import onsButton %}
 {% from "components/collapsible/_macro.njk" import onsCollapsible %}
+{% from "components/lists/_macro.njk" import onsList %}
 
 {% set page_title = survey_info.longName ~ ' ' ~ collection_exercise_info.userDescription %}
 
@@ -16,7 +17,7 @@
 
 <br/>
 
-<h1 class="u-fs-xl">{{ survey_info.longName }}</h1>
+<h1 class="ons-u-fs-xl">{{ survey_info.longName }}</h1>
 
 <h2>Download</h2>
 
@@ -30,39 +31,47 @@
 {{
     onsButton({
         "url": url_for('surveys_bp.download_survey', case_id=case_id, business_party_id=business_info.id, survey_short_name=survey_info.shortName),
-        "text": '<span class="download__text">Download spreadsheet&nbsp;&nbsp;&nbsp;</span><span class="download__text"><i class="fa fa-download fa-lg" aria-hidden="true"></i></span><div class="download__text u-fs-s">(' ~ collection_instrument_size | file_size_filter ~ ' kb XLS)</div>',
+        "text": 'Download spreadsheet<div class="ons-u-fs-s">(' ~ collection_instrument_size | file_size_filter ~ ' kb XLS)</div>',
         "type": "submit",
         "hideCaret": true,
-        "classes": "u-mt-s u-mb-s",
+        "classes": "ons-u-mt-s ons-u-mb-s",
         "id": "download_survey_button",
         "submitType": "timer",
         "attributes": {
             "onclick": "ga('send', 'event', 'survey', 'download', 'survey_ref = " ~ survey_info.surveyRef ~ " collection_exercise_ref = " ~ collection_exercise_info.exerciseRef ~ "');"
         }
     })
-}}        
+}}
 <hr>
-<h2 class="u-mt-m">Upload your spreadsheet</h2>
+<h2 class="ons-u-mt-m">Upload your spreadsheet</h2>
 {% if collection_exercise_info.scheduledReturnDateTimeFormatted %}
 <p>Please upload by <strong>{{ collection_exercise_info.scheduledReturnDateTimeFormatted }}</strong></p>
 {% endif %}
 
  {% call onsCollapsible({
     "id": "collapsible",
-    "classes": "u-mb-m",
+    "classes": "ons-u-mb-m",
     "title": "Guidance for uploading",
     "button": {
         "close": "Hide this",
         "contextSuffix": "content"
     }
 }) %}
-    <h3 class="u-mb-s">Your file needs to be:</h3>
-    <ul>
-        <li>.xls or .xlsx format</li>
-        <li>smaller than 20MB</li>
-    </ul>
+    <h3 class="ons-u-mb-s">Your file needs to be:</h3>
+    {{
+        onsList({
+            "itemsList": [
+                {
+                    "text": '.xls or .xlsx format'
+                },
+                {
+                    "text": 'smaller than 20MB'
+                }
+            ]
+        })
+    }}
 {% endcall %}
-<p class="u-fs-r--b icon--lock">We will treat your data securely and confidentially</p>
+<p class="ons-u-fs-r--b icon--lock">We will treat your data securely and confidentially</p>
 
 {% include "surveys/surveys-upload-file-picker.html" %}
 

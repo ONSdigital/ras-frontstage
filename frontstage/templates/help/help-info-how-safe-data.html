@@ -1,53 +1,75 @@
 {% extends "layouts/_block_content.html" %}
-{% from "components/breadcrumb/_macro.njk" import onsBreadcrumb %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/button/_macro.njk" import onsButton %}
+{% from "components/lists/_macro.njk" import onsList %}
 
 {% set page_title = "Help how safe is my data" %}
 {% set breadcrumbsData = [
-  {
-    "text": "Sign in",
-    "url": "/sign-in"
-  },
-  {
-    "text": "Help",
-    "url": "/help"
-  },
-  {
-    "text": "Information about the ONS",
-    "url": "/help/info-ons"
-  }
+    {
+        "text": "Sign in",
+        "url": "/sign-in"
+    },
+    {
+        "text": "Help",
+        "url": "/help"
+    },
+    {
+        "text": "Information about the ONS",
+        "url": "/help/info-ons"
+    }
 ] %}
-{% block breadcrumb %}
-{{
-    onsBreadcrumb({
-        "ariaLabel": "Breadcrumbs",
-        "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
-    })
-}}
-{% endblock breadcrumb %}
+{% block breadcrumbs %}
+    {{
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
+    }}
+{% endblock breadcrumbs %}
 
 {% block main %}
-<h1 class="u-fs-xl">How do you keep my data safe?</h1>
+    <h1 class="ons-u-fs-xl">How do you keep my data safe?</h1>
 
-<p>We uphold our legal obligation to protect data in the following ways:</p>
-<ul>
-    <li>through the staff we employ</li>
-    <li>their training</li>
-    <li>the procedures we adopt</li>
-    <li>the IT equipment we use</li>
-</ul>
-<p>We treat your data in strict confidence in line with the provisions of:</p>
-<ul>
-    <li>section 39 of the Statistics and Registration Services Act 2007</li>
-    <li>data protection legislation (including the General Data Protection Regulation and the Data Protection Act 2018)</li>
-    <li>the Code of Practice for Statistics</li>
-</ul>
-<p>We only share your data with  authorised ONS staff who need to be aware of them to compile statistics.</p>
-<p>Any unauthorised disclosure of data would be a disciplinary and, in some cases criminal, offence.</p>
+    <p>We uphold our legal obligation to protect data in the following ways:</p>
+    {{
+        onsList({
+            "itemsList": [
+                {
+                    "text": 'through the staff we employ'
+                },
+                {
+                    "text": 'their training'
+                },
+                {
+                    "text": 'the procedures we adopt'
+                },
+                {
+                    "text": 'the IT equipment we use'
+                }
+            ]
+        })
+    }}
+    <p>We treat your data in strict confidence in line with the provisions of:</p>
+    {{
+        onsList({
+            "itemsList": [
+                {
+                    "text": 'section 39 of the Statistics and Registration Services Act 2007'
+                },
+                {
+                    "text": 'data protection legislation (including the General Data Protection Regulation and the Data Protection Act 2018)'
+                },
+                {
+                    "text": 'the Code of Practice for Statistics'
+                }
+            ]
+        })
+    }}
+    <p>We only share your data with  authorised ONS staff who need to be aware of them to compile statistics.</p>
+    <p>Any unauthorised disclosure of data would be a disciplinary and, in some cases criminal, offence.</p>
 
-<h2>Need more information?</h2>
-<p><a href="{{ url_for('sign_in_bp.login') }}" rel="noopener">Sign in to your account</a> to send us a secure message.</p>
-<p>If you are having problems signing in, please <a href="{{ url_for('contact_us_bp.contact_us') }}" rel="noopener">contact us</a>.</p>
-<p></p>
+    <h2>Need more information?</h2>
+    <p><a href="{{ url_for('sign_in_bp.login') }}" rel="noopener">Sign in to your account</a> to send us a secure message.</p>
+    <p>If you are having problems signing in, please <a href="{{ url_for('contact_us_bp.contact_us') }}" rel="noopener">contact us</a>.</p>
 {% endblock main %}

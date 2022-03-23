@@ -1,15 +1,15 @@
-.tab--row {
-  height:2.55rem;
+.tab {
+  text-decoration: none !important;
 }
 
-.tab--row[aria-selected=true]:after {
-  height: .11rem;
+.tab--text {
+  text-decoration: underline;
 }
 
-.notification-badge {
-  display: inline-block;
+.tab--notification-badge {
+  max-height: 28px;
   min-width: 28px;
-  padding: 0px 4px 0 3px;
+  padding: 1px 9px 1px 8px;
   margin-left: 8px;
   border-radius: 16px;
   color: #fff;
@@ -17,8 +17,17 @@
   font-weight: 600;
   text-align: center;
   white-space: nowrap;
+  text-decoration: none;
 }
 
-.no-js .hide-if-no-js {
-  display: none;
+.ons-tab--row[aria-selected=true] .tab--text {
+  text-decoration: none;
+}
+
+.ons-tab--row[aria-selected=true]:hover .tab--text {
+  text-decoration: none;
+}
+
+.ons-tab--row:hover .tab--text {
+  text-decoration: underline solid 2px;
 }

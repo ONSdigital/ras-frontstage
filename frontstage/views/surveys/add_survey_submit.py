@@ -23,11 +23,11 @@ logger = wrap_logger(logging.getLogger(__name__))
 @jwt_authorization(request)
 def add_survey_submit(session):
     party_id = session.get_party_id()
-    logger.info("Assigning new survey to a user", party_id=party_id)
 
     cryptographer = Cryptographer()
     encrypted_enrolment_code = request.args.get("encrypted_enrolment_code")
     enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
+    logger.info("Assigning new survey to a user", party_id=party_id, enrolment_code=enrolment_code)
 
     try:
         # Verify enrolment code is active
@@ -37,6 +37,7 @@ def add_survey_submit(session):
             # but it's better then what used to happen, which was raise TypeError and show them the generic exception
             # page.  This lets us more easily debug the issue.  Ideally we'd redirect the user to the surveys_list
             # page with a 'Something went wrong when signing you up for the survey, try again or call us' error.
+            logger.error("IAC code not found or inactive", enrolment_code=enrolment_code)
             abort(400)
 
         # Add enrolment for user in party
@@ -56,7 +57,10 @@ def add_survey_submit(session):
         already_enrolled = None
         if is_respondent_and_business_enrolled(info["associations"], case["caseGroup"]["surveyId"], party_id):
             logger.info(
-                "User tried to enrol onto a survey they are already enrolled on", case_id=case_id, party_id=party_id
+                "User tried to enrol onto a survey they are already enrolled on",
+                case_id=case_id,
+                party_id=party_id,
+                enrolment_code=enrolment_code,
             )
             already_enrolled = True
         else:
@@ -77,7 +81,10 @@ def add_survey_submit(session):
         raise
 
     logger.info(
-        "Successfully retrieved data for confirm add organisation/survey page", case_id=case_id, party_id=party_id
+        "Successfully retrieved data for confirm add organisation/survey page",
+        case_id=case_id,
+        party_id=party_id,
+        enrolment_code=enrolment_code,
     )
     return redirect(
         url_for(

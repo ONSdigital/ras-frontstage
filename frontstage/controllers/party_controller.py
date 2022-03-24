@@ -52,10 +52,10 @@ def add_survey(party_id, enrolment_code):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error("Failed to add a survey", party_id=party_id)
+        logger.error("Failed to add a survey", party_id=party_id, enrolment_code=enrolment_code)
         raise ApiError(logger, response)
 
-    logger.info("Successfully added a survey", party_id=party_id)
+    logger.info("Successfully added a survey", party_id=party_id, enrolment_code=enrolment_code)
 
 
 def change_password(email, password):

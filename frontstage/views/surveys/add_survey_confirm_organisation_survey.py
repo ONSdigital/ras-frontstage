@@ -30,7 +30,7 @@ def survey_confirm_organisation(_):
     # Validate enrolment code before retrieving organisation data
     iac_controller.validate_enrolment_code(enrolment_code)
 
-    logger.info("Attempting to retrieve data for confirm add organisation/survey page")
+    logger.info("Attempting to retrieve data for confirm add organisation/survey page", enrolment_code=enrolment_code)
     try:
         # Get organisation name
         case = case_controller.get_case_by_enrolment_code(enrolment_code)
@@ -51,6 +51,7 @@ def survey_confirm_organisation(_):
             "Failed to retrieve data for confirm add organisation/survey page",
             api_url=exc.url,
             api_status_code=exc.status_code,
+            enrolment_code=enrolment_code,
         )
         raise
 
@@ -70,6 +71,7 @@ def survey_confirm_organisation(_):
         collection_exercise_id=collection_exercise_id,
         business_party_id=business_party_id,
         survey_id=survey_id,
+        enrolment_code=enrolment_code,
     )
 
     return render_template("surveys/surveys-confirm-organisation.html", context=business_context)

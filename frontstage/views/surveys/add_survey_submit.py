@@ -37,7 +37,7 @@ def add_survey_submit(session):
             # but it's better then what used to happen, which was raise TypeError and show them the generic exception
             # page.  This lets us more easily debug the issue.  Ideally we'd redirect the user to the surveys_list
             # page with a 'Something went wrong when signing you up for the survey, try again or call us' error.
-            logger.info("IAC code not found or inactive", enrolment_code=enrolment_code)
+            logger.error("IAC code not found or inactive", enrolment_code=enrolment_code)
             abort(400)
 
         # Add enrolment for user in party

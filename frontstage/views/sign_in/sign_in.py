@@ -104,6 +104,7 @@ def login():  # noqa: C901
             expires=redis_session.get_expires_in(),
             secure=secure,
             httponly=secure,
+            samesite="strict",
         )
         count = conversation_controller.get_message_count_from_api(redis_session)
         redis_session.set_unread_message_total(count)

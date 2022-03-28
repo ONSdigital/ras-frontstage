@@ -12,11 +12,9 @@
 {% block messages %}
 
     {% if conversation_data.is_closed %}
-        {% call
-            onsPanel({
-                "classes": "ons-u-mb-s"
-            })
-        %}
+        {% call onsPanel({
+            "classes": "ons-u-mb-s"
+        }) %}
             <p class="ons-u-fs-r ons-u-mb-xs">This conversation has now been closed. <br>
             You can still send a message from your
             <a href="/surveys/todo">to do list</a> or
@@ -32,11 +30,10 @@
         {% endif %}
 
         {% call onsPanel({
-                "type": "error",
-                "classes": "ons-u-mb-s",
-                "title": errorTitle
-            })
-        %}
+            "type": "error",
+            "classes": "ons-u-mb-s",
+            "title": errorTitle
+        }) %}
             <p>These <strong>must be corrected</strong> to continue.</p>
             {% set errorData = [] %}
             {% for error in form.body.errors %}
@@ -79,22 +76,21 @@
                     {% endif %}
 
                     {% call onsMessage({
-                            "type": msgType,
-                            "id": 'conversation-message-' + loop.index|string,
-                            "name": 'conversation-message',
-                            "fromLabel": 'From',
-                            "fromName": 'sm-sender',
-                            "fromId": 'sm-sender-' + loop.index|string,
-                            "fromValue": message.get('from'),
-                            "sentLabel": 'Sent',
-                            "sentValue": message.get('sent_date'),
-                            "sentName": 'sm-sent-date',
-                            "sentId": 'sm-sent-date-' + loop.index|string,
-                            "messageID": 'conversation-message-body-' + loop.index|string,
-                            "messageName": 'conversation-message-body'
-                        })
-                    %}
-                            <span style="white-space:pre-line">{{ message.get('body') }}</span>
+                        "type": msgType,
+                        "id": 'conversation-message-' + loop.index|string,
+                        "name": 'conversation-message',
+                        "fromLabel": 'From',
+                        "fromName": 'sm-sender',
+                        "fromId": 'sm-sender-' + loop.index|string,
+                        "fromValue": message.get('from'),
+                        "sentLabel": 'Sent',
+                        "sentValue": message.get('sent_date'),
+                        "sentName": 'sm-sent-date',
+                        "sentId": 'sm-sent-date-' + loop.index|string,
+                        "messageID": 'conversation-message-body-' + loop.index|string,
+                        "messageName": 'conversation-message-body'
+                    }) %}
+                        <span style="white-space:pre-line">{{ message.get('body') }}</span>
                     {% endcall %}
                     {% if loop.last %}
                         </div>

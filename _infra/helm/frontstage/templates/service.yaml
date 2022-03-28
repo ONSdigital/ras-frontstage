@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: {{ .Chart.Name }}
   annotations:
-    beta.cloud.google.com/backend-config: '{"ports": {"{{ .Values.service.port }}":"frontstage-backend-config"}}'
+    cloud.google.com/backend-config: '{"ports": {"{{ .Values.service.port }}":"frontstage-backend-config"}}'
 spec:
   type: {{ .Values.service.type }}
   ports:

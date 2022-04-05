@@ -87,6 +87,11 @@ def reset_password_check_email():
     return render_template("passwords/reset-password.check-email.html")
 
 
+@passwords_bp.route("/reset-password/exceeded-attempts", methods=["GET"])
+def exceeded_number_of_reset_attempts():
+    return render_template("passwords/exceeded-password-reset-attempts.html")
+
+
 @passwords_bp.route("/resend-password-email-expired-token/<token>", methods=["GET"])
 def resend_password_email_expired_token(token):
     email = verification.decode_email_token(token)
@@ -102,6 +107,16 @@ def request_password_change(email):
         return redirect(url_for("passwords_bp.reset_password_check_email"))
 
     party_id = str(respondent["id"])
+
+    if respondent["password_reset_counter"] >= 5:
+        try:
+            email = verification.decode_email_token(
+                respondent["password_verification_token"], app.config["PASSWORD_RESET_ATTEMPTS_TIMEOUT"]
+            )
+        except SignatureExpired:
+            party_controller.reset_password_reset_counter(party_id)
+        logger.error("Password reset attempts exceeded")
+        return redirect(url_for("passwords_bp.exceeded_number_of_reset_attempts"))
 
     logger.info("Requesting password change", party_id=party_id)
 

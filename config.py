@@ -45,6 +45,7 @@ class Config(object):
     PASSWORD_CRITERIA_ERROR_TEXT = "Your password doesn't meet the requirements"
     PASSWORD_MIN_LENGTH = 12
     PASSWORD_MAX_LENGTH = 160
+    PASSWORD_RESET_ATTEMPTS_TIMEOUT = 86400
 
     AUTH_URL = os.getenv("AUTH_URL")
     CASE_URL = os.getenv("CASE_URL")

@@ -715,6 +715,29 @@ def get_business_by_ru_ref(ru_ref: str):
     return response.json()
 
 
+def get_verification_token(party_id):
+    """
+    Gives call to party service to retrieve a verification token for the respondent
+    :param party_id: the respondent's id
+    :returns: verification token
+    """
+    logger.info("Attempting to retrieve respondent verification token", party_id=party_id)
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-verification-token"
+    response = requests.get(url, auth=app.config["BASIC_AUTH"])
+
+    try:
+        response.raise_for_status()
+    except requests.HTTPError:
+        if response == 404:
+            logger.error("Verification token not found")
+            raise NotFound("Token not found")
+        logger.error("Failed to retrieve verification token", party_id=party_id)
+
+    logger.info("Successfully retrieved verification token")
+
+    return response.json()
+
+
 def post_verification_token(email, token):
     """
     Gives call to party service to add a verification token for the respondent
@@ -724,7 +747,7 @@ def post_verification_token(email, token):
     logger.info("Attempting to add respondent verification token", email=obfuscate_email(email))
 
     party_id = get_respondent_by_email(email)["id"]
-    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-verification-tokens"
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-verification-token"
     payload = {
         "token": token,
     }
@@ -750,7 +773,7 @@ def delete_verification_token(token):
     logger.info("Attempting to delete respondent verification token", email=obfuscate_email(email))
 
     party_id = get_respondent_by_email(email)["id"]
-    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-verification-tokens/{token}"
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-verification-token/{token}"
     response = requests.delete(url, auth=app.config["BASIC_AUTH"])
 
     try:
@@ -764,4 +787,50 @@ def delete_verification_token(token):
 
     logger.info("Successfully deleted respondent verification token", email=obfuscate_email(email))
 
+    return response.json()
+
+
+def get_password_reset_counter(party_id):
+    """
+    Gives call to the party service to retrieve the password reset counter for the respondent
+    :param party_id: the respondent's id
+    :returns: current number of password reset attempts
+    """
+
+    logger.info("Attempting to retrieve respondent password reset counter", party_id=party_id)
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-reset-counter/"
+    response = requests.get(url, auth=app.config["BASIC_AUTH"])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        if response.status_code == 404:
+            logger.error("Counter not found")
+            raise NotFound("Counter not found")
+        logger.error("Failed to retrieve password reset counter", party_id=party_id)
+
+    logger.info("Successfully retrieved password reset counter")
+    return response.json()
+
+
+def reset_password_reset_counter(party_id):
+    """
+    Gives call to the party service to reset the password reset counter for the respondent
+    :param party_id: the respondent's id
+    :returns: current number of password reset attempts
+    """
+
+    logger.info("Attempting to reset respondent password reset counter", party_id=party_id)
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-reset-counter/"
+    response = requests.delete(url, auth=app.config["BASIC_AUTH"])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        if response.status_code == 404:
+            logger.error("Counter not found")
+            raise NotFound("Counter not found")
+        logger.error("Failed to reset password reset counter", party_id=party_id)
+
+    logger.info("Successfully reset password reset counter")
     return response.json()

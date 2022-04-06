@@ -319,7 +319,6 @@ class TestPasswords(unittest.TestCase):
         )
         with app.app_context():
             token = verification.generate_email_token("test@test.com")
-        print(url_password_reset_counter)
         mock_request.get(url_password_reset_counter, status_code=200, json={"counter": 0})
         mock_request.delete(url_password_reset_counter, status_code=200, json={})
         mock_request.put(url_password_reset_counter, status_code=200, json={})

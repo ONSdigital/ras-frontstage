@@ -798,7 +798,7 @@ def get_password_reset_counter(party_id):
     """
 
     logger.info("Attempting to retrieve respondent password reset counter", party_id=party_id)
-    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-reset-counter/"
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-reset-counter"
     response = requests.get(url, auth=app.config["BASIC_AUTH"])
 
     try:
@@ -821,7 +821,7 @@ def increase_password_reset_counter(party_id):
 
     logger.info("Attempting to increase respondent password reset counter", party_id=party_id)
     payload = {"message": "++"}
-    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-reset-counter/"
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-reset-counter"
     response = requests.put(url, auth=app.config["BASIC_AUTH"], json=payload)
 
     try:
@@ -843,7 +843,7 @@ def reset_password_reset_counter(party_id):
     """
 
     logger.info("Attempting to reset respondent password reset counter", party_id=party_id)
-    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-reset-counter/"
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-reset-counter"
     response = requests.delete(url, auth=app.config["BASIC_AUTH"])
 
     try:

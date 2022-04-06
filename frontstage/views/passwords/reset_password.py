@@ -109,13 +109,20 @@ def request_password_change(email):
     party_id = str(respondent["id"])
     password_reset_counter = party_controller.get_password_reset_counter(party_id)["counter"]
 
-    if password_reset_counter >= 5:
+    if password_reset_counter != 0:
         try:
             email = verification.decode_email_token(
                 respondent["password_verification_token"], app.config["PASSWORD_RESET_ATTEMPTS_TIMEOUT"]
             )
         except SignatureExpired:
-            party_controller.reset_password_reset_counter(party_id)
+            try:
+                party_controller.reset_password_reset_counter(party_id)
+                password_reset_counter = 0
+            except ApiError:
+                logger.error("Error resetting password reset counter")
+                return render_template("passwords/reset-password.trouble.html")
+
+    if password_reset_counter >= 5:
         logger.error("Password reset attempts exceeded")
         return redirect(url_for("passwords_bp.exceeded_number_of_reset_attempts"))
 

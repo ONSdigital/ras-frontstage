@@ -813,11 +813,33 @@ def get_password_reset_counter(party_id):
     return response.json()
 
 
+def increase_password_reset_counter(party_id):
+    """
+    Gives call to the party service to increase the password reset counter for the respondent
+    :param party_id: the respondent's id
+    """
+
+    logger.info("Attempting to increase respondent password reset counter", party_id=party_id)
+    payload = {"message": "++"}
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-reset-counter/"
+    response = requests.put(url, auth=app.config["BASIC_AUTH"], json=payload)
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        if response.status_code == 404:
+            logger.error("Counter not found")
+            raise NotFound("Counter not found")
+        logger.error("Failed to increase password reset counter", party_id=party_id)
+
+    logger.info("Successfully increased password reset counter")
+    return response.json()
+
+
 def reset_password_reset_counter(party_id):
     """
     Gives call to the party service to reset the password reset counter for the respondent
     :param party_id: the respondent's id
-    :returns: current number of password reset attempts
     """
 
     logger.info("Attempting to reset respondent password reset counter", party_id=party_id)

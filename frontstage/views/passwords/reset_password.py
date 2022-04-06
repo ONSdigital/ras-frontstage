@@ -133,6 +133,7 @@ def request_password_change(email):
     logger.info("Reset password url", url=verification_url, party_id=party_id)
 
     party_controller.post_verification_token(email, token)
+    party_controller.increase_password_reset_counter(party_id)
 
     try:
         NotifyGateway(app.config).request_to_notify(email=email, personalisation=personalisation, reference=party_id)

@@ -732,6 +732,7 @@ def get_verification_token(party_id):
             logger.error("Verification token not found")
             raise NotFound("Token not found")
         logger.error("Failed to retrieve verification token", party_id=party_id)
+        raise ApiError(logger, response)
 
     logger.info("Successfully retrieved verification token")
 
@@ -808,6 +809,7 @@ def get_password_reset_counter(party_id):
             logger.error("Counter not found")
             raise NotFound("Counter not found")
         logger.error("Failed to retrieve password reset counter", party_id=party_id)
+        raise ApiError(logger, response)
 
     logger.info("Successfully retrieved password reset counter")
     return response.json()
@@ -831,6 +833,7 @@ def increase_password_reset_counter(party_id):
             logger.error("Counter not found")
             raise NotFound("Counter not found")
         logger.error("Failed to increase password reset counter", party_id=party_id)
+        raise ApiError(logger, response)
 
     logger.info("Successfully increased password reset counter")
     return response.json()
@@ -853,6 +856,7 @@ def reset_password_reset_counter(party_id):
             logger.error("Counter not found")
             raise NotFound("Counter not found")
         logger.error("Failed to reset password reset counter", party_id=party_id)
+        raise ApiError(logger, response)
 
     logger.info("Successfully reset password reset counter")
     return response.json()

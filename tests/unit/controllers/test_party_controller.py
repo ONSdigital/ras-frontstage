@@ -8,6 +8,7 @@ import responses
 
 from config import TestingConfig
 from frontstage import app
+from frontstage.common import verification
 from frontstage.controllers import party_controller
 from frontstage.controllers.party_controller import (
     display_button,
@@ -26,6 +27,7 @@ from tests.integration.mocked_services import (
     survey,
     url_get_business_party,
     url_get_collection_exercises_by_survey,
+    url_get_respondent_by_email,
     url_get_respondent_email,
     url_get_respondent_party,
     url_get_survey,
@@ -43,6 +45,15 @@ registration_data = {
     "enrolmentCode": case["iac"],
     "status": "CREATED",
 }
+url_password_reset_counter = (
+    f"{app.config['PARTY_URL']}/party-api/v1/respondents/{respondent_party['id']}/password-reset-counter"
+)
+url_post_password_verification_token = (
+    f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/{respondent_party['id']}/password-verification-token"
+)
+url_delete_password_verification_token = (
+    f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/{respondent_party['id']}/password-verification-token/"
+)
 
 
 class TestPartyController(unittest.TestCase):
@@ -324,3 +335,101 @@ class TestPartyController(unittest.TestCase):
         ]
         result = filter_ended_collection_exercises(collection_exercises)
         self.assertEqual(2, len(result))
+
+    def test_post_password_verification_token_success(self):
+        with responses.RequestsMock() as rsps:
+            with app.app_context():
+                token = verification.generate_email_token(respondent_party["emailAddress"])
+                rsps.add(rsps.GET, url_get_respondent_by_email, json=respondent_party, status=200)
+                rsps.add(
+                    rsps.POST,
+                    url_post_password_verification_token,
+                    json={"message": "Successfully added token"},
+                    status=200,
+                )
+                try:
+                    party_controller.post_verification_token(respondent_party["emailAddress"], token)
+                except ApiError:
+                    self.fail("Password verification token failed to POST")
+
+    def test_post_password_verification_token_fail(self):
+        with responses.RequestsMock() as rsps:
+            with app.app_context():
+                token = verification.generate_email_token(respondent_party["emailAddress"])
+                rsps.add(rsps.GET, url_get_respondent_by_email, json=respondent_party, status=200)
+                rsps.add(
+                    rsps.POST,
+                    url_post_password_verification_token,
+                    json={"message": "Successfully added token"},
+                    status=400,
+                )
+                with self.assertRaises(ApiError):
+                    party_controller.post_verification_token(respondent_party["emailAddress"], token)
+
+    def test_delete_password_verification_token_success(self):
+        with responses.RequestsMock() as rsps:
+            with app.app_context():
+                token = verification.generate_email_token(respondent_party["emailAddress"])
+                rsps.add(rsps.GET, url_get_respondent_by_email, json=respondent_party, status=200)
+                rsps.add(
+                    rsps.DELETE,
+                    f"{url_delete_password_verification_token}{token}",
+                    json={"message": "Successfully removed token"},
+                    status=200,
+                )
+                try:
+                    party_controller.delete_verification_token(token)
+                except ApiError:
+                    self.fail("Password verification token failed to DELETE")
+
+    def test_delete_password_verification_token_fail(self):
+        with responses.RequestsMock() as rsps:
+            with app.app_context():
+                token = verification.generate_email_token(respondent_party["emailAddress"])
+                rsps.add(rsps.GET, url_get_respondent_by_email, json=respondent_party, status=200)
+                rsps.add(
+                    rsps.DELETE,
+                    f"{url_delete_password_verification_token}{token}",
+                    json={"message": "Successfully removed token"},
+                    status=400,
+                )
+                with self.assertRaises(ApiError):
+                    party_controller.delete_verification_token(token)
+
+    @patch("frontstage.controllers.party_controller.get_password_reset_counter")
+    def test_get_password_reset_counter(self, get_password_counter):
+        get_password_counter.return_value = respondent_party["password_reset_counter"]
+        counter = party_controller.get_password_reset_counter(respondent_party["id"])
+        self.assertEqual(counter, 0)
+
+    def test_increase_password_reset_counter_success(self):
+        with responses.RequestsMock() as rsps:
+            with app.app_context():
+                rsps.add(rsps.PUT, url_password_reset_counter, json={}, status=200)
+                try:
+                    party_controller.increase_password_reset_counter(respondent_party["id"])
+                except ApiError:
+                    self.fail("Password reset counter failed to update with PUT request")
+
+    def test_increase_password_reset_counter_fail(self):
+        with responses.RequestsMock() as rsps:
+            with app.app_context():
+                rsps.add(rsps.PUT, url_password_reset_counter, json={}, status=400)
+                with self.assertRaises(ApiError):
+                    party_controller.increase_password_reset_counter(respondent_party["id"])
+
+    def test_reset_password_reset_counter_success(self):
+        with responses.RequestsMock() as rsps:
+            with app.app_context():
+                rsps.add(rsps.DELETE, url_password_reset_counter, json={}, status=200)
+                try:
+                    party_controller.reset_password_reset_counter(respondent_party["id"])
+                except ApiError:
+                    self.fail("Password reset counter failed to reset with DELETE request")
+
+    def test_reset_password_reset_counter_fail(self):
+        with responses.RequestsMock() as rsps:
+            with app.app_context():
+                rsps.add(rsps.DELETE, url_password_reset_counter, json={}, status=400)
+                with self.assertRaises(ApiError):
+                    party_controller.reset_password_reset_counter(respondent_party["id"])

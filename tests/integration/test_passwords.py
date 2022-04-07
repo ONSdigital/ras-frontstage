@@ -21,6 +21,7 @@ encoded_invalid_email = "abcd"
 url_resend_password_email_expired_token = (
     f"{TestingConfig.PARTY_URL}/party-api/v1" f"/resend-password-email-expired-token/{token}"
 )
+url_password_reset_counter = f"{app.config['PARTY_URL']}/party-api/v1/respondents/123456/password-reset-counter"
 
 
 # noinspection DuplicatedCode
@@ -43,7 +44,6 @@ class TestPasswords(unittest.TestCase):
     @requests_mock.mock()
     @patch("frontstage.controllers.notify_controller.NotifyGateway.request_to_notify")
     def test_forgot_password_post_success(self, mock_request, mock_notify):
-        url_password_reset_counter = f"{app.config['PARTY_URL']}/party-api/v1/respondents/123456/password-reset-counter"
         mock_request.get(url_banner_api, status_code=404)
         mock_request.post(url_reset_password_request, status_code=200)
         mock_request.get(url_get_respondent_by_email, status_code=200, json={"firstName": "Bob", "id": "123456"})
@@ -197,7 +197,6 @@ class TestPasswords(unittest.TestCase):
 
     @requests_mock.mock()
     def test_reset_password_post_success(self, mock_request):
-        url_password_reset_counter = f"{app.config['PARTY_URL']}/party-api/v1/respondents/123456/password-reset-counter"
         mock_request.get(url_banner_api, status_code=404)
         mock_request.put(url_password_change, status_code=200)
         password_form = {"password": "Gizmo007!Gizmo", "password_confirm": "Gizmo007!Gizmo"}
@@ -310,7 +309,6 @@ class TestPasswords(unittest.TestCase):
     @requests_mock.mock()
     @patch("frontstage.controllers.notify_controller.NotifyGateway.request_to_notify")
     def test_resend_verification_email_using_expired_token(self, mock_request, mock_notify):
-        url_password_reset_counter = f"{app.config['PARTY_URL']}/party-api/v1/respondents/123456/password-reset-counter"
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(
             "http://localhost:8081/party-api/v1/respondents/email",
@@ -339,3 +337,31 @@ class TestPasswords(unittest.TestCase):
         response = self.app.get(f"passwords/resend-password-email-expired-token/{token}", follow_redirects=True)
         self.assertEqual(response.status_code, 500)
         self.assertTrue("An error has occurred".encode() in response.data)
+
+    @requests_mock.mock()
+    def test_too_many_reset_attempts(self, mock_request):
+        with app.app_context():
+            token = verification.generate_email_token("test.com")
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.post(url_reset_password_request, status_code=200)
+        mock_request.get(
+            url_get_respondent_by_email,
+            status_code=200,
+            json={"firstName": "Bob", "id": "123456", "password_verification_token": token},
+        )
+        mock_request.get(url_password_reset_counter, status_code=200, json={"counter": 5})
+        mock_request.delete(url_password_reset_counter, status_code=200, json={})
+        mock_request.put(url_password_reset_counter, status_code=200, json={})
+        mock_request.post(
+            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-token",
+            status_code=200,
+            json={"message": "Successfully added token"},
+        )
+
+        response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            "Exceeded maximum number of attempts to reset password, please wait 24 hours or call us on".encode(),
+            response.data,
+        )

@@ -92,6 +92,11 @@ def exceeded_number_of_reset_attempts():
     return render_template("passwords/exceeded-password-reset-attempts.html")
 
 
+@passwords_bp.route("/reset-password-trouble", methods=["GET"])
+def reset_password_trouble():
+    return render_template("passwords/reset-password-trouble.html")
+
+
 @passwords_bp.route("/resend-password-email-expired-token/<token>", methods=["GET"])
 def resend_password_email_expired_token(token):
     email = verification.decode_email_token(token)
@@ -104,7 +109,7 @@ def request_password_change(email):
 
     if not respondent:
         logger.info("Respondent does not exist")
-        return redirect(url_for("passwords_bp.reset_password_check_email"))
+        return redirect(url_for("passwords_bp.reset_password_trouble"))
 
     party_id = str(respondent["id"])
     password_reset_counter = party_controller.get_password_reset_counter(party_id)["counter"]
@@ -120,7 +125,7 @@ def request_password_change(email):
                 password_reset_counter = 0
             except ApiError:
                 logger.error("Error resetting password reset counter")
-                return render_template("passwords/reset-password.trouble.html")
+                return redirect(url_for("passwords_bp.reset_password_trouble"))
 
     if password_reset_counter >= 5:
         logger.error("Password reset attempts exceeded")

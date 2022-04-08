@@ -15,6 +15,9 @@ from tests.integration.mocked_services import (
     url_verify_token,
 )
 
+# from itsdangerous import SignatureExpired
+
+
 encoded_valid_email = "ImV4YW1wbGVAZXhhbXBsZS5jb20i.vMOqeMafWQpuxbUBRyRs29T0vDI"
 encoded_invalid_email = "abcd"
 
@@ -365,3 +368,30 @@ class TestPasswords(unittest.TestCase):
             "Exceeded maximum number of attempts to reset password, please wait 24 hours or call us on".encode(),
             response.data,
         )
+
+    # THIS TAKES 10 MINUTES AND I DON'T KNOW WHY
+    @requests_mock.mock()
+    def test_reset_password_reset_counter(self, mock_request):
+        token = "InRlc3RAZW1haWwuY29tIg.YlARnw.8hj0e_lcI_Wq5y0iHYbvDxHnio0"
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.post(url_reset_password_request, status_code=200)
+        mock_request.get(
+            url_get_respondent_by_email,
+            status_code=200,
+            json={"firstName": "Bob", "id": "123456", "password_verification_token": token},
+        )
+        mock_request.get(url_password_reset_counter, status_code=200, json={"counter": 5})
+        mock_request.delete(url_password_reset_counter, status_code=200, json={"message": "Successfully reset counter"})
+        mock_request.put(
+            url_password_reset_counter, status_code=200, json={"message": "Successfully increased counter"}
+        )
+        mock_request.post(
+            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-token",
+            status_code=200,
+            json={"message": "Successfully added token"},
+        )
+
+        response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Check your email".encode(), response.data)

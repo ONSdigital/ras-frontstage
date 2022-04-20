@@ -2,7 +2,7 @@ import logging
 
 from flask import abort
 from flask import current_app as app
-from flask import redirect, render_template, request, url_for
+from flask import flash, redirect, render_template, request, url_for
 from itsdangerous import BadData, BadSignature, SignatureExpired
 from structlog import wrap_logger
 from werkzeug.exceptions import NotFound
@@ -82,9 +82,10 @@ def reset_password_confirmation():
     return render_template("passwords/reset-password.confirmation.html")
 
 
-@passwords_bp.route("/reset-password/check-email", methods=["GET"])
-def reset_password_check_email():
-    return render_template("passwords/reset-password.check-email.html")
+@passwords_bp.route("/reset-password/check-email/<token>", methods=["GET"])
+def reset_password_check_email(token):
+    email = verification.decode_email_token(token)
+    return render_template("passwords/reset-password.check-email.html", email=email)
 
 
 @passwords_bp.route("/reset-password/exceeded-attempts", methods=["GET"])
@@ -155,4 +156,9 @@ def request_password_change(email):
         # Note: intentionally suppresses exception
         logger.error("Error sending request to Notify Gateway", respondent_id=party_id, exc_info=True)
 
-    return redirect(url_for("passwords_bp.reset_password_check_email"))
+    # Get real time counter to check how many attempts are left
+    password_reset_counter = party_controller.get_password_reset_counter(party_id)["counter"]
+    if password_reset_counter == 4:
+        flash(message="You have 1 try left to reset your password", category="warn")
+
+    return redirect(url_for("passwords_bp.reset_password_check_email", token=token))

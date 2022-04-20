@@ -362,7 +362,7 @@ class TestPasswords(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn(
-            "Exceeded maximum number of attempts to reset password, please wait 24 hours or call us on".encode(),
+            "You've tried to reset your password too many times".encode(),
             response.data,
         )
 

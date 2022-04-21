@@ -236,6 +236,6 @@ spec:
           - name: ONS_GNU_RECIPIENT
             value: "{{ .Values.gnu.recipient }}"
           - name: PASSWORD_RESET_ATTEMPTS_TIMEOUT
-            value: "{{ .Values.password.attempt_timeout }}"
+            value: "{{ .Values.password.attemptTimeout }}"
           resources:
             {{ toYaml .Values.resources | nindent 12 }}

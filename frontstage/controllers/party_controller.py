@@ -741,14 +741,17 @@ def get_verification_token(party_id):
 
 def post_verification_token(email, token):
     """
-    Gives call to party service to add a verification token for the respondent
+    Gives call to party service to add a verification token for the respondent and increase the password reset counter
     :param email: the respondent's email
     :param token: the verification token
     """
-    logger.info("Attempting to add respondent verification token", email=obfuscate_email(email))
+    logger.info(
+        "Attempting to add respondent verification token and increase password reset counter",
+        email=obfuscate_email(email),
+    )
 
     party_id = get_respondent_by_email(email)["id"]
-    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-verification-token"
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-verification-tokens"
     payload = {
         "token": token,
     }
@@ -757,10 +760,15 @@ def post_verification_token(email, token):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error("Failed to add respondent verification token", email=obfuscate_email(email))
+        logger.error(
+            "Failed to add respondent verification token or increase password reset counter",
+            email=obfuscate_email(email),
+        )
         raise ApiError(logger, response)
 
-    logger.info("Successfully added respondent verification token", email=obfuscate_email(email))
+    logger.info(
+        "Successfully added respondent verification token and password reset counter", email=obfuscate_email(email)
+    )
 
     return response.json()
 
@@ -774,7 +782,7 @@ def delete_verification_token(token):
     logger.info("Attempting to delete respondent verification token", email=obfuscate_email(email))
 
     party_id = get_respondent_by_email(email)["id"]
-    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-verification-token/{token}"
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-verification-tokens/{token}"
     response = requests.delete(url, auth=app.config["BASIC_AUTH"])
 
     try:
@@ -812,30 +820,6 @@ def get_password_reset_counter(party_id):
         raise ApiError(logger, response)
 
     logger.info("Successfully retrieved password reset counter")
-    return response.json()
-
-
-def increase_password_reset_counter(party_id):
-    """
-    Gives call to the party service to increase the password reset counter for the respondent
-    :param party_id: the respondent's id
-    """
-
-    logger.info("Attempting to increase respondent password reset counter", party_id=party_id)
-    payload = {"message": "++"}
-    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-reset-counter"
-    response = requests.put(url, auth=app.config["BASIC_AUTH"], json=payload)
-
-    try:
-        response.raise_for_status()
-    except requests.exceptions.HTTPError:
-        if response.status_code == 404:
-            logger.error("Counter not found")
-            raise NotFound("Counter not found")
-        logger.error("Failed to increase password reset counter", party_id=party_id)
-        raise ApiError(logger, response)
-
-    logger.info("Successfully increased password reset counter")
     return response.json()
 
 

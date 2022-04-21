@@ -92,4 +92,4 @@ gnu:
   fingerprint: ED1B7A3EADF95687
 
 password:
-  attempt_timeout: 86400
+  attemptTimeout: 86400

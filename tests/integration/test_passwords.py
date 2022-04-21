@@ -49,9 +49,8 @@ class TestPasswords(unittest.TestCase):
         mock_request.get(url_get_respondent_by_email, status_code=200, json={"firstName": "Bob", "id": "123456"})
         mock_request.get(url_password_reset_counter, status_code=200, json={"counter": 0})
         mock_request.delete(url_password_reset_counter, status_code=200, json={})
-        mock_request.put(url_password_reset_counter, status_code=200, json={})
         mock_request.post(
-            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-token",
+            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-tokens",
             status_code=200,
             json={"message": "Successfully added token"},
         )
@@ -208,7 +207,7 @@ class TestPasswords(unittest.TestCase):
             json={"firstName": "Bob", "id": "123456", "password_verification_token": token},
         )
         mock_request.delete(
-            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-token/{token}",
+            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-tokens/{token}",
             status_code=200,
             json={"message": "Successfully removed token"},
         )
@@ -319,9 +318,8 @@ class TestPasswords(unittest.TestCase):
             token = verification.generate_email_token("test@test.com")
         mock_request.get(url_password_reset_counter, status_code=200, json={"counter": 0})
         mock_request.delete(url_password_reset_counter, status_code=200, json={})
-        mock_request.put(url_password_reset_counter, status_code=200, json={})
         mock_request.post(
-            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-token",
+            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-tokens",
             status_code=200,
             json={"message": "Successfully added token"},
         )
@@ -351,7 +349,6 @@ class TestPasswords(unittest.TestCase):
         )
         mock_request.get(url_password_reset_counter, status_code=200, json={"counter": 5})
         mock_request.delete(url_password_reset_counter, status_code=200, json={})
-        mock_request.put(url_password_reset_counter, status_code=200, json={})
         mock_request.post(
             f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-token",
             status_code=200,
@@ -383,7 +380,7 @@ class TestPasswords(unittest.TestCase):
             url_password_reset_counter, status_code=200, json={"message": "Successfully increased counter"}
         )
         mock_request.post(
-            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-token",
+            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-tokens",
             status_code=200,
             json={"message": "Successfully added token"},
         )

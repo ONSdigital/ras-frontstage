@@ -90,3 +90,6 @@ maintenancePage:
 gnu:
   recipient: dev@example.com
   fingerprint: ED1B7A3EADF95687
+
+password:
+  attemptTimeout: 86400

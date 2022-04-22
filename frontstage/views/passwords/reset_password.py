@@ -2,7 +2,7 @@ import logging
 
 from flask import abort
 from flask import current_app as app
-from flask import redirect, render_template, request, url_for
+from flask import flash, redirect, render_template, request, url_for
 from itsdangerous import BadData, BadSignature, SignatureExpired
 from structlog import wrap_logger
 from werkzeug.exceptions import NotFound
@@ -82,9 +82,20 @@ def reset_password_confirmation():
     return render_template("passwords/reset-password.confirmation.html")
 
 
-@passwords_bp.route("/reset-password/check-email", methods=["GET"])
-def reset_password_check_email():
-    return render_template("passwords/reset-password.check-email.html")
+@passwords_bp.route("/reset-password/check-email/<token>", methods=["GET"])
+def reset_password_check_email(token):
+    email = verification.decode_email_token(token)
+    return render_template("passwords/reset-password.check-email.html", email=email)
+
+
+@passwords_bp.route("/reset-password/exceeded-attempts", methods=["GET"])
+def exceeded_number_of_reset_attempts():
+    return render_template("passwords/exceeded-password-reset-attempts.html")
+
+
+@passwords_bp.route("/reset-password-trouble", methods=["GET"])
+def reset_password_trouble():
+    return render_template("passwords/reset-password-trouble.html")
 
 
 @passwords_bp.route("/resend-password-email-expired-token/<token>", methods=["GET"])
@@ -99,9 +110,27 @@ def request_password_change(email):
 
     if not respondent:
         logger.info("Respondent does not exist")
-        return redirect(url_for("passwords_bp.reset_password_check_email"))
+        return redirect(url_for("passwords_bp.reset_password_trouble"))
 
     party_id = str(respondent["id"])
+    password_reset_counter = party_controller.get_password_reset_counter(party_id)["counter"]
+
+    if password_reset_counter != 0:
+        try:
+            email = verification.decode_email_token(
+                respondent["password_verification_token"], app.config["PASSWORD_RESET_ATTEMPTS_TIMEOUT"]
+            )
+        except SignatureExpired:
+            try:
+                party_controller.reset_password_reset_counter(party_id)
+                password_reset_counter = 0
+            except ApiError:
+                logger.error("Error resetting password reset counter")
+                return redirect(url_for("passwords_bp.reset_password_trouble"))
+
+    if password_reset_counter >= 5:
+        logger.error("Password reset attempts exceeded")
+        return redirect(url_for("passwords_bp.exceeded_number_of_reset_attempts"))
 
     logger.info("Requesting password change", party_id=party_id)
 
@@ -126,4 +155,9 @@ def request_password_change(email):
         # Note: intentionally suppresses exception
         logger.error("Error sending request to Notify Gateway", respondent_id=party_id, exc_info=True)
 
-    return redirect(url_for("passwords_bp.reset_password_check_email"))
+    # Get real time counter to check how many attempts are left
+    password_reset_counter = party_controller.get_password_reset_counter(party_id)["counter"]
+    if password_reset_counter == 4:
+        flash(message="You have 1 try left to reset your password", category="warn")
+
+    return redirect(url_for("passwords_bp.reset_password_check_email", token=token))

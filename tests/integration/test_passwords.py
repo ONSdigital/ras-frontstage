@@ -50,7 +50,7 @@ class TestPasswords(unittest.TestCase):
         mock_request.get(url_password_reset_counter, status_code=200, json={"counter": 0})
         mock_request.delete(url_password_reset_counter, status_code=200, json={})
         mock_request.post(
-            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-tokens",
+            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-token",
             status_code=200,
             json={"message": "Successfully added token"},
         )
@@ -207,7 +207,7 @@ class TestPasswords(unittest.TestCase):
             json={"firstName": "Bob", "id": "123456", "password_verification_token": token},
         )
         mock_request.delete(
-            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-tokens/{token}",
+            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-token/{token}",
             status_code=200,
             json={"message": "Successfully removed token"},
         )
@@ -319,7 +319,7 @@ class TestPasswords(unittest.TestCase):
         mock_request.get(url_password_reset_counter, status_code=200, json={"counter": 0})
         mock_request.delete(url_password_reset_counter, status_code=200, json={})
         mock_request.post(
-            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-tokens",
+            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-token",
             status_code=200,
             json={"message": "Successfully added token"},
         )
@@ -380,7 +380,7 @@ class TestPasswords(unittest.TestCase):
             url_password_reset_counter, status_code=200, json={"message": "Successfully increased counter"}
         )
         mock_request.post(
-            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-tokens",
+            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-token",
             status_code=200,
             json={"message": "Successfully added token"},
         )

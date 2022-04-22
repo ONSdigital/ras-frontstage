@@ -751,7 +751,7 @@ def post_verification_token(email, token):
     )
 
     party_id = get_respondent_by_email(email)["id"]
-    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-verification-tokens"
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-verification-token"
     payload = {
         "token": token,
     }
@@ -782,7 +782,7 @@ def delete_verification_token(token):
     logger.info("Attempting to delete respondent verification token", email=obfuscate_email(email))
 
     party_id = get_respondent_by_email(email)["id"]
-    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-verification-tokens/{token}"
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/{party_id}/password-verification-token/{token}"
     response = requests.delete(url, auth=app.config["BASIC_AUTH"])
 
     try:

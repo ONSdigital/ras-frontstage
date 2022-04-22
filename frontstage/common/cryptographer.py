@@ -33,12 +33,12 @@ class Cryptographer:
         ons_cipher = AES.new(self._key, AES.MODE_CBC, init_vector)
         return b64encode(init_vector + ons_cipher.encrypt(raw_text))
 
-    def decrypt(self, encrypted_text):
+    def decrypt(self, encrypted_text: bytes) -> bytes:
         """
         Decrypt the supplied text
 
-        :param encrypted_text: The data to decrypt, must be a string of type byte
-        :return: The unencrypted text
+        :param encrypted_text: The data to decrypt
+        :return: The unencrypted text in byte form
         """
         encrypted_text = b64decode(encrypted_text)
         init_vector = encrypted_text[:16]

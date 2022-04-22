@@ -11,11 +11,7 @@ from werkzeug.exceptions import NotFound
 from frontstage.common.thread_wrapper import ThreadWrapper
 from frontstage.common.utilities import obfuscate_email
 from frontstage.common.verification import decode_email_token
-from frontstage.controllers import (
-    case_controller,
-    collection_instrument_controller,
-    survey_controller,
-)
+from frontstage.controllers import case_controller, survey_controller
 from frontstage.exceptions.exceptions import ApiError, UserDoesNotExist
 
 CLOSED_STATE = ["COMPLETE", "COMPLETEDBYPHONE", "NOLONGERREQUIRED"]
@@ -369,27 +365,6 @@ def caching_case_data(cache_data, business_ids, tag):
         thread.join()
 
 
-def caching_data_for_collection_instrument(cache_data: dict, cases: list):
-    """
-    Adds to the collection instrument part of the cache dictionary.  Given a list of cases, it will get a set of
-    the collectionInstrumentId's, then if the id isn't in the cache already, it'll ask the collection instrument service
-    for it.  This doesn't return a dict with the cached data, this will modify the dictionary as a side-effect.
-
-    :param cache_data: The cache dictionary.
-    :param cases: A list of cases
-    """
-    collection_instrument_ids = set()
-    for case in cases:
-        collection_instrument_ids.add(case["collectionInstrumentId"])
-    for collection_instrument_id in collection_instrument_ids:
-        if not cache_data["instrument"].get(collection_instrument_id):
-            cache_data["instrument"][
-                collection_instrument_id
-            ] = collection_instrument_controller.get_collection_instrument(
-                collection_instrument_id, app.config["COLLECTION_INSTRUMENT_URL"], app.config["BASIC_AUTH"]
-            )
-
-
 def get_survey_list_details_for_party(respondent: dict, tag: str, business_party_id: str, survey_id: str):
     """
     Gets a list of cases (and any useful metadata) for a respondent.  Depending on the tag the list of cases will be
@@ -509,10 +484,6 @@ def filter_ended_collection_exercises(collection_exercises: dict) -> list:
         if ce.get("scheduledEndDateTime")
         and parse(ce.get("scheduledEndDateTime")) > datetime.datetime.now(datetime.timezone.utc)
     ]
-
-
-def get_survey(cache_data, survey_id, survey_url, survey_auth):
-    cache_data["surveys"][survey_id] = survey_controller.get_survey(survey_url, survey_auth, survey_id)
 
 
 def get_case(cache_data, business_id, case_url, case_auth, tag):

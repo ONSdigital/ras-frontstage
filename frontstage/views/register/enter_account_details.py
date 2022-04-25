@@ -17,8 +17,12 @@ cryptographer = Cryptographer()
 @register_bp.route("/create-account/enter-account-details", methods=["GET", "POST"])
 def register_enter_your_details():
     # Get and decrypt enrolment code
-    encrypted_enrolment_code = request.args.get("encrypted_enrolment_code", None)
-    enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
+    encrypted_enrolment_code = request.args.get("encrypted_enrolment_code")
+    try:
+        enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
+    except AttributeError:
+        logger.error("No enrolment code supplied", exc_info=True, url=request.url)
+        raise
     form = RegistrationForm(request.values, enrolment_code=encrypted_enrolment_code)
     if form.email_address.data is not None:
         form.email_address.data = form.email_address.data.strip()

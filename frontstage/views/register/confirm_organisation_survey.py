@@ -22,8 +22,12 @@ logger = wrap_logger(logging.getLogger(__name__))
 def register_confirm_organisation_survey():
     # Get and decrypt enrolment code
     cryptographer = Cryptographer()
-    encrypted_enrolment_code = request.args.get("encrypted_enrolment_code", None)
-    enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
+    encrypted_enrolment_code = request.args.get("encrypted_enrolment_code")
+    try:
+        enrolment_code = cryptographer.decrypt(encrypted_enrolment_code.encode()).decode()
+    except AttributeError:
+        logger.error("No enrolment code supplied", exc_info=True, url=request.url)
+        raise
     # Validate enrolment code before retrieving organisation data
     iac_controller.validate_enrolment_code(enrolment_code)
 

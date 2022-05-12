@@ -28,10 +28,6 @@ It can also be run with docker
 docker run --name redis -p 6379:6379 -d redis
 ```
 
-## ras-frontstage-api
-ras-frontstage calls one other service, [ras-frontstage-api](https://github.com/ONSdigital/ras-frontstage-api)
-See that repo for how to run it and see the config below for the environment variables used to connect to it
-
 ## Run the application
 ```
 pipenv run python run.py
@@ -80,21 +76,62 @@ To update to a different version of the Design System:
 ## Configuration
 Environment variables available for configuration are listed below:
 
-| Environment Variable            | Description                                                   | Default
-|---------------------------------|---------------------------------------------------------------|-------------------------------
-| APP_SETTINGS                    | Which config to use                                           | 'Config' (use DevelopmentConfig) for developers
-| SECRET_KEY                      | Secret key used by flask                                      | 'ONS_DUMMY_KEY'
-| SECURITY_USER_NAME              | Username for basic auth                                       | 'admin'
-| SECURITY_USER_PASSWORD          | Password for basic auth                                       | 'secret'
-| JWT_SECRET                      | SECRET used to code JWT                                       | 'testsecret'
-| VALIDATE_JWT                    | Boolean for turning on/off JWT validation (True=on)           | True 
-| GOOGLE_ANALYTICS                | Code for google analytics                                     | None
-| GOOGLE_TAG_MANAGER              | Code for google tag manager                                   | None
-| REDIS_HOST                      | Host address for the redis instance                           | 'localhost' 
-| REDIS_PORT                      | Port for the redis instance                                   | 6379
-| REDIS_DB                        | Database number for the redis instance                        | 1
-| RAS_FRONTSTAGE_API_PROTOCOL     | Protocol used for frontstage-api uri                          | 'http' 
-| RAS_FRONTSTAGE_API_HOST         | Host address used for frontstage-api uri                      | 'localhost'
-| RAS_FRONTSTAGE_API_PORT         | Port used for frontstage-api uri                              | 8083
+| Environment Variable        | Description                                         | Default                                         |
+|-----------------------------|-----------------------------------------------------|-------------------------------------------------|
+| APP_SETTINGS                | Which config to use                                 | 'Config' (use DevelopmentConfig) for developers |
+| SECRET_KEY                  | Secret key used by flask                            | 'ONS_DUMMY_KEY'                                 |
+| SECURITY_USER_NAME          | Username for basic auth                             | 'admin'                                         |
+| SECURITY_USER_PASSWORD      | Password for basic auth                             | 'secret'                                        |
+| JWT_SECRET                  | SECRET used to code JWT                             | 'testsecret'                                    |
+| VALIDATE_JWT                | Boolean for turning on/off JWT validation (True=on) | True                                            |
+| GOOGLE_ANALYTICS            | Code for google analytics                           | None                                            |
+| GOOGLE_TAG_MANAGER          | Code for google tag manager                         | None                                            |
+| REDIS_HOST                  | Host address for the redis instance                 | 'localhost'                                     |
+| REDIS_PORT                  | Port for the redis instance                         | 6379                                            |
+| REDIS_DB                    | Database number for the redis instance              | 1                                               |
+| RAS_FRONTSTAGE_API_PROTOCOL | Protocol used for frontstage-api uri                | 'http'                                          |
+| RAS_FRONTSTAGE_API_HOST     | Host address used for frontstage-api uri            | 'localhost'                                     |
+| RAS_FRONTSTAGE_API_PORT     | Port used for frontstage-api uri                    | 8083                                            |
 
 These are set in [config.py](config.py)
+
+## Updates GNU
+* The system now uses GNUPG to encrypt seft messages which is controlled by the saveSeftInGcp flagged stored in the values.yml file
+* Due to the version of GNUPG current used in Docker (as of 03/06/2021) (gpg (GnuPG) 2.2.12 libgcrypt 1.8.4) it does NOT
+  support an email as a recipient, you need to use the fingerprint
+* if you receive a binary public key you MUST convert it to ascii with armor. use the following command.
+```
+ gpg --export -a <  sdx_preprod_binary_key.gpg > sdx_preprod_binary_key.gpg.asc
+```
+and load this upto the secret key manager - gnu-public-crypto-key
+
+* to get the fingerprint. the fingerprint will look like 'A8F49D6EE2DE17F03ACF11A9BF16B2EB4DASE991
+Also, make sure have an empty local trusted db
+```
+gpg --with-fingerprint <~/.gnupg/sdx_preprod_binary_key.gpg.asc
+```
+
+* It's important to check that the subkey next to the fingerprint has not expired. It is worth sanity checking them on
+  the command line
+
+* within the project there is a development public/private gnupg key. However, if you wish to create your own
+```
+gpg --full-generate-key
+gpg --list-secret-keys --keyid-format=long
+```
+The current values provided are
+```
+gpg --list-secret-keys --keyid-format=long
+------------------------------------
+sec   ed25519/3CB9DD17EFF9948B 2021-06-10 [SC]
+      C46BB0CB8CEBBC20BC07FCA83CB9DD17EFF9948B
+uid                 [ultimate] ONS RAS Dev Team (USE FOR DEVELOPMENT ONLY) <dev@example.com>
+ssb   cv25519/ED1B7A3EADF95687 2021-06-10 [E]
+```
+Then export via
+```
+gpg --armor --export ED1B7A3EADF95687
+```
+current saved exported  public private keys are dev-public-key.asc dev-private-key.asc
+The private key is only supplied for testing decryption
+passphase if needed is PASSWORD1

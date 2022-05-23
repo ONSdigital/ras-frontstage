@@ -10,12 +10,13 @@
 
 {% block main %}
     {% call onsPanel({
-            "classes": "ons-u-mb-s ons-u-d-no cookies-confirmation-message",
+            "classes": "ons-u-mb-s ons-u-d-no ons-cookies-confirmation-message",
             "type": "success"
         })
     %}
-        <p class="ons-u-fs-r-b">Your cookie settings have been saved</p>
+        <h2>Your cookie settings have been saved</h2>
         <p>Some parts of surveys.ons.gov.uk may use additional cookies and will have their own cookie policy and banner.</p>
+        <a class="ons-js-return-link ons-u-mt-s ons-u-dib" href="#0">Return to previous page</a>
     {% endcall %}
     <h1 class="ons-u-fs-xxl">Cookies on surveys.ons.gov.uk</h1>
     <p>Cookies are small files saved on your phone, tablet or computer when you visit a website.</p>

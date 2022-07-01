@@ -63,10 +63,13 @@ jobs:
       - name: Test
         run: |
           make test
-      - uses: google-github-actions/setup-gcloud@v0
+      - name: Authenticate with Google Cloud
+        id: 'auth'
+        uses: 'google-github-actions/auth@v0'
         with:
-          service_account_key: ${{ secrets.GCR_KEY }}
-        # Configure docker to use the gcloud command-line tool as a credential helper
+          credentials_json: '${{ secrets.GCR_KEY }}'
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
       - run: |
           gcloud auth configure-docker
 

@@ -7,15 +7,6 @@ on:
 env:
   SERVICE: frontstage
 
-name: comment
-
-on:
-  issue_comment:
-    types: [created]
-
-env:
-  SERVICE: csv-worker
-
 jobs:
   comment:
     runs-on: ubuntu-latest

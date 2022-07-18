@@ -9,6 +9,7 @@ metadata:
     networking.gke.io/managed-certificates: {{ .Values.ingress.certNameSurveys }}
 
 spec:
+  sslPolicy: {{ .Values.ingress.sslPolicy }}
   rules:
   - host: {{ .Values.ingress.host | quote }}
     http:

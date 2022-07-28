@@ -72,7 +72,8 @@ def change_password(email, password):
 
 
 def create_account(registration_data):
-    logger.info("Attempting to create account")
+    obfuscated_email = obfuscate_email(registration_data["emailAddress"])
+    logger.info("Attempting to create account", email=obfuscated_email)
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents"
     registration_data["status"] = "CREATED"
@@ -82,12 +83,12 @@ def create_account(registration_data):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         if response.status_code == 400:
-            logger.info("Email has already been used")
+            logger.info("Email has already been used", email=obfuscated_email)
         else:
-            logger.error("Failed to create account")
+            logger.error("Failed to create account", email=obfuscated_email)
         raise ApiError(logger, response)
 
-    logger.info("Successfully created account")
+    logger.info("Successfully created account", email=obfuscated_email)
 
 
 def update_account(respondent_data):

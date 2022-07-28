@@ -5,6 +5,7 @@ from flask import render_template, request
 from structlog import wrap_logger
 
 from frontstage.common.cryptographer import Cryptographer
+from frontstage.common.utilities import obfuscate_email
 from frontstage.controllers import iac_controller, party_controller
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.models import PendingSurveyRegistrationForm, RegistrationForm
@@ -31,8 +32,9 @@ def register_enter_your_details():
     iac_controller.validate_enrolment_code(enrolment_code)
 
     if request.method == "POST" and form.validate():
-        logger.info("Attempting to create account")
         email_address = form.email_address.data
+        logger.info("Attempting to create account", email=obfuscate_email(email_address))
+
         registration_data = {
             "emailAddress": email_address,
             "firstName": request.form.get("first_name"),
@@ -46,14 +48,19 @@ def register_enter_your_details():
             party_controller.create_account(registration_data)
         except ApiError as exc:
             if exc.status_code == 400:
-                logger.info("Email already used")
+                # TODO, not all 400s are a duplicate account... and should really be a 409...
+                logger.info("Email already used", email=obfuscate_email(email_address))
+                error = {"email_address": ["This email has already been used to register an account"]}
+                return render_template("register/register.enter-your-details.html", form=form, errors=error)
+            elif exc.status_code == 409:
+                logger.info("Email already used", email=obfuscate_email(email_address))
                 error = {"email_address": ["This email has already been used to register an account"]}
                 return render_template("register/register.enter-your-details.html", form=form, errors=error)
             else:
                 logger.error("Failed to create account", status=exc.status_code)
                 raise exc
 
-        logger.info("Successfully created account")
+        logger.info("Successfully created account", email=obfuscate_email(email_address))
         return render_template("register/register.almost-done.html", email=email_address)
 
     else:

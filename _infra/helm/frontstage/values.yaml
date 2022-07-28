@@ -24,6 +24,7 @@ ingress:
   surveysHost: surveys.example.com
   certNameSurveys: surveys-cert
   timeoutSec: 30
+  sslPolicy: frontstage-ingress-ssl-policy
 
 analytics:
   enabled: false

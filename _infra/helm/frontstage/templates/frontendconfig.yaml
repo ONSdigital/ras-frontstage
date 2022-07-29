@@ -5,3 +5,4 @@ metadata:
   name: frontstage-frontend-config
 spec:
   sslPolicy: {{ .Values.frontendConfig.sslPolicy }}
+{{- end }}

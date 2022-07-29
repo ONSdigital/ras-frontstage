@@ -520,7 +520,7 @@ class TestRegistration(unittest.TestCase):
     def test_create_account_duplicate_email(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_validate_enrolment, json={"active": True, "caseId": case["id"]})
-        mock_request.post(url_create_account, status_code=409)
+        mock_request.post(url_create_account, status_code=409, json={"description": "Email address already exists"})
 
         response = self.app.post(
             "register/create-account/enter-account-details",

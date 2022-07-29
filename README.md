@@ -30,7 +30,7 @@ docker run --name redis -p 6379:6379 -d redis
 
 ## Run the application
 ```
-pipenv run python run.py
+make start
 ```
 
 ## Run tests
@@ -38,11 +38,10 @@ Install test dependencies with
 ```bash
 pipenv install --dev
 ```
-The Makefile will run the tests in the unit or integration tests folder using pytest, and present a coverage report.
+The Makefile will run the unit and integration tests folder using pytest, and present a coverage report.
 These can be easily run via the following commands:
 ```bash
-make unit-tests
-make integration-tests
+make test
 ```
 or if you are running redis in the docker environment
 ```bash
@@ -50,12 +49,9 @@ make docker-test
 ```
 or if you wish to run a single test file, it can be specified as follows:
 ```bash
-make INTEGRATION_TESTS=tests/integration/views/surveys/test_surveys_list.py integration-tests
-make UNIT_TESTS=tests/unit/test_filters.py unit-tests
-
+make TESTS=tests/integration/views/surveys/test_surveys_list.py test
 ```
 The syntax above will work equally well with the 'docker-test' target
-
 
 Note that this script will fail if there is a `node_modules` folder in the repo
 
@@ -89,9 +85,6 @@ Environment variables available for configuration are listed below:
 | REDIS_HOST                  | Host address for the redis instance                 | 'localhost'                                     |
 | REDIS_PORT                  | Port for the redis instance                         | 6379                                            |
 | REDIS_DB                    | Database number for the redis instance              | 1                                               |
-| RAS_FRONTSTAGE_API_PROTOCOL | Protocol used for frontstage-api uri                | 'http'                                          |
-| RAS_FRONTSTAGE_API_HOST     | Host address used for frontstage-api uri            | 'localhost'                                     |
-| RAS_FRONTSTAGE_API_PORT     | Port used for frontstage-api uri                    | 8083                                            |
 
 These are set in [config.py](config.py)
 

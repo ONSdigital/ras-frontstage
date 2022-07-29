@@ -1,7 +1,7 @@
 import logging
 from distutils.util import strtobool
 
-from flask import render_template, request
+from flask import flash, render_template, request
 from structlog import wrap_logger
 
 from frontstage.common.cryptographer import Cryptographer
@@ -48,16 +48,23 @@ def register_enter_your_details():
             party_controller.create_account(registration_data)
         except ApiError as exc:
             if exc.status_code == 400:
-                # TODO, not all 400s are a duplicate account... and should really be a 409...
-                logger.info("Email already used", email=obfuscate_email(email_address))
-                error = {"email_address": ["This email has already been used to register an account"]}
-                return render_template("register/register.enter-your-details.html", form=form, errors=error)
+                # If party returns an error, we should just log out the error with as much detail as possible, and
+                # put a generic message up for the user as we don't want to show them any potentially ugly messages
+                # from party
+                logger.info(
+                    "Party returned an error",
+                    email=obfuscate_email(email_address),
+                    enrolment_code=enrolment_code,
+                    error=exc.message,
+                )
+                flash("Something went wrong, please try again or contact us", "error")
+                return render_template("register/register.enter-your-details.html", form=form, errors=form.errors)
             elif exc.status_code == 409:
-                logger.info("Email already used", email=obfuscate_email(email_address))
+                logger.info("Email already used", email=obfuscate_email(email_address), enrolment_code=enrolment_code)
                 error = {"email_address": ["This email has already been used to register an account"]}
                 return render_template("register/register.enter-your-details.html", form=form, errors=error)
             else:
-                logger.error("Failed to create account", status=exc.status_code)
+                logger.error("Failed to create account", status=exc.status_code, error=exc.message)
                 raise exc
 
         logger.info("Successfully created account", email=obfuscate_email(email_address))

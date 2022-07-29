@@ -22,37 +22,27 @@ from frontstage.exceptions.exceptions import (
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def calculate_case_status(case_group_status, collection_instrument_type):
+def calculate_case_status(case_group_status: str, collection_instrument_type: str) -> str:
     """
     Given a case group status and instrument type, this will generate user readable text to describe the status.
 
     :param case_group_status: Status of the case group
-    :type case_group_status: str
     :param collection_instrument_type: The type of collection instrument.  Either EQ or SEFT
-    :type collection_instrument_type: str
     :return: A user readable description of the status.
     """
-    logger.info(
-        "Getting the status of caseGroup",
-        case_group_status=case_group_status,
-        collection_instrument_type=collection_instrument_type,
-    )
-
-    status = "Not started"
 
     if case_group_status == "COMPLETE":
-        status = "Complete"
+        return "Complete"
     elif case_group_status == "COMPLETEDBYPHONE":
-        status = "Completed by phone"
+        return "Completed by phone"
     elif case_group_status == "NOLONGERREQUIRED":
-        status = "No longer required"
+        return "No longer required"
     elif case_group_status == "INPROGRESS" and collection_instrument_type == "EQ":
-        status = "In progress"
+        return "In progress"
     elif case_group_status == "INPROGRESS" and collection_instrument_type == "SEFT":
-        status = "Downloaded"
-
-    logger.info("Retrieved the status of case", collection_instrument_type=collection_instrument_type, status=status)
-    return status
+        return "Downloaded"
+    else:
+        return "Not started"
 
 
 def get_case_by_case_id(case_id):

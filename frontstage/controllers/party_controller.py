@@ -71,9 +71,10 @@ def change_password(email, password):
     bound_logger.info("Successfully changed password through the party service")
 
 
-def create_account(registration_data):
+def create_account(registration_data: dict) -> None:
     obfuscated_email = obfuscate_email(registration_data["emailAddress"])
-    logger.info("Attempting to create account", email=obfuscated_email)
+    enrolment_code = registration_data["enrolmentCode"]
+    logger.info("Attempting to create account", email=obfuscated_email, enrolment_code=enrolment_code)
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents"
     registration_data["status"] = "CREATED"
@@ -82,17 +83,17 @@ def create_account(registration_data):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        if response.status_code == 400:
-            logger.info("Email has already been used", email=obfuscated_email)
+        if response.status_code == 409:
+            logger.info("Email has already been used", email=obfuscated_email, enrolment_code=enrolment_code)
         else:
-            logger.error("Failed to create account", email=obfuscated_email)
-        raise ApiError(logger, response)
+            logger.error("Failed to create account", email=obfuscated_email, enrolment_code=enrolment_code)
+        raise ApiError(logger, response, message=response.json())
 
-    logger.info("Successfully created account", email=obfuscated_email)
+    logger.info("Successfully created account", email=obfuscated_email, enrolment_code=enrolment_code)
 
 
 def update_account(respondent_data):
-    logger.info("Attempting to update account")
+    logger.info("Attempting to update account", party_id=respondent_data["id"])
 
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/id/{respondent_data['id']}"
     response = requests.put(url, auth=app.config["BASIC_AUTH"], json=respondent_data)
@@ -100,10 +101,10 @@ def update_account(respondent_data):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error("Failed to update account")
+        logger.error("Failed to update account", party_id=respondent_data["id"])
         raise ApiError(logger, response)
 
-    logger.info("Successfully updated account")
+    logger.info("Successfully updated account", party_id=respondent_data["id"])
 
 
 def get_party_by_business_id(party_id, party_url, party_auth, collection_exercise_id=None, verbose=True):

@@ -23,8 +23,7 @@ def sign_in(username, password):
     """
     if app.config["CANARY_GENERATE_ERRORS"]:
         logger.error("Canary experiment running this error can be ignored", status=500)
-    bound_logger = logger.bind(email=obfuscate_email(username))
-    bound_logger.info("Attempting to sign in")
+    logger.info("Attempting to sign in", email=obfuscate_email(username))
 
     url = f"{app.config['AUTH_URL']}/api/v1/tokens/"
     data = {
@@ -46,11 +45,10 @@ def sign_in(username, password):
 
             raise AuthError(logger, response, log_level="warning", message=message, auth_error=auth_error)
         else:
-            bound_logger.error("Failed to authenticate")
+            logger.error("Failed to authenticate", email=obfuscate_email(username))
             raise ApiError(logger, response)
 
-    bound_logger.info("Successfully signed in")
-    bound_logger.unbind("email")
+    logger.info("Successfully signed in", email=obfuscate_email(username))
     return {}
 
 

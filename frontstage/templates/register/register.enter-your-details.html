@@ -9,6 +9,21 @@
 {% set page_title = "Enter account details" %}
 
 {% block main %}
+    {% with messages = get_flashed_messages(category_filter=["error"]) %}
+        {% if messages %}
+            {% call
+                onsPanel({
+                        "type": "error",
+                        "classes": "ons-u-mb-l",
+                        "title":  errorTitle
+                    })
+            %}
+                {% for message in messages %}
+                    <p id="flashed-message-{{ loop.index }}">{{ message }}</p>
+                {% endfor %}
+            {% endcall %}
+        {% endif %}
+    {% endwith %}
     {% if errors|length > 0 %}
         {% if errors|length == 1 %}
             {% set errorTitle = 'There is 1 error on this page' %}
@@ -25,6 +40,7 @@
             <p>These <strong>must be corrected</strong> to continue.</p>
             {% set errorData = [] %}
             {% for error in errors %}
+
                 {% set error_text = 'passwords' if error == 'password' else error %}
                 {% do errorData.append(
                     {

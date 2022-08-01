@@ -500,10 +500,27 @@ class TestRegistration(unittest.TestCase):
         self.assertTrue("Almost done".encode() in response.data)
 
     @requests_mock.mock()
+    def test_create_account_party_client_error(self, mock_request):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_validate_enrolment, json={"active": True, "caseId": case["id"]})
+        mock_request.post(url_create_account, json={"description": "The key 'lastName' is missing"}, status_code=400)
+
+        response = self.app.post(
+            "register/create-account/enter-account-details",
+            query_string=self.params,
+            data=self.test_user,
+            headers=self.headers,
+            follow_redirects=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("Something went wrong, please try again or contact us".encode() in response.data)
+
+    @requests_mock.mock()
     def test_create_account_duplicate_email(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_validate_enrolment, json={"active": True, "caseId": case["id"]})
-        mock_request.post(url_create_account, status_code=400)
+        mock_request.post(url_create_account, status_code=409, json={"description": "Email address already exists"})
 
         response = self.app.post(
             "register/create-account/enter-account-details",

@@ -1,10 +1,11 @@
 import logging
 from distutils.util import strtobool
 
-from flask import render_template, request
+from flask import flash, render_template, request
 from structlog import wrap_logger
 
 from frontstage.common.cryptographer import Cryptographer
+from frontstage.common.utilities import obfuscate_email
 from frontstage.controllers import iac_controller, party_controller
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.models import PendingSurveyRegistrationForm, RegistrationForm
@@ -31,8 +32,8 @@ def register_enter_your_details():
     iac_controller.validate_enrolment_code(enrolment_code)
 
     if request.method == "POST" and form.validate():
-        logger.info("Attempting to create account")
         email_address = form.email_address.data
+
         registration_data = {
             "emailAddress": email_address,
             "firstName": request.form.get("first_name"),
@@ -46,14 +47,24 @@ def register_enter_your_details():
             party_controller.create_account(registration_data)
         except ApiError as exc:
             if exc.status_code == 400:
-                logger.info("Email already used")
+                # If party returns an error, we should just log out the error with as much detail as possible, and
+                # put a generic message up for the user as we don't want to show them any potentially ugly messages
+                # from party
+                logger.info(
+                    "Party returned an error",
+                    email=obfuscate_email(email_address),
+                    enrolment_code=enrolment_code,
+                    error=exc.message,
+                )
+                flash("Something went wrong, please try again or contact us", "error")
+                return render_template("register/register.enter-your-details.html", form=form, errors=form.errors)
+            elif exc.status_code == 409:
                 error = {"email_address": ["This email has already been used to register an account"]}
                 return render_template("register/register.enter-your-details.html", form=form, errors=error)
             else:
-                logger.error("Failed to create account", status=exc.status_code)
+                logger.error("Failed to create account", status=exc.status_code, error=exc.message)
                 raise exc
 
-        logger.info("Successfully created account")
         return render_template("register/register.almost-done.html", email=email_address)
 
     else:

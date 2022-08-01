@@ -25,9 +25,6 @@ ingress:
   certNameSurveys: surveys-cert
   timeoutSec: 30
 
-frontendConfig:
-  sslPolicy: frontstage-ingress-ssl-policy
-
 analytics:
   enabled: false
 

@@ -1,6 +1,5 @@
 DESIGN_SYSTEM_VERSION=`cat .design-system-version`
-UNIT_TESTS=tests/unit
-INTEGRATION_TESTS=tests/integration
+TESTS=tests/
 
 build:
 	pipenv install --dev
@@ -18,7 +17,7 @@ start: load-design-system-templates
 	pipenv run python run.py
 
 docker-test: REDIS_PORT=6379
-docker-test: unit-tests integration-tests
+docker-test: test
 
 lint:
 	pipenv check
@@ -32,10 +31,6 @@ lint-check: load-design-system-templates
 	pipenv run black --line-length 120 --check .
 	pipenv run flake8
 
-test: lint-check unit-tests integration-tests
+test: lint-check
+	APP_SETTINGS=TestingConfig pipenv run pytest $(TESTS) --cov frontstage --cov-report term-missing
 
-unit-tests:
-	APP_SETTINGS=TestingConfig pipenv run pytest $(UNIT_TESTS) --cov frontstage --cov-report term-missing
-
-integration-tests:
-	APP_SETTINGS=TestingConfig pipenv run pytest $(INTEGRATION_TESTS) --cov frontstage --cov-report term-missing

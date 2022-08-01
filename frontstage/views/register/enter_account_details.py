@@ -33,7 +33,6 @@ def register_enter_your_details():
 
     if request.method == "POST" and form.validate():
         email_address = form.email_address.data
-        logger.info("Attempting to create account", email=obfuscate_email(email_address))
 
         registration_data = {
             "emailAddress": email_address,
@@ -60,14 +59,12 @@ def register_enter_your_details():
                 flash("Something went wrong, please try again or contact us", "error")
                 return render_template("register/register.enter-your-details.html", form=form, errors=form.errors)
             elif exc.status_code == 409:
-                logger.info("Email already used", email=obfuscate_email(email_address), enrolment_code=enrolment_code)
                 error = {"email_address": ["This email has already been used to register an account"]}
                 return render_template("register/register.enter-your-details.html", form=form, errors=error)
             else:
                 logger.error("Failed to create account", status=exc.status_code, error=exc.message)
                 raise exc
 
-        logger.info("Successfully created account", email=obfuscate_email(email_address))
         return render_template("register/register.almost-done.html", email=email_address)
 
     else:

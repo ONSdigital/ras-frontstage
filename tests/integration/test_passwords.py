@@ -412,3 +412,28 @@ class TestPasswords(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Something went wrong".encode(), response.data)
+
+    @requests_mock.mock()
+    @patch("frontstage.controllers.notify_controller.NotifyGateway.request_to_notify")
+    def test_resend_verification_email_using_expired_token_when_counter_is_greater_than_0(
+        self, mock_request, mock_notify
+    ):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(
+            "http://localhost:8081/party-api/v1/respondents/email",
+            status_code=200,
+            json={"firstName": "Bob", "id": "123456"},
+        )
+        with app.app_context():
+            token = verification.generate_email_token("test@test.com")
+        mock_request.get(url_password_reset_counter, status_code=200, json={"counter": 1})
+        mock_request.delete(url_password_reset_counter, status_code=200, json={})
+        mock_request.post(
+            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-token",
+            status_code=200,
+            json={"message": "Successfully added token"},
+        )
+        response = self.app.get(f"passwords/resend-password-email-expired-token/{token}", follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        mock_notify.assert_called_once()
+        self.assertTrue("Check your email".encode() in response.data)

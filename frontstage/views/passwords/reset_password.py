@@ -115,7 +115,7 @@ def request_password_change(email):
     party_id = str(respondent["id"])
     password_reset_counter = party_controller.get_password_reset_counter(party_id)["counter"]
 
-    if password_reset_counter != 0:
+    if password_reset_counter != 0 and "password_verification_token" in respondent:
         try:
             email = verification.decode_email_token(
                 respondent["password_verification_token"], app.config["PASSWORD_RESET_ATTEMPTS_TIMEOUT"]

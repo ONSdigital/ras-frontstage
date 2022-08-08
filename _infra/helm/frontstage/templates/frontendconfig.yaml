@@ -1,0 +1,8 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: frontstage-frontend-config
+spec:
+  sslPolicy: {{ .Values.frontendConfig.sslPolicy }}
+{{- end }}

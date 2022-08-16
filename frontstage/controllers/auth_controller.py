@@ -12,7 +12,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 def sign_in(username, password):
     """
-    Checks if the users credentials are valid. On success it returns an empty dict (a hangover from when
+    Checks if the users credentials are valid. On success, it returns an empty dict (a hangover from when
     this function used to call a different authentication application).
 
     :param username: The username.  Should be an email address
@@ -45,7 +45,7 @@ def sign_in(username, password):
 
             raise AuthError(logger, response, log_level="warning", message=message, auth_error=auth_error)
         else:
-            logger.error("Failed to authenticate", email=obfuscate_email(username))
+            logger.error("Failed to authenticate", email=obfuscate_email(username), exc_info=True)
             raise ApiError(logger, response)
 
     logger.info("Successfully signed in", email=obfuscate_email(username))

@@ -23,6 +23,7 @@ ingress:
   enabled: false
   surveysHost: surveys.example.com
   certNameSurveys: surveys-cert
+  frontendConfigName: frontstage-frontend-config
   timeoutSec: 30
 
 frontendConfig:

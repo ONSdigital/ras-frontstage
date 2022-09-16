@@ -1,6 +1,7 @@
 import redis
 from flask import render_template
 from flask_talisman import Talisman
+from jinja2 import ChainableUndefined
 
 from frontstage.common.jinja_filters import filter_blueprint
 from frontstage.controllers.banner_controller import current_banner
@@ -48,6 +49,7 @@ talisman = Talisman(
 )
 redis = redis.Redis(host=app.config["REDIS_HOST"], port=app.config["REDIS_PORT"], db=app.config["REDIS_DB"])
 
+app.jinja_env.undefined = ChainableUndefined
 app.jinja_env.add_extension("jinja2.ext.do")
 
 app.register_blueprint(filter_blueprint)

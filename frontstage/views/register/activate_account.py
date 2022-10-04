@@ -23,7 +23,7 @@ def register_activate_account(token):
             logger.info(
                 "Expired email verification token", token=token, api_url=exc.url, api_status_code=exc.status_code
             )
-            return render_template("register/register.link-expired.html", token=token)
+            return render_template("register/link-expired.html", token=token)
         elif exc.status_code == 404:
             logger.warning(
                 "Unrecognised email verification token", token=token, api_url=exc.url, api_status_code=exc.status_code

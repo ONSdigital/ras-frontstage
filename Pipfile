@@ -32,7 +32,7 @@ python-gnupg = "*"
 werkzeug = "*"
 
 [dev-packages]
-black = "==21.12b0"
+black = "*"
 coverage= "*"
 flake8 = "*"
 isort = "*"

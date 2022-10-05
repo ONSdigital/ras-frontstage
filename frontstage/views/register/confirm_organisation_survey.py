@@ -74,6 +74,6 @@ def register_confirm_organisation_survey():
     )
 
     return render_template(
-        "register/register.confirm-organisation-survey.html",
+        "register/confirm-organisation-survey.html",
         context=business_context,
     )

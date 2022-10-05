@@ -57,18 +57,18 @@ def register_enter_your_details():
                     error=exc.message,
                 )
                 flash("Something went wrong, please try again or contact us", "error")
-                return render_template("register/register.enter-your-details.html", form=form, errors=form.errors)
+                return render_template("register/enter-your-details.html", form=form, errors=form.errors)
             elif exc.status_code == 409:
                 error = {"email_address": ["This email has already been used to register an account"]}
-                return render_template("register/register.enter-your-details.html", form=form, errors=error)
+                return render_template("register/enter-your-details.html", form=form, errors=error)
             else:
                 logger.error("Failed to create account", status=exc.status_code, error=exc.message)
                 raise exc
 
-        return render_template("register/register.almost-done.html", email=email_address)
+        return render_template("register/almost-done.html", email=email_address)
 
     else:
-        return render_template("register/register.enter-your-details.html", form=form, errors=form.errors)
+        return render_template("register/enter-your-details.html", form=form, errors=form.errors)
 
 
 @register_bp.route("/pending-surveys/create-account/enter-account-details", methods=["GET", "POST"])

@@ -31,7 +31,7 @@ def register():
                 logger.info("Enrolment code not found when attempting to create account", enrolment_code=enrolment_code)
                 template_data = {"error": {"type": "failed"}}
                 return (
-                    render_template("register/register.enter-enrolment-code.html", form=form, data=template_data),
+                    render_template("register/enter-enrolment-code.html", form=form, data=template_data),
                     200,
                 )
             if not iac["active"]:
@@ -39,7 +39,7 @@ def register():
                     "Enrolment code not active when attempting to create account", enrolment_code=enrolment_code
                 )
                 template_data = {"error": {"type": "failed"}}
-                return render_template("register/register.enter-enrolment-code.html", form=form, data=template_data)
+                return render_template("register/enter-enrolment-code.html", form=form, data=template_data)
         except ApiError as exc:
             if exc.status_code == 400:
                 logger.info(
@@ -47,7 +47,7 @@ def register():
                 )
                 template_data = {"error": {"type": "failed"}}
                 return (
-                    render_template("register/register.enter-enrolment-code.html", form=form, data=template_data),
+                    render_template("register/enter-enrolment-code.html", form=form, data=template_data),
                     200,
                 )
             else:
@@ -80,4 +80,4 @@ def register():
             )
         )
 
-    return render_template("register/register.enter-enrolment-code.html", form=form, data={"error": {}})
+    return render_template("register/enter-enrolment-code.html", form=form, data={"error": {}})

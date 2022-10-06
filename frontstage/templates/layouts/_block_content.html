@@ -1,17 +1,14 @@
 {% set ns = namespace() %}
 {% set ns.showHelp = true %}
 {% extends 'layouts/_base.html' %}
-{% if survey_ref is defined and ru_ref is defined%}
+{% if survey_ref is defined and ru_ref is defined %}
     {% set ns.survey_ref = survey_ref %}
     {% set ns.ru_ref = ru_ref %}
 {% endif %}
-
 {% block content %}
-
     <div class="ons-grid">
         <div class="ons-grid__col ons-col-8@m ons-u-pt-no">
             {% block main %}{% endblock %}
         </div>
     </div>
-
 {% endblock %}

@@ -1,25 +1,23 @@
 {% from "components/button/_macro.njk" import onsButton %}
-
 {% set survey_name = survey_info['longName'] if survey_info %}
-<form
-        method="post"
-        action="{{ url_for('surveys_bp.upload_survey', case_id=case_id, business_party_id=business_info.id, survey_short_name=survey_info.shortName) }}"
-        id="surveys_upload_form"
-        role="form"
-        enctype="multipart/form-data">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-        {% from "components/upload/_macro.njk" import onsUpload %}
-        {{
-            onsUpload({
-                "id": "selected-file",
-                "accept": ".xls,.xlsx",
-                "name": "file",
-                "label": {
-                    "description": "File types accepted are .xls and .xlsx",
-                    "text": "Upload a file",
-                }
-            })
-        }}
+<form method="post"
+      action="{{ url_for('surveys_bp.upload_survey', case_id=case_id, business_party_id=business_info.id, survey_short_name=survey_info.shortName) }}"
+      id="surveys_upload_form"
+      role="form"
+      enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    {% from "components/upload/_macro.njk" import onsUpload %}
+    {{
+    onsUpload({
+    "id": "selected-file",
+    "accept": ".xls,.xlsx",
+    "name": "file",
+    "label": {
+    "description": "File types accepted are .xls and .xlsx",
+    "text": "Upload a file",
+    }
+    })
+    }}
     <script {% if csp_nonce %} nonce="{{ csp_nonce() }}"{% endif %}>
         function clickEvent(button){
             try {
@@ -30,17 +28,16 @@
             form.submit();
         }
     </script>
-
     {{
-        onsButton({
-            "text": "Upload",
-            "type": "submit",
-            "classes": "ons-u-mt-s",
-            "id": "upload_survey_button",
-            "submitType": "loader",
-            "attributes": {
-                "onclick": "clickEvent(this)"
-            }
-        })
+    onsButton({
+    "text": "Upload",
+    "type": "submit",
+    "classes": "ons-u-mt-s",
+    "id": "upload_survey_button",
+    "submitType": "loader",
+    "attributes": {
+    "onclick": "clickEvent(this)"
+    }
+    })
     }}
 </form>

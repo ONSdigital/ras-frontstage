@@ -1,8 +1,8 @@
 {% extends "layouts/_block_content.html" %}
+
 {% set page_title = "Not signed in" %}
+
 {% block main %}
     <h1 class="ons-u-fs-xl">Not signed in</h1>
-    <p>
-        <a href="{{ url_for('sign_in_bp.login') }}">sign in</a> to see this page.
-    </p>
+    <p><a href="{{ url_for('sign_in_bp.login') }}">sign in </a> to see this page.</p>
 {% endblock main %}

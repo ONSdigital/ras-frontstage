@@ -1,65 +1,71 @@
 {% extends "layouts/_block_content.html" %}
 {% from "components/lists/_macro.njk" import onsList %}
+
 {% set page_title = "Privacy and data protection" %}
+
 {% block main %}
-    <h1 class="ons-u-fs-xl">We will keep your information secure and confidential</h1>
+
+    <h1 class="ons-u-fs-xl">
+        We will keep your information secure and confidential
+    </h1>
+
     <p>This means that we will:</p>
     {{
-    onsList({
-    "itemsList": [
-    {
-    "text": 'recognise that you are sharing personal information with us and treat it as confidential, as directed
-    by the <a href="https://code.statisticsauthority.gov.uk/">Code of Practice for Statistics</a>'
-    },
-    {
-    "text": 'only use your information for statistical purposes, or to help us run our surveys, and not publish anything
-    that identifies an individual, household or business'
-    },
-    {
-    "text": 'only hold your information for as long as it is being used for producing statistics'
-    },
-    {
-    "text": 'provide survey information to <a href="https://www.ons.gov.uk/aboutus/whatwedo/statistics/requestingstatistics/accesstounpublishedonsresearchdatabygovernmentorganisationsforstatisticalresearch">
-    other government departments, approved organisations</a> and
-    <a href="https://www.ons.gov.uk/aboutus/whatwedo/statistics/requestingstatistics/approvedresearcherscheme">
-        approved researchers</a> for statistical purposes only, subject to the same standards of
-        protection we apply (and according to the provisions of the Data Protection Legislation,
-        the Statistics and Registration Services Act and the Code of Practice for Statistics)'
-        },
-        {
-        "text": 'ensure our staff are aware of their obligations to protect your confidential information'
-        },
-        {
-        "text": 'maintain the security of our systems and our buildings'
-        }
-        ]
-        })
-        }}
-        <h2>Who can access the information?</h2>
-        <p>
-            We employ third-party providers to assist us in survey data collection. These third parties work under our instruction,
-            and are strictly used as technical service providers in a capacity as a data processor.
-            We retain your data and control how this is used. The third parties we work with are:
-        </p>
-        {{
         onsList({
-        "itemsList": [
-        {
-        "text": 'Google Cloud Platform service'
-        },
-        {
-        "text": 'Amazon Web Services'
-        },
-        {
-        "text": 'GOV.UK Notify'
-        }
-        ]
+            "itemsList": [
+                {
+                    "text": 'recognise that you are sharing personal information with us and treat it as confidential, as directed
+                        by the <a href="https://code.statisticsauthority.gov.uk/">Code of Practice for Statistics</a>'
+                },
+                {
+                    "text": 'only use your information for statistical purposes, or to help us run our surveys, and not publish anything
+                        that identifies an individual, household or business'
+                },
+                {
+                    "text": 'only hold your information for as long as it is being used for producing statistics'
+                },
+                {
+                    "text": 'provide survey information to <a href="https://www.ons.gov.uk/aboutus/whatwedo/statistics/requestingstatistics/accesstounpublishedonsresearchdatabygovernmentorganisationsforstatisticalresearch">
+                        other government departments, approved organisations</a> and
+                        <a href="https://www.ons.gov.uk/aboutus/whatwedo/statistics/requestingstatistics/approvedresearcherscheme">
+                        approved researchers</a> for statistical purposes only, subject to the same standards of
+                        protection we apply (and according to the provisions of the Data Protection Legislation,
+                        the Statistics and Registration Services Act and the Code of Practice for Statistics)'
+                },
+                {
+                    "text": 'ensure our staff are aware of their obligations to protect your confidential information'
+                },
+                {
+                    "text": 'maintain the security of our systems and our buildings'
+                }
+            ]
         })
-        }}
-        <h2 class="ons-u-fs-xl ons-u-mt-l">Where can I find out more about how my information will be treated?</h2>
-        <p>
-            If you have a question about how we process your personal data or want to find out more
-            about your rights under data protection legislation, please see our
-            <a href="https://www.ons.gov.uk/aboutus/transparencyandgovernance/dataprotection">protection page</a>.
-        </p>
-    {% endblock main %}
+    }}
+
+    <h2>Who can access the information?</h2>
+    <p>We employ third-party providers to assist us in survey data collection. These third parties work under our instruction,
+        and are strictly used as technical service providers in a capacity as a data processor.
+        We retain your data and control how this is used. The third parties we work with are:</p>
+    {{
+        onsList({
+            "itemsList": [
+                {
+                    "text": 'Google Cloud Platform service'
+                },
+                {
+                    "text": 'Amazon Web Services'
+                },
+                {
+                    "text": 'GOV.UK Notify'
+                }
+            ]
+        })
+    }}
+
+    <h2 class="ons-u-fs-xl ons-u-mt-l">Where can I find out more about how my information will be treated?</h2>
+    <p>If you have a question about how we process your personal data or want to find out more
+        about your rights under data protection legislation, please see our 
+        <a href="https://www.ons.gov.uk/aboutus/transparencyandgovernance/dataprotection">protection page</a>.
+    </p>
+
+{% endblock main %}

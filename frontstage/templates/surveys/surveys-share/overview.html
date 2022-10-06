@@ -2,28 +2,31 @@
 {% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/button/_macro.njk" import onsButton %}
 {% from "components/lists/_macro.njk" import onsList %}
+
 {% set page_title = "Share surveys overview" %}
 {% set breadcrumbsData = [
-{
-"text": "Surveys",
-"url": "/surveys/todo",
-"id": "b-item-1"
-},
-{
-"text": "Account",
-"url": "/my-account",
-"id": "b-item-2"
-},
+    {
+        "text": "Surveys",
+        "url": "/surveys/todo",
+        "id": "b-item-1"
+    },
+    {
+        "text": "Account",
+        "url": "/my-account",
+        "id": "b-item-2"
+    },
 ] %}
+
 {% block breadcrumbs %}
     {{
-    onsBreadcrumbs({
-    "ariaLabel": "Breadcrumbs",
-    "id": "breadcrumbs",
-    "itemsList": breadcrumbsData
-    })
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
     }}
 {% endblock breadcrumbs %}
+
 {% block main %}
     <h1>Share access to your surveys</h1>
     {% call onsPanel({}) %}
@@ -33,38 +36,39 @@
     {% endcall %}
     <h2 class="ons-u-fs-m ons-u-mt-m">What will happen</h2>
     {{
-    onsList({
-    "itemsList": [
-    {
-    "text": 'Select which surveys you want to share.'
-    },
-    {
-    "text": 'Enter the email address of the person who will be responding to these surveys.'
-    },
-    {
-    "text": 'We will email them the instructions to access the surveys.'
-    },
-    {
-    "text": 'Once we confirm their access, they will be able to respond to surveys on your behalf and share access with colleagues.'
-    }
-    ]
-    })
+        onsList({
+            "itemsList": [
+                {
+                    "text": 'Select which surveys you want to share.'
+                },
+                {
+                    "text": 'Enter the email address of the person who will be responding to these surveys.'
+                },
+                {
+                    "text": 'We will email them the instructions to access the surveys.'
+                },
+                {
+                    "text": 'Once we confirm their access, they will be able to respond to surveys on your behalf and share access with colleagues.'
+                }
+            ]
+        })
     }}
+
     <div class="ons-field ons-u-mt-l">
         {{
-        onsButton({
-        "text": "Continue",
-        "url": url_for('account_bp.share_survey_business_select'),
-        "noIcon": true
-        })
+            onsButton({
+                "text": "Continue",
+                "url": url_for('account_bp.share_survey_business_select'),
+                "noIcon": true
+            })
         }}
         {{
-        onsButton({
-        "url": url_for('account_bp.get_account'),
-        "text": 'Cancel',
-        "variants": 'secondary',
-        "noIcon": true
-        })
+            onsButton({
+                "url": url_for('account_bp.get_account'),
+                "text": 'Cancel',
+                "variants": 'secondary',
+                "noIcon": true
+            })
         }}
     </div>
 {% endblock main %}

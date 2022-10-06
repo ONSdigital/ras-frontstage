@@ -3,85 +3,86 @@
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/radios/_macro.njk" import onsRadios %}
 {% from "components/button/_macro.njk" import onsButton %}
+
 {% set page_title = "Help Information about the ONS" %}
 {% set breadcrumbsData = [
-{
-"text": "Surveys",
-"url": "/surveys/todo",
-"id": "b-item-1"
-},
-{
-"text": "Help",
-"url": "/surveys/surveys-help?survey_ref="~survey_ref~"&ru_ref="~ru_ref,
-"id": "b-item-2"
-}
+    {
+        "text": "Surveys",
+        "url": "/surveys/todo",
+        "id": "b-item-1"
+    },
+    {
+        "text": "Help",
+        "url": "/surveys/surveys-help?survey_ref="~survey_ref~"&ru_ref="~ru_ref,
+        "id": "b-item-2"
+    }
 ] %}
 {% block breadcrumbs %}
     {{
-    onsBreadcrumbs({
-    "ariaLabel": "Breadcrumbs",
-    "id": "breadcrumbs",
-    "itemsList": breadcrumbsData
-    })
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
     }}
 {% endblock breadcrumbs %}
+
 {% block main %}
     {% set ns = namespace() %}
     {% include "radio-option-select-error-panel.html" %}
     <h1 class="ons-u-fs-xl">Information about the ONS</h1>
-    <form action="{{ url_for('surveys_bp.post_help_option_select', short_name=short_name, business_id=business_id, option=option, survey_ref=survey_ref, ru_ref=ru_ref)}}"
-          method="post">
+    <form action="{{ url_for('surveys_bp.post_help_option_select', short_name=short_name, business_id=business_id, option=option, survey_ref=survey_ref, ru_ref=ru_ref)}}" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         {% if ns.optionError %}
             {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
         {% endif %}
         {{
-        onsRadios({
-        "legend": "Choose an option",
-        "name": "option",
-        "id": "option",
-        "error": errorOption,
-        "radios": [
-        {
-        "id": "who-is-the-ons",
-        "label": {
-        "text": "Who is the ONS?"
-        },
-        "value": "who-is-the-ons"
-        },
-        {
-        "id": "how-safe-is-my-data",
-        "label": {
-        "text": "How safe is my data?"
-        },
-        "value": "how-safe-is-my-data"
-        },
-        {
-        "id": "info-ons-something-else",
-        "label": {
-        "text": "Something else"
-        },
-        "value": "info-ons-something-else"
-        }
-        ]
-        })
+            onsRadios({
+                "legend": "Choose an option",
+                "name": "option",
+                "id": "option",
+                "error": errorOption,
+                "radios": [
+                    {
+                        "id": "who-is-the-ons",
+                        "label": {
+                            "text": "Who is the ONS?"
+                        },
+                        "value": "who-is-the-ons"
+                    },
+                    {
+                        "id": "how-safe-is-my-data",
+                        "label": {
+                            "text": "How safe is my data?"
+                        },
+                        "value": "how-safe-is-my-data"
+                    },
+                    {
+                        "id": "info-ons-something-else",
+                        "label": {
+                            "text": "Something else"
+                        },
+                        "value": "info-ons-something-else"
+                    }
+                ]
+            })
         }}
         <div class="ons-field ons-u-mt-l">
             {{
-            onsButton({
-            "text": "Continue",
-            "id": "btn-help-info-survey-option-continue",
-            "submitType": "timer"
-            })
+                onsButton({
+                    "text": "Continue",
+                    "id": "btn-help-info-survey-option-continue",
+                    "submitType": "timer"
+                })
             }}
             {{
-            onsButton({
-            "id": "btn-help-info-survey-option-cancel",
-            "url": url_for('surveys_bp.get_surveys_help_page', survey_ref=survey_ref, ru_ref=ru_ref),
-            "text": 'Cancel',
-            "variants": 'secondary',
-            "noIcon": true
-            })
+                onsButton({
+                    "id": "btn-help-info-survey-option-cancel",
+                    "url": url_for('surveys_bp.get_surveys_help_page', survey_ref=survey_ref, ru_ref=ru_ref),
+                    "text": 'Cancel',
+                    "variants": 'secondary',
+                    "noIcon": true
+                })
             }}
         </div>
     </form>

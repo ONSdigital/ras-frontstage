@@ -6,45 +6,47 @@
 {% from "components/button/_macro.njk" import onsButton %}
 {% set page_title = "Survey transfer email send instructions" %}
 {% set breadcrumbsData = [
-{
-"text": "Surveys",
-"url": "/surveys/todo",
-"id": "b-item-1"
-},
-{
-"text": "Account",
-"url": "/my-account",
-"id": "b-item-2"
-},
-{
-"text": "Transfer Surveys",
-"url": "/my-account/transfer-surveys",
-"id": "b-item-3"
-},
-{
-"text": "Select business",
-"url": "/my-account/transfer-surveys/business-selection",
-"id": "b-item-4"
-},
-{
-"text": "Select survey",
-"url": "/my-account/transfer-surveys/survey-selection",
-"id": "b-item-5"
-},
-{
-"text": "Enter email address",
-"url": "/my-account/transfer-surveys/recipient-email-address"
-}
+    {
+        "text": "Surveys",
+        "url": "/surveys/todo",
+        "id": "b-item-1"
+    },
+    {
+        "text": "Account",
+        "url": "/my-account",
+        "id": "b-item-2"
+    },
+    {
+        "text": "Transfer Surveys",
+        "url": "/my-account/transfer-surveys",
+        "id": "b-item-3"
+    },
+    {
+        "text": "Select business",
+        "url": "/my-account/transfer-surveys/business-selection",
+        "id": "b-item-4"
+    },
+    {
+        "text": "Select survey",
+        "url": "/my-account/transfer-surveys/survey-selection",
+        "id": "b-item-5"
+    },
+    {
+        "text": "Enter email address",
+        "url": "/my-account/transfer-surveys/recipient-email-address"
+    }
 ] %}
+
 {% block breadcrumbs %}
     {{
-    onsBreadcrumbs({
-    "ariaLabel": "Breadcrumbs",
-    "id": "breadcrumbs",
-    "itemsList": breadcrumbsData
-    })
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
     }}
 {% endblock breadcrumbs %}
+
 {% block main %}
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -55,7 +57,7 @@
                         "id": 'error-id',
                         "iconType": 'error',
                         "classes": 'ons-u-mb-m'
-                        }) %}
+                    }) %}
                         <p class="ons-u-fs-r" id="flashed-error-message-{{ loop.index }}">{{ message }}</p>
                     {% endcall %}
                 {% else %}
@@ -64,7 +66,7 @@
                         "id": 'success-id',
                         "iconType": 'check',
                         "classes": 'ons-u-mb-m'
-                        }) %}
+                    }) %}
                         <p class="ons-u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>
                     {% endcall %}
                 {% endif %}
@@ -72,28 +74,26 @@
         {% endif %}
     {% endwith %}
     <h1 class="ons-u-fs-xl">Send instructions</h1>
-    <p>
-        We will send an email to <strong>{{ email }}</strong> with instructions to access the following surveys:
-    </p>
+    <p>We will send an email to <strong>{{ email }}</strong> with instructions to access the following surveys:</p>
     {% for business in share_dict %}
         <h2 class="ons-u-fs-m">{{ share_dict[business].name }}</h2>
         {% if share_dict[business] | length > 0 %}
-            <div class="ons-text-indent">
-                {% set surveyList = [] %}
-                {% for survey in share_dict[business].surveys %}
-                    {% do surveyList.append(
+        <div class="ons-text-indent">
+            {% set surveyList = [] %}
+            {% for survey in share_dict[business].surveys %}
+                {% do surveyList.append(
                     {
-                    "text": survey['longName']
+                        "text": survey['longName']
                     }
-                    ) %}
-                {% endfor %}
-                {{
+                ) %}
+            {% endfor %}
+            {{
                 onsList({
-                "variants": 'bare',
-                "itemsList": surveyList
+                    "variants": 'bare',
+                    "itemsList": surveyList
                 })
-                }}
-            </div>
+            }}
+        </div>
         {% endif %}
     {% endfor %}
     <form action="" method="post">
@@ -102,14 +102,13 @@
         <div class="ons-field ons-u-mt-l">
             <div class="ons-btn-group">
                 {{
-                onsButton({
-                "text": "Send email",
-                "submitType": "timer"
-                })
+                    onsButton({
+                    "text": "Send email",
+                    "submitType": "timer"
+                    })
                 }}
                 <a href="{{ url_for('account_bp.transfer_survey_email_entry') }}"
-                   role="button"
-                   class="ons-btn ons-btn--link ons-btn--secondary"><span class="ons-btn__inner">Cancel</span></a>
+                    role="button" class="ons-btn ons-btn--link ons-btn--secondary"><span class="ons-btn__inner">Cancel</span></a>
             </div>
         </div>
     </form>

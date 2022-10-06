@@ -7,41 +7,43 @@
 {% from "components/button/_macro.njk" import onsButton %}
 {% set page_title = "Survey share email entry" %}
 {% set breadcrumbsData = [
-{
-"text": "Surveys",
-"url": "/surveys/todo",
-"id": "b-item-1"
-},
-{
-"text": "Account",
-"url": "/my-account",
-"id": "b-item-2"
-},
-{
-"text": "Share Surveys",
-"url": "/my-account/share-surveys",
-"id": "b-item-3"
-},
-{
-"text": "Select business",
-"url": "/my-account/share-surveys/business-selection",
-"id": "b-item-4"
-},
-{
-"text": "Select survey",
-"url": "/my-account/share-surveys/survey-selection",
-"id": "b-item-5"
-}
+    {
+        "text": "Surveys",
+        "url": "/surveys/todo",
+        "id": "b-item-1"
+    },
+    {
+        "text": "Account",
+        "url": "/my-account",
+        "id": "b-item-2"
+    },
+    {
+        "text": "Share Surveys",
+        "url": "/my-account/share-surveys",
+        "id": "b-item-3"
+    },
+    {
+        "text": "Select business",
+        "url": "/my-account/share-surveys/business-selection",
+        "id": "b-item-4"
+    },
+    {
+        "text": "Select survey",
+        "url": "/my-account/share-surveys/survey-selection",
+        "id": "b-item-5"
+    }
 ] %}
+
 {% block breadcrumbs %}
     {{
-    onsBreadcrumbs({
-    "ariaLabel": "Breadcrumbs",
-    "id": "breadcrumbs",
-    "itemsList": breadcrumbsData
-    })
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
     }}
 {% endblock breadcrumbs %}
+
 {% block main %}
     {% if errors|length > 0 %}
         {% if errors|length == 1 %}
@@ -51,72 +53,71 @@
         {% endif %}
         {% call
             onsPanel({
-            "type": "error",
-            "classes": "ons-u-mb-s",
-            "title": errorTitle
+                "type": "error",
+                "classes": "ons-u-mb-s",
+                "title": errorTitle
             })
-            %}
+        %}
             {% set errorData = [] %}
             {% for error in errors %}
                 {% set error_text =  error %}
                 {% do errorData.append(
-                {
-                "text": 'Problem with the ' ~ error_text.replace('_', ' '),
-                "url": "#" ~ error ~ '_error',
-                "classes": "ons-js-inpagelink"
-                }
+                    {
+                        "text": 'Problem with the ' ~ error_text.replace('_', ' '),
+                        "url": "#" ~ error ~ '_error',
+                        "classes": "ons-js-inpagelink"
+                    }
                 ) %}
             {% endfor %}
             {{
-            onsList({
-            "element": "ol",
-            "itemsList": errorData
-            })
+                onsList({
+                    "element": "ol",
+                    "itemsList": errorData
+                })
             }}
         {% endcall %}
     {% endif %}
+
     <h1>Enter recipient's email address</h1>
     <p>We need the email address of the person who will be responding to your surveys.</p>
     {% set checkboxData = [] %}
     <form action="" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         {{
-        onsPanel({
-        "body": '
-        <p>Make sure you have their permission to give us their email address.</p>
-        '
-        })
+            onsPanel({
+                "body": '<p>Make sure you have their permission to give us their email address.</p>'
+            })
         }}
         {% if errors.email_address %}
             {% set errorEmailAddress = { "text": errors['email_address'][0],  "id": 'email_address_error' } %}
             {% set emailAddress = form.email_address.data %}
         {% endif %}
         {{
-        onsInput({
-        "id": "email_address",
-        "name": "email_address",
-        "type": "text",
-        "label": {
-        "text": "Enter email address"
-        },
-        "error": errorEmailAddress,
-        "value": emailAddress,
-        })
+            onsInput({
+                "id": "email_address",
+                "name": "email_address",
+                "type": "text",
+                "label": {
+                    "text": "Enter email address"
+                },
+                "error": errorEmailAddress,
+                "value": emailAddress,
+            })
         }}
         <div class="ons-field ons-u-mt-l">
             {{
-            onsButton({
-            "text": "Continue",
-            "submitType": "timer"
-            })
+                onsButton({
+                    "text": "Continue",
+                    "submitType": "timer"
+                })
             }}
             {{
-            onsButton({
-            "url": url_for('account_bp.share_survey_survey_select'),
-            "text": 'Cancel',
-            "variants": 'secondary',
-            "noIcon": true
-            })
+                onsButton({
+                    "url": url_for('account_bp.share_survey_survey_select'),
+                    "text": 'Cancel',
+                    "variants": 'secondary',
+                    "noIcon": true
+                })
             }}
         </div>
     </form>

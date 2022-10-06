@@ -1,14 +1,14 @@
 {% extends "layouts/_block_content.html" %}
+
 {% set page_title = "Error downloading file" %}
+
 {% block content %}
+
     {{
-    onsPanel({
-    "body": '
-    <h1 class="ons-u-fs-r--b">Something went wrong</h1>
-    <p>
-        Please call us on <a href="tel:03001234931">0300 1234 931</a>
-    </p>
-    '
-    })
+        onsPanel({
+            "body": '<h1 class="ons-u-fs-r--b">Something went wrong</h1>
+                <p>Please call us on <a href="tel:03001234931">0300 1234 931</a></p>'
+        })
     }}
+
 {% endblock content %}

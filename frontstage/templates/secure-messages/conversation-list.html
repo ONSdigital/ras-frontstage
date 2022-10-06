@@ -1,38 +1,43 @@
 {% extends 'layouts/_base.html' %}
+
 {% set page_title = "Messages" %}
+
 {% block content %}
     {% include "partials/tab_list.html" %}
+
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% call onsPanel ({
                 "type":"success",
                 "classes": "ons-u-mb-s",
                 "bodyAttributes": {
-                "data-qa": "success-body"
+                    "data-qa": "success-body"
                 }
-                }) %}
-                {% for message in messages %}<p id="flashed-message-{{ loop.index }}">{{ message }}</p>{% endfor %}
+            }) %}
+                {% for message in messages %}
+                    <p id="flashed-message-{{ loop.index }}">{{ message }}</p>
+                {% endfor %}
             {% endcall %}
         {% endif %}
     {% endwith %}
     <section class="ons-u-mb-s">
         {% from "components/section-navigation/_macro.njk" import onsSectionNavigation %}
         {{
-        onsSectionNavigation({
-        "ariaLabel": "Section menu",
-        "ariraListLabel": "Navigation menu",
-        "tabQuery": "closed" if is_closed else "open",
-        "itemsList": [
-        {
-        "title": "Open",
-        "url": url_for('secure_message_bp.view_conversation_list')
-        },
-        {
-        "title": "Closed",
-        "url": url_for('secure_message_bp.view_conversation_list', is_closed='true')
-        }
-        ]
-        })
+            onsSectionNavigation({
+                "ariaLabel": "Section menu",
+                "ariraListLabel": "Navigation menu",
+                "tabQuery": "closed" if is_closed else "open",
+                "itemsList": [
+                    {
+                        "title": "Open",
+                        "url": url_for('secure_message_bp.view_conversation_list')
+                    },
+                    {
+                        "title": "Closed",
+                        "url": url_for('secure_message_bp.view_conversation_list', is_closed='true')
+                    }
+                ]
+            })
         }}
     </section>
     {% if not messages %}
@@ -46,28 +51,29 @@
         {% set messageList = [] %}
         {% for message in messages %}
             {% do messageList.append(
-            {
-            "id": "message-link-" ~ loop.index,
-            "unread": true if message['unread'] else false,
-            "url": url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) ~ "#latest-message",
-            "subject": message.subject,
-            "fromText": message.from or 'Unavailable',
-            "dateText": message.sent_date or 'Unavailable',
-            "body": '<xmp>'+ message['body']|truncate(80, False, '...', 0) +'</xmp>'
-            }
+                {
+                  "id": "message-link-" ~ loop.index,
+                  "unread": true if message['unread'] else false,
+                  "url": url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) ~ "#latest-message",
+                  "subject": message.subject,
+                  "fromText": message.from or 'Unavailable',
+                  "dateText": message.sent_date or 'Unavailable',
+                  "body": '<xmp>'+ message['body']|truncate(80, False, '...', 0) +'</xmp>'
+                }
             ) %}
         {% endfor %}
         {{
-        onsMessageList({
-        "ariaLabel": "Message list for ONS Business Surveys",
-        "unreadText": "New",
-        "fromLabel": "From",
-        "dateLabel": "Date",
-        "hiddenReadLabel": "Read the message",
-        "ariaLabelMetaData": "Message information",
-        "ariaLabelMsg": "Message preview",
-        "messages": messageList
-        })
+            onsMessageList({
+                "ariaLabel": "Message list for ONS Business Surveys",
+                "unreadText": "New",
+                "fromLabel": "From",
+                "dateLabel": "Date",
+                "hiddenReadLabel": "Read the message",
+                "ariaLabelMetaData": "Message information",
+                "ariaLabelMsg": "Message preview",
+                "messages": messageList
+            })
         }}
     {% endif %}
+
 {% endblock content %}

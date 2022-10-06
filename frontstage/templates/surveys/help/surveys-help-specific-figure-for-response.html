@@ -1,49 +1,47 @@
 {% extends "layouts/_block_content.html" %}
 {% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/button/_macro.njk" import onsButton %}
+
 {% set page_title = "Help with specific figures" %}
 {% set breadcrumbsData = [
-{
-"text": "Surveys",
-"url": "/surveys/todo",
-"id": "b-item-1"
-},
-{
-"text": "Help",
-"url": "/surveys/surveys-help?survey_ref="~survey_ref~"&ru_ref="~ru_ref,
-"id": "b-item-2"
-},
-{
-"text": "Help completing this survey",
-"url": "/surveys/help/"~option,
-"id": "b-item-3"
-}
+    {
+        "text": "Surveys",
+        "url": "/surveys/todo",
+        "id": "b-item-1"
+    },
+    {
+        "text": "Help",
+        "url": "/surveys/surveys-help?survey_ref="~survey_ref~"&ru_ref="~ru_ref,
+        "id": "b-item-2"
+    },
+    {
+        "text": "Help completing this survey",
+        "url": "/surveys/help/"~option,
+        "id": "b-item-3"
+    }
 ] %}
+
 {% block breadcrumbs %}
     {{
-    onsBreadcrumbs({
-    "ariaLabel": "Breadcrumbs",
-    "id": "breadcrumbs",
-    "itemsList": breadcrumbsData
-    })
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
     }}
 {% endblock breadcrumbs %}
+
 {% block main %}
     <h1>I do not have specific figures for a response</h1>
     <p>We do not expect you to spend too long or go to any great expense to get hold of the information we request.</p>
-    <p>
-        We will accept informed estimates as we combine the data we receive from all businesses to measure changes in the economy.
-    </p>
+    <p>We will accept informed estimates as we combine the data we receive from all businesses to measure changes in the economy.</p>
     <p>Reporting a genuine zero return is as valid as any other figure as we are measuring business trends.</p>
+
     <h2>Did this answer your question?</h2>
-    <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}"
-       role="button"
-       class="ons-btn ons-btn--link ons-js-submit-btn">
+    <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" role="button" class="ons-btn ons-btn--link ons-js-submit-btn">
         <span class="ons-btn__inner">Yes</span>
     </a>
-    <a href="{{ url_for('surveys_bp.get_send_help_message_page', option=option, sub_option='do-not-have-specific-figures') }}"
-       role="button"
-       class="ons-btn ons-btn--link ons-btn--secondary">
+    <a href="{{ url_for('surveys_bp.get_send_help_message_page', option=option, sub_option='do-not-have-specific-figures') }}" role="button" class="ons-btn ons-btn--link ons-btn--secondary">
         <span class="ons-btn__inner">No</span>
     </a>
 {% endblock main %}

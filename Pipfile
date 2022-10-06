@@ -31,12 +31,13 @@ google-cloud-storage = "*"
 python-gnupg = "*"
 werkzeug = "*"
 
+
 [dev-packages]
 black = "*"
 coverage= "*"
+djlint = "*"
 flake8 = "*"
 isort = "*"
-djlint = "*"
 pytest = "*"
 requests-mock = "*"
 pytest-cov = "*"

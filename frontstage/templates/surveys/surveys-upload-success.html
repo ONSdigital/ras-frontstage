@@ -10,6 +10,6 @@
             <h1 class="ons-u-fs-r--b">File uploaded successfully</h1>
             <p>{{ upload_filename }} has been uploaded.</p>
             <p>This survey has now moved into your <a href="{{ url_for('surveys_bp.get_survey_list', tag='history') }}">history</a>.</p>
-            <p><a id='return-survey-list' href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}">Return to my 'To do' list</a></p>
+            <p><a id="return-survey-list" href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}">Return to my 'To do' list</a></p>
     {% endcall %}
 {% endblock content %}

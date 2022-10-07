@@ -2,4 +2,4 @@
 profile = "black"
 
 [tool.djlint]
-ignore="T001,T002,T003,T032,H008,H017,H021"
+ignore="T001,T002,T003,T032,H017,H021,H025"

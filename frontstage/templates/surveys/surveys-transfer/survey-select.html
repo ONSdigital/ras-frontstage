@@ -83,7 +83,7 @@
                 {% set errorOption = { "text": 'You need to select a survey',  "id": 'option_error_'~business } %}
             {% endif %}
             {% if error == 'max_transfer_survey_exceeded' and business in ns.businesses %}
-                {% set errorOption = { "text": 'You have reached the maximum amount of emails you can enroll on one or more surveys.<br><br>
+                {% set errorOption = { "text": 'You have reached the maximum amount of emails you can enroll on one or more surveys.<br /><br />
             Deselect the survey/s to continue or call 0300 1234 931 to discuss your options.',  "id": 'option_error_'~business } %}
             {% endif %}
             {% set checkboxesData = {

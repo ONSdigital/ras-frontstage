@@ -34,7 +34,7 @@
     <dt class="ons-metadata__term ons-grid__col ons-col-4@m">Phone number:</dt>
     <dd class="ons-metadata__value ons-grid__col ons-col-8@m">{{ respondent.telephone }}</dd>
     </dl>
-        <hr class="ons-u-mb-l">
+        <hr class="ons-u-mb-l" />
     <h1 class="ons-u-fs-xl">Help with your account</h1>
     <form action="{{ url_for('account_bp.update_account')}}" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>

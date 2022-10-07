@@ -45,9 +45,9 @@ class TestAccount(unittest.TestCase):
         self.assertTrue(actual_message == expected_message)
 
     def test_check_attribute_change_returns_true(self):
-        first_name = TestFormData("something")
-        last_name = TestFormData("test")
-        telephone = TestFormData("07234765346")
+        first_name = FormData("something")
+        last_name = FormData("test")
+        telephone = FormData("07234765346")
         form = ImmutableMultiDict([("first_name", first_name), ("last_name", last_name), ("phone_number", telephone)])
         attributes_changed = []
         respondent_details = {"firstName": "test", "lastName": "test", "telephone": "07234765346"}
@@ -59,9 +59,9 @@ class TestAccount(unittest.TestCase):
         self.assertEqual(["first name"], attributes_changed)
 
     def test_check_attribute_change_return_false(self):
-        first_name = TestFormData("test")
-        last_name = TestFormData("test")
-        telephone = TestFormData("07234765346")
+        first_name = FormData("test")
+        last_name = FormData("test")
+        telephone = FormData("07234765346")
         form = ImmutableMultiDict([("first_name", first_name), ("last_name", last_name), ("phone_number", telephone)])
         attributes_changed = []
         respondent_details = {"firstName": "test", "lastName": "test", "telephone": "07234765346"}
@@ -73,6 +73,6 @@ class TestAccount(unittest.TestCase):
         self.assertEqual([], attributes_changed)
 
 
-class TestFormData:
+class FormData:
     def __init__(self, data):
         self.data = data

@@ -1,2 +1,5 @@
 [tool.isort]
 profile = "black"
+
+[tool.djlint]
+ignore="H021"

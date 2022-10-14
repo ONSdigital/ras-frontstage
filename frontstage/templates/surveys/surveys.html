@@ -1,11 +1,11 @@
 {% from "components/button/_macro.njk" import onsButton %}
 {% for survey in sorted_surveys_list %}
     {% if survey.added_survey %}
-{% set highlight = 'ons-table__row--highlight' %}
-{% set id = 'new-survey' %}
+        {% set highlight = 'ons-table__row--highlight' %}
+        {% set id = 'new-survey' %}
     {% else %}
-{% set highlight = '' %}
-{% set id = 'access_survey_button_' ~ loop.index %}
+        {% set highlight = '' %}
+        {% set id = 'access_survey_button_' ~ loop.index %}
     {% endif %}
     <section class="ons-u-bb {{ highlight }}" id="{{ id }}">
         {% if survey.display_button %}
@@ -25,18 +25,18 @@
                 <dt style="float: left;
                            clear: left;"
                     class="ons-u-ml-no ons-u-mb-xs ons-u-pr-xs ons-u-fs-s">
-Business:
+                    Business:
                 </dt>
                 <dd class="ons-u-ml-no ons-u-mb-xs ons-u-fs-s">
-{{ survey.business_name }}
+                    {{ survey.business_name }}
                 </dd>
                 <dt style="float: left;
                            clear: left;"
                     class="ons-u-ml-no ons-u-mb-xs ons-u-pr-xs ons-u-fs-s">
-RU ref:
+                    RU ref:
                 </dt>
                 <dd class="ons-u-ml-no ons-u-mb-xs ons-u-fs-s">
-{{ survey.business_ref }}
+                    {{ survey.business_ref }}
                 </dd>
             </div>
             <div class="ons-grid__col ons-col-4@m ons-u-pt-no ons-u-pb-xs">
@@ -48,28 +48,28 @@ RU ref:
                 <dt style="float: left;
                            clear: left;"
                     class="ons-u-ml-no ons-u-mb-xs ons-u-pr-xs ons-u-fs-s">
-Submit by:
+                    Submit by:
                 </dt>
                 <dd class="ons-u-ml-no ons-u-mb-xs ons-u-fs-s">
-{{ survey.formatted_submit_by }}
+                    {{ survey.formatted_submit_by }}
                 </dd>
             </div>
             {% if survey.status == 'Not started' %}
-{% set status_class = 'ons-status--info' %}
+                {% set status_class = 'ons-status--info' %}
             {% elif survey.status == 'Downloaded' or survey.status == 'In progress' %}
-{% set status_class = 'ons-status--success' %}
+                {% set status_class = 'ons-status--success' %}
             {% else %}
-{% set status_class = 'ons-status--dead' %}
+                {% set status_class = 'ons-status--dead' %}
             {% endif %}
             <div class="ons-grid__col ons-col-3@m ons-u-pt-no ons-u-pb-xs">
                 <dt style="float: left; clear: left;" class="ons-u-vh">
-Status:
+                    Status:
                 </dt>
                 <dd class="ons-u-fs-r ons-u-ml-no ons-u-mb-xs" style="line-height:1">
                     <span id="surveyStatus" class="ons-status {{ status_class }}">{{ survey.status }}</span>
                 </dd>
                 <dt style="float: left; clear: left;" class="ons-u-vh">
-Help:
+                    Help:
                 </dt>
                 <dd class="ons-u-ml-no ons-u-mb-s">
                     <a id="create-message-link-{{ loop.index }}"

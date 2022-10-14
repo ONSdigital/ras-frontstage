@@ -5,22 +5,22 @@
 {% from "components/button/_macro.njk" import onsButton %}
 {% set page_title = "Help something else" %}
 {% set breadcrumbsData = [
-    {
-        "text": "Sign in",
-        "url": "/sign-in"
-    },
-    {
-        "text": "Help",
-        "url": "/help"
-    }
+{
+"text": "Sign in",
+"url": "/sign-in"
+},
+{
+"text": "Help",
+"url": "/help"
+}
 ] %}
 {% block breadcrumbs %}
-{{
-        onsBreadcrumbs({
-            "ariaLabel": "Breadcrumbs",
-            "id": "breadcrumbs",
-            "itemsList": breadcrumbsData
-        })
+    {{
+    onsBreadcrumbs({
+    "ariaLabel": "Breadcrumbs",
+    "id": "breadcrumbs",
+    "itemsList": breadcrumbsData
+    })
     }}
 {% endblock breadcrumbs %}
 {% block main %}

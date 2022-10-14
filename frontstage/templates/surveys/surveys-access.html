@@ -16,25 +16,25 @@
     <h2>Download</h2>
     <p>
         {{ survey_info.shortName }} spreadsheet for <strong>{{ business_info.name }}</strong>
-    for the period {{ collection_exercise_info.userDescription }}
+        for the period {{ collection_exercise_info.userDescription }}
     </p>
     <p>If actual figures are not available, please provide informed estimates.</p>
-{{
+    {{
     onsButton({
-        "url": url_for('surveys_bp.download_survey', case_id=case_id, business_party_id=business_info.id, survey_short_name=survey_info.shortName),
-        "text": 'Download spreadsheet
+    "url": url_for('surveys_bp.download_survey', case_id=case_id, business_party_id=business_info.id, survey_short_name=survey_info.shortName),
+    "text": 'Download spreadsheet
     <div class="ons-u-fs-s">(' ~ collection_instrument_size | file_size_filter ~ ' kb XLS)</div>
-',
-        "type": "submit",
-        "hideCaret": true,
-        "classes": "ons-u-mt-s ons-u-mb-s",
-        "id": "download_survey_button",
-        "submitType": "timer",
-        "attributes": {
-            "onclick": "ga('send', 'event', 'survey', 'download', 'survey_ref = " ~ survey_info.surveyRef ~ " collection_exercise_ref = " ~ collection_exercise_info.exerciseRef ~ "');"
-        }
+    ',
+    "type": "submit",
+    "hideCaret": true,
+    "classes": "ons-u-mt-s ons-u-mb-s",
+    "id": "download_survey_button",
+    "submitType": "timer",
+    "attributes": {
+    "onclick": "ga('send', 'event', 'survey', 'download', 'survey_ref = " ~ survey_info.surveyRef ~ " collection_exercise_ref = " ~ collection_exercise_info.exerciseRef ~ "');"
+    }
     })
-}}
+    }}
     <hr/>
     <h2 class="ons-u-mt-m">Upload your spreadsheet</h2>
     {% if collection_exercise_info.scheduledReturnDateTimeFormatted %}
@@ -43,28 +43,28 @@
         </p>
     {% endif %}
     {% call onsCollapsible({
-    "id": "collapsible",
-    "classes": "ons-u-mb-m",
-    "title": "Guidance for uploading",
-    "button": {
+        "id": "collapsible",
+        "classes": "ons-u-mb-m",
+        "title": "Guidance for uploading",
+        "button": {
         "close": "Hide this",
         "contextSuffix": "content"
-    }
-}) %}
+        }
+        }) %}
         <h3 class="ons-u-mb-s">Your file needs to be:</h3>
-{{
+        {{
         onsList({
-            "itemsList": [
-                {
-                    "text": '.xls or .xlsx format'
-                },
-                {
-                    "text": 'smaller than 20MB'
-                }
-            ]
+        "itemsList": [
+        {
+        "text": '.xls or .xlsx format'
+        },
+        {
+        "text": 'smaller than 20MB'
+        }
+        ]
         })
-    }}
+        }}
     {% endcall %}
     <p class="ons-u-fs-r--b icon--lock">We will treat your data securely and confidentially</p>
-{% include "surveys/surveys-upload-file-picker.html" %}
+    {% include "surveys/surveys-upload-file-picker.html" %}
 {% endblock content %}

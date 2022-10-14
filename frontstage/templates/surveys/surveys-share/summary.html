@@ -8,28 +8,28 @@
 {% block main %}
     <h1 class="ons-u-fs-xl">Confirm survey access</h1>
     <p>
-Your colleague {{ shared_by }} wants to share access to the following surveys with you.
-    You need to check the details are correct and then confirm access.
+        Your colleague {{ shared_by }} wants to share access to the following surveys with you.
+        You need to check the details are correct and then confirm access.
     </p>
     {% for business in share_dict %}
         <section class="ons-u-mt-l ons-u-mb-l">
             <h2 class="ons-u-fs-m ons-u-mb-xs">{{ share_dict[business].name }}</h2>
             <p class="ons-u-mb-s">Trading as {{ share_dict[business]['trading_as'] }}</p>
             <div class="ons-text-indent">
-{% set surveyList = [] %}
+                {% set surveyList = [] %}
                 {% for survey in share_dict[business]['surveys'] %}
-{% do surveyList.append(
+                    {% do surveyList.append(
                     {
-                        "text": survey['longName']
+                    "text": survey['longName']
                     }
-                ) %}
+                    ) %}
                 {% endfor %}
-{{
+                {{
                 onsList({
-                    "variants": 'bare',
-                    "itemsList": surveyList
+                "variants": 'bare',
+                "itemsList": surveyList
                 })
-            }}
+                }}
             </div>
         </section>
     {% endfor %}

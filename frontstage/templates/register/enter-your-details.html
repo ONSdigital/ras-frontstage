@@ -10,88 +10,88 @@
         {% if messages %}
             {% call
                 onsPanel({
-                        "type": "error",
-                        "classes": "ons-u-mb-l",
-                        "title":  errorTitle
-                    })
-            %}
+                "type": "error",
+                "classes": "ons-u-mb-l",
+                "title":  errorTitle
+                })
+                %}
                 {% for message in messages %}<p id="flashed-message-{{ loop.index }}">{{ message }}</p>{% endfor %}
             {% endcall %}
         {% endif %}
     {% endwith %}
     {% if errors|length > 0 %}
         {% if errors|length == 1 %}
-{% set errorTitle = 'There is 1 error on this page' %}
+            {% set errorTitle = 'There is 1 error on this page' %}
         {% elif errors|length > 1 %}
-{% set errorTitle = 'There are ' ~ errors|length ~ ' errors on this page' %}
+            {% set errorTitle = 'There are ' ~ errors|length ~ ' errors on this page' %}
         {% endif %}
         {% call
             onsPanel({
-                "type": "error",
-                "classes": "ons-u-mb-s",
-                "title": errorTitle
+            "type": "error",
+            "classes": "ons-u-mb-s",
+            "title": errorTitle
             })
-        %}
+            %}
             <p>
                 These <strong>must be corrected</strong> to continue.
             </p>
-{% set errorData = [] %}
+            {% set errorData = [] %}
             {% for error in errors %}
-{% set error_text = 'passwords' if error == 'password' else error %}
-{% do errorData.append(
-                    {
-                        "text": 'Problem with the ' ~ error_text.replace('_', ' '),
-                        "url": "#" ~ error ~ '_error',
-                        "classes": "ons-js-inpagelink"
-                    }
+                {% set error_text = 'passwords' if error == 'password' else error %}
+                {% do errorData.append(
+                {
+                "text": 'Problem with the ' ~ error_text.replace('_', ' '),
+                "url": "#" ~ error ~ '_error',
+                "classes": "ons-js-inpagelink"
+                }
                 ) %}
             {% endfor %}
-{{
-                onsList({
-                    "element": "ol",
-                    "itemsList": errorData
-                })
+            {{
+            onsList({
+            "element": "ol",
+            "itemsList": errorData
+            })
             }}
         {% endcall %}
     {% endif %}
     <form method="post" role="form" onsubmit="formSubmitted(event);">
-{{ form.csrf_token }}
+        {{ form.csrf_token }}
         <h1 class="ons-u-fs-xl">Enter your account details</h1>
-{{ form.enrolment_code }}
+        {{ form.enrolment_code }}
         <h2>Your name</h2>
         {%- call onsFieldset({
             "legend": "Your name",
             "legendClasses": "ons-u-vh"
-        }) -%}
+            }) -%}
             {% if errors.first_name %}
-{% set errorFirstName = { "text": errors['first_name'][0],  "id": 'first_name_error' } %}
+                {% set errorFirstName = { "text": errors['first_name'][0],  "id": 'first_name_error' } %}
             {% endif %}
-{{
-                onsInput({
-                    "id": "first_name",
-                    "name": "first_name",
-                    "type": "text",
-                    "label": {
-                        "text": "First name"
-                    },
-                    "error": errorFirstName,
-                    "value": form.first_name.data
-                })
+            {{
+            onsInput({
+            "id": "first_name",
+            "name": "first_name",
+            "type": "text",
+            "label": {
+            "text": "First name"
+            },
+            "error": errorFirstName,
+            "value": form.first_name.data
+            })
             }}
             {% if errors.last_name %}
-{% set errorLastName = { "text": errors['last_name'][0],  "id": 'last_name_error' } %}
+                {% set errorLastName = { "text": errors['last_name'][0],  "id": 'last_name_error' } %}
             {% endif %}
-{{
-                onsInput({
-                    "id": "last_name",
-                    "name": "last_name",
-                    "type": "text",
-                    "label": {
-                        "text": "Last name"
-                    },
-                    "error": errorLastName,
-                    "value": form.last_name.data
-                })
+            {{
+            onsInput({
+            "id": "last_name",
+            "name": "last_name",
+            "type": "text",
+            "label": {
+            "text": "Last name"
+            },
+            "error": errorLastName,
+            "value": form.last_name.data
+            })
             }}
         {% endcall %}
         <h2 class="ons-u-mt-l">Email address</h2>
@@ -99,84 +99,84 @@
         {%- call onsFieldset({
             "legend": "Email address",
             "legendClasses": "ons-u-vh"
-        }) -%}
+            }) -%}
             {% if errors.email_address %}
-{% set errorEmailAddress = { "text": errors['email_address'][0],  "id": 'email_address_error' } %}
+                {% set errorEmailAddress = { "text": errors['email_address'][0],  "id": 'email_address_error' } %}
             {% endif %}
-{{
-                onsInput({
-                    "id": "email_address",
-                    "name": "email_address",
-                    "type": "text",
-                    "label": {
-                        "text": "Email address"
-                    },
-                    "error": errorEmailAddress,
-                    "value": form.email_address.data
-                })
+            {{
+            onsInput({
+            "id": "email_address",
+            "name": "email_address",
+            "type": "text",
+            "label": {
+            "text": "Email address"
+            },
+            "error": errorEmailAddress,
+            "value": form.email_address.data
+            })
             }}
-{{
-                onsInput({
-                    "id": "email_address_confirm",
-                    "name": "email_address_confirm",
-                    "type": "text",
-                    "label": {
-                        "text": "Re-type your email address"
-                    },
-                    "error": errorEmailAddress
-                })
+            {{
+            onsInput({
+            "id": "email_address_confirm",
+            "name": "email_address_confirm",
+            "type": "text",
+            "label": {
+            "text": "Re-type your email address"
+            },
+            "error": errorEmailAddress
+            })
             }}
         {% endcall %}
         <h2 class="ons-u-mt-l">Create a password</h2>
         <p>Your password must have:</p>
-{{
-            onsList({
-                "itemsList": [
-                    {
-                        "text": 'at least 12 characters'
-                    },
-                    {
-                        "text": 'at least one symbol (eg ?!£%)'
-                    },
-                    {
-                        "text": 'at least one capital letter'
-                    },
-                    {
-                        "text": 'at least one number'
-                    }
-                ]
-            })
+        {{
+        onsList({
+        "itemsList": [
+        {
+        "text": 'at least 12 characters'
+        },
+        {
+        "text": 'at least one symbol (eg ?!£%)'
+        },
+        {
+        "text": 'at least one capital letter'
+        },
+        {
+        "text": 'at least one number'
+        }
+        ]
+        })
         }}
         {%- call onsFieldset({
             "legend": "Create a password",
             "legendClasses": "ons-u-vh"
-        }) -%}
+            }) -%}
             {% if errors.password %}
-{% set errorPassword = { "text": errors['password'][0],  "id": 'password_error' } %}
+                {% set errorPassword = { "text": errors['password'][0],  "id": 'password_error' } %}
             {% endif %}
-{{
-                onsPassword({
-                    "id": "password",
-                    "name": "password",
-                    "type": "text",
-                    "label": {
-                        "text": "Password"
-                    },
-                    "showPasswordText": "Show password",
-                    "error": errorPassword
-                })
+            {{
+            onsPassword({
+            "id": "password",
+            "name": "password",
+            "type": "text",
+            "label": {
+            "text": "Password"
+            },
+            "showPasswordText": "Show password",
+            "error": errorPassword
+            })
             }}
-{{
-                onsPassword({
-                    "id": "password_confirm",
-                    "name": "password_confirm",
-                    "type": "text",
-                    "label": {
-                        "text": "Re-type your password"
-                    },
-                    "showPasswordText": "Show password",
-                    "error": errorPassword
-                })
+            {{
+            onsPassword({
+            "id": "password_confirm",
+            "name": "password_confirm",
+            "type": "text",
+            "label": {
+            "text": "Re-type your password"
+            },
+            "showPasswordText": "Show password",
+            "error": errorPassword
+            })
             }}
         {% endcall %}
         <h2 class="ons-u-mt-l">Contact telephone number</h2>
@@ -184,36 +184,36 @@
         {%- call onsFieldset({
             "legend": "Create a password",
             "legendClasses": "ons-u-vh"
-        }) -%}
+            }) -%}
             {% if errors.phone_number %}
-{% set errorPhoneNumber = { "text": errors['phone_number'][0],  "id": 'phone_number_error' } %}
+                {% set errorPhoneNumber = { "text": errors['phone_number'][0],  "id": 'phone_number_error' } %}
             {% endif %}
-{{
-                onsInput({
-                    "id": "phone_number",
-                    "name": "phone_number",
-                    "type": "tel",
-                    "autocomplete": "tel",
-                    "classes": "input--w-8",
-                    "label": {
-                        "text": "Telephone number",
-                        "description": "For international numbers include the country code, for example +33 1234 567 890"
-                    },
-                    "error": errorPhoneNumber,
-                    "value": form.phone_number.data
-                })
+            {{
+            onsInput({
+            "id": "phone_number",
+            "name": "phone_number",
+            "type": "tel",
+            "autocomplete": "tel",
+            "classes": "input--w-8",
+            "label": {
+            "text": "Telephone number",
+            "description": "For international numbers include the country code, for example +33 1234 567 890"
+            },
+            "error": errorPhoneNumber,
+            "value": form.phone_number.data
+            })
             }}
         {% endcall %}
         <h3 class="ons-u-mt-l">Privacy notice</h3>
         <p>Your user account will be deleted after 36 months of inactivity</p>
-{{
-            onsButton({
-                "text": "Continue",
-                "type": "submit",
-                "classes": "ons-u-mt-l ons-u-mb-s",
-                "id": "continue_button",
-                "submitType": "timer"
-            })
+        {{
+        onsButton({
+        "text": "Continue",
+        "type": "submit",
+        "classes": "ons-u-mt-l ons-u-mb-s",
+        "id": "continue_button",
+        "submitType": "timer"
+        })
         }}
     </form>
     <script{% if csp_nonce %} nonce="{{ csp_nonce() }}"{% endif %}>

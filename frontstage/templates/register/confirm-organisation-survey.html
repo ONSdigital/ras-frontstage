@@ -3,18 +3,18 @@
 {% set page_title = "Confirm organisation and survey" %}
 {% block main %}
     <h1 class="ons-u-fs-xl">Confirm organisation and survey details</h1>
-{% include('partials/business_survey_credentials.html') %}
-{{
+    {% include('partials/business_survey_credentials.html') %}
+    {{
     onsButton({
-        "url": url_for('register_bp.register_enter_your_details', encrypted_enrolment_code=context.encrypted_enrolment_code),
-        "text": "Confirm",
-        "type": "submit",
-        "classes": "ons-u-mb-m",
-        "id": "confirm_button"
+    "url": url_for('register_bp.register_enter_your_details', encrypted_enrolment_code=context.encrypted_enrolment_code),
+    "text": "Confirm",
+    "type": "submit",
+    "classes": "ons-u-mb-m",
+    "id": "confirm_button"
     })
-}}
+    }}
     <p>
         If the organisation or survey details aren't what you were expecting, please contact us on <a href="tel:+44-300-1234-931">0300 1234 931</a>
         or send an email to <a href="mailto:surveys@ons.gov.uk">surveys@ons.gov.uk</a>
-</p>
+    </p>
 {% endblock main %}

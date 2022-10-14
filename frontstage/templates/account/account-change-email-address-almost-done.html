@@ -4,29 +4,29 @@
 {% from "components/button/_macro.njk" import onsButton %}
 {% set page_title = "Change email address" %}
 {% set breadcrumbsData = [
-    {
-        "text": "Surveys",
-        "url": "/surveys/todo",
-        "id": "b-item-1"
-    },
-    {
-        "text": "Account",
-        "url": "/my-account",
-        "id": "b-item-2"
-    },
-    {
-        "text": "Change your contact details",
-        "url": "/my-account/change-account-details",
-        "id": "b-item-3"
-    },
+{
+"text": "Surveys",
+"url": "/surveys/todo",
+"id": "b-item-1"
+},
+{
+"text": "Account",
+"url": "/my-account",
+"id": "b-item-2"
+},
+{
+"text": "Change your contact details",
+"url": "/my-account/change-account-details",
+"id": "b-item-3"
+},
 ] %}
 {% block breadcrumbs %}
-{{
-        onsBreadcrumbs({
-            "ariaLabel": "Breadcrumbs",
-            "id": "breadcrumbs",
-            "itemsList": breadcrumbsData
-        })
+    {{
+    onsBreadcrumbs({
+    "ariaLabel": "Breadcrumbs",
+    "id": "breadcrumbs",
+    "itemsList": breadcrumbsData
+    })
     }}
 {% endblock breadcrumbs %}
 {% block main %}

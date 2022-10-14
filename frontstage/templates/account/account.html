@@ -5,45 +5,45 @@
 {% from "components/button/_macro.njk" import onsButton %}
 {% set page_title = "Account details" %}
 {% set breadcrumbsData = [
-    {
-        "text": "Surveys",
-        "url": "/surveys/todo",
-        "id": "b-item"
-    }
+{
+"text": "Surveys",
+"url": "/surveys/todo",
+"id": "b-item"
+}
 ] %}
 {% block breadcrumbs %}
-{{
-        onsBreadcrumbs({
-            "ariaLabel": "Breadcrumbs",
-            "id": "breadcrumbs",
-            "itemsList": breadcrumbsData
-        })
+    {{
+    onsBreadcrumbs({
+    "ariaLabel": "Breadcrumbs",
+    "id": "breadcrumbs",
+    "itemsList": breadcrumbsData
+    })
     }}
 {% endblock breadcrumbs %}
 {% block main %}
-{% set ns = namespace() %}
-{% include "radio-option-select-error-panel.html" %}
+    {% set ns = namespace() %}
+    {% include "radio-option-select-error-panel.html" %}
     <h1 class="ons-u-fs-xl">Account details</h1>
     <dl class="ons-metadata ons-metadata__list ons-grid ons-grid--gutterless ons-u-cf ons-u-mb-l"
         title=""
         aria-label="">
         <dt class="ons-metadata__term ons-grid__col ons-col-4@m">
-Name:
+            Name:
         </dt>
         <dd class="ons-metadata__value ons-grid__col ons-col-8@m">
-{{ respondent.firstName }} {{ respondent.lastName }}
+            {{ respondent.firstName }} {{ respondent.lastName }}
         </dd>
         <dt class="ons-metadata__term ons-grid__col ons-col-4@m">
-Email address:
+            Email address:
         </dt>
         <dd class="ons-metadata__value ons-grid__col ons-col-8@m">
-{{ respondent.emailAddress }}
+            {{ respondent.emailAddress }}
         </dd>
         <dt class="ons-metadata__term ons-grid__col ons-col-4@m">
-Phone number:
+            Phone number:
         </dt>
         <dd class="ons-metadata__value ons-grid__col ons-col-8@m">
-{{ respondent.telephone }}
+            {{ respondent.telephone }}
         </dd>
     </dl>
     <hr class="ons-u-mb-l"/>
@@ -51,79 +51,79 @@ Phone number:
     <form action="{{ url_for('account_bp.update_account')}}" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         {% if ns.optionError %}
-{% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
+            {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
         {% endif %}
-{% set radioComponent = {
-                "legend": "Choose an option",
-                "name": "option",
-                "id": "option",
-                "error": errorOption,
-            } %}
-{% set radios = [] %}
-{% do radios.append(
-                {
-                    "id": "contact_details",
-                    "label": {
-                        "text": "Change my contact details"
-                    },
-                    "value": "contact_details"
-                }) %}
-{% do radios.append(
-                {
-                    "id": "change_password",
-                    "label": {
-                        "text": "Change password"
-                    },
-                    "value": "change_password"
-                }
-                ) %}
-{% do radios.append(
-            {
-                "id": "share_surveys",
-                "label": {
-                    "text": "Share access to my surveys"
-                },
-                "value": "share_surveys"
-            }
-            ) %}
-{% do radios.append(
-            {
-                "id": "transfer_surveys",
-                "label": {
-                    "text": "I am no longer required to complete any surveys"
-                },
-                "value": "transfer_surveys"
-            }
-            ) %}
-{% do radios.append(
-            {
-                "id": "something_else",
-                "label": {
-                    "text": "Something else"
-                },
-                "value": "something_else"
-            }
-            ) %}
-{% do radioComponent | setAttribute("radios", radios) %}
-{{
-                onsRadios(radioComponent)
-            }}
+        {% set radioComponent = {
+        "legend": "Choose an option",
+        "name": "option",
+        "id": "option",
+        "error": errorOption,
+        } %}
+        {% set radios = [] %}
+        {% do radios.append(
+        {
+        "id": "contact_details",
+        "label": {
+        "text": "Change my contact details"
+        },
+        "value": "contact_details"
+        }) %}
+        {% do radios.append(
+        {
+        "id": "change_password",
+        "label": {
+        "text": "Change password"
+        },
+        "value": "change_password"
+        }
+        ) %}
+        {% do radios.append(
+        {
+        "id": "share_surveys",
+        "label": {
+        "text": "Share access to my surveys"
+        },
+        "value": "share_surveys"
+        }
+        ) %}
+        {% do radios.append(
+        {
+        "id": "transfer_surveys",
+        "label": {
+        "text": "I am no longer required to complete any surveys"
+        },
+        "value": "transfer_surveys"
+        }
+        ) %}
+        {% do radios.append(
+        {
+        "id": "something_else",
+        "label": {
+        "text": "Something else"
+        },
+        "value": "something_else"
+        }
+        ) %}
+        {% do radioComponent | setAttribute("radios", radios) %}
+        {{
+        onsRadios(radioComponent)
+        }}
         <div class="ons-field ons-u-mt-l">
-{{
-                onsButton({
-                    "text": "Continue",
-                    "id": "btn-option-continue",
-                    "submitType": "timer"
-                })
+            {{
+            onsButton({
+            "text": "Continue",
+            "id": "btn-option-continue",
+            "submitType": "timer"
+            })
             }}
-{{
-                onsButton({
-                    "id": "btn-option-cancel",
-                    "url": url_for('surveys_bp.get_survey_list', tag='todo'),
-                    "text": 'Cancel',
-                    "variants": 'secondary',
-                    "noIcon": true
-                })
+            {{
+            onsButton({
+            "id": "btn-option-cancel",
+            "url": url_for('surveys_bp.get_survey_list', tag='todo'),
+            "text": 'Cancel',
+            "variants": 'secondary',
+            "noIcon": true
+            })
             }}
         </div>
     </form>

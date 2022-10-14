@@ -4,29 +4,29 @@
 {% from "components/button/_macro.njk" import onsButton %}
 {% set page_title = "Change email address" %}
 {% set breadcrumbsData = [
-    {
-        "text": "Surveys",
-        "url": "/surveys/todo",
-        "id": "b-item-1"
-    },
-    {
-        "text": "Account",
-        "url": "/my-account",
-        "id": "b-item-2"
-    },
-    {
-        "text": "Change your contact details",
-        "url": "/my-account/change-account-details",
-        "id": "b-item-3"
-    },
+{
+"text": "Surveys",
+"url": "/surveys/todo",
+"id": "b-item-1"
+},
+{
+"text": "Account",
+"url": "/my-account",
+"id": "b-item-2"
+},
+{
+"text": "Change your contact details",
+"url": "/my-account/change-account-details",
+"id": "b-item-3"
+},
 ] %}
 {% block breadcrumbs %}
-{{
-        onsBreadcrumbs({
-            "ariaLabel": "Breadcrumbs",
-            "id": "breadcrumbs",
-            "itemsList": breadcrumbsData
-        })
+    {{
+    onsBreadcrumbs({
+    "ariaLabel": "Breadcrumbs",
+    "id": "breadcrumbs",
+    "itemsList": breadcrumbsData
+    })
     }}
 {% endblock breadcrumbs %}
 {% block main %}
@@ -39,7 +39,7 @@
                         "id": 'error-id',
                         "iconType": 'lock',
                         "classes": 'ons-u-mb-m'
-                    }) %}
+                        }) %}
                         <p class="ons-u-fs-r" id="flashed-error-message-{{ loop.index }}">{{ message }}</p>
                     {% endcall %}
                 {% else %}
@@ -48,7 +48,7 @@
                         "id": 'success-id',
                         "iconType": 'check',
                         "classes": 'ons-u-mb-m'
-                    }) %}
+                        }) %}
                         <p class="ons-u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>
                     {% endcall %}
                 {% endif %}
@@ -67,16 +67,16 @@
     {% endcall %}
     <form action="{{ url_for('account_bp.change_email_address')}}"
           method="post">
-{{ form.csrf_token }}
+        {{ form.csrf_token }}
         <input type="hidden" name="email_address" value="{{ new_email }}"/>
         <div class="ons-grid ons-grid--flex ons-grid--gutterless ons-grid--vertical-center ons-grid--no-wrap@s ons-u-mt-m ons-u-mb-m">
             <div class="ons-grid__col">
-{{
-                    onsButton({
-                        "text": "Send verification email",
-                        "id": "btn-option-send-email",
-                        "submitType": "timer"
-                    })
+                {{
+                onsButton({
+                "text": "Send verification email",
+                "id": "btn-option-send-email",
+                "submitType": "timer"
+                })
                 }}
             </div>
             <div class="ons-grid__col ons-u-ml-m">

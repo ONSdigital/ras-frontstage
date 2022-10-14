@@ -1,7 +1,7 @@
 {% extends "layout/_template.njk" %}
 {% from "components/cookies-banner/_macro.njk" import onsCookiesBanner %}
 {% block head %}
-{% set css_theme = "css"~_theme~"/theme.css" %}
+    {% set css_theme = "css"~_theme~"/theme.css" %}
     <link href="{{ url_for('static', filename=css_theme) }}" rel="stylesheet" />
     {% if config.GOOGLE_TAG_MANAGER %}
         <!-- Google Tag Manager -->
@@ -29,20 +29,20 @@
     {% endif %}
 {% endblock %}
 {% block preHeader %}
-{{
-        onsCookiesBanner({
-            "statementTitle": 'Tell us whether you accept cookies',
-            "statementText": 'We use <a href="/cookies">cookies to collect information</a> about how you use surveys.ons.gov.uk. We use this information to make the website work as well as possible and improve our services.',
-            "confirmationText": 'You’ve accepted all cookies. You can <a href="/cookies">change your cookie preferences</a> at any time.',
-            "secondaryButtonUrl": '/cookies'
-        })
+    {{
+    onsCookiesBanner({
+    "statementTitle": 'Tell us whether you accept cookies',
+    "statementText": 'We use <a href="/cookies">cookies to collect information</a> about how you use surveys.ons.gov.uk. We use this information to make the website work as well as possible and improve our services.',
+    "confirmationText": 'You’ve accepted all cookies. You can <a href="/cookies">change your cookie preferences</a> at any time.',
+    "secondaryButtonUrl": '/cookies'
+    })
     }}
 {% endblock %}
 {% set pageConfig = {
-    "title": page_title + " | ONS Business Surveys" if page_title else "ONS Business Surveys",
-    "header": {
-        "title": "ONS Business Surveys",
-    }
+"title": page_title + " | ONS Business Surveys" if page_title else "ONS Business Surveys",
+"header": {
+"title": "ONS Business Surveys",
+}
 } %}
 {% include 'layouts/configs/service-links.html' %}
 {% include 'layouts/configs/footer.html' %}
@@ -52,11 +52,11 @@
         {% block breadcrumbs %}
         {% endblock breadcrumbs %}
         {% if availability_message %}
-{{
-                onsPanel({
-                    "body": availability_message,
-                    "classes": "ons-u-mt-l"
-                })
+            {{
+            onsPanel({
+            "body": availability_message,
+            "classes": "ons-u-mt-l"
+            })
             }}
         {% endif %}
         <div class="ons-grid">

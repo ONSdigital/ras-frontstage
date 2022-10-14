@@ -9,19 +9,19 @@
             <dl>
                 <dt class="ons-grid__col ons-col-1@s">
                     {% if label == 'SENT' %}
-                    To:
+                        To:
                     {% else %}
-                    From:
+                        From:
                     {% endif %}
                 </dt>
                 <dd class="ons-grid__col ons-col-11@s">
-ONS Business Surveys team
+                    ONS Business Surveys team
                 </dd>
                 <dt class="ons-grid__col ons-col-1@s">
-Sent:
+                    Sent:
                 </dt>
                 <dd class="ons-grid__col ons-col-11@s">
-{{ message['sent_date'][:19] }}
+                    {{ message['sent_date'][:19] }}
                 </dd>
             </dl>
         </div>

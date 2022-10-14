@@ -6,151 +6,151 @@
 {% from "components/lists/_macro.njk" import onsList %}
 {% set page_title = "Change contact details" %}
 {% set breadcrumbsData = [
-    {
-        "text": "Surveys",
-        "url": "/surveys/todo",
-        "id": "b-item-1"
-    },
-    {
-        "text": "Account",
-        "url": "/my-account",
-        "id": "b-item-2"
-    }
+{
+"text": "Surveys",
+"url": "/surveys/todo",
+"id": "b-item-1"
+},
+{
+"text": "Account",
+"url": "/my-account",
+"id": "b-item-2"
+}
 ] %}
 {% block breadcrumbs %}
-{{
-        onsBreadcrumbs({
-            "ariaLabel": "Breadcrumbs",
-            "id": "breadcrumbs",
-            "itemsList": breadcrumbsData
-        })
+    {{
+    onsBreadcrumbs({
+    "ariaLabel": "Breadcrumbs",
+    "id": "breadcrumbs",
+    "itemsList": breadcrumbsData
+    })
     }}
 {% endblock breadcrumbs %}
 {% block main %}
     {% if errors|length > 0 %}
         {% if errors|length == 1 %}
-{% set errorTitle = 'There is 1 error on this page' %}
+            {% set errorTitle = 'There is 1 error on this page' %}
         {% elif errors|length > 1 %}
-{% set errorTitle = 'There are ' ~ errors|length ~ ' errors on this page' %}
+            {% set errorTitle = 'There are ' ~ errors|length ~ ' errors on this page' %}
         {% endif %}
         {% call
             onsPanel({
-                "type": "error",
-                "classes": "ons-u-mb-s",
-                "title": errorTitle
+            "type": "error",
+            "classes": "ons-u-mb-s",
+            "title": errorTitle
             })
-        %}
+            %}
             <p>
                 These <strong>must be corrected</strong> to continue.
             </p>
-{% set errorData = [] %}
+            {% set errorData = [] %}
             {% for error in errors %}
-{% set error_text =  error %}
-{% do errorData.append(
-                    {
-                        "text": 'Problem with the ' ~ error_text.replace('_', ' '),
-                        "url": "#" ~ error ~ '_error',
-                        "classes": "ons-js-inpagelink"
-                    }
+                {% set error_text =  error %}
+                {% do errorData.append(
+                {
+                "text": 'Problem with the ' ~ error_text.replace('_', ' '),
+                "url": "#" ~ error ~ '_error',
+                "classes": "ons-js-inpagelink"
+                }
                 ) %}
             {% endfor %}
-{{
-                onsList({
-                    "element": "ol",
-                    "itemsList": errorData
-                })
+            {{
+            onsList({
+            "element": "ol",
+            "itemsList": errorData
+            })
             }}
         {% endcall %}
     {% endif %}
     <h1 class="ons-u-fs-xl">Enter your new contact details</h1>
     <form action="" method="post">
-{{ form.csrf_token }}
-{% set firstName = respondent.firstName %}
+        {{ form.csrf_token }}
+        {% set firstName = respondent.firstName %}
         {% if errors.first_name %}
-{% set errorFirstName = { "text": errors['first_name'][0],  "id": 'first_name_error' } %}
-{% set firstName = form.first_name.data %}
+            {% set errorFirstName = { "text": errors['first_name'][0],  "id": 'first_name_error' } %}
+            {% set firstName = form.first_name.data %}
         {% endif %}
-{{
-            onsInput({
-                "id": "first_name",
-                "name": "first_name",
-                "type": "text",
-                "label": {
-                    "text": 'First name'
-                },
-                "error": errorFirstName,
-                "value": firstName
-            })
+        {{
+        onsInput({
+        "id": "first_name",
+        "name": "first_name",
+        "type": "text",
+        "label": {
+        "text": 'First name'
+        },
+        "error": errorFirstName,
+        "value": firstName
+        })
         }}
-{% set lastName = respondent.lastName %}
+        {% set lastName = respondent.lastName %}
         {% if errors.last_name %}
-{% set errorLastName = { "text": errors['last_name'][0],  "id": 'last_name_error' } %}
-{% set lastName = form.last_name.data %}
+            {% set errorLastName = { "text": errors['last_name'][0],  "id": 'last_name_error' } %}
+            {% set lastName = form.last_name.data %}
         {% endif %}
-{{
-            onsInput({
-                "id": "last_name",
-                "name": "last_name",
-                "type": "text",
-                "label": {
-                    "text": 'Last name'
-                },
-                "error": errorLastName,
-                "value": lastName
-            })
+        {{
+        onsInput({
+        "id": "last_name",
+        "name": "last_name",
+        "type": "text",
+        "label": {
+        "text": 'Last name'
+        },
+        "error": errorLastName,
+        "value": lastName
+        })
         }}
-{% set emailAddress = respondent.emailAddress %}
+        {% set emailAddress = respondent.emailAddress %}
         {% if errors.email_address %}
-{% set errorEmailAddress = { "text": errors['email_address'][0],  "id": 'email_address_error' } %}
-{% set emailAddress = form.email_address.data %}
+            {% set errorEmailAddress = { "text": errors['email_address'][0],  "id": 'email_address_error' } %}
+            {% set emailAddress = form.email_address.data %}
         {% endif %}
-{{
-            onsInput({
-                "id": "email_address",
-                "name": "email_address",
-                "type": "text",
-                "label": {
-                    "text": 'Email address'
-                },
-                "error": errorEmailAddress,
-                "value": emailAddress,
-            })
+        {{
+        onsInput({
+        "id": "email_address",
+        "name": "email_address",
+        "type": "text",
+        "label": {
+        "text": 'Email address'
+        },
+        "error": errorEmailAddress,
+        "value": emailAddress,
+        })
         }}
-{% set phoneNumber = respondent.telephone %}
+        {% set phoneNumber = respondent.telephone %}
         {% if errors.phone_number %}
-{% set errorPhoneNumber = { "text": errors['phone_number'][0],  "id": 'phone_number_error' } %}
-{% set phoneNumber = form.phone_number.data %}
+            {% set errorPhoneNumber = { "text": errors['phone_number'][0],  "id": 'phone_number_error' } %}
+            {% set phoneNumber = form.phone_number.data %}
         {% endif %}
-{{
-            onsInput({
-                "id": "phone_number",
-                "name": "phone_number",
-                "type": "tel",
-                "autocomplete": "tel",
-                "classes": "input--w-8",
-                "label": {
-                    "text": 'Phone number'
-                },
-                "error": errorPhoneNumber,
-                "value": phoneNumber
-            })
+        {{
+        onsInput({
+        "id": "phone_number",
+        "name": "phone_number",
+        "type": "tel",
+        "autocomplete": "tel",
+        "classes": "input--w-8",
+        "label": {
+        "text": 'Phone number'
+        },
+        "error": errorPhoneNumber,
+        "value": phoneNumber
+        })
         }}
         <div class="ons-field ons-u-mt-l">
-{{
-                onsButton({
-                    "text": "Save",
-                    "id": "btn-option-save",
-                    "submitType": "timer"
-                })
+            {{
+            onsButton({
+            "text": "Save",
+            "id": "btn-option-save",
+            "submitType": "timer"
+            })
             }}
-{{
-                onsButton({
-                    "id": "btn-account-change-detail-cancel",
-                    "url": url_for('account_bp.get_account'),
-                    "text": 'Cancel',
-                    "variants": 'secondary',
-                    "noIcon": true
-                })
+            {{
+            onsButton({
+            "id": "btn-account-change-detail-cancel",
+            "url": url_for('account_bp.get_account'),
+            "text": 'Cancel',
+            "variants": 'secondary',
+            "noIcon": true
+            })
             }}
         </div>
     </form>

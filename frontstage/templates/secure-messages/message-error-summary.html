@@ -1,30 +1,30 @@
 {% from "components/lists/_macro.njk" import onsList %}
 {% if "subject" in errors or "body" in errors %}
-{% set errorData = [] %}
+    {% set errorData = [] %}
     {% call
         onsPanel({
-            "title": "This page has 1 error" if errors|length == 1 else "There are " + errors|length|string + " errors on this page",
-            "type": "error",
-            "classes": "ons-u-mb-l"
+        "title": "This page has 1 error" if errors|length == 1 else "There are " + errors|length|string + " errors on this page",
+        "type": "error",
+        "classes": "ons-u-mb-l"
         })
-    %}
+        %}
         <p>
             These <strong>must be corrected</strong> to continue.
         </p>
         {% for error in errors %}
-{% do errorData.append(
+            {% do errorData.append(
             {
-                "text": error,
-                "url": "#" ~ error ~ "_error",
-                "classes": "ons-js-inpagelink"
+            "text": error,
+            "url": "#" ~ error ~ "_error",
+            "classes": "ons-js-inpagelink"
             }
-        ) %}
+            ) %}
         {% endfor %}
-{{
+        {{
         onsList({
-            "element": "ol",
-            "itemsList": errorData
+        "element": "ol",
+        "itemsList": errorData
         })
-    }}
+        }}
     {% endcall %}
 {% endif %}

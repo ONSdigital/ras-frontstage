@@ -6,53 +6,53 @@
 {% from "components/textarea/_macro.njk" import onsTextarea %}
 {% set page_title = "My Account Something Else" %}
 {% set breadcrumbsData = [
-    {
-        "text": "Surveys",
-        "url": "/surveys/todo",
-        "id": "b-item-1"
-    },
-    {
-        "text": "Account",
-        "url": "/my-account",
-        "id": "b-item-2"
-    }
+{
+"text": "Surveys",
+"url": "/surveys/todo",
+"id": "b-item-1"
+},
+{
+"text": "Account",
+"url": "/my-account",
+"id": "b-item-2"
+}
 ] %}
 {% block breadcrumbs %}
-{{
+    {{
     onsBreadcrumbs({
-        "ariaLabel": "Breadcrumbs",
-        "id": "breadcrumbs",
-        "itemsList": breadcrumbsData
+    "ariaLabel": "Breadcrumbs",
+    "id": "breadcrumbs",
+    "itemsList": breadcrumbsData
     })
-}}
+    }}
 {% endblock breadcrumbs %}
 {% block main %}
-{% set ns = namespace(bodyError = false) %}
+    {% set ns = namespace(bodyError = false) %}
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
-{% set errorTitle = 'There is 1 error on this page' %}
-{% set ns.bodyError = true %}
-{% set ns.errorMessage = message %}
+                {% set errorTitle = 'There is 1 error on this page' %}
+                {% set ns.bodyError = true %}
+                {% set ns.errorMessage = message %}
                 {% call
-                        onsPanel({
-                            "type": "error",
-                            "classes": "ons-u-mb-s",
-                            "title": errorTitle
-                        })
+                    onsPanel({
+                    "type": "error",
+                    "classes": "ons-u-mb-s",
+                    "title": errorTitle
+                    })
                     %}
-{{
-                            onsList({
-                                "element": "ol",
-                                "itemsList": [
-                                    {
-                                        "text": message,
-                                        "url": "#secure-message-body_error",
-                                        "classes": "ons-js-inpagelink"
-                                    }
-                                ]
-                            })
-                        }}
+                    {{
+                    onsList({
+                    "element": "ol",
+                    "itemsList": [
+                    {
+                    "text": message,
+                    "url": "#secure-message-body_error",
+                    "classes": "ons-js-inpagelink"
+                    }
+                    ]
+                    })
+                    }}
                 {% endcall %}
             {% endfor %}
         {% endif %}
@@ -63,10 +63,10 @@
         title="Message subject"
         aria-label="Message subject">
         <dt class="ons-metadata__term ons-grid__col ons-col-2@m">
-Subject:
+            Subject:
         </dt>
         <dd class="ons-metadata__value ons-grid__col ons-col-10@m">
-My account
+            My account
         </dd>
     </dl>
     <div class="ons-col-12@m" id="secure-message-form">
@@ -74,35 +74,35 @@ My account
               method="post">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             {% if ns.bodyError %}
-{% set error = { "text": ns.errorMessage,  "id": 'secure-message-body_error' } %}
+                {% set error = { "text": ns.errorMessage,  "id": 'secure-message-body_error' } %}
             {% endif %}
-{{
-                onsTextarea({
-                    "id": "secure-message-body",
-                    "name": "body",
-                    "label": {
-                        "text": "Create message",
-                    },
-                    "charCheckLimit": false,
-                    "error": error,
-                })
+            {{
+            onsTextarea({
+            "id": "secure-message-body",
+            "name": "body",
+            "label": {
+            "text": "Create message",
+            },
+            "charCheckLimit": false,
+            "error": error,
+            })
             }}
             <div class="ons-field ons-u-mt-l">
-{{
-                    onsButton({
-                        "text": "Send",
-                        "id": "send-message-ons-btn",
-                        "submitType": "timer"
-                    })
+                {{
+                onsButton({
+                "text": "Send",
+                "id": "send-message-ons-btn",
+                "submitType": "timer"
+                })
                 }}
-{{
-                    onsButton({
-                        "id": "btn-option-cancel",
-                        "url": url_for('account_bp.get_account'),
-                        "text": 'Cancel',
-                        "variants": 'secondary',
-                        "noIcon": true
-                    })
+                {{
+                onsButton({
+                "id": "btn-option-cancel",
+                "url": url_for('account_bp.get_account'),
+                "text": 'Cancel',
+                "variants": 'secondary',
+                "noIcon": true
+                })
                 }}
             </div>
         </form>

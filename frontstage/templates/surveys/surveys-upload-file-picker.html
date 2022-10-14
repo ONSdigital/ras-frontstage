@@ -6,18 +6,18 @@
       role="form"
       enctype="multipart/form-data">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-{% from "components/upload/_macro.njk" import onsUpload %}
-{{
-            onsUpload({
-                "id": "selected-file",
-                "accept": ".xls,.xlsx",
-                "name": "file",
-                "label": {
-                    "description": "File types accepted are .xls and .xlsx",
-                    "text": "Upload a file",
-                }
-            })
-        }}
+    {% from "components/upload/_macro.njk" import onsUpload %}
+    {{
+    onsUpload({
+    "id": "selected-file",
+    "accept": ".xls,.xlsx",
+    "name": "file",
+    "label": {
+    "description": "File types accepted are .xls and .xlsx",
+    "text": "Upload a file",
+    }
+    })
+    }}
     <script {% if csp_nonce %} nonce="{{ csp_nonce() }}"{% endif %}>
         function clickEvent(button){
             try {
@@ -28,16 +28,16 @@
             form.submit();
         }
     </script>
-{{
-        onsButton({
-            "text": "Upload",
-            "type": "submit",
-            "classes": "ons-u-mt-s",
-            "id": "upload_survey_button",
-            "submitType": "loader",
-            "attributes": {
-                "onclick": "clickEvent(this)"
-            }
-        })
+    {{
+    onsButton({
+    "text": "Upload",
+    "type": "submit",
+    "classes": "ons-u-mt-s",
+    "id": "upload_survey_button",
+    "submitType": "loader",
+    "attributes": {
+    "onclick": "clickEvent(this)"
+    }
+    })
     }}
 </form>

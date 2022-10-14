@@ -16,20 +16,20 @@
             <h2 class="ons-u-fs-m ons-u-mb-xs">{{ transfer_dict[business].name }}</h2>
             <p class="ons-u-mb-s">Trading as {{ transfer_dict[business]['trading_as'] }}</p>
             <div class="ons-text-indent">
-{% set surveyList = [] %}
+                {% set surveyList = [] %}
                 {% for survey in transfer_dict[business]['surveys'] %}
-{% do surveyList.append(
+                    {% do surveyList.append(
                     {
-                        "text": survey['longName']
+                    "text": survey['longName']
                     }
-                ) %}
+                    ) %}
                 {% endfor %}
-{{
+                {{
                 onsList({
-                    "variants": 'bare',
-                    "itemsList": surveyList
+                "variants": 'bare',
+                "itemsList": surveyList
                 })
-            }}
+                }}
             </div>
         </section>
     {% endfor %}

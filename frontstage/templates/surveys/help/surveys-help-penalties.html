@@ -3,29 +3,29 @@
 {% from "components/button/_macro.njk" import onsButton %}
 {% set page_title = "Help with penalties" %}
 {% set breadcrumbsData = [
-    {
-        "text": "Surveys",
-        "url": "/surveys/todo",
-        "id": "b-item-1"
-    },
-    {
-        "text": "Help",
-        "url": "/surveys/surveys-help?survey_ref="~survey_ref~"&ru_ref="~ru_ref,
-        "id": "b-item-2"
-    },
-    {
-        "text": "Information about this survey",
-        "url": "/surveys/help/"~option,
-        "id": "b-item-3"
-    }
+{
+"text": "Surveys",
+"url": "/surveys/todo",
+"id": "b-item-1"
+},
+{
+"text": "Help",
+"url": "/surveys/surveys-help?survey_ref="~survey_ref~"&ru_ref="~ru_ref,
+"id": "b-item-2"
+},
+{
+"text": "Information about this survey",
+"url": "/surveys/help/"~option,
+"id": "b-item-3"
+}
 ] %}
 {% block breadcrumbs %}
-{{
-        onsBreadcrumbs({
-            "ariaLabel": "Breadcrumbs",
-            "id": "breadcrumbs",
-            "itemsList": breadcrumbsData
-        })
+    {{
+    onsBreadcrumbs({
+    "ariaLabel": "Breadcrumbs",
+    "id": "breadcrumbs",
+    "itemsList": breadcrumbsData
+    })
     }}
 {% endblock breadcrumbs %}
 {% block main %}
@@ -35,12 +35,12 @@
             You are required by law to complete it. We want to work with you to help you meet this legal requirement. <a href="{{ url_for('surveys_bp.get_send_help_message_page', short_name=short_name, option=option, sub_option='penalties', business_id=business_id, survey_ref=survey_ref, ru_ref=ru_ref) }}">Send us a message</a> and we can advise.
         </p>
         <p>
-If you do not contact us or complete and return by the deadline, penalties may be incurred resulting in a fine of up to £2,500 (under section 4 of the Statistics of Trade Act 1947, last updated by section 17 of the Criminal Justice Act 1991).
+            If you do not contact us or complete and return by the deadline, penalties may be incurred resulting in a fine of up to £2,500 (under section 4 of the Statistics of Trade Act 1947, last updated by section 17 of the Criminal Justice Act 1991).
         </p>
         <p>You will still need to complete the survey.</p>
     {% else %}
         <p>
-Your information is crucial to make sure we produce statistics that best reflect the status of the UK economy. There is no legal obligation to complete this survey, however your participation ensures your industry, and businesses like yours, are represented in the statistics we produce.
+            Your information is crucial to make sure we produce statistics that best reflect the status of the UK economy. There is no legal obligation to complete this survey, however your participation ensures your industry, and businesses like yours, are represented in the statistics we produce.
         </p>
         <p>
             <a href="{{ url_for('surveys_bp.get_send_help_message_page', short_name=short_name, option=option, sub_option='penalties', business_id=business_id, survey_ref=survey_ref, ru_ref=ru_ref) }}">Send us a message</a> if you need further information.

@@ -3,9 +3,7 @@
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/radios/_macro.njk" import onsRadios %}
 {% from "components/button/_macro.njk" import onsButton %}
-
 {% set page_title = "Help" %}
-
 {% set breadcrumbsData = [
     {
         "text": "Surveys",
@@ -13,9 +11,8 @@
         "id": "b-item-1"
     }
 ] %}
-
 {% block breadcrumbs %}
-    {{
+{{
         onsBreadcrumbs({
             "ariaLabel": "Breadcrumbs",
             "id": "breadcrumbs",
@@ -23,19 +20,17 @@
         })
     }}
 {% endblock breadcrumbs %}
-
 {% block main %}
-    {% set ns = namespace() %}
-    {% include "radio-option-select-error-panel.html" %}
-
+{% set ns = namespace() %}
+{% include "radio-option-select-error-panel.html" %}
     <h1 class="ons-u-fs-xl">Help</h1>
-
-    <form action="{{ url_for('surveys_bp.post_help_page', short_name=short_name, business_id=business_id, survey_ref=survey_ref, ru_ref=ru_ref)}}" method="post">
+    <form action="{{ url_for('surveys_bp.post_help_page', short_name=short_name, business_id=business_id, survey_ref=survey_ref, ru_ref=ru_ref)}}"
+          method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         {% if ns.optionError %}
-            {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
+{% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
         {% endif %}
-        {{
+{{
             onsRadios({
                 "id": "option",
                 "legend": "Choose an option",
@@ -81,14 +76,14 @@
             })
         }}
         <div class="ons-field ons-u-mt-l">
-            {{
+{{
                 onsButton({
                     "text": "Continue",
                     "id": "btn-help-option-continue",
                     "submitType": "timer"
                 })
             }}
-            {{
+{{
                 onsButton({
                     "id": "btn-help-option-cancel",
                     "url": url_for('surveys_bp.get_survey_list', tag='todo'),

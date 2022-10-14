@@ -1,17 +1,12 @@
-
 {% extends "layouts/_block_content.html" %}
 {% from "components/button/_macro.njk" import onsButton %}
 {% from "components/input/_macro.njk" import onsInput %}
-
 {% set errorType = data['error']['type'] %}
-
 {% set page_title = "Add a survey" %}
-
 {% block content %}
-
     {% if errorType == "failed" %}
-        {% set errorMsg = 'Enter a valid enrolment code' %}
-        {% set errorMsgText = { "text": errorMsg, "id": 'enrolment_code_error' } %}
+{% set errorMsg = 'Enter a valid enrolment code' %}
+{% set errorMsgText = { "text": errorMsg, "id": 'enrolment_code_error' } %}
         {% call
             onsPanel({
                 "type": "error",
@@ -19,9 +14,11 @@
                 "title": "This page has 1 error"
             })
         %}
-            <p>This <strong>must be corrected</strong> to continue.</p>
-            {% from "components/lists/_macro.njk" import onsList %}
-            {{
+            <p>
+                This <strong>must be corrected</strong> to continue.
+            </p>
+{% from "components/lists/_macro.njk" import onsList %}
+{{
                 onsList({
                     "element": "ol",
                     "itemsList": [
@@ -35,17 +32,14 @@
             }}
         {% endcall %}
     {% endif %}
-
     <section>
         <form id="enrolment-code"
-            action="{{ url_for('surveys_bp.add_survey') }}"
-            method="post"
-            class="form">
-            {{ form.csrf_token }}
-
+              action="{{ url_for('surveys_bp.add_survey') }}"
+              method="post"
+              class="form">
+{{ form.csrf_token }}
             <h1 class="u-fs-xl ons-u-mt-s">Add a survey</h1>
-
-            {{
+{{
                 onsInput({
                     "id": "enrolment_code",
                     "name": "enrolment_code",
@@ -58,8 +52,8 @@
                 })
             }}
             <div class="ons-grid ons-grid--flex ons-grid--gutterless ons-grid--vertical-center ons-grid--no-wrap@s ons-u-mt-m ons-u-mb-m">
-                    <div class="ons-grid__col">
-                        {{
+                <div class="ons-grid__col">
+{{
                             onsButton({
                                 "text": "Continue",
                                 "type": "submit",
@@ -67,12 +61,13 @@
                                 "submitType": "timer"
                             })
                         }}
-                    </div>
-                    <div class="ons-grid__col ons-u-ml-m">
-                        <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" id="cancel_button" role="button">Cancel</a>
-                    </div>
                 </div>
+                <div class="ons-grid__col ons-u-ml-m">
+                    <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}"
+                       id="cancel_button"
+                       role="button">Cancel</a>
+                </div>
+            </div>
         </form>
     </section>
-
 {% endblock content %}

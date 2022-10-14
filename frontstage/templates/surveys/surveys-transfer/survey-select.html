@@ -28,7 +28,7 @@
     }
 ] %}
 {% block breadcrumbs %}
-    {{
+{{
         onsBreadcrumbs({
             "ariaLabel": "Breadcrumbs",
             "id": "breadcrumbs",
@@ -36,15 +36,14 @@
         })
     }}
 {% endblock breadcrumbs %}
-
 {% block main %}
-    {% set ns = namespace (businesses = []) %}
+{% set ns = namespace (businesses = []) %}
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% if messages|length == 1 %}
-                {% set errorTitle = 'There is 1 error on this page' %}
+{% set errorTitle = 'There is 1 error on this page' %}
             {% elif messages|length > 1 %}
-                {% set errorTitle = 'There are ' ~ messages|length ~ ' errors on this page' %}
+{% set errorTitle = 'There are ' ~ messages|length ~ ' errors on this page' %}
             {% endif %}
             {% call
                 onsPanel({
@@ -53,10 +52,10 @@
                     "title": errorTitle
                 })
             %}
-                {% set errorData = [] %}
+{% set errorData = [] %}
                 {% for category, message in messages %}
-                    {% do ns.businesses.append(category) %}
-                    {% do errorData.append(
+{% do ns.businesses.append(category) %}
+{% do errorData.append(
                         {
                             "text": message,
                             "url": "#option_error_"~category,
@@ -64,7 +63,7 @@
                         }
                     ) %}
                 {% endfor %}
-                {{
+{{
                     onsList({
                         "element": "ol",
                         "itemsList": errorData
@@ -73,36 +72,35 @@
             {% endcall %}
         {% endif %}
     {% endwith %}
-
     <h1>Which surveys do you want to transfer?</h1>
     <form action="" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         {% for business in transfer_dict %}
-            {% set checkboxData = [] %}
+{% set checkboxData = [] %}
             {% if error == 'surveys_not_selected' and business in ns.businesses %}
-                {% set errorOption = { "text": 'You need to select a survey',  "id": 'option_error_'~business } %}
+{% set errorOption = { "text": 'You need to select a survey',  "id": 'option_error_'~business } %}
             {% endif %}
             {% if error == 'max_transfer_survey_exceeded' and business in ns.businesses %}
                 {% set errorOption = { "text": 'You have reached the maximum amount of emails you can enroll on one or more surveys.<br/><br/>
             Deselect the survey/s to continue or call 0300 1234 931 to discuss your options.',  "id": 'option_error_'~business } %}
             {% endif %}
-            {% set checkboxesData = {
+{% set checkboxesData = {
                 "legend": transfer_dict[business].name,
                 "checkboxesLabel": "Select all that apply",
                 "error": errorOption,
             } %}
             {% for survey in transfer_dict[business].surveys %}
                 {% if survey['id'] in failed_surveys_list %}
-                    {% set params = 'input--error' %}
+{% set params = 'input--error' %}
                 {% else %}
-                    {% set params = '' %}
+{% set params = '' %}
                 {% endif %}
                 {% if survey['id'] in selected_survey_list %}
-                    {% set checked = true %}
+{% set checked = true %}
                 {% else %}
-                    {% set checked = false %}
+{% set checked = false %}
                 {% endif %}
-                {% do checkboxData.append(
+{% do checkboxData.append(
                     {
                         "id": survey['id'],
                         "name": business,
@@ -114,18 +112,18 @@
                         "checked": checked
                     }
                     ) %}
-                {% endfor %}
-                {% do checkboxesData | setAttribute("checkboxes", checkboxData) %}
-            {{ onsCheckboxes(checkboxesData) }}
+            {% endfor %}
+{% do checkboxesData | setAttribute("checkboxes", checkboxData) %}
+{{ onsCheckboxes(checkboxesData) }}
         {% endfor %}
         <div class="ons-field ons-u-mt-l">
-            {{
+{{
                 onsButton({
                     "text": "Continue",
                     "submitType": "timer"
                 })
             }}
-            {{
+{{
                 onsButton({
                     "url": url_for('account_bp.transfer_survey_business_select'),
                     "text": 'Cancel',

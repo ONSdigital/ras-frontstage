@@ -4,41 +4,43 @@
 {% from "components/input/_macro.njk" import onsInput %}
 {% from "components/lists/_macro.njk" import onsList %}
 {% from "components/button/_macro.njk" import onsButton %}
-
 {% set page_title = "Confirm survey access" %}
-
 {% block main %}
     <h1 class="ons-u-fs-xl">Confirm survey access</h1>
-    <p>Your colleague {{ shared_by }} wants to share access to the following surveys with you.
-    You need to check the details are correct and then confirm access.</p>
+    <p>
+Your colleague {{ shared_by }} wants to share access to the following surveys with you.
+    You need to check the details are correct and then confirm access.
+    </p>
     {% for business in share_dict %}
-    <section class="ons-u-mt-l ons-u-mb-l">
-        <h2 class="ons-u-fs-m ons-u-mb-xs">{{ share_dict[business].name }}</h2>
-        <p class="ons-u-mb-s">Trading as {{ share_dict[business]['trading_as'] }}</p>
-        <div class="ons-text-indent">
-            {% set surveyList = [] %}
-            {% for survey in share_dict[business]['surveys'] %}
-                {% do surveyList.append(
+        <section class="ons-u-mt-l ons-u-mb-l">
+            <h2 class="ons-u-fs-m ons-u-mb-xs">{{ share_dict[business].name }}</h2>
+            <p class="ons-u-mb-s">Trading as {{ share_dict[business]['trading_as'] }}</p>
+            <div class="ons-text-indent">
+{% set surveyList = [] %}
+                {% for survey in share_dict[business]['surveys'] %}
+{% do surveyList.append(
                     {
                         "text": survey['longName']
                     }
                 ) %}
-            {% endfor %}
-            {{
+                {% endfor %}
+{{
                 onsList({
                     "variants": 'bare',
                     "itemsList": surveyList
                 })
             }}
-        </div>
-    </section>
+            </div>
+        </section>
     {% endfor %}
     <p>If there is an error please refer to the colleague who shared access.</p>
     <p>If you ignore this request the invitation will expire after 72 hours.</p>
-
     <div class="ons-field ons-u-mt-l">
         <div class="ons-btn-group">
-            <a href="{{ url_for('account_bp.accept_share_surveys', batch=batch_no) }}" role="button" class="ons-btn ons-btn--primary" id="btn-accept-share-survey"><span class="ons-btn__inner">Confirm access</span></a>
+            <a href="{{ url_for('account_bp.accept_share_surveys', batch=batch_no) }}"
+               role="button"
+               class="ons-btn ons-btn--primary"
+               id="btn-accept-share-survey"><span class="ons-btn__inner">Confirm access</span></a>
         </div>
     </div>
 {% endblock main %}

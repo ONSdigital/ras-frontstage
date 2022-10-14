@@ -14,9 +14,8 @@
         "url": "/help"
     }
 ] %}
-
 {% block breadcrumbs %}
-    {{
+{{
         onsBreadcrumbs({
             "ariaLabel": "Breadcrumbs",
             "id": "breadcrumbs",
@@ -24,9 +23,12 @@
         })
     }}
 {% endblock breadcrumbs %}
-
 {% block main %}
     <h1 class="ons-u-fs-xl">Further help</h1>
-    <p>You can find help for common issues if you <a href="{{ url_for('sign_in_bp.login') }}" rel="noopener">sign in to your account</a>.</p>
-    <p>If you are having problems signing in, please <a href="{{ url_for('contact_us_bp.contact_us') }}" rel="noopener">contact us</a>.</p>
+    <p>
+        You can find help for common issues if you <a href="{{ url_for('sign_in_bp.login') }}" rel="noopener">sign in to your account</a>.
+    </p>
+    <p>
+        If you are having problems signing in, please <a href="{{ url_for('contact_us_bp.contact_us') }}" rel="noopener">contact us</a>.
+    </p>
 {% endblock main %}

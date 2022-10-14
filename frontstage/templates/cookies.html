@@ -5,9 +5,7 @@
 {% from "components/collapsible/_macro.njk" import onsCollapsible %}
 {% from "components/table/_macro.njk" import onsTable %}
 {% from "components/lists/_macro.njk" import onsList %}
-
 {% set page_title = "Cookies on surveys.ons.gov.uk" %}
-
 {% block main %}
     {% call onsPanel({
             "classes": "ons-u-mb-s ons-u-d-no ons-cookies-confirmation-message",
@@ -23,9 +21,11 @@
     <p>We use cookies to store information about how you use this service, such as the pages you visit.</p>
     <h2>Cookie settings</h2>
     <div class="ons-u-db-no-js_enabled">
-        <p>We use JavaScript to set our cookies. Javascript is not running on your browser so you cannot change your settings.</p>
+        <p>
+We use JavaScript to set our cookies. Javascript is not running on your browser so you cannot change your settings.
+        </p>
         <p>You can try:</p>
-        {{
+{{
             onsList({
                 "itemsList": [
                     {
@@ -42,8 +42,10 @@
         <p>We use three types of cookie. You can choose which cookies you're happy for us to use.</p>
         <form data-module="cookie-settings">
             <h3>Cookies that measure website use</h3>
-            <p>We use Google Analytics to measure how you use the website so we can improve it based on user needs. Google Analytics sets cookies that store anonymised information about:</p>
-            {{
+            <p>
+We use Google Analytics to measure how you use the website so we can improve it based on user needs. Google Analytics sets cookies that store anonymised information about:
+            </p>
+{{
                 onsList({
                     "itemsList": [
                         {
@@ -67,7 +69,7 @@
                     "contextSuffix": "content"
                 }
             }) %}
-                {{
+{{
                     onsTable({
                         "ths": [
                             {
@@ -126,7 +128,7 @@
             {% endcall %}
             <p>We do not allow Google to use or share the data about how you use this site.</p>
             <div class="ons-u-mb-s">
-                {{ onsRadios({
+{{ onsRadios({
                     "id": "cookies-measure-website-use",
                     "name": "cookies-usage",
                     "legend": "Do you want to allow usage tracking?",
@@ -151,9 +153,13 @@
             </div>
             <p>This selection will expire after two years.</p>
             <h3>Cookies that help with our communications</h3>
-            <p>Some of our pages may contain content from other sites which may set their own cookies. These sites are sometimes called “third party” services. This tells us how many people are seeing the content and whether it’s useful.</p>
-            <p>In addition, if you share a link to a page, the service you share it on may set a cookie. We have no control over cookies set on other websites – you can turn them off, but not through us.</p>
-            {{ onsRadios({
+            <p>
+Some of our pages may contain content from other sites which may set their own cookies. These sites are sometimes called “third party” services. This tells us how many people are seeing the content and whether it’s useful.
+            </p>
+            <p>
+In addition, if you share a link to a page, the service you share it on may set a cookie. We have no control over cookies set on other websites – you can turn them off, but not through us.
+            </p>
+{{ onsRadios({
                 "id": "cookies-measure-website-comms",
                 "name": "cookies-campaigns",
                 "legend": "Do you want to allow communications tracking?",
@@ -176,8 +182,10 @@
                 ]
             }) }}
             <h3 class="ons-u-mt-l">Cookies that remember your settings</h3>
-            <p>These cookies do things like remember your preferences and the choices you make, to personalise your experience of using the site.</p>
-            {{ onsRadios({
+            <p>
+These cookies do things like remember your preferences and the choices you make, to personalise your experience of using the site.
+            </p>
+{{ onsRadios({
                 "id": "cookies-measure-website-settings",
                 "name": "cookies-settings",
                 "legend": "Do you want to allow settings?",
@@ -201,7 +209,7 @@
             }) }}
             <h3 class="ons-u-mt-l">Strictly necessary cookies</h3>
             <p>These essential cookies do things like:</p>
-            {{
+{{
                 onsList({
                     "itemsList": [
                         {
@@ -223,9 +231,9 @@
                     "contextSuffix": "content"
                 }
             }) %}
-                <h4>Your progress </h4>
+                <h4>Your progress</h4>
                 <p>We’ll set a cookie to remember your progress while logged in. These cookies do not store your personal data.</p>
-                {{
+{{
                     onsTable({
                         "ths": [
                             {
@@ -360,8 +368,10 @@
                     })
                 }}
                 <h4>Cookie message</h4>
-                <p>You may see a banner when you visit surveys.ons.gov.uk inviting you to accept cookies or review your settings. We’ll set cookies so that your computer knows you’ve seen it and not to show it again, and also to store your settings.</p>
-                {{
+                <p>
+You may see a banner when you visit surveys.ons.gov.uk inviting you to accept cookies or review your settings. We’ll set cookies so that your computer knows you’ve seen it and not to show it again, and also to store your settings.
+                </p>
+{{
                     onsTable({
                         "ths": [
                             {
@@ -405,7 +415,7 @@
                     })
                 }}
             {% endcall %}
-            {{
+{{
                 onsButton({
                     "type": 'submit',
                     "text": 'Save changes'

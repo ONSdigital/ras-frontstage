@@ -4,7 +4,6 @@
 {% from "components/input/_macro.njk" import onsInput %}
 {% from "components/button/_macro.njk" import onsButton %}
 {% from "components/lists/_macro.njk" import onsList %}
-
 {% set page_title = "Change contact details" %}
 {% set breadcrumbsData = [
     {
@@ -18,9 +17,8 @@
         "id": "b-item-2"
     }
 ] %}
-
 {% block breadcrumbs %}
-    {{
+{{
         onsBreadcrumbs({
             "ariaLabel": "Breadcrumbs",
             "id": "breadcrumbs",
@@ -28,13 +26,12 @@
         })
     }}
 {% endblock breadcrumbs %}
-
 {% block main %}
     {% if errors|length > 0 %}
         {% if errors|length == 1 %}
-            {% set errorTitle = 'There is 1 error on this page' %}
+{% set errorTitle = 'There is 1 error on this page' %}
         {% elif errors|length > 1 %}
-            {% set errorTitle = 'There are ' ~ errors|length ~ ' errors on this page' %}
+{% set errorTitle = 'There are ' ~ errors|length ~ ' errors on this page' %}
         {% endif %}
         {% call
             onsPanel({
@@ -43,11 +40,13 @@
                 "title": errorTitle
             })
         %}
-            <p>These <strong>must be corrected</strong> to continue.</p>
-            {% set errorData = [] %}
+            <p>
+                These <strong>must be corrected</strong> to continue.
+            </p>
+{% set errorData = [] %}
             {% for error in errors %}
-                {% set error_text =  error %}
-                {% do errorData.append(
+{% set error_text =  error %}
+{% do errorData.append(
                     {
                         "text": 'Problem with the ' ~ error_text.replace('_', ' '),
                         "url": "#" ~ error ~ '_error',
@@ -55,7 +54,7 @@
                     }
                 ) %}
             {% endfor %}
-            {{
+{{
                 onsList({
                     "element": "ol",
                     "itemsList": errorData
@@ -65,13 +64,13 @@
     {% endif %}
     <h1 class="ons-u-fs-xl">Enter your new contact details</h1>
     <form action="" method="post">
-        {{ form.csrf_token }}
-        {% set firstName = respondent.firstName %}
+{{ form.csrf_token }}
+{% set firstName = respondent.firstName %}
         {% if errors.first_name %}
-            {% set errorFirstName = { "text": errors['first_name'][0],  "id": 'first_name_error' } %}
-            {% set firstName = form.first_name.data %}
+{% set errorFirstName = { "text": errors['first_name'][0],  "id": 'first_name_error' } %}
+{% set firstName = form.first_name.data %}
         {% endif %}
-        {{
+{{
             onsInput({
                 "id": "first_name",
                 "name": "first_name",
@@ -83,12 +82,12 @@
                 "value": firstName
             })
         }}
-        {% set lastName = respondent.lastName %}
+{% set lastName = respondent.lastName %}
         {% if errors.last_name %}
-            {% set errorLastName = { "text": errors['last_name'][0],  "id": 'last_name_error' } %}
-            {% set lastName = form.last_name.data %}
+{% set errorLastName = { "text": errors['last_name'][0],  "id": 'last_name_error' } %}
+{% set lastName = form.last_name.data %}
         {% endif %}
-        {{
+{{
             onsInput({
                 "id": "last_name",
                 "name": "last_name",
@@ -100,12 +99,12 @@
                 "value": lastName
             })
         }}
-        {% set emailAddress = respondent.emailAddress %}
+{% set emailAddress = respondent.emailAddress %}
         {% if errors.email_address %}
-            {% set errorEmailAddress = { "text": errors['email_address'][0],  "id": 'email_address_error' } %}
-            {% set emailAddress = form.email_address.data %}
+{% set errorEmailAddress = { "text": errors['email_address'][0],  "id": 'email_address_error' } %}
+{% set emailAddress = form.email_address.data %}
         {% endif %}
-        {{
+{{
             onsInput({
                 "id": "email_address",
                 "name": "email_address",
@@ -117,12 +116,12 @@
                 "value": emailAddress,
             })
         }}
-        {% set phoneNumber = respondent.telephone %}
+{% set phoneNumber = respondent.telephone %}
         {% if errors.phone_number %}
-            {% set errorPhoneNumber = { "text": errors['phone_number'][0],  "id": 'phone_number_error' } %}
-            {% set phoneNumber = form.phone_number.data %}
+{% set errorPhoneNumber = { "text": errors['phone_number'][0],  "id": 'phone_number_error' } %}
+{% set phoneNumber = form.phone_number.data %}
         {% endif %}
-        {{
+{{
             onsInput({
                 "id": "phone_number",
                 "name": "phone_number",
@@ -137,14 +136,14 @@
             })
         }}
         <div class="ons-field ons-u-mt-l">
-            {{
+{{
                 onsButton({
                     "text": "Save",
                     "id": "btn-option-save",
                     "submitType": "timer"
                 })
             }}
-            {{
+{{
                 onsButton({
                     "id": "btn-account-change-detail-cancel",
                     "url": url_for('account_bp.get_account'),

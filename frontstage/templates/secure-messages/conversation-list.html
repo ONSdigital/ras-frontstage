@@ -1,10 +1,7 @@
 {% extends 'layouts/_base.html' %}
-
 {% set page_title = "Messages" %}
-
 {% block content %}
-    {% include "partials/tab_list.html" %}
-
+{% include "partials/tab_list.html" %}
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% call onsPanel ({
@@ -14,15 +11,13 @@
                     "data-qa": "success-body"
                 }
             }) %}
-                {% for message in messages %}
-                    <p id="flashed-message-{{ loop.index }}">{{ message }}</p>
-                {% endfor %}
+                {% for message in messages %}<p id="flashed-message-{{ loop.index }}">{{ message }}</p>{% endfor %}
             {% endcall %}
         {% endif %}
     {% endwith %}
     <section class="ons-u-mb-s">
-        {% from "components/section-navigation/_macro.njk" import onsSectionNavigation %}
-        {{
+{% from "components/section-navigation/_macro.njk" import onsSectionNavigation %}
+{{
             onsSectionNavigation({
                 "ariaLabel": "Section menu",
                 "ariraListLabel": "Navigation menu",
@@ -47,10 +42,10 @@
             <p>No new conversations</p>
         {% endif %}
     {% else %}
-        {% from "components/message-list/_macro.njk" import onsMessageList %}
-        {% set messageList = [] %}
+{% from "components/message-list/_macro.njk" import onsMessageList %}
+{% set messageList = [] %}
         {% for message in messages %}
-            {% do messageList.append(
+{% do messageList.append(
                 {
                   "id": "message-link-" ~ loop.index,
                   "unread": true if message['unread'] else false,
@@ -62,7 +57,7 @@
                 }
             ) %}
         {% endfor %}
-        {{
+{{
             onsMessageList({
                 "ariaLabel": "Message list for ONS Business Surveys",
                 "unreadText": "New",
@@ -75,5 +70,4 @@
             })
         }}
     {% endif %}
-
 {% endblock content %}

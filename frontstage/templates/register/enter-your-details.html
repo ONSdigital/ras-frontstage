@@ -1,13 +1,10 @@
-
 {% extends "layouts/_block_content.html" %}
 {% from "components/button/_macro.njk" import onsButton %}
 {% from "components/lists/_macro.njk" import onsList %}
 {% from "components/input/_macro.njk" import onsInput %}
 {% from "components/password/_macro.njk" import onsPassword %}
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
-
 {% set page_title = "Enter account details" %}
-
 {% block main %}
     {% with messages = get_flashed_messages(category_filter=["error"]) %}
         {% if messages %}
@@ -18,17 +15,15 @@
                         "title":  errorTitle
                     })
             %}
-                {% for message in messages %}
-                    <p id="flashed-message-{{ loop.index }}">{{ message }}</p>
-                {% endfor %}
+                {% for message in messages %}<p id="flashed-message-{{ loop.index }}">{{ message }}</p>{% endfor %}
             {% endcall %}
         {% endif %}
     {% endwith %}
     {% if errors|length > 0 %}
         {% if errors|length == 1 %}
-            {% set errorTitle = 'There is 1 error on this page' %}
+{% set errorTitle = 'There is 1 error on this page' %}
         {% elif errors|length > 1 %}
-            {% set errorTitle = 'There are ' ~ errors|length ~ ' errors on this page' %}
+{% set errorTitle = 'There are ' ~ errors|length ~ ' errors on this page' %}
         {% endif %}
         {% call
             onsPanel({
@@ -37,12 +32,13 @@
                 "title": errorTitle
             })
         %}
-            <p>These <strong>must be corrected</strong> to continue.</p>
-            {% set errorData = [] %}
+            <p>
+                These <strong>must be corrected</strong> to continue.
+            </p>
+{% set errorData = [] %}
             {% for error in errors %}
-
-                {% set error_text = 'passwords' if error == 'password' else error %}
-                {% do errorData.append(
+{% set error_text = 'passwords' if error == 'password' else error %}
+{% do errorData.append(
                     {
                         "text": 'Problem with the ' ~ error_text.replace('_', ' '),
                         "url": "#" ~ error ~ '_error',
@@ -50,7 +46,7 @@
                     }
                 ) %}
             {% endfor %}
-            {{
+{{
                 onsList({
                     "element": "ol",
                     "itemsList": errorData
@@ -58,25 +54,19 @@
             }}
         {% endcall %}
     {% endif %}
-        <form
-            method="post"
-            role="form"
-            onsubmit="formSubmitted(event);">
-            {{ form.csrf_token }}
-
+    <form method="post" role="form" onsubmit="formSubmitted(event);">
+{{ form.csrf_token }}
         <h1 class="ons-u-fs-xl">Enter your account details</h1>
-        {{ form.enrolment_code }}
-
+{{ form.enrolment_code }}
         <h2>Your name</h2>
         {%- call onsFieldset({
             "legend": "Your name",
             "legendClasses": "ons-u-vh"
         }) -%}
             {% if errors.first_name %}
-                {% set errorFirstName = { "text": errors['first_name'][0],  "id": 'first_name_error' } %}
-
+{% set errorFirstName = { "text": errors['first_name'][0],  "id": 'first_name_error' } %}
             {% endif %}
-            {{
+{{
                 onsInput({
                     "id": "first_name",
                     "name": "first_name",
@@ -89,9 +79,9 @@
                 })
             }}
             {% if errors.last_name %}
-                {% set errorLastName = { "text": errors['last_name'][0],  "id": 'last_name_error' } %}
+{% set errorLastName = { "text": errors['last_name'][0],  "id": 'last_name_error' } %}
             {% endif %}
-            {{
+{{
                 onsInput({
                     "id": "last_name",
                     "name": "last_name",
@@ -104,7 +94,6 @@
                 })
             }}
         {% endcall %}
-        
         <h2 class="ons-u-mt-l">Email address</h2>
         <p>We'll send you an email so you can activate your account</p>
         {%- call onsFieldset({
@@ -112,9 +101,9 @@
             "legendClasses": "ons-u-vh"
         }) -%}
             {% if errors.email_address %}
-                {% set errorEmailAddress = { "text": errors['email_address'][0],  "id": 'email_address_error' } %}
+{% set errorEmailAddress = { "text": errors['email_address'][0],  "id": 'email_address_error' } %}
             {% endif %}
-            {{
+{{
                 onsInput({
                     "id": "email_address",
                     "name": "email_address",
@@ -126,7 +115,7 @@
                     "value": form.email_address.data
                 })
             }}
-            {{
+{{
                 onsInput({
                     "id": "email_address_confirm",
                     "name": "email_address_confirm",
@@ -140,7 +129,7 @@
         {% endcall %}
         <h2 class="ons-u-mt-l">Create a password</h2>
         <p>Your password must have:</p>
-        {{
+{{
             onsList({
                 "itemsList": [
                     {
@@ -163,9 +152,9 @@
             "legendClasses": "ons-u-vh"
         }) -%}
             {% if errors.password %}
-                {% set errorPassword = { "text": errors['password'][0],  "id": 'password_error' } %}
+{% set errorPassword = { "text": errors['password'][0],  "id": 'password_error' } %}
             {% endif %}
-            {{
+{{
                 onsPassword({
                     "id": "password",
                     "name": "password",
@@ -177,7 +166,7 @@
                     "error": errorPassword
                 })
             }}
-            {{
+{{
                 onsPassword({
                     "id": "password_confirm",
                     "name": "password_confirm",
@@ -189,9 +178,7 @@
                     "error": errorPassword
                 })
             }}
-
         {% endcall %}
-        
         <h2 class="ons-u-mt-l">Contact telephone number</h2>
         <p>We'll use this number if we need to discuss any survey information provided</p>
         {%- call onsFieldset({
@@ -199,9 +186,9 @@
             "legendClasses": "ons-u-vh"
         }) -%}
             {% if errors.phone_number %}
-                {% set errorPhoneNumber = { "text": errors['phone_number'][0],  "id": 'phone_number_error' } %}
+{% set errorPhoneNumber = { "text": errors['phone_number'][0],  "id": 'phone_number_error' } %}
             {% endif %}
-            {{
+{{
                 onsInput({
                     "id": "phone_number",
                     "name": "phone_number",
@@ -218,8 +205,8 @@
             }}
         {% endcall %}
         <h3 class="ons-u-mt-l">Privacy notice</h3>
-            <p>Your user account will be deleted after 36 months of inactivity</p>
-        {{
+        <p>Your user account will be deleted after 36 months of inactivity</p>
+{{
             onsButton({
                 "text": "Continue",
                 "type": "submit",
@@ -228,9 +215,7 @@
                 "submitType": "timer"
             })
         }}
-
     </form>
-
     <script{% if csp_nonce %} nonce="{{ csp_nonce() }}"{% endif %}>
     var submitted = false;
     function formSubmitted(event) {

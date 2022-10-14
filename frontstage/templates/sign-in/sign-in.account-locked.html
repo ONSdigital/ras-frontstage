@@ -1,15 +1,10 @@
-
 {% extends "layouts/_block_content.html" %}
 {% from "components/collapsible/_macro.njk" import onsCollapsible %}
-
 {% set page_title = "Trouble signing in?" %}
-
 {% block main %}
     <h1 class="ons-u-fs-xl">Check your email</h1>
-
     <p>You've tried to sign in a few times with the wrong details.</p>
     <p>If {{ form.data['username'] }} is registered to an account, we'll send an email explaining how to sign in.</p>
-    
     {% call onsCollapsible({
         "id": "guidance-help-with-email",
         "title": "Help with email",
@@ -18,11 +13,13 @@
             "contextSuffix": "content"
         }
     }) %}
-      <p>If you do not receive this email in 15 minutes, you can try the following: </p>
+        <p>If you do not receive this email in 15 minutes, you can try the following:</p>
         <li>Check your spam folder</li>
-        <li>Check that you've entered your email address correctly </li>
-        <li>Ensure that you've registered an account using this email address </li>
-        <br/>If you're still having problems, call us on <a href="tel:0300 1234 931">0300 1234 931</a> or send an <br/>email to <a href="mailto:surveys@ons.gov.uk">surveys@ons.gov.uk</a>.
+        <li>Check that you've entered your email address correctly</li>
+        <li>Ensure that you've registered an account using this email address</li>
+        <br/>
+        If you're still having problems, call us on <a href="tel:0300 1234 931">0300 1234 931</a> or send an
+        <br/>
+        email to <a href="mailto:surveys@ons.gov.uk">surveys@ons.gov.uk</a>.
     {% endcall %}
-
 {% endblock main %}

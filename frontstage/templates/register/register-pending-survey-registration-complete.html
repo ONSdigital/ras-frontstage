@@ -4,7 +4,6 @@
 {% from "components/input/_macro.njk" import onsInput %}
 {% from "components/lists/_macro.njk" import onsList %}
 {% from "components/button/_macro.njk" import onsButton %}
-
 {% set page_title = "Pending survey registration complete" %}
 {% set breadcrumbsData = [
     {
@@ -19,7 +18,7 @@
     }
 ] %}
 {% block breadcrumbs %}
-  {{
+{{
       onsBreadcrumbs({
           "ariaLabel": "Breadcrumbs",
           "id": "breadcrumbs",
@@ -27,7 +26,6 @@
       })
   }}
 {% endblock breadcrumbs %}
-
 {% block main %}
     <h1 class="ons-u-fs-xl">Thank you</h1>
     {% if is_transfer  %}
@@ -36,10 +34,12 @@
         <p>You are now registered to access the business surveys shared with you.</p>
     {% endif %}
     <p>To access your surveys you must first sign in.</p>
-
     <div class="ons-field ons-u-mt-l">
         <div class="ons-btn-group">
-            <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" role="button" class="ons-btn ons-btn--primary" id="btn-sign-in"><span class="ons-btn__inner">Sign in</span></a>
+            <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}"
+               role="button"
+               class="ons-btn ons-btn--primary"
+               id="btn-sign-in"><span class="ons-btn__inner">Sign in</span></a>
         </div>
     </div>
 {% endblock main %}

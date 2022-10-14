@@ -3,7 +3,6 @@
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/radios/_macro.njk" import onsRadios %}
 {% from "components/button/_macro.njk" import onsButton %}
-
 {% set page_title = "Help Information about the ONS" %}
 {% set breadcrumbsData = [
     {
@@ -18,7 +17,7 @@
     }
 ] %}
 {% block breadcrumbs %}
-    {{
+{{
         onsBreadcrumbs({
             "ariaLabel": "Breadcrumbs",
             "id": "breadcrumbs",
@@ -26,17 +25,17 @@
         })
     }}
 {% endblock breadcrumbs %}
-
 {% block main %}
-    {% set ns = namespace() %}
-    {% include "radio-option-select-error-panel.html" %}
+{% set ns = namespace() %}
+{% include "radio-option-select-error-panel.html" %}
     <h1 class="ons-u-fs-xl">Something else</h1>
-    <form action="{{ url_for('surveys_bp.post_help_option_select', short_name=short_name, business_id=business_id, option=option, survey_ref=survey_ref, ru_ref=ru_ref)}}" method="post">
+    <form action="{{ url_for('surveys_bp.post_help_option_select', short_name=short_name, business_id=business_id, option=option, survey_ref=survey_ref, ru_ref=ru_ref)}}"
+          method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         {% if ns.optionError %}
-            {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
+{% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
         {% endif %}
-        {{
+{{
             onsRadios({
                 "legend": "Choose an option",
                 "name": "option",
@@ -61,14 +60,14 @@
             })
         }}
         <div class="ons-field ons-u-mt-l">
-            {{
+{{
                 onsButton({
                     "text": "Continue",
                     "id": "btn-help-info-survey-option-continue",
                     "submitType": "timer"
                 })
             }}
-            {{
+{{
                 onsButton({
                     "id": "btn-help-info-survey-option-cancel",
                     "url": url_for('surveys_bp.get_surveys_help_page', survey_ref=survey_ref, ru_ref=ru_ref),

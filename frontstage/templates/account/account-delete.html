@@ -3,7 +3,6 @@
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/button/_macro.njk" import onsButton %}
 {% from "components/panel/_macro.njk" import onsPanel %}
-
 {% set page_title = "Account delete" %}
 {% set breadcrumbsData = [
     {
@@ -12,9 +11,8 @@
         "id": "b-item"
     }
 ] %}
-
 {% block breadcrumbs %}
-    {{
+{{
         onsBreadcrumbs({
             "ariaLabel": "Breadcrumbs",
             "id": "breadcrumbs",
@@ -22,7 +20,6 @@
         })
     }}
 {% endblock breadcrumbs %}
-
 {% block main %}
     {%- with messages = get_flashed_messages(category_filter=["info"]) -%}
         {%- if messages -%}
@@ -55,18 +52,19 @@
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div class="ons-grid ons-grid--flex ons-grid--gutterless ons-grid--vertical-center ons-grid--no-wrap@s ons-u-mt-m ons-u-mb-m">
             {% if is_validated %}
-            <div class="ons-grid__col">
-                {{
+                <div class="ons-grid__col">
+{{
                     onsButton({
                         "text": "Delete account",
                         "id": "btn-option-delete-account",
                         "submitType": "timer"
                     })
                 }}
-            </div>
+                </div>
             {% endif %}
             <div class="ons-grid__col ons-u-ml-m">
-                <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" id="btn-option-cancel">Cancel</a>
+                <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}"
+                   id="btn-option-cancel">Cancel</a>
             </div>
         </div>
     </form>

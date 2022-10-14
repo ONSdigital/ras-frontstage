@@ -1,35 +1,32 @@
-
 {% from "components/lists/_macro.njk" import onsList %}
 {% from "components/panel/_macro.njk" import onsPanel %}
-
 {% set ns.optionError = false %}
-
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         {% for category, message in messages %}
-            {% set ns.optionError = true %}
+{% set ns.optionError = true %}
             {% if not ns.optionErrorMessage %}
                 {% if not ns.checkbox %}
-                    {% set ns.optionErrorMessage = 'You need to choose an option' %}
+{% set ns.optionErrorMessage = 'You need to choose an option' %}
                 {% else %}
-                    {% set ns.optionErrorMessage = 'You need to choose at least one option' %}
+{% set ns.optionErrorMessage = 'You need to choose at least one option' %}
                 {% endif %}
             {% endif %}
             {% if category != 'message' %}
-                {% set ns.category = category %}
-                {% set url = "#option_error_"~category %}
+{% set ns.category = category %}
+{% set url = "#option_error_"~category %}
             {% else %}
-                    {% set url = "#option_error" %}
+{% set url = "#option_error" %}
             {% endif %}
-            {% set errorTitle = 'There is 1 error on this page' %}
-                {% call
+{% set errorTitle = 'There is 1 error on this page' %}
+            {% call
                     onsPanel({
                         "type": "error",
                         "classes": "ons-u-mb-s",
                         "title": errorTitle
                     })
                 %}
-                  {{
+{{
                     onsList({
                         "element": "ol",
                         "itemsList": [
@@ -41,7 +38,7 @@
                         ]
                     })
                 }}
-                {% endcall %}
+            {% endcall %}
         {% endfor %}
     {% endif %}
 {% endwith %}

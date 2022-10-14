@@ -1,14 +1,10 @@
-
 {% extends "layouts/_block_content.html" %}
 {% from "components/collapsible/_macro.njk" import onsCollapsible %}
-
 {% set page_title = "Check your email" %}
-
 {% block main %}
     <h1 class="ons-u-fs-xl">Almost done...</h1>
     <p id="email_confirmation_sent">We've sent an email to {{ email }}</p>
     <p>Please follow the link in the email to confirm your email address and finish setting up your account.</p>
-
     {% call onsCollapsible({
         "id": "guidance-help-with-email",
         "title": "Help with email",
@@ -18,6 +14,8 @@
         }
     }) %}
         <p>Email not arrived? It might be in your spam folder.</p>
-        <p>If it doesn’t arrive in the next 15 minutes, please call <a href="tel:03001234931">0300 1234 931</a></p>
+        <p>
+            If it doesn’t arrive in the next 15 minutes, please call <a href="tel:03001234931">0300 1234 931</a>
+        </p>
     {% endcall %}
 {% endblock main %}

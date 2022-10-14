@@ -1,7 +1,5 @@
 {% extends 'layouts/_base.html' %}
-
 {% set page_title = "Error uploading file" %}
-
 {% block content %}
     {% call
         onsPanel({
@@ -10,18 +8,13 @@
             "title": error_info.header
         })
     %}
-
         <p>{{ error_info.body }}</p>
-        <div>
-            {% include "surveys/surveys-upload-file-picker.html" %}
-        </div>
+        <div>{% include "surveys/surveys-upload-file-picker.html" %}</div>
     {% endcall %}
     <div class="ons-u-mb-s ons-u-mb-m@s">
         <p class="ons-u-fs-r--b">We will treat your data securely and confidentially</p>
     </div>
-
     <div>
         <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}">Back</a>
     </div>
-
 {% endblock content %}

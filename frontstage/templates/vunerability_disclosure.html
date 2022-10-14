@@ -1,15 +1,12 @@
 {% extends "layouts/_block_content.html" %}
 {% from "components/lists/_macro.njk" import onsList %}
-
 {% set page_title = "Vulnerability Disclosure Policy" %}
-
 {% block main %}
-    <h1 class="ons-u-fs-xl">
-        VULNERABILITY DISCLOSURE POLICY
-    </h1>
+    <h1 class="ons-u-fs-xl">VULNERABILITY DISCLOSURE POLICY</h1>
     <h2 class="ons-u-fs-xl ons-u-mt-l">Scope</h2>
-    <p>This disclosure policy applies only to vulnerabilities in the ONS products and services under the following conditions:
-        {{
+    <p>
+This disclosure policy applies only to vulnerabilities in the ONS products and services under the following conditions:
+{{
             onsList({
                 "itemsList": [
                     {
@@ -30,7 +27,7 @@
                             support or the presence of TLS1.0 support, are not in scope."
                     },
                     {
-                        "text": "The policy applies to everyone, including for example the ONSstaff, 
+                        "text": "The policy applies to everyone, including for example the ONSstaff,
                             third party suppliers and general users of the ONS publicservices."
                     }
                 ]
@@ -38,12 +35,13 @@
         }}
     </p>
     <h2 class="ons-u-fs-xl ons-u-mt-l">Reporting</h2>
-    <p>If you have discovered something you believe to be an in-scope security 
-        vulnerability, first you should check the above details for more information 
-        about scope, then submit a report on 
+    <p>
+If you have discovered something you believe to be an in-scope security
+        vulnerability, first you should check the above details for more information
+        about scope, then submit a report on
         <a href="https://hackerone.com/52fa7bc0-5356-4c86-9f79-eeb03e1d55cc/embedded_submissions/new">this page</a>.
         In your submission, include details of:
-        {{
+{{
             onsList({
                 "itemsList": [
                     {
@@ -55,30 +53,37 @@
                 ]
             })
         }}
-        Your report should provide a benign, non-destructive, proof of exploitation. This 
-        helps to ensure that the report can be triaged quickly and accurately. 
-        It also reduces the likelihood of duplicate reports, or malicious exploitation 
+        Your report should provide a benign, non-destructive, proof of exploitation. This
+        helps to ensure that the report can be triaged quickly and accurately.
+        It also reduces the likelihood of duplicate reports, or malicious exploitation
         of some vulnerabilities, such as sub-domain takeovers.
     </p>
     <h2 class="ons-u-fs-xl ons-u-mt-l">What to expect</h2>
-    <p>After you have submitted your report, we will respond to your report within 5 
-        working days and aim to triage your report within 10 working days. We’ll also 
-        keep you informed about our progress throughout the process via HackerOne if 
-        you have registered for an account.</p>
-    <p>Priority for bug fixes or mitigations are assessed by looking at the impact 
-        severity and exploit complexity. Vulnerability reports might take some time to 
-        triage or address. You are welcome to enquire onthe status of the process but 
-        should avoid doing so more than once every 14 days. The reason is to allow our 
-        teams to focus on the reports as much as possible.</p>
-    <p>When the reported vulnerability is resolved, or remediation work is scheduled, 
-        the Vulnerability Disclosure Team will notify you, and invite you to confirm 
-        that the solution covers the vulnerability adequately.</p>
+    <p>
+After you have submitted your report, we will respond to your report within 5
+        working days and aim to triage your report within 10 working days. We’ll also
+        keep you informed about our progress throughout the process via HackerOne if
+        you have registered for an account.
+    </p>
+    <p>
+Priority for bug fixes or mitigations are assessed by looking at the impact
+        severity and exploit complexity. Vulnerability reports might take some time to
+        triage or address. You are welcome to enquire onthe status of the process but
+        should avoid doing so more than once every 14 days. The reason is to allow our
+        teams to focus on the reports as much as possible.
+    </p>
+    <p>
+When the reported vulnerability is resolved, or remediation work is scheduled,
+        the Vulnerability Disclosure Team will notify you, and invite you to confirm
+        that the solution covers the vulnerability adequately.
+    </p>
     <h2 class="ons-u-fs-xl ons-u-mt-l">Legalities</h2>
-    <p>This policy is designed to be compatible with common vulnerability disclosure 
-        good practice. It does not give you permission to act in any manner that is 
-        inconsistent with the law, or which might cause the ONS to be in breach of 
+    <p>
+This policy is designed to be compatible with common vulnerability disclosure
+        good practice. It does not give you permission to act in any manner that is
+        inconsistent with the law, or which might cause the ONS to be in breach of
         any of its legal obligations, including but not limited to:
-        {{
+{{
             onsList({
                 "itemsList": [
                     {
@@ -96,32 +101,32 @@
                 ]
             })
         }}
-        The ONS affirms that it will not seek prosecution of any security researcher 
-        who reports any security vulnerability on a ONS service or system, where the 
+        The ONS affirms that it will not seek prosecution of any security researcher
+        who reports any security vulnerability on a ONS service or system, where the
         researcher has acted in good faith and in accordance with this disclosure policy.
-        </p>
-            <h2 class="ons-u-fs-xl ons-u-mt-l">Guidance</h2>
-        <p>
+    </p>
+    <h2 class="ons-u-fs-xl ons-u-mt-l">Guidance</h2>
+    <p>
         You must NOT:
-        {{
+{{
             onsList({
                 "itemsList": [
                     {
-                        "text": 'Access unnecessary amounts of data. For example, 2 or 3 records is enough 
-                            to demonstrate most vulnerabilities, such asan enumeration or direct object 
+                        "text": 'Access unnecessary amounts of data. For example, 2 or 3 records is enough
+                            to demonstrate most vulnerabilities, such asan enumeration or direct object
                             reference vulnerability.'
                     },
                     {
-                        "text": 'Use high-intensity invasive or destructive technical security scanning tools 
+                        "text": 'Use high-intensity invasive or destructive technical security scanning tools
                             to find vulnerabilities.'
                     },
                     {
-                        "text": 'Violate the privacy of the ONS users, staff, contractors, services or systems. 
-                            For example, by sharing, redistributing and/or not properly securing data 
+                        "text": 'Violate the privacy of the ONS users, staff, contractors, services or systems.
+                            For example, by sharing, redistributing and/or not properly securing data
                             retrieved from our systems or services.'
                     },
                     {
-                        "text": 'Communicate any vulnerabilities or associated details using methods not 
+                        "text": 'Communicate any vulnerabilities or associated details using methods not
                             described in this policy.'
                     },
                     {
@@ -134,12 +139,12 @@
                         "text": "Social engineer, 'phish'or physically attack ONS staff or infrastructure."
                     },
                     {
-                        "text": 'Disclose any vulnerabilities in the ONS systems or services to 3rd parties 
-                            or the public, prior to the ONS confirming that those vulnerabilities have 
-                            been mitigated or rectified. However, this is not intended to stop you 
-                            notifying a vulnerability to 3rd parties for whom the vulnerability is directly relevant. 
-                            An example would be where the vulnerability being reported is in a 3rd party 
-                            software library or framework. Details of the specific vulnerability as it applies 
+                        "text": 'Disclose any vulnerabilities in the ONS systems or services to 3rd parties
+                            or the public, prior to the ONS confirming that those vulnerabilities have
+                            been mitigated or rectified. However, this is not intended to stop you
+                            notifying a vulnerability to 3rd parties for whom the vulnerability is directly relevant.
+                            An example would be where the vulnerability being reported is in a 3rd party
+                            software library or framework. Details of the specific vulnerability as it applies
                             to the ONS must not be referenced in such reports.'
                     }
                 ]

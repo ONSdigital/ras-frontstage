@@ -3,17 +3,14 @@
 {% from "components/input/_macro.njk" import onsInput %}
 {% from "components/password/_macro.njk" import onsPassword %}
 {% from "components/button/_macro.njk" import onsButton %}
-
 {% set errorType = data['error']['type'] %}
 {% set page_title = "Error signing in" if errorType else "Complete a survey on behalf of a business" %}
-
 {% block main %}
-
     {% if errorType %}
-        {% set errorData = [] %}
+{% set errorData = [] %}
         {% if errorType == 'failed' %}
-            {% set errorTitle = 'There is 1 error on this page' %}
-            {% do errorData.append(
+{% set errorTitle = 'There is 1 error on this page' %}
+{% do errorData.append(
                 {
                     "text": "Incorrect email or password",
                     "url": "#username_error",
@@ -21,9 +18,9 @@
                 }
             ) %}
         {% elif errorType|length > 1 %}
-            {% set errorTitle = 'There are ' ~ errorType|length ~ ' errors on this page' %}
+{% set errorTitle = 'There are ' ~ errorType|length ~ ' errors on this page' %}
             {% for error in errorType %}
-                {% do errorData.append(
+{% do errorData.append(
                     {
                         "text": errorType[error][0],
                         "url": "#username_error",
@@ -32,9 +29,9 @@
                 ) %}
             {% endfor %}
         {% else %}
-            {% set errorTitle = 'There is 1 error on this page' %}
+{% set errorTitle = 'There is 1 error on this page' %}
             {% for error in errorType %}
-                {% do errorData.append(
+{% do errorData.append(
                     {
                         "text": errorType[error][0],
                         "url": "#username_error",
@@ -43,7 +40,6 @@
                 ) %}
             {% endfor %}
         {% endif %}
-        
         {% call
             onsPanel({
                 "type": "error",
@@ -51,10 +47,11 @@
                 "title": errorTitle
             })
         %}
-            <p>This <strong>must be corrected</strong> to continue.</p>
-
-            {% from "components/lists/_macro.njk" import onsList %}
-            {{
+            <p>
+                This <strong>must be corrected</strong> to continue.
+            </p>
+{% from "components/lists/_macro.njk" import onsList %}
+{{
                 onsList({
                     "element": "ol",
                     "itemsList": errorData
@@ -62,7 +59,6 @@
             }}
         {% endcall %}
     {% endif %}
-
     {%- with messages = get_flashed_messages(category_filter=["info"]) -%}
         {%- if messages -%}
             {% call
@@ -79,7 +75,6 @@
             {% endcall %}
         {%- endif -%}
     {%- endwith -%}
-
     {%- with messages = get_flashed_messages(category_filter=["success"]) -%}
         {%- if messages -%}
             {% call
@@ -89,51 +84,53 @@
                     "iconType": "check",
                 })
             %}
-                    {%- for message in messages -%}
-                        <p>{{ message }}</p>
-                    {%- endfor -%}
+                {%- for message in messages -%}
+                    <p>{{ message }}</p>
+                {%- endfor -%}
             {% endcall %}
         {%- endif -%}
     {%- endwith -%}
-
-    <form method="post" action="{{ url_for('sign_in_bp.login', next=next) }}" role="form">
-        {{ form.csrf_token }}
-
+    <form method="post"
+          action="{{ url_for('sign_in_bp.login', next=next) }}"
+          role="form">
+{{ form.csrf_token }}
         {% if data['account_activated'] %}
             <h1 class="ons-u-fs-xl">You've activated your account</h1>
             <p>You may now sign in.</p>
         {% else %}
-
-        {% if config.AVAILABILITY_BANNER and config.AVAILABILITY_BANNER != 'False' %}
-            {% call
+            {% if config.AVAILABILITY_BANNER and config.AVAILABILITY_BANNER != 'False' %}
+                {% call
                 onsPanel({
                     "classes": "ons-u-mb-s"
                 })
             %}
-                <strong class="ons-u-d-b">Service Availability</strong>
-                <p class="ons-u-fs-r ons-u-mt-xs">Thank you for visiting the Office for National Statistics Secure Data Collection website.</p>
-                <p>We are carrying out essential maintenance on our internal systems.</p>
-                <p>You are able to use the system and submit data during this period however your response status may not display as completed until after the maintenance has been completed.</p>
-            {% endcall %}
+                    <strong class="ons-u-d-b">Service Availability</strong>
+                    <p class="ons-u-fs-r ons-u-mt-xs">
+Thank you for visiting the Office for National Statistics Secure Data Collection website.
+                    </p>
+                    <p>We are carrying out essential maintenance on our internal systems.</p>
+                    <p>
+You are able to use the system and submit data during this period however your response status may not display as completed until after the maintenance has been completed.
+                    </p>
+                {% endcall %}
+            {% endif %}
+            <p>
+New to this service?
+                <a id="create-account" href="/register/create-account/">Create an account</a>
+            </p>
+            <h1 class="ons-u-fs-xl">Sign in</h1>
         {% endif %}
-
-        <p>New to this service?
-           <a id="create-account" href="/register/create-account/">Create an account</a>
-        </p>
-        <h1 class="ons-u-fs-xl">Sign in</h1>
-        {% endif %}
-
         {% if errorType == 'failed' %}
-            {% set errorUN = { "text": "Email Address is required", "id": 'username_error' } %}
+{% set errorUN = { "text": "Email Address is required", "id": 'username_error' } %}
         {% elif errorType %}
-            {% set errorUN = { "text": "Invalid email address", "id": 'username_error' } %}
+{% set errorUN = { "text": "Invalid email address", "id": 'username_error' } %}
         {% endif %}
         {%- call onsFieldset({
             "legend": "Sign in",
             "legendClasses": "ons-u-vh",
             "id": "sign-in-details"
         }) -%}
-            {{
+{{
                 onsInput({
                     "id": "username",
                     "name": "username",
@@ -144,11 +141,10 @@
                     "error": errorUN
                 })
             }}
-
             {% if errorType %}
-                {% set errorPW = { "text": "Password is required", "id": 'password_error' } %}
+{% set errorPW = { "text": "Password is required", "id": 'password_error' } %}
             {% endif %}
-            {{
+{{
                 onsPassword({
                     "id": "inputPassword",
                     "name": "password",
@@ -160,9 +156,8 @@
                     "error": errorPW
                 })
             }}
-
         {% endcall %}
-        {{
+{{
             onsButton({
                 "text": "Sign in",
                 "type": "submit",

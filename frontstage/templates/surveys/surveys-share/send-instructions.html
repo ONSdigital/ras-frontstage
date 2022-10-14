@@ -5,9 +5,7 @@
 {% from "components/lists/_macro.njk" import onsList %}
 {% from "components/button/_macro.njk" import onsButton %}
 {% from "components/panel/_macro.njk" import onsPanel %}
-
 {% set page_title = "Survey share email send instructions" %}
-
 {% set breadcrumbsData = [
     {
         "text": "Surveys",
@@ -39,9 +37,8 @@
         "url": "/my-account/share-surveys/recipient-email-address"
     }
 ] %}
-
 {% block breadcrumbs %}
-    {{
+{{
         onsBreadcrumbs({
             "ariaLabel": "Breadcrumbs",
             "id": "breadcrumbs",
@@ -49,7 +46,6 @@
         })
     }}
 {% endblock breadcrumbs %}
-
 {% block main %}
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -77,41 +73,44 @@
         {% endif %}
     {% endwith %}
     <h1 class="ons-u-fs-xl">Send instructions</h1>
-    <p>We will send an email to <strong>{{ email }}</strong> with instructions to access the following surveys:</p>
+    <p>
+        We will send an email to <strong>{{ email }}</strong> with instructions to access the following surveys:
+    </p>
     {% for business in share_dict %}
         <h2 class="ons-u-fs-m">{{ share_dict[business].name }}</h2>
         {% if share_dict[business] | length > 0 %}
-        <div class="ons-text-indent">
-            {% set surveyList = [] %}
-            {% for survey in share_dict[business].surveys %}
-                {% do surveyList.append(
+            <div class="ons-text-indent">
+{% set surveyList = [] %}
+                {% for survey in share_dict[business].surveys %}
+{% do surveyList.append(
                     {
                         "text": survey['longName']
                     }
                 ) %}
-            {% endfor %}
-            {{
+                {% endfor %}
+{{
                 onsList({
                     "variants": 'bare',
                     "itemsList": surveyList
                 })
             }}
-        </div>
+            </div>
         {% endif %}
     {% endfor %}
     <form action="" method="post">
-        {{ form.csrf_token }}
+{{ form.csrf_token }}
         <input type="hidden" name="email_address" value="{{ email }}"/>
         <div class="ons-field ons-u-mt-l">
             <div class="ons-btn-group">
-                {{
+{{
                     onsButton({
                         "text": "Send email",
                         "submitType": "timer"
                     })
                 }}
                 <a href="{{ url_for('account_bp.share_survey_email_entry') }}"
-                    role="button" class="ons-btn ons-btn--link ons-btn--secondary"><span class="ons-btn__inner">Cancel</span></a>
+                   role="button"
+                   class="ons-btn ons-btn--link ons-btn--secondary"><span class="ons-btn__inner">Cancel</span></a>
             </div>
         </div>
     </form>

@@ -24,12 +24,14 @@ lint:
 	pipenv run isort .
 	pipenv run black --line-length 120 .
 	pipenv run djlint .
+	pipenv run djlint . --check
 	pipenv run flake8
 
 lint-check: load-design-system-templates
 	pipenv check
 	pipenv run isort . --check-only
 	pipenv run black --line-length 120 --check .
+	pipenv run djlint .
 	pipenv run djlint . --check
 	pipenv run flake8
 

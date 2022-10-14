@@ -1,16 +1,13 @@
 {% extends "layouts/_block_content.html" %}
 {% from "components/button/_macro.njk" import onsButton %}
 {% from "components/input/_macro.njk" import onsInput %}
-
 {% set errorType = data['error']['type'] %}
 {% set errors = form['errors'] %}
-
 {% set page_title = "Create an account" %}
-
 {% block main %}
     {% if errorType or errors %}
-        {% set errorMsg = 'Enter a valid enrolment code' %}
-        {% set errorMsgText = { "text": errorMsg, "id": 'enrolment_code_error' } %}
+{% set errorMsg = 'Enter a valid enrolment code' %}
+{% set errorMsgText = { "text": errorMsg, "id": 'enrolment_code_error' } %}
         {% call
             onsPanel({
                 "type": "error",
@@ -18,9 +15,11 @@
                 "title": "This page has 1 error"
             })
         %}
-        <p>This <strong>must be corrected</strong> to continue.</p>
-        {% from "components/lists/_macro.njk" import onsList %}
-        {{
+            <p>
+                This <strong>must be corrected</strong> to continue.
+            </p>
+{% from "components/lists/_macro.njk" import onsList %}
+{{
             onsList({
                 "element": "ol",
                 "itemsList": [
@@ -34,16 +33,12 @@
         }}
         {% endcall %}
     {% endif %}
-
-    <form
-        method="post"
-        action="{{ url_for('register_bp.register') }}"
-        role="form">
-        {{ form.csrf_token }}
-
+    <form method="post"
+          action="{{ url_for('register_bp.register') }}"
+          role="form">
+{{ form.csrf_token }}
         <h1 class="ons-u-fs-xl">Create an account</h1>
-
-        {{
+{{
             onsInput({
                 "id": "enrolment_code",
                 "name": "enrolment_code",
@@ -55,8 +50,7 @@
                 "error": errorMsgText
             })
         }}
-
-        {{
+{{
             onsButton({
                 "text": "Continue",
                 "type": "submit",
@@ -66,5 +60,4 @@
             })
         }}
     </form>
-
 {% endblock main %}

@@ -21,9 +21,8 @@
         "id": "b-item-3"
     }
 ] %}
-
 {% block breadcrumbs %}
-    {{
+{{
         onsBreadcrumbs({
             "ariaLabel": "Breadcrumbs",
             "id": "breadcrumbs",
@@ -31,28 +30,26 @@
         })
     }}
 {% endblock breadcrumbs %}
-
 {% block main %}
-    {% set ns = namespace() %}
-    {% set ns.optionErrorMessage = 'You need to choose a business' %}
-    {% include "radio-option-select-error-panel.html" %}
-
+{% set ns = namespace() %}
+{% set ns.optionErrorMessage = 'You need to choose a business' %}
+{% include "radio-option-select-error-panel.html" %}
     <h1>For which businesses do you want to transfer your surveys?</h1>
-    {% set checkboxData = [] %}
+{% set checkboxData = [] %}
     <form action="" method="post">
-        {{ form.csrf_token }}
+{{ form.csrf_token }}
         {% if ns.optionError %}
-            {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
+{% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
         {% endif %}
-        {% set checkboxesData = {
+{% set checkboxesData = {
             "id": "option",
             "legend": "Select all that apply",
             "name": "option",
             "error": errorOption,
         } %}
-        {% set radios = [] %}
+{% set radios = [] %}
         {% for business in businesses %}
-            {% do checkboxData.append(
+{% do checkboxData.append(
                 {
                     "id": business['id']|string,
                     "name": "checkbox-answer",
@@ -63,16 +60,16 @@
                 }
             ) %}
         {% endfor %}
-        {% do checkboxesData | setAttribute("checkboxes", checkboxData) %}
-        {{ onsCheckboxes(checkboxesData) }}
+{% do checkboxesData | setAttribute("checkboxes", checkboxData) %}
+{{ onsCheckboxes(checkboxesData) }}
         <div class="ons-field ons-u-mt-l">
-            {{
+{{
                 onsButton({
                     "text": "Continue",
                     "submitType": "timer"
                 })
             }}
-            {{
+{{
                 onsButton({
                     "url": url_for('account_bp.transfer_survey_overview'),
                     "text": 'Cancel',
@@ -82,5 +79,4 @@
             }}
         </div>
     </form>
-
 {% endblock main %}

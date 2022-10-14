@@ -1,5 +1,4 @@
 {% set footer = {
-
     "OGLLink": {
         "pre": "All content is available under the",
         "link": "Open Government Licence v3.0",
@@ -7,9 +6,7 @@
         "post": ", except where otherwise stated"
     },
     "poweredBy": false
-
 } %}
-
 {% do footer | setAttribute("cols", [
     {
         "title": "Legal information",
@@ -59,5 +56,4 @@
         ]
     }
 ]) %}
-
 {% do pageConfig | setAttribute("footer", footer) %}

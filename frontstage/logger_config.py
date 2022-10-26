@@ -4,7 +4,7 @@ import sys
 from structlog import configure
 from structlog.processors import JSONRenderer, TimeStamper, format_exc_info
 from structlog.stdlib import LoggerFactory, add_log_level, filter_by_level
-from structlog.threadlocal import wrap_dict
+from structlog.contextvars import wrap_dict
 
 
 def logger_initial_config(log_level="INFO", logger_format="%(message)s", logger_date_format="%Y-%m-%dT%H:%M%s"):
@@ -27,7 +27,7 @@ def logger_initial_config(log_level="INFO", logger_format="%(message)s", logger_
         """
         if method_name == "warn":
             # The stdlib has an alias
-            method_name = "warning"
+            method_name = "warning" §
 
         event_dict["severity"] = method_name
         return event_dict

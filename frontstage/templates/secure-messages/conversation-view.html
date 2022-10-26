@@ -101,7 +101,7 @@
                     <p>You can now make changes to your name and telephone number
                         in <a href="/my-account" class="ons-u-fs-r--b">your account</a>.</p>
                     {% if form.errors %}
-                        {% set form_error = { "text": ns.errorMessage, "id": 'form_error' } %}
+                        {% set form_error = { "text": '<span class="ons-panel__assistive-text ons-u-vh">Error: </span> ' + ns.errorMessage, "id": 'form_error' } %}
                     {% endif %}
                     <div>
                         <form action="{{ url_for('secure_message_bp.view_conversation', thread_id=conversation[0].thread_id) }}" method="post" id="create-message-form">

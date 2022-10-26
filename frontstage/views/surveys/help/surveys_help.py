@@ -99,19 +99,27 @@ def get_surveys_help_page(session):
     flask_session["help_survey_ref"] = request.args.get("survey_ref", None)
     flask_session["help_ru_ref"] = request.args.get("ru_ref", None)
     abort_help_if_session_not_set()
-    return redirect(
-        url_for(
-            "surveys_bp.get_help_page",
-        )
-    )
+    return redirect(url_for("surveys_bp.help_page",))
 
 
-@surveys_bp.route("/help", methods=["GET"])
+@surveys_bp.route("/help", methods=["GET", "POST"])
 @jwt_authorization(request)
-def get_help_page(session):
-    """Gets Survey Help page provided survey_ref and ru_ref are in session"""
+def help_page(session):
+    """Get survey help page provided survey_ref and ru_ref are in session and post help completing this survey option for respective survey"""
     abort_help_if_session_not_set()
     business_id, ru_ref, short_name, survey, survey_ref = get_selected_survey_business_details()
+    page_title = "Help"
+    form = HelpOptionsForm(request.values)
+    if request.method == "POST":
+        if form.validate():
+            option = form.data["option"]
+            if option == "help-with-my-account":
+                return redirect(url_for("account_bp.get_account"))
+            return redirect(url_for("surveys_bp.get_help_option_select", option=option))
+        else:
+            flash("You need to choose an option")
+            page_title = "Error: Help"
+
     return render_template(
         "surveys/help/surveys-help.html",
         form=HelpOptionsForm(),
@@ -120,30 +128,8 @@ def get_help_page(session):
         business_id=business_id,
         survey_ref=survey_ref,
         ru_ref=ru_ref,
+        page_title=page_title,
     )
-
-
-@surveys_bp.route("/help", methods=["POST"])
-@jwt_authorization(request)
-def post_help_page(session):
-    """Post help completing this survey option for respective survey"""
-    abort_help_if_session_not_set()
-    business_id, ru_ref, short_name, survey, survey_ref = get_selected_survey_business_details()
-    form = HelpOptionsForm(request.values)
-    if form.validate():
-        option = form.data["option"]
-        if option == "help-with-my-account":
-            return redirect(url_for("account_bp.get_account"))
-        return redirect(url_for("surveys_bp.get_help_option_select", option=option))
-    else:
-        flash("You need to choose an option")
-        return redirect(
-            url_for(
-                "surveys_bp.get_help_page",
-                survey_ref=survey_ref,
-                ru_ref=ru_ref,
-            )
-        )
 
 
 @surveys_bp.route("/help/<option>", methods=["GET"])

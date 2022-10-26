@@ -4,7 +4,8 @@
 {% from "components/radios/_macro.njk" import onsRadios %}
 {% from "components/button/_macro.njk" import onsButton %}
 
-{% set page_title = "Account details" %}
+{% set ns = namespace() %}
+{% set page_title = 'Error: Account details' if ns.optionError else 'Account details hello' %}
 {% set breadcrumbsData = [
     {
         "text": "Surveys",
@@ -23,7 +24,6 @@
 {% endblock breadcrumbs %}
 
 {% block main %}
-    {% set ns = namespace() %}
     {% include "radio-option-select-error-panel.html" %}
     <h1 class="ons-u-fs-xl">Account details</h1>
     <dl class="ons-metadata ons-metadata__list ons-grid ons-grid--gutterless ons-u-cf ons-u-mb-l" title="" aria-label="">

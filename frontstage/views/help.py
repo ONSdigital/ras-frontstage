@@ -33,7 +33,7 @@ def help():
 
 @help_bp.route("/", methods=["GET"])
 def help_get():
-    return render_template("help/help.html", form=HelpForm())
+    return render_template("help/help.html", form=HelpForm(), page_title="Help")
 
 
 @help_bp.route("/", methods=["POST"])
@@ -43,12 +43,12 @@ def help_submit():
         return redirect(url_for(form_redirect_mapper.get(form.data["option"])))
     else:
         flash("At least one option should be selected.")
-        return redirect(url_for("help_bp.help_get"))
+        return render_template("help/help.html", form=HelpForm(), page_title="Error: Help")
 
 
 @help_bp.route("/info-ons", methods=["GET"])
 def info_ons_get():
-    return render_template("help/help-info-ons.html", form=HelpInfoOnsForm())
+    return render_template("help/help-info-ons.html", form=HelpInfoOnsForm(), page_title="Help info ONS")
 
 
 @help_bp.route("/info-ons", methods=["POST"])
@@ -58,12 +58,12 @@ def info_ons_submit():
         return render_template(form_render_page_mapper.get(form.data["option"]))
     else:
         flash("At least one option should be selected.")
-        return redirect(url_for("help_bp.info_ons_get"))
+        return render_template("help/help-info-ons.html", form=HelpInfoOnsForm(), page_title="Error: Help info ONS")
 
 
 @help_bp.route("/help-with-my-password", methods=["GET"])
 def help_with_password_get():
-    return render_template("help/help-with-password.html", form=HelpPasswordForm())
+    return render_template("help/help-with-password.html", form=HelpPasswordForm(), page_title="Help with my password")
 
 
 @help_bp.route("/help-with-my-password", methods=["POST"])
@@ -73,7 +73,8 @@ def help_with_password_submit():
         return render_template(form_render_page_mapper.get(form.data["option"]))
     else:
         flash("At least one option should be selected.")
-        return redirect(url_for("help_bp.help_with_password_get"))
+        return render_template("help/help-with-password.html", form=HelpPasswordForm(),
+                               page_title="Error: Help with my password")
 
 
 @help_bp.route("/something-else", methods=["GET"])

@@ -27,7 +27,7 @@ def logger_initial_config(log_level="INFO", logger_format="%(message)s", logger_
         """
         if method_name == "warn":
             # The stdlib has an alias
-            method_name = "warning" §
+            method_name = "warning"
 
         event_dict["severity"] = method_name
         return event_dict

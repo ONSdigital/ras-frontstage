@@ -18,8 +18,8 @@ redis = "*"
 requests = "*"
 structlog = "*"
 iso8601 = "*"
-cryptography = "*"
-sdc-cryptography = "==1.1.0"
+cryptography = "==36.0.1"
+sdc-cryptography = "*"
 greenlet = "*"
 dateutils = "*"
 requestsdefaulter = "*"
@@ -30,7 +30,6 @@ google-cloud-pubsub = "*"
 google-cloud-storage = "*"
 python-gnupg = "*"
 werkzeug = "*"
-jwcrypto = "==1.0"
 
 
 [dev-packages]

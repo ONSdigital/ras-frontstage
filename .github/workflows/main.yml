@@ -54,10 +54,10 @@ jobs:
           python-version: '3.10'
       - name: Build
         run: |
+          openssl version
           python -m pip install --upgrade pip
           pip install pipenv
           pipenv install --dev
-          openssl version
       - name: Load Design System templates
         run: |
           make load-design-system-templates

@@ -30,6 +30,7 @@ google-cloud-pubsub = "*"
 google-cloud-storage = "*"
 python-gnupg = "*"
 werkzeug = "*"
+wheel = "==0.38.0"
 
 [dev-packages]
 black = "*"

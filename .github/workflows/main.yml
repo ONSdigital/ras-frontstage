@@ -57,6 +57,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pipenv
           pipenv install --dev
+          openssl version
       - name: Load Design System templates
         run: |
           make load-design-system-templates

@@ -3,7 +3,8 @@
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/radios/_macro.njk" import onsRadios %}
 {% from "components/button/_macro.njk" import onsButton %}
-{% set ns = namespace() %}
+
+{% set page_title = page_title + "Help" %}
 
 {% set breadcrumbsData = [
     {
@@ -24,6 +25,7 @@
 {% endblock breadcrumbs %}
 
 {% block main %}
+    {% set ns = namespace() %}
     {% include "radio-option-select-error-panel.html" %}
 
     <h1 class="ons-u-fs-xl">Help</h1>

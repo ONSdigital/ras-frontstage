@@ -1,11 +1,11 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "b2d7f7b305c68db7b1d82bf7e3908888b5027f350d144681364e19b6279cf76f"
+            "sha256": "cfd8ebd93d61d9348328c7a2d44190c1b9cd3857b3d19ff857cd5fe411af46c6"
         },
         "pipfile-spec": 6,
         "requires": {
-            "python_version": "3.10"
+            "python_version": "3.11"
         },
         "sources": [
             {
@@ -293,6 +293,7 @@
         },
         "google-auth": {
             "hashes": [
+                "sha256:ccaa901f31ad5cbb562615eb8b664b3dd0bf5404a67618e642307f00613eda4d",
                 "sha256:f5d8701633bebc12e0deea4df8abd8aff31c28b355360597f7f2ee60f2e4d016"
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5'",

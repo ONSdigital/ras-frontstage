@@ -39,7 +39,7 @@ option_template_title_mapping = {
     "help-completing-this-survey": "Help completing this survey",
     "info-about-this-survey": "Help information about this survey",
     "info-about-the-ons": "Help information about the ONS",
-    "something-else": "Help something else",
+    "something-else": "Help with something else",
 }
 sub_option_template_url_mapping = {
     "do-not-have-specific-figures": "surveys/help/surveys-help-specific-figure-for-response.html",

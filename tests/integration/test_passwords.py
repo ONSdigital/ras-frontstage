@@ -24,7 +24,6 @@ url_resend_password_email_expired_token = (
 url_password_reset_counter = f"{app.config['PARTY_URL']}/party-api/v1/respondents/123456/password-reset-counter"
 
 
-# noinspection DuplicatedCode
 class TestPasswords(unittest.TestCase):
     def setUp(self):
         app.testing = True

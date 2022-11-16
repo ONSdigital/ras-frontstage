@@ -62,7 +62,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         response = self.app.post("/surveys/help", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Information about the ONS".encode(), response.data)
+        self.assertIn("Help with something else".encode(), response.data)
         self.assertIn("Choose an option".encode(), response.data)
         self.assertIn("My survey is not listed".encode(), response.data)
         self.assertIn("Something else".encode(), response.data)

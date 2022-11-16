@@ -33,45 +33,44 @@ def help():
 
 @help_bp.route("/", methods=["GET", "POST"])
 def help_page():
+    page_title = "Help"
     form = HelpForm(request.values)
     if request.method == "POST":
         if form.validate():
             return redirect(url_for(form_redirect_mapper.get(form.data["option"])))
         else:
             flash("At least one option should be selected.")
-            return render_template("help/help.html", form=HelpForm(), page_title="Error: Help")
-    else:
-        return render_template("help/help.html", form=HelpForm(), page_title="Help")
+            page_title = "Error: " + page_title
+
+    return render_template("help/help.html", form=HelpForm(), page_title=page_title)
 
 
 @help_bp.route("/info-ons", methods=["GET", "POST"])
-def info_ons_submit():
+def info_ons_page():
+    page_title = "Help info ONS"
     form = HelpInfoOnsForm(request.values)
     if request.method == "POST":
         if form.validate():
             return render_template(form_render_page_mapper.get(form.data["option"]))
         else:
             flash("At least one option should be selected.")
-            return render_template("help/help-info-ons.html", form=HelpInfoOnsForm(), page_title="Error: Help info ONS")
-    else:
-        return render_template("help/help-info-ons.html", form=HelpInfoOnsForm(), page_title="Help info ONS")
+            page_title = "Error: " + page_title
+
+    return render_template("help/help-info-ons.html", form=HelpInfoOnsForm(), page_title=page_title)
 
 
 @help_bp.route("/help-with-my-password", methods=["GET", "POST"])
 def help_with_password_page():
+    page_title = "Help with my password"
     form = HelpPasswordForm(request.values)
     if request.method == "POST":
         if form.validate():
             return render_template(form_render_page_mapper.get(form.data["option"]))
         else:
             flash("At least one option should be selected.")
-            return render_template(
-                "help/help-with-password.html", form=HelpPasswordForm(), page_title="Error: Help with my password"
-            )
-    else:
-        return render_template(
-            "help/help-with-password.html", form=HelpPasswordForm(), page_title="Help with my password"
-        )
+            page_title = "Error: " + page_title
+
+    return render_template("help/help-with-password.html", form=HelpPasswordForm(), page_title=page_title)
 
 
 @help_bp.route("/something-else", methods=["GET"])

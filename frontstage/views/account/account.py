@@ -35,25 +35,25 @@ form_redirect_mapper = {
 }
 
 
-@account_bp.route("/", methods=["GET"])
+@account_bp.route("/", methods=["GET", "POST"])
 @jwt_authorization(request)
-def get_account(session):
-    form = OptionsForm()
+def account(session):
+    page_title = "Account details"
     party_id = session.get_party_id()
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
-    return render_template("account/account.html", form=form, respondent=respondent_details)
 
-
-@account_bp.route("/", methods=["POST"])
-@jwt_authorization(request)
-def update_account(session):
-    form = OptionsForm()
-    form_valid = form.validate()
-    if not form_valid:
-        flash("You need to choose an option")
-        return redirect(url_for("account_bp.get_account"))
+    if request.method == "POST":
+        form = OptionsForm()
+        form_valid = form.validate()
+        if not form_valid:
+            flash("You need to choose an option")
+            page_title = "Error: " + page_title
+        else:
+            return redirect(url_for(form_redirect_mapper.get(form.data["option"])))
     else:
-        return redirect(url_for(form_redirect_mapper.get(form.data["option"])))
+        form = OptionsForm()
+
+    return render_template("account/account.html", form=form, respondent=respondent_details, page_title=page_title)
 
 
 @account_bp.route("/change-password", methods=["GET", "POST"])

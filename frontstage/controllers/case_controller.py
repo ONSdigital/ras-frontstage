@@ -172,7 +172,7 @@ def get_eq_url(version, case, collection_exercise, party_id, business_party_id, 
     start = time.perf_counter()
     encrypter = Encrypter(json_secret_keys)
     finish = time.perf_counter()
-    print(f"timer ---- {finish - start:0.4f} seconds")
+    print(f"encrypter ---- {finish - start:0.4f} seconds")
 
     if version == "v2":
         token = encrypter.encrypt(payload, "eq")

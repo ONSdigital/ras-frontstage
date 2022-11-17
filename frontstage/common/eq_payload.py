@@ -32,6 +32,7 @@ class EqPayload(object):
         :returns: Payload for EQ
         """
 
+        start = time.perf_counter()
         tx_id = str(uuid.uuid4())
         logger.info("Creating payload for JWT", case_id=case["id"], tx_id=tx_id)
 
@@ -101,6 +102,8 @@ class EqPayload(object):
             )
 
         logger.debug(payload)
+        finish = time.perf_counter()
+        print(f"timer ---- {finish - start:0.4f} seconds")
 
         return payload
 

@@ -1,7 +1,7 @@
 import logging
+import time
 
 import requests
-import time
 from flask import abort
 from flask import current_app as app
 from structlog import wrap_logger

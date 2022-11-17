@@ -59,6 +59,8 @@ class TestSurveyList(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         response = self.app.post("/my-account", data={"option": None}, follow_redirects=True)
+        self.assertIn("Error: ".encode(), response.data)
+        self.assertIn('<span class="ons-panel__assistive-text ons-u-vh">Error: </span>'.encode(), response.data)
         self.assertIn("You need to choose an option".encode(), response.data)
 
     @requests_mock.mock()

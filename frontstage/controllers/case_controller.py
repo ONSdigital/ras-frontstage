@@ -1,6 +1,7 @@
 import logging
 
 import requests
+import time
 from flask import abort
 from flask import current_app as app
 from structlog import wrap_logger
@@ -167,7 +168,11 @@ def get_eq_url(version, case, collection_exercise, party_id, business_party_id, 
     payload = EqPayload().create_payload(case, collection_exercise, party_id, business_party_id, survey, version)
 
     json_secret_keys = app.config["JSON_SECRET_KEYS"]
+
+    start = time.perf_counter()
     encrypter = Encrypter(json_secret_keys)
+    finish = time.perf_counter()
+    print(f"timer ---- {finish - start:0.4f} seconds")
 
     if version == "v2":
         token = encrypter.encrypt(payload, "eq")

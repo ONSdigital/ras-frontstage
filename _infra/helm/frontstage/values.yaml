@@ -56,14 +56,6 @@ security:
     protected: true
     timeLimit: 7200
 
-resources:
-  requests:
-    cpu: "150m"
-    memory: "400Mi"
-  limits:
-    cpu: "300m"
-    memory: "800Mi"
-
 autoscaling: false
 scaleAt:
   # These are expressed as a percentage of resources.requests, not resources.limits

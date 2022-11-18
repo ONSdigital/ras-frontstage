@@ -175,11 +175,15 @@ def get_eq_url(version, case, collection_exercise, party_id, business_party_id, 
     print(f"encrypter ---- {finish - start:0.4f} seconds")
 
     if version == "v2":
+        start_encrypt = time.perf_counter()
         token = encrypter.encrypt(payload, "eq")
         eq_url = app.config["EQ_URL"] + token
     elif version == "v3":
+        start_encrypt = time.perf_counter()
         token = encrypter.encrypt(payload, "eq_v3")
         eq_url = app.config["EQ_V3_URL"] + token
+    finish_encrypt = time.perf_counter()
+    print(f"encrypt ---- {finish_encrypt - start_encrypt:0.4f} seconds")
 
     category = "EQ_LAUNCH"
     ci_id = case["collectionInstrumentId"]

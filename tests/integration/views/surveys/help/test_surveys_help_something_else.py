@@ -92,6 +92,23 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
     @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
+    def test_survey_help_info_bricks_with_no_option_select(self, mock_request, get_survey, get_business):
+        mock_request.get(url_banner_api, status_code=404)
+        get_survey.return_value = survey
+        get_business.return_value = business_party
+        form = {}
+        self.set_flask_session()
+        response = self.app.post("/surveys/help/something-else", data=form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Error: ".encode(), response.data)
+        self.assertIn('<span class="ons-panel__assistive-text ons-u-vh">Error: </span>'.encode(), response.data)
+        self.assertIn("There is 1 error on this page".encode(), response.data)
+        self.assertIn("You need to choose an option".encode(), response.data)
+
+    @requests_mock.mock()
+    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
+    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
     def test_survey_help_info_bricks_with_sub_option_something_else(self, mock_request, get_survey, get_business):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey

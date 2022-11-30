@@ -2,7 +2,6 @@
 {% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/button/_macro.njk" import onsButton %}
 
-{% set page_title = "Help with penalties" %}
 {% set breadcrumbsData = [
     {
         "text": "Surveys",
@@ -33,18 +32,18 @@
 {% block main %}
     <h1 class="ons-u-fs-xl">Are there penalties for not completing this survey?</h1>
     {% if inside_legal_basis %}
-        <p>You are required by law to complete it. We want to work with you to help you meet this legal requirement. <a href="{{ url_for('surveys_bp.get_send_help_message_page', short_name=short_name, option=option, sub_option='penalties', business_id=business_id, survey_ref=survey_ref, ru_ref=ru_ref) }}">Send us a message</a> and we can advise.</p>
+        <p>You are required by law to complete it. We want to work with you to help you meet this legal requirement. <a href="{{ url_for('surveys_bp.send_help_message', short_name=short_name, option=option, sub_option='penalties', business_id=business_id, survey_ref=survey_ref, ru_ref=ru_ref) }}">Send us a message</a> and we can advise.</p>
         <p>If you do not contact us or complete and return by the deadline, penalties may be incurred resulting in a fine of up to £2,500 (under section 4 of the Statistics of Trade Act 1947, last updated by section 17 of the Criminal Justice Act 1991).</p>
         <p>You will still need to complete the survey.</p>
     {% else %}
         <p>Your information is crucial to make sure we produce statistics that best reflect the status of the UK economy. There is no legal obligation to complete this survey, however your participation ensures your industry, and businesses like yours, are represented in the statistics we produce.</p>
-        <p><a href="{{ url_for('surveys_bp.get_send_help_message_page', short_name=short_name, option=option, sub_option='penalties', business_id=business_id, survey_ref=survey_ref, ru_ref=ru_ref) }}">Send us a message</a> if you need further information.</p>
+        <p><a href="{{ url_for('surveys_bp.send_help_message', short_name=short_name, option=option, sub_option='penalties', business_id=business_id, survey_ref=survey_ref, ru_ref=ru_ref) }}">Send us a message</a> if you need further information.</p>
     {% endif %}
     <h2>Did this answer your question?</h2>
     <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" role="button" class="ons-btn ons-btn--link ons-js-submit-btn">
         <span class="ons-btn__inner">Yes</span>
     </a>
-    <a href="{{ url_for('surveys_bp.get_send_help_message_page', option=option, sub_option='penalties') }}" role="button" class="ons-btn ons-btn--link ons-btn--secondary">
+    <a href="{{ url_for('surveys_bp.send_help_message', option=option, sub_option='penalties') }}" role="button" class="ons-btn ons-btn--link ons-btn--secondary">
         <span class="ons-btn__inner">No</span>
     </a>
 {% endblock main %}

@@ -63,6 +63,8 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         response = self.app.post("/surveys/help", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
+        self.assertIn("Error: ".encode(), response.data)
+        self.assertIn('<span class="ons-panel__assistive-text ons-u-vh">Error: </span>'.encode(), response.data)
         self.assertIn("There is 1 error on this page".encode(), response.data)
         self.assertIn("You need to choose an option".encode(), response.data)
 
@@ -233,6 +235,8 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
+        self.assertIn("Error: ".encode(), response.data)
+        self.assertIn('<span class="ons-panel__assistive-text ons-u-vh">Error: </span>'.encode(), response.data)
         self.assertIn("There is 1 error on this page".encode(), response.data)
         self.assertIn("Message is required".encode(), response.data)
         self.assertIn("Send a message".encode(), response.data)

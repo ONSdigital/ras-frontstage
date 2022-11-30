@@ -4,8 +4,6 @@
 {% from "components/radios/_macro.njk" import onsRadios %}
 {% from "components/button/_macro.njk" import onsButton %}
 
-{% set page_title = "Help" %}
-
 {% set breadcrumbsData = [
     {
         "text": "Surveys",
@@ -30,7 +28,7 @@
 
     <h1 class="ons-u-fs-xl">Help</h1>
 
-    <form action="{{ url_for('surveys_bp.post_help_page', short_name=short_name, business_id=business_id, survey_ref=survey_ref, ru_ref=ru_ref)}}" method="post">
+    <form action="{{ url_for('surveys_bp.help_page', short_name=short_name, business_id=business_id, survey_ref=survey_ref, ru_ref=ru_ref)}}" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         {% if ns.optionError %}
             {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}

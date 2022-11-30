@@ -2,7 +2,6 @@
 {% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/button/_macro.njk" import onsButton %}
 
-{% set page_title = "Help with how long selected for" %}
 {% set breadcrumbsData = [
     {
         "text": "Surveys",
@@ -40,7 +39,7 @@
         You should <a href="{{ url_for('surveys_bp.add_survey') }}">add the new survey to your account</a> using the code in the letter.</p>
     <p>
         {% if is_survey_help_page is defined and  is_survey_help_page %}
-        <a href="{{ url_for('surveys_bp.get_send_help_message_page', option=option, sub_option='my-survey-is-not-listed') }}"> Send us a message</a>
+        <a href="{{ url_for('surveys_bp.send_help_message', option=option, sub_option='my-survey-is-not-listed') }}"> Send us a message</a>
         {% else %}
         <a href="{{ url_for('surveys_bp.get_send_help_technical_message_page', option=option) }}"> Send us a message</a>
         {% endif %} if you have not received the enrolment letter.</p>
@@ -51,7 +50,7 @@
         <span class="ons-btn__inner">Yes</span>
     </a>
     {% if is_survey_help_page is defined and is_survey_help_page %}
-        <a href="{{ url_for('surveys_bp.get_send_help_message_page', option=option, sub_option='my-survey-is-not-listed') }}" role="button" class="ons-btn ons-btn--link ons-btn--secondary">
+        <a href="{{ url_for('surveys_bp.send_help_message', option=option, sub_option='my-survey-is-not-listed') }}" role="button" class="ons-btn ons-btn--link ons-btn--secondary">
             <span class="ons-btn__inner">No</span>
         </a>
     {% else %}

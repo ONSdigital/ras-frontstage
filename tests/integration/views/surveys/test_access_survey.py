@@ -193,31 +193,7 @@ class TestAccessSurvey(unittest.TestCase):
         self.assertTrue("An error has occurred".encode() in response.data)
 
     def test_generate_eq_url(self, mock_request):
-        # Given all external services are mocked and we have an EQ collection instrument
-        mock_request.get(url_get_case, json=case)
-        mock_request.get(url_get_collection_exercise, json=collection_exercise)
-        mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
-        mock_request.get(url_get_business_party, json=business_party)
-        mock_request.get(url_get_survey_by_short_name_eq, json=survey_eq)
-        mock_request.get(url_get_ci, json=collection_instrument_eq)
-        mock_request.get(url_get_case_categories, json=categories)
-        mock_request.post(url_post_case_event_uuid, status_code=201)
-        mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_banner_api, status_code=404)
-
-        # When the generate-eq-url is called
-        response = self.app.get(
-            f"/surveys/access-survey?case_id={case['id']}&business_party_id={business_party['id']}"
-            f"&survey_short_name={survey_eq['shortName']}&ci_type=EQ",
-            headers=self.headers,
-        )
-
-        # An eq url is generated
-        self.assertEqual(response.status_code, 302)
-        self.assertIn("https://eq-test/session?token=", response.location)
-
-    def test_generate_eq_url_v3(self, mock_request):
-        # Given all external services are mocked and we have an EQ collection instrument
+        # Given all external services are mocked, and we have an EQ collection instrument
         mock_request.get(url_get_case, json=case)
         mock_request.get(url_get_collection_exercise, json=collection_exercise_v3)
         mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)

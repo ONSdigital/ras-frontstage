@@ -23,10 +23,13 @@
 
 <p>
     {{ survey_info.shortName }} spreadsheet for <strong>{{ business_info.name }}</strong>
-    for the period {{ collection_exercise_info.userDescription }}
 </p>
 
+<p>Please download the correct spreadsheet for the period {{ collection_exercise_info.userDescription }} by using the "Download spreadsheet" button.</p>
+
 <p>If actual figures are not available, please provide informed estimates.</p>
+
+<p><b>Do not use an older version as we will not be able to process your data.</b></p>
 
 {{
     onsButton({
@@ -72,6 +75,10 @@
     }}
 {% endcall %}
 <p class="ons-u-fs-r--b icon--lock">We will treat your data securely and confidentially</p>
+
+<p>Please upload the correct version of the file for the period {{ collection_exercise_info.userDescription }}</p>
+
+<p><b>Do not upload an older version as we will not be able to process your data.</b></p>
 
 {% include "surveys/surveys-upload-file-picker.html" %}
 

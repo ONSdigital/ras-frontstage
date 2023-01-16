@@ -362,9 +362,9 @@ class TestPasswords(unittest.TestCase):
             response.data,
         )
 
-    # This takes 10 minutes locally
     @requests_mock.mock()
-    def test_reset_password_reset_counter(self, mock_request):
+    @patch("frontstage.controllers.notify_controller.NotifyGateway.request_to_notify")
+    def test_reset_password_reset_counter(self, mock_request, mock_notify):
         token = "InRlc3RAZW1haWwuY29tIg.YlARnw.8hj0e_lcI_Wq5y0iHYbvDxHnio0"
         mock_request.get(url_banner_api, status_code=404)
         mock_request.post(url_reset_password_request, status_code=200)
@@ -388,6 +388,7 @@ class TestPasswords(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Check your email".encode(), response.data)
+        mock_notify.assert_called_once()
 
     @requests_mock.mock()
     def test_reset_password_reset_counter_party_fail(self, mock_request):

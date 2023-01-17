@@ -17,9 +17,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 class EqPayload(object):
-    def create_payload(
-        self, case, collection_exercise, party_id: str, business_party_id: str, survey, version: str
-    ) -> dict:
+    def create_payload(self, case, collection_exercise, party_id: str, business_party_id: str, survey) -> dict:
         """
         Creates the payload needed to communicate with EQ, built from the Case, Collection Exercise, Party,
         Survey and Collection Instrument services
@@ -28,7 +26,6 @@ class EqPayload(object):
         :param party_id: The uuid of the respondent
         :param business_party_id: The uuid of the reporting unit
         :param survey: A dict containing information about the survey
-        :param version: EQ version
         :returns: Payload for EQ
         """
 
@@ -66,6 +63,7 @@ class EqPayload(object):
         account_service_log_out_url = current_app.config["ACCOUNT_SERVICE_LOG_OUT_URL"]
         iat = time.time()
         exp = time.time() + (5 * 60)
+        response_id = f"{party['sampleUnitRef'] + party['checkletter']}{collection_exercise['id']}{eq_id}{form_type}"
 
         payload = {
             "jti": str(uuid.uuid4()),
@@ -86,19 +84,11 @@ class EqPayload(object):
             "account_service_url": account_service_url,
             "account_service_log_out_url": account_service_log_out_url,
             "trad_as": f"{party['tradstyle1']} {party['tradstyle2']} {party['tradstyle3']}",
+            "response_id": response_id,
         }
 
         # Add any non null event dates that exist for this collection exercise
         payload.update([(key, value) for key, value in collex_event_dates.items() if value is not None])
-
-        # Add response_id for v3
-        if version == "v3":
-            payload.update(
-                {
-                    "response_id": f"{party['sampleUnitRef'] + party['checkletter']}"
-                    f"{collection_exercise['id']}{eq_id}{form_type}"
-                }
-            )
 
         logger.debug(payload)
 

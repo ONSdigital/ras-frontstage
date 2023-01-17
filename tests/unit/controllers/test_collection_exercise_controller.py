@@ -50,6 +50,19 @@ class TestCollectionExerciseController(unittest.TestCase):
                         self.app_config["BASIC_AUTH"],
                     )
 
+    def test_get_collection_exercises_for_survey_no_exercises(self):
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.GET, url_get_collection_exercises_by_survey, status=204)
+
+            with app.app_context():
+                collection_exercises = collection_exercise_controller.get_collection_exercises_for_survey(
+                    collection_exercise["surveyId"],
+                    self.app_config["COLLECTION_EXERCISE_URL"],
+                    self.app_config["BASIC_AUTH"],
+                )
+
+                self.assertListEqual(collection_exercises, [])
+
     def test_convert_events_to_new_format_successful(self):
         formatted_events = collection_exercise_controller.convert_events_to_new_format(collection_exercise["events"])
 

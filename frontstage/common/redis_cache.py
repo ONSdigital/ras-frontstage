@@ -19,10 +19,10 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 class RedisCache:
-    SURVEY_CATEGORY_EXPIRY = 600  # 10 mins
-    COLLECTION_INSTRUMENT_CATEGORY_EXPIRY = 600  # 10 mins
-    BUSINESS_PARTY_CATEGORY_EXPIRY = 600  # 10 mins
-    COLLECTION_EXERCISE_CATEGORY_EXPIRY = 600  # 10 mins
+    SURVEY_CATEGORY_EXPIRY = 3000  # 10 mins
+    COLLECTION_INSTRUMENT_CATEGORY_EXPIRY = 3000  # 10 mins
+    BUSINESS_PARTY_CATEGORY_EXPIRY = 3000  # 10 mins
+    COLLECTION_EXERCISE_CATEGORY_EXPIRY = 3000  # 10 mins
 
     def get_survey(self, key):
         """

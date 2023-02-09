@@ -119,6 +119,11 @@ class DevelopmentConfig(Config):
 
 
 class TestingConfig(DevelopmentConfig):
+
+
+    FAKE_REDIS_PORT = os.getenv("FAKE_REDIS_PORT", 6380)
+
+
     TESTING = True
     DEVELOPMENT = False
     WTF_CSRF_ENABLED = False

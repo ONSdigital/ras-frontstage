@@ -1,3 +1,4 @@
+import fakeredis as fakeredis
 import redis
 from flask import render_template
 from flask_talisman import Talisman
@@ -48,6 +49,10 @@ talisman = Talisman(
     frame_options="DENY",
 )
 redis = redis.Redis(host=app.config["REDIS_HOST"], port=app.config["REDIS_PORT"], db=app.config["REDIS_DB"])
+if app.config["TESTING"]:
+    redis = fakeredis.FakeRedis(
+        host=app.config["REDIS_HOST"], port=app.config["FAKE_REDIS_PORT"], db=app.config["REDIS_DB"]
+    )
 
 app.jinja_env.undefined = ChainableUndefined
 app.jinja_env.add_extension("jinja2.ext.do")

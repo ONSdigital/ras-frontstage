@@ -10,5 +10,4 @@ privacy_bp = Blueprint("privacy_bp", __name__, static_folder="static", template_
 
 @privacy_bp.route("/", methods=["GET"])
 def privacy():
-
     return render_template("privacy-and-data-protection.html")

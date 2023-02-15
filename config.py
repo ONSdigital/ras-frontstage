@@ -140,4 +140,3 @@ class TestingConfig(DevelopmentConfig):
     SECURE_APP = bool(strtobool(os.getenv("SECURE_APP", "False")))
     ACCESS_CONTROL_ALLOW_ORIGIN = os.getenv("ACCESS_CONTROL_ALLOW_ORIGIN", "http://localhost")
     UNDER_MAINTENANCE = bool(strtobool(os.getenv("UNDER_MAINTENANCE", "False")))
-    FAKE_REDIS_PORT = os.getenv("FAKE_REDIS_PORT", 6380)

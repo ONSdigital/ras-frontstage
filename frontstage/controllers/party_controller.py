@@ -1,9 +1,7 @@
-import datetime
 import json
 import logging
 
 import requests
-from dateutil.parser import parse
 from flask import current_app as app
 from structlog import wrap_logger
 from werkzeug.exceptions import NotFound
@@ -373,11 +371,11 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
     ones that require action (in the form of an EQ or SEFT submission); Or they will be cases that have been completed
     and are used to see what has been submitted in the past.
 
-    This function uses threads and caching to get data from Case, Party, Collection exercise, Survey and
+    This function uses caching to get data from Case, Party, Collection exercise, Survey and
     Collection Instrument services. Without this, respondents with a large number of cases can experience page timeouts
     as it'll take too long to load due to repeated calls for the same information from the services.
 
-    There isn't a direct link between respondent and the cases they're involved in.  Instead we can work out what
+    There isn't a direct link between respondent and the cases they're involved in.  Instead, we can work out what
     cases they're involved in via an implicit and indirect link between:
         - The combination of survey and business a respondent is enrolled for, and;
         - the cases and collection exercises the business is involved in
@@ -386,7 +384,7 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
       - Get all survey enrolments for the respondent
       - For each enrolment:
           - Get the business details the enrolment is for
-          - Get the live-but-not-ended collection exercises for the survey the enrolment is for
+          - Get the live collection exercises for the survey the enrolment is for
           - Get the cases the business is part of, from the list of collection exercises. Note, this isn't every case
             against the business; depending on if you're looking at the to-do or history page, you'll get a different
             subset of them.
@@ -424,12 +422,7 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
         business_party = redis_cache.get_business_party(enrolment["business_id"])
         survey = redis_cache.get_survey(enrolment["survey_id"])
 
-        # Note: If it ever becomes possible to get only live-but-not-ended collection exercises from the
-        # collection exercise service, the filter_ended_collection_exercises function will no longer
-        # be needed as we can request what we want instead of having to filter what we get.
-
-        live_collection_exercises = filter_ended_collection_exercises(collection_exercises[enrolment["survey_id"]])
-
+        live_collection_exercises = collection_exercises[enrolment["survey_id"]]
         collection_exercises_by_id = dict((ce["id"], ce) for ce in live_collection_exercises)
         cases_for_business = cache_data["cases"][business_party["id"]]
 
@@ -470,22 +463,6 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
                 "added_survey": added_survey,
                 "display_button": display_access_button,
             }
-
-
-def filter_ended_collection_exercises(collection_exercises: dict) -> list:
-    """
-    Takes the list of collection exercises and returns a list with all the ones that don't have a
-    scheduledEndDateTime that is in the past. If a collection exercise is missing a scheduledEndDateTime
-    attribute then it is also removed from the list.
-
-    :param collection_exercises: A list of dictionaries containing collection exercises
-    """
-    return [
-        ce
-        for ce in collection_exercises
-        if ce.get("scheduledEndDateTime")
-        and parse(ce.get("scheduledEndDateTime")) > datetime.datetime.now(datetime.timezone.utc)
-    ]
 
 
 def get_case(cache_data, business_id, case_url, case_auth, tag):

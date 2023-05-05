@@ -78,7 +78,7 @@
     {% if expires_at %}
         {{
             onsTimeoutModal ({
-                    "showModalTimeInSeconds": 55,
+                    "showModalTimeInSeconds": 60,
                     "redirectUrl": url_for("sign_in_bp.login"),
                     "sessionExpiresAt": expires_at,
                     "serverSessionExpiryEndpoint": url_for("session.session_expires_at"),

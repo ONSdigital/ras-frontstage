@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, timezone
 
 from flask import abort
 from flask import current_app as app
@@ -86,6 +87,7 @@ def add_survey_submit(session):
         party_id=party_id,
         enrolment_code=enrolment_code,
     )
+
     return redirect(
         url_for(
             "surveys_bp.get_survey_list",
@@ -95,6 +97,7 @@ def add_survey_submit(session):
             survey_id=added_survey_id,
             tag="todo",
             already_enrolled=already_enrolled,
+            expires_at=session.get_formatted_expires_in(),
         )
     )
 

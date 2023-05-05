@@ -1,5 +1,6 @@
 {% extends "layout/_template.njk" %}
 {% from "components/cookies-banner/_macro.njk" import onsCookiesBanner %}
+{% from "components/timeout-modal/_macro.njk" import onsTimeoutModal %}
 
 {% block head %}
     {% set css_theme = "css"~_theme~"/theme.css" %}
@@ -71,4 +72,28 @@
 {% endblock pageContent -%}
 
 {% block bodyEnd %}
+{% endblock %}
+
+{% block preFooter %}
+    {% if expires_at %}
+        <p>Test if true</p>
+        {{
+            onsTimeoutModal ({
+                    "showModalTimeInSeconds": 55,
+                    "redirectUrl": url_for("sign_in_bp.login"),
+                    "sessionExpiresAt": expires_at,
+                    "serverSessionExpiryEndpoint": url_for("session.session_expires_at"),
+                    "title": "You will be signed out soon",
+                    "textFirstLine": "It appears you have been inactive for a while.",
+                    "countdownText": "To protect your information, your progress will be saved and you will be signed out in",
+                    "countdownExpiredText": "You are being signed out.",
+                    "btnText": "Continue survey",
+                    "minutesTextSingular": "minute",
+                    "minutesTextPlural": "minutes",
+                    "secondsTextSingular": "second",
+                    "secondsTextPlural": "seconds",
+                    "endWithFullStop": true
+            })
+        }}
+    {% endif %}
 {% endblock %}

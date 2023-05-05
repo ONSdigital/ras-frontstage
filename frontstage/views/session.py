@@ -7,8 +7,7 @@ from frontstage.common.authorisation import jwt_authorization
 session_bp = Blueprint("session", __name__)
 
 
-@session_bp.route("/expires-at", methods=["GET"])
+@session_bp.route("/expires-at", methods=["GET", "PATCH"])
 @jwt_authorization(request, refresh_session=False)
 def session_expires_at(session):
-    expires_at = session.get_expires_in()
-    return jsonify(expires_at=datetime.fromtimestamp(expires_at, tz=timezone.utc).isoformat())
+    return jsonify(expires_at=datetime.fromtimestamp(session.get_expires_in(), tz=timezone.utc).isoformat())

@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 
 from flask import make_response, render_template, request
 from flask import session as flask_session
@@ -52,6 +52,8 @@ def get_survey_list(session, tag):
         tag=tag,
     )
 
+    expires_at = session.get_formatted_expires_in()
+
     unread_message_count = {"unread_message_count": conversation_controller.try_message_count_from_session(session)}
     if tag == "todo":
         added_survey = True if business_id and survey_id and not already_enrolled else None
@@ -63,6 +65,7 @@ def get_survey_list(session, tag):
                 already_enrolled=already_enrolled,
                 unread_message_count=unread_message_count,
                 delete_option_allowed=delete_option_allowed,
+                expires_at=expires_at,
             )
         )
 
@@ -76,6 +79,7 @@ def get_survey_list(session, tag):
             sorted_surveys_list=sorted_survey_list,
             history=True,
             unread_message_count=unread_message_count,
+            expires_at=expires_at,
         )
 
 

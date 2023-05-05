@@ -1,5 +1,6 @@
 import json
 import logging
+from datetime import datetime, timezone
 
 from flask import Markup, flash, redirect, render_template, request, url_for
 from structlog import wrap_logger
@@ -39,6 +40,7 @@ def create_message(session):
             errors=form.errors,
             message={},
             unread_message_count=unread_message_count,
+            expires_at=session.get_formatted_expires_in(),
         )
 
 

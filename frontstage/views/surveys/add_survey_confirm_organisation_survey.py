@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, timezone
 
 from flask import current_app as app
 from flask import render_template, request
@@ -21,7 +22,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 @surveys_bp.route("/add-survey/confirm-organisation-survey", methods=["GET"])
 @jwt_authorization(request)
-def survey_confirm_organisation(_):
+def survey_confirm_organisation(session):
     # Get and decrypt enrolment code
     cryptographer = Cryptographer()
     encrypted_enrolment_code = request.args.get("encrypted_enrolment_code", None)
@@ -74,4 +75,5 @@ def survey_confirm_organisation(_):
         enrolment_code=enrolment_code,
     )
 
-    return render_template("surveys/surveys-confirm-organisation.html", context=business_context)
+    return render_template("surveys/surveys-confirm-organisation.html", context=business_context,
+                           expires_at=session.get_formatted_expires_in(),)

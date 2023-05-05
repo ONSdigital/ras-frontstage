@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, timezone
 from os import getenv
 
 from flask import redirect, render_template, request, url_for
@@ -16,8 +17,10 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 @surveys_bp.route("/add-survey", methods=["GET", "POST"])
 @jwt_authorization(request)
-def add_survey(_):
+def add_survey(session):
     form = EnrolmentCodeForm(request.form)
+
+    expires_at = session.get_formatted_expires_in()
 
     if request.method == "POST" and form.validate():
         enrolment_code = request.form.get("enrolment_code").lower()
@@ -26,13 +29,17 @@ def add_survey(_):
         try:
             iac = iac_controller.get_iac_from_enrolment(enrolment_code)
             if iac is None:
-                logger.info("Enrolment code not found when attempting to add survey", enrolment_code=enrolment_code)
+                logger.info("Enrolment code not found when attempting to add survey", enrolment_code=enrolment_code,
+                            expires_at=expires_at)
                 template_data = {"error": {"type": "failed"}}
-                return render_template("surveys/surveys-add.html", form=form, data=template_data), 200
+                return render_template("surveys/surveys-add.html", form=form, data=template_data,
+                                       expires_at=expires_at), 200
             if not iac["active"]:
-                logger.info("Enrolment code not active when attempting to add survey", enrolment_code=enrolment_code)
+                logger.info("Enrolment code not active when attempting to add survey", enrolment_code=enrolment_code,
+                            expires_at=expires_at)
                 template_data = {"error": {"type": "failed"}}
-                return render_template("surveys/surveys-add.html", form=form, data=template_data)
+                return render_template("surveys/surveys-add.html", form=form, data=template_data,
+                                       expires_at=expires_at,)
         except ApiError as exc:
             if exc.status_code == 400:
                 logger.info(
@@ -41,7 +48,8 @@ def add_survey(_):
                     enrolment_code=enrolment_code,
                 )
                 template_data = {"error": {"type": "failed"}}
-                return render_template("surveys/surveys-add.html", form=form, data=template_data)
+                return render_template("surveys/surveys-add.html", form=form, data=template_data,
+                                       expires_at=expires_at,)
             else:
                 logger.error(
                     "Failed to submit enrolment code when attempting to add survey",
@@ -60,12 +68,13 @@ def add_survey(_):
                 encrypted_enrolment_code=encrypted_enrolment_code,
                 _external=True,
                 _scheme=getenv("SCHEME", "http"),
+                expires_at=expires_at,
             )
         )
 
     elif request.method == "POST" and not form.validate():
         logger.info("Invalid character length, must be 12 characters")
         template_data = {"error": {"type": "failed"}}
-        return render_template("surveys/surveys-add.html", form=form, data=template_data)
+        return render_template("surveys/surveys-add.html", form=form, data=template_data, expires_at=expires_at,)
 
-    return render_template("surveys/surveys-add.html", form=form, data={"error": {}})
+    return render_template("surveys/surveys-add.html", form=form, data={"error": {}}, expires_at=expires_at,)

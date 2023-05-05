@@ -111,7 +111,6 @@ def view_conversation_list(session):
         raise
     logger.info("Retrieving and refining conversation successful", party_id=party_id)
     unread_message_count = {"unread_message_count": try_message_count_from_session(session)}
-
     return render_template(
         "secure-messages/conversation-list.html",
         messages=refined_conversation,

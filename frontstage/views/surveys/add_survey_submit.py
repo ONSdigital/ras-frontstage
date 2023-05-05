@@ -86,7 +86,6 @@ def add_survey_submit(session):
         party_id=party_id,
         enrolment_code=enrolment_code,
     )
-
     return redirect(
         url_for(
             "surveys_bp.get_survey_list",

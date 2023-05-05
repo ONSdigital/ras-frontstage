@@ -1,6 +1,5 @@
 import json
 import logging
-from datetime import datetime, timezone
 
 from flask import abort, flash, render_template, request
 from flask import session as flask_session
@@ -240,7 +239,6 @@ def get_help_option_sub_option_select(session, option, sub_option):
     if template == "Invalid template":
         abort(404)
     else:
-
         return render_template(
             template,
             short_name=short_name,

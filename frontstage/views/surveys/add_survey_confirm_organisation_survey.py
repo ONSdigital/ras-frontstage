@@ -1,5 +1,4 @@
 import logging
-from datetime import datetime, timezone
 
 from flask import current_app as app
 from flask import render_template, request
@@ -75,5 +74,8 @@ def survey_confirm_organisation(session):
         enrolment_code=enrolment_code,
     )
 
-    return render_template("surveys/surveys-confirm-organisation.html", context=business_context,
-                           expires_at=session.get_formatted_expires_in(),)
+    return render_template(
+        "surveys/surveys-confirm-organisation.html",
+        context=business_context,
+        expires_at=session.get_formatted_expires_in(),
+    )

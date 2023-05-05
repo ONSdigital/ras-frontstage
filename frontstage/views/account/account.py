@@ -1,6 +1,5 @@
 import json
 import logging
-from datetime import datetime, timezone
 
 from flask import flash, render_template, request, url_for
 from markupsafe import Markup
@@ -54,8 +53,13 @@ def account(session):
     else:
         form = OptionsForm()
 
-    return render_template("account/account.html", form=form, respondent=respondent_details, page_title=page_title,
-                           expires_at=session.get_formatted_expires_in())
+    return render_template(
+        "account/account.html",
+        form=form,
+        respondent=respondent_details,
+        page_title=page_title,
+        expires_at=session.get_formatted_expires_in(),
+    )
 
 
 @account_bp.route("/change-password", methods=["GET", "POST"])
@@ -163,8 +167,11 @@ def change_account_details(session):
         return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
     else:
         return render_template(
-            "account/account-contact-detail-change.html", form=form, errors=form.errors, respondent=respondent_details,
-            expires_at=expires_at
+            "account/account-contact-detail-change.html",
+            form=form,
+            errors=form.errors,
+            respondent=respondent_details,
+            expires_at=expires_at,
         )
 
 
@@ -172,8 +179,11 @@ def change_account_details(session):
 @jwt_authorization(request)
 def something_else(session):
     """Gets the something else once the option is selected"""
-    return render_template("account/account-something-else.html", form=SecureMessagingForm(),
-                           expires_at=session.get_formatted_expires_in(),)
+    return render_template(
+        "account/account-something-else.html",
+        form=SecureMessagingForm(),
+        expires_at=session.get_formatted_expires_in(),
+    )
 
 
 @account_bp.route("/something-else", methods=["POST"])

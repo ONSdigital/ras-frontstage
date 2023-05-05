@@ -53,4 +53,5 @@ def upload_failed(session):
         error_info=error_info,
         case_id=case_id,
         unread_message_count=unread_message_count,
+        expires_at=session.get_formatted_expires_in(),
     )

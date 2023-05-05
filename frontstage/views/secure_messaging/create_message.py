@@ -1,6 +1,5 @@
 import json
 import logging
-from datetime import datetime, timezone
 
 from flask import Markup, flash, redirect, render_template, request, url_for
 from structlog import wrap_logger

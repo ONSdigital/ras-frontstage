@@ -1,6 +1,5 @@
 import json
 import logging
-from datetime import datetime, timezone
 
 from flask import flash, render_template, request
 from flask import session as flask_session
@@ -53,8 +52,12 @@ def share_survey_business_select(session):
     form = AccountSurveySelectBusinessForm(request.values)
     party_id = session.get_party_id()
     businesses = get_list_of_business_for_party(party_id)
-    return render_template("surveys/surveys-share/business-select.html", businesses=businesses, form=form,
-                           expires_at=session.get_formatted_expires_in(),)
+    return render_template(
+        "surveys/surveys-share/business-select.html",
+        businesses=businesses,
+        form=form,
+        expires_at=session.get_formatted_expires_in(),
+    )
 
 
 @account_bp.route("/share-surveys/business-selection", methods=["POST"])
@@ -210,8 +213,12 @@ def share_survey_post_survey_select(session):
 def share_survey_email_entry(session):
     form = AccountSurveyShareRecipientEmailForm(request.values)
     flask_session["share_survey_recipient_email_address"] = None
-    return render_template("surveys/surveys-share/recipient-email-address.html", form=form, errors=form.errors,
-                           expires_at=session.get_formatted_expires_in())
+    return render_template(
+        "surveys/surveys-share/recipient-email-address.html",
+        form=form,
+        errors=form.errors,
+        expires_at=session.get_formatted_expires_in(),
+    )
 
 
 @account_bp.route("/share-surveys/recipient-email-address", methods=["POST"])
@@ -223,14 +230,16 @@ def share_survey_post_email_entry(session):
     expires_at = session.get_formatted_expires_in()
     if not form.validate():
         errors = form.errors
-        return render_template("surveys/surveys-share/recipient-email-address.html", form=form, errors=errors,
-                               expires_at=expires_at)
+        return render_template(
+            "surveys/surveys-share/recipient-email-address.html", form=form, errors=errors, expires_at=expires_at
+        )
 
     if "emailAddress" in respondent_details:
         if respondent_details["emailAddress"].lower() == form.data["email_address"].lower():
             errors = {"email_address": ["You can not share surveys with yourself."]}
-            return render_template("surveys/surveys-share/recipient-email-address.html", form=form, errors=errors,
-                                   expires_at=expires_at)
+            return render_template(
+                "surveys/surveys-share/recipient-email-address.html", form=form, errors=errors, expires_at=expires_at
+            )
     flask_session["share_survey_recipient_email_address"] = form.data["email_address"]
     return redirect(url_for("account_bp.send_instruction_get"))
 
@@ -312,7 +321,10 @@ def send_instruction(session):
             "contact us.",
         )
         return redirect(url_for("account_bp.send_instruction_get"))
-    return render_template("surveys/surveys-share/almost-done.html", expires_at=session.get_formatted_expires_in(),)
+    return render_template(
+        "surveys/surveys-share/almost-done.html",
+        expires_at=session.get_formatted_expires_in(),
+    )
 
 
 @account_bp.route("/share-surveys/done", methods=["GET"])

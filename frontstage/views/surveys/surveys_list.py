@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timezone
+from datetime import datetime
 
 from flask import make_response, render_template, request
 from flask import session as flask_session

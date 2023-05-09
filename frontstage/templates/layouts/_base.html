@@ -79,7 +79,7 @@
         {{
             onsTimeoutModal ({
                     "showModalTimeInSeconds": 60,
-                    "redirectUrl": url_for("sign_in_bp.login"),
+                    "redirectUrl": url_for("session.session_expired"),
                     "sessionExpiresAt": expires_at,
                     "serverSessionExpiryEndpoint": url_for("session.session_expires_at"),
                     "title": "You will be signed out soon",

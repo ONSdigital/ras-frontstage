@@ -81,7 +81,7 @@ class Session(object):
         self.persisted = True
 
     def get_formatted_expires_in(self):
-        return datetime.fromtimestamp((self.get_expires_in() - 3500), tz=timezone.utc).isoformat()
+        return datetime.fromtimestamp(self.get_expires_in(), tz=timezone.utc).isoformat()
 
 
 def _get_new_timestamp(ttl=3600):

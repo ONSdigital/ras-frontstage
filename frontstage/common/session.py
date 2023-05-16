@@ -83,7 +83,7 @@ class Session(object):
     def get_formatted_expires_in(self, refresh=None):
         if refresh:
             self.refresh_session()
-        return datetime.fromtimestamp((self.get_expires_in() - 3400), tz=timezone.utc).isoformat()
+        return datetime.fromtimestamp(self.get_expires_in(), tz=timezone.utc).isoformat()
 
 
 def _get_new_timestamp(ttl=3600):

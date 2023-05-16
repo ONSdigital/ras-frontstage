@@ -1,12 +1,4 @@
-from flask import (
-    Blueprint,
-    jsonify,
-    make_response,
-    redirect,
-    request,
-    session,
-    url_for,
-)
+from flask import Blueprint, jsonify, make_response, redirect, request, session, url_for
 
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.common.session import Session

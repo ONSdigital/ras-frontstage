@@ -16,19 +16,3 @@ def session_expires_at(expires_at):
 @jwt_authorization(request)
 def session_refresh_expires_at(expires_at):
     return jsonify(expires_at=expires_at.get_formatted_expires_in())
-
-
-@session_bp.route("/session-expired", methods=["GET"])
-def session_expired():
-    # Delete user session in redis
-    session_key = request.cookies.get("authorization")
-    current_session = Session.from_session_key(session_key)
-    current_session.delete_session()
-    # We need to remove the next value from the flask session otherwise, user is redirected to the expiry end point and
-    # Not the survey list page
-    if session.get("next"):
-        session.pop("next")
-    # Delete session cookie
-    response = make_response(redirect(url_for("sign_in_bp.login")))
-    response.delete_cookie("authorization")
-    return response

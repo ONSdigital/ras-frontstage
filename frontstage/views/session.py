@@ -1,7 +1,6 @@
-from flask import Blueprint, jsonify, make_response, redirect, request, session, url_for
+from flask import Blueprint, jsonify, request
 
 from frontstage.common.authorisation import jwt_authorization
-from frontstage.common.session import Session
 
 session_bp = Blueprint("session", __name__)
 

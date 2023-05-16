@@ -31,7 +31,6 @@ def add_survey(session):
                 logger.info(
                     "Enrolment code not found when attempting to add survey",
                     enrolment_code=enrolment_code,
-                    expires_at=expires_at,
                 )
                 template_data = {"error": {"type": "failed"}}
                 return (
@@ -42,7 +41,6 @@ def add_survey(session):
                 logger.info(
                     "Enrolment code not active when attempting to add survey",
                     enrolment_code=enrolment_code,
-                    expires_at=expires_at,
                 )
                 template_data = {"error": {"type": "failed"}}
                 return render_template(

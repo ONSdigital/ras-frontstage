@@ -80,8 +80,10 @@ class Session(object):
         redis.setex(self.session_key, 3600, self.encoded_jwt_token)
         self.persisted = True
 
-    def get_formatted_expires_in(self):
-        return datetime.fromtimestamp(self.get_expires_in(), tz=timezone.utc).isoformat()
+    def get_formatted_expires_in(self, refresh=None):
+        if refresh:
+            self.refresh_session()
+        return datetime.fromtimestamp((self.get_expires_in() - 3400), tz=timezone.utc).isoformat()
 
 
 def _get_new_timestamp(ttl=3600):

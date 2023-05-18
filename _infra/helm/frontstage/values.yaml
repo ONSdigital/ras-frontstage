@@ -58,10 +58,10 @@ security:
 
 resources:
   requests:
-    cpu: "150m"
+    cpu: "350m"
     memory: "400Mi"
   limits:
-    cpu: "300m"
+    cpu: "1050m"
     memory: "800Mi"
 
 autoscaling: false

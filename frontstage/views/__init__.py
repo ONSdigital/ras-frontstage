@@ -9,6 +9,7 @@ from frontstage.views.privacy import privacy_bp
 from frontstage.views.register import register_bp
 from frontstage.views.secure_messaging import secure_message_bp
 from frontstage.views.security import security_bp
+from frontstage.views.session import session_bp
 from frontstage.views.sign_in import sign_in_bp
 from frontstage.views.surveys import surveys_bp
 
@@ -19,6 +20,7 @@ app.register_blueprint(privacy_bp, url_prefix="/privacy-and-data-protection")
 app.register_blueprint(contact_us_bp, url_prefix="/contact-us")
 app.register_blueprint(info_bp, url_prefix="/info")
 app.register_blueprint(passwords_bp, url_prefix="/passwords")
+app.register_blueprint(session_bp, url_prefix="/session")
 app.register_blueprint(secure_message_bp, url_prefix="/secure-message")
 app.register_blueprint(sign_in_bp, url_prefix="/sign-in")
 app.register_blueprint(surveys_bp, url_prefix="/surveys")

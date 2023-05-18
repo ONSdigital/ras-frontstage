@@ -33,7 +33,7 @@ def validate(token):
     return True
 
 
-def jwt_authorization(request):
+def jwt_authorization(request, refresh_session=True):
     jwt_secret = app.config["JWT_SECRET"]
 
     def extract_session(original_function):
@@ -58,7 +58,8 @@ def jwt_authorization(request):
 
             if app.config["VALIDATE_JWT"]:
                 if validate(jwt):
-                    redis_session.refresh_session()
+                    if refresh_session:
+                        redis_session.refresh_session()
                     return original_function(redis_session, *args, **kwargs)
                 else:
                     logger.warning("Token is not valid for this request")

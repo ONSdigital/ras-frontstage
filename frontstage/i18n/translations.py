@@ -31,7 +31,6 @@ class Translate:
             raise exc
 
     def translate(self, msgid, locale=None):
-
         active_locale = locale if locale else self.locale
 
         if active_locale not in self.translations:

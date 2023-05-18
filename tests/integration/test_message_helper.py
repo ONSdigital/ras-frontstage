@@ -16,7 +16,6 @@ with open("tests/test_data/message.json") as json_data:
 
 class TestMessageHelper(unittest.TestCase):
     def test_from_internal(self):
-
         expected_data = {
             "subject": "testy2",
             "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d",

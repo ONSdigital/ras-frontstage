@@ -43,7 +43,6 @@ class TestCaseControllers(unittest.TestCase):
         self.app_config = self.app.application.config
 
     def test_calculate_case_status_returns_correct_status_for_complete_for_eq_and_seft(self):
-
         case_status_seft = case_controller.calculate_case_status("COMPLETE", "SEFT")
         case_status_eq = case_controller.calculate_case_status("COMPLETE", "EQ")
 
@@ -51,7 +50,6 @@ class TestCaseControllers(unittest.TestCase):
         self.assertEqual("Complete", case_status_eq)
 
     def test_calculate_case_status_returns_correct_status_for_completed_by_phone_for_eq_and_seft(self):
-
         case_status_seft = case_controller.calculate_case_status("COMPLETEDBYPHONE", "SEFT")
         case_status_eq = case_controller.calculate_case_status("COMPLETEDBYPHONE", "EQ")
 
@@ -59,7 +57,6 @@ class TestCaseControllers(unittest.TestCase):
         self.assertEqual("Completed by phone", case_status_eq)
 
     def test_calculate_case_status_returns_correct_status_for_no_longer_required_for_eq_and_seft(self):
-
         case_status_seft = case_controller.calculate_case_status("NOLONGERREQUIRED", "SEFT")
         case_status_eq = case_controller.calculate_case_status("NOLONGERREQUIRED", "EQ")
 
@@ -67,7 +64,6 @@ class TestCaseControllers(unittest.TestCase):
         self.assertEqual("No longer required", case_status_eq)
 
     def test_calculate_case_status_returns_correct_state_for_in_progress_for_eq_and_seft(self):
-
         case_status_seft = case_controller.calculate_case_status("INPROGRESS", "SEFT")
         case_status_eq = case_controller.calculate_case_status("INPROGRESS", "EQ")
 
@@ -75,7 +71,6 @@ class TestCaseControllers(unittest.TestCase):
         self.assertEqual("In progress", case_status_eq)
 
     def test_calculate_case_status_returns_not_started_with_unexpected_status(self):
-
         case_status_seft = case_controller.calculate_case_status("Apple", "SEFT")
         case_status_eq = case_controller.calculate_case_status("Banana", "EQ")
 
@@ -322,7 +317,6 @@ class TestCaseControllers(unittest.TestCase):
         get_case,
         _,
     ):
-
         get_collection_exercise.return_value = collection_exercise
         get_collection_instrument.return_value = collection_instrument_seft
         get_survey_by_short_name.return_value = survey

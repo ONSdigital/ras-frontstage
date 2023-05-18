@@ -10,5 +10,4 @@ cookies_bp = Blueprint("cookies_bp", __name__, static_folder="static", template_
 
 @cookies_bp.route("/", methods=["GET"])
 def cookies():
-
     return render_template("cookies.html")

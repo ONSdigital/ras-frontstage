@@ -30,7 +30,7 @@ google-cloud-pubsub = "*"
 google-cloud-storage = "*"
 python-gnupg = "*"
 werkzeug = "*"
-
+fakeredis = "*"
 
 [dev-packages]
 black = "*"
@@ -42,3 +42,4 @@ pytest = "*"
 requests-mock = "*"
 pytest-cov = "*"
 responses = "*"
+freezegun = "*"

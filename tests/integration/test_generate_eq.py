@@ -1,8 +1,11 @@
 import json
 import unittest
+import uuid
+from datetime import datetime, timezone
 from unittest.mock import patch
 
 import requests_mock
+from freezegun import freeze_time
 
 from frontstage import app
 from frontstage.common.eq_payload import EqPayload
@@ -33,6 +36,38 @@ encoded_jwt_token = (
     "jc2NzQwMDAuMH0.m94R50EPIKTJmE6gf6PvCmCq8ZpYwwV8PHSqsJh5fnI"
 )
 
+with open("tests/test_data/collection_instrument/collection_instrument_eq.json") as json_data:
+    collection_instrument_eq = json.load(json_data)
+
+TIME_TO_FREEZE = datetime(2023, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
+
+PAYLOAD = {
+    "exp": 1672574700,
+    "iat": 1672574400,
+    "version": "v2",
+    "account_service_url": "http://frontstage-url/surveys",
+    "case_id": "8cdc01f9-656a-4715-a148-ffed0dbe1b04",
+    "collection_exercise_sid": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+    "response_id": "49900000001F8d990a74-5f07-4765-ac66-df7e1a96505b20001",
+    "response_expires_at": "2023-05-31T01:00:00+01:00",
+    "schema_name": "2_0001",
+    "survey_metadata": {
+        "data": {
+            "case_ref": "1000000000000016",
+            "form_type": "0001",
+            "period_id": "204901",
+            "period_str": "test_exercise",
+            "ref_p_end_date": "2018-04-10",
+            "ref_p_start_date": "2020-05-31",
+            "ru_name": "RUNAME1_COMPANY1 RUNNAME2_COMPANY1",
+            "ru_ref": "49900000001F",
+            "trad_as": "  ",
+            "user_id": "f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b",
+            "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d",
+        }
+    },
+}
+
 
 class TestGenerateEqURL(unittest.TestCase):
     def setUp(self):
@@ -49,6 +84,57 @@ class TestGenerateEqURL(unittest.TestCase):
 
     def tearDown(self):
         self.patcher.stop()
+
+    @freeze_time(TIME_TO_FREEZE)
+    @requests_mock.mock()
+    def test_create_payload_without_employment_date(self, mock_request):
+        # Given a collection exercise without an employment date event
+        mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
+        mock_request.get(url_get_business_party, json=business_party)
+        mock_request.get(url_get_ci, json=collection_instrument_eq)
+
+        # When a payload is created
+        with app.app_context():
+            payload = EqPayload().create_payload(
+                case, collection_exercise, respondent_party["id"], business_party["id"], survey_eq
+            )
+
+        # Then the payload is as expected
+        self.assertTrue(PAYLOAD.items() <= payload.items())
+        self.assertIn("jti", payload)
+        self.assertTrue(_is_valid_uuid(payload["jti"]))
+        self.assertIn("tx_id", payload)
+        self.assertTrue(_is_valid_uuid(payload["tx_id"]))
+        self.assertNotIn("employment_date", payload)
+
+    @freeze_time(TIME_TO_FREEZE)
+    @requests_mock.mock()
+    def test_create_payload_with_employment_date(self, mock_request):
+        # Given a collection exercise with an employment date event
+        collection_exercise_event_employment_date = {
+            "id": "5629d715-ec3e-4ca2-9232-be5c1d56cf32",
+            "collectionExerciseId": "df634637-2aac-487f-9d2f-eb56615ed80e",
+            "tag": "employment",
+            "timestamp": "2023-05-31T00:00:00.000Z",
+        }
+        collection_exercise_events.append(collection_exercise_event_employment_date)
+        PAYLOAD["survey_metadata"]["data"]["employment_date"] = "2023-05-31"
+        mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
+        mock_request.get(url_get_business_party, json=business_party)
+        mock_request.get(url_get_ci, json=collection_instrument_eq)
+
+        # When a payload is created
+        with app.app_context():
+            payload = EqPayload().create_payload(
+                case, collection_exercise, respondent_party["id"], business_party["id"], survey_eq
+            )
+
+        # Then the payload is as expected
+        self.assertTrue(PAYLOAD.items() <= payload.items())
+        self.assertTrue("jti" in payload)
+        self.assertTrue(_is_valid_uuid(payload["jti"]))
+        self.assertTrue("tx_id" in payload)
+        self.assertTrue(_is_valid_uuid(payload["tx_id"]))
 
     @requests_mock.mock()
     def test_generate_eq_url_seft(self, mock_request):
@@ -254,3 +340,11 @@ class TestGenerateEqURL(unittest.TestCase):
 
         response = EqPayload()._find_event_date_by_tag("employment", collex_events_dates, "123", False)
         self.assertEqual(response, "2018-04-03")
+
+
+def _is_valid_uuid(uuid_string: str) -> bool:
+    try:
+        uuid.UUID(uuid_string, version=4)
+    except ValueError:
+        return False
+    return True

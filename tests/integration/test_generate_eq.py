@@ -49,7 +49,6 @@ PAYLOAD = {
     "case_id": "8cdc01f9-656a-4715-a148-ffed0dbe1b04",
     "collection_exercise_sid": "8d990a74-5f07-4765-ac66-df7e1a96505b",
     "response_id": "49900000001F8d990a74-5f07-4765-ac66-df7e1a96505b20001",
-    "response_expires_at": "2023-05-31T01:00:00+01:00",
     "schema_name": "2_0001",
     "survey_metadata": {
         "data": {
@@ -99,8 +98,6 @@ class TestGenerateEqURL(unittest.TestCase):
                 case, collection_exercise, respondent_party["id"], business_party["id"], survey_eq
             )
         # Then the payload is as expected
-        print(payload_created)
-        print(PAYLOAD)
         self.assertTrue(PAYLOAD.items() <= payload_created.items())
         self.assertIn("jti", payload_created)
         self.assertTrue(_is_valid_uuid(payload_created["jti"]))

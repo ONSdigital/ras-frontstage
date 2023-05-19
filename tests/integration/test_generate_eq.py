@@ -99,6 +99,8 @@ class TestGenerateEqURL(unittest.TestCase):
                 case, collection_exercise, respondent_party["id"], business_party["id"], survey_eq
             )
         # Then the payload is as expected
+        print(payload_created)
+        print(PAYLOAD)
         self.assertTrue(PAYLOAD.items() <= payload_created.items())
         self.assertIn("jti", payload_created)
         self.assertTrue(_is_valid_uuid(payload_created["jti"]))

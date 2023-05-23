@@ -95,6 +95,7 @@ def add_survey_submit(session):
             survey_id=added_survey_id,
             tag="todo",
             already_enrolled=already_enrolled,
+            expires_at=session.get_formatted_expires_in(),
         )
     )
 

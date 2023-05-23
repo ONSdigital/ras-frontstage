@@ -53,7 +53,13 @@ def account(session):
     else:
         form = OptionsForm()
 
-    return render_template("account/account.html", form=form, respondent=respondent_details, page_title=page_title)
+    return render_template(
+        "account/account.html",
+        form=form,
+        respondent=respondent_details,
+        page_title=page_title,
+        expires_at=session.get_formatted_expires_in(),
+    )
 
 
 @account_bp.route("/change-password", methods=["GET", "POST"])
@@ -62,6 +68,7 @@ def change_password(session):
     form = ChangePasswordFrom(request.values)
     party_id = session.get_party_id()
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
+    expires_at = session.get_formatted_expires_in()
     if request.method == "POST" and form.validate():
         username = respondent_details["emailAddress"]
         password = request.form.get("password")
@@ -71,6 +78,7 @@ def change_password(session):
                 "account/account-change-password.html",
                 form=form,
                 errors={"new_password": ["Your new password is the same as your old password"]},
+                expires_at=expires_at,
             )
         bound_logger = logger.bind(email=obfuscate_email(username))
         bound_logger.info("Attempting to find user in auth service")
@@ -90,11 +98,12 @@ def change_password(session):
                     "account/account-change-password.html",
                     form=form,
                     errors={"password": ["Incorrect current password"]},
+                    expires_at=expires_at,
                 )
     else:
         errors = form.errors
 
-    return render_template("account/account-change-password.html", form=form, errors=errors)
+    return render_template("account/account-change-password.html", form=form, errors=errors, expires_at=expires_at)
 
 
 @account_bp.route("/change-account-email-address", methods=["POST"])
@@ -107,6 +116,7 @@ def change_email_address(session):
     respondent_details["new_email_address"] = form["email_address"].data
     respondent_details["change_requested_by_respondent"] = True
     logger.info("Attempting to update email address changes on the account", party_id=party_id)
+    expires_at = session.get_formatted_expires_in()
     try:
         party_controller.update_account(respondent_details)
 
@@ -114,11 +124,11 @@ def change_email_address(session):
         logger.error("Failed to updated email on account", status=exc.status_code, party_id=party_id)
         if exc.status_code == 409:
             logger.info("The email requested already registered in our system. Request denied", party_id=party_id)
-            return render_template("account/account-change-email-address-conflict.html")
+            return render_template("account/account-change-email-address-conflict.html", expires_at=expires_at)
         else:
             raise exc
     logger.info("Successfully updated email on account", party_id=party_id)
-    return render_template("account/account-change-email-address-almost-done.html")
+    return render_template("account/account-change-email-address-almost-done.html", expires_at=expires_at)
 
 
 @account_bp.route("/change-account-details", methods=["GET", "POST"])
@@ -129,6 +139,7 @@ def change_account_details(session):
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
     is_contact_details_update_required = False
     attributes_changed = []
+    expires_at = session.get_formatted_expires_in()
     if request.method == "POST" and form.validate():
         logger.info("Attempting to update contact details changes on the account", party_id=party_id)
         # check_attribute changes also magically updates the respondent_details as a side effect of running this
@@ -151,11 +162,16 @@ def change_account_details(session):
                 "account/account-change-email-address.html",
                 new_email=form["email_address"].data,
                 form=ConfirmEmailChangeForm(),
+                expires_at=expires_at,
             )
         return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
     else:
         return render_template(
-            "account/account-contact-detail-change.html", form=form, errors=form.errors, respondent=respondent_details
+            "account/account-contact-detail-change.html",
+            form=form,
+            errors=form.errors,
+            respondent=respondent_details,
+            expires_at=expires_at,
         )
 
 
@@ -163,7 +179,11 @@ def change_account_details(session):
 @jwt_authorization(request)
 def something_else(session):
     """Gets the something else once the option is selected"""
-    return render_template("account/account-something-else.html", form=SecureMessagingForm())
+    return render_template(
+        "account/account-something-else.html",
+        form=SecureMessagingForm(),
+        expires_at=session.get_formatted_expires_in(),
+    )
 
 
 @account_bp.route("/something-else", methods=["POST"])

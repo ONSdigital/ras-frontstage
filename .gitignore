@@ -105,3 +105,4 @@ ENV/
 # Design System templates
 frontstage/templates/components
 frontstage/templates/layout
+/.gradle/

@@ -44,7 +44,6 @@ def get_send_help_technical_message_page(session):
         option=option,
         subject=subject,
         breadcrumbs=breadcrumbs,
-        expires_at=session.get_formatted_expires_in(),
     )
 
 

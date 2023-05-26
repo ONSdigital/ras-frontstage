@@ -40,7 +40,7 @@ def transfer_survey_overview(session):
     flask_session.pop("validation_failure_transfer_surveys_list", None)
     # 'transfer_surveys_selected_list' holds list of surveys selected by user so that its checked in case of any error
     flask_session.pop("transfer_surveys_selected_list", None)
-    return render_template("surveys/surveys-transfer/overview.html", expires_at=session.get_formatted_expires_in())
+    return render_template("surveys/surveys-transfer/overview.html")
 
 
 @account_bp.route("/transfer-surveys/business-selection", methods=["GET"])
@@ -56,7 +56,6 @@ def transfer_survey_business_select(session):
         "surveys/surveys-transfer/business-select.html",
         businesses=businesses,
         form=form,
-        expires_at=session.get_formatted_expires_in(),
     )
 
 
@@ -93,7 +92,6 @@ def transfer_survey_survey_select(session):
         error=error,
         failed_surveys_list=failed_surveys_list if failed_surveys_list is not None else [],
         selected_survey_list=selected_survey_list if selected_survey_list is not None else [],
-        expires_at=session.get_formatted_expires_in(),
     )
 
 
@@ -215,12 +213,7 @@ def transfer_survey_post_survey_select(session):
 def transfer_survey_email_entry(session):
     form = AccountSurveyShareRecipientEmailForm(request.values)
     flask_session["transfer_survey_recipient_email_address"] = None
-    return render_template(
-        "surveys/surveys-transfer/recipient-email-address.html",
-        form=form,
-        errors=form.errors,
-        expires_at=session.get_formatted_expires_in(),
-    )
+    return render_template("surveys/surveys-transfer/recipient-email-address.html", form=form, errors=form.errors)
 
 
 @account_bp.route("/transfer-surveys/recipient-email-address", methods=["POST"])
@@ -229,19 +222,14 @@ def transfer_survey_post_email_entry(session):
     form = AccountSurveyShareRecipientEmailForm(request.values)
     party_id = session.get_party_id()
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
-    expires_at = session.get_formatted_expires_in()
     if not form.validate():
         errors = form.errors
-        return render_template(
-            "surveys/surveys-transfer/recipient-email-address.html", form=form, errors=errors, expires_at=expires_at
-        )
+        return render_template("surveys/surveys-transfer/recipient-email-address.html", form=form, errors=errors)
 
     if "emailAddress" in respondent_details:
         if respondent_details["emailAddress"].lower() == form.data["email_address"].lower():
             errors = {"email_address": ["You can not transfer surveys to yourself."]}
-            return render_template(
-                "surveys/surveys-transfer/recipient-email-address.html", form=form, errors=errors, expires_at=expires_at
-            )
+            return render_template("surveys/surveys-transfer/recipient-email-address.html", form=form, errors=errors)
     flask_session["transfer_survey_recipient_email_address"] = form.data["email_address"]
     return redirect(url_for("account_bp.send_transfer_instruction_get"))
 
@@ -265,7 +253,6 @@ def send_transfer_instruction_get(session):
         email=email,
         share_dict=share_dict,
         form=ConfirmEmailChangeForm(),
-        expires_at=session.get_formatted_expires_in(),
     )
 
 
@@ -324,7 +311,6 @@ def send_transfer_instruction(session):
         return redirect(url_for("account_bp.send_transfer_instruction_get"))
     return render_template(
         "surveys/surveys-transfer/almost-done.html",
-        expires_at=session.get_formatted_expires_in(),
     )
 
 

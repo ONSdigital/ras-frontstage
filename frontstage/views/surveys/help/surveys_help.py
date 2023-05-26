@@ -157,7 +157,6 @@ def help_page(session):
         survey_ref=survey_ref,
         ru_ref=ru_ref,
         page_title=page_title,
-        expires_at=session.get_formatted_expires_in(),
     )
 
 
@@ -224,7 +223,6 @@ def help_option_select(session, option: str):
         survey_ref=survey_ref,
         ru_ref=ru_ref,
         page_title=page_title,
-        expires_at=session.get_formatted_expires_in(),
     )
 
 
@@ -251,7 +249,6 @@ def get_help_option_sub_option_select(session, option, sub_option):
             ru_ref=ru_ref,
             is_survey_help_page=True,  # currently used by survey not listed.
             page_title=page_title,
-            expires_at=session.get_formatted_expires_in(),
         )
 
 
@@ -301,7 +298,6 @@ def send_help_message(session, option, sub_option):
         survey_ref=survey_ref,
         ru_ref=ru_ref,
         page_title=page_title,
-        expires_at=session.get_formatted_expires_in(),
     )
 
 

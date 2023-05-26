@@ -7,7 +7,7 @@
       "type": "public",
       "use": "encryption",
       "value": "-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAvS3GeL0RWC3OP4EAG0z7\nEJyIvAsqjvHSjUzlf1UHB1WqMs1ZUeMGw2uwufq+0hOjoOmJ8xdK7xPTIcstuxU2\nZbrWyozh9K5w/UQKTT88CzAiJ4SdXarmVHNO4WsNDZQL35LMLPzeeYdRH76kZro0\nci/QgrdJgkKsrB2JQnCx3r9vaP6V0SFBw2NYVgAwEFgtf126F3zfvKRFZdYzRsDW\nMB03snohhSpRh9XL3D5U4bhQu63AmJSjmWHGQtWhTcnPEFo5hfkh9zjQcUyoxZLV\ncu+7ERH1hocLb7VlOOp5UyAytAMJ0vtQFWJi2K5H1Z/iXSUaOGIzS/5AU4AaR16R\nZg7k4o26RLcqvp4x/twyV5niPS2XW+mEs4vRbOeZD3qNyB+nDkoUzKf/FLP7O1UJ\ni2PjthM/h8RvsIYWcS7jVKr7ziJDTeC1xk87T6Zz5Zp6juI8Piu+CPQ02Ghf7ozn\nxYRTKz6Ev3D+/rd47B/Kpl4phg7sreNaHrrS9dm1wmEowx38ediCtmF12Dp6eJkM\nY9oSXjue9tgPjL1xkXmoukL49QZfZ1CEXeds8K++lLd060emnrJhY5OAw55v2FAn\nA9pmZcqvHiAes9Lyzp55psO2wmOiq1hvaMTupPRVSM6+gJFmjik8J3NguppVs+MT\n34g7DWMszuYw9UxfX4okjJECAwEAAQ==\n-----END PUBLIC KEY-----\n",
-      "version": "v1"
+      "version": "v2"
     },
     "2225f01580a949801274a5f3e6861947018aff5b": {
       "platform": "sdc",

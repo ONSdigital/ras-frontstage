@@ -90,7 +90,6 @@ def view_conversation(session, thread_id):
         survey_name=survey_name,
         business_name=business_name,
         category=category,
-        expires_at=session.get_formatted_expires_in(),
     )
 
 
@@ -116,7 +115,6 @@ def view_conversation_list(session):
         messages=refined_conversation,
         is_closed=strtobool(is_closed),
         unread_message_count=unread_message_count,
-        expires_at=session.get_formatted_expires_in(),
     )
 
 

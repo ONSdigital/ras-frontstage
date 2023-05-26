@@ -77,5 +77,4 @@ def survey_confirm_organisation(session):
     return render_template(
         "surveys/surveys-confirm-organisation.html",
         context=business_context,
-        expires_at=session.get_formatted_expires_in(),
     )

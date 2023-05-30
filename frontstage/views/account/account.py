@@ -169,7 +169,7 @@ def change_account_details(session):
 
 @account_bp.route("/something-else", methods=["GET"])
 @jwt_authorization(request)
-def something_else(session):
+def something_else(_):
     """Gets the something else once the option is selected"""
     return render_template(
         "account/account-something-else.html",

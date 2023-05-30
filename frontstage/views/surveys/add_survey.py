@@ -16,7 +16,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 @surveys_bp.route("/add-survey", methods=["GET", "POST"])
 @jwt_authorization(request)
-def add_survey(session):
+def add_survey(_):
     form = EnrolmentCodeForm(request.form)
 
     if request.method == "POST" and form.validate():

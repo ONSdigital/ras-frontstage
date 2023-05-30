@@ -30,7 +30,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 @account_bp.route("/transfer-surveys", methods=["GET"])
 @jwt_authorization(request)
-def transfer_survey_overview(session):
+def transfer_survey_overview(_):
     # 'transfer_survey_data' holds business and surveys selected for share
     flask_session.pop("transfer_survey_data", None)
     # 'transfer_survey_recipient_email_address' holds the recipient email address
@@ -61,7 +61,7 @@ def transfer_survey_business_select(session):
 
 @account_bp.route("/transfer-surveys/business-selection", methods=["POST"])
 @jwt_authorization(request)
-def transfer_survey_post_business_select(session):
+def transfer_survey_post_business_select(_):
     flask_session.pop("transfer_survey_data", None)
     transfer_survey_business_selected = request.form.getlist("checkbox-answer")
     if len(transfer_survey_business_selected) == 0:
@@ -184,7 +184,7 @@ def is_max_transfer_survey_exceeded(selected_businesses, form):
 
 @account_bp.route("/transfer-surveys/survey-selection", methods=["POST"])
 @jwt_authorization(request)
-def transfer_survey_post_survey_select(session):
+def transfer_survey_post_survey_select(_):
     share_dictionary_copy = flask_session["transfer_survey_data"]
     flask_session.pop("validation_failure_transfer_surveys_list", None)
     selected_businesses = get_selected_businesses()
@@ -210,7 +210,7 @@ def transfer_survey_post_survey_select(session):
 
 @account_bp.route("/transfer-surveys/recipient-email-address", methods=["GET"])
 @jwt_authorization(request)
-def transfer_survey_email_entry(session):
+def transfer_survey_email_entry(_):
     form = AccountSurveyShareRecipientEmailForm(request.values)
     flask_session["transfer_survey_recipient_email_address"] = None
     return render_template("surveys/surveys-transfer/recipient-email-address.html", form=form, errors=form.errors)
@@ -236,7 +236,7 @@ def transfer_survey_post_email_entry(session):
 
 @account_bp.route("/transfer-surveys/send-instruction", methods=["GET"])
 @jwt_authorization(request)
-def send_transfer_instruction_get(session):
+def send_transfer_instruction_get(_):
     email = flask_session["transfer_survey_recipient_email_address"]
     share_dict = {}
     for business_id in flask_session["transfer_survey_data"]:
@@ -316,7 +316,7 @@ def send_transfer_instruction(session):
 
 @account_bp.route("/transfer-surveys/done", methods=["GET"])
 @jwt_authorization(request)
-def transfer_survey_done(session):
+def transfer_survey_done(_):
     flask_session.pop("share", None)
     flask_session.pop("transfer_survey_recipient_email_address", None)
     return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))

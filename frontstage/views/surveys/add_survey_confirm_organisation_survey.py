@@ -21,7 +21,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 @surveys_bp.route("/add-survey/confirm-organisation-survey", methods=["GET"])
 @jwt_authorization(request)
-def survey_confirm_organisation(session):
+def survey_confirm_organisation(_):
     # Get and decrypt enrolment code
     cryptographer = Cryptographer()
     encrypted_enrolment_code = request.args.get("encrypted_enrolment_code", None)
@@ -77,5 +77,4 @@ def survey_confirm_organisation(session):
     return render_template(
         "surveys/surveys-confirm-organisation.html",
         context=business_context,
-        expires_at=session.get_formatted_expires_in(),
     )

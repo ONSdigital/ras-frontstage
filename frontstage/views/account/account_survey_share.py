@@ -30,7 +30,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 @account_bp.route("/share-surveys", methods=["GET"])
 @jwt_authorization(request)
-def share_survey_overview(session):
+def share_survey_overview(_):
     # 'share_survey_data' holds business and surveys selected for share
     flask_session.pop("share_survey_data", None)
     # 'share_survey_recipient_email_address' holds the recipient email address
@@ -40,7 +40,7 @@ def share_survey_overview(session):
     flask_session.pop("validation_failure_share_surveys_list", None)
     # 'share_surveys_selected_list' holds list of surveys selected by user so that its checked in case of any error
     flask_session.pop("share_surveys_selected_list", None)
-    return render_template("surveys/surveys-share/overview.html", expires_at=session.get_formatted_expires_in())
+    return render_template("surveys/surveys-share/overview.html")
 
 
 @account_bp.route("/share-surveys/business-selection", methods=["GET"])
@@ -52,17 +52,12 @@ def share_survey_business_select(session):
     form = AccountSurveySelectBusinessForm(request.values)
     party_id = session.get_party_id()
     businesses = get_list_of_business_for_party(party_id)
-    return render_template(
-        "surveys/surveys-share/business-select.html",
-        businesses=businesses,
-        form=form,
-        expires_at=session.get_formatted_expires_in(),
-    )
+    return render_template("surveys/surveys-share/business-select.html", businesses=businesses, form=form)
 
 
 @account_bp.route("/share-surveys/business-selection", methods=["POST"])
 @jwt_authorization(request)
-def share_survey_post_business_select(session):
+def share_survey_post_business_select(_):
     flask_session.pop("share_survey_data", None)
     share_survey_business_selected = request.form.getlist("checkbox-answer")
     if len(share_survey_business_selected) == 0:
@@ -93,7 +88,6 @@ def share_survey_survey_select(session):
         error=error,
         failed_surveys_list=failed_surveys_list if failed_surveys_list is not None else [],
         selected_survey_list=selected_survey_list if selected_survey_list is not None else [],
-        expires_at=session.get_formatted_expires_in(),
     )
 
 
@@ -184,7 +178,7 @@ def is_max_share_survey_exceeded(selected_businesses, form):
 
 @account_bp.route("/share-surveys/survey-selection", methods=["POST"])
 @jwt_authorization(request)
-def share_survey_post_survey_select(session):
+def share_survey_post_survey_select(_):
     share_dictionary_copy = flask_session["share_survey_data"]
     flask_session.pop("validation_failure_share_surveys_list", None)
     selected_businesses = get_selected_businesses()
@@ -210,14 +204,13 @@ def share_survey_post_survey_select(session):
 
 @account_bp.route("/share-surveys/recipient-email-address", methods=["GET"])
 @jwt_authorization(request)
-def share_survey_email_entry(session):
+def share_survey_email_entry(_):
     form = AccountSurveyShareRecipientEmailForm(request.values)
     flask_session["share_survey_recipient_email_address"] = None
     return render_template(
         "surveys/surveys-share/recipient-email-address.html",
         form=form,
         errors=form.errors,
-        expires_at=session.get_formatted_expires_in(),
     )
 
 
@@ -227,26 +220,21 @@ def share_survey_post_email_entry(session):
     form = AccountSurveyShareRecipientEmailForm(request.values)
     party_id = session.get_party_id()
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
-    expires_at = session.get_formatted_expires_in()
     if not form.validate():
         errors = form.errors
-        return render_template(
-            "surveys/surveys-share/recipient-email-address.html", form=form, errors=errors, expires_at=expires_at
-        )
+        return render_template("surveys/surveys-share/recipient-email-address.html", form=form, errors=errors)
 
     if "emailAddress" in respondent_details:
         if respondent_details["emailAddress"].lower() == form.data["email_address"].lower():
             errors = {"email_address": ["You can not share surveys with yourself."]}
-            return render_template(
-                "surveys/surveys-share/recipient-email-address.html", form=form, errors=errors, expires_at=expires_at
-            )
+            return render_template("surveys/surveys-share/recipient-email-address.html", form=form, errors=errors)
     flask_session["share_survey_recipient_email_address"] = form.data["email_address"]
     return redirect(url_for("account_bp.send_instruction_get"))
 
 
 @account_bp.route("/share-surveys/send-instruction", methods=["GET"])
 @jwt_authorization(request)
-def send_instruction_get(session):
+def send_instruction_get(_):
     email = flask_session["share_survey_recipient_email_address"]
     share_dict = {}
     for business_id in flask_session["share_survey_data"]:
@@ -263,7 +251,6 @@ def send_instruction_get(session):
         email=email,
         share_dict=share_dict,
         form=ConfirmEmailChangeForm(),
-        expires_at=session.get_formatted_expires_in(),
     )
 
 
@@ -323,13 +310,12 @@ def send_instruction(session):
         return redirect(url_for("account_bp.send_instruction_get"))
     return render_template(
         "surveys/surveys-share/almost-done.html",
-        expires_at=session.get_formatted_expires_in(),
     )
 
 
 @account_bp.route("/share-surveys/done", methods=["GET"])
 @jwt_authorization(request)
-def share_survey_done(session):
+def share_survey_done(_):
     flask_session.pop("share", None)
     flask_session.pop("share_survey_recipient_email_address", None)
     return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))

@@ -34,7 +34,7 @@ def get_technical_message_page_option(session, option):
 
 @surveys_bp.route("/technical/send-message", methods=["GET"])
 @jwt_authorization(request)
-def get_send_help_technical_message_page(session):
+def get_send_help_technical_message_page(_):
     """Gets the send message page"""
     option = request.args.get("option", None)
     subject = subject_text_mapping.get(option, None)
@@ -44,7 +44,6 @@ def get_send_help_technical_message_page(session):
         option=option,
         subject=subject,
         breadcrumbs=breadcrumbs,
-        expires_at=session.get_formatted_expires_in(),
     )
 
 

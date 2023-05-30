@@ -117,7 +117,7 @@ breadcrumb_text_mapping = {
 
 @surveys_bp.route("/surveys-help", methods=["GET"])
 @jwt_authorization(request)
-def get_surveys_help_page(session):
+def get_surveys_help_page(_):
     """Gets Survey Help page provided survey_ref and ru_ref and creates flash session for selection"""
     flask_session["help_survey_ref"] = request.args.get("survey_ref", None)
     flask_session["help_ru_ref"] = request.args.get("ru_ref", None)
@@ -131,7 +131,7 @@ def get_surveys_help_page(session):
 
 @surveys_bp.route("/help", methods=["GET", "POST"])
 @jwt_authorization(request)
-def help_page(session):
+def help_page(_):
     """Get survey help page provided survey_ref and ru_ref are in session and post help completing this survey option
     for respective survey"""
     abort_help_if_session_not_set()
@@ -157,7 +157,6 @@ def help_page(session):
         survey_ref=survey_ref,
         ru_ref=ru_ref,
         page_title=page_title,
-        expires_at=session.get_formatted_expires_in(),
     )
 
 
@@ -224,7 +223,6 @@ def help_option_select(session, option: str):
         survey_ref=survey_ref,
         ru_ref=ru_ref,
         page_title=page_title,
-        expires_at=session.get_formatted_expires_in(),
     )
 
 
@@ -251,7 +249,6 @@ def get_help_option_sub_option_select(session, option, sub_option):
             ru_ref=ru_ref,
             is_survey_help_page=True,  # currently used by survey not listed.
             page_title=page_title,
-            expires_at=session.get_formatted_expires_in(),
         )
 
 
@@ -301,7 +298,6 @@ def send_help_message(session, option, sub_option):
         survey_ref=survey_ref,
         ru_ref=ru_ref,
         page_title=page_title,
-        expires_at=session.get_formatted_expires_in(),
     )
 
 

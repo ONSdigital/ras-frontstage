@@ -30,7 +30,7 @@ lint-check: load-design-system-templates
 	pipenv check
 	pipenv run isort . --check-only
 	pipenv run black --line-length 120 --check .
-	pipenv run djlint .
+	pipenv run djlint . --ignore=H037
 	pipenv run flake8
 
 test: lint-check

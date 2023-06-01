@@ -39,7 +39,6 @@ def create_message(session):
             errors=form.errors,
             message={},
             unread_message_count=unread_message_count,
-            expires_at=session.get_formatted_expires_in(),
         )
 
 

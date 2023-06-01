@@ -26,7 +26,6 @@ def upload_survey(session):
     business_party_id = request.args["business_party_id"]
     survey_short_name = request.args["survey_short_name"]
     logger.info("Attempting to upload collection instrument", case_id=case_id, party_id=party_id)
-    expires_at = session.get_formatted_expires_in()
 
     if request.content_length > app.config["MAX_UPLOAD_LENGTH"]:
         return redirect(
@@ -37,7 +36,6 @@ def upload_survey(session):
                 business_party_id=business_party_id,
                 survey_short_name=survey_short_name,
                 error_info="size",
-                expires_at=expires_at,
             )
         )
 
@@ -84,7 +82,6 @@ def upload_survey(session):
                 business_party_id=business_party_id,
                 survey_short_name=survey_short_name,
                 error_info=error_type,
-                expires_at=expires_at,
             )
         )
 
@@ -94,7 +91,6 @@ def upload_survey(session):
         "surveys/surveys-upload-success.html",
         upload_filename=upload_file.filename,
         unread_message_count=unread_message_count,
-        expires_at=expires_at,
     )
 
 

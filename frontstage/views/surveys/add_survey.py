@@ -16,10 +16,8 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 @surveys_bp.route("/add-survey", methods=["GET", "POST"])
 @jwt_authorization(request)
-def add_survey(session):
+def add_survey(_):
     form = EnrolmentCodeForm(request.form)
-
-    expires_at = session.get_formatted_expires_in()
 
     if request.method == "POST" and form.validate():
         enrolment_code = request.form.get("enrolment_code").lower()
@@ -34,7 +32,7 @@ def add_survey(session):
                 )
                 template_data = {"error": {"type": "failed"}}
                 return (
-                    render_template("surveys/surveys-add.html", form=form, data=template_data, expires_at=expires_at),
+                    render_template("surveys/surveys-add.html", form=form, data=template_data),
                     200,
                 )
             if not iac["active"]:
@@ -47,7 +45,6 @@ def add_survey(session):
                     "surveys/surveys-add.html",
                     form=form,
                     data=template_data,
-                    expires_at=expires_at,
                 )
         except ApiError as exc:
             if exc.status_code == 400:
@@ -61,7 +58,6 @@ def add_survey(session):
                     "surveys/surveys-add.html",
                     form=form,
                     data=template_data,
-                    expires_at=expires_at,
                 )
             else:
                 logger.error(
@@ -81,23 +77,12 @@ def add_survey(session):
                 encrypted_enrolment_code=encrypted_enrolment_code,
                 _external=True,
                 _scheme=getenv("SCHEME", "http"),
-                expires_at=expires_at,
             )
         )
 
     elif request.method == "POST" and not form.validate():
         logger.info("Invalid character length, must be 12 characters")
         template_data = {"error": {"type": "failed"}}
-        return render_template(
-            "surveys/surveys-add.html",
-            form=form,
-            data=template_data,
-            expires_at=expires_at,
-        )
+        return render_template("surveys/surveys-add.html", form=form, data=template_data)
 
-    return render_template(
-        "surveys/surveys-add.html",
-        form=form,
-        data={"error": {}},
-        expires_at=expires_at,
-    )
+    return render_template("surveys/surveys-add.html", form=form, data={"error": {}})

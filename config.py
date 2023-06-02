@@ -130,9 +130,7 @@ class TestingConfig(DevelopmentConfig):
     ACCOUNT_SERVICE_LOG_OUT_URL = "http://frontstage-url/sign-in/logout"
     EQ_URL = "https://eq-test/session?token="
     EQ_V3_URL = "https://eq-test/v3/session?token="
-    JSON_SECRET_KEYS = open(
-        "/Users/matthewrobinson/Documents/rasrm/ras-frontstage/tests/test_data/jwt-test-keys/test_key.json"
-    ).read()
+    JSON_SECRET_KEYS = open("./tests/test_data/jwt-test-keys/test_key.json").read()
     SECURITY_USER_NAME = "username"
     SECURITY_USER_PASSWORD = "password"
     SECRET_KEY = os.getenv("SECRET_KEY", "ONS_DUMMY_KEY")

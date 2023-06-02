@@ -18,7 +18,7 @@ class TestSession(unittest.TestCase):
     @freeze_time(TIME_TO_FREEZE)
     def setUp(self):
         self.app = app.test_client()
-        self.app.set_cookie(server_name="localhost", key="authorization", value=SESSION_KEY)
+        self.app.set_cookie(domain="localhost", key="authorization", value=SESSION_KEY)
         session = Session.from_party_id(PARTY_ID)
         self.encoded_jwt_token = session.encoded_jwt_token
 

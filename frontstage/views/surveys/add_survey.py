@@ -26,13 +26,26 @@ def add_survey(_):
         try:
             iac = iac_controller.get_iac_from_enrolment(enrolment_code)
             if iac is None:
-                logger.info("Enrolment code not found when attempting to add survey", enrolment_code=enrolment_code)
+                logger.info(
+                    "Enrolment code not found when attempting to add survey",
+                    enrolment_code=enrolment_code,
+                )
                 template_data = {"error": {"type": "failed"}}
-                return render_template("surveys/surveys-add.html", form=form, data=template_data), 200
+                return (
+                    render_template("surveys/surveys-add.html", form=form, data=template_data),
+                    200,
+                )
             if not iac["active"]:
-                logger.info("Enrolment code not active when attempting to add survey", enrolment_code=enrolment_code)
+                logger.info(
+                    "Enrolment code not active when attempting to add survey",
+                    enrolment_code=enrolment_code,
+                )
                 template_data = {"error": {"type": "failed"}}
-                return render_template("surveys/surveys-add.html", form=form, data=template_data)
+                return render_template(
+                    "surveys/surveys-add.html",
+                    form=form,
+                    data=template_data,
+                )
         except ApiError as exc:
             if exc.status_code == 400:
                 logger.info(
@@ -41,7 +54,11 @@ def add_survey(_):
                     enrolment_code=enrolment_code,
                 )
                 template_data = {"error": {"type": "failed"}}
-                return render_template("surveys/surveys-add.html", form=form, data=template_data)
+                return render_template(
+                    "surveys/surveys-add.html",
+                    form=form,
+                    data=template_data,
+                )
             else:
                 logger.error(
                     "Failed to submit enrolment code when attempting to add survey",

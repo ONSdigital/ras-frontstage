@@ -30,7 +30,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 @account_bp.route("/share-surveys", methods=["GET"])
 @jwt_authorization(request)
-def share_survey_overview(session):
+def share_survey_overview(_):
     # 'share_survey_data' holds business and surveys selected for share
     flask_session.pop("share_survey_data", None)
     # 'share_survey_recipient_email_address' holds the recipient email address
@@ -57,7 +57,7 @@ def share_survey_business_select(session):
 
 @account_bp.route("/share-surveys/business-selection", methods=["POST"])
 @jwt_authorization(request)
-def share_survey_post_business_select(session):
+def share_survey_post_business_select(_):
     flask_session.pop("share_survey_data", None)
     share_survey_business_selected = request.form.getlist("checkbox-answer")
     if len(share_survey_business_selected) == 0:
@@ -178,7 +178,7 @@ def is_max_share_survey_exceeded(selected_businesses, form):
 
 @account_bp.route("/share-surveys/survey-selection", methods=["POST"])
 @jwt_authorization(request)
-def share_survey_post_survey_select(session):
+def share_survey_post_survey_select(_):
     share_dictionary_copy = flask_session["share_survey_data"]
     flask_session.pop("validation_failure_share_surveys_list", None)
     selected_businesses = get_selected_businesses()
@@ -204,10 +204,14 @@ def share_survey_post_survey_select(session):
 
 @account_bp.route("/share-surveys/recipient-email-address", methods=["GET"])
 @jwt_authorization(request)
-def share_survey_email_entry(session):
+def share_survey_email_entry(_):
     form = AccountSurveyShareRecipientEmailForm(request.values)
     flask_session["share_survey_recipient_email_address"] = None
-    return render_template("surveys/surveys-share/recipient-email-address.html", form=form, errors=form.errors)
+    return render_template(
+        "surveys/surveys-share/recipient-email-address.html",
+        form=form,
+        errors=form.errors,
+    )
 
 
 @account_bp.route("/share-surveys/recipient-email-address", methods=["POST"])
@@ -230,7 +234,7 @@ def share_survey_post_email_entry(session):
 
 @account_bp.route("/share-surveys/send-instruction", methods=["GET"])
 @jwt_authorization(request)
-def send_instruction_get(session):
+def send_instruction_get(_):
     email = flask_session["share_survey_recipient_email_address"]
     share_dict = {}
     for business_id in flask_session["share_survey_data"]:
@@ -304,12 +308,14 @@ def send_instruction(session):
             "contact us.",
         )
         return redirect(url_for("account_bp.send_instruction_get"))
-    return render_template("surveys/surveys-share/almost-done.html")
+    return render_template(
+        "surveys/surveys-share/almost-done.html",
+    )
 
 
 @account_bp.route("/share-surveys/done", methods=["GET"])
 @jwt_authorization(request)
-def share_survey_done(session):
+def share_survey_done(_):
     flask_session.pop("share", None)
     flask_session.pop("share_survey_recipient_email_address", None)
     return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))

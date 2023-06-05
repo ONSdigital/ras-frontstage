@@ -53,7 +53,12 @@ def account(session):
     else:
         form = OptionsForm()
 
-    return render_template("account/account.html", form=form, respondent=respondent_details, page_title=page_title)
+    return render_template(
+        "account/account.html",
+        form=form,
+        respondent=respondent_details,
+        page_title=page_title,
+    )
 
 
 @account_bp.route("/change-password", methods=["GET", "POST"])
@@ -155,15 +160,21 @@ def change_account_details(session):
         return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
     else:
         return render_template(
-            "account/account-contact-detail-change.html", form=form, errors=form.errors, respondent=respondent_details
+            "account/account-contact-detail-change.html",
+            form=form,
+            errors=form.errors,
+            respondent=respondent_details,
         )
 
 
 @account_bp.route("/something-else", methods=["GET"])
 @jwt_authorization(request)
-def something_else(session):
+def something_else(_):
     """Gets the something else once the option is selected"""
-    return render_template("account/account-something-else.html", form=SecureMessagingForm())
+    return render_template(
+        "account/account-something-else.html",
+        form=SecureMessagingForm(),
+    )
 
 
 @account_bp.route("/something-else", methods=["POST"])

@@ -74,4 +74,7 @@ def survey_confirm_organisation(_):
         enrolment_code=enrolment_code,
     )
 
-    return render_template("surveys/surveys-confirm-organisation.html", context=business_context)
+    return render_template(
+        "surveys/surveys-confirm-organisation.html",
+        context=business_context,
+    )

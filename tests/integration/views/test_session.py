@@ -52,3 +52,18 @@ class TestSession(unittest.TestCase):
         # Then the expiration time is in 40 minutes as calling expires-at doesn't extend the session
         self.assertEqual(expected_expires_at, parsed_json["expires_at"])
         self.assertEqual((future_time + timedelta(minutes=40)).isoformat(), expected_expires_at)
+
+    @freeze_time(TIME_TO_FREEZE)
+    @patch("redis.StrictRedis.get")
+    def test_expire_at_patch_extends_session(self, mock_redis):
+        # Given a user has a valid jwt_token set to expire in 60 minutes
+        mock_redis.return_value = self.encoded_jwt_token
+        # When the expires-at end point is patched we receive an updated expires-at value
+        request_time = TIME_TO_FREEZE + timedelta(minutes=20)
+        with freeze_time(request_time):
+            response = self.app.patch("/session/expires-at")
+            parsed_json = json.loads(response.data)
+            expected_expires_at = (request_time + timedelta(seconds=SESSION_TIMEOUT_SECONDS)).isoformat()
+
+        # Then the expires value is 60 minutes greater than it was
+        self.assertEqual(parsed_json["expires_at"], expected_expires_at)

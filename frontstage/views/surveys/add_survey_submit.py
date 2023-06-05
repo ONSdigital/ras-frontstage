@@ -95,10 +95,6 @@ def add_survey_submit(session):
             tag="todo",
             already_enrolled=already_enrolled,
         )
-        + "#"
-        + business_party_id
-        + "#"
-        + added_survey_id
     )
 
 

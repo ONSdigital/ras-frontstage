@@ -100,7 +100,7 @@ class TestJWTAuthorization(unittest.TestCase):
         request = mock.MagicMock(cookies={"authorization": self.session.session_key})
 
         # When the jwt_authorization decorator is exercised
-        # Then the function raises an JWTPayLoadError exception
+        # Then the function raises an JWTValidationError exception
         with self.assertRaises(JWTValidationError) as e:
             self.decorator_test(request)
         self.assertEqual(e.exception.message, f"{EXPIRES_IN_MISSING_FROM_PAYLOAD} {self.party_id}")

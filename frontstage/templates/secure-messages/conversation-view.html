@@ -78,6 +78,7 @@
                     {% call onsMessage({
                         "type": msgType,
                         "id": 'conversation-message-' + loop.index|string,
+                        "name": 'conversation-message',
                         "fromLabel": 'From',
                         "fromName": 'sm-sender',
                         "fromId": 'sm-sender-' + loop.index|string,
@@ -87,6 +88,7 @@
                         "sentName": 'sm-sent-date',
                         "sentId": 'sm-sent-date-' + loop.index|string,
                         "messageID": 'conversation-message-body-' + loop.index|string,
+                        "messageName": 'conversation-message-body'
                     }) %}
                         <span style="white-space:pre-line">{{ message.get('body') }}</span>
                     {% endcall %}

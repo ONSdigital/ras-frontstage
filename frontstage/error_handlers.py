@@ -1,9 +1,10 @@
 import logging
 
-from flask import render_template, request, session, url_for
+from flask import flash, render_template, request, session, url_for
 from flask_wtf.csrf import CSRFError
 from requests.exceptions import ConnectionError
 from structlog import wrap_logger
+from werkzeug.exceptions import Unauthorized
 from werkzeug.utils import redirect
 
 from frontstage import app
@@ -44,6 +45,14 @@ def handle_csrf_error(error):
         return redirect(url_for("sign_in_bp.logout", csrf_error=True))
 
 
+@app.errorhandler(Unauthorized)
+def unauthorized(error):
+    logger.info(error.description, url=request.url, status_code=401)
+    flash("To help protect your information we have signed you out.", "info")
+    session["next"] = request.url
+    return redirect(url_for("sign_in_bp.logout"))
+
+
 @app.errorhandler(ApiError)
 def api_error(error):
     logger.error(
@@ -65,8 +74,8 @@ def connection_error(error):
 
 @app.errorhandler(JWTValidationError)
 def jwt_validation_error(error):
-    logger.error("JWT validation error", url=request.url, status_code=403)
-    return render_template("errors/403-error.html"), 403
+    logger.error(error=error.message, status_code=500)
+    return render_template("errors/500-error.html"), 500
 
 
 @app.errorhandler(Exception)

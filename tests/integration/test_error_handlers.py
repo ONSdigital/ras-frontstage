@@ -71,11 +71,8 @@ class TestErrorHandlers(unittest.TestCase):
         mock_request.get(url_get_respondent_email, json=party)
         mock_request.post(url_auth_token, exc=JWTValidationError)
         mock_request.get(url_banner_api, status_code=404)
-
         response = self.app.post("sign-in", data=self.sign_in_form, follow_redirects=True)
-
-        self.assertEqual(response.status_code, 403)
-        self.assertTrue("Not signed in".encode() in response.data)
+        self.assertEqual(response.status_code, 500)
 
     @requests_mock.mock()
     def test_csrf_token_expired(self, mock_request):

@@ -102,7 +102,6 @@ def login():  # noqa: C901
         response.set_cookie(
             "authorization",
             value=redis_session.session_key,
-            expires=redis_session.get_expires_in(),
             secure=secure,
             httponly=secure,
             samesite="strict",

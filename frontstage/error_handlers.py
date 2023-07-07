@@ -33,7 +33,7 @@ def not_found_error(error):
 
 @app.errorhandler(CSRFError)
 def handle_csrf_error(error):
-    logger.warning("CSRF token has expired", error_message=error.description, status_code=error.code)
+    logger.warning(error.description, status_code=error.code)
 
     session_key = request.cookies.get("authorization")
     session_handler = Session.from_session_key(session_key)

@@ -98,12 +98,11 @@ def login():  # noqa: C901
         bound_logger.info("Successfully found user in party service")
         bound_logger.info("Creating session")
         redis_session = Session.from_party_id(party_id)
-        secure = app.config["WTF_CSRF_ENABLED"]
         response.set_cookie(
             "authorization",
             value=redis_session.session_key,
-            secure=secure,
-            httponly=secure,
+            secure=app.config["SECURE_APP"],
+            httponly=True,
             samesite="strict",
         )
         count = conversation_controller.get_message_count_from_api(redis_session)

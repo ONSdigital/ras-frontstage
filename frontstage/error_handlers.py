@@ -1,6 +1,6 @@
 import logging
 
-from flask import flash, render_template, request, session, url_for
+from flask import flash, request, session, url_for
 from flask_wtf.csrf import CSRFError
 from requests.exceptions import ConnectionError
 from structlog import wrap_logger
@@ -15,6 +15,7 @@ from frontstage.exceptions.exceptions import (
     InvalidEqPayLoad,
     JWTValidationError,
 )
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 

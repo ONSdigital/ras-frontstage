@@ -1,7 +1,7 @@
 import json
 import logging
 
-from flask import flash, render_template, request
+from flask import flash, request
 from flask import session as flask_session
 from flask import url_for
 from structlog import wrap_logger
@@ -24,13 +24,14 @@ from frontstage.models import (
     ConfirmEmailChangeForm,
 )
 from frontstage.views.account import account_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 
 
 @account_bp.route("/transfer-surveys", methods=["GET"])
 @jwt_authorization(request)
-def transfer_survey_overview(_):
+def transfer_survey_overview(session):
     # 'transfer_survey_data' holds business and surveys selected for share
     flask_session.pop("transfer_survey_data", None)
     # 'transfer_survey_recipient_email_address' holds the recipient email address
@@ -40,7 +41,7 @@ def transfer_survey_overview(_):
     flask_session.pop("validation_failure_transfer_surveys_list", None)
     # 'transfer_surveys_selected_list' holds list of surveys selected by user so that its checked in case of any error
     flask_session.pop("transfer_surveys_selected_list", None)
-    return render_template("surveys/surveys-transfer/overview.html")
+    return render_template("surveys/surveys-transfer/overview.html", session=session)
 
 
 @account_bp.route("/transfer-surveys/business-selection", methods=["GET"])
@@ -54,6 +55,7 @@ def transfer_survey_business_select(session):
     businesses = get_list_of_business_for_party(party_id)
     return render_template(
         "surveys/surveys-transfer/business-select.html",
+        session=session,
         businesses=businesses,
         form=form,
     )
@@ -61,7 +63,7 @@ def transfer_survey_business_select(session):
 
 @account_bp.route("/transfer-surveys/business-selection", methods=["POST"])
 @jwt_authorization(request)
-def transfer_survey_post_business_select(_):
+def transfer_survey_post_business_select(session):
     flask_session.pop("transfer_survey_data", None)
     transfer_survey_business_selected = request.form.getlist("checkbox-answer")
     if len(transfer_survey_business_selected) == 0:
@@ -88,6 +90,7 @@ def transfer_survey_survey_select(session):
     selected_survey_list = flask_session.get("transfer_surveys_selected_list")
     return render_template(
         "surveys/surveys-transfer/survey-select.html",
+        session=session,
         transfer_dict=transfer_dict,
         error=error,
         failed_surveys_list=failed_surveys_list if failed_surveys_list is not None else [],
@@ -184,7 +187,7 @@ def is_max_transfer_survey_exceeded(selected_businesses, form):
 
 @account_bp.route("/transfer-surveys/survey-selection", methods=["POST"])
 @jwt_authorization(request)
-def transfer_survey_post_survey_select(_):
+def transfer_survey_post_survey_select(session):
     share_dictionary_copy = flask_session["transfer_survey_data"]
     flask_session.pop("validation_failure_transfer_surveys_list", None)
     selected_businesses = get_selected_businesses()
@@ -210,10 +213,12 @@ def transfer_survey_post_survey_select(_):
 
 @account_bp.route("/transfer-surveys/recipient-email-address", methods=["GET"])
 @jwt_authorization(request)
-def transfer_survey_email_entry(_):
+def transfer_survey_email_entry(session):
     form = AccountSurveyShareRecipientEmailForm(request.values)
     flask_session["transfer_survey_recipient_email_address"] = None
-    return render_template("surveys/surveys-transfer/recipient-email-address.html", form=form, errors=form.errors)
+    return render_template(
+        "surveys/surveys-transfer/recipient-email-address.html", session=session, form=form, errors=form.errors
+    )
 
 
 @account_bp.route("/transfer-surveys/recipient-email-address", methods=["POST"])
@@ -224,19 +229,23 @@ def transfer_survey_post_email_entry(session):
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
     if not form.validate():
         errors = form.errors
-        return render_template("surveys/surveys-transfer/recipient-email-address.html", form=form, errors=errors)
+        return render_template(
+            "surveys/surveys-transfer/recipient-email-address.html", session=session, form=form, errors=errors
+        )
 
     if "emailAddress" in respondent_details:
         if respondent_details["emailAddress"].lower() == form.data["email_address"].lower():
             errors = {"email_address": ["You can not transfer surveys to yourself."]}
-            return render_template("surveys/surveys-transfer/recipient-email-address.html", form=form, errors=errors)
+            return render_template(
+                "surveys/surveys-transfer/recipient-email-address.html", session=session, form=form, errors=errors
+            )
     flask_session["transfer_survey_recipient_email_address"] = form.data["email_address"]
     return redirect(url_for("account_bp.send_transfer_instruction_get"))
 
 
 @account_bp.route("/transfer-surveys/send-instruction", methods=["GET"])
 @jwt_authorization(request)
-def send_transfer_instruction_get(_):
+def send_transfer_instruction_get(session):
     email = flask_session["transfer_survey_recipient_email_address"]
     share_dict = {}
     for business_id in flask_session["transfer_survey_data"]:
@@ -250,6 +259,7 @@ def send_transfer_instruction_get(_):
         }
     return render_template(
         "surveys/surveys-transfer/send-instructions.html",
+        session=session,
         email=email,
         share_dict=share_dict,
         form=ConfirmEmailChangeForm(),
@@ -309,14 +319,12 @@ def send_transfer_instruction(session):
             "contact us.",
         )
         return redirect(url_for("account_bp.send_transfer_instruction_get"))
-    return render_template(
-        "surveys/surveys-transfer/almost-done.html",
-    )
+    return render_template("surveys/surveys-transfer/almost-done.html", session=session)
 
 
 @account_bp.route("/transfer-surveys/done", methods=["GET"])
 @jwt_authorization(request)
-def transfer_survey_done(_):
+def transfer_survey_done(session):
     flask_session.pop("share", None)
     flask_session.pop("transfer_survey_recipient_email_address", None)
-    return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
+    return redirect(url_for("surveys_bp.get_survey_list", session=session, tag="todo"))

@@ -1,7 +1,7 @@
 import json
 import logging
 
-from flask import flash, render_template, request
+from flask import flash, request
 from flask import session as flask_session
 from flask import url_for
 from structlog import wrap_logger
@@ -24,13 +24,14 @@ from frontstage.models import (
     ConfirmEmailChangeForm,
 )
 from frontstage.views.account import account_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 
 
 @account_bp.route("/share-surveys", methods=["GET"])
 @jwt_authorization(request)
-def share_survey_overview(_):
+def share_survey_overview(session):
     # 'share_survey_data' holds business and surveys selected for share
     flask_session.pop("share_survey_data", None)
     # 'share_survey_recipient_email_address' holds the recipient email address
@@ -40,7 +41,7 @@ def share_survey_overview(_):
     flask_session.pop("validation_failure_share_surveys_list", None)
     # 'share_surveys_selected_list' holds list of surveys selected by user so that its checked in case of any error
     flask_session.pop("share_surveys_selected_list", None)
-    return render_template("surveys/surveys-share/overview.html")
+    return render_template("surveys/surveys-share/overview.html", session=session)
 
 
 @account_bp.route("/share-surveys/business-selection", methods=["GET"])
@@ -52,7 +53,9 @@ def share_survey_business_select(session):
     form = AccountSurveySelectBusinessForm(request.values)
     party_id = session.get_party_id()
     businesses = get_list_of_business_for_party(party_id)
-    return render_template("surveys/surveys-share/business-select.html", businesses=businesses, form=form)
+    return render_template(
+        "surveys/surveys-share/business-select.html", session=session, businesses=businesses, form=form
+    )
 
 
 @account_bp.route("/share-surveys/business-selection", methods=["POST"])
@@ -84,6 +87,7 @@ def share_survey_survey_select(session):
     selected_survey_list = flask_session.get("share_surveys_selected_list")
     return render_template(
         "surveys/surveys-share/survey-select.html",
+        session=session,
         share_dict=share_dict,
         error=error,
         failed_surveys_list=failed_surveys_list if failed_surveys_list is not None else [],

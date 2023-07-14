@@ -1,11 +1,12 @@
 import logging
 
-from flask import render_template, request
+from flask import request
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import case_controller, conversation_controller
 from frontstage.views.surveys import surveys_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -47,6 +48,7 @@ def upload_failed(session):
     unread_message_count = {"unread_message_count": conversation_controller.try_message_count_from_session(session)}
     return render_template(
         "surveys/surveys-upload-failure.html",
+        session=session,
         business_info=case_data["business_party"],
         survey_info=case_data["survey"],
         collection_exercise_info=case_data["collection_exercise"],

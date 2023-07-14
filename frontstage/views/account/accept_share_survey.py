@@ -1,6 +1,6 @@
 import logging
 
-from flask import flash, render_template, request, url_for
+from flask import flash, request, url_for
 from structlog import wrap_logger
 from werkzeug.utils import redirect
 
@@ -10,6 +10,7 @@ from frontstage.controllers import party_controller, survey_controller
 from frontstage.controllers.party_controller import get_business_by_id
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.views.account import account_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -126,7 +127,7 @@ def accept_share_surveys_existing_account(session, batch):
         logger.error("Failed to confirm share survey for existing account", status=exc.status_code, batch_number=batch)
         raise exc
     logger.info("Successfully completed share survey for existing account", batch_number=batch)
-    return render_template("surveys/surveys-share/share-survey-complete-thank-you.html")
+    return render_template("surveys/surveys-share/share-survey-complete-thank-you.html", session=session)
 
 
 def _is_existing_account(respondent_email):

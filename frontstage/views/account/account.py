@@ -194,7 +194,7 @@ def something_else_post(session):
     sent_message = _send_new_message(subject, party_id, category="TECHNICAL")
     thread_url = url_for("secure_message_bp.view_conversation", thread_id=sent_message["thread_id"]) + "#latest-message"
     flash(Markup(f"Message sent. <a href={thread_url}>View Message</a>"))
-    return redirect(url_for("surveys_bp.get_survey_list", session=session, tag="todo"))
+    return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
 
 
 def check_attribute_change(form, attributes_changed, respondent_details, update_required_flag):

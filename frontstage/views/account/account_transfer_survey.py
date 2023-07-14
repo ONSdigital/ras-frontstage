@@ -187,7 +187,7 @@ def is_max_transfer_survey_exceeded(selected_businesses, form):
 
 @account_bp.route("/transfer-surveys/survey-selection", methods=["POST"])
 @jwt_authorization(request)
-def transfer_survey_post_survey_select(session):
+def transfer_survey_post_survey_select(_):
     share_dictionary_copy = flask_session["transfer_survey_data"]
     flask_session.pop("validation_failure_transfer_surveys_list", None)
     selected_businesses = get_selected_businesses()
@@ -327,4 +327,4 @@ def send_transfer_instruction(session):
 def transfer_survey_done(session):
     flask_session.pop("share", None)
     flask_session.pop("transfer_survey_recipient_email_address", None)
-    return redirect(url_for("surveys_bp.get_survey_list", session=session, tag="todo"))
+    return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))

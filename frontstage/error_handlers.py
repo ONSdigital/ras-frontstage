@@ -1,6 +1,6 @@
 import logging
 
-from flask import flash, request, session, url_for
+from flask import request, session, url_for
 from flask_wtf.csrf import CSRFError
 from requests.exceptions import ConnectionError
 from structlog import wrap_logger
@@ -13,6 +13,7 @@ from frontstage.exceptions.exceptions import (
     ApiError,
     IncorrectAccountAccessError,
     InvalidEqPayLoad,
+    JWTTimeoutError,
     JWTValidationError,
 )
 from frontstage.views.template_helper import render_template
@@ -43,15 +44,13 @@ def handle_csrf_error(error):
         return render_template("errors/400-error.html"), 400
     else:
         session["next"] = request.url
-        return redirect(url_for("sign_in_bp.logout", csrf_error=True))
+        return redirect(url_for("sign_in_bp.logout", sign_out_guidance=True))
 
 
 @app.errorhandler(Unauthorized)
 def unauthorized(error):
     logger.info(error.description, url=request.url, status_code=401)
-    flash("To help protect your information we have signed you out.", "info")
-    session["next"] = request.url
-    return redirect(url_for("sign_in_bp.logout"))
+    return redirect(url_for("sign_in_bp.logout", sign_out_guidance=True))
 
 
 @app.errorhandler(ApiError)
@@ -75,8 +74,14 @@ def connection_error(error):
 
 @app.errorhandler(JWTValidationError)
 def jwt_validation_error(error):
-    logger.error(error=error.message, status_code=500)
+    logger.error(error.message, status_code=500)
     return render_template("errors/500-error.html"), 500
+
+
+@app.errorhandler(JWTTimeoutError)
+def jwt_timeout(error):
+    logger.error(error.message, status_code=401)
+    return render_template("errors/400-error.html"), 401
 
 
 @app.errorhandler(Exception)

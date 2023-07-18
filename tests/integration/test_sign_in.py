@@ -11,6 +11,7 @@ from frontstage.controllers.party_controller import (
     notify_party_and_respondent_account_locked,
 )
 from frontstage.exceptions.exceptions import ApiError
+from frontstage.views.sign_in.logout import SIGN_OUT_GUIDANCE
 from tests.integration.mocked_services import (
     message_count,
     party,
@@ -166,7 +167,7 @@ class TestSignIn(unittest.TestCase):
 
         response = self.app.get("/surveys/todo", follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue("To help protect your information we have signed you out".encode() in response.data)
+        self.assertTrue(SIGN_OUT_GUIDANCE.encode() in response.data)
         self.assertIn(b"Sign in", response.data)
 
     @requests_mock.mock()

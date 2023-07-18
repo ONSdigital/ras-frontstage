@@ -75,11 +75,11 @@
 {% endblock %}
 
 {% block preFooter %}
-    {% if expires_at %}
+    {% if session_expires_at %}
         {{
             onsTimeoutModal ({
                 "showModalTimeInSeconds": 60,
-                "redirectUrl": url_for("sign_in_bp.logout"),
+                "redirectUrl": url_for("sign_in_bp.logout", sign_out_guidance=True),
                 "sessionExpiresAt": session_expires_at,
                 "serverSessionExpiryEndpoint": url_for("session.session_expires_at"),
                 "title": "You will be signed out soon",

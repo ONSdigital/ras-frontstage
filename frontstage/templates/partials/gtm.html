@@ -10,7 +10,7 @@
             j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
             f.parentNode.insertBefore(j,f);
         })
-        (window,document,'script','dataLayer','<<GOOGLE_TAG_MANAGER_ID>>');
+        (window,document,'script','dataLayer',{{ config['GOOGLE_TAG_MANAGER_ID']|tojson }});
     }
 </script>
 <!-- End Google Tag Manager -->

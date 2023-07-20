@@ -11,8 +11,11 @@
     {% endif %}
 {% endblock %}
 {% block bodyStart %}
-    {% if config.GOOGLE_TAG_MANAGER_ID and config.GOOGLE_ANALYTICS_MEASUREMENT_ID %}
-        {% include "partials/ga.html" %}
+    {% if config.GOOGLE_TAG_MANAGER_ID %}
+        {% if config.GOOGLE_ANALYTICS_MEASUREMENT_ID %}
+            {% include "partials/ga.html" %}
+        {% endif %}
+        {% include "partials/gtm-no-script.html" %}
     {% endif %}
 {% endblock %}
 

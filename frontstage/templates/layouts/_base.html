@@ -10,8 +10,8 @@
     {% endif %}
 {% endblock %}
 {% block bodyStart %}
-    {% if config.GOOGLE_TAG_MANAGER_ID %}
-        {% include "partials/gtm-no-script.html" %}
+    {% if config.GOOGLE_TAG_MANAGER_ID and config.GOOGLE_ANALYTICS_MEASUREMENT_ID %}
+        {% include "partials/ga.html" %}
     {% endif %}
 {% endblock %}
 

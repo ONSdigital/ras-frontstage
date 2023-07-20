@@ -1,6 +1,6 @@
 import logging
 
-from flask import redirect, render_template, request, url_for
+from flask import redirect, request, url_for
 from structlog import wrap_logger
 
 from frontstage import app
@@ -14,6 +14,7 @@ from frontstage.controllers import (
 )
 from frontstage.exceptions.exceptions import CiUploadError, NoSurveyPermission
 from frontstage.views.surveys import surveys_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -89,6 +90,7 @@ def upload_survey(session):
     unread_message_count = {"unread_message_count": conversation_controller.try_message_count_from_session(session)}
     return render_template(
         "surveys/surveys-upload-success.html",
+        session=session,
         upload_filename=upload_file.filename,
         unread_message_count=unread_message_count,
     )

@@ -1,7 +1,7 @@
 import logging
 
 from flask import current_app as app
-from flask import render_template, request
+from flask import request
 from structlog import wrap_logger
 
 from frontstage.common.cryptographer import Cryptographer
@@ -14,6 +14,7 @@ from frontstage.controllers import (
 )
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.views.register import register_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 

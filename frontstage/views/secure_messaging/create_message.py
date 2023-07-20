@@ -1,13 +1,14 @@
 import json
 import logging
 
-from flask import Markup, flash, redirect, render_template, request, url_for
+from flask import Markup, flash, redirect, request, url_for
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import conversation_controller
 from frontstage.models import SecureMessagingForm
 from frontstage.views.secure_messaging import secure_message_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -33,6 +34,7 @@ def create_message(session):
         unread_message_count = {"unread_message_count": conversation_controller.try_message_count_from_session(session)}
         return render_template(
             "secure-messages/secure-messages-view.html",
+            session=session,
             ru_ref=ru_ref,
             survey_id=survey_id,
             form=form,

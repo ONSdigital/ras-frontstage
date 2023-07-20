@@ -1,10 +1,11 @@
 import logging
 
-from flask import Blueprint, flash, render_template, request, url_for
+from flask import Blueprint, flash, request, url_for
 from structlog import wrap_logger
 from werkzeug.utils import redirect
 
 from frontstage.models import HelpForm, HelpInfoOnsForm, HelpPasswordForm
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 

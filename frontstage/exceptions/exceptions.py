@@ -46,6 +46,11 @@ class JWTValidationError(Exception):
         self.message = message
 
 
+class JWTTimeoutError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
 class MissingEnvironmentVariable(Exception):
     def __init__(self, app, logger):
         self.app = app

@@ -1,7 +1,9 @@
 import logging
 
-from flask import Blueprint, render_template
+from flask import Blueprint
 from structlog import wrap_logger
+
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 

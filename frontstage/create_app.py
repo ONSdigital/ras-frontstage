@@ -54,7 +54,8 @@ def create_app_object():
     app.jinja_env.filters["file_size_filter"] = file_size_filter
     app.jinja_env.filters["subject_filter"] = subject_filter
 
-    CSRFProtect(app)
+    csrf = CSRFProtect(app)
+    csrf.exempt("frontstage.views.session.session_refresh_expires_at")
 
     @app.after_request
     def apply_headers(response):

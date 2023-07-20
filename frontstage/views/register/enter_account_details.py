@@ -1,7 +1,7 @@
 import logging
 from distutils.util import strtobool
 
-from flask import flash, render_template, request
+from flask import flash, request
 from structlog import wrap_logger
 
 from frontstage.common.cryptographer import Cryptographer
@@ -10,6 +10,7 @@ from frontstage.controllers import iac_controller, party_controller
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.models import PendingSurveyRegistrationForm, RegistrationForm
 from frontstage.views.register import register_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 cryptographer = Cryptographer()

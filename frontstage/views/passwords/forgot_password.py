@@ -1,12 +1,13 @@
 import logging
 
-from flask import abort, redirect, render_template, request, url_for
+from flask import abort, redirect, request, url_for
 from itsdangerous import BadSignature, URLSafeSerializer
 from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.models import ForgotPasswordForm
 from frontstage.views.passwords import passwords_bp, reset_password
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 

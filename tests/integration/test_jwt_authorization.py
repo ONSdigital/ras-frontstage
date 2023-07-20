@@ -13,7 +13,7 @@ from frontstage.common.authorisation import (
     jwt_authorization,
 )
 from frontstage.common.session import Session
-from frontstage.exceptions.exceptions import JWTValidationError
+from frontstage.exceptions.exceptions import JWTTimeoutError, JWTValidationError
 
 valid_jwt = (
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXJ0eV9pZCI6InRlc3QiLCJyb2xlIjoicmVzcG9uZGVudCIsInVucmVhZF9"
@@ -90,9 +90,9 @@ class TestJWTAuthorization(unittest.TestCase):
 
         # When the jwt_authorization decorator is exercised
         # Then the function raises an Unauthorized, JWT_DATE_EXPIRED exception
-        with self.assertRaises(Unauthorized) as e:
+        with self.assertRaises(JWTTimeoutError) as e:
             self.decorator_test(request)
-        self.assertEqual(e.exception.description, f"{JWT_DATE_EXPIRED} {self.party_id}")
+        self.assertEqual(e.exception.message, f"{JWT_DATE_EXPIRED} {self.party_id}")
 
     def test_jwt_authorization_no_expiry_in_payload(self):
         # Given a valid authorization cookie, but invalid JWT where the expiry_in key is missing from the payload

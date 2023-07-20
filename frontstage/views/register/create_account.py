@@ -1,7 +1,7 @@
 import logging
 import os
 
-from flask import redirect, render_template, request, url_for
+from flask import redirect, request, url_for
 from structlog import wrap_logger
 
 from frontstage.common.cryptographer import Cryptographer
@@ -9,6 +9,7 @@ from frontstage.controllers import case_controller, iac_controller
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.models import EnrolmentCodeForm
 from frontstage.views.register import register_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 

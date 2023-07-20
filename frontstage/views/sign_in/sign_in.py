@@ -1,7 +1,7 @@
 import logging
 from os import getenv
 
-from flask import make_response, redirect, render_template, request, session, url_for
+from flask import make_response, redirect, request, session, url_for
 from structlog import wrap_logger
 
 from frontstage import app
@@ -18,6 +18,7 @@ from frontstage.controllers.party_controller import (
 from frontstage.exceptions.exceptions import AuthError
 from frontstage.models import LoginForm
 from frontstage.views.sign_in import sign_in_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 

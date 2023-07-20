@@ -9,7 +9,7 @@ from werkzeug.exceptions import Unauthorized
 
 from frontstage import app
 from frontstage.common.session import Session
-from frontstage.exceptions.exceptions import JWTValidationError
+from frontstage.exceptions.exceptions import JWTTimeoutError, JWTValidationError
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -55,6 +55,6 @@ def _validate_jwt_date(token):
         if datetime.now().timestamp() <= expires_in:
             return
 
-        raise Unauthorized(f"{JWT_DATE_EXPIRED} {token.get('party_id')}")
+        raise JWTTimeoutError(f"{JWT_DATE_EXPIRED} {token.get('party_id')}")
 
     raise JWTValidationError(f"{EXPIRES_IN_MISSING_FROM_PAYLOAD} {token.get('party_id')}")

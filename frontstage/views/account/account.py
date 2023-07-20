@@ -1,7 +1,7 @@
 import json
 import logging
 
-from flask import flash, render_template, request, url_for
+from flask import flash, request, url_for
 from markupsafe import Markup
 from structlog import wrap_logger
 from werkzeug.utils import redirect
@@ -22,6 +22,7 @@ from frontstage.models import (
     SecureMessagingForm,
 )
 from frontstage.views.account import account_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -99,7 +100,7 @@ def change_password(session):
     else:
         errors = form.errors
 
-    return render_template("account/account-change-password.html", form=form, errors=errors)
+    return render_template("account/account-change-password.html", session=session, form=form, errors=errors)
 
 
 @account_bp.route("/change-account-email-address", methods=["POST"])
@@ -123,7 +124,7 @@ def change_email_address(session):
         else:
             raise exc
     logger.info("Successfully updated email on account", party_id=party_id)
-    return render_template("account/account-change-email-address-almost-done.html")
+    return render_template("account/account-change-email-address-almost-done.html", session=session)
 
 
 @account_bp.route("/change-account-details", methods=["GET", "POST"])
@@ -161,6 +162,7 @@ def change_account_details(session):
     else:
         return render_template(
             "account/account-contact-detail-change.html",
+            session=session,
             form=form,
             errors=form.errors,
             respondent=respondent_details,
@@ -169,10 +171,11 @@ def change_account_details(session):
 
 @account_bp.route("/something-else", methods=["GET"])
 @jwt_authorization(request)
-def something_else(_):
+def something_else(session):
     """Gets the something else once the option is selected"""
     return render_template(
         "account/account-something-else.html",
+        session=session,
         form=SecureMessagingForm(),
     )
 

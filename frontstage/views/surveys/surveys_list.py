@@ -1,13 +1,14 @@
 import logging
 from datetime import datetime
 
-from flask import make_response, render_template, request
+from flask import make_response, request
 from flask import session as flask_session
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import conversation_controller, party_controller
 from frontstage.views.surveys import surveys_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -58,6 +59,7 @@ def get_survey_list(session, tag):
         response = make_response(
             render_template(
                 "surveys/surveys-todo.html",
+                session=session,
                 sorted_surveys_list=sorted_survey_list,
                 added_survey=added_survey,
                 already_enrolled=already_enrolled,
@@ -73,6 +75,7 @@ def get_survey_list(session, tag):
     else:
         return render_template(
             "surveys/surveys-history.html",
+            session=session,
             sorted_surveys_list=sorted_survey_list,
             history=True,
             unread_message_count=unread_message_count,

@@ -8,13 +8,16 @@ from freezegun import freeze_time
 from requests.exceptions import ConnectionError
 
 from frontstage import app
-from frontstage.exceptions.exceptions import ApiError, JWTValidationError
+from frontstage.exceptions.exceptions import (
+    ApiError,
+    JWTTimeoutError,
+    JWTValidationError,
+)
+from frontstage.views.sign_in.logout import SIGN_OUT_GUIDANCE
 from tests.integration.mocked_services import (
     encoded_jwt_token,
-    party,
     url_auth_token,
     url_banner_api,
-    url_get_respondent_email,
 )
 
 TIME_TO_FREEZE = datetime(2023, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
@@ -69,11 +72,17 @@ class TestErrorHandlers(unittest.TestCase):
 
     @requests_mock.mock()
     def test_jwt_validation_error(self, mock_request):
-        mock_request.get(url_get_respondent_email, json=party)
-        mock_request.post(url_auth_token, exc=JWTValidationError)
+        mock_request.post(url_auth_token, exc=JWTValidationError(message="Error message"))
         mock_request.get(url_banner_api, status_code=404)
         response = self.app.post("sign-in", data=self.sign_in_form, follow_redirects=True)
         self.assertEqual(response.status_code, 500)
+
+    @requests_mock.mock()
+    def test_jwt_timeout_error(self, mock_request):
+        mock_request.post(url_auth_token, exc=JWTTimeoutError(message="Error message"))
+        mock_request.get(url_banner_api, status_code=404)
+        response = self.app.post("sign-in", data=self.sign_in_form, follow_redirects=True)
+        self.assertEqual(response.status_code, 401)
 
     def test_csrf_token_missing(self):
         # Given csrf is enabled
@@ -124,9 +133,7 @@ class TestErrorHandlers(unittest.TestCase):
 
         # Then a 200 is returned and notified they have been signed out
         self.assertEqual(csrf_timeout_response.status_code, 200)
-        self.assertTrue(
-            "To help protect your information we have signed you out.".encode() in csrf_timeout_response.data
-        )
+        self.assertTrue(SIGN_OUT_GUIDANCE.encode() in csrf_timeout_response.data)
 
     def _get_csrf_timeout_response(self):
         csrf_value = self._get_csrf_value_from_html(self.app.get("/sign-in/").data)

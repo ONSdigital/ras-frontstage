@@ -80,8 +80,8 @@ Environment variables available for configuration are listed below:
 | SECURITY_USER_PASSWORD          | Password for basic auth                             | 'secret'                                        |
 | JWT_SECRET                      | SECRET used to code JWT                             | 'testsecret'                                    |
 | VALIDATE_JWT                    | Boolean for turning on/off JWT validation (True=on) | True                                            |
-| GOOGLE_ANALYTICS_MEASUREMENT_ID | Code for google analytics                           | None                                            |
-| GOOGLE_TAG_MANAGER_ID           | Code for google tag manager                         | None                                            |
+| GOOGLE_ANALYTICS_MEASUREMENT_ID | Parameter used by google analytics                  | None                                            |
+| GOOGLE_TAG_MANAGER_ID           | Parameter used by google tag manager                | None                                            |
 | REDIS_HOST                      | Host address for the redis instance                 | 'localhost'                                     |
 | REDIS_PORT                      | Port for the redis instance                         | 6379                                            |
 | REDIS_DB                        | Database number for the redis instance              | 1                                               |

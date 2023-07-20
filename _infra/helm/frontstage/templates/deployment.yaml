@@ -122,9 +122,9 @@ spec:
             value: "{{ .Values.eq.v3url }}"
           {{ if .Values.analytics.enabled }}
           - name: GOOGLE_ANALYTICS_MEASUREMENT_ID
-            value: "{{ .Values.analytics.id }}"
+            value: "{{ .Values.analytics.measurementID }}"
           - name: GOOGLE_TAG_MANAGER_ID
-            value: "{{ .Values.analytics.tagManager }}"
+            value: "{{ .Values.analytics.managerID }}"
           {{- end }}
           - name: ACCESS_CONTROL_ALLOW_ORIGIN
             {{- if .Values.ingress.enabled }}

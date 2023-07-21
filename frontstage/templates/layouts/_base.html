@@ -6,27 +6,16 @@
     {% set css_theme = "css"~_theme~"/theme.css" %}
     <link href="{{ url_for('static', filename=css_theme) }}" rel="stylesheet" />
 
-    {% if config.GOOGLE_TAG_MANAGER %}
-        <!-- Google Tag Manager -->
-        <script{% if csp_nonce %} nonce="{{ csp_nonce() }}"{% endif %}>
-            var testCookies = /^(.*)?\s*'usage':true\s*[^;]+(.*)?$/;
-            if (document.cookie.match(testCookies)) {
-                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-                'https://www.googletagmanager.com/gtm.js?id='+i+dl+'&gtm_auth={{ config.GOOGLE_TAG_MANAGER_PROP }}&gtm_cookies_win=x';f.parentNode.insertBefore(j,f);
-                })(window,document,'script','dataLayer','{{ config.GOOGLE_TAG_MANAGER }}');
-            }
-        </script>
-        <!-- End Google Tag Manager -->
+    {% if config.GOOGLE_TAG_MANAGER_ID %}
+        {% include "partials/gtm.html" %}
     {% endif %}
 {% endblock %}
 {% block bodyStart %}
-    {% if config.GOOGLE_TAG_MANAGER %}
-        <!-- Google Tag Manager (noscript) -->
-        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ config.GOOGLE_TAG_MANAGER }}&gtm_auth={{ config.GOOGLE_TAG_MANAGER_PROP }}&gtm_cookies_win=x"
-        height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-        <!-- End Google Tag Manager (noscript) -->
+    {% if config.GOOGLE_TAG_MANAGER_ID %}
+        {% if config.GOOGLE_ANALYTICS_MEASUREMENT_ID %}
+            {% include "partials/ga.html" %}
+        {% endif %}
+        {% include "partials/gtm-no-script.html" %}
     {% endif %}
 {% endblock %}
 

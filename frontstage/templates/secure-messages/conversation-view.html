@@ -2,7 +2,7 @@
 {% from "components/button/_macro.njk" import onsButton %}
 {% from "components/message/_macro.njk" import onsMessage %}
 {% from "components/textarea/_macro.njk" import onsTextarea %}
-{% from "components/lists/_macro.njk" import onsList %}
+{% from "components/list/_macro.njk" import onsList %}
 
 {% set page_title = "View message" %}
 {% set subject = conversation[-1]["subject"] or "No Subject" %}
@@ -78,7 +78,6 @@
                     {% call onsMessage({
                         "type": msgType,
                         "id": 'conversation-message-' + loop.index|string,
-                        "name": 'conversation-message',
                         "fromLabel": 'From',
                         "fromName": 'sm-sender',
                         "fromId": 'sm-sender-' + loop.index|string,
@@ -87,8 +86,7 @@
                         "sentValue": message.get('sent_date'),
                         "sentName": 'sm-sent-date',
                         "sentId": 'sm-sent-date-' + loop.index|string,
-                        "messageID": 'conversation-message-body-' + loop.index|string,
-                        "messageName": 'conversation-message-body'
+                        "messageID": 'conversation-message-body-' + loop.index|string
                     }) %}
                         <span style="white-space:pre-line">{{ message.get('body') }}</span>
                     {% endcall %}

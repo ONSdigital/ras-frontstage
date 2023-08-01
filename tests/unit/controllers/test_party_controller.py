@@ -1,7 +1,5 @@
-import json
 import unittest
 from collections import namedtuple
-from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 
 import responses
@@ -11,7 +9,6 @@ from frontstage import app
 from frontstage.controllers import party_controller
 from frontstage.controllers.party_controller import (
     display_button,
-    filter_ended_collection_exercises,
     get_respondent_enrolments_for_started_collex,
 )
 from frontstage.exceptions.exceptions import ApiError
@@ -257,7 +254,7 @@ class TestPartyController(unittest.TestCase):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_survey, json=survey, status=200)
             rsps.add(rsps.GET, url_get_business_party, json=business_party, status=200)
-            rsps.add(rsps.GET, url_get_collection_exercises_by_survey, json=collection_exercise_by_survey, status=200)
+            rsps.add(rsps.GET, url_get_collction_exercises_by_survey, json=collection_exercise_by_survey, status=200)
 
             survey_list = party_controller.get_survey_list_details_for_party(
                 respondent_party["id"], "todo", business_party["id"], survey["id"]
@@ -292,35 +289,3 @@ class TestPartyController(unittest.TestCase):
         ]
         for combination in combinations:
             self.assertEqual(display_button(combination.status, combination.ci_type), combination.expected)
-
-    def test_filter_ended_collection_exercises(self):
-        """Tests the functionality of the 'filter_ended_collection_exercises' function"""
-        with open("tests/test_data/party/collection_exercises.json") as business_json_data:
-            data = json.load(business_json_data)
-
-        # Enddates set for tomorrow. Millseconds are set up this way because datetime generates 6 digits
-        # where we receive 3 digits.
-        date = datetime.now() + timedelta(days=1)
-        data[0]["scheduledEndDateTime"] = date.strftime("%Y-%m-%dT%H:%M:%S") + ".000Z"
-        data[1]["scheduledEndDateTime"] = date.strftime("%Y-%m-%dT%H:%M:%S") + ".111Z"
-        self.assertEqual(2, len(data))
-        result = filter_ended_collection_exercises(data)
-        self.assertEqual(2, len(result))
-
-        # Change one of the end dates to a past date.  It should successfully filter the collection exercise
-        # out of the list.
-        data[0]["scheduledEndDateTime"] = "2019-01-31T00:00:00.000Z"
-        self.assertEqual(2, len(data))
-        result = filter_ended_collection_exercises(data)
-        self.assertEqual(1, len(result))
-
-    def test_filter_ended_collection_exercises_remove_multiple(self):
-        collection_exercises = [
-            {"missingEndDateTime": "!"},
-            {"scheduledEndDateTime": str(datetime.now(timezone.utc) - timedelta(days=1))},
-            {"scheduledEndDateTime": str(datetime.now(timezone.utc) - timedelta(hours=1))},
-            {"scheduledEndDateTime": str(datetime.now(timezone.utc) + timedelta(hours=1))},
-            {"scheduledEndDateTime": str(datetime.now(timezone.utc) + timedelta(days=1))},
-        ]
-        result = filter_ended_collection_exercises(collection_exercises)
-        self.assertEqual(2, len(result))

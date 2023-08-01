@@ -62,26 +62,3 @@
 
 {% block bodyEnd %}
 {% endblock %}
-
-{% block preFooter %}
-    {% if session_expires_at %}
-        {{
-            onsTimeoutModal ({
-                "showModalTimeInSeconds": 60,
-                "redirectUrl": url_for("sign_in_bp.logout", sign_out_guidance=True),
-                "sessionExpiresAt": session_expires_at,
-                "serverSessionExpiryEndpoint": url_for("session.session_expires_at"),
-                "title": "You will be signed out soon",
-                "textFirstLine": "It appears you have been inactive for a while.",
-                "countdownText": "To protect your information, your progress will be saved and you will be signed out in",
-                "countdownExpiredText": "You are being signed out.",
-                "btnText": "Continue survey",
-                "minutesTextSingular": "minute",
-                "minutesTextPlural": "minutes",
-                "secondsTextSingular": "second",
-                "secondsTextPlural": "seconds",
-                "endWithFullStop": true
-            })
-        }}
-    {% endif %}
-{% endblock %}

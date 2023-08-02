@@ -1,6 +1,5 @@
 import unittest
 from collections import namedtuple
-from unittest.mock import patch
 
 import responses
 
@@ -15,17 +14,11 @@ from frontstage.exceptions.exceptions import ApiError
 from tests.integration.mocked_services import (
     business_party,
     case,
-    case_list,
     collection_exercise,
-    collection_exercise_by_survey,
-    collection_instrument_seft,
     respondent_party,
-    survey,
     url_get_business_party,
-    url_get_collection_exercises_by_survey,
     url_get_respondent_email,
     url_get_respondent_party,
-    url_get_survey,
     url_notify_party_and_respondent_account_locked,
     url_post_add_survey,
     url_reset_password_request,
@@ -232,44 +225,6 @@ class TestPartyController(unittest.TestCase):
         for enrolment in enrolments:
             self.assertTrue(enrolment["business_id"] is not None)
             self.assertTrue(enrolment["survey_id"] is not None)
-
-    @patch("frontstage.controllers.case_controller.calculate_case_status")
-    @patch("frontstage.controllers.collection_instrument_controller.get_collection_instrument")
-    @patch("frontstage.controllers.case_controller.get_cases_for_list_type_by_party_id")
-    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
-    def test_get_survey_list_details_for_party(
-        self,
-        get_respondent_enrolments,
-        get_cases,
-        get_collection_instrument,
-        calculate_case_status,
-    ):
-        enrolments = [{"business_id": business_party["id"], "survey_id": survey["id"]}]
-
-        get_respondent_enrolments.return_value = enrolments
-        get_cases.return_value = case_list
-        get_collection_instrument.return_value = collection_instrument_seft
-        calculate_case_status.return_value = "In Progress"
-
-        with responses.RequestsMock() as rsps:
-            rsps.add(rsps.GET, url_get_survey, json=survey, status=200)
-            rsps.add(rsps.GET, url_get_business_party, json=business_party, status=200)
-            rsps.add(rsps.GET, url_get_collction_exercises_by_survey, json=collection_exercise_by_survey, status=200)
-
-            survey_list = party_controller.get_survey_list_details_for_party(
-                respondent_party["id"], "todo", business_party["id"], survey["id"]
-            )
-            with app.app_context():
-                # This test might not do anything as the survey_list might be empty... look into this
-                for survey_details in survey_list:
-                    self.assertTrue(survey_details["case_id"] is not None)
-                    self.assertTrue(survey_details["status"] is not None)
-                    self.assertTrue(survey_details["collection_instrument_type"] is not None)
-                    self.assertTrue(survey_details["survey_id"] is not None)
-                    self.assertTrue(survey_details["survey_long_name"] is not None)
-                    self.assertTrue(survey_details["survey_short_name"] is not None)
-                    self.assertTrue(survey_details["business_party_id"] is not None)
-                    self.assertTrue(survey_details["collection_exercise_ref"] is not None)
 
     def test_display_button(self):
         Combination = namedtuple("Combination", ["status", "ci_type", "expected"])

@@ -61,14 +61,14 @@ class NotifyGateway:
 
             msg_id = future.result()
             bound_logger.info("Publish succeeded", msg_id=msg_id)
-            logger.unbind("template_id", "project_id", "topic_id")
+            bound_logger.unbind("template_id", "project_id", "topic_id")
         except TimeoutError as e:
             bound_logger.error("Publish to pubsub timed out", exc_info=True)
-            logger.unbind("template_id", "project_id", "topic_id")
+            bound_logger.unbind("template_id", "project_id", "topic_id")
             raise exceptions.RasNotifyError("Publish to pubsub timed out", error=e)
         except Exception as e:  # noqa
             bound_logger.error("A non-timeout error was raised when publishing to pubsub", exc_info=True)
-            logger.unbind("template_id", "project_id", "topic_id")
+            bound_logger.unbind("template_id", "project_id", "topic_id")
             raise exceptions.RasNotifyError("A non-timeout error was raised when publishing to pubsub", error=e)
 
     def request_to_notify(self, email, personalisation=None, reference=None):

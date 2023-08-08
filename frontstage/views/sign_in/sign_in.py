@@ -75,7 +75,7 @@ def login():  # noqa: C901
             else:
                 bound_logger.error("Unexpected error was returned from Auth service", auth_error=error_message)
 
-            logger.unbind("email")
+            bound_logger.unbind("email")
             return render_template("sign-in/sign-in.html", form=form, data={"error": {"type": "failed"}})
 
         bound_logger.info("Successfully found user in auth service.  Attempting to find user in party service")

@@ -31,7 +31,6 @@ google-cloud-storage = "*"
 python-gnupg = "*"
 werkzeug = "*"
 fakeredis = "*"
-certifi = "*"
 
 [dev-packages]
 black = "*"

@@ -25,12 +25,12 @@ dateutils = "*"
 requestsdefaulter = "*"
 pycryptodome = "*"
 flask-talisman = "*"
-email_validator = "*"
 google-cloud-pubsub = "*"
 google-cloud-storage = "*"
 python-gnupg = "*"
 werkzeug = "*"
 fakeredis = "*"
+email-validator = "*"
 
 [dev-packages]
 black = "*"

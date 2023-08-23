@@ -124,6 +124,9 @@ def change_email_address(session):
         else:
             raise exc
     logger.info("Successfully updated email on account", party_id=party_id)
+    password_verification_token = party_controller.get_verification_token(party_id)
+    if password_verification_token:
+        party_controller.delete_verification_token(password_verification_token["token"])
     return render_template("account/account-change-email-address-almost-done.html", session=session)
 
 

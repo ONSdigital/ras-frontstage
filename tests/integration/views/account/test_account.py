@@ -3,7 +3,9 @@ from unittest.mock import patch
 
 import requests_mock
 
+from config import TestingConfig
 from frontstage import app
+from frontstage.common import verification
 from tests.integration.mocked_services import (
     encoded_jwt_token,
     respondent_party,
@@ -139,9 +141,16 @@ class TestSurveyList(unittest.TestCase):
     def test_account_change_account_email_address_almost_done(
         self, mock_request, get_survey_list, update_account, get_respondent_party_by_id
     ):
+        with app.app_context():
+            token = verification.generate_email_token("test.com")
         mock_request.get(url_banner_api, status_code=404)
         get_respondent_party_by_id.return_value = respondent_party
         get_survey_list.return_value = survey_list_todo
+        mock_request.delete(
+            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-token/{token}",
+            status_code=200,
+            json={"message": "Successfully removed token"},
+        )
         response = self.app.post(
             "/my-account/change-account-email-address",
             data={"email_address": "exampleone@example.com"},

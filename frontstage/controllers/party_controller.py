@@ -148,7 +148,7 @@ def get_respondent_by_email(email):
 
     if response.status_code == 404:
         bound_logger.info("Failed to retrieve party by email")
-        raise AttributeError(logger, response)
+        return
 
     try:
         response.raise_for_status()
@@ -729,11 +729,6 @@ def delete_verification_token(token):
     Gives call to party service to delete a verification token for the respondent
     :param token: the verification token
     """
-    print(token)
-    print()
-    print()
-    print()
-    print()
     email = decode_email_token(token)
     logger.info("Attempting to delete respondent verification token", email=obfuscate_email(email))
 

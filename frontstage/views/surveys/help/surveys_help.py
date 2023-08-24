@@ -1,7 +1,7 @@
 import json
 import logging
 
-from flask import abort, flash, render_template, request
+from flask import abort, flash, request
 from flask import session as flask_session
 from flask import url_for
 from markupsafe import Markup
@@ -23,6 +23,7 @@ from frontstage.models import (
     SecureMessagingForm,
 )
 from frontstage.views.surveys import surveys_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 help_completing_this_survey_title = "Help completing this survey"
@@ -117,7 +118,7 @@ breadcrumb_text_mapping = {
 
 @surveys_bp.route("/surveys-help", methods=["GET"])
 @jwt_authorization(request)
-def get_surveys_help_page(_):
+def get_surveys_help_page(session):
     """Gets Survey Help page provided survey_ref and ru_ref and creates flash session for selection"""
     flask_session["help_survey_ref"] = request.args.get("survey_ref", None)
     flask_session["help_ru_ref"] = request.args.get("ru_ref", None)
@@ -131,7 +132,7 @@ def get_surveys_help_page(_):
 
 @surveys_bp.route("/help", methods=["GET", "POST"])
 @jwt_authorization(request)
-def help_page(_):
+def help_page(session):
     """Get survey help page provided survey_ref and ru_ref are in session and post help completing this survey option
     for respective survey"""
     abort_help_if_session_not_set()
@@ -150,6 +151,7 @@ def help_page(_):
 
     return render_template(
         "surveys/help/surveys-help.html",
+        session=session,
         form=HelpOptionsForm(),
         short_name=short_name,
         survey_name=survey["longName"],
@@ -215,6 +217,7 @@ def help_option_select(session, option: str):
 
     return render_template(
         template,
+        session=session,
         short_name=short_name,
         business_id=business_id,
         option=option,
@@ -239,6 +242,7 @@ def get_help_option_sub_option_select(session, option, sub_option):
     else:
         return render_template(
             template,
+            session=session,
             short_name=short_name,
             option=option,
             sub_option=sub_option,
@@ -287,6 +291,7 @@ def send_help_message(session, option, sub_option):
 
     return render_template(
         "secure-messages/help/secure-message-send-messages-view.html",
+        session=session,
         short_name=short_name,
         option=option,
         sub_option=sub_option,

@@ -1,0 +1,13 @@
+<!-- Google tag (gtag.js) -->
+<script nonce="{{ csp_nonce() }}" async src="https://www.googletagmanager.com/gtag/js?id={{config['GOOGLE_ANALYTICS_MEASUREMENT_ID']}}"></script>
+
+<script nonce="{{ csp_nonce() }}">
+    var allowTrackingCookies = /^(.*)?\s*'usage':true\s*[^;]+(.*)?$/;
+    if (document.cookie.match(allowTrackingCookies)) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);} gtag('js', new Date());
+        gtag({{ config['GOOGLE_ANALYTICS_MEASUREMENT_ID']|tojson }});
+    }
+</script>
+
+<!-- End Google tag -->

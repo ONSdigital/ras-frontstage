@@ -62,7 +62,6 @@ class TestDownloadSurvey(unittest.TestCase):
             self.assertEqual("no-cache", headers["Pragma"])
             self.assertEqual("max-age=31536000; includeSubDomains", headers["Strict-Transport-Security"])
             self.assertEqual("DENY", headers["X-Frame-Options"])
-            self.assertEqual("1; mode=block", headers["X-Xss-Protection"])
             self.assertEqual("nosniff", headers["X-Content-Type-Options"])
 
             csp_policy_parts = headers["Content-Security-Policy"].split("; ")

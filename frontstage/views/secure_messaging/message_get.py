@@ -1,7 +1,7 @@
 import logging
 from distutils.util import strtobool
 
-from flask import Markup, flash, json, redirect, render_template, request, url_for
+from flask import Markup, flash, json, redirect, request, url_for
 from structlog import wrap_logger
 
 from frontstage import app
@@ -19,6 +19,7 @@ from frontstage.controllers.survey_controller import get_survey
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.models import SecureMessagingForm
 from frontstage.views.secure_messaging import secure_message_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -83,6 +84,7 @@ def view_conversation(session, thread_id):
 
     return render_template(
         "secure-messages/conversation-view.html",
+        session=session,
         form=form,
         conversation=refined_conversation,
         conversation_data=conversation,
@@ -112,6 +114,7 @@ def view_conversation_list(session):
     unread_message_count = {"unread_message_count": try_message_count_from_session(session)}
     return render_template(
         "secure-messages/conversation-list.html",
+        session=session,
         messages=refined_conversation,
         is_closed=strtobool(is_closed),
         unread_message_count=unread_message_count,

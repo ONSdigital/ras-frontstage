@@ -1,7 +1,7 @@
 import logging
 from os import getenv
 
-from flask import make_response, redirect, render_template, request, session, url_for
+from flask import make_response, redirect, request, session, url_for
 from structlog import wrap_logger
 
 from frontstage import app
@@ -18,6 +18,7 @@ from frontstage.controllers.party_controller import (
 from frontstage.exceptions.exceptions import AuthError
 from frontstage.models import LoginForm
 from frontstage.views.sign_in import sign_in_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -74,7 +75,7 @@ def login():  # noqa: C901
             else:
                 bound_logger.error("Unexpected error was returned from Auth service", auth_error=error_message)
 
-            logger.unbind("email")
+            bound_logger.unbind("email")
             return render_template("sign-in/sign-in.html", form=form, data={"error": {"type": "failed"}})
 
         bound_logger.info("Successfully found user in auth service.  Attempting to find user in party service")
@@ -98,13 +99,11 @@ def login():  # noqa: C901
         bound_logger.info("Successfully found user in party service")
         bound_logger.info("Creating session")
         redis_session = Session.from_party_id(party_id)
-        secure = app.config["WTF_CSRF_ENABLED"]
         response.set_cookie(
             "authorization",
             value=redis_session.session_key,
-            expires=redis_session.get_expires_in(),
-            secure=secure,
-            httponly=secure,
+            secure=app.config["SECURE_APP"],
+            httponly=True,
             samesite="strict",
         )
         count = conversation_controller.get_message_count_from_api(redis_session)

@@ -8,6 +8,8 @@ from frontstage.views.sign_in import sign_in_bp
 
 logger = wrap_logger(logging.getLogger(__name__))
 
+SIGN_OUT_GUIDANCE = "To help protect your information we have signed you out."
+
 
 @sign_in_bp.route("/logout")
 def logout():
@@ -19,8 +21,8 @@ def logout():
     if len(flashed_messages) > 0:
         for category, message in flashed_messages:
             flash(message=message, category=category)
-    if request.args.get("csrf_error"):
-        flash("To help protect your information we have signed you out.", "info")
+    if request.args.get("sign_out_guidance"):
+        flash(SIGN_OUT_GUIDANCE, "info")
     # Delete session cookie
     response = make_response(redirect(url_for("sign_in_bp.login", next=request.args.get("next"))))
     response.delete_cookie("authorization")

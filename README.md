@@ -72,19 +72,19 @@ To update to a different version of the Design System:
 ## Configuration
 Environment variables available for configuration are listed below:
 
-| Environment Variable        | Description                                         | Default                                         |
-|-----------------------------|-----------------------------------------------------|-------------------------------------------------|
-| APP_SETTINGS                | Which config to use                                 | 'Config' (use DevelopmentConfig) for developers |
-| SECRET_KEY                  | Secret key used by flask                            | 'ONS_DUMMY_KEY'                                 |
-| SECURITY_USER_NAME          | Username for basic auth                             | 'admin'                                         |
-| SECURITY_USER_PASSWORD      | Password for basic auth                             | 'secret'                                        |
-| JWT_SECRET                  | SECRET used to code JWT                             | 'testsecret'                                    |
-| VALIDATE_JWT                | Boolean for turning on/off JWT validation (True=on) | True                                            |
-| GOOGLE_ANALYTICS            | Code for google analytics                           | None                                            |
-| GOOGLE_TAG_MANAGER          | Code for google tag manager                         | None                                            |
-| REDIS_HOST                  | Host address for the redis instance                 | 'localhost'                                     |
-| REDIS_PORT                  | Port for the redis instance                         | 6379                                            |
-| REDIS_DB                    | Database number for the redis instance              | 1                                               |
+| Environment Variable            | Description                                         | Default                                         |
+|---------------------------------|-----------------------------------------------------|-------------------------------------------------|
+| APP_SETTINGS                    | Which config to use                                 | 'Config' (use DevelopmentConfig) for developers |
+| SECRET_KEY                      | Secret key used by flask                            | 'ONS_DUMMY_KEY'                                 |
+| SECURITY_USER_NAME              | Username for basic auth                             | 'admin'                                         |
+| SECURITY_USER_PASSWORD          | Password for basic auth                             | 'secret'                                        |
+| JWT_SECRET                      | SECRET used to code JWT                             | 'testsecret'                                    |
+| VALIDATE_JWT                    | Boolean for turning on/off JWT validation (True=on) | True                                            |
+| GOOGLE_ANALYTICS_MEASUREMENT_ID | Parameter used by google analytics                  | None                                            |
+| GOOGLE_TAG_MANAGER_ID           | Parameter used by google tag manager                | None                                            |
+| REDIS_HOST                      | Host address for the redis instance                 | 'localhost'                                     |
+| REDIS_PORT                      | Port for the redis instance                         | 6379                                            |
+| REDIS_DB                        | Database number for the redis instance              | 1                                               |
 
 These are set in [config.py](config.py)
 

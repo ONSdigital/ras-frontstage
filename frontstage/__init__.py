@@ -13,16 +13,15 @@ from frontstage.create_app import create_app_object
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-# TODO: review https://content-security-policy.com/, remove this comment if we're covered.
 CSP_POLICY = {
     "default-src": ["'self'", "https://cdn.ons.gov.uk"],
     "font-src": ["'self'", "data:", "https://fonts.gstatic.com", "https://cdn.ons.gov.uk"],
     "script-src": ["'self'", "https://www.googletagmanager.com", "https://cdn.ons.gov.uk"],
     "connect-src": [
         "'self'",
-        "https://www.googletagmanager.com",
-        "https://tagmanager.google.com",
-        "https://cdn.ons.gov.uk",
+        "https://*.google-analytics.com",
+        "https://*.analytics.google.com",
+        "https://*.googletagmanager.com",
     ],
     "img-src": [
         "'self'",

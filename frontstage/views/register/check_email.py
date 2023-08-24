@@ -1,6 +1,5 @@
-from flask import render_template
-
 from frontstage.views.register import register_bp
+from frontstage.views.template_helper import render_template
 
 
 @register_bp.route("/create-account/check-email")

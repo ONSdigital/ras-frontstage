@@ -1,12 +1,13 @@
 import logging
 from os import getenv
 
-from flask import abort, redirect, render_template, url_for
+from flask import abort, redirect, url_for
 from structlog import wrap_logger
 
 from frontstage.controllers import party_controller
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.views.register import register_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 

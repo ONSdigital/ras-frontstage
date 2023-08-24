@@ -172,6 +172,7 @@ def get_eq_url(case, collection_exercise, party_id, business_party_id, survey_sh
         description=f"Instrument {ci_id} launched by {party_id} for case {case_id}",
     )
 
+    # This log is associated with a custom log metric
     logger.info(
         "Successfully generated EQ URL",
         case_id=case_id,

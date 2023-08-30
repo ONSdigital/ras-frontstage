@@ -82,16 +82,9 @@ class TestPasswords(unittest.TestCase):
 
     @requests_mock.mock()
     def test_forgot_password_post_unrecognised_email_party(self, mock_request):
-        with app.app_context():
-            password_token = verification.generate_email_token("test.com")
         mock_request.get(url_banner_api, status_code=404)
         mock_request.post(url_reset_password_request, status_code=404)
         mock_request.get(url_get_respondent_by_email, status_code=404)
-        mock_request.delete(
-            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-token/{password_token}",
-            status_code=200,
-            json={"message": "Successfully removed token"},
-        )
 
         self.email_form["email_address"] = "test@email.com"
 

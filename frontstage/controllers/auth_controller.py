@@ -47,7 +47,7 @@ def sign_in(username, password):
         else:
             logger.error("Failed to authenticate", email=obfuscate_email(username), exc_info=True)
             raise ApiError(logger, response)
-
+    # This log is associated with a custom log metric
     logger.info("Successfully signed in", email=obfuscate_email(username))
     return {}
 

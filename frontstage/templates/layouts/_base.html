@@ -10,13 +10,6 @@
         {% include "partials/gtm.html" %}
     {% endif %}
 {% endblock %}
-{% block bodyStart %}
-    {% if config.GOOGLE_TAG_MANAGER_ID %}
-        {% if config.GOOGLE_ANALYTICS_MEASUREMENT_ID %}
-            {% include "partials/ga.html" %}
-        {% endif %}
-    {% endif %}
-{% endblock %}
 
 {% block preHeader %}
     {{

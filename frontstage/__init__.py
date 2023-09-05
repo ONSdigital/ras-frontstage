@@ -16,7 +16,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 CSP_POLICY = {
     "default-src": ["'self'", "https://cdn.ons.gov.uk"],
     "font-src": ["'self'", "data:", "https://fonts.gstatic.com", "https://cdn.ons.gov.uk"],
-    "script-src": ["'self'", "https://www.googletagmanager.com", "https://cdn.ons.gov.uk", "unsafe-eval"],
+    "script-src": ["'self'", "https://www.googletagmanager.com", "https://cdn.ons.gov.uk", "'unsafe-eval'"],
     "connect-src": [
         "'self'",
         "https://*.google-analytics.com",

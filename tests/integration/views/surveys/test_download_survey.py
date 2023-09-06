@@ -68,7 +68,7 @@ class TestDownloadSurvey(unittest.TestCase):
             self.assertIn("default-src 'self' https://cdn.ons.gov.uk", csp_policy_parts)
             self.assertIn("font-src 'self' data: https://fonts.gstatic.com https://cdn.ons.gov.uk", csp_policy_parts)
             self.assertIn(
-                "script-src 'self' 'wasm-unsafe-eval' https://www.googletagmanager.com https://cdn.ons.gov.uk 'nonce-{}'".format(
+                "script-src 'self' 'unsafe-eval' https://www.googletagmanager.com https://cdn.ons.gov.uk 'nonce-{}'".format(
                     request.csp_nonce
                 ),
                 csp_policy_parts,

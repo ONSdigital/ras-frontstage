@@ -219,14 +219,15 @@ class TestPasswords(unittest.TestCase):
     @requests_mock.mock()
     def test_reset_password_respondent_not_found(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        mock_request.put(url_password_change, status_code=200)
-        with app.app_context():
-            token = verification.generate_email_token("failing_email_token.com")
         mock_request.get(
             url_get_respondent_by_email,
             status_code=404,
             json={},
         )
+
+        with app.app_context():
+            token = verification.generate_email_token("failing_email_token.com")
+
         response = self.app.get(f"passwords/reset-password/{token}", follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)

@@ -343,13 +343,15 @@ class TestGenerateEqURL(unittest.TestCase):
     @requests_mock.mock()
     def test_create_payload_with_supplementary_data_but_different_form_type(self, mock_request):
         # Given a collection exercise contains supplementary data
-        collection_exercise_supplementary_data = "{\"survey_id\":\"009\",\"period_id\":\"220823\",\"form_types\":[" \
-                                                 "\"0002\"],\"title\":\"Testdatasetforsurveyid009period220823\"," \
-                                                 "\"sds_published_at\":\"2023-08-22T14:46:36Z\"," \
-                                                 "\"total_reporting_units\":2,\"schema_version\":\"v1.0.0\"," \
-                                                 "\"sds_dataset_version\":4," \
-                                                 "\"filename\":\"373d9a77-2ee5-4c1f-a6dd-8d07b0ea9793.json\"," \
-                                                 "\"dataset_id\":\"b9a87999-fcc0-4085-979f-06390fb5dddd\"} "
+        collection_exercise_supplementary_data = (
+            '{"survey_id":"009","period_id":"220823","form_types":['
+            '"0002"],"title":"Testdatasetforsurveyid009period220823",'
+            '"sds_published_at":"2023-08-22T14:46:36Z",'
+            '"total_reporting_units":2,"schema_version":"v1.0.0",'
+            '"sds_dataset_version":4,'
+            '"filename":"373d9a77-2ee5-4c1f-a6dd-8d07b0ea9793.json",'
+            '"dataset_id":"b9a87999-fcc0-4085-979f-06390fb5dddd"} '
+        )
 
         collection_exercise["supplementaryDatasetJson"] = collection_exercise_supplementary_data
         mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
@@ -369,13 +371,15 @@ class TestGenerateEqURL(unittest.TestCase):
     @requests_mock.mock()
     def test_create_payload_with_supplementary_data(self, mock_request):
         # Given a collection exercise contains supplementary data
-        collection_exercise_supplementary_data = "{\"survey_id\":\"009\",\"period_id\":\"220823\",\"form_types\":[" \
-                                                 "\"0001\"],\"title\":\"Testdatasetforsurveyid009period220823\"," \
-                                                 "\"sds_published_at\":\"2023-08-22T14:46:36Z\"," \
-                                                 "\"total_reporting_units\":2,\"schema_version\":\"v1.0.0\"," \
-                                                 "\"sds_dataset_version\":4," \
-                                                 "\"filename\":\"373d9a77-2ee5-4c1f-a6dd-8d07b0ea9793.json\"," \
-                                                 "\"dataset_id\":\"b9a87999-fcc0-4085-979f-06390fb5dddd\"} "
+        collection_exercise_supplementary_data = (
+            '{"survey_id":"009","period_id":"220823","form_types":['
+            '"0001"],"title":"Testdatasetforsurveyid009period220823",'
+            '"sds_published_at":"2023-08-22T14:46:36Z",'
+            '"total_reporting_units":2,"schema_version":"v1.0.0",'
+            '"sds_dataset_version":4,'
+            '"filename":"373d9a77-2ee5-4c1f-a6dd-8d07b0ea9793.json",'
+            '"dataset_id":"b9a87999-fcc0-4085-979f-06390fb5dddd"} '
+        )
 
         collection_exercise["supplementaryDatasetJson"] = collection_exercise_supplementary_data
         mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
@@ -389,7 +393,9 @@ class TestGenerateEqURL(unittest.TestCase):
 
         # Then the payload is as expected
         self.maxDiff = 1000
-        self.assertIn("b9a87999-fcc0-4085-979f-06390fb5dddd", payload_created["survey_metadata"]["data"]["sds_dataset_id"])
+        self.assertIn(
+            "b9a87999-fcc0-4085-979f-06390fb5dddd", payload_created["survey_metadata"]["data"]["sds_dataset_id"]
+        )
 
 
 def _is_valid_uuid(uuid_string: str) -> bool:

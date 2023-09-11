@@ -43,6 +43,9 @@ def get_reset_password(token, form_errors=None):
     except (BadSignature, BadData):
         logger.warning("Invalid token sent to frontstage password reset", token=token, exc_info=True)
         return render_template("passwords/password-expired.html", token=token)
+    except TypeError:
+        logger.error("Type error when decoding and using token", token=token, exc_info=True)
+        return render_template("passwords/password-token-not-found.html", token=token)
 
     template_data = {"error": {"type": form_errors}, "token": token}
     return render_template("passwords/reset-password.html", form=form, data=template_data)

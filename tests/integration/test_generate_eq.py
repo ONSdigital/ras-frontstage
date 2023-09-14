@@ -353,7 +353,8 @@ class TestGenerateEqURL(unittest.TestCase):
             '"dataset_id":"b9a87999-fcc0-4085-979f-06390fb5dddd"} '
         )
 
-        collection_exercise["supplementaryDatasetJson"] = collection_exercise_supplementary_data
+        collex = collection_exercise["supplementaryDatasetEntity"]
+        collex["supplementaryDatasetJson"] = collection_exercise_supplementary_data
         mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
         mock_request.get(url_get_business_party, json=business_party)
         mock_request.get(url_get_ci, json=collection_instrument_eq)
@@ -381,7 +382,8 @@ class TestGenerateEqURL(unittest.TestCase):
             '"dataset_id":"b9a87999-fcc0-4085-979f-06390fb5dddd"} '
         )
 
-        collection_exercise["supplementaryDatasetJson"] = collection_exercise_supplementary_data
+        collex = collection_exercise["supplementaryDatasetEntity"]
+        collex["supplementaryDatasetJson"] = collection_exercise_supplementary_data
         mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
         mock_request.get(url_get_business_party, json=business_party)
         mock_request.get(url_get_ci, json=collection_instrument_eq)

@@ -31,3 +31,19 @@
 .ons-tab--row:hover .tab--text {
   text-decoration: underline solid 2px;
 }
+
+.ons-tabs__list {
+    width: 100%;
+}
+
+.ons-tabs__list--row::after {
+    background: var(--ons-color-borders);
+    bottom: 0;
+    -webkit-box-shadow: 0 1px 0 0 var(--ons-color-page-light);
+    box-shadow: 0 1px 0 0 var(--ons-color-page-light);
+    content: "";
+    height: 1px;
+    left: 0;
+    position: absolute;
+    width: 100%;
+}

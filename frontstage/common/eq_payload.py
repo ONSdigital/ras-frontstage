@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import time
 import uuid
 
@@ -88,10 +89,12 @@ class EqPayload(object):
         if employment_date := self._find_event_date_by_tag("employment", ce_events, ce_id, False):
             payload["survey_metadata"]["data"]["employment_date"] = employment_date
 
-        if ce["supplementaryDatasetEntity"]:
-            supplementary_dataset = json.loads(ce["supplementaryDatasetEntity"]["supplementaryDatasetJson"])
-            if form_type in supplementary_dataset["form_types"]:
-                payload["survey_metadata"]["data"]["sds_dataset_id"] = supplementary_dataset["dataset_id"]
+        # Put in temporarily until we have confirmation the eQ are ready for this field
+        if not os.environ["APP_SETTINGS"] == 'prod':
+            if "supplementaryDatasetEntity" in ce:
+                supplementary_dataset = json.loads(ce["supplementaryDatasetEntity"]["supplementaryDatasetJson"])
+                if form_type in supplementary_dataset["form_types"]:
+                    payload["survey_metadata"]["data"]["sds_dataset_id"] = supplementary_dataset["dataset_id"]
 
         return payload
 

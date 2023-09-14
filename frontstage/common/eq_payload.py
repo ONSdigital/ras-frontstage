@@ -90,7 +90,7 @@ class EqPayload(object):
             payload["survey_metadata"]["data"]["employment_date"] = employment_date
 
         # Put in temporarily until we have confirmation the eQ are ready for this field
-        if not os.environ["APP_SETTINGS"] == 'prod':
+        if not os.environ["APP_SETTINGS"] == "prod":
             if "supplementaryDatasetEntity" in ce:
                 supplementary_dataset = json.loads(ce["supplementaryDatasetEntity"]["supplementaryDatasetJson"])
                 if form_type in supplementary_dataset["form_types"]:

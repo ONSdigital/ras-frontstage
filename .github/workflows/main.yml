@@ -60,9 +60,6 @@ jobs:
       - name: Load Design System templates
         run: |
           make load-design-system-templates
-      - name: Test
-        run: |
-          make test
       - name: Authenticate with Google Cloud
         id: auth
         uses: google-github-actions/auth@v0

@@ -5,9 +5,11 @@ import time
 import uuid
 
 import iso8601
+from certifi.__main__ import args
 from flask import current_app
 from structlog import wrap_logger
 
+from frontstage import app
 from frontstage.controllers import (
     collection_exercise_controller,
     collection_instrument_controller,
@@ -89,8 +91,8 @@ class EqPayload(object):
         if employment_date := self._find_event_date_by_tag("employment", ce_events, ce_id, False):
             payload["survey_metadata"]["data"]["employment_date"] = employment_date
 
-        # Put in temporarily until we have confirmation the eQ are ready for this field
-        if not os.environ["APP_SETTINGS"] == "prod":
+        # Put in temporarily until we have confirmation that eQ are ready for this field
+        if os.environ["APP_SETTINGS"] == 'DevelopmentConfig' or 'TestingConfig':
             if "supplementaryDatasetEntity" in ce:
                 supplementary_dataset = json.loads(ce["supplementaryDatasetEntity"]["supplementaryDatasetJson"])
                 if form_type in supplementary_dataset["form_types"]:

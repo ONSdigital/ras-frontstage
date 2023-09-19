@@ -15,8 +15,8 @@ from tests.integration.mocked_services import (
     business_party,
     case,
     collection_exercise,
-    collection_exercise_with_supplementary_dataset,
     collection_exercise_events,
+    collection_exercise_with_supplementary_dataset,
     collection_instrument_seft,
     respondent_party,
     survey,
@@ -351,7 +351,11 @@ class TestGenerateEqURL(unittest.TestCase):
         # When a payload is created
         with app.app_context():
             payload_created = EqPayload().create_payload(
-                case, collection_exercise_with_supplementary_dataset, respondent_party["id"], business_party["id"], survey_eq
+                case,
+                collection_exercise_with_supplementary_dataset,
+                respondent_party["id"],
+                business_party["id"],
+                survey_eq,
             )
 
         # Then the payload is as expected
@@ -364,13 +368,15 @@ class TestGenerateEqURL(unittest.TestCase):
     @requests_mock.mock()
     def test_create_payload_with_supplementary_data_but_different_form_type(self, mock_request):
         # Given a collection exercise contains supplementary data
-        different_form_type = {"supplementaryDatasetJson": "{\"survey_id\":\"001\",\"period_id\":\"220823\","
-                              "\"form_types\":[\"0002\",\"1234\"]," \
-                              "\"title\":\"Test dataset for survey id 009 period 220823\"," \
-                              "\"sds_published_at\":\"2023-08-22T14:46:36Z\",\"total_reporting_units\":2," \
-                              "\"schema_version\":\"v1.0.0\",\"sds_dataset_version\":4," \
-                              "\"filename\":\"373d9a77-2ee5-4c1f-a6dd-8d07b0ea9793.json\"," \
-                              "\"dataset_id\":\"b9a87999-fcc0-4085-979f-06390fb5dddd\"}"}
+        different_form_type = {
+            "supplementaryDatasetJson": '{"survey_id":"001","period_id":"220823",'
+            '"form_types":["0002","1234"],'
+            '"title":"Test dataset for survey id 009 period 220823",'
+            '"sds_published_at":"2023-08-22T14:46:36Z","total_reporting_units":2,'
+            '"schema_version":"v1.0.0","sds_dataset_version":4,'
+            '"filename":"373d9a77-2ee5-4c1f-a6dd-8d07b0ea9793.json",'
+            '"dataset_id":"b9a87999-fcc0-4085-979f-06390fb5dddd"}'
+        }
         collection_exercise_with_supplementary_dataset["supplementaryDatasetJson"] = different_form_type
         mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
         mock_request.get(url_get_business_party, json=business_party)
@@ -378,7 +384,11 @@ class TestGenerateEqURL(unittest.TestCase):
         # When a payload is created
         with app.app_context():
             payload_created = EqPayload().create_payload(
-                case, collection_exercise_with_supplementary_dataset, respondent_party["id"], business_party["id"], survey_eq
+                case,
+                collection_exercise_with_supplementary_dataset,
+                respondent_party["id"],
+                business_party["id"],
+                survey_eq,
             )
 
         # Then the payload is as expected

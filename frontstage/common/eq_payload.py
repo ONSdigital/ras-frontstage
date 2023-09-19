@@ -1,15 +1,12 @@
 import json
 import logging
-import os
 import time
 import uuid
 
 import iso8601
-from certifi.__main__ import args
 from flask import current_app
 from structlog import wrap_logger
 
-from frontstage import app
 from frontstage.controllers import (
     collection_exercise_controller,
     collection_instrument_controller,

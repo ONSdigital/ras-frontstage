@@ -40,7 +40,6 @@ def login():  # noqa: C901
     try:
         googlecloudprofiler.start(
             service="frontstage",
-            service_version="1.0.1",
             # verbose is the logging level. 0-error, 1-warning, 2-info,
             # 3-debug. It defaults to 0 (error) if not set.
             verbose=3,

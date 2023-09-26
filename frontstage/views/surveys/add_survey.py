@@ -82,7 +82,11 @@ def add_survey(session):
         )
 
     elif request.method == "POST" and not form.validate():
-        logger.info("Invalid character length, must be 12 characters")
+        logger.info(
+            "Invalid character length, must be 12 characters",
+            enrolment_code=request.form.get("enrolment_code").lower(),
+            enrolment_code_length=len(request.form.get("enrolment_code")),
+        )
         template_data = {"error": {"type": "failed"}}
         return render_template("surveys/surveys-add.html", session=session, form=form, data=template_data)
 

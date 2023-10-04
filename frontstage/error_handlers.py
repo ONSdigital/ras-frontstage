@@ -49,6 +49,7 @@ def handle_csrf_error(error):
 
 @app.errorhandler(Unauthorized)
 def unauthorized(error):
+    session["next"] = request.url
     logger.info(error.description, url=request.url, status_code=401)
     return redirect(url_for("sign_in_bp.logout", sign_out_guidance=True))
 

@@ -3,6 +3,7 @@ FROM python:3.11-slim
 
 RUN apt update && apt install -y build-essential curl gunicorn
 RUN pip install pipenv
+RUN pip install google-cloud-profiler
 
 WORKDIR /app
 

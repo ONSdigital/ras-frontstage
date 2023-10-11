@@ -73,7 +73,7 @@ def create_app_object():
     return app
 
 
-# # Setup Google Cloud Profiler
+# Setup Google Cloud Profiler
 # def start_google_profiler():
 #     try:
 #         googlecloudprofiler.start(

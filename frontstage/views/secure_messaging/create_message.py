@@ -1,9 +1,9 @@
 import json
 import logging
 
-from flask import Markup, flash, redirect, request, url_for
+from flask import flash, redirect, request, url_for
+from markupsafe import Markup
 from structlog import wrap_logger
-
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import conversation_controller
 from frontstage.models import SecureMessagingForm
@@ -11,7 +11,6 @@ from frontstage.views.secure_messaging import secure_message_bp
 from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
-
 
 @secure_message_bp.route("/create-message/", methods=["GET", "POST"])
 @jwt_authorization(request)

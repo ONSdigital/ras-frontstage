@@ -38,7 +38,7 @@ def home():
 @sign_in_bp.route("/", methods=["GET", "POST"])
 def login():  # noqa: C901
     try:
-        googlecloudprofiler.start()
+        googlecloudprofiler.start(verbose=3)
     except (ValueError, NotImplementedError) as exc:
         print(exc)  # Handle errors here
 

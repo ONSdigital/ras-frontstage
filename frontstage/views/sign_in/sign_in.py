@@ -38,6 +38,7 @@ def home():
 
 @sign_in_bp.route("/", methods=["GET", "POST"])
 def login():  # noqa: C901
+    logger.info("Test env: " + os.environ["APP_SETTINGS"])
     if "TestingConfig" not in os.environ["APP_SETTINGS"]:
         try:
             googlecloudprofiler.start(verbose=3, service="frontstage")

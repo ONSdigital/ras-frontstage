@@ -3,7 +3,6 @@ from distutils.util import strtobool
 
 from flask import flash, json, redirect, request, url_for
 from markupsafe import Markup
-
 from structlog import wrap_logger
 
 from frontstage import app

@@ -242,7 +242,7 @@ class TestSignIn(unittest.TestCase):
     @requests_mock.mock()
     def test_logout(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        self.app.set_cookie("localhost", "authorization", encoded_jwt_token)
+        self.app.set_cookie("authorization", encoded_jwt_token)
         response = self.app.get("/sign-in/logout", follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)

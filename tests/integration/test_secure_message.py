@@ -27,7 +27,7 @@ class TestSecureMessage(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
         self.app.testing = True
-        self.app.set_cookie("localhost", "authorization", "session_key")
+        self.app.set_cookie("authorization", "session_key")
         self.patcher = patch("redis.StrictRedis.get", return_value=encoded_jwt_token)
         self.patcher.start()
         self.message_form = {

@@ -38,8 +38,8 @@ def home():
 
 @sign_in_bp.route("/", methods=["GET", "POST"])
 def login():  # noqa: C901
-    logger.info("Test env: " + os.environ["APP_SETTINGS"])
-    if "TestingConfig" not in os.environ["APP_SETTINGS"]:
+    logger.info("Test env: " + os.environ.get("APP_SETTINGS"))
+    if os.environ.get("APP_SETTINGS") != "TestingConfig":
         try:
             googlecloudprofiler.start(verbose=3, service="frontstage")
         except (ValueError, NotImplementedError) as exc:

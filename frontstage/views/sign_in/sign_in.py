@@ -39,7 +39,7 @@ def home():
 def login():  # noqa: C901
     try:
         logger.info("Attempting to profile app")
-        googlecloudprofiler.start(verbose=3)
+        googlecloudprofiler.start(verbose=3, service="frontstage")
     except (ValueError, NotImplementedError) as exc:
         logger.info("Failed to profile app")
         print(exc)  # Handle errors here

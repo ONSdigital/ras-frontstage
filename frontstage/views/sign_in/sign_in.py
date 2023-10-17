@@ -38,9 +38,13 @@ def home():
 @sign_in_bp.route("/", methods=["GET", "POST"])
 def login():  # noqa: C901
     try:
+        logger.info("Attempting to profile app")
         googlecloudprofiler.start(verbose=3)
     except (ValueError, NotImplementedError) as exc:
+        logger.info("Failed to profile app")
         print(exc)  # Handle errors here
+
+    logger.info("Finished trying to profile app")
 
     form = LoginForm(request.form)
     if form.username.data is not None:

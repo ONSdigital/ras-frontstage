@@ -1,3 +1,4 @@
+import os
 import unittest
 from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock, patch
@@ -27,6 +28,7 @@ class TestErrorHandlers(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
         self.sign_in_form = {"username": "testuser@email.com", "password": "password"}
+        os.environ["APP_SETTINGS"] = "TestingConfig"
 
     @requests_mock.mock()
     def test_not_found_error(self, mock_request):

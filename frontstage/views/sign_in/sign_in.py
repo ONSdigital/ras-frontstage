@@ -1,4 +1,5 @@
 import logging
+import os
 from os import getenv
 
 import googlecloudprofiler
@@ -37,10 +38,11 @@ def home():
 
 @sign_in_bp.route("/", methods=["GET", "POST"])
 def login():  # noqa: C901
-    try:
-        googlecloudprofiler.start(verbose=3, service="frontstage")
-    except (ValueError, NotImplementedError) as exc:
-        print(exc)  # Handle errors here
+    if os.environ.get("APP_SETTINGS") != "TestingConfig":
+        try:
+            googlecloudprofiler.start(verbose=3, service="frontstage")
+        except (ValueError, NotImplementedError) as exc:
+            print(exc)  # Handle errors here
 
     form = LoginForm(request.form)
     if form.username.data is not None:

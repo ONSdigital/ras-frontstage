@@ -28,7 +28,8 @@ class TestErrorHandlers(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
         self.sign_in_form = {"username": "testuser@email.com", "password": "password"}
-        os.environ["APP_SETTINGS"] = "TestingConfig"
+        self.auth_response = {}
+        # os.environ["APP_SETTINGS"] = "TestingConfig"
 
     @requests_mock.mock()
     def test_not_found_error(self, mock_request):
@@ -86,9 +87,10 @@ class TestErrorHandlers(unittest.TestCase):
         response = self.app.post("sign-in", data=self.sign_in_form, follow_redirects=True)
         self.assertEqual(response.status_code, 401)
 
-    def test_csrf_token_missing(self):
+    def test_csrf_token_missing(self, mock_request):
         # Given csrf is enabled
         app.config["WTF_CSRF_ENABLED"] = True
+        mock_request.post(url_auth_token, status_code=200, json=self.auth_response)
 
         # When the respondent signs in without a csrf token in the form data
         response = self.app.post("/sign-in/", data=self.sign_in_form, follow_redirects=True)
@@ -97,9 +99,10 @@ class TestErrorHandlers(unittest.TestCase):
         # Then a 400 is returned
         self.assertEqual(response.status_code, 400)
 
-    def test_csrf_token_invalid(self):
+    def test_csrf_token_invalid(self, mock_request):
         # Given csrf is enabled
         app.config["WTF_CSRF_ENABLED"] = True
+        mock_request.post(url_auth_token, status_code=200, json=self.auth_response)
 
         # When the respondent signs in with an invalid csrf token in the form data
         invalid_csrf_token = (

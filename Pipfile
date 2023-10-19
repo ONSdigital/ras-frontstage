@@ -7,7 +7,7 @@ url = "https://pypi.python.org/simple"
 python_version = "3.11"
 
 [packages]
-flask = "*"
+flask = "==2.3.3"
 flask-wtf = "*"
 wtforms = "*"
 gunicorn = "*"

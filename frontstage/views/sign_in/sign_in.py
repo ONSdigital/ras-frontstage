@@ -42,7 +42,7 @@ def login():  # noqa: C901
         try:
             googlecloudprofiler.start(verbose=3, service="frontstage")
         except (ValueError, NotImplementedError) as exc:
-            print(exc)  # Handle errors here
+            logger.error(exc)  # Handle errors here
 
     form = LoginForm(request.form)
     if form.username.data is not None:

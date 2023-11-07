@@ -1,7 +1,8 @@
 import json
 import logging
 
-from flask import Markup, flash, redirect, request, url_for
+from flask import flash, redirect, request, url_for
+from markupsafe import Markup
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization

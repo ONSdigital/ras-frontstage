@@ -1,3 +1,4 @@
+import os
 import unittest
 from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock, patch
@@ -27,6 +28,7 @@ class TestErrorHandlers(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
         self.sign_in_form = {"username": "testuser@email.com", "password": "password"}
+        os.environ["APP_SETTINGS"] = "TestingConfig"
 
     @requests_mock.mock()
     def test_not_found_error(self, mock_request):
@@ -127,7 +129,7 @@ class TestErrorHandlers(unittest.TestCase):
         app.config["WTF_CSRF_ENABLED"] = True
 
         # When the respondent signs in with an expired csrf token but does have a valid authorization cookie
-        self.app.set_cookie("localhost", "authorization", "session_key")
+        self.app.set_cookie("authorization", "session_key")
         redis_get.return_value = encoded_jwt_token
         csrf_timeout_response = self._get_csrf_timeout_response()
 

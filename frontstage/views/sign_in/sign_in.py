@@ -37,7 +37,6 @@ def home():
 
 @sign_in_bp.route("/", methods=["GET", "POST"])
 def login():  # noqa: C901
-    print("PROFILER: " + str(app.config["PROFILER_ACTIVE"]))
     if app.config["PROFILER_ACTIVE"]:
         try:
             googlecloudprofiler.start(verbose=3, service="frontstage")

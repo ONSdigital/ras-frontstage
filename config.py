@@ -85,7 +85,7 @@ class Config(object):
     MAX_SHARED_SURVEY = int(os.getenv("MAX_SHARED_SURVEY", "50"))
     UNDER_MAINTENANCE = bool(strtobool(os.getenv("UNDER_MAINTENANCE", "False")))
 
-    PROFILER_ACTIVE = False
+    PROFILER_ACTIVE = bool(strtobool(os.getenv("PROFILER_ACTIVE", "False")))
 
 
 class DevelopmentConfig(Config):
@@ -118,8 +118,6 @@ class DevelopmentConfig(Config):
 
     WTF_CSRF_TIME_LIMIT = int(os.getenv("WTF_CSRF_TIME_LIMIT", "3200"))
     SECURE_APP = bool(strtobool(os.getenv("SECURE_APP", "False")))
-
-    PROFILER_ACTIVE = bool(strtobool(os.getenv("PROFILER_ACTIVE", "False")))
 
 
 class TestingConfig(DevelopmentConfig):

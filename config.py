@@ -121,6 +121,7 @@ class DevelopmentConfig(Config):
 
     PROFILER_ACTIVE = True
 
+
 class TestingConfig(DevelopmentConfig):
     TESTING = True
     DEVELOPMENT = False

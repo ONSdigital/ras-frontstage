@@ -236,6 +236,6 @@ spec:
           - name: PASSWORD_RESET_ATTEMPTS_TIMEOUT
             value: "{{ .Values.password.attemptTimeout }}"
           - name: PROFILER_ACTIVE
-            value: "{{ .Values.frontstageProfiler.enabled }}"
+            value: "{{- if .Values.frontstageProfiler.enabled -}}True{{- else -}}False{{- end -}}"
           resources:
             {{ toYaml .Values.resources | nindent 12 }}

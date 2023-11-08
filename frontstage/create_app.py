@@ -39,8 +39,8 @@ def create_app_object():
     if not app.config["DEBUG"]:
         app.wsgi_app = GCPLoadBalancer(app.wsgi_app)
 
-    if os.environ.get("APP_SETTINGS") == "TestingConfig":
-        app.config["PROFILER_ACTIVE"] = False
+    # if os.environ.get("APP_SETTINGS") == "TestingConfig":
+    #     app.config["PROFILER_ACTIVE"] = False
 
     # Configure logger
     logger_initial_config(log_level=app.config["LOGGING_LEVEL"])

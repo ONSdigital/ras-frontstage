@@ -1,8 +1,6 @@
 import logging
-import os
 from os import getenv
 
-import googlecloudprofiler
 from flask import make_response, redirect, request, session, url_for
 from structlog import wrap_logger
 

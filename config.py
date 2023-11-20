@@ -119,7 +119,7 @@ class DevelopmentConfig(Config):
     WTF_CSRF_TIME_LIMIT = int(os.getenv("WTF_CSRF_TIME_LIMIT", "3200"))
     SECURE_APP = bool(strtobool(os.getenv("SECURE_APP", "False")))
 
-    PROFILER_ENABLED = True
+    PROFILER_ENABLED = bool(strtobool(os.getenv("PROFILER_ENABLED", "False")))
 
 
 class TestingConfig(DevelopmentConfig):
@@ -144,4 +144,4 @@ class TestingConfig(DevelopmentConfig):
     SECURE_APP = bool(strtobool(os.getenv("SECURE_APP", "False")))
     ACCESS_CONTROL_ALLOW_ORIGIN = os.getenv("ACCESS_CONTROL_ALLOW_ORIGIN", "http://localhost")
     UNDER_MAINTENANCE = bool(strtobool(os.getenv("UNDER_MAINTENANCE", "False")))
-    PROFILER_ENABLED = False
+    PROFILER_ENABLED = bool(strtobool(os.getenv("PROFILER_ENABLED", "False")))

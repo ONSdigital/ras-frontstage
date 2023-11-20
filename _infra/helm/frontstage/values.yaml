@@ -99,4 +99,4 @@ password:
   attemptTimeout: 86400
 
 frontstageProfiler:
-  enabled: true
+  enabled: false

@@ -98,5 +98,5 @@ gnu:
 password:
   attemptTimeout: 86400
 
-frontstageProfiler:
+profiler:
   enabled: false

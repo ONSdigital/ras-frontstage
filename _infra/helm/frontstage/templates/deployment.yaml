@@ -235,5 +235,7 @@ spec:
             value: "{{ .Values.gnu.recipient }}"
           - name: PASSWORD_RESET_ATTEMPTS_TIMEOUT
             value: "{{ .Values.password.attemptTimeout }}"
+          - name: PROFILER_ENABLED
+            value: "{{- if .Values.profiler.enabled -}}True{{- else -}}False{{- end -}}"
           resources:
             {{ toYaml .Values.resources | nindent 12 }}

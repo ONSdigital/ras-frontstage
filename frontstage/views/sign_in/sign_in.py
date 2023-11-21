@@ -1,8 +1,6 @@
 import logging
-import os
 from os import getenv
 
-import googlecloudprofiler
 from flask import make_response, redirect, request, session, url_for
 from structlog import wrap_logger
 
@@ -38,13 +36,8 @@ def home():
 
 @sign_in_bp.route("/", methods=["GET", "POST"])
 def login():  # noqa: C901
-    if os.environ.get("APP_SETTINGS") != "TestingConfig":
-        try:
-            googlecloudprofiler.start(verbose=3, service="frontstage")
-        except (ValueError, NotImplementedError) as exc:
-            logger.error(exc)  # Handle errors here
-
     form = LoginForm(request.form)
+
     if form.username.data is not None:
         form.username.data = form.username.data.strip()
 

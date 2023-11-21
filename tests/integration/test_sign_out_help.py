@@ -9,10 +9,10 @@ from tests.integration.mocked_services import url_banner_api
 class TestSignOutHelp(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
-        self.app.set_cookie("localhost", "authorization", "session_key")
+        self.app.set_cookie("authorization", "session_key")
 
     @requests_mock.mock()
-    def test_sign_out_help_get(self, mock_request):
+    def test_sign_out_help_page(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         response = self.app.get("/help")
         self.assertEqual(response.status_code, 200)

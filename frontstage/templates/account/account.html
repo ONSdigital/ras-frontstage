@@ -4,7 +4,6 @@
 {% from "components/radios/_macro.njk" import onsRadios %}
 {% from "components/button/_macro.njk" import onsButton %}
 
-{% set page_title = "Account details" %}
 {% set breadcrumbsData = [
     {
         "text": "Surveys",
@@ -36,7 +35,7 @@
     </dl>
         <hr class="ons-u-mb-l"/>
     <h1 class="ons-u-fs-xl">Help with your account</h1>
-    <form action="{{ url_for('account_bp.update_account')}}" method="post">
+    <form action="{{ url_for('account_bp.account')}}" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             {% if ns.optionError %}
                 {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}

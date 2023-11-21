@@ -97,3 +97,6 @@ gnu:
 
 password:
   attemptTimeout: 86400
+
+profiler:
+  enabled: false

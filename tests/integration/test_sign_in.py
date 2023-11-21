@@ -2,6 +2,7 @@ import os
 import unittest
 
 import requests_mock
+from bs4 import BeautifulSoup
 
 from config import TestingConfig
 from frontstage import app, create_app_object
@@ -10,6 +11,7 @@ from frontstage.controllers.party_controller import (
     notify_party_and_respondent_account_locked,
 )
 from frontstage.exceptions.exceptions import ApiError
+from frontstage.views.sign_in.logout import SIGN_OUT_GUIDANCE
 from tests.integration.mocked_services import (
     message_count,
     party,
@@ -121,6 +123,29 @@ class TestSignIn(unittest.TestCase):
         self.assertTrue("/surveys/".encode() in response.data)
 
     @requests_mock.mock()
+    def test_sign_in_success_csrf(self, mock_request):
+        # Given csrf is enabled, services are mocked and there is a valid csrf_token
+        app.config["WTF_CSRF_ENABLED"] = True
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_get_respondent_email, json=party)
+        mock_request.post(url_auth_token, status_code=200, json=self.auth_response)
+        mock_request.get(url_get_conversation_count, json=message_count)
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(get_respondent_by_id_url, json=party)
+
+        soup = BeautifulSoup(self.app.get("/sign-in/").data, "html.parser")
+        csrf_token_value = soup.find("input", {"id": "csrf_token"}).get("value")
+        sign_in_details = {"username": "testuser@email.com", "password": "password", "csrf_token": csrf_token_value}
+
+        # When the respondent signs in
+        response = self.app.post("/sign-in/", data=sign_in_details)
+        app.config["WTF_CSRF_ENABLED"] = False
+
+        # Then the respondent is signed in successfully and is redirect to the todo page
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue("/surveys/todo".encode() in response.data)
+
+    @requests_mock.mock()
     def test_sign_in_success_redirect_to_url(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_email, json=party)
@@ -142,7 +167,7 @@ class TestSignIn(unittest.TestCase):
 
         response = self.app.get("/surveys/todo", follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue("To help protect your information we have signed you out".encode() in response.data)
+        self.assertTrue(SIGN_OUT_GUIDANCE.encode() in response.data)
         self.assertIn(b"Sign in", response.data)
 
     @requests_mock.mock()
@@ -217,7 +242,7 @@ class TestSignIn(unittest.TestCase):
     @requests_mock.mock()
     def test_logout(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        self.app.set_cookie("localhost", "authorization", encoded_jwt_token)
+        self.app.set_cookie("authorization", encoded_jwt_token)
         response = self.app.get("/sign-in/logout", follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)

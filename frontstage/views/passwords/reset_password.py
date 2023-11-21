@@ -2,7 +2,7 @@ import logging
 
 from flask import abort
 from flask import current_app as app
-from flask import flash, redirect, render_template, request, url_for
+from flask import flash, redirect, request, url_for
 from itsdangerous import BadData, BadSignature, SignatureExpired
 from structlog import wrap_logger
 from werkzeug.exceptions import NotFound
@@ -13,6 +13,7 @@ from frontstage.controllers.notify_controller import NotifyGateway
 from frontstage.exceptions.exceptions import ApiError, RasNotifyError
 from frontstage.models import ResetPasswordForm
 from frontstage.views.passwords import passwords_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -42,6 +43,9 @@ def get_reset_password(token, form_errors=None):
     except (BadSignature, BadData):
         logger.warning("Invalid token sent to frontstage password reset", token=token, exc_info=True)
         return render_template("passwords/password-expired.html", token=token)
+    except TypeError:
+        logger.error("Type error when decoding and using token", token=token, exc_info=True)
+        return render_template("passwords/password-token-not-found.html", token=token)
 
     template_data = {"error": {"type": form_errors}, "token": token}
     return render_template("passwords/reset-password.html", form=form, data=template_data)

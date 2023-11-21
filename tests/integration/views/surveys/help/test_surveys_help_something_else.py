@@ -18,7 +18,7 @@ from tests.integration.mocked_services import (
 class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
-        self.app.set_cookie("localhost", "authorization", "session_key")
+        self.app.set_cookie("authorization", "session_key")
         self.headers = {
             "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2Vy"
             "X3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"
@@ -62,7 +62,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         response = self.app.post("/surveys/help", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Information about the ONS".encode(), response.data)
+        self.assertIn("Help with something else".encode(), response.data)
         self.assertIn("Choose an option".encode(), response.data)
         self.assertIn("My survey is not listed".encode(), response.data)
         self.assertIn("Something else".encode(), response.data)
@@ -88,6 +88,23 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("Did this answer your question?".encode(), response.data)
         self.assertIn("Yes".encode(), response.data)
         self.assertIn("No".encode(), response.data)
+
+    @requests_mock.mock()
+    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
+    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
+    def test_survey_help_info_bricks_with_no_option_select(self, mock_request, get_survey, get_business):
+        mock_request.get(url_banner_api, status_code=404)
+        get_survey.return_value = survey
+        get_business.return_value = business_party
+        form = {}
+        self.set_flask_session()
+        response = self.app.post("/surveys/help/something-else", data=form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Error: ".encode(), response.data)
+        self.assertIn('<span class="ons-panel__assistive-text ons-u-vh">Error: </span>'.encode(), response.data)
+        self.assertIn("There is 1 error on this page".encode(), response.data)
+        self.assertIn("You need to choose an option".encode(), response.data)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
@@ -175,6 +192,8 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
+        self.assertIn("Error: ".encode(), response.data)
+        self.assertIn('<span class="ons-panel__assistive-text ons-u-vh">Error: </span>'.encode(), response.data)
         self.assertIn("There is 1 error on this page".encode(), response.data)
         self.assertIn("Message is required".encode(), response.data)
         self.assertIn("Send a message".encode(), response.data)

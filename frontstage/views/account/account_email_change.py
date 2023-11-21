@@ -1,6 +1,6 @@
 import logging
 
-from flask import abort, render_template, request
+from flask import abort, request
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
@@ -8,6 +8,7 @@ from frontstage.common.session import Session
 from frontstage.controllers import party_controller
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.views.account import account_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -60,4 +61,4 @@ def confirm_account_email_change(token):
 def resend_account_email_change_expired_token(session, token):
     party_controller.resend_account_email_change_expired_token(token)
     logger.info("Re-sent verification email for account email change expired token.", token=token)
-    return render_template("sign-in/sign-in.verification-email-sent.html")
+    return render_template("sign-in/sign-in.verification-email-sent.html", session=session)

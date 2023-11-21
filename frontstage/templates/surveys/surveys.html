@@ -10,7 +10,7 @@
     <section class="ons-u-bb {{ highlight }}" id="{{ id }}">
         {% if survey.display_button %}
             <h1 class="ons-u-mb-xs ons-u-fs-m ons-u-mt-s">
-                <a id="surveyLongName" href="{{ url_for('surveys_bp.access_survey', case_id=survey.case_id, ci_type = survey.collection_instrument_type, business_party_id=survey.business_party_id, survey_short_name=survey.survey_short_name) }}" aria-label="Access the {{ survey.survey_long_name }}">{{ survey.survey_long_name }}</a>
+                <a id="surveyLongName" href="{{ url_for('surveys_bp.access_survey', case_id=survey.case_id, ci_type = survey.collection_instrument_type, business_party_id=survey.business_party_id, survey_short_name=survey.survey_short_name) }}">{{ survey.survey_long_name }}</a>
             </h1>
         {% else %}
             <h1 class="ons-u-mb-xs ons-u-fs-m ons-u-mt-s">
@@ -48,7 +48,7 @@
                 </dd>
                 <dt style="float: left; clear: left;" class="ons-u-vh">Help: </dt>
                 <dd class="ons-u-ml-no ons-u-mb-s">
-                    <a id="create-message-link-{{loop.index}}" href="{{ url_for('surveys_bp.get_surveys_help_page', survey_ref=survey.survey_ref, ru_ref=survey.business_ref) }}"  aria-label="Get help with the {{ survey.survey_long_name }}">Get help with this survey <span class="ons-u-vh"> about {{ survey.survey_long_name }}</span></a>
+                    <a id="create-message-link-{{loop.index}}" href="{{ url_for('surveys_bp.get_surveys_help_page', survey_ref=survey.survey_ref, ru_ref=survey.business_ref) }}">Get help with this survey <span class="ons-u-vh"> about {{ survey.survey_long_name }}</span></a>
                 </dd>
             </div>
         </dl>

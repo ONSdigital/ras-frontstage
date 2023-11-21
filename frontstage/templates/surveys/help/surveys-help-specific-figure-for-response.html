@@ -2,7 +2,6 @@
 {% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/button/_macro.njk" import onsButton %}
 
-{% set page_title = "Help with specific figures" %}
 {% set breadcrumbsData = [
     {
         "text": "Surveys",
@@ -41,7 +40,7 @@
     <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" role="button" class="ons-btn ons-btn--link ons-js-submit-btn">
         <span class="ons-btn__inner">Yes</span>
     </a>
-    <a href="{{ url_for('surveys_bp.get_send_help_message_page', option=option, sub_option='do-not-have-specific-figures') }}" role="button" class="ons-btn ons-btn--link ons-btn--secondary">
+    <a href="{{ url_for('surveys_bp.send_help_message', option=option, sub_option='do-not-have-specific-figures') }}" role="button" class="ons-btn ons-btn--link ons-btn--secondary">
         <span class="ons-btn__inner">No</span>
     </a>
 {% endblock main %}

@@ -1,87 +1,121 @@
 import unittest
 from unittest import mock
-from uuid import uuid4
 
-from jose import JWTError
+from werkzeug.exceptions import Unauthorized
 
 from frontstage import app
-from frontstage.common.authorisation import jwt_authorization
+from frontstage.common.authorisation import (
+    EXPIRES_IN_MISSING_FROM_PAYLOAD,
+    JWT_DATE_EXPIRED,
+    JWT_DECODE_ERROR,
+    NO_AUTHORIZATION_COOKIE,
+    NO_ENCODED_JWT,
+    jwt_authorization,
+)
 from frontstage.common.session import Session
-from frontstage.exceptions.exceptions import JWTValidationError
+from frontstage.exceptions.exceptions import JWTTimeoutError, JWTValidationError
 
 valid_jwt = (
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXJ0eV9pZCI6ImY5NTZlOGFlLTZ"
-    "lMGYtNDQxNC1iMGNmLWEwN2MxYWEzZTM3YiIsImV4cGlyZXNfYXQiOiIxMDAxMjM0NTY"
-    "3ODkiLCJyb2xlIjoicmVzcG9uZGVudCIsInVucmVhZF9tZXNzYWdlX2NvdW50Ijp7InZh"
-    "bHVlIjowLCJyZWZyZXNoX2luIjozMjUyNzY3NDAwMC4wfSwiZXhwaXJlc19pbiI6MzI1M"
-    "jc2NzQwMDAuMH0.m94R50EPIKTJmE6gf6PvCmCq8ZpYwwV8PHSqsJh5fnI"
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXJ0eV9pZCI6InRlc3QiLCJyb2xlIjoicmVzcG9uZGVudCIsInVucmVhZF9"
+    "tZXNzYWdlX2NvdW50Ijp7InZhbHVlIjoxLCJyZWZyZXNoX2luIjozMjUwMzcyNTY4MTAwMH0sImV4cGlyZXNfaW4iOjMyNTAzNzI"
+    "1NjgxMDAwfQ.8lZiYTzjFuPb6sgYJne88Qua8ozAjnSrZRgoXN6qKic"
 )
+
+in_valid_jwt = (
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXJ0eV9pZCI6InRlc3QiLCJyb2xlIjoicmVzcG9uZGVudCIsInVucmVhZF9"
+    "tZXNzYWdlX2NvdW50Ijp7InZhbHVlIjoxLCJyZWZyZXNoX2luIjozMjUwMzcyNTY4MTAwMH0sImV4cGlyZXNfaW4iOjMyNTAzNzI"
+    "1NjgxMDAwfQ"
+)
+
 expired_jwt = (
-    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoX3Rva2VuIjoiNGYzMmI0YjQtNGUwYS00NTUyLThiOTYtODIzNjRjO"
-    "Dk2ZjFiIiwiYWNjZXNzX3Rva2VuIjoiMWMxNGJhOGMtOTlhMS00NjBjLTllYmUtMTFlY2U4NGY1ZTAzIiwic2NvcGUiOlsiIl0sImV"
-    "4cGlyZXNfYXQiOjk0NjY4ODQ2MS4wLCJ1c2VybmFtZSI6InRlc3R1c2VyQGVtYWlsLmNvbSIsInJvbGUiOiJyZXNwb25kZW50Iiwic"
-    "GFydHlfaWQiOiJkYjAzNmZkNy1jZTE3LTQwYzItYThmYy05MzJlN2MyMjgzOTcifQ.ro95XUJ2gqgz7ecF2r3guSi-kh4wI_XYTgUF"
-    "8IZFHDA"
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXJ0eV9pZCI6InRlc3QiLCJyb2xlIjoicmVzcG9uZGVudCIsInVucmVhZF"
+    "9tZXNzYWdlX2NvdW50Ijp7InZhbHVlIjoxLCJyZWZyZXNoX2luIjoxNTg3OTU1ODAzLjk4ODM4M30sImV4cGlyZXNfaW4iOjE1O"
+    "Dc5NTkxMDMuOTI1MDg4fQ.nntdPMRSQFjCAax0J0Iez1l5BbtqE8x617yWcN_zhKY"
 )
-no_expiry_jwt = (
-    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoX3Rva2VuIjoiMGE0NGQ4YzYtZWEzYy00ZTMzLTg4MDctNjJkYmV"
-    "iOTNlMzZhIiwiYWNjZXNzX3Rva2VuIjoiYWVmZTkyYjAtNTYxYi00ZWM0LTljNTYtMTYwZGZhNGIzNzY0Iiwicm9sZSI6InJlc3B"
-    "vbmRlbnQiLCJwYXJ0eV9pZCI6IjU2NWJjMDc5LWVkMDItNDk0MS04ODgyLWRhZTZmYzE4NWEzZCJ9.unskbEm5dWQfCTvE25cxrO"
-    "hAf1_Ii8ZXiLhBioQq8OE"
+
+no_expires_in_jwt = (
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXJ0eV9pZCI6InRlc3QiLCJyb2xlIjoicmVzcG9uZGVudCIsInVucmVh"
+    "ZF9tZXNzYWdlX2NvdW50Ijp7InZhbHVlIjoxLCJyZWZyZXNoX2luIjoxNjg3OTU1ODAzLjk4ODM4M319.JHUjhH4D00vIFCrC"
+    "YCyUMoxQCx0cTIPdsUVglKdNajk"
 )
 
 
 class TestJWTAuthorization(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
-        self.app.testing = True
-        self.session = Session.from_party_id("test")
-
-    def tearDown(self):
-        self.session.delete_session()
+        self.party_id = "test"
+        self.session = Session.from_party_id(self.party_id)
 
     @staticmethod
     def decorator_test(request):
         @jwt_authorization(request)
-        def test_function(session):
+        def test_function(_):
             pass
 
         test_function()
 
     def test_jwt_authorization_success(self):
-        self.session.encoded_jwt_token = valid_jwt
-        self.session.session_key = str(uuid4())
-        self.session.save()
+        # Given a valid JWT and authorization cookie
+        self._update_session_token()
         request = mock.MagicMock(cookies={"authorization": self.session.session_key})
 
-        # If this function runs without exceptions the test is considered passed
+        # When the jwt_authorization decorator is exercised
+        # Then the function runs without exceptions and the test is considered as passed
         self.decorator_test(request)
 
-    def test_jwt_authorization_expired_jwt(self):
-        self.session.encoded_jwt_token = expired_jwt
-        self.session.session_key = str(uuid4())
-        self.session.save()
+    def test_jwt_authorization_no_cookie(self):
+        # Given the respondent doesnt have an authorization cookie
+        request = mock.MagicMock(cookies={})
+
+        # When the jwt_authorization decorator is exercised
+        # Then the function raises an Unauthorized, NO_AUTHORIZATION_COOKIE exception
+        with self.assertRaises(Unauthorized) as e:
+            self.decorator_test(request)
+        self.assertEqual(e.exception.description, NO_AUTHORIZATION_COOKIE)
+
+    def test_jwt_authorization_no_encoded_jwt_for_session(self):
+        # Given the respondent has an authorization cookie, but the key doesn't match a session in redis
+        request = mock.MagicMock(cookies={"authorization": "incorrect_session_key"})
+
+        # When the jwt_authorization decorator is exercised
+        # Then the function raises an Unauthorized, NO_ENCODED_JWT exception
+        with self.assertRaises(Unauthorized) as e:
+            self.decorator_test(request)
+        self.assertEqual(e.exception.description, NO_ENCODED_JWT)
+
+    def test_jwt_authorization_expired(self):
+        # Given a valid JWT and authorization cookie, but the token has expired
+        self._update_session_token(expired_jwt)
         request = mock.MagicMock(cookies={"authorization": self.session.session_key})
 
-        with self.assertRaises(JWTValidationError):
+        # When the jwt_authorization decorator is exercised
+        # Then the function raises an Unauthorized, JWT_DATE_EXPIRED exception
+        with self.assertRaises(JWTTimeoutError) as e:
             self.decorator_test(request)
+        self.assertEqual(e.exception.message, f"{JWT_DATE_EXPIRED} {self.party_id}")
 
-    def test_jwt_authorization_no_expiry(self):
-        self.session.encoded_jwt_token = no_expiry_jwt
-        self.session.session_key = str(uuid4())
-        self.session.save()
+    def test_jwt_authorization_no_expiry_in_payload(self):
+        # Given a valid authorization cookie, but invalid JWT where the expiry_in key is missing from the payload
+        self._update_session_token(no_expires_in_jwt)
         request = mock.MagicMock(cookies={"authorization": self.session.session_key})
 
-        with self.assertRaises(JWTValidationError):
+        # When the jwt_authorization decorator is exercised
+        # Then the function raises an JWTValidationError exception
+        with self.assertRaises(JWTValidationError) as e:
             self.decorator_test(request)
+        self.assertEqual(e.exception.message, f"{EXPIRES_IN_MISSING_FROM_PAYLOAD} {self.party_id}")
 
-    @mock.patch("frontstage.common.authorisation.decode")
-    def test_jwt_authorization_decode_failure(self, mock_decode):
-        self.session.encoded_jwt_token = valid_jwt
-        self.session.session_key = str(uuid4())
-        self.session.save()
+    def test_jwt_authorization_decode_failure(self):
+        # Given a valid authorization cookie, but invalid JWT where the decode step fails
+        self._update_session_token(in_valid_jwt)
         request = mock.MagicMock(cookies={"authorization": self.session.session_key})
-        mock_decode.side_effect = JWTError
 
-        with self.assertRaises(JWTValidationError):
+        # When the jwt_authorization decorator is exercised
+        # Then the function raises an JWTValidationError exception
+        with self.assertRaises(JWTValidationError) as e:
             self.decorator_test(request)
+        self.assertEqual(e.exception.message, f"{JWT_DECODE_ERROR} {self.session.session_key}")
+
+    def _update_session_token(self, token=valid_jwt):
+        self.session.encoded_jwt_token = token
+        self.session.save()

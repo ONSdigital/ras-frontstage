@@ -1,7 +1,7 @@
 import json
 import logging
 
-from flask import flash, render_template, request, url_for
+from flask import flash, request, url_for
 from markupsafe import Markup
 from structlog import wrap_logger
 from werkzeug.utils import redirect
@@ -10,6 +10,7 @@ from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import conversation_controller
 from frontstage.models import SecureMessagingForm
 from frontstage.views.surveys import surveys_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -29,7 +30,7 @@ breadcrumb_text_mapping = {
 @jwt_authorization(request)
 def get_technical_message_page_option(session, option):
     template = option_template_url_mapping.get(option, "Invalid template")
-    return render_template(template, option=option)
+    return render_template(template, session=session, option=option)
 
 
 @surveys_bp.route("/technical/send-message", methods=["GET"])
@@ -41,6 +42,7 @@ def get_send_help_technical_message_page(session):
     breadcrumbs = breadcrumb_text_mapping.get(option, None)
     return render_template(
         "secure-messages/help/secure-message-send-technical-messages-view.html",
+        session=session,
         option=option,
         subject=subject,
         breadcrumbs=breadcrumbs,

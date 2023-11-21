@@ -2,7 +2,6 @@
 {% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/button/_macro.njk" import onsButton %}
 
-{% set page_title = "Help with how long selected for" %}
 {% set breadcrumbsData = [
     {
         "text": "Surveys",
@@ -34,7 +33,7 @@
     <h1 class="ons-u-fs-xl">How long will my business be selected for?</h1>
     <p>We cannot give a definite period of selection for business surveys as this depends on various factors. We choose a specific number of businesses for a survey sample. This can change as businesses start and other businesses stop trading.</p>
     <p>Employment levels within each business may change, which affects the number of businesses in each size-band. This also has an impact on how long a business is selected for.</p>
-    <p>See more <a href="https://www.ons.gov.uk/surveys/informationforbusinesses" class="ons-external-link" target="_blank" rel="noopener">information for businesses<svg id="external-link" class="ons-svg-icon" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+    <p>See more <a href="https://www.ons.gov.uk/surveys/informationforbusinesses" class="ons-external-link" target="_blank" rel="noopener">information for businesses<svg id="external-link" class="ons-icon" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
         <path d="M13.5,9H13a.5.5,0,0,0-.5.5v3h-9v-9h3A.5.5,0,0,0,7,3V2.5A.5.5,0,0,0,6.5,2h-4a.5.5,0,0,0-.5.5v11a.5.5,0,0,0,.5.5h11a.5.5,0,0,0,.5-.5v-4A.5.5,0,0,0,13.5,9Z" transform="translate(-2 -1.99)" />
         <path d="M8.83,7.88a.51.51,0,0,0,.71,0l2.31-2.32,1.28,1.28A.51.51,0,0,0,14,6.49v-4a.52.52,0,0,0-.5-.5h-4A.51.51,0,0,0,9,2.52a.58.58,0,0,0,.14.33l1.28,1.28L8.12,6.46a.51.51,0,0,0,0,.71Z" transform="translate(-2 -1.99)" />
       </svg></a></p>
@@ -42,7 +41,7 @@
     <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" role="button" class="ons-btn ons-btn--link ons-js-submit-btn">
         <span class="ons-btn__inner">Yes</span>
     </a>
-    <a href="{{ url_for('surveys_bp.get_send_help_message_page', option=option, sub_option='how-long-selected-for') }}" role="button" class="ons-btn ons-btn--link ons-btn--secondary">
+    <a href="{{ url_for('surveys_bp.send_help_message', option=option, sub_option='how-long-selected-for') }}" role="button" class="ons-btn ons-btn--link ons-btn--secondary">
         <span class="ons-btn__inner">No</span>
     </a>
 {% endblock main %}

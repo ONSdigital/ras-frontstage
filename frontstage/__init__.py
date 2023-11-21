@@ -1,22 +1,27 @@
+import logging
+
+import fakeredis
 import redis
 from flask import render_template
 from flask_talisman import Talisman
 from jinja2 import ChainableUndefined
+from structlog import wrap_logger
 
 from frontstage.common.jinja_filters import filter_blueprint
 from frontstage.controllers.banner_controller import current_banner
 from frontstage.create_app import create_app_object
 
-# TODO: review https://content-security-policy.com/, remove this comment if we're covered.
+logger = wrap_logger(logging.getLogger(__name__))
+
 CSP_POLICY = {
     "default-src": ["'self'", "https://cdn.ons.gov.uk"],
     "font-src": ["'self'", "data:", "https://fonts.gstatic.com", "https://cdn.ons.gov.uk"],
     "script-src": ["'self'", "https://www.googletagmanager.com", "https://cdn.ons.gov.uk"],
     "connect-src": [
         "'self'",
-        "https://www.googletagmanager.com",
-        "https://tagmanager.google.com",
-        "https://cdn.ons.gov.uk",
+        "https://*.google-analytics.com",
+        "https://*.analytics.google.com",
+        "https://*.googletagmanager.com",
     ],
     "img-src": [
         "'self'",
@@ -47,7 +52,13 @@ talisman = Talisman(
     strict_transport_security_max_age=31536000,
     frame_options="DENY",
 )
-redis = redis.Redis(host=app.config["REDIS_HOST"], port=app.config["REDIS_PORT"], db=app.config["REDIS_DB"])
+
+if not app.config["TESTING"]:
+    redis = redis.Redis(host=app.config["REDIS_HOST"], port=app.config["REDIS_PORT"], db=app.config["REDIS_DB"])
+    logger.info("Using real redis")
+else:
+    redis = fakeredis.FakeRedis()
+    logger.info("Using fakeredis")
 
 app.jinja_env.undefined = ChainableUndefined
 app.jinja_env.add_extension("jinja2.ext.do")

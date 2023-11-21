@@ -1,7 +1,7 @@
 import json
 import logging
 
-from flask import abort, flash, render_template, request
+from flask import abort, flash, request
 from flask import session as flask_session
 from flask import url_for
 from markupsafe import Markup
@@ -23,6 +23,7 @@ from frontstage.models import (
     SecureMessagingForm,
 )
 from frontstage.views.surveys import surveys_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 help_completing_this_survey_title = "Help completing this survey"
@@ -34,6 +35,12 @@ option_template_url_mapping = {
     "info-about-this-survey": "surveys/help/surveys-help-info-about-this-survey.html",
     "info-about-the-ons": "surveys/help/surveys-help-info-about-the-ons.html",
     "something-else": "surveys/help/surveys-help-something-else.html",
+}
+option_template_title_mapping = {
+    "help-completing-this-survey": "Help completing this survey",
+    "info-about-this-survey": "Help information about this survey",
+    "info-about-the-ons": "Help information about the ONS",
+    "something-else": "Help with something else",
 }
 sub_option_template_url_mapping = {
     "do-not-have-specific-figures": "surveys/help/surveys-help-specific-figure-for-response.html",
@@ -47,6 +54,23 @@ sub_option_template_url_mapping = {
     "who-is-the-ons": "surveys/help/surveys-help-who-is-the-ons.html",
     "how-safe-is-my-data": "surveys/help/surveys-help-how-safe-is-my-data.html",
     "my-survey-is-not-listed": "surveys/help/surveys-help-my-survey-is-not-listed.html",
+}
+sub_option_template_title_mapping = {
+    "do-not-have-specific-figures": "Help with specific figures",
+    "unable-to-return-by-deadline": "Help with deadline",
+    "exemption-completing-survey": "Help with exemption completing survey",
+    "why-selected": "Help with why business selected",
+    "time-to-complete": "Help with time to complete",
+    "how-long-selected-for": "Help with how long selected for",
+    "penalties": "Help with penalties",
+    "info-something-else": "Help survey info something else",
+    "who-is-the-ons": "Help with who is the ONS",
+    "how-safe-is-my-data": "Help with how safe is my data",
+    "my-survey-is-not-listed": "Help my survey is not listed",
+    "answer-survey-question": "Send message",
+    "completing-this-survey-something-else": "Send message",
+    "info-ons-something-else": "Send message",
+    "something-else": "Send message",
 }
 subject_text_mapping = {
     "do-not-have-specific-figures": "I don’t have specific figures for a response",
@@ -101,118 +125,108 @@ def get_surveys_help_page(session):
     abort_help_if_session_not_set()
     return redirect(
         url_for(
-            "surveys_bp.get_help_page",
+            "surveys_bp.help_page",
         )
     )
 
 
-@surveys_bp.route("/help", methods=["GET"])
+@surveys_bp.route("/help", methods=["GET", "POST"])
 @jwt_authorization(request)
-def get_help_page(session):
-    """Gets Survey Help page provided survey_ref and ru_ref are in session"""
+def help_page(session):
+    """Get survey help page provided survey_ref and ru_ref are in session and post help completing this survey option
+    for respective survey"""
     abort_help_if_session_not_set()
     business_id, ru_ref, short_name, survey, survey_ref = get_selected_survey_business_details()
+    page_title = "Help"
+    if request.method == "POST":
+        form = HelpOptionsForm(request.values)
+        if form.validate():
+            option = form.data["option"]
+            if option == "help-with-my-account":
+                return redirect(url_for("account_bp.account"))
+            return redirect(url_for("surveys_bp.help_option_select", option=option))
+        else:
+            flash("You need to choose an option")
+            page_title = "Error: " + page_title
+
     return render_template(
         "surveys/help/surveys-help.html",
+        session=session,
         form=HelpOptionsForm(),
         short_name=short_name,
         survey_name=survey["longName"],
         business_id=business_id,
         survey_ref=survey_ref,
         ru_ref=ru_ref,
+        page_title=page_title,
     )
 
 
-@surveys_bp.route("/help", methods=["POST"])
+@surveys_bp.route("/help/<option>", methods=["GET", "POST"])
 @jwt_authorization(request)
-def post_help_page(session):
-    """Post help completing this survey option for respective survey"""
-    abort_help_if_session_not_set()
-    business_id, ru_ref, short_name, survey, survey_ref = get_selected_survey_business_details()
-    form = HelpOptionsForm(request.values)
-    if form.validate():
-        option = form.data["option"]
-        if option == "help-with-my-account":
-            return redirect(url_for("account_bp.get_account"))
-        return redirect(url_for("surveys_bp.get_help_option_select", option=option))
-    else:
-        flash("You need to choose an option")
-        return redirect(
-            url_for(
-                "surveys_bp.get_help_page",
-                survey_ref=survey_ref,
-                ru_ref=ru_ref,
-            )
-        )
-
-
-@surveys_bp.route("/help/<option>", methods=["GET"])
-@jwt_authorization(request)
-def get_help_option_select(session, option):
-    """Gets help completing this survey's additional options (sub options)"""
+def help_option_select(session, option: str):
+    """Gets and provides additional options once sub options are selected"""
+    page_title = option_template_title_mapping.get(option, "Invalid template")
     abort_help_if_session_not_set()
     business_id, ru_ref, short_name, survey, survey_ref = get_selected_survey_business_details()
     template = option_template_url_mapping.get(option, "Invalid template")
-    if template == "Invalid template":
-        abort(404)
-    else:
-        return render_template(
-            template,
-            short_name=short_name,
-            business_id=business_id,
-            option=option,
-            form=HelpCompletingThisSurveyForm(),
-            survey_name=survey["longName"],
-            survey_ref=survey_ref,
-            ru_ref=ru_ref,
-        )
 
-
-@surveys_bp.route("/help/<option>", methods=["POST"])
-@jwt_authorization(request)
-def post_help_option_select(session, option: str):
-    """Provides additional options once sub options are selected"""
-    if option == "help-completing-this-survey":
-        form = HelpCompletingThisSurveyForm(request.values)
-        form_valid = form.validate()
-        if form_valid:
-            sub_option = form.data["option"]
-            if sub_option == "answer-survey-question" or sub_option == "completing-this-survey-something-else":
-                return redirect_to_send_message_page(option, sub_option)
-            if sub_option == "do-not-have-specific-figures" or sub_option == "unable-to-return-by-deadline":
+    if request.method == "POST":
+        if option == "help-completing-this-survey":
+            form = HelpCompletingThisSurveyForm(request.values)
+            form_valid = form.validate()
+            if form_valid:
+                sub_option = form.data["option"]
+                if sub_option == "answer-survey-question" or sub_option == "completing-this-survey-something-else":
+                    return redirect_to_send_message_page(option, sub_option)
+                if sub_option == "do-not-have-specific-figures" or sub_option == "unable-to-return-by-deadline":
+                    return redirect_to_sub_option_select_page(option, sub_option)
+            else:
+                page_title = flash_error_and_set_title(page_title)
+        if option == "info-about-this-survey":
+            form = HelpInfoAboutThisSurveyForm(request.values)
+            form_valid = form.validate()
+            if form_valid:
+                sub_option = form.data["option"]
+                return redirect_to_sub_option_select_page(option=option, sub_option=sub_option)
+            else:
+                page_title = flash_error_and_set_title(page_title)
+        if option == "info-about-the-ons":
+            form = HelpInfoAboutTheONSForm(request.values)
+            form_valid = form.validate()
+            if form_valid:
+                sub_option = form.data["option"]
+                if sub_option == "info-ons-something-else":
+                    return redirect_to_send_message_page(option, sub_option)
+                return redirect_to_sub_option_select_page(option=option, sub_option=sub_option)
+            else:
+                page_title = flash_error_and_set_title(page_title)
+        if option == "something-else":
+            form = HelpSomethingElseForm(request.values)
+            form_valid = form.validate()
+            if form_valid:
+                sub_option = form.data["option"]
+                if sub_option == "something-else":
+                    return redirect_to_send_message_page(option, sub_option)
                 return redirect_to_sub_option_select_page(option, sub_option)
-        else:
-            return flash_error_and_redirect(option)
-    if option == "info-about-this-survey":
-        form = HelpInfoAboutThisSurveyForm(request.values)
-        form_valid = form.validate()
-        if form_valid:
-            sub_option = form.data["option"]
-            return redirect_to_sub_option_select_page(option=option, sub_option=sub_option)
-        else:
-            return flash_error_and_redirect(option)
-    if option == "info-about-the-ons":
-        form = HelpInfoAboutTheONSForm(request.values)
-        form_valid = form.validate()
-        if form_valid:
-            sub_option = form.data["option"]
-            if sub_option == "info-ons-something-else":
-                return redirect_to_send_message_page(option, sub_option)
-            return redirect_to_sub_option_select_page(option=option, sub_option=sub_option)
-        else:
-            return flash_error_and_redirect(option)
-    if option == "something-else":
-        form = HelpSomethingElseForm(request.values)
-        form_valid = form.validate()
-        if form_valid:
-            sub_option = form.data["option"]
-            if sub_option == "something-else":
-                return redirect_to_send_message_page(option, sub_option)
-            return redirect_to_sub_option_select_page(option, sub_option)
-        else:
-            return flash_error_and_redirect(option)
+            else:
+                page_title = flash_error_and_set_title(page_title)
     else:
-        abort(404)
+        if template == "Invalid template":
+            abort(404)
+
+    return render_template(
+        template,
+        session=session,
+        short_name=short_name,
+        business_id=business_id,
+        option=option,
+        form=HelpCompletingThisSurveyForm(),
+        survey_name=survey["longName"],
+        survey_ref=survey_ref,
+        ru_ref=ru_ref,
+        page_title=page_title,
+    )
 
 
 @surveys_bp.route("/help/<option>/<sub_option>", methods=["GET"])
@@ -220,6 +234,7 @@ def post_help_option_select(session, option: str):
 def get_help_option_sub_option_select(session, option, sub_option):
     """Provides additional options with sub option provided"""
     template = sub_option_template_url_mapping.get(sub_option, "Invalid template")
+    page_title = sub_option_template_title_mapping.get(sub_option, "Invalid option")
     abort_help_if_session_not_set()
     business_id, ru_ref, short_name, survey, survey_ref = get_selected_survey_business_details()
     if template == "Invalid template":
@@ -227,6 +242,7 @@ def get_help_option_sub_option_select(session, option, sub_option):
     else:
         return render_template(
             template,
+            session=session,
             short_name=short_name,
             option=option,
             sub_option=sub_option,
@@ -236,21 +252,46 @@ def get_help_option_sub_option_select(session, option, sub_option):
             survey_ref=survey_ref,
             ru_ref=ru_ref,
             is_survey_help_page=True,  # currently used by survey not listed.
+            page_title=page_title,
         )
 
 
-@surveys_bp.route("/help/<option>/<sub_option>/send-message", methods=["GET"])
+@surveys_bp.route("/help/<option>/<sub_option>/send-message", methods=["GET", "POST"])
 @jwt_authorization(request)
-def get_send_help_message_page(session, option, sub_option):
-    """Gets the send message page once the option and sub option is selected"""
+def send_help_message(session, option, sub_option):
+    """Handles requests to send a secure message for the help pages"""
+    print(sub_option)
+    page_title = sub_option_template_title_mapping.get(sub_option, "Invalid option")
     abort_help_if_session_not_set()
     business_id, ru_ref, short_name, survey, survey_ref = get_selected_survey_business_details()
     subject = subject_text_mapping.get(sub_option)
     breadcrumb_text = breadcrumb_text_mapping.get(sub_option, None)
     breadcrumb_title_one = breadcrumb_text[0] if len(breadcrumb_text) > 0 else None
     breadcrumb_title_two = breadcrumb_text[1] if len(breadcrumb_text) > 1 else None
+
+    if request.method == "POST":
+        form = SecureMessagingForm(request.form)
+        if not form.validate():
+            flash(form.errors["body"][0])
+            page_title = "Error: " + page_title
+            # return redirect(url_for("surveys_bp.send_help_message", option=option, sub_option=sub_option))
+        else:
+            party_id = session.get_party_id()
+            business_id = business_id
+            logger.info("Form validation successful", party_id=party_id)
+            category = "SURVEY"
+            if option == "info-about-the-ons":
+                category = "TECHNICAL"
+            sent_message = _send_new_message(subject, party_id, survey["id"], business_id, category)
+            thread_url = (
+                url_for("secure_message_bp.view_conversation", thread_id=sent_message["thread_id"]) + "#latest-message"
+            )
+            flash(Markup(f"Message sent. <a href={thread_url}>View Message</a>"))
+            return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
+
     return render_template(
         "secure-messages/help/secure-message-send-messages-view.html",
+        session=session,
         short_name=short_name,
         option=option,
         sub_option=sub_option,
@@ -261,33 +302,8 @@ def get_send_help_message_page(session, option, sub_option):
         business_id=business_id,
         survey_ref=survey_ref,
         ru_ref=ru_ref,
+        page_title=page_title,
     )
-
-
-@surveys_bp.route("/help/<option>/<sub_option>/send-message", methods=["POST"])
-@jwt_authorization(request)
-def send_help_message(session, option, sub_option):
-    """Sends secure message for the help pages"""
-    form = SecureMessagingForm(request.form)
-    if not form.validate():
-        flash(form.errors["body"][0])
-        return redirect(url_for("surveys_bp.get_send_help_message_page", option=option, sub_option=sub_option))
-    else:
-        abort_help_if_session_not_set()
-        business_id, ru_ref, short_name, survey, survey_ref = get_selected_survey_business_details()
-        subject = subject_text_mapping.get(sub_option)
-        party_id = session.get_party_id()
-        business_id = business_id
-        logger.info("Form validation successful", party_id=party_id)
-        category = "SURVEY"
-        if option == "info-about-the-ons":
-            category = "TECHNICAL"
-        sent_message = _send_new_message(subject, party_id, survey["id"], business_id, category)
-        thread_url = (
-            url_for("secure_message_bp.view_conversation", thread_id=sent_message["thread_id"]) + "#latest-message"
-        )
-        flash(Markup(f"Message sent. <a href={thread_url}>View Message</a>"))
-        return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
 
 
 def abort_help_if_session_not_set():
@@ -329,19 +345,14 @@ def redirect_to_sub_option_select_page(option: str, sub_option: str):
 
 def redirect_to_send_message_page(option: str, sub_option: str):
     """
-    redirect to get_send_help_message_page
+    redirect to send_help_message
     """
-    return redirect(url_for("surveys_bp.get_send_help_message_page", option=option, sub_option=sub_option))
+    return redirect(url_for("surveys_bp.send_help_message", option=option, sub_option=sub_option))
 
 
-def flash_error_and_redirect(option: str):
+def flash_error_and_set_title(page_title: str):
     flash("You need to choose an option")
-    return redirect(
-        url_for(
-            "surveys_bp.get_help_option_select",
-            option=option,
-        )
-    )
+    return "Error: " + page_title
 
 
 def _send_new_message(subject, party_id, survey_id, business_id, category):

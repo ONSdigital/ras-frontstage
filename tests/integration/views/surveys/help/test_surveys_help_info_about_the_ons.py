@@ -19,7 +19,7 @@ from tests.integration.mocked_services import (
 class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
-        self.app.set_cookie("localhost", "authorization", "session_key")
+        self.app.set_cookie("authorization", "session_key")
         self.headers = {
             "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2Vy"
             "X3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"
@@ -63,6 +63,8 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         response = self.app.post("/surveys/help", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
+        self.assertIn("Error: ".encode(), response.data)
+        self.assertIn('<span class="ons-panel__assistive-text ons-u-vh">Error: </span>'.encode(), response.data)
         self.assertIn("There is 1 error on this page".encode(), response.data)
         self.assertIn("You need to choose an option".encode(), response.data)
 
@@ -233,6 +235,8 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
+        self.assertIn("Error: ".encode(), response.data)
+        self.assertIn('<span class="ons-panel__assistive-text ons-u-vh">Error: </span>'.encode(), response.data)
         self.assertIn("There is 1 error on this page".encode(), response.data)
         self.assertIn("Message is required".encode(), response.data)
         self.assertIn("Send a message".encode(), response.data)

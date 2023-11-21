@@ -89,7 +89,7 @@ def add_survey_submit(session):
     return redirect(
         url_for(
             "surveys_bp.get_survey_list",
-            _anchor=(business_party_id, added_survey_id),
+            session=session,
             _external=True,
             business_party_id=business_party_id,
             survey_id=added_survey_id,

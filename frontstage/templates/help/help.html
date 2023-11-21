@@ -3,7 +3,6 @@
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/radios/_macro.njk" import onsRadios %}
 {% from "components/button/_macro.njk" import onsButton %}
-{% set page_title = "Help" %}
 {% set breadcrumbsData = [
     {
         "text": "Sign in",
@@ -27,7 +26,7 @@
 
     <h1 class="ons-u-fs-xl">Help</h1>
 
-    <form action="{{ url_for('help_bp.help_submit')}}" method="post">
+    <form action="{{ url_for('help_bp.help_page')}}" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         {% if ns.optionError %}
             {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}

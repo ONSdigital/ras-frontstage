@@ -31,7 +31,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 class TestAddSurveySubmit(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
-        self.app.set_cookie("localhost", "authorization", "session_key")
+        self.app.set_cookie("authorization", "session_key")
         self.headers = {
             "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"  # NOQA
         }
@@ -54,7 +54,7 @@ class TestAddSurveySubmit(unittest.TestCase):
         self,
         mock_request,
         decrypt_enrolment_code,
-        get_iac_by_enrolment_code,
+        get_iac_from_enrolment_code,
         get_case_by_enrolment,
         get_collection_exercise,
         get_party_by_business_id,
@@ -62,7 +62,7 @@ class TestAddSurveySubmit(unittest.TestCase):
     ):
         mock_request.get(url_banner_api, status_code=404)
         decrypt_enrolment_code.return_value = enrolment_code.encode()
-        get_iac_by_enrolment_code.return_value = active_iac
+        get_iac_from_enrolment_code.return_value = active_iac
         get_case_by_enrolment.return_value = case
         get_collection_exercise.return_value = collection_exercise
         get_party_by_business_id.return_value = business_party
@@ -88,7 +88,7 @@ class TestAddSurveySubmit(unittest.TestCase):
         self,
         mock_request,
         decrypt_enrolment_code,
-        get_iac_by_enrolment_code,
+        get_iac_from_enrolment_code,
         get_case_by_enrolment,
         get_collection_exercise,
         get_party_by_business_id,
@@ -96,7 +96,7 @@ class TestAddSurveySubmit(unittest.TestCase):
     ):
         mock_request.get(url_banner_api, status_code=404)
         decrypt_enrolment_code.return_value = enrolment_code.encode()
-        get_iac_by_enrolment_code.return_value = active_iac
+        get_iac_from_enrolment_code.return_value = active_iac
         get_case_by_enrolment.return_value = case_diff_surveyId
         get_collection_exercise.return_value = collection_exercise
         get_party_by_business_id.return_value = business_party

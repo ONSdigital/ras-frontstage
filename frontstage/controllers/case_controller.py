@@ -143,18 +143,9 @@ def get_cases_by_party_id(party_id, case_url, case_auth, case_events=False, iac=
     return response.json()
 
 
-def get_eq_url(version, case, collection_exercise, party_id, business_party_id, survey_short_name):
+def get_eq_url(case, collection_exercise, party_id, business_party_id, survey_short_name):
     case_id = case["id"]
-    logger.info("Attempting to generate EQ URL", case_id=case_id, party_id=party_id, version=version)
-
-    if version not in ["v2", "v3"]:
-        # EQ collection exercises created before the concept of versions might have a null value for the version.
-        # If this is the case, we can safely assume it's v2 as that was the only one availible at the time.
-        if version is None:
-            logger.info("EQ version not set, assuming v2", case_id=case_id, party_id=party_id, version=version)
-            version = "v2"
-        else:
-            raise ValueError(f"The eq version [{version}] is not supported")
+    logger.info("Attempting to generate EQ URL", case_id=case_id, party_id=party_id)
 
     if case["caseGroup"]["caseGroupStatus"] in ("COMPLETE", "COMPLETEDBYPHONE", "NOLONGERREQUIRED"):
         logger.info("The case group status is complete, opening an EQ is forbidden", case_id=case_id, party_id=party_id)
@@ -164,17 +155,13 @@ def get_eq_url(version, case, collection_exercise, party_id, business_party_id, 
     if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey):
         raise NoSurveyPermission(party_id, case_id)
 
-    payload = EqPayload().create_payload(case, collection_exercise, party_id, business_party_id, survey, version)
+    payload = EqPayload().create_payload(case, collection_exercise, party_id, business_party_id, survey)
 
     json_secret_keys = app.config["JSON_SECRET_KEYS"]
     encrypter = Encrypter(json_secret_keys)
 
-    if version == "v2":
-        token = encrypter.encrypt(payload, "eq")
-        eq_url = app.config["EQ_URL"] + token
-    elif version == "v3":
-        token = encrypter.encrypt(payload, "eq_v3")
-        eq_url = app.config["EQ_V3_URL"] + token
+    token = encrypter.encrypt(payload, "eq_v3")
+    eq_url = app.config["EQ_V3_URL"] + token
 
     category = "EQ_LAUNCH"
     ci_id = case["collectionInstrumentId"]
@@ -185,6 +172,7 @@ def get_eq_url(version, case, collection_exercise, party_id, business_party_id, 
         description=f"Instrument {ci_id} launched by {party_id} for case {case_id}",
     )
 
+    # This log is associated with a custom log metric
     logger.info(
         "Successfully generated EQ URL",
         case_id=case_id,
@@ -193,7 +181,6 @@ def get_eq_url(version, case, collection_exercise, party_id, business_party_id, 
         business_party_id=business_party_id,
         survey_short_name=survey_short_name,
         tx_id=payload["tx_id"],
-        version=version,
     )
     return eq_url
 

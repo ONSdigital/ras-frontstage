@@ -1,6 +1,6 @@
 import logging
 
-from flask import redirect, render_template, request
+from flask import redirect, request
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
@@ -10,6 +10,7 @@ from frontstage.controllers import (
     conversation_controller,
 )
 from frontstage.views.surveys import surveys_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -29,11 +30,8 @@ def access_survey(session):
         collection_exercise = collection_exercise_controller.get_collection_exercise(
             case["caseGroup"]["collectionExerciseId"]
         )
-        eq_version = collection_exercise["eqVersion"]
         return redirect(
-            case_controller.get_eq_url(
-                eq_version, case, collection_exercise, party_id, business_party_id, survey_short_name
-            )
+            case_controller.get_eq_url(case, collection_exercise, party_id, business_party_id, survey_short_name)
         )
 
     logger.info("Retrieving case data", party_id=party_id, case_id=case_id)
@@ -44,6 +42,7 @@ def access_survey(session):
     unread_message_count = {"unread_message_count": conversation_controller.try_message_count_from_session(session)}
     return render_template(
         "surveys/surveys-access.html",
+        session=session,
         case_id=case_id,
         collection_instrument_id=case_data["collection_instrument"]["id"],
         collection_instrument_size=case_data["collection_instrument"]["len"],

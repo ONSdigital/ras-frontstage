@@ -21,7 +21,7 @@ from tests.integration.mocked_services import (
 class TestDownloadSurvey(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
-        self.app.set_cookie("localhost", "authorization", "session_key")
+        self.app.set_cookie("authorization", "session_key")
         self.headers = {
             "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"  # NOQA
         }
@@ -62,7 +62,6 @@ class TestDownloadSurvey(unittest.TestCase):
             self.assertEqual("no-cache", headers["Pragma"])
             self.assertEqual("max-age=31536000; includeSubDomains", headers["Strict-Transport-Security"])
             self.assertEqual("DENY", headers["X-Frame-Options"])
-            self.assertEqual("1; mode=block", headers["X-Xss-Protection"])
             self.assertEqual("nosniff", headers["X-Content-Type-Options"])
 
             csp_policy_parts = headers["Content-Security-Policy"].split("; ")

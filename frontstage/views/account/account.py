@@ -1,7 +1,7 @@
 import json
 import logging
 
-from flask import flash, render_template, request, url_for
+from flask import flash, request, url_for
 from markupsafe import Markup
 from structlog import wrap_logger
 from werkzeug.utils import redirect
@@ -22,6 +22,7 @@ from frontstage.models import (
     SecureMessagingForm,
 )
 from frontstage.views.account import account_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -35,25 +36,30 @@ form_redirect_mapper = {
 }
 
 
-@account_bp.route("/", methods=["GET"])
+@account_bp.route("/", methods=["GET", "POST"])
 @jwt_authorization(request)
-def get_account(session):
-    form = OptionsForm()
+def account(session):
+    page_title = "Account details"
     party_id = session.get_party_id()
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
-    return render_template("account/account.html", form=form, respondent=respondent_details)
 
-
-@account_bp.route("/", methods=["POST"])
-@jwt_authorization(request)
-def update_account(session):
-    form = OptionsForm()
-    form_valid = form.validate()
-    if not form_valid:
-        flash("You need to choose an option")
-        return redirect(url_for("account_bp.get_account"))
+    if request.method == "POST":
+        form = OptionsForm()
+        form_valid = form.validate()
+        if not form_valid:
+            flash("You need to choose an option")
+            page_title = "Error: " + page_title
+        else:
+            return redirect(url_for(form_redirect_mapper.get(form.data["option"])))
     else:
-        return redirect(url_for(form_redirect_mapper.get(form.data["option"])))
+        form = OptionsForm()
+
+    return render_template(
+        "account/account.html",
+        form=form,
+        respondent=respondent_details,
+        page_title=page_title,
+    )
 
 
 @account_bp.route("/change-password", methods=["GET", "POST"])
@@ -94,7 +100,7 @@ def change_password(session):
     else:
         errors = form.errors
 
-    return render_template("account/account-change-password.html", form=form, errors=errors)
+    return render_template("account/account-change-password.html", session=session, form=form, errors=errors)
 
 
 @account_bp.route("/change-account-email-address", methods=["POST"])
@@ -118,7 +124,7 @@ def change_email_address(session):
         else:
             raise exc
     logger.info("Successfully updated email on account", party_id=party_id)
-    return render_template("account/account-change-email-address-almost-done.html")
+    return render_template("account/account-change-email-address-almost-done.html", session=session)
 
 
 @account_bp.route("/change-account-details", methods=["GET", "POST"])
@@ -155,7 +161,11 @@ def change_account_details(session):
         return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
     else:
         return render_template(
-            "account/account-contact-detail-change.html", form=form, errors=form.errors, respondent=respondent_details
+            "account/account-contact-detail-change.html",
+            session=session,
+            form=form,
+            errors=form.errors,
+            respondent=respondent_details,
         )
 
 
@@ -163,7 +173,11 @@ def change_account_details(session):
 @jwt_authorization(request)
 def something_else(session):
     """Gets the something else once the option is selected"""
-    return render_template("account/account-something-else.html", form=SecureMessagingForm())
+    return render_template(
+        "account/account-something-else.html",
+        session=session,
+        form=SecureMessagingForm(),
+    )
 
 
 @account_bp.route("/something-else", methods=["POST"])

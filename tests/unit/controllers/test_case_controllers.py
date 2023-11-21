@@ -43,7 +43,6 @@ class TestCaseControllers(unittest.TestCase):
         self.app_config = self.app.application.config
 
     def test_calculate_case_status_returns_correct_status_for_complete_for_eq_and_seft(self):
-
         case_status_seft = case_controller.calculate_case_status("COMPLETE", "SEFT")
         case_status_eq = case_controller.calculate_case_status("COMPLETE", "EQ")
 
@@ -51,7 +50,6 @@ class TestCaseControllers(unittest.TestCase):
         self.assertEqual("Complete", case_status_eq)
 
     def test_calculate_case_status_returns_correct_status_for_completed_by_phone_for_eq_and_seft(self):
-
         case_status_seft = case_controller.calculate_case_status("COMPLETEDBYPHONE", "SEFT")
         case_status_eq = case_controller.calculate_case_status("COMPLETEDBYPHONE", "EQ")
 
@@ -59,7 +57,6 @@ class TestCaseControllers(unittest.TestCase):
         self.assertEqual("Completed by phone", case_status_eq)
 
     def test_calculate_case_status_returns_correct_status_for_no_longer_required_for_eq_and_seft(self):
-
         case_status_seft = case_controller.calculate_case_status("NOLONGERREQUIRED", "SEFT")
         case_status_eq = case_controller.calculate_case_status("NOLONGERREQUIRED", "EQ")
 
@@ -67,7 +64,6 @@ class TestCaseControllers(unittest.TestCase):
         self.assertEqual("No longer required", case_status_eq)
 
     def test_calculate_case_status_returns_correct_state_for_in_progress_for_eq_and_seft(self):
-
         case_status_seft = case_controller.calculate_case_status("INPROGRESS", "SEFT")
         case_status_eq = case_controller.calculate_case_status("INPROGRESS", "EQ")
 
@@ -75,7 +71,6 @@ class TestCaseControllers(unittest.TestCase):
         self.assertEqual("In progress", case_status_eq)
 
     def test_calculate_case_status_returns_not_started_with_unexpected_status(self):
-
         case_status_seft = case_controller.calculate_case_status("Apple", "SEFT")
         case_status_eq = case_controller.calculate_case_status("Banana", "EQ")
 
@@ -139,28 +134,6 @@ class TestCaseControllers(unittest.TestCase):
             rsps.add(rsps.GET, url_get_survey_by_short_name_eq, json=survey_eq, status=200)
             with app.app_context():
                 eq_url = case_controller.get_eq_url(
-                    "v2",
-                    case,
-                    collection_exercise,
-                    respondent_party["id"],
-                    business_party["id"],
-                    survey_eq["shortName"],
-                )
-
-                self.assertIn("https://eq-test/session?token=", eq_url)
-
-    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
-    @patch("frontstage.controllers.case_controller.post_case_event")
-    @patch("frontstage.common.eq_payload.EqPayload.create_payload")
-    @patch("frontstage.controllers.case_controller.get_case_by_case_id")
-    def test_get_eq_v3_url_case_group_status_not_complete(self, get_case_by_id, create_eq_payload, *_):
-        get_case_by_id.return_value = case
-        create_eq_payload.return_value = eq_payload
-        with responses.RequestsMock() as rsps:
-            rsps.add(rsps.GET, url_get_survey_by_short_name_eq, json=survey_eq, status=200)
-            with app.app_context():
-                eq_url = case_controller.get_eq_url(
-                    "v3",
                     case,
                     collection_exercise,
                     respondent_party["id"],
@@ -174,14 +147,13 @@ class TestCaseControllers(unittest.TestCase):
     @patch("frontstage.controllers.case_controller.post_case_event")
     @patch("frontstage.common.eq_payload.EqPayload.create_payload")
     @patch("frontstage.controllers.case_controller.get_case_by_case_id")
-    def test_get_eq_url_blank_eq_version_redirects_to_v2(self, get_case_by_id, create_eq_payload, *_):
+    def test_get_eq_v3_url_case_group_status_not_complete(self, get_case_by_id, create_eq_payload, *_):
         get_case_by_id.return_value = case
         create_eq_payload.return_value = eq_payload
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_survey_by_short_name_eq, json=survey_eq, status=200)
             with app.app_context():
                 eq_url = case_controller.get_eq_url(
-                    None,
                     case,
                     collection_exercise,
                     respondent_party["id"],
@@ -189,7 +161,7 @@ class TestCaseControllers(unittest.TestCase):
                     survey_eq["shortName"],
                 )
 
-                self.assertIn("https://eq-test/session?token=", eq_url)
+                self.assertIn("https://eq-test/v3/session?token=", eq_url)
 
     @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
     @patch("frontstage.controllers.case_controller.get_case_by_case_id")
@@ -200,7 +172,6 @@ class TestCaseControllers(unittest.TestCase):
         with app.app_context():
             with self.assertRaises(Forbidden):
                 case_controller.get_eq_url(
-                    "v2",
                     case_copy,
                     collection_exercise,
                     respondent_party["id"],
@@ -217,7 +188,6 @@ class TestCaseControllers(unittest.TestCase):
         with app.app_context():
             with self.assertRaises(Forbidden):
                 case_controller.get_eq_url(
-                    "v2",
                     case_copy,
                     collection_exercise,
                     respondent_party["id"],
@@ -234,7 +204,6 @@ class TestCaseControllers(unittest.TestCase):
         with app.app_context():
             with self.assertRaises(Forbidden):
                 case_controller.get_eq_url(
-                    "v2",
                     case_copy,
                     collection_exercise,
                     respondent_party["id"],
@@ -253,27 +222,12 @@ class TestCaseControllers(unittest.TestCase):
             with app.app_context():
                 with self.assertRaises(NoSurveyPermission):
                     case_controller.get_eq_url(
-                        "v2",
                         case,
                         collection_exercise,
                         respondent_party["id"],
                         business_party["id"],
                         survey_eq["shortName"],
                     )
-
-    def test_get_eq_url_unsupported_version(self):
-        with app.app_context():
-            with self.assertRaises(ValueError) as e:
-                case_controller.get_eq_url(
-                    "v1234",
-                    case,
-                    collection_exercise,
-                    respondent_party["id"],
-                    business_party["id"],
-                    survey_eq["shortName"],
-                )
-
-            self.assertEqual(str(e.exception), "The eq version [v1234] is not supported")
 
     @patch("frontstage.controllers.case_controller.validate_case_category")
     def test_post_case_event_success(self, _):
@@ -363,7 +317,6 @@ class TestCaseControllers(unittest.TestCase):
         get_case,
         _,
     ):
-
         get_collection_exercise.return_value = collection_exercise
         get_collection_instrument.return_value = collection_instrument_seft
         get_survey_by_short_name.return_value = survey

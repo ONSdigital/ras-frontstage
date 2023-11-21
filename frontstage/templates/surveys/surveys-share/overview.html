@@ -1,7 +1,7 @@
 {% extends "layouts/_block_content.html" %}
 {% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/button/_macro.njk" import onsButton %}
-{% from "components/lists/_macro.njk" import onsList %}
+{% from "components/list/_macro.njk" import onsList %}
 
 {% set page_title = "Share surveys overview" %}
 {% set breadcrumbsData = [
@@ -64,7 +64,7 @@
         }}
         {{
             onsButton({
-                "url": url_for('account_bp.get_account'),
+                "url": url_for('account_bp.account'),
                 "text": 'Cancel',
                 "variants": 'secondary',
                 "noIcon": true

@@ -117,12 +117,10 @@ spec:
           - name: EQ_V3_URL
             value: "{{ .Values.eq.v3url }}"
           {{ if .Values.analytics.enabled }}
-          - name: GOOGLE_ANALYTICS_ID
-            value: "{{ .Values.analytics.id }}"
-          - name: GOOGLE_TAG_MANAGER
-            value: "{{ .Values.analytics.tagManager }}"
-          - name: GOOGLE_TAG_MANAGER_PROP
-            value: "{{ .Values.analytics.tagManagerProp }}"
+          - name: GOOGLE_ANALYTICS_MEASUREMENT_ID
+            value: "{{ .Values.analytics.measurementID }}"
+          - name: GOOGLE_TAG_MANAGER_ID
+            value: "{{ .Values.analytics.managerID }}"
           {{- end }}
           - name: ACCESS_CONTROL_ALLOW_ORIGIN
             {{- if .Values.ingress.enabled }}
@@ -233,5 +231,7 @@ spec:
             value: "{{ .Values.gnu.recipient }}"
           - name: PASSWORD_RESET_ATTEMPTS_TIMEOUT
             value: "{{ .Values.password.attemptTimeout }}"
+          - name: PROFILER_ENABLED
+            value: "{{- if .Values.profiler.enabled -}}True{{- else -}}False{{- end -}}"
           resources:
             {{ toYaml .Values.resources | nindent 12 }}

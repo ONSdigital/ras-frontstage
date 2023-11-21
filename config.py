@@ -21,9 +21,8 @@ class Config(object):
     SECURITY_USER_PASSWORD = os.getenv("SECURITY_USER_PASSWORD")
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
     JWT_SECRET = os.getenv("JWT_SECRET")
-    VALIDATE_JWT = os.environ.get("VALIDATE_JWT", True)
-    GOOGLE_TAG_MANAGER = os.getenv("GOOGLE_TAG_MANAGER", None)
-    GOOGLE_TAG_MANAGER_PROP = os.getenv("GOOGLE_TAG_MANAGER_PROP", None)
+    GOOGLE_ANALYTICS_MEASUREMENT_ID = os.getenv("GOOGLE_ANALYTICS_MEASUREMENT_ID")
+    GOOGLE_TAG_MANAGER_ID = os.getenv("GOOGLE_TAG_MANAGER_ID")
     NON_DEFAULT_VARIABLES = ["SECRET_KEY", "SECURITY_USER_NAME", "SECURITY_USER_PASSWORD", "JWT_SECRET"]
 
     BANNER_SERVICE_HOST = os.getenv("BANNER_API_SERVICE_HOST", "http://localhost")
@@ -64,6 +63,7 @@ class Config(object):
     SEND_EMAIL_TO_GOV_NOTIFY = os.getenv("SEND_EMAIL_TO_GOV_NOTIFY", False)
     REQUESTS_POST_TIMEOUT = os.getenv("REQUESTS_POST_TIMEOUT", 20)
     SECURE_APP = bool(strtobool(os.getenv("SECURE_APP", "True")))
+    # WTF_CSRF_ENABLED is used by the flask_wtf.csrf library to control if CSRF protection is turned on
     WTF_CSRF_ENABLED = bool(strtobool(os.getenv("WTF_CSRF_ENABLED", str(SECURE_APP))))
     WTF_CSRF_TIME_LIMIT = int(os.getenv("WTF_CSRF_TIME_LIMIT", "7200"))
 
@@ -84,6 +84,8 @@ class Config(object):
     CANARY_GENERATE_ERRORS = bool(strtobool(os.getenv("CANARY_GENERATE_ERRORS", "False")))
     MAX_SHARED_SURVEY = int(os.getenv("MAX_SHARED_SURVEY", "50"))
     UNDER_MAINTENANCE = bool(strtobool(os.getenv("UNDER_MAINTENANCE", "False")))
+
+    PROFILER_ENABLED = bool(strtobool(os.getenv("PROFILER_ENABLED", "False")))
 
 
 class DevelopmentConfig(Config):
@@ -117,6 +119,8 @@ class DevelopmentConfig(Config):
     WTF_CSRF_TIME_LIMIT = int(os.getenv("WTF_CSRF_TIME_LIMIT", "3200"))
     SECURE_APP = bool(strtobool(os.getenv("SECURE_APP", "False")))
 
+    PROFILER_ENABLED = bool(strtobool(os.getenv("PROFILER_ENABLED", "False")))
+
 
 class TestingConfig(DevelopmentConfig):
     TESTING = True
@@ -140,3 +144,4 @@ class TestingConfig(DevelopmentConfig):
     SECURE_APP = bool(strtobool(os.getenv("SECURE_APP", "False")))
     ACCESS_CONTROL_ALLOW_ORIGIN = os.getenv("ACCESS_CONTROL_ALLOW_ORIGIN", "http://localhost")
     UNDER_MAINTENANCE = bool(strtobool(os.getenv("UNDER_MAINTENANCE", "False")))
+    PROFILER_ENABLED = bool(strtobool(os.getenv("PROFILER_ENABLED", "False")))

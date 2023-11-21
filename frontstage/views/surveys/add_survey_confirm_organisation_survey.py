@@ -1,7 +1,7 @@
 import logging
 
 from flask import current_app as app
-from flask import render_template, request
+from flask import request
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
@@ -15,13 +15,14 @@ from frontstage.controllers import (
 )
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.views.surveys import surveys_bp
+from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 
 
 @surveys_bp.route("/add-survey/confirm-organisation-survey", methods=["GET"])
 @jwt_authorization(request)
-def survey_confirm_organisation(_):
+def survey_confirm_organisation(session):
     # Get and decrypt enrolment code
     cryptographer = Cryptographer()
     encrypted_enrolment_code = request.args.get("encrypted_enrolment_code", None)
@@ -74,4 +75,8 @@ def survey_confirm_organisation(_):
         enrolment_code=enrolment_code,
     )
 
-    return render_template("surveys/surveys-confirm-organisation.html", context=business_context)
+    return render_template(
+        "surveys/surveys-confirm-organisation.html",
+        session=session,
+        context=business_context,
+    )

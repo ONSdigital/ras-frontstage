@@ -1,11 +1,10 @@
 {% extends "layouts/_block_content.html" %}
 {% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/button/_macro.njk" import onsButton %}
-{% from "components/lists/_macro.njk" import onsList %}
+{% from "components/list/_macro.njk" import onsList %}
 {% from "components/panel/_macro.njk" import onsPanel %}
 {% from "components/textarea/_macro.njk" import onsTextarea %}
 
-{% set page_title = "Send a message" %}
 {% set breadcrumbsData = [
     {
         "text": "Surveys",
@@ -125,7 +124,7 @@
                     {{
                         onsButton({
                             "id": "btn-option-cancel",
-                            "url": url_for('surveys_bp.get_help_option_select', option=option),
+                            "url": url_for('surveys_bp.help_option_select', option=option),
                             "text": 'Cancel',
                             "variants": 'secondary',
                             "noIcon": true

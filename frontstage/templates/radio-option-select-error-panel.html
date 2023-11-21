@@ -1,5 +1,5 @@
 
-{% from "components/lists/_macro.njk" import onsList %}
+{% from "components/list/_macro.njk" import onsList %}
 {% from "components/panel/_macro.njk" import onsPanel %}
 
 {% set ns.optionError = false %}
@@ -10,7 +10,7 @@
             {% set ns.optionError = true %}
             {% if not ns.optionErrorMessage %}
                 {% if not ns.checkbox %}
-                    {% set ns.optionErrorMessage = 'You need to choose an option' %}
+                    {% set ns.optionErrorMessage = '<span class="ons-panel__assistive-text ons-u-vh">Error: </span>You need to choose an option' %}
                 {% else %}
                     {% set ns.optionErrorMessage = 'You need to choose at least one option' %}
                 {% endif %}

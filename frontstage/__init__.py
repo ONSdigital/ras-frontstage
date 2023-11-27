@@ -51,7 +51,7 @@ talisman = Talisman(
     strict_transport_security=True,
     strict_transport_security_max_age=31536000,
     frame_options="DENY",
-    session_cookie_secure=app.config["SESSION_COOKIE_SECURE"]
+    session_cookie_secure=app.config["SESSION_COOKIE_SECURE"],
 )
 
 if not app.config["TESTING"]:

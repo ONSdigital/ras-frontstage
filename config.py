@@ -92,6 +92,7 @@ class Config(object):
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
+    SESSION_COOKIE_SECURE = False
     TEMPLATES_AUTO_RELOAD = True
     PREFERRED_URL_SCHEME = "http"
     SECRET_KEY = os.getenv("SECRET_KEY", "ONS_DUMMY_KEY")

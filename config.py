@@ -66,6 +66,7 @@ class Config(object):
     # WTF_CSRF_ENABLED is used by the flask_wtf.csrf library to control if CSRF protection is turned on
     WTF_CSRF_ENABLED = bool(strtobool(os.getenv("WTF_CSRF_ENABLED", str(SECURE_APP))))
     WTF_CSRF_TIME_LIMIT = int(os.getenv("WTF_CSRF_TIME_LIMIT", "7200"))
+    SESSION_COOKIE_SECURE = bool(strtobool(os.getenv("SESSION_COOKIE_SECURE", "True")))
 
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "ras-rm-sandbox")
     PUBSUB_TOPIC = os.getenv("PUBSUB_TOPIC", "ras-rm-notify-test")

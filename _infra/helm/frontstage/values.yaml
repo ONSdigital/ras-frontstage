@@ -52,6 +52,7 @@ scheme: http
 
 security:
   enabled: true
+  sessionCookieSecure: true
   csrf:
     protected: true
     timeLimit: 7200

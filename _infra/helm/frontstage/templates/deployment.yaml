@@ -209,6 +209,8 @@ spec:
             value: "{{- if .Values.security.csrf.protected -}}True{{- else -}}False{{- end -}}"
           - name: WTF_CSRF_TIME_LIMIT
             value: "{{ .Values.security.csrf.timeLimit }}"
+          - name: SESSION_COOKIE_SECURE
+            value: "{{ .Values.security.sessionCookieSecure }}"
           - name: CANARY_GENERATE_ERRORS
             value: "{{- if .Values.canary.generate_errors -}}True{{- else -}}False{{- end -}}"
           - name: SECRET_KEY

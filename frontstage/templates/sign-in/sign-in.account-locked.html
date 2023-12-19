@@ -1,6 +1,6 @@
 
 {% extends "layouts/_block_content.html" %}
-{% from "components/collapsible/_macro.njk" import onsCollapsible %}
+{% from "components/details/_macro.njk" import onsDetails %}
 
 {% set page_title = "Trouble signing in?" %}
 
@@ -10,7 +10,7 @@
     <p>You've tried to sign in a few times with the wrong details.</p>
     <p>If {{ form.data['username'] }} is registered to an account, we'll send an email explaining how to sign in.</p>
     
-    {% call onsCollapsible({
+    {% call onsDetails({
         "id": "guidance-help-with-email",
         "title": "Help with email",
         "button": {

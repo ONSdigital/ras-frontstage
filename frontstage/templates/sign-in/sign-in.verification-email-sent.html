@@ -1,6 +1,6 @@
 
 {% extends "layouts/_block_content.html" %}
-{% from "components/collapsible/_macro.njk" import onsCollapsible %}
+{% from "components/details/_macro.njk" import onsDetails %}
 
 {% set page_title = "Check your email" %}
 
@@ -9,7 +9,7 @@
     <h1 class="ons-u-fs-xl">Check your email</h1>
     <p id="email_confirmation_sent">Please follow the link in the email we've sent you to verify your email address and sign in to your account.</p>
 
-    {% call onsCollapsible({
+    {% call onsDetails({
         "id": "guidance-help-with-email",
         "title": "Help with email",
         "button": {

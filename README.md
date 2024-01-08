@@ -128,3 +128,5 @@ gpg --armor --export ED1B7A3EADF95687
 current saved exported  public private keys are dev-public-key.asc dev-private-key.asc
 The private key is only supplied for testing decryption
 passphase if needed is PASSWORD1
+
+TODO: forcing co-author, revert before merge

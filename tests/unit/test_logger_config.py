@@ -85,5 +85,7 @@ class TestLoggerConfig(unittest.TestCase):
 
 
 class TestException(Exception):
+    __test__ = False
+
     def __init__(self, message):
         self.message = message

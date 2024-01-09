@@ -68,11 +68,11 @@ class TestLoggerConfig(unittest.TestCase):
 
         with self.assertLogs() as logs:
             try:
-                raise TestException("test exception for logging")
-            except TestException:
+                raise GenerateException("test exception for logging")
+            except GenerateException:
                 logger.error("Test error", exc_info=True)
 
-        self.assertIn("TestException('test exception for logging'", logs[0][0].msg)
+        self.assertIn("GenerateException('test exception for logging'", logs[0][0].msg)
 
     def _get_logs(self, log_level):
         logger_initial_config(log_level)
@@ -84,8 +84,6 @@ class TestLoggerConfig(unittest.TestCase):
         return logs
 
 
-class TestException(Exception):
-    __test__ = False
-
+class GenerateException(Exception):
     def __init__(self, message):
         self.message = message

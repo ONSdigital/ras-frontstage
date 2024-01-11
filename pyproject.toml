@@ -3,9 +3,3 @@ profile = "black"
 
 [tool.djlint]
 ignore="H021"
-
-[tool.pytest.ini_options]
-filterwarnings = [
-    "ignore:Deprecated call to `pkg_resources\\.declare_namespace\\('.*'\\):DeprecationWarning",
-    "ignore::DeprecationWarning:google.rpc",
-]

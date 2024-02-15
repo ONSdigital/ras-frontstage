@@ -4,6 +4,7 @@ from json import JSONDecodeError
 
 import requests
 from flask import current_app, request
+from flask import session as flask_session
 from requests.adapters import HTTPAdapter
 from requests.exceptions import HTTPError
 from structlog import wrap_logger
@@ -89,8 +90,16 @@ def send_message(message_json):
     :raises ApiError: Raised when secure-message returns a non-200 status code
     :return: A json response from secure-message
     """
-    party_id = json.loads(message_json).get("msg_from")
+    json_message = json.loads(message_json)
+    category = ""
+    collection_exercise_id = ""
+    party_id = json_message.get("msg_from")
+    if json_message.get("category"):
+        category = json_message.get("category")
     logger.info("Sending message", party_id=party_id)
+    if "collection_exercise_id" in flask_session:
+        collection_exercise_id = flask_session["collection_exercise_id"]
+
 
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/messages"
     headers = _create_send_message_headers()
@@ -104,9 +113,9 @@ def send_message(message_json):
             raise ApiError(logger, response)
 
     logger.info("Successfully sent message", party_id=party_id)
+    logger.info("Message sent", survey_id=json_message.get("survey_id"), collectionexercise_id=collection_exercise_id, category=category, internal_user=False)
+
     return response.json()
-
-
 def try_message_count_from_session(session):
     """Attempts to get the unread message count from the session,
     will fall back to the secure-message api if unsuccessful"""

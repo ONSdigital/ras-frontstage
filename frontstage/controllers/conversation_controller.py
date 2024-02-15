@@ -100,7 +100,6 @@ def send_message(message_json):
     if "collection_exercise_id" in flask_session:
         collection_exercise_id = flask_session["collection_exercise_id"]
 
-
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/messages"
     headers = _create_send_message_headers()
 
@@ -113,9 +112,17 @@ def send_message(message_json):
             raise ApiError(logger, response)
 
     logger.info("Successfully sent message", party_id=party_id)
-    logger.info("Message sent", survey_id=json_message.get("survey_id"), collectionexercise_id=collection_exercise_id, category=category, internal_user=False)
+    logger.info(
+        "Message sent",
+        survey_id=json_message.get("survey_id"),
+        collectionexercise_id=collection_exercise_id,
+        category=category,
+        internal_user=False,
+    )
 
     return response.json()
+
+
 def try_message_count_from_session(session):
     """Attempts to get the unread message count from the session,
     will fall back to the secure-message api if unsuccessful"""

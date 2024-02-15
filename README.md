@@ -60,6 +60,7 @@ Note that this script will fail if there is a `node_modules` folder in the repo
 make load-design-system-templates
 ```
 
+
 This command will take the version number defined in the `.design-system-version` file and download the templates for that version of the Design System. It will also be automatically run when running `make start`.
 
 To update to a different version of the Design System:

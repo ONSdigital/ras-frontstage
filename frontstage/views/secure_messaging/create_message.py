@@ -1,9 +1,8 @@
 import json
 import logging
 
-from flask import flash, redirect, request
+from flask import flash, redirect, request, url_for
 from flask import session as flask_session
-from flask import url_for
 from markupsafe import Markup
 from structlog import wrap_logger
 

@@ -122,6 +122,7 @@ def get_surveys_help_page(session):
     """Gets Survey Help page provided survey_ref and ru_ref and creates flash session for selection"""
     flask_session["help_survey_ref"] = request.args.get("survey_ref", None)
     flask_session["help_ru_ref"] = request.args.get("ru_ref", None)
+    flask_session["collection_exercise_id"] = request.args.get("collection_exercise_id", None)
     abort_help_if_session_not_set()
     return redirect(
         url_for(

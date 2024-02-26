@@ -461,7 +461,6 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
                 "formatted_submit_by": collection_exercise["events"]["return_by"]["formatted_date"],
                 "due_in": collection_exercise["events"]["return_by"]["due_time"],
                 "collection_exercise_ref": collection_exercise["exerciseRef"],
-                "collection_exercise_id": collection_exercise["id"],
                 "added_survey": added_survey,
                 "display_button": display_access_button,
             }

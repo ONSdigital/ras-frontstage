@@ -2,6 +2,7 @@ import json
 import logging
 
 from flask import flash, request, url_for
+from flask import session as flask_session
 from markupsafe import Markup
 from structlog import wrap_logger
 from werkzeug.utils import redirect
@@ -40,6 +41,7 @@ def get_send_help_technical_message_page(session):
     option = request.args.get("option", None)
     subject = subject_text_mapping.get(option, None)
     breadcrumbs = breadcrumb_text_mapping.get(option, None)
+    logger.info("Request at start: " + str(request))
     return render_template(
         "secure-messages/help/secure-message-send-technical-messages-view.html",
         session=session,
@@ -55,6 +57,7 @@ def send_help_technical_message(session):
     """Sends secure message for the help pages"""
     form = SecureMessagingForm(request.form)
     option = request.args.get("option", None)
+    logger.info("Request: " + str(request))
     if not form.validate():
         flash(form.errors["body"][0])
         return redirect(url_for("surveys_bp.get_send_help_technical_message_page", option=option))
@@ -85,5 +88,13 @@ def _send_new_message(subject, party_id):
 
     response = conversation_controller.send_message(json.dumps(message_json))
 
-    logger.info("Secure message sent successfully", message_id=response["msg_id"], party_id=party_id)
+    category = form["category"].data if "category" in form else None
+    collection_exercise_id = flask_session["collection_exercise_id"] if "collection_exercise_id" in flask_session else None
+    survey_id = form["survey_id"].data if "survey_id" in form else None
+
+    logger.info(
+        "Secure message sent successfully", message_id=response["msg_id"], party_id=party_id,
+        collection_exercise_id=collection_exercise_id, survey_id=survey_id, category=category, internal_user=False
+    )
+
     return response

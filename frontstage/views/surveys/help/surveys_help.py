@@ -123,6 +123,7 @@ def get_surveys_help_page(session):
     flask_session["help_survey_ref"] = request.args.get("survey_ref", None)
     flask_session["help_ru_ref"] = request.args.get("ru_ref", None)
     flask_session["collection_exercise_id"] = request.args.get("collection_exercise_id", None)
+    flask_session["survey_id"] = request.args.get("survey_id")
     abort_help_if_session_not_set()
     return redirect(
         url_for(
@@ -356,8 +357,9 @@ def flash_error_and_set_title(page_title: str):
     return "Error: " + page_title
 
 
-def _send_new_message(subject, party_id, survey_id, business_id, category, collection_exercise_id=None):
+def _send_new_message(subject, party_id, survey_id, business_id, category):
     logger.info("Attempting to send message", party_id=party_id, business_id=business_id)
+
     form = SecureMessagingForm(request.form)
     message_json = {
         "msg_from": party_id,
@@ -372,9 +374,13 @@ def _send_new_message(subject, party_id, survey_id, business_id, category, colle
 
     response = conversation_controller.send_message(json.dumps(message_json))
 
+    collection_exercise_id = flask_session["collection_exercise_id"] if "collection_exercise_id" in flask_session else None
+
     logger.info(
-        "Secure message sent successfully", message_id=response["msg_id"], party_id=party_id, business_id=business_id
+        "Secure message sent successfully", message_id=response["msg_id"], party_id=party_id, business_id=business_id,
+        collection_exercise_id=collection_exercise_id, survey_id=survey_id, category=category, internal_user=False
     )
+
     return response
 
 

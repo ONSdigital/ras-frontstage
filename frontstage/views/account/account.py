@@ -1,8 +1,9 @@
 import json
 import logging
 
-from flask import flash, request, url_for
+from flask import flash, request
 from flask import session as flask_session
+from flask import url_for
 from markupsafe import Markup
 from structlog import wrap_logger
 from werkzeug.utils import redirect
@@ -191,7 +192,9 @@ def something_else_post(session):
         return redirect(url_for("account_bp.something_else"))
     subject = "My account"
     party_id = session.get_party_id()
-    collection_exercise_id = flask_session["collection_exercise_id"] if "collection_exercise_id" in flask_session else None
+    collection_exercise_id = (
+        flask_session["collection_exercise_id"] if "collection_exercise_id" in flask_session else None
+    )
     survey_id = flask_session["survey_id"] if "survey_id" in flask_session else None
     logger.info("Form validation successful", party_id=party_id)
     sent_message = _send_new_message(collection_exercise_id, survey_id, subject, party_id, category="TECHNICAL")
@@ -263,8 +266,13 @@ def _send_new_message(collection_exercise_id, survey_id, subject, party_id, cate
     response = conversation_controller.send_message(json.dumps(message_json))
 
     logger.info(
-        "Secure message sent successfully", message_id=response["msg_id"], party_id=party_id,
-        collection_exercise_id=collection_exercise_id, survey_id=survey_id, category=category, internal_user=False
+        "Secure message sent successfully",
+        message_id=response["msg_id"],
+        party_id=party_id,
+        collection_exercise_id=collection_exercise_id,
+        survey_id=survey_id,
+        category=category,
+        internal_user=False,
     )
 
     return response

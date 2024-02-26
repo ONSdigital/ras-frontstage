@@ -374,11 +374,19 @@ def _send_new_message(subject, party_id, survey_id, business_id, category):
 
     response = conversation_controller.send_message(json.dumps(message_json))
 
-    collection_exercise_id = flask_session["collection_exercise_id"] if "collection_exercise_id" in flask_session else None
+    collection_exercise_id = (
+        flask_session["collection_exercise_id"] if "collection_exercise_id" in flask_session else None
+    )
 
     logger.info(
-        "Secure message sent successfully", message_id=response["msg_id"], party_id=party_id, business_id=business_id,
-        collection_exercise_id=collection_exercise_id, survey_id=survey_id, category=category, internal_user=False
+        "Secure message sent successfully",
+        message_id=response["msg_id"],
+        party_id=party_id,
+        business_id=business_id,
+        collection_exercise_id=collection_exercise_id,
+        survey_id=survey_id,
+        category=category,
+        internal_user=False,
     )
 
     return response

@@ -358,6 +358,8 @@ def flash_error_and_set_title(page_title: str):
 
 def _send_new_message(subject, party_id, survey_id, business_id, category):
     logger.info("Attempting to send message", party_id=party_id, business_id=business_id)
+    collection_exercise_id = flask_session["collection_exercise_id"] if "collection_exercise_id" in flask_session else None
+
     form = SecureMessagingForm(request.form)
     message_json = {
         "msg_from": party_id,
@@ -368,6 +370,7 @@ def _send_new_message(subject, party_id, survey_id, business_id, category):
         "business_id": business_id,
         "survey_id": survey_id,
         "category": category,
+        "collection_exercise_id": collection_exercise_id,
     }
 
     response = conversation_controller.send_message(json.dumps(message_json))

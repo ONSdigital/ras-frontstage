@@ -42,7 +42,6 @@ def get_send_help_technical_message_page(session):
     option = request.args.get("option", None)
     subject = subject_text_mapping.get(option, None)
     breadcrumbs = breadcrumb_text_mapping.get(option, None)
-    logger.info("Request at start: " + str(request))
     return render_template(
         "secure-messages/help/secure-message-send-technical-messages-view.html",
         session=session,
@@ -58,7 +57,6 @@ def send_help_technical_message(session):
     """Sends secure message for the help pages"""
     form = SecureMessagingForm(request.form)
     option = request.args.get("option", None)
-    logger.info("Request: " + str(request))
     if not form.validate():
         flash(form.errors["body"][0])
         return redirect(url_for("surveys_bp.get_send_help_technical_message_page", option=option))

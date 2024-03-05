@@ -25,7 +25,7 @@
         {{
             onsSectionNavigation({
                 "ariaLabel": "Section menu",
-                "ariraListLabel": "Navigation menu",
+                "ariaListLabel": "Navigation menu",
                 "tabQuery": "closed" if is_closed else "open",
                 "itemsList": [
                     {
@@ -36,7 +36,8 @@
                         "title": "Closed",
                         "url": url_for('secure_message_bp.view_conversation_list', is_closed='true')
                     }
-                ]
+                ],
+                "headingLevel": 2
             })
         }}
     </section>

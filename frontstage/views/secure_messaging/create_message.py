@@ -68,7 +68,12 @@ def _send_new_message(party_id, survey_id, business_id):
     collection_exercise_id = (
         flask_session["collection_exercise_id"] if "collection_exercise_id" in flask_session else None
     )
+
     category = form["category"].data if "category" in form else None
+
+    period_ref = flask_session["period_ref"] if "period_ref" in flask_session else None
+
+    survey_ref = flask_session["survey_ref"] if "survey_ref" in flask_session else None
 
     logger.info(
         "Secure message sent successfully",
@@ -76,7 +81,9 @@ def _send_new_message(party_id, survey_id, business_id):
         party_id=party_id,
         business_id=business_id,
         collection_exercise_id=collection_exercise_id,
+        period_ref=period_ref,
         survey_id=survey_id,
+        survey_ref=survey_ref,
         category=category,
         internal_user=False,
     )

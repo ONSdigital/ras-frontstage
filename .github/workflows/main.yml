@@ -65,7 +65,7 @@ jobs:
           make test
       - name: Authenticate with Google Cloud
         id: auth
-        uses: google-github-actions/auth@v0
+        uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCR_KEY }}
       - name: Setup Google Cloud SDK
@@ -79,16 +79,16 @@ jobs:
         run: |
           PR=$(echo "$GITHUB_REF" | awk -F / '{print $3}')
           echo "$PR"
-          echo "pr_number=pr-$PR" >> $GITHUB_OUTPUT
+          echo "pr_number=pr-$PR" >> $GITHUB_ENV
         # Build the Docker image
       - name: Build Docker Image
         if: github.ref != 'refs/heads/main'
         run: |
-          docker build -t "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":${{ steps.tag.outputs.pr_number }} -f _infra/docker/Dockerfile .
+          docker build -t "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":${{ env.pr_number }} -f _infra/docker/Dockerfile .
       - name: Push dev image
         if: github.ref != 'refs/heads/main'
         run: |
-          docker push "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":${{ steps.tag.outputs.pr_number }}
+          docker push "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":${{ env.pr_number }}
       - name: template helm
         run: |
           helm template $CHART_DIRECTORY
@@ -98,7 +98,7 @@ jobs:
         id: vars
         run: |
           git fetch --tags
-          echo "tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+          echo "tag=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
 
       - name: update version
         if: github.ref != 'refs/heads/main'
@@ -108,19 +108,19 @@ jobs:
             auto patch increment
         shell: bash
         run: |
-          echo "Current git version: ${{ steps.vars.outputs.tag }}"
+          echo "Current git version: ${{ env.tag }}"
           export APP_VERSION=$(grep -E "appVersion:\s+" $CHART_DIRECTORY/Chart.yaml | cut -d" " -f2 | sed -r 's/"//g')
           export CHART_VERSION=$(grep -E "version:\s+" $CHART_DIRECTORY/Chart.yaml | cut -d" " -f2 | sed -r 's/"//g')
           echo "appVersion: $APP_VERSION"
           echo "chartVersion: $CHART_VERSION"
-          if [ ${{ steps.vars.outputs.tag }} = $APP_VERSION ]; then
+          if [ ${{ env.tag }} = $APP_VERSION ]; then
             echo "versions match, incrementing patch"
-            OLD_PATCH=$(echo ${{ steps.vars.outputs.tag }} | cut -d '.' -f3)
+            OLD_PATCH=$(echo ${{ env.tag }} | cut -d '.' -f3)
             echo "OLD patch: $OLD_PATCH"
             NEW_PATCH=$(($OLD_PATCH + 1))
             echo "New patch version: $NEW_PATCH"
-            NEW_APP_VERSION="appVersion: $(echo ${{ steps.vars.outputs.tag }} | sed -e "s/[0-9]\{1,3\}/$NEW_PATCH/3")"
-            NEW_CHART_VERSION="version: $(echo ${{ steps.vars.outputs.tag }} | sed -e "s/[0-9]\{1,3\}/$NEW_PATCH/3")"
+            NEW_APP_VERSION="appVersion: $(echo ${{ env.tag }} | sed -e "s/[0-9]\{1,3\}/$NEW_PATCH/3")"
+            NEW_CHART_VERSION="version: $(echo ${{ env.tag }} | sed -e "s/[0-9]\{1,3\}/$NEW_PATCH/3")"
             sed -i -e "s/appVersion: .*/$NEW_APP_VERSION/g" $CHART_DIRECTORY/Chart.yaml
             sed -i -e "s/version: .*/$NEW_CHART_VERSION/g" $CHART_DIRECTORY/Chart.yaml
             git config user.name "ras-rm-pr-bot"
@@ -158,7 +158,7 @@ jobs:
         id: release
         shell: bash
         run: |
-          echo "version=$(grep -E "appVersion:\s+" $CHART_DIRECTORY/Chart.yaml | cut -d" " -f2 | sed -r 's/"//g')" >> $GITHUB_OUTPUT
+          echo "version=$(grep -E "appVersion:\s+" $CHART_DIRECTORY/Chart.yaml | cut -d" " -f2 | sed -r 's/"//g')" >> $GITHUB_ENV
 
       - name: package helm
         run: |
@@ -169,17 +169,17 @@ jobs:
       - name: Publish dev Chart
         if: github.ref != 'refs/heads/main'
         run: |
-          mv $IMAGE-${{ env.HELM_VERSION }}.tgz $IMAGE-${{ steps.tag.outputs.pr_number }}.tgz
+          mv $IMAGE-${{ env.HELM_VERSION }}.tgz $IMAGE-${{ env.pr_number }}.tgz
           gsutil cp $IMAGE-*.tgz gs://$ARTIFACT_BUCKET/$IMAGE/
 
       - name: Build Release Image
         if: github.ref == 'refs/heads/main'
         run: |
-          docker build -f _infra/docker/Dockerfile -t "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$IMAGE":latest -t "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$IMAGE":${{ steps.release.outputs.version }} .
+          docker build -f _infra/docker/Dockerfile -t "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$IMAGE":latest -t "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$IMAGE":${{ env.version }} .
       - name: Push Release image
         if: github.ref == 'refs/heads/main'
         run: |
-          docker push "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$IMAGE":${{ steps.release.outputs.version }}
+          docker push "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$IMAGE":${{ env.version }}
           docker push "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$IMAGE":latest
       
       - name: Publish Charts
@@ -193,11 +193,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.release.outputs.version }}
-          release_name: ${{ steps.release.outputs.version }}
+          tag_name: ${{ env.version }}
+          release_name: ${{ env.version }}
           body: |
             Automated release
-            ${{ steps.release.outputs.version }}
+            ${{ env.version }}
           draft: false
           prerelease: false
 

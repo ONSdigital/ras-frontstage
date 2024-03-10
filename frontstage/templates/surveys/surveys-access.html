@@ -1,6 +1,6 @@
 {% extends 'layouts/_base.html' %}
 {% from "components/button/_macro.njk" import onsButton %}
-{% from "components/collapsible/_macro.njk" import onsCollapsible %}
+{% from "components/details/_macro.njk" import onsDetails %}
 {% from "components/list/_macro.njk" import onsList %}
 
 {% set page_title = survey_info.longName ~ ' ' ~ collection_exercise_info.userDescription %}
@@ -51,7 +51,7 @@
 <p>Please upload by <strong>{{ collection_exercise_info.scheduledReturnDateTimeFormatted }}</strong></p>
 {% endif %}
 
- {% call onsCollapsible({
+ {% call onsDetails({
     "id": "collapsible",
     "classes": "ons-u-mb-m",
     "title": "Guidance for uploading",

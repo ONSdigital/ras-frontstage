@@ -5,6 +5,6 @@ metadata:
 spec:
   securityPolicy:
     name: {{ .Values.armorPolicy }}
-  sessionAffinity: 
+  sessionAffinity:
     affinityType: CLIENT_IP
   timeoutSec: {{ .Values.ingress.timeoutSec }}

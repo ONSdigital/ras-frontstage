@@ -1,7 +1,9 @@
 import logging
 from distutils.util import strtobool
 
-from flask import flash, json, redirect, request, url_for
+from flask import flash, json, redirect, request
+from flask import session as flask_session
+from flask import url_for
 from markupsafe import Markup
 from structlog import wrap_logger
 
@@ -56,18 +58,32 @@ def view_conversation(session, thread_id):
             logger.info("Sending message", thread_id=thread_id, party_id=party_id)
             msg_to = get_msg_to(refined_conversation)
             if is_survey_category:
-                send_message(
-                    _get_message_json(
-                        form, refined_conversation[0], msg_to=msg_to, msg_from=party_id, category=category
-                    )
-                )
+                send_message(_get_message_json(form, refined_conversation[0], msg_to=msg_to, msg_from=party_id))
             else:
                 send_message(
                     _get_non_survey_message_json(
                         form, refined_conversation[0], msg_to=msg_to, msg_from=party_id, category=category
                     )
                 )
-            logger.info("Successfully sent message", thread_id=thread_id, party_id=party_id)
+            collection_exercise_id = (
+                flask_session["collection_exercise_id"] if "collection_exercise_id" in flask_session else None
+            )
+            period_ref = flask_session["period_ref"] if "period_ref" in flask_session else None
+            survey_id = flask_session["survey_id"] if "survey_id" in flask_session else None
+            survey_ref = flask_session["survey_ref"] if "survey_ref" in flask_session else "0000"
+
+            logger.info(
+                "Successfully sent message",
+                thread_id=thread_id,
+                party_id=party_id,
+                collection_exercise_id=collection_exercise_id,
+                period_ref=period_ref,
+                survey_id=survey_id,
+                survey_ref=survey_ref,
+                category=category,
+                internal_user=False,
+            )
+
             thread_url = url_for("secure_message_bp.view_conversation", thread_id=thread_id) + "#latest-message"
             flash(Markup(f"Message sent. <a href={thread_url}>View Message</a>"))
             return redirect(url_for("secure_message_bp.view_conversation_list"))

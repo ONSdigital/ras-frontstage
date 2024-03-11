@@ -73,7 +73,7 @@ def _send_new_message(party_id, survey_id, business_id):
 
     period_ref = flask_session["period_ref"] if "period_ref" in flask_session else None
 
-    survey_ref = flask_session["survey_ref"] if "survey_ref" in flask_session else None
+    survey_ref = flask_session["survey_ref"] if "survey_ref" in flask_session else "0000"
 
     logger.info(
         "Secure message sent successfully",

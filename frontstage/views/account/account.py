@@ -197,7 +197,7 @@ def something_else_post(session):
     )
     period_ref = flask_session["period_ref"] if "period_ref" in flask_session else None
     survey_id = flask_session["survey_id"] if "survey_id" in flask_session else None
-    survey_ref = flask_session["survey_ref"] if "survey_ref" in flask_session else None
+    survey_ref = flask_session["survey_ref"] if "survey_ref" in flask_session else "0000"
     logger.info("Form validation successful", party_id=party_id)
     sent_message = _send_new_message(
         collection_exercise_id, survey_id, subject, party_id, period_ref, survey_ref, category="TECHNICAL"

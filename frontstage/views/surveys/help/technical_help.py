@@ -96,7 +96,7 @@ def _send_new_message(subject, party_id):
 
     survey_id = form["survey_id"].data if "survey_id" in form else None
 
-    survey_ref = flask_session["survey_ref"] if "survey_ref" in flask_session else None
+    survey_ref = flask_session["survey_ref"] if "survey_ref" in flask_session else "0000"
 
     logger.info(
         "Secure message sent successfully",

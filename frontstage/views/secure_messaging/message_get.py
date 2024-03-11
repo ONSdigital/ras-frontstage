@@ -56,7 +56,7 @@ def view_conversation(session, thread_id):
             logger.info("Sending message", thread_id=thread_id, party_id=party_id)
             msg_to = get_msg_to(refined_conversation)
             if is_survey_category:
-                send_message(_get_message_json(form, refined_conversation[0], msg_to=msg_to, msg_from=party_id))
+                send_message(_get_message_json(form, refined_conversation[0], msg_to=msg_to, msg_from=party_id, category=category))
             else:
                 send_message(
                     _get_non_survey_message_json(

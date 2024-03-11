@@ -457,10 +457,12 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
                 "trading_as": business_party["trading_as"],
                 "business_ref": business_party["sampleUnitRef"],
                 "period": collection_exercise["userDescription"],
+                "period_ref": collection_exercise["exerciseRef"],
                 "submit_by": collection_exercise["events"]["return_by"]["date"],
                 "formatted_submit_by": collection_exercise["events"]["return_by"]["formatted_date"],
                 "due_in": collection_exercise["events"]["return_by"]["due_time"],
                 "collection_exercise_ref": collection_exercise["exerciseRef"],
+                "collection_exercise_id": collection_exercise["id"],
                 "added_survey": added_survey,
                 "display_button": display_access_button,
             }

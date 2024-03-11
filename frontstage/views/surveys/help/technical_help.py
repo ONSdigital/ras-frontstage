@@ -1,7 +1,9 @@
 import json
 import logging
 
-from flask import flash, request, url_for
+from flask import flash, request
+from flask import session as flask_session
+from flask import url_for
 from markupsafe import Markup
 from structlog import wrap_logger
 from werkzeug.utils import redirect
@@ -85,5 +87,27 @@ def _send_new_message(subject, party_id):
 
     response = conversation_controller.send_message(json.dumps(message_json))
 
-    logger.info("Secure message sent successfully", message_id=response["msg_id"], party_id=party_id)
+    category = form["category"].data if "category" in form else None
+    collection_exercise_id = (
+        flask_session["collection_exercise_id"] if "collection_exercise_id" in flask_session else None
+    )
+
+    period_ref = flask_session["period_ref"] if "period_ref" in flask_session else None
+
+    survey_id = form["survey_id"].data if "survey_id" in form else None
+
+    survey_ref = flask_session["survey_ref"] if "survey_ref" in flask_session else "0000"
+
+    logger.info(
+        "Secure message sent successfully",
+        message_id=response["msg_id"],
+        party_id=party_id,
+        collection_exercise_id=collection_exercise_id,
+        period_ref=period_ref,
+        survey_id=survey_id,
+        survey_ref=survey_ref,
+        category=category,
+        internal_user=False,
+    )
+
     return response

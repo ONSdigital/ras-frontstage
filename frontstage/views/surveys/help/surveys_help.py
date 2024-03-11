@@ -122,6 +122,10 @@ def get_surveys_help_page(session):
     """Gets Survey Help page provided survey_ref and ru_ref and creates flash session for selection"""
     flask_session["help_survey_ref"] = request.args.get("survey_ref", None)
     flask_session["help_ru_ref"] = request.args.get("ru_ref", None)
+    flask_session["collection_exercise_id"] = request.args.get("collection_exercise_id", None)
+    flask_session["survey_id"] = request.args.get("survey_id")
+    flask_session["survey_ref"] = request.args.get("survey_ref")
+    flask_session["period_ref"] = request.args.get("period_ref")
     abort_help_if_session_not_set()
     return redirect(
         url_for(
@@ -357,6 +361,7 @@ def flash_error_and_set_title(page_title: str):
 
 def _send_new_message(subject, party_id, survey_id, business_id, category):
     logger.info("Attempting to send message", party_id=party_id, business_id=business_id)
+
     form = SecureMessagingForm(request.form)
     message_json = {
         "msg_from": party_id,
@@ -371,9 +376,27 @@ def _send_new_message(subject, party_id, survey_id, business_id, category):
 
     response = conversation_controller.send_message(json.dumps(message_json))
 
-    logger.info(
-        "Secure message sent successfully", message_id=response["msg_id"], party_id=party_id, business_id=business_id
+    collection_exercise_id = (
+        flask_session["collection_exercise_id"] if "collection_exercise_id" in flask_session else None
     )
+
+    period_ref = flask_session["period_ref"] if "period_ref" in flask_session else None
+
+    survey_ref = flask_session["survey_ref"] if "survey_ref" in flask_session else "0000"
+
+    logger.info(
+        "Secure message sent successfully",
+        message_id=response["msg_id"],
+        party_id=party_id,
+        business_id=business_id,
+        collection_exercise_id=collection_exercise_id,
+        period_ref=period_ref,
+        survey_id=survey_id,
+        survey_ref=survey_ref,
+        category=category,
+        internal_user=False,
+    )
+
     return response
 
 

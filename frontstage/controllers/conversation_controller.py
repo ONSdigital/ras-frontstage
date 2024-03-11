@@ -104,20 +104,23 @@ def send_message(message_json):
             logger.error("Message sending failed due to API Error", party_id=party_id, exc_info=True)
             raise ApiError(logger, response)
 
-    collection_exercise_id = flask_session["collection_exercise_id"] if "collection_exercise_id" in flask_session else None
+    collection_exercise_id = (
+        flask_session["collection_exercise_id"] if "collection_exercise_id" in flask_session else None
+    )
     period_ref = flask_session["period_ref"] if "period_ref" in flask_session else None
     survey_id = flask_session["survey_id"] if "survey_id" in flask_session else None
     survey_ref = flask_session["survey_ref"] if "survey_ref" in flask_session else "0000"
 
-    logger.info("Successfully sent message",
-                party_id=party_id,
-                collection_exercise_id=collection_exercise_id,
-                period_ref=period_ref,
-                survey_id=survey_id,
-                survey_ref=survey_ref,
-                category=json.loads(message_json).get("category"),
-                internal_user=False,
-                )
+    logger.info(
+        "Successfully sent message",
+        party_id=party_id,
+        collection_exercise_id=collection_exercise_id,
+        period_ref=period_ref,
+        survey_id=survey_id,
+        survey_ref=survey_ref,
+        category=json.loads(message_json).get("category"),
+        internal_user=False,
+    )
     return response.json()
 
 

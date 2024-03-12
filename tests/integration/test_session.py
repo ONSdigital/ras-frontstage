@@ -1,3 +1,4 @@
+import time
 import unittest
 from datetime import datetime, timedelta
 from unittest.mock import patch
@@ -31,7 +32,8 @@ class TestSession(unittest.TestCase):
         session.save()
         session_key = session.session_key
 
-        # Update the session
+        # Wait 3 seconds and update the session
+        time.sleep(15)
         session.refresh_session()
 
         # Check that the session expiry time has been reset

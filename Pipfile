@@ -33,6 +33,7 @@ fakeredis = "*"
 email-validator = "*"
 pyjwt = "*"
 isort = "*"
+black = "*"
 
 [dev-packages]
 black = "*"

@@ -1,6 +1,7 @@
 """
 Module to create jwt token.
 """
+
 import jwt
 
 from frontstage import app

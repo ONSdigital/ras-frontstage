@@ -2,8 +2,8 @@ import logging
 from datetime import datetime
 from functools import wraps
 
-from jose.exceptions import JWTError
-from jose.jwt import decode
+from jwt.exceptions import DecodeError
+from jwt import decode
 from structlog import wrap_logger
 from werkzeug.exceptions import Unauthorized
 
@@ -35,7 +35,7 @@ def jwt_authorization(request, refresh_session=True):
 
             try:
                 jwt = decode(encoded_jwt, app.config["JWT_SECRET"], algorithms="HS256")
-            except JWTError:
+            except DecodeError:
                 raise JWTValidationError(f"{JWT_DECODE_ERROR} {session_key}")
 
             _validate_jwt_date(jwt)

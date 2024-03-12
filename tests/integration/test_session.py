@@ -33,7 +33,7 @@ class TestSession(unittest.TestCase):
         session_key = session.session_key
 
         # Wait 3 seconds and update the session
-        time.sleep(15)
+        time.sleep(3)
         session.refresh_session()
 
         # Check that the session expiry time has been reset

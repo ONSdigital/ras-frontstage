@@ -2,8 +2,8 @@ import logging
 from datetime import datetime
 from functools import wraps
 
-from jwt.exceptions import DecodeError
 from jwt import decode
+from jwt.exceptions import DecodeError
 from structlog import wrap_logger
 from werkzeug.exceptions import Unauthorized
 

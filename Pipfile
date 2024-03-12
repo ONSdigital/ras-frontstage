@@ -32,6 +32,7 @@ werkzeug = "*"
 fakeredis = "*"
 email-validator = "*"
 pyjwt = "*"
+isort = "*"
 
 [dev-packages]
 black = "*"

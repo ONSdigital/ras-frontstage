@@ -30,7 +30,7 @@
         {% endif %}
 
         {% call onsPanel({
-            "type": "error",
+            "variant": "error",
             "classes": "ons-u-mb-s",
             "title": errorTitle
         }) %}
@@ -76,7 +76,7 @@
                     {% endif %}
 
                     {% call onsMessage({
-                        "type": msgType,
+                        "variant": msgType,
                         "id": 'conversation-message-' + loop.index|string,
                         "fromLabel": 'From',
                         "fromName": 'sm-sender',

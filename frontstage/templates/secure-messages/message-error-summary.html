@@ -5,7 +5,7 @@
     {% call
         onsPanel({
             "title": "This page has 1 error" if errors|length == 1 else "There are " + errors|length|string + " errors on this page",
-            "type": "error",
+            "variant": "error",
             "classes": "ons-u-mb-l"
         })
     %}

@@ -8,7 +8,7 @@
             {% for category, message in messages %}
                 {% if category == "error" %}
                     {% call onsPanel({
-                        "type": 'error',
+                        "variant": 'error',
                         "id": 'error-id',
                         "iconType": 'lock',
                         "classes": 'ons-u-mb-m'
@@ -17,7 +17,7 @@
                     {% endcall %}
                 {% else %}
                     {% call onsPanel({
-                        "type": 'success',
+                        "variant": 'success',
                         "id": 'success-id',
                         "iconType": 'check',
                         "classes": 'ons-u-mb-m'
@@ -32,7 +32,7 @@
 
     {% if added_survey %}
         {% call onsPanel({
-            "type": "success",
+            "variant": "success",
             "classes": "ons-u-mb-s"
         }) %}
                 Your <a id="NEW_SURVEY_NOTIF" href="#new-survey">new survey</a> has been added.

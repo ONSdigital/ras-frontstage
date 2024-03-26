@@ -39,7 +39,7 @@
                 {% set ns.errorMessage = message %}
                     {% call
                         onsPanel({
-                            "type": "error",
+                            "variant": "error",
                             "classes": "ons-u-mb-s",
                             "title": errorTitle
                         })
@@ -63,7 +63,7 @@
     <h1>Send a message</h1>
     <p>Send us a message with a description of your issue and we will get back to you.</p>
     <dl class="ons-metadata ons-metadata__list ons-grid ons-grid--gutterless ons-u-cf ons-u-mb-l" title="Message subject" aria-label="Message subject">
-        <dt class="ons-metadata__term ons-grid__col ons-col-2@m">Subject:</dt>
+        <dt class="ons-metadata__term ons-grid__col ons-col-2@m"><strong>Subject:</strong></dt>
         <dd class="ons-metadata__value ons-grid__col ons-col-10@m">My account</dd>
     </dl>
     <div class="ons-col-12@m" id="secure-message-form">

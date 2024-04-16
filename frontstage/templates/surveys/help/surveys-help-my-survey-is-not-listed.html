@@ -13,12 +13,12 @@
 {% if is_survey_help_page is defined and  is_survey_help_page %}
     {% do breadcrumbsData.append({
         "text": "Help",
-        "url": "/surveys/surveys-help?survey_ref="~survey_ref~"&ru_ref="~ru_ref,
+        "url": breadcrumbs["help"],
         "id": "b-item-2"
     },) %}
     {% do breadcrumbsData.append({
         "text": "Something else",
-        "url": "/surveys/help/"~option,
+        "url": breadcrumbs["option"],
         "id": "b-item-3"
     },) %}
 {% endif %}
@@ -39,9 +39,9 @@
         You should <a href="{{ url_for('surveys_bp.add_survey') }}">add the new survey to your account</a> using the code in the letter.</p>
     <p>
         {% if is_survey_help_page is defined and  is_survey_help_page %}
-        <a href="{{ url_for('surveys_bp.send_help_message', option=option, sub_option='my-survey-is-not-listed') }}"> Send us a message</a>
+        <a href="{{ url_for('surveys_bp.send_help_message', option=option, sub_option='my-survey-is-not-listed', survey_name=survey_name, business_id=business_id, survey_id=survey_id, ce_id=ce_id) }}"> Send us a message</a>
         {% else %}
-        <a href="{{ url_for('surveys_bp.get_send_help_technical_message_page', option=option) }}"> Send us a message</a>
+        <a href="{{ url_for('surveys_bp.get_send_help_technical_message_page', option=option, survey_name=survey_name, business_id=business_id, survey_id=survey_id, ce_id=ce_id) }}"> Send us a message</a>
         {% endif %} if you have not received the enrolment letter.</p>
     <p>If you have received a request from a colleague to access a survey you need to follow the link in the email.
         The link expires after 72 hours. If the link has expired, you should request access from your colleague again.</p>
@@ -50,11 +50,11 @@
         <span class="ons-btn__inner">Yes</span>
     </a>
     {% if is_survey_help_page is defined and is_survey_help_page %}
-        <a href="{{ url_for('surveys_bp.send_help_message', option=option, sub_option='my-survey-is-not-listed') }}" role="button" class="ons-btn ons-btn--link ons-btn--secondary">
+        <a href="{{ send_help_message_url }}" role="button" class="ons-btn ons-btn--link ons-btn--secondary">
             <span class="ons-btn__inner">No</span>
         </a>
     {% else %}
-        <a href="{{ url_for('surveys_bp.get_send_help_technical_message_page', option=option) }}" role="button" class="ons-btn ons-btn--link ons-btn--secondary">
+        <a href="{{ send_help_message_url }}" role="button" class="ons-btn ons-btn--link ons-btn--secondary">
             <span class="ons-btn__inner">No</span>
         </a>
     {% endif %}

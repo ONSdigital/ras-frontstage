@@ -8,7 +8,7 @@ from requests.adapters import HTTPAdapter
 from requests.exceptions import HTTPError
 from structlog import wrap_logger
 from urllib3 import Retry
-
+from uuid import UUID
 from frontstage.common.session import Session
 from frontstage.exceptions.exceptions import (
     ApiError,
@@ -16,6 +16,14 @@ from frontstage.exceptions.exceptions import (
     IncorrectAccountAccessError,
     NoMessagesError,
 )
+from frontstage.models import SecureMessagingForm
+
+
+class InvalidSecureMessagingForm(Exception):
+    def __init__(self, errors: list) -> None:
+        super().__init__()
+        self.errors = errors
+
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -80,31 +88,62 @@ def get_conversation_list(params):
         raise NoMessagesError
 
 
-def send_message(message_json):
+def send_message(
+    form,
+    party_id: UUID,
+    subject: str,
+    category: str,
+    survey_id: UUID = None,
+    business_id: UUID = None,
+    collection_exercise_id: UUID = None,
+) -> UUID:
     """
     Creates a message in the secure-message service
-
-    :param message_json: A block of JSON representing a message
-    :type message_json: dict
-    :raises ApiError: Raised when secure-message returns a non-200 status code
-    :return: A json response from secure-message
     """
-    party_id = json.loads(message_json).get("msg_from")
-    logger.info("Sending message", party_id=party_id)
+
+    secure_message_form = SecureMessagingForm(form)
+
+    if not secure_message_form.validate():
+        raise InvalidSecureMessagingForm(secure_message_form.errors)
+
+    message_json = {
+        "msg_from": party_id,
+        "msg_to": ["GROUP"],
+        "subject": subject,
+        "category": category,
+        "body": secure_message_form["body"].data,
+        "thread_id": secure_message_form["thread_id"].data,
+    }
+
+    if survey_id:
+        message_json["survey_id"] = survey_id
+    if business_id:
+        message_json["business_id"] = business_id
 
     url = f"{current_app.config['SECURE_MESSAGE_URL']}/messages"
     headers = _create_send_message_headers()
 
     with _get_session() as session:
-        response = session.post(url, headers=headers, data=message_json)
+        response = session.post(url, headers=headers, data=json.dumps(message_json))
         try:
             response.raise_for_status()
         except HTTPError:
             logger.error("Message sending failed due to API Error", party_id=party_id, exc_info=True)
             raise ApiError(logger, response)
 
-    logger.info("Successfully sent message", party_id=party_id)
-    return response.json()
+    msg_id = response.json()["msg_id"]
+
+    logger.info(
+        "Secure message sent successfully",
+        message_id=msg_id,
+        party_id=party_id,
+        category=category,
+        survey_id=survey_id,
+        business_id=business_id,
+        collection_exercise_id=collection_exercise_id,
+    )
+
+    return msg_id
 
 
 def try_message_count_from_session(session):

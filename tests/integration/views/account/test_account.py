@@ -230,12 +230,13 @@ class TestSurveyList(unittest.TestCase):
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
     @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
-    @patch("frontstage.controllers.conversation_controller.send_message")
     @patch("frontstage.controllers.survey_controller.get_survey_by_short_name")
+    @patch("frontstage.views.account.account.send_message")
     def test_create_message_post_success(
-        self, mock_request, get_survey, send_message, get_survey_list, get_respondent_party_by_id
+        self, mock_request, send_message, get_survey, get_survey_list, get_respondent_party_by_id
     ):
         mock_request.get(url_banner_api, status_code=404)
+        send_message.return_value = "a5e67f8a-0d90-4d60-a15a-7e334c75402b"
         get_survey.return_value = survey
         get_survey_list.return_value = survey_list_todo
         get_respondent_party_by_id.return_value = respondent_party

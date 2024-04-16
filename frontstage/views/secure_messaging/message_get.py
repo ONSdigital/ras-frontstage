@@ -9,6 +9,7 @@ from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.common.message_helper import from_internal, refine
 from frontstage.controllers.conversation_controller import (
+    InvalidSecureMessagingForm,
     get_conversation,
     get_conversation_list,
     get_message_count_from_api,
@@ -18,7 +19,6 @@ from frontstage.controllers.conversation_controller import (
 )
 from frontstage.controllers.survey_controller import get_survey
 from frontstage.exceptions.exceptions import ApiError
-from frontstage.models import SecureMessagingForm
 from frontstage.views.secure_messaging import secure_message_bp
 from frontstage.views.template_helper import render_template
 
@@ -48,25 +48,18 @@ def view_conversation(session, thread_id):
     if refined_conversation[-1]["unread"]:
         remove_unread_label(refined_conversation[-1]["message_id"])
 
-    form = SecureMessagingForm(request.form)
-    form.subject.data = refined_conversation[0].get("subject")
-
-    if not conversation["is_closed"]:
-        if form.validate_on_submit():
-            logger.info("Sending message", thread_id=thread_id, party_id=party_id)
-            msg_to = get_msg_to(refined_conversation)
-            if is_survey_category:
-                send_message(_get_message_json(form, refined_conversation[0], msg_to=msg_to, msg_from=party_id))
-            else:
-                send_message(
-                    _get_non_survey_message_json(
-                        form, refined_conversation[0], msg_to=msg_to, msg_from=party_id, category=category
-                    )
-                )
-            logger.info("Successfully sent message", thread_id=thread_id, party_id=party_id)
+    errors = []
+    if not conversation["is_closed"] and request.method == "POST":
+        subject = refined_conversation[0].get("subject")
+        survey_id = refined_conversation[0].get("survey_id")
+        business_id = refined_conversation[0].get("ru_ref")
+        try:
+            send_message(request.form, party_id, subject, category, survey_id, business_id)
             thread_url = url_for("secure_message_bp.view_conversation", thread_id=thread_id) + "#latest-message"
             flash(Markup(f"Message sent. <a href={thread_url}>View Message</a>"))
             return redirect(url_for("secure_message_bp.view_conversation_list"))
+        except InvalidSecureMessagingForm as e:
+            errors = e.errors
 
     unread_message_count = {"unread_message_count": get_message_count_from_api(session)}
     survey_name = None
@@ -86,7 +79,7 @@ def view_conversation(session, thread_id):
     return render_template(
         "secure-messages/conversation-view.html",
         session=session,
-        form=form,
+        errors=errors,
         conversation=refined_conversation,
         conversation_data=conversation,
         unread_message_count=unread_message_count,
@@ -132,19 +125,6 @@ def _get_message_json(form, first_message_in_conversation, msg_to, msg_from):
             "thread_id": first_message_in_conversation["thread_id"],
             "survey_id": first_message_in_conversation.get("survey_id", "No Survey"),
             "business_id": first_message_in_conversation.get("ru_ref", "No Business"),
-        }
-    )
-
-
-def _get_non_survey_message_json(form, first_message_in_conversation, msg_to, msg_from, category):
-    return json.dumps(
-        {
-            "msg_from": msg_from,
-            "msg_to": msg_to,
-            "subject": form.subject.data,
-            "body": form.body.data,
-            "thread_id": first_message_in_conversation["thread_id"],
-            "category": category,
         }
     )
 

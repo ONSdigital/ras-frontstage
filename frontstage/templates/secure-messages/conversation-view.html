@@ -103,7 +103,8 @@
                     {% endif %}
                     <div>
                         <form action="{{ url_for('secure_message_bp.view_conversation', thread_id=conversation[0].thread_id) }}" method="post" id="create-message-form">
-                            {{ form.csrf_token }}
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <input type="hidden" name="thread_id" value="{{ conversation[0].thread_id }}"/>
                             {{
                                 onsTextarea({
                                     "id": "secure-message-body",

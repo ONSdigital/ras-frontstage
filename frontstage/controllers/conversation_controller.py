@@ -1,6 +1,7 @@
 import json
 import logging
 from json import JSONDecodeError
+from uuid import UUID
 
 import requests
 from flask import current_app, request
@@ -8,7 +9,7 @@ from requests.adapters import HTTPAdapter
 from requests.exceptions import HTTPError
 from structlog import wrap_logger
 from urllib3 import Retry
-from uuid import UUID
+
 from frontstage.common.session import Session
 from frontstage.exceptions.exceptions import (
     ApiError,

@@ -231,7 +231,7 @@ def help_option_select(_, option: str) -> (Response, str):
         survey_id=survey_id,
         ce_id=ce_id,
         option=option,
-        breadcrumbs=_create_breadcrumbs()
+        breadcrumbs=_create_breadcrumbs(),
     )
 
 
@@ -257,7 +257,7 @@ def get_help_option_sub_option_select(_, option, sub_option) -> str:
             if sub_option in ("penalties", "unable-to-return-by-deadline", "exemption-completing-survey")
             else None
         ),
-        breadcrumbs=_create_breadcrumbs(option)
+        breadcrumbs=_create_breadcrumbs(option),
     )
 
 
@@ -300,7 +300,7 @@ def send_help_message(session, option: str, sub_option: str):
         ce_id=ce_id,
         option=option,
         sub_option=sub_option,
-        breadcrumbs=_create_breadcrumbs(option, sub_option)
+        breadcrumbs=_create_breadcrumbs(option, sub_option),
     )
 
 
@@ -344,7 +344,7 @@ def _help_details() -> (UUID, str, UUID, UUID):
 
 
 def _create_breadcrumbs(option=None, sub_option=None):
-    query_string = request.query_string.decode('utf-8')
+    query_string = request.query_string.decode("utf-8")
     breadcrumbs = {"help": f"/surveys/help?{query_string}"}
 
     if option:

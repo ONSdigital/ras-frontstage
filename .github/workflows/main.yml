@@ -69,7 +69,7 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCR_KEY }}
       - name: Setup Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0
+        uses: google-github-actions/setup-gcloud@v2
       - run: |
           gcloud auth configure-docker
 
@@ -188,18 +188,11 @@ jobs:
           cp $IMAGE-${{ env.HELM_VERSION }}.tgz $IMAGE-latest.tgz
           gsutil cp $IMAGE-*.tgz gs://$ARTIFACT_BUCKET/$IMAGE/
 
-      - uses: actions/create-release@v1
+      - name: Create Release
         if: github.ref == 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ env.version }}
-          release_name: ${{ env.version }}
-          body: |
-            Automated release
-            ${{ env.version }}
-          draft: false
-          prerelease: false
+        run: gh release create ${{ env.version }} --title ${{ env.version }} --notes ${{ env.version }}
 
       - name: CD hook
         if: github.ref == 'refs/heads/main'

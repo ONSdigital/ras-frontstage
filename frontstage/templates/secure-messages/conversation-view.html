@@ -22,30 +22,22 @@
         {% endcall %}
     {% endif %}
     {% set ns = namespace() %}
-    {% if form.errors %}
-        {% if form.errors|length > 1 %}
-            {% set errorTitle = 'This page has ' ~ form.errors|length ~' '~ 'errors' %}
-        {% elif form.errors %}
-            {% set errorTitle = 'This page has ' ~ form.errors|length ~' '~ 'error' %}
-        {% endif %}
-
+    {% if error %}
+        {% set errorTitle = 'This page has 1 error' %}
         {% call onsPanel({
             "variant": "error",
             "classes": "ons-u-mb-s",
             "title": errorTitle
         }) %}
-            <p>These <strong>must be corrected</strong> to continue.</p>
+            <p>This <strong>must be corrected</strong> to continue.</p>
             {% set errorData = [] %}
-            {% for error in form.body.errors %}
-                {% set ns.errorMessage = error %}
-                {% do errorData.append(
-                    {
-                        "text": error,
-                        "url": '#form_error',
-                        "classes": "ons-js-inpagelink"
-                    }
-                ) %}
-            {% endfor %}
+            {% do errorData.append(
+                {
+                    "text": error,
+                    "url": '#form_error',
+                    "classes": "ons-js-inpagelink"
+                }
+            ) %}
             {{
                 onsList({
                     "element": "ol",
@@ -98,8 +90,8 @@
                 {% if not conversation_data.is_closed %}
                     <p>You can now make changes to your name and telephone number
                         in <a href="/my-account" class="ons-u-fs-r--b">your account</a>.</p>
-                    {% if form.errors %}
-                        {% set form_error = { "text": '<span class="ons-panel__assistive-text ons-u-vh">Error: </span> ' + ns.errorMessage, "id": 'form_error' } %}
+                    {% if error %}
+                        {% set form_error = { "text": '<span class="ons-panel__assistive-text ons-u-vh">Error: </span> ' + error, "id": 'form_error' } %}
                     {% endif %}
                     <div>
                         <form action="{{ url_for('secure_message_bp.view_conversation', thread_id=conversation[0].thread_id) }}" method="post" id="create-message-form">

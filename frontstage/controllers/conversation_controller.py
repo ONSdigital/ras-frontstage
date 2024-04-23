@@ -21,7 +21,7 @@ from frontstage.models import SecureMessagingForm
 
 
 class InvalidSecureMessagingForm(Exception):
-    def __init__(self, errors: list) -> None:
+    def __init__(self, errors: dict) -> None:
         super().__init__()
         self.errors = errors
 
@@ -103,7 +103,6 @@ def send_message(
     """
 
     secure_message_form = SecureMessagingForm(form)
-
     if not secure_message_form.validate():
         raise InvalidSecureMessagingForm(secure_message_form.errors)
 

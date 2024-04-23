@@ -157,7 +157,7 @@ SUB_OPTION_MAPPER = {
     },
     "info-ons-something-else": {
         "title": "Send message",
-        "subject": "My survey is not listed",
+        "subject": "Information about the ONS",
         "breadcrumbs": [info_about_the_ons],
         "url": _send_help_message_url,
     },

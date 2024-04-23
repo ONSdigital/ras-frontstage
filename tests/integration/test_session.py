@@ -1,12 +1,14 @@
-import time
 import unittest
 from datetime import datetime, timedelta
 from unittest.mock import patch
 
+from freezegun import freeze_time
+
 from frontstage import app, redis
 from frontstage.common.session import Session
-from freezegun import freeze_time
+
 TIME_TO_FREEZE = datetime(2024, 1, 1, 12, 0, 0)
+
 
 class TestSession(unittest.TestCase):
     def setUp(self):

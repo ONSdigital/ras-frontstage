@@ -29,6 +29,7 @@ CE_ID = "2bf53fd0-f3af-45c1-b269-c5b01c623c95"
 MSG_ID = "bd4923d5-573f-4aec-a68d-5847b7b567d3"
 SM_FORM = ImmutableMultiDict([("body", "message"), ("send", "")])
 
+
 class TestConversationController(unittest.TestCase):
     def setUp(self):
         app_config = TestingConfig()

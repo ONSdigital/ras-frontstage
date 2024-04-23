@@ -51,19 +51,27 @@ class TestMessageGet(unittest.TestCase):
         self.assertTrue("Business:".encode() in response.data)
         self.assertTrue("No Business".encode() in response.data)
 
-    @patch("frontstage.views.secure_messaging.message_get.get_conversation")
+    @requests_mock.mock()
     @patch("frontstage.views.secure_messaging.message_get.send_message")
-    def test_view_conversation_message_sent(self, send_message, get_conversation):
-        get_conversation.return_value = {"messages": [message_json], "is_closed": False}
+    def test_view_conversation_message_sent(self, mock_request, send_message):
+        mock_request.get(url_get_thread, json={"messages": [message_json], "is_closed": False})
+        mock_request.get(url_get_conversation_count, json={"total": 0})
+        mock_request.get(url_get_survey_long_name, json={"longName": "survey name"})
+        mock_request.get(url_banner_api, status_code=404)
         send_message.return_value = "2b414f98-4c02-40fc-90fe-6476d730593a"
-        response = self.app.post("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594", follow_redirects=True)
-        self.assertTrue("Message sent".encode() in response.data)
-
-    @patch("frontstage.views.secure_messaging.message_get.get_conversation")
-    @patch("frontstage.views.secure_messaging.message_get.send_message")
-    def test_view_conversation_message_is_required(self, send_message, get_conversation):
-        get_conversation.return_value = {"messages": [message_json], "is_closed": False}
-        send_message.side_effect = InvalidSecureMessagingForm({"body": ["Message is required"]})
         response = self.app.post("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue("/threads".encode() in response.data)
+
+    @requests_mock.mock()
+    @patch("frontstage.views.secure_messaging.message_get.send_message")
+    def test_view_conversation_message_is_required(self, mock_request, send_message):
+        mock_request.get(url_get_thread, json={"messages": [message_json], "is_closed": False})
+        mock_request.get(url_get_conversation_count, json={"total": 0})
+        mock_request.get(url_get_survey_long_name, json={"longName": "survey name"})
+        mock_request.get(url_banner_api, status_code=404)
+        send_message.side_effect = InvalidSecureMessagingForm({"body": ["Message is required"]})
+        response = self.app.post("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594", follow_redirects=True)
 
         self.assertTrue("Message is required".encode() in response.data)

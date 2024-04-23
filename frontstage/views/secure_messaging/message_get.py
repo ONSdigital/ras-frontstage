@@ -95,7 +95,6 @@ def view_conversation_list(session):
     logger.info("Getting conversation list", party_id=party_id)
     is_closed = request.args.get("is_closed", default="false")
     params = {"is_closed": is_closed}
-
     conversation = get_conversation_list(params=params)
 
     try:

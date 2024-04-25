@@ -13,7 +13,7 @@
     },
     {
         "text": "Help",
-        "url": "/surveys/surveys-help?survey_ref="~survey_ref~"&ru_ref="~ru_ref,
+        "url": breadcrumbs["help"],
         "id": "b-item-2"
     }
 ] %}
@@ -21,14 +21,14 @@
 {% if breadcrumb_title_one is defined and  breadcrumb_title_one != None %}
     {% do breadcrumbsData.append({
         "text": breadcrumb_title_one,
-        "url": "/surveys/help/"~option,
+        "url": breadcrumbs["option"],
         "id": "b-item-8"
     },) %}
 {% endif %}
 {% if breadcrumb_title_two is defined and breadcrumb_title_two != None %}
     {% do breadcrumbsData.append({
         "text": breadcrumb_title_two,
-        "url": "/surveys/help/"~option~"/"~sub_option,
+        "url": breadcrumbs["sub_option"],
         "id": "b-item-7"
     },) %}
 {% endif %}
@@ -84,12 +84,11 @@
         <dd class="ons-metadata__value ons-grid__col ons-col-10@m">{{ subject }}</dd>
     </dl>
     <div class="ons-col-10@m" id="secure-message-form">
-        <form action="{{ url_for('surveys_bp.send_help_message', option=option, sub_option=sub_option) }}" method="post">
+        <form method="post">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             {% if ns.bodyError %}
                 {% set error = { "text": ns.errorMessage, "id": 'secure-message-body_error' } %}
             {% endif %}
-
             {{
                 onsTextarea({
                     "id": "secure-message-body",
@@ -114,7 +113,7 @@
                     {{
                         onsButton({
                             "id": "btn-sub-option-cancel",
-                            "url": url_for('surveys_bp.get_help_option_sub_option_select', option=option, sub_option=sub_option),
+                            "url": breadcrumbs["sub_option"],
                             "text": 'Cancel',
                             "variants": 'secondary',
                             "noIcon": true
@@ -124,7 +123,7 @@
                     {{
                         onsButton({
                             "id": "btn-option-cancel",
-                            "url": url_for('surveys_bp.help_option_select', option=option),
+                            "url": breadcrumbs["option"],
                             "text": 'Cancel',
                             "variants": 'secondary',
                             "noIcon": true

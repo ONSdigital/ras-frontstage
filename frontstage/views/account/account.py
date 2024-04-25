@@ -1,4 +1,3 @@
-import json
 import logging
 
 from flask import flash, request, url_for
@@ -8,10 +7,10 @@ from werkzeug.utils import redirect
 
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.common.utilities import obfuscate_email
-from frontstage.controllers import (
-    auth_controller,
-    conversation_controller,
-    party_controller,
+from frontstage.controllers import auth_controller, party_controller
+from frontstage.controllers.conversation_controller import (
+    InvalidSecureMessagingForm,
+    send_message,
 )
 from frontstage.exceptions.exceptions import ApiError, AuthError
 from frontstage.models import (
@@ -184,15 +183,14 @@ def something_else(session):
 @jwt_authorization(request)
 def something_else_post(session):
     """Sends secure message for the something else pages"""
-    form = SecureMessagingForm(request.form)
-    if not form.validate():
-        flash(form.errors["body"][0])
-        return redirect(url_for("account_bp.something_else"))
-    subject = "My account"
     party_id = session.get_party_id()
-    logger.info("Form validation successful", party_id=party_id)
-    sent_message = _send_new_message(subject, party_id, category="TECHNICAL")
-    thread_url = url_for("secure_message_bp.view_conversation", thread_id=sent_message["thread_id"]) + "#latest-message"
+    try:
+        msg_id = send_message(request.form, party_id, "My account", "TECHNICAL")
+    except InvalidSecureMessagingForm as e:
+        flash(e.errors["body"][0])
+        return redirect(url_for("account_bp.something_else"))
+
+    thread_url = url_for("secure_message_bp.view_conversation", thread_id=msg_id) + "#latest-message"
     flash(Markup(f"Message sent. <a href={thread_url}>View Message</a>"))
     return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
 
@@ -244,20 +242,3 @@ def create_success_message(attr, message):
             message += x
 
     return message
-
-
-def _send_new_message(subject, party_id, category):
-    logger.info("Attempting to send message", party_id=party_id)
-    form = SecureMessagingForm(request.form)
-    message_json = {
-        "msg_from": party_id,
-        "msg_to": ["GROUP"],
-        "subject": subject,
-        "body": form["body"].data,
-        "thread_id": form["thread_id"].data,
-        "category": category,
-    }
-    response = conversation_controller.send_message(json.dumps(message_json))
-
-    logger.info("Secure message sent successfully", message_id=response["msg_id"], party_id=party_id)
-    return response

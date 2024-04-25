@@ -10,12 +10,12 @@
     },
     {
         "text": "Help",
-        "url": "/surveys/surveys-help?survey_ref="~survey_ref~"&ru_ref="~ru_ref,
+        "url": breadcrumbs["help"],
         "id": "b-item-2"
     },
     {
         "text": "Information about this survey",
-        "url": "/surveys/help/"~option,
+        "url": breadcrumbs["option"],
         "id": "b-item-3"
     }
 ] %}
@@ -41,7 +41,7 @@
     <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" role="button" class="ons-btn ons-btn--link ons-js-submit-btn">
         <span class="ons-btn__inner">Yes</span>
     </a>
-    <a href="{{ url_for('surveys_bp.send_help_message', option=option, sub_option='time-to-complete') }}" role="button" class="ons-btn ons-btn--link ons-btn--secondary">
+    <a href="{{ send_help_message_url }}" role="button" class="ons-btn ons-btn--link ons-btn--secondary">
         <span class="ons-btn__inner">No</span>
     </a>
 {% endblock main %}

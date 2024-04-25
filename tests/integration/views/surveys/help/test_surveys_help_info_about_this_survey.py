@@ -5,13 +5,9 @@ import requests_mock
 
 from frontstage import app
 from tests.integration.mocked_services import (
-    business_party,
     encoded_jwt_token,
     respondent_party,
-    survey,
-    survey_eq,
     survey_list_todo,
-    survey_rsi,
     url_banner_api,
 )
 
@@ -31,34 +27,10 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
     def tearDown(self):
         self.patcher.stop()
 
-    def set_flask_session(self):
-        with self.app.session_transaction() as mock_session:
-            mock_session["help_survey_ref"] = "074"
-            mock_session["help_ru_ref"] = "49900000001F"
-
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_survey_help_info_qbs(self, mock_request, get_survey, get_business):
+    def test_survey_help_info_bricks(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        get_survey.return_value = survey_eq
-        get_business.return_value = business_party
-        response = self.app.get("/surveys/surveys-help?survey_ref=139&ru_ref=49900000001F", follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("Help".encode(), response.data)
-        self.assertIn("Choose an option".encode(), response.data)
-        self.assertIn("Information about the Quarterly Business Survey".encode(), response.data)
-        self.assertIn("Continue".encode(), response.data)
-        self.assertIn("Cancel".encode(), response.data)
-
-    @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_survey_help_info_bricks(self, mock_request, get_survey, get_business):
-        mock_request.get(url_banner_api, status_code=404)
-        get_survey.return_value = survey
-        get_business.return_value = business_party
-        response = self.app.get("/surveys/surveys-help?survey_ref=074&ru_ref=49900000001F", follow_redirects=True)
+        response = self.app.get(f"/surveys/help{self._help_details()}")
         self.assertEqual(response.status_code, 200)
         self.assertIn("Help".encode(), response.data)
         self.assertIn("Choose an option".encode(), response.data)
@@ -68,15 +40,10 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("Help".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_survey_help_info_bricks_with_no_option_select(self, mock_request, get_survey, get_business):
+    def test_survey_help_info_bricks_with_no_option_select(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        get_survey.return_value = survey
-        get_business.return_value = business_party
         form = {}
-        self.set_flask_session()
-        response = self.app.post("/surveys/help", data=form, follow_redirects=True)
+        response = self.app.post(f"/surveys/help{self._help_details()}", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Error: ".encode(), response.data)
@@ -85,15 +52,10 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("You need to choose an option".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_survey_help_info_bricks_with_option_select(self, mock_request, get_survey, get_business):
+    def test_survey_help_info_bricks_with_option_select(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        get_survey.return_value = survey
-        get_business.return_value = business_party
         form = {"option": "info-about-this-survey"}
-        self.set_flask_session()
-        response = self.app.post("/surveys/help", data=form, follow_redirects=True)
+        response = self.app.post(f"/surveys/help{self._help_details()}", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Information about the Monthly Survey of Building Materials Bricks".encode(), response.data)
@@ -107,17 +69,14 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("Cancel".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_survey_help_info_bricks_with_sub_option_exemption_completing_survey(
-        self, mock_request, get_survey, get_business
-    ):
+    @patch("frontstage.views.surveys.help.surveys_help.get_survey")
+    def test_survey_help_info_bricks_with_sub_option_exemption_completing_survey(self, mock_request, get_survey):
+        get_survey.return_value = {"legalBasisRef": "Vol_BEIS"}
         mock_request.get(url_banner_api, status_code=404)
-        get_survey.return_value = survey
-        get_business.return_value = business_party
         form = {"option": "exemption-completing-survey"}
-        self.set_flask_session()
-        response = self.app.post("/surveys/help/info-about-this-survey", data=form, follow_redirects=True)
+        response = self.app.post(
+            f"/surveys/help/info-about-this-survey{self._help_details()}", data=form, follow_redirects=True
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Can I be exempt from completing the survey questionnaire?".encode(), response.data)
@@ -130,17 +89,14 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("No".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_survey_help_info_rsi_with_sub_option_exemption_completing_survey(
-        self, mock_request, get_survey, get_business
-    ):
+    @patch("frontstage.views.surveys.help.surveys_help.get_survey")
+    def test_survey_help_info_rsi_with_sub_option_exemption_completing_survey(self, mock_request, get_survey):
+        get_survey.return_value = {"legalBasisRef": "STA1947"}
         mock_request.get(url_banner_api, status_code=404)
-        get_survey.return_value = survey_rsi
-        get_business.return_value = business_party
         form = {"option": "exemption-completing-survey"}
-        self.set_flask_session()
-        response = self.app.post("/surveys/help/info-about-this-survey", data=form, follow_redirects=True)
+        response = self.app.post(
+            f"/surveys/help/info-about-this-survey{self._help_details()}", data=form, follow_redirects=True
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Can I be exempt from completing the survey questionnaire?".encode(), response.data)
@@ -155,15 +111,12 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("No".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_survey_help_info_bricks_with_sub_option_why_selected(self, mock_request, get_survey, get_business):
+    def test_survey_help_info_bricks_with_sub_option_why_selected(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        get_survey.return_value = survey
-        get_business.return_value = business_party
         form = {"option": "why-selected"}
-        self.set_flask_session()
-        response = self.app.post("/surveys/help/info-about-this-survey", data=form, follow_redirects=True)
+        response = self.app.post(
+            f"/surveys/help/info-about-this-survey{self._help_details()}", data=form, follow_redirects=True
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("How was my business selected?".encode(), response.data)
@@ -176,15 +129,12 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("No".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_survey_help_info_bricks_with_sub_option_time_to_complete(self, mock_request, get_survey, get_business):
+    def test_survey_help_info_bricks_with_sub_option_time_to_complete(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        get_survey.return_value = survey
-        get_business.return_value = business_party
         form = {"option": "time-to-complete"}
-        self.set_flask_session()
-        response = self.app.post("/surveys/help/info-about-this-survey", data=form, follow_redirects=True)
+        response = self.app.post(
+            f"/surveys/help/info-about-this-survey{self._help_details()}", data=form, follow_redirects=True
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("How long will it take to complete?".encode(), response.data)
@@ -194,17 +144,12 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("No".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_survey_help_info_bricks_with_sub_option_how_long_selected_for(
-        self, mock_request, get_survey, get_business
-    ):
+    def test_survey_help_info_bricks_with_sub_option_how_long_selected_for(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        get_survey.return_value = survey
-        get_business.return_value = business_party
         form = {"option": "how-long-selected-for"}
-        self.set_flask_session()
-        response = self.app.post("/surveys/help/info-about-this-survey", data=form, follow_redirects=True)
+        response = self.app.post(
+            f"/surveys/help/info-about-this-survey{self._help_details()}", data=form, follow_redirects=True
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("How long will my business be selected for?".encode(), response.data)
@@ -214,15 +159,14 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("No".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_survey_help_for_voluntary_survey_with_sub_option_penalties(self, mock_request, get_survey, get_business):
+    @patch("frontstage.views.surveys.help.surveys_help.get_survey")
+    def test_survey_help_for_voluntary_survey_with_sub_option_penalties(self, mock_request, get_survey):
         mock_request.get(url_banner_api, status_code=404)
-        get_survey.return_value = survey
-        get_business.return_value = business_party
+        get_survey.return_value = {"legalBasisRef": "Vol_BEIS"}
         form = {"option": "penalties"}
-        self.set_flask_session()
-        response = self.app.post("/surveys/help/info-about-this-survey", data=form, follow_redirects=True)
+        response = self.app.post(
+            f"/surveys/help/info-about-this-survey{self._help_details()}", data=form, follow_redirects=True
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Are there penalties for not completing this survey?".encode(), response.data)
@@ -237,15 +181,14 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("No".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_survey_help_for_statutory_survey_with_sub_option_penalties(self, mock_request, get_survey, get_business):
+    @patch("frontstage.views.surveys.help.surveys_help.get_survey")
+    def test_survey_help_for_statutory_survey_with_sub_option_penalties(self, mock_request, get_survey):
         mock_request.get(url_banner_api, status_code=404)
-        get_survey.return_value = survey_eq
-        get_business.return_value = business_party
         form = {"option": "penalties"}
-        self.set_flask_session()
-        response = self.app.post("/surveys/help/info-about-this-survey", data=form, follow_redirects=True)
+        get_survey.return_value = {"legalBasisRef": "STA1947"}
+        response = self.app.post(
+            f"/surveys/help/info-about-this-survey{self._help_details()}", data=form, follow_redirects=True
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Are there penalties for not completing this survey?".encode(), response.data)
@@ -260,15 +203,12 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("No".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_survey_help_info_bricks_with_sub_option_something_else(self, mock_request, get_survey, get_business):
+    def test_survey_help_info_bricks_with_sub_option_something_else(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        get_survey.return_value = survey
-        get_business.return_value = business_party
         form = {"option": "info-something-else"}
-        self.set_flask_session()
-        response = self.app.post("/surveys/help/info-about-this-survey", data=form, follow_redirects=True)
+        response = self.app.post(
+            f"/surveys/help/info-about-this-survey{self._help_details()}", data=form, follow_redirects=True
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Information about the Monthly Survey of Building Materials Bricks".encode(), response.data)
@@ -278,71 +218,38 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("No".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_survey_help_send_message_info_bricks_with_sub_option_exemption_completing_survey(
-        self, mock_request, get_survey, get_business
-    ):
+    def test_survey_help_send_message_info_bricks_with_sub_option_exemption_completing_survey(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        get_survey.return_value = survey
-        get_business.return_value = business_party
-        self.set_flask_session()
         response = self.app.get(
-            "/surveys/help/info-about-this-survey/" "exemption-completing-survey/send-message",
-            follow_redirects=True,
+            f"/surveys/help/info-about-this-survey/exemption-completing-survey/send-message{self._help_details()}"
         )
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Can I be exempt from completing the survey questionnaire?".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_survey_help_send_message_info_bricks_with_sub_option_why_selected_survey(
-        self, mock_request, get_survey, get_business
-    ):
+    def test_survey_help_send_message_info_bricks_with_sub_option_why_selected_survey(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        get_survey.return_value = survey
-        get_business.return_value = business_party
-        self.set_flask_session()
-        response = self.app.get(
-            "/surveys/help/info-about-this-survey/" "why-selected/send-message", follow_redirects=True
-        )
+        response = self.app.get(f"/surveys/help/info-about-this-survey/why-selected/send-message{self._help_details()}")
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("How  was my business selected?".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_survey_help_send_message_info_bricks_with_sub_option_time_to_complete(
-        self, mock_request, get_survey, get_business
-    ):
+    def test_survey_help_send_message_info_bricks_with_sub_option_time_to_complete(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        get_survey.return_value = survey
-        get_business.return_value = business_party
-        self.set_flask_session()
         response = self.app.get(
-            "/surveys/help/info-about-this-survey/" "time-to-complete/send-message",
-            follow_redirects=True,
+            f"/surveys/help/info-about-this-survey/time-to-complete/send-message{self._help_details()}"
         )
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("How long will it take to complete?".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_survey_help_send_message_info_bricks_with_sub_option_how_long_selected_for(
-        self, mock_request, get_survey, get_business
-    ):
+    def test_survey_help_send_message_info_bricks_with_sub_option_how_long_selected_for(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        get_survey.return_value = survey
-        get_business.return_value = business_party
-        self.set_flask_session()
         response = self.app.get(
-            "/surveys/help/info-about-this-survey/how-long-selected-for/send-message",
-            follow_redirects=True,
+            f"/surveys/help/info-about-this-survey/how-long-selected-for/send-message{self._help_details()}",
         )
 
         self.assertEqual(response.status_code, 200)
@@ -354,16 +261,9 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("Cancel".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_survey_help_send_message_info_bricks_with_sub_option_penalties(
-        self, mock_request, get_survey, get_business
-    ):
+    def test_survey_help_send_message_info_bricks_with_sub_option_penalties(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        get_survey.return_value = survey
-        get_business.return_value = business_party
-        self.set_flask_session()
-        response = self.app.get("/surveys/help/info-about-this-survey/penalties/send-message", follow_redirects=True)
+        response = self.app.get(f"/surveys/help/info-about-this-survey/penalties/send-message{self._help_details()}")
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Send a message".encode(), response.data)
@@ -374,18 +274,10 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("Cancel".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_survey_help_send_message_info_bricks_with_sub_option_info_something_else(
-        self, mock_request, get_survey, get_business
-    ):
+    def test_survey_help_send_message_info_bricks_with_sub_option_info_something_else(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        get_survey.return_value = survey
-        get_business.return_value = business_party
-        self.set_flask_session()
         response = self.app.get(
-            "/surveys/help/info-about-this-survey/info-something-else/send-message",
-            follow_redirects=True,
+            f"/surveys/help/info-about-this-survey/info-something-else/send-message{self._help_details()}"
         )
 
         self.assertEqual(response.status_code, 200)
@@ -399,21 +291,15 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
     @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
-    @patch("frontstage.controllers.conversation_controller.send_message")
-    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_create_message_post_success(
-        self, mock_request, get_survey, get_business, send_message, get_survey_list, get_respondent_party_by_id
-    ):
+    @patch("frontstage.views.surveys.help.surveys_help.send_message")
+    def test_create_message_post_success(self, mock_request, send_message, get_survey_list, get_respondent_party_by_id):
         mock_request.get(url_banner_api, status_code=404)
-        get_survey.return_value = survey
-        get_business.return_value = business_party
+        send_message.return_value = "a5e67f8a-0d90-4d60-a15a-7e334c75402b"
         get_survey_list.return_value = survey_list_todo
         get_respondent_party_by_id.return_value = respondent_party
         form = {"body": "info-something-else"}
-        self.set_flask_session()
         response = self.app.post(
-            "/surveys/help/info-about-this-survey/info-something-else/send-message",
+            f"/surveys/help/info-about-this-survey/info-something-else/send-message{self._help_details()}",
             data=form,
             follow_redirects=True,
         )
@@ -425,20 +311,13 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
     @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
     @patch("frontstage.controllers.conversation_controller.send_message")
-    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_create_message_post_failure(
-        self, mock_request, get_survey, get_business, send_message, get_survey_list, get_respondent_party_by_id
-    ):
+    def test_create_message_post_failure(self, mock_request, send_message, get_survey_list, get_respondent_party_by_id):
         mock_request.get(url_banner_api, status_code=404)
-        get_survey.return_value = survey
-        get_business.return_value = business_party
         get_survey_list.return_value = survey_list_todo
         get_respondent_party_by_id.return_value = respondent_party
         form = {"body": ""}
-        self.set_flask_session()
         response = self.app.post(
-            "/surveys/help/info-about-this-survey/info-something-else/send-message",
+            f"/surveys/help/info-about-this-survey/info-something-else/send-message{self._help_details()}",
             data=form,
             follow_redirects=True,
         )
@@ -451,3 +330,12 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("Send a message".encode(), response.data)
         self.assertIn("Describe your issue and we will get back to you.".encode(), response.data)
         self.assertIn("Information about this survey".encode(), response.data)
+
+    @staticmethod
+    def _help_details():
+        return (
+            "?survey_name=Monthly+Survey+of+Building+Materials+Bricks"
+            "&survey_id=cb8accda-6118-4d3b-85a3-149e28960c54"
+            "&business_id=5e03702d-1d02-4b13-9e0e-ab9e79863d08"
+            "&ce_id=3bc7ccf0-638b-4a05-a3dc-9847c4354d90"
+        )

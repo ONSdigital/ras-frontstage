@@ -10,12 +10,12 @@
     },
     {
         "text": "Help",
-        "url": "/surveys/surveys-help?survey_ref="~survey_ref~"&ru_ref="~ru_ref,
+        "url": breadcrumbs["help"],
         "id": "b-item-2"
     },
     {
         "text": "Help completing this survey",
-        "url": "/surveys/help/"~option,
+        "url": breadcrumbs["option"],
         "id": "b-item-3"
     }
 ] %}
@@ -33,18 +33,18 @@
 {% block main %}
     <h1 class="ons-u-fs-xl">What if I cannot return the survey by the deadline?</h1>
     {% if inside_legal_basis %}
-        <p><a href="{{ url_for('surveys_bp.send_help_message', short_name=short_name, option=option, sub_option='unable-to-return-by-deadline', business_id=business_id, survey_ref=survey_ref, ru_ref=ru_ref) }}">Send us a message</a> if you cannot complete and return by the deadline and we will be able to advise.</p>
+        <p><a href="{{ url_for('surveys_bp.send_help_message', short_name=short_name, option=option, sub_option='unable-to-return-by-deadline', survey_name=survey_name, business_id=business_id, survey_id=survey_id, ce_id=ce_id) }}">Send us a message</a> if you cannot complete and return by the deadline and we will be able to advise.</p>
         <p>If you do not contact us to discuss alternative arrangements or do not complete and return the survey, penalties may be incurred resulting in a fine of up to £2,500 (under section 4 of the Statistics of Trade Act 1947, last updated by section 17 of the Criminal Justice Act 1991).</p>
         <p>You will still need to complete the survey.</p>
     {% else %}
-        <p><a href="{{ url_for('surveys_bp.send_help_message', short_name=short_name, option=option, sub_option='unable-to-return-by-deadline', business_id=business_id, survey_ref=survey_ref, ru_ref=ru_ref) }}">Send us a message</a> if you cannot complete and return this survey by the deadline and we will be able to advise.</p>
+        <p><a href="{{ url_for('surveys_bp.send_help_message', short_name=short_name, option=option, sub_option='unable-to-return-by-deadline', survey_name=survey_name, business_id=business_id, survey_id=survey_id, ce_id=ce_id) }}">Send us a message</a> if you cannot complete and return this survey by the deadline and we will be able to advise.</p>
     {% endif %}
 
     <h2>Did this answer your question?</h2>
     <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" role="button" class="ons-btn ons-btn--link ons-js-submit-btn">
         <span class="ons-btn__inner">Yes</span>
     </a>
-    <a href="{{ url_for('surveys_bp.send_help_message', option=option, sub_option='unable-to-return-by-deadline') }}" role="button" class="ons-btn ons-btn--link ons-btn--secondary">
+    <a href="{{ send_help_message_url }}" role="button" class="ons-btn ons-btn--link ons-btn--secondary">
         <span class="ons-btn__inner">No</span>
     </a>
 {% endblock main %}

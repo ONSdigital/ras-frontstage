@@ -1,4 +1,3 @@
-import json
 import logging
 
 from flask import flash, request, url_for
@@ -7,8 +6,10 @@ from structlog import wrap_logger
 from werkzeug.utils import redirect
 
 from frontstage.common.authorisation import jwt_authorization
-from frontstage.controllers import conversation_controller
-from frontstage.models import SecureMessagingForm
+from frontstage.controllers.conversation_controller import (
+    InvalidSecureMessagingForm,
+    send_message,
+)
 from frontstage.views.surveys import surveys_bp
 from frontstage.views.template_helper import render_template
 
@@ -53,37 +54,16 @@ def get_send_help_technical_message_page(session):
 @jwt_authorization(request)
 def send_help_technical_message(session):
     """Sends secure message for the help pages"""
-    form = SecureMessagingForm(request.form)
     option = request.args.get("option", None)
-    if not form.validate():
-        flash(form.errors["body"][0])
+    subject = subject_text_mapping.get(option)
+    party_id = session.get_party_id()
+
+    try:
+        msg_id = send_message(request.form, party_id, "dd", subject)
+    except InvalidSecureMessagingForm as e:
+        flash(e.errors["body"][0])
         return redirect(url_for("surveys_bp.get_send_help_technical_message_page", option=option))
-    else:
-        subject = subject_text_mapping.get(option)
-        party_id = session.get_party_id()
-        logger.info("Form validation successful", party_id=party_id)
 
-        sent_message = _send_new_message(subject, party_id)
-        thread_url = (
-            url_for("secure_message_bp.view_conversation", thread_id=sent_message["thread_id"]) + "#latest-message"
-        )
-        flash(Markup(f"Message sent. <a href={thread_url}>View Message</a>"))
-        return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
-
-
-def _send_new_message(subject, party_id):
-    logger.info("Attempting to send technical message", party_id=party_id)
-    form = SecureMessagingForm(request.form)
-    message_json = {
-        "msg_from": party_id,
-        "msg_to": ["GROUP"],
-        "subject": subject,
-        "body": form["body"].data,
-        "thread_id": form["thread_id"].data,
-        "category": "TECHNICAL",
-    }
-
-    response = conversation_controller.send_message(json.dumps(message_json))
-
-    logger.info("Secure message sent successfully", message_id=response["msg_id"], party_id=party_id)
-    return response
+    thread_url = url_for("secure_message_bp.view_conversation", thread_id=msg_id) + "#latest-message"
+    flash(Markup(f"Message sent. <a href={thread_url}>View Message</a>"))
+    return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))

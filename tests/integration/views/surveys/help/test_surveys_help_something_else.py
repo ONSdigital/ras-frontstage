@@ -9,7 +9,6 @@ from tests.integration.mocked_services import (
     encoded_jwt_token,
     respondent_party,
     survey,
-    survey_eq,
     survey_list_todo,
     url_banner_api,
 )
@@ -36,13 +35,9 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
             mock_session["help_ru_ref"] = "49900000001F"
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_survey_help_info_bricks(self, mock_request, get_survey, get_business):
+    def test_survey_help_info_bricks(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        get_survey.return_value = survey_eq
-        get_business.return_value = business_party
-        response = self.app.get("/surveys/surveys-help?survey_ref=074&ru_ref=49900000001F", follow_redirects=True)
+        response = self.app.get("/surveys/help", follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("Help".encode(), response.data)
         self.assertIn("Choose an option".encode(), response.data)
@@ -58,7 +53,6 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         form = {"option": "something-else"}
-        self.set_flask_session()
         response = self.app.post("/surveys/help", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -79,8 +73,11 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         form = {"option": "my-survey-is-not-listed"}
-        self.set_flask_session()
-        response = self.app.post("/surveys/help/something-else", data=form, follow_redirects=True)
+        response = self.app.post(
+            "/surveys/help/something-else?survey_id=1&business_id=1&ce_id=1&survey_name=4",
+            data=form,
+            follow_redirects=True,
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("My survey is not listed".encode(), response.data)
@@ -97,7 +94,6 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         form = {}
-        self.set_flask_session()
         response = self.app.post("/surveys/help/something-else", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -114,7 +110,6 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         form = {"option": "something-else"}
-        self.set_flask_session()
         response = self.app.post("/surveys/help/something-else", data=form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
@@ -134,7 +129,6 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         get_business.return_value = business_party
-        self.set_flask_session()
         response = self.app.get(
             "/surveys/help/something-else/my-survey-is-not-listed/send-message", follow_redirects=True
         )
@@ -150,7 +144,7 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
     @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
-    @patch("frontstage.controllers.conversation_controller.send_message")
+    @patch("frontstage.views.surveys.help.surveys_help.send_message")
     @patch("frontstage.controllers.party_controller.get_business_by_ru_ref")
     @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
     def test_create_message_post_success(
@@ -158,11 +152,11 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
     ):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
+        send_message.return_value = "a5e67f8a-0d90-4d60-a15a-7e334c75402b"
         get_business.return_value = business_party
         get_survey_list.return_value = survey_list_todo
         get_respondent_party_by_id.return_value = respondent_party
         form = {"body": "info-something-else"}
-        self.set_flask_session()
         response = self.app.post(
             "/surveys/help/something-else/my-survey-is-not-listed/send-message",
             data=form,
@@ -184,7 +178,6 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         get_survey.return_value = survey
         get_business.return_value = business_party
         form = {"body": ""}
-        self.set_flask_session()
         response = self.app.post(
             "/surveys/help/something-else/something-else/send-message",
             data=form,

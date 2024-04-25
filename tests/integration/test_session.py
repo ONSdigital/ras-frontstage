@@ -1,10 +1,13 @@
-import time
 import unittest
 from datetime import datetime, timedelta
 from unittest.mock import patch
 
+from freezegun import freeze_time
+
 from frontstage import app, redis
 from frontstage.common.session import Session
+
+TIME_TO_FREEZE = datetime(2024, 1, 1, 12, 0, 0)
 
 
 class TestSession(unittest.TestCase):
@@ -26,19 +29,20 @@ class TestSession(unittest.TestCase):
         self.assertEqual(test_jwt["party_id"], "party")
         self.assertEqual(test_jwt["unread_message_count"]["value"], 0)
 
+    @freeze_time(TIME_TO_FREEZE)
     def test_refresh_session(self):
         # Create session and get session key
         session = Session.from_party_id("party")
         session.save()
-        session_key = session.session_key
 
-        # Wait 3 seconds and update the session
-        time.sleep(3)
-        session.refresh_session()
+        future_time = TIME_TO_FREEZE + timedelta(minutes=5)
+        with freeze_time(future_time):
+            session.refresh_session()
 
-        # Check that the session expiry time has been reset
-        expires_in = redis.ttl(session_key)
-        self.assertEqual(expires_in, 3600)
+        # Check that the session expiry time has been extended
+        expires_in = datetime.fromtimestamp(session.get_expires_in())
+
+        self.assertEqual(expires_in, future_time + timedelta(minutes=60))
 
     def test_delete_session(self):
         # Create session and get session key

@@ -59,7 +59,7 @@ def send_help_technical_message(session):
     party_id = session.get_party_id()
 
     try:
-        msg_id = send_message(request.form, party_id, "dd", subject)
+        msg_id = send_message(request.form, party_id, subject, "TECHNICAL")
     except InvalidSecureMessagingForm as e:
         flash(e.errors["body"][0])
         return redirect(url_for("surveys_bp.get_send_help_technical_message_page", option=option))

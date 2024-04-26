@@ -6,6 +6,7 @@ import requests_mock
 
 from frontstage import app
 from frontstage.controllers.conversation_controller import InvalidSecureMessagingForm
+from frontstage.views.secure_messaging.message_get import get_msg_to
 from tests.integration.mocked_services import (
     encoded_jwt_token,
     message_json,
@@ -75,3 +76,19 @@ class TestMessageGet(unittest.TestCase):
         response = self.app.post("secure-message/threads/9e3465c0-9172-4974-a7d1-3a01592d1594", follow_redirects=True)
 
         self.assertTrue("Message is required".encode() in response.data)
+
+    def test_get_msg_to_returns_group_if_no_internal_user(self):
+        msg = {"something": "somethings"}
+        conversation = [msg, copy.deepcopy(msg), copy.deepcopy(msg)]
+        to = get_msg_to(conversation)
+
+        self.assertEqual(to, ["GROUP"])
+
+    def test_get_msg_to_returns_newest_internal_user_if_known(self):
+        msg = {"something": "somethings"}
+        first_message_with_user = {"internal_user": "user1", "from_internal": True}
+        second_message_with_user = {"internal_user": "user2", "from_internal": True}
+        conversation = [msg, first_message_with_user, second_message_with_user, copy.deepcopy(msg)]
+        to = get_msg_to(conversation)
+
+        self.assertEqual(to, ["user2"])

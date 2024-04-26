@@ -138,7 +138,9 @@ class TestConversationController(unittest.TestCase):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.POST, url_send_message, json={"msg_id": MSG_ID})
             with app.app_context():
-                msg_id = send_message(SM_FORM, PARTY_ID, "subject", "category", SURVEY_ID, BUSINESS_ID, CE_ID)
+                msg_id = send_message(
+                    SM_FORM, PARTY_ID, "subject", "category", survey_id=SURVEY_ID, business_id=BUSINESS_ID, ce_id=CE_ID
+                )
 
         self.assertEqual(msg_id, MSG_ID)
 
@@ -149,7 +151,15 @@ class TestConversationController(unittest.TestCase):
         with app.app_context():
 
             with self.assertRaises(InvalidSecureMessagingForm):
-                send_message(empty_form, PARTY_ID, "subject", "category", SURVEY_ID, BUSINESS_ID, CE_ID)
+                send_message(
+                    empty_form,
+                    PARTY_ID,
+                    "subject",
+                    "category",
+                    survey_id=SURVEY_ID,
+                    business_id=BUSINESS_ID,
+                    ce_id=CE_ID,
+                )
 
     @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
     def test_send_message_api_error(self, headers):
@@ -159,4 +169,12 @@ class TestConversationController(unittest.TestCase):
             with app.app_context():
 
                 with self.assertRaises(ApiError):
-                    send_message(SM_FORM, PARTY_ID, "subject", "category", SURVEY_ID, BUSINESS_ID, CE_ID)
+                    send_message(
+                        SM_FORM,
+                        PARTY_ID,
+                        "subject",
+                        "category",
+                        survey_id=SURVEY_ID,
+                        business_id=BUSINESS_ID,
+                        ce_id=CE_ID,
+                    )

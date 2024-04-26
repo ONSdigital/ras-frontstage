@@ -7,7 +7,7 @@ from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
-from frontstage.common.message_helper import refine
+from frontstage.common.message_helper import from_internal, refine
 from frontstage.controllers.conversation_controller import (
     InvalidSecureMessagingForm,
     get_conversation,
@@ -52,8 +52,11 @@ def view_conversation(session, thread_id):
         subject = refined_conversation[0].get("subject")
         survey_id = refined_conversation[0].get("survey_id")
         business_id = refined_conversation[0].get("ru_ref")
+        msg_to = get_msg_to(refined_conversation)
         try:
-            send_message(request.form, party_id, subject, category, survey_id, business_id)
+            send_message(
+                request.form, party_id, subject, category, msg_to=msg_to, survey_id=survey_id, business_id=business_id
+            )
             thread_url = url_for("secure_message_bp.view_conversation", thread_id=thread_id) + "#latest-message"
             flash(Markup(f"Message sent. <a href={thread_url}>View Message</a>"))
             return redirect(url_for("secure_message_bp.view_conversation_list"))
@@ -111,3 +114,12 @@ def view_conversation_list(session):
         is_closed=strtobool(is_closed),
         unread_message_count=unread_message_count,
     )
+
+
+def get_msg_to(conversation):
+    """Walks the conversation from latest sent message to first and looks for the latest message sent from internal.
+    Uses that as the to , if none found then defaults to group"""
+    for message in reversed(conversation):
+        if from_internal(message):
+            return [message["internal_user"]]
+    return ["GROUP"]

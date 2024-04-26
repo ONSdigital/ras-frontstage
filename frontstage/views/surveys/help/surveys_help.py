@@ -274,7 +274,9 @@ def send_help_message(session, option: str, sub_option: str):
         category = "TECHNICAL" if option == "info-about-the-ons" else "SURVEY"
         subject = sub_option_dict["subject"]
         try:
-            msg_id = send_message(request.form, party_id, subject, category, survey_id, business_id)
+            msg_id = send_message(
+                request.form, party_id, subject, category, survey_id=survey_id, business_id=business_id, ce_id=ce_id
+            )
 
             thread_url = url_for("secure_message_bp.view_conversation", thread_id=msg_id) + "#latest-message"
             flash(Markup(f"Message sent. <a href={thread_url}>View Message</a>"))

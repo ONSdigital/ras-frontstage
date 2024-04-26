@@ -94,9 +94,10 @@ def send_message(
     party_id: UUID,
     subject: str,
     category: str,
+    msg_to=["GROUP"],
     survey_id: UUID = None,
     business_id: UUID = None,
-    collection_exercise_id: UUID = None,
+    ce_id: UUID = None,
 ) -> UUID:
     """
     Creates a message in the secure-message service
@@ -108,7 +109,7 @@ def send_message(
 
     message_json = {
         "msg_from": party_id,
-        "msg_to": ["GROUP"],
+        "msg_to": msg_to,
         "subject": subject,
         "category": category,
         "body": secure_message_form["body"].data,
@@ -140,7 +141,7 @@ def send_message(
         category=category,
         survey_id=survey_id,
         business_id=business_id,
-        collection_exercise_id=collection_exercise_id,
+        ce_id=ce_id,
     )
 
     return msg_id

@@ -36,3 +36,5 @@ lint-check: load-design-system-templates
 test: lint-check
 	APP_SETTINGS=TestingConfig pipenv run pytest $(TESTS) --cov frontstage --cov-report term-missing
 
+test-html: lint-check
+	APP_SETTINGS=TestingConfig pipenv run pytest $(TESTS) --cov frontstage --cov-report html

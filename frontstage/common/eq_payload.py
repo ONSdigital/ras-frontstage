@@ -61,7 +61,6 @@ class EqPayload(object):
             "iat": int_time,
             "jti": str(uuid.uuid4()),
             "tx_id": tx_id,
-            "version": "v2",
             "account_service_url": current_app.config["ACCOUNT_SERVICE_URL"],
             "case_id": case["id"],
             "collection_exercise_sid": ce_id,

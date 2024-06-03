@@ -1,54 +1,53 @@
 {
-   "id":"8d990a74-5f07-4765-ac66-df7e1a96505b",
-   "surveyId":"cb8accda-6118-4d3b-85a3-149e28960c54",
-   "name":null,
-   "actualExecutionDateTime":"2018-07-12T09:00:27.458Z",
-   "scheduledExecutionDateTime":"2018-07-12T09:00:18.000Z",
-   "scheduledStartDateTime":"2018-07-12T09:00:18.000Z",
-   "actualPublishDateTime":"2018-07-12T09:00:29.051Z",
-   "periodStartDateTime":"2018-07-12T09:00:18.000Z",
-   "periodEndDateTime":"2018-07-23T09:00:13.000Z",
-   "scheduledReturnDateTime":"2018-07-22T09:00:13.000Z",
-   "scheduledEndDateTime":"2018-07-23T09:00:13.000Z",
-   "executedBy":null,
-   "state":"LIVE",
-   "exerciseRef":"204901",
-   "userDescription":"test_exercise",
-   "created":"2018-07-12T09:00:21.568Z",
-   "updated":"2018-07-12T09:01:13.004Z",
-   "deleted":null,
-   "validationErrors":null,
-   "eqVersion":"v3",
-   "events":[
+   "id": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+   "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
+   "name": null,
+   "actualExecutionDateTime": "2018-07-12T09:00:27.458Z",
+   "scheduledExecutionDateTime": "2018-07-12T09:00:18.000Z",
+   "scheduledStartDateTime": "2018-07-12T09:00:18.000Z",
+   "actualPublishDateTime": "2018-07-12T09:00:29.051Z",
+   "periodStartDateTime": "2018-07-12T09:00:18.000Z",
+   "periodEndDateTime": "2018-07-23T09:00:13.000Z",
+   "scheduledReturnDateTime": "2018-07-22T09:00:13.000Z",
+   "scheduledEndDateTime": "2018-07-23T09:00:13.000Z",
+   "executedBy": null,
+   "state": "LIVE",
+   "exerciseRef": "204901",
+   "userDescription": "test_exercise",
+   "created": "2018-07-12T09:00:21.568Z",
+   "updated": "2018-07-12T09:01:13.004Z",
+   "deleted": null,
+   "validationErrors": null,
+   "events": [
       {
-         "id":"b3651d8b-bb0b-42f7-a2a3-d05d85822226",
-         "collectionExerciseId":"8d990a74-5f07-4765-ac66-df7e1a96505b",
-         "tag":"mps",
-         "timestamp":"2018-07-12T09:00:18.000Z"
+         "id": "b3651d8b-bb0b-42f7-a2a3-d05d85822226",
+         "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+         "tag": "mps",
+         "timestamp": "2018-07-12T09:00:18.000Z"
       },
       {
-         "id":"052328b1-65ea-4778-a788-ec1ecc846802",
-         "collectionExerciseId":"8d990a74-5f07-4765-ac66-df7e1a96505b",
-         "tag":"go_live",
-         "timestamp":"2018-07-12T09:01:13.000Z"
+         "id": "052328b1-65ea-4778-a788-ec1ecc846802",
+         "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+         "tag": "go_live",
+         "timestamp": "2018-07-12T09:01:13.000Z"
       },
       {
-         "id":"186e1a0f-0a49-4e4a-8e0a-c8db7593117e",
-         "collectionExerciseId":"8d990a74-5f07-4765-ac66-df7e1a96505b",
-         "tag":"return_by",
-         "timestamp":"2018-07-22T09:00:13.000Z"
+         "id": "186e1a0f-0a49-4e4a-8e0a-c8db7593117e",
+         "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+         "tag": "return_by",
+         "timestamp": "2018-07-22T09:00:13.000Z"
       },
       {
-         "id":"e5c34d4e-e7eb-4e38-a14a-7ca16cca4787",
-         "collectionExerciseId":"8d990a74-5f07-4765-ac66-df7e1a96505b",
-         "tag":"exercise_end",
-         "timestamp":"2018-07-23T09:00:13.000Z"
+         "id": "e5c34d4e-e7eb-4e38-a14a-7ca16cca4787",
+         "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+         "tag": "exercise_end",
+         "timestamp": "2018-07-23T09:00:13.000Z"
       }
    ],
-   "supplementaryDatasetEntity":{
-      "id":1,
-      "exerciseFK":69,
-      "supplementaryDatasetId":"b9a87999-fcc0-4085-979f-06390fb5dddd",
-      "supplementaryDatasetJson":"{\"survey_id\":\"001\",\"period_id\":\"220823\",\"form_types\":[\"0001\",\"1234\"],\"title\":\"Test dataset for survey id 009 period 220823\",\"sds_published_at\":\"2023-08-22T14:46:36Z\",\"total_reporting_units\":2,\"schema_version\":\"v1.0.0\",\"sds_dataset_version\":4,\"filename\":\"373d9a77-2ee5-4c1f-a6dd-8d07b0ea9793.json\",\"dataset_id\":\"b9a87999-fcc0-4085-979f-06390fb5dddd\"}"
+   "supplementaryDatasetEntity": {
+      "id": 1,
+      "exerciseFK": 69,
+      "supplementaryDatasetId": "b9a87999-fcc0-4085-979f-06390fb5dddd",
+      "supplementaryDatasetJson": "{\"survey_id\":\"001\",\"period_id\":\"220823\",\"form_types\":[\"0001\",\"1234\"],\"title\":\"Test dataset for survey id 009 period 220823\",\"sds_published_at\":\"2023-08-22T14:46:36Z\",\"total_reporting_units\":2,\"schema_version\":\"v1.0.0\",\"sds_dataset_version\":4,\"filename\":\"373d9a77-2ee5-4c1f-a6dd-8d07b0ea9793.json\",\"dataset_id\":\"b9a87999-fcc0-4085-979f-06390fb5dddd\"}"
    }
 }

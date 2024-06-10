@@ -56,11 +56,13 @@ class EqPayload(object):
         ru_ref = f"{party['sampleUnitRef'] + party['checkletter']}"
         int_time = int(time.time())
 
+        # Note that the version mentioned here is the RM->EQ communication version, not the EQ version
         payload = {
             "exp": int_time + 300,
             "iat": int_time,
             "jti": str(uuid.uuid4()),
             "tx_id": tx_id,
+            "version": "v2",
             "account_service_url": current_app.config["ACCOUNT_SERVICE_URL"],
             "case_id": case["id"],
             "collection_exercise_sid": ce_id,

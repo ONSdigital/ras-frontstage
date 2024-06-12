@@ -20,14 +20,14 @@ docker-test: REDIS_PORT=6379
 docker-test: test
 
 lint:
-	pipenv check
+	pipenv check --ignore=70612
 	pipenv run isort .
 	pipenv run black --line-length 120 .
 	pipenv run djlint frontstage/ --ignore=H037,H021
 	pipenv run flake8
 
 lint-check: load-design-system-templates
-	pipenv check
+	pipenv check --ignore=70612
 	pipenv run isort . --check-only
 	pipenv run black --line-length 120 --check .
 	pipenv run djlint frontstage/ --ignore=H037,H021

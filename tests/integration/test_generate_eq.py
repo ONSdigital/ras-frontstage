@@ -42,6 +42,7 @@ with open("tests/test_data/collection_instrument/collection_instrument_eq.json")
 
 TIME_TO_FREEZE = datetime(2023, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
 
+# Note that the version mentioned here is the RM->EQ communication version, not the EQ version
 PAYLOAD = {
     "exp": 1672574700,
     "iat": 1672574400,

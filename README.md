@@ -43,6 +43,10 @@ These can be easily run via the following commands:
 ```bash
 make test
 ```
+or if you wish to generate an HTML report viewable at htmlcov/index.html
+```bash
+make test-html
+```
 or if you are running redis in the docker environment
 ```bash
 make docker-test

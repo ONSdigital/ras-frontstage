@@ -1,48 +1,47 @@
 {
-        "id": "8d990a74-5f07-4765-ac66-df7e1a96505b",
-        "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
-        "name": null,
-        "actualExecutionDateTime": "2018-07-12T09:00:27.458Z",
-        "scheduledExecutionDateTime": "2018-07-12T09:00:18.000Z",
-        "scheduledStartDateTime": "2018-07-12T09:00:18.000Z",
-        "actualPublishDateTime": "2018-07-12T09:00:29.051Z",
-        "periodStartDateTime": "2018-07-12T09:00:18.000Z",
-        "periodEndDateTime": "2018-07-23T09:00:13.000Z",
-        "scheduledReturnDateTime": "2018-07-22T09:00:13.000Z",
-        "scheduledEndDateTime": "2018-07-23T09:00:13.000Z",
-        "executedBy": null,
-        "state": "LIVE",
-        "exerciseRef": "204901",
-        "userDescription": "test_exercise",
-        "created": "2018-07-12T09:00:21.568Z",
-        "updated": "2018-07-12T09:01:13.004Z",
-        "deleted": null,
-        "validationErrors": null,
-        "eqVersion": "v2",
-        "events": [
-            {
-                "id": "b3651d8b-bb0b-42f7-a2a3-d05d85822226",
-                "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
-                "tag": "mps",
-                "timestamp": "2018-07-12T09:00:18.000Z"
-            },
-            {
-                "id": "052328b1-65ea-4778-a788-ec1ecc846802",
-                "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
-                "tag": "go_live",
-                "timestamp": "2018-07-12T09:01:13.000Z"
-            },
-            {
-                "id": "186e1a0f-0a49-4e4a-8e0a-c8db7593117e",
-                "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
-                "tag": "return_by",
-                "timestamp": "2018-07-22T09:00:13.000Z"
-            },
-            {
-                "id": "e5c34d4e-e7eb-4e38-a14a-7ca16cca4787",
-                "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
-                "tag": "exercise_end",
-                "timestamp": "2018-07-23T09:00:13.000Z"
-            }
-        ]
+    "id": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+    "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
+    "name": null,
+    "actualExecutionDateTime": "2018-07-12T09:00:27.458Z",
+    "scheduledExecutionDateTime": "2018-07-12T09:00:18.000Z",
+    "scheduledStartDateTime": "2018-07-12T09:00:18.000Z",
+    "actualPublishDateTime": "2018-07-12T09:00:29.051Z",
+    "periodStartDateTime": "2018-07-12T09:00:18.000Z",
+    "periodEndDateTime": "2018-07-23T09:00:13.000Z",
+    "scheduledReturnDateTime": "2018-07-22T09:00:13.000Z",
+    "scheduledEndDateTime": "2018-07-23T09:00:13.000Z",
+    "executedBy": null,
+    "state": "LIVE",
+    "exerciseRef": "204901",
+    "userDescription": "test_exercise",
+    "created": "2018-07-12T09:00:21.568Z",
+    "updated": "2018-07-12T09:01:13.004Z",
+    "deleted": null,
+    "validationErrors": null,
+    "events": [
+        {
+            "id": "b3651d8b-bb0b-42f7-a2a3-d05d85822226",
+            "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+            "tag": "mps",
+            "timestamp": "2018-07-12T09:00:18.000Z"
+        },
+        {
+            "id": "052328b1-65ea-4778-a788-ec1ecc846802",
+            "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+            "tag": "go_live",
+            "timestamp": "2018-07-12T09:01:13.000Z"
+        },
+        {
+            "id": "186e1a0f-0a49-4e4a-8e0a-c8db7593117e",
+            "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+            "tag": "return_by",
+            "timestamp": "2018-07-22T09:00:13.000Z"
+        },
+        {
+            "id": "e5c34d4e-e7eb-4e38-a14a-7ca16cca4787",
+            "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+            "tag": "exercise_end",
+            "timestamp": "2018-07-23T09:00:13.000Z"
+        }
+    ]
 }

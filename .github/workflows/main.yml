@@ -99,11 +99,28 @@ jobs:
         run: |
           git fetch --tags
           echo "tag=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
-
+      - name: Import BOT GPG key
+        run: echo $BOT_GPG_KEY | base64 --decode | gpg --batch --import
+        env:
+          BOT_GPG_KEY: ${{ secrets.BOT_GPG_KEY }}
+      - name: Prepare gpg CLI signing step
+        run: |
+          rm -rf /tmp/gpg.sh
+          echo '#!/bin/bash' >> /tmp/gpg.sh
+          echo 'gpg --batch --pinentry-mode=loopback --passphrase $BOT_GPG_KEY_PASSPHRASE $@' >> /tmp/gpg.sh
+          chmod +x /tmp/gpg.sh
+      - name: Setup git
+        run: |
+          git config commit.gpgsign true
+          git config user.signingkey "${{ secrets.BOT_GPG_KEY_ID }}"
+          git config gpg.program /tmp/gpg.sh
+          git config user.name "${{ secrets.BOT_USERNAME }}"
+          git config user.email "${{ secrets.BOT_EMAIL }}"
       - name: update version
         if: github.ref != 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+          BOT_GPG_KEY_PASSPHRASE: ${{ secrets.BOT_GPG_KEY_PASSPHRASE }}
           COMMIT_MSG: |
             auto patch increment
         shell: bash

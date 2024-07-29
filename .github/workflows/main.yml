@@ -53,13 +53,10 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Create constraints.txt
-        run: echo 'setuptools<72' > constraints.txt
-
       - name: Build
         run: |
           python -m pip install --upgrade pip
-          pip install pipenv -c constraints.txt
+          pip install pipenv
           pipenv install --dev
       - name: Load Design System templates
         run: |

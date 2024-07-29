@@ -3,10 +3,10 @@ import logging
 from json import JSONDecodeError
 from uuid import UUID
 
-import requests
 from flask import current_app, request
+from requests import Session as request_session
 from requests.adapters import HTTPAdapter
-from requests.exceptions import HTTPError
+from requests.exceptions import ConnectionError, HTTPError, Timeout
 from structlog import wrap_logger
 from urllib3 import Retry
 
@@ -16,6 +16,7 @@ from frontstage.exceptions.exceptions import (
     AuthorizationTokenMissing,
     IncorrectAccountAccessError,
     NoMessagesError,
+    ServiceUnavailableException,
 )
 from frontstage.models import SecureMessagingForm
 
@@ -30,7 +31,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def _get_session():
-    session = requests.Session()
+    session = request_session()
     retries = Retry(total=10, backoff_factor=0.1)
     session.mount("http://", HTTPAdapter(max_retries=retries))
     session.mount("https://", HTTPAdapter(max_retries=retries))
@@ -107,44 +108,86 @@ def send_message(
     if not secure_message_form.validate():
         raise InvalidSecureMessagingForm(secure_message_form.errors)
 
-    message_json = {
-        "msg_from": party_id,
-        "msg_to": msg_to,
-        "subject": subject,
-        "category": category,
-        "body": secure_message_form["body"].data,
-        "thread_id": secure_message_form["thread_id"].data,
-    }
-
-    if survey_id:
-        message_json["survey_id"] = survey_id
-    if business_id:
-        message_json["business_id"] = business_id
-
-    url = f"{current_app.config['SECURE_MESSAGE_URL']}/messages"
+    body = secure_message_form["body"].data
+    thread_id = secure_message_form["thread_id"].data
+    sm_version = current_app.config["SECURE_MESSAGE_VERSION"]
+    session = _get_session()
     headers = _create_send_message_headers()
 
-    with _get_session() as session:
-        response = session.post(url, headers=headers, data=json.dumps(message_json))
+    if sm_version in ("v1", "both"):
+        sm_v1_message_json = {
+            "msg_from": party_id,
+            "msg_to": msg_to,
+            "subject": subject,
+            "category": category,
+            "body": body,
+            "thread_id": thread_id,
+        }
+
+        if survey_id:
+            sm_v1_message_json["survey_id"] = survey_id
+        if business_id:
+            sm_v1_message_json["business_id"] = business_id
+
+        url = f"{current_app.config['SECURE_MESSAGE_URL']}/messages"
+        response = session.post(url, headers=headers, data=json.dumps(sm_v1_message_json))
         try:
             response.raise_for_status()
         except HTTPError:
             logger.error("Message sending failed due to API Error", party_id=party_id, exc_info=True)
             raise ApiError(logger, response)
 
-    msg_id = response.json()["msg_id"]
+        sm_v1_msg_id = response.json()["msg_id"]
 
-    logger.info(
-        "Secure message sent successfully",
-        message_id=msg_id,
-        party_id=party_id,
-        category=category,
-        survey_id=survey_id,
-        business_id=business_id,
-        ce_id=ce_id,
-    )
+        logger.info(
+            "Secure message sent successfully",
+            message_id=sm_v1_msg_id,
+            party_id=party_id,
+            category=category,
+            survey_id=survey_id,
+            business_id=business_id,
+            ce_id=ce_id,
+        )
 
-    return msg_id
+    if current_app.config["SECURE_MESSAGE_VERSION"] in ("v2", "both"):
+
+        if not thread_id:
+            sm_v2_thread = {
+                "subject": subject,
+                "category": category,
+                "ru_ref": business_id,
+                "survey_id": survey_id,
+                "respondent_id": party_id,
+                "is_read_by_respondent": False,
+                "is_read_by_internal": False,
+            }
+            sm_v2_thread_json = _post_to_secure_message_v2(session, headers, "threads", sm_v2_thread)
+            thread_id = sm_v2_thread_json["id"]
+
+        sm_v2_message = {
+            "thread_id": thread_id,
+            "body": body,
+            "is_from_internal": False,
+            "sent_by": party_id,
+        }
+
+        sm_v2_message_json = _post_to_secure_message_v2(session, headers, "messages", sm_v2_message)
+
+    return sm_v2_message_json["id"] if current_app.config["SECURE_MESSAGE_VERSION"] == "v2" else sm_v1_msg_id
+
+
+def _post_to_secure_message_v2(session: request_session, headers: dict, endpoint: str, data: dict) -> dict:
+    url = f"{current_app.config['SECURE_MESSAGE_V2_URL']}/{endpoint}"
+    try:
+        response = session.post(url, headers=headers, data=json.dumps(data))
+        response.raise_for_status()
+    except HTTPError:
+        raise ApiError(logger, response)
+    except ConnectionError:
+        raise ServiceUnavailableException("Secure message v2 returned a connection error", 503)
+    except Timeout:
+        raise ServiceUnavailableException("Secure message v2 has timed out", 504)
+    return response.json()
 
 
 def try_message_count_from_session(session):

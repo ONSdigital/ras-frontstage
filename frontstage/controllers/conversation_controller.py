@@ -150,22 +150,19 @@ def send_message(
         )
 
     if current_app.config["SECURE_MESSAGE_VERSION"] in ("v2", "both"):
-
-        if not thread_id:
-            sm_v2_thread = {
-                "subject": subject,
-                "category": category,
-                "ru_ref": business_id,
-                "survey_id": survey_id,
-                "respondent_id": party_id,
-                "is_read_by_respondent": False,
-                "is_read_by_internal": False,
-            }
-            sm_v2_thread_json = _post_to_secure_message_v2(session, headers, "threads", sm_v2_thread)
-            thread_id = sm_v2_thread_json["id"]
+        sm_v2_thread = {
+            "subject": subject,
+            "category": category,
+            "ru_ref": business_id,
+            "survey_id": survey_id,
+            "respondent_id": party_id,
+            "is_read_by_respondent": False,
+            "is_read_by_internal": False,
+        }
+        sm_v2_thread_json = _post_to_secure_message_v2(session, headers, "threads", sm_v2_thread)
 
         sm_v2_message = {
-            "thread_id": thread_id,
+            "thread_id": sm_v2_thread_json["id"],
             "body": body,
             "is_from_internal": False,
             "sent_by": party_id,

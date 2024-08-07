@@ -2,7 +2,9 @@ import unittest
 from datetime import datetime, timedelta
 from unittest.mock import patch
 
+import requests_mock
 import responses
+from requests import ConnectionError, Timeout
 from werkzeug.datastructures import ImmutableMultiDict
 
 from config import TestingConfig
@@ -15,11 +17,13 @@ from frontstage.controllers.conversation_controller import (
     send_message,
     try_message_count_from_session,
 )
-from frontstage.exceptions.exceptions import ApiError
+from frontstage.exceptions.exceptions import ApiError, ServiceUnavailableException
 from tests.integration.mocked_services import (
     message_count,
     url_get_conversation_count,
     url_send_message,
+    url_send_message_v2_messages,
+    url_send_message_v2_threads,
 )
 
 PARTY_ID = "db01929d-128c-4790-a563-8915c95931e1"
@@ -133,16 +137,94 @@ class TestConversationController(unittest.TestCase):
                 self.assertEqual(0, count)
 
     @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
-    def test_send_message(self, headers):
+    @requests_mock.Mocker()
+    def test_send_message_v1(self, headers, request_mock):
         headers.return_value = {"Authorization": "token"}
-        with responses.RequestsMock() as rsps:
-            rsps.add(rsps.POST, url_send_message, json={"msg_id": MSG_ID})
-            with app.app_context():
-                msg_id = send_message(
+        request_mock.post(url_send_message, json={"msg_id": MSG_ID})
+
+        with app.app_context():
+            app.config["SECURE_MESSAGE_VERSION"] = "v1"
+            msg_id = send_message(
+                SM_FORM, PARTY_ID, "subject", "category", survey_id=SURVEY_ID, business_id=BUSINESS_ID, ce_id=CE_ID
+            )
+
+        self.assertEqual(msg_id, MSG_ID)
+
+    @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
+    @requests_mock.Mocker()
+    def test_send_message_v2(self, headers, request_mock):
+        headers.return_value = {"Authorization": "token"}
+        app.config["SECURE_MESSAGE_VERSION"] = "v2"
+        request_mock.post(url_send_message_v2_threads, json={"id": "4bd2eb4d-8788-476a-824b-8caf826a70cd"})
+        request_mock.post(url_send_message_v2_messages, json={"id": "287e264d-e330-476c-9c39-3b39eef090ae"})
+
+        with app.app_context():
+            msg_id = send_message(
+                SM_FORM, PARTY_ID, "subject", "category", survey_id=SURVEY_ID, business_id=BUSINESS_ID, ce_id=CE_ID
+            )
+
+        self.assertEqual(msg_id, "287e264d-e330-476c-9c39-3b39eef090ae")
+
+    @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
+    @requests_mock.Mocker()
+    def test_send_message_both(self, headers, request_mock):
+        headers.return_value = {"Authorization": "token"}
+        request_mock.post(url_send_message, json={"msg_id": MSG_ID})
+        request_mock.post(url_send_message_v2_threads, json={"id": "4bd2eb4d-8788-476a-824b-8caf826a70cd"})
+        request_mock.post(url_send_message_v2_messages, json={"id": "287e264d-e330-476c-9c39-3b39eef090ae"})
+
+        with app.app_context():
+            msg_id = send_message(
+                SM_FORM, PARTY_ID, "subject", "category", survey_id=SURVEY_ID, business_id=BUSINESS_ID, ce_id=CE_ID
+            )
+
+        self.assertEqual(msg_id, MSG_ID)
+
+    @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
+    @requests_mock.Mocker()
+    def test_send_message_v2_timeout(self, headers, request_mock):
+        headers.return_value = {"Authorization": "token"}
+        app.config["SECURE_MESSAGE_VERSION"] = "v2"
+        request_mock.post(url_send_message_v2_threads, exc=Timeout)
+
+        with app.app_context():
+            with self.assertRaises(ServiceUnavailableException):
+                send_message(
                     SM_FORM, PARTY_ID, "subject", "category", survey_id=SURVEY_ID, business_id=BUSINESS_ID, ce_id=CE_ID
                 )
 
-        self.assertEqual(msg_id, MSG_ID)
+    @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
+    @requests_mock.Mocker()
+    def test_send_message_v2_connection_error(self, headers, request_mock):
+        headers.return_value = {"Authorization": "token"}
+        app.config["SECURE_MESSAGE_VERSION"] = "v2"
+        request_mock.post(url_send_message_v2_threads, exc=ConnectionError)
+
+        with app.app_context():
+            with self.assertRaises(ServiceUnavailableException):
+                send_message(
+                    SM_FORM, PARTY_ID, "subject", "category", survey_id=SURVEY_ID, business_id=BUSINESS_ID, ce_id=CE_ID
+                )
+
+    @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
+    def test_send_message_v2_http_error(self, headers):
+        headers.return_value = {"Authorization": "token"}
+
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.POST, url_send_message_v2_threads, status=404)
+
+            with app.app_context():
+                app.config["SECURE_MESSAGE_VERSION"] = "v2"
+                with self.assertRaises(ApiError):
+                    send_message(
+                        SM_FORM,
+                        PARTY_ID,
+                        "subject",
+                        "category",
+                        survey_id=SURVEY_ID,
+                        business_id=BUSINESS_ID,
+                        ce_id=CE_ID,
+                    )
 
     @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
     def test_send_message_invalid_secure_message_form(self, headers):

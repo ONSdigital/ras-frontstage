@@ -101,3 +101,6 @@ password:
 
 profiler:
   enabled: false
+
+secureMessage:
+  version: both

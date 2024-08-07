@@ -193,6 +193,14 @@ spec:
             {{- else }}
             value: "http://$(SECURE_MESSAGE_SERVICE_HOST):$(SECURE_MESSAGE_SERVICE_PORT)"
             {{- end }}
+          - name: SECURE_MESSAGE_V2_URL
+            {{- if .Values.dns.enabled }}
+            value: "http://secure-message-v2.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"
+            {{- else }}
+            value: "http://$(SECURE_MESSAGE_V2_SERVICE_HOST):$(SECURE_MESSAGE_SERVICE_PORT)"
+            {{- end }}
+          - name: SECURE_MESSAGE_VERSION
+            value: "{{ .Values.secureMessage.version }}"
           - name: SEND_EMAIL_TO_GOV_NOTIFY
             value: "{{ .Values.email.enabled }}"
           - name: UNDER_MAINTENANCE

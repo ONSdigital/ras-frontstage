@@ -169,6 +169,7 @@ class TestConversationController(unittest.TestCase):
     @requests_mock.Mocker()
     def test_send_message_both(self, headers, request_mock):
         headers.return_value = {"Authorization": "token"}
+        app.config["SECURE_MESSAGE_VERSION"] = "both"
         request_mock.post(url_send_message, json={"msg_id": MSG_ID})
         request_mock.post(url_send_message_v2_threads, json={"id": "4bd2eb4d-8788-476a-824b-8caf826a70cd"})
         request_mock.post(url_send_message_v2_messages, json={"id": "287e264d-e330-476c-9c39-3b39eef090ae"})

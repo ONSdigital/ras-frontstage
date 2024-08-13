@@ -159,7 +159,7 @@ def send_message(
             "is_read_by_respondent": False,
             "is_read_by_internal": False,
         }
-        sm_v2_thread_json = _post_to_secure_message_v2(session, headers, "threads", sm_v2_thread)
+        sm_v2_thread_json = _post_to_secure_message_v2_threads(session, headers, sm_v2_thread)
 
         sm_v2_message = {
             "thread_id": sm_v2_thread_json["id"],
@@ -168,23 +168,9 @@ def send_message(
             "sent_by": party_id,
         }
 
-        sm_v2_message_json = _post_to_secure_message_v2(session, headers, "messages", sm_v2_message)
+        sm_v2_message_json = _post_to_secure_message_v2_messages(session, headers, sm_v2_message)
 
     return sm_v2_message_json["id"] if current_app.config["SECURE_MESSAGE_VERSION"] == "v2" else sm_v1_msg_id
-
-
-def _post_to_secure_message_v2(session: request_session, headers: dict, endpoint: str, data: dict) -> dict:
-    url = f"{current_app.config['SECURE_MESSAGE_V2_URL']}/{endpoint}"
-    try:
-        response = session.post(url, headers=headers, data=json.dumps(data))
-        response.raise_for_status()
-    except HTTPError:
-        raise ApiError(logger, response)
-    except ConnectionError:
-        raise ServiceUnavailableException("Secure message v2 returned a connection error", 503)
-    except Timeout:
-        raise ServiceUnavailableException("Secure message v2 has timed out", 504)
-    return response.json()
 
 
 def try_message_count_from_session(session):
@@ -266,3 +252,33 @@ def remove_unread_label(message_id: str):
             logger.error("Failed to remove unread label", message_id=message_id, status=response.status_code)
 
     logger.info("Successfully removed unread label", message_id=message_id)
+
+
+def _post_to_secure_message_v2_threads(session: request_session, headers: dict, data: dict) -> dict:
+    url = f"{current_app.config['SECURE_MESSAGE_V2_URL']}/threads"
+    try:
+        response = session.post(url, headers=headers, data=json.dumps(data))
+        response.raise_for_status()
+    except HTTPError:
+        logger.error("Failed to create secure message v2 thread", status=response.status_code)
+        raise ApiError(logger, response)
+    except ConnectionError:
+        raise ServiceUnavailableException("Secure message v2 returned a connection error", 503)
+    except Timeout:
+        raise ServiceUnavailableException("Secure message v2 has timed out", 504)
+    return response.json()
+
+
+def _post_to_secure_message_v2_messages(session: request_session, headers: dict, data: dict) -> dict:
+    url = f"{current_app.config['SECURE_MESSAGE_V2_URL']}/messages"
+    try:
+        response = session.post(url, headers=headers, data=json.dumps(data))
+        response.raise_for_status()
+    except HTTPError:
+        logger.error("Failed to create secure message v2 message", status=response.status_code)
+        raise ApiError(logger, response)
+    except ConnectionError:
+        raise ServiceUnavailableException("Secure message v2 returned a connection error", 503)
+    except Timeout:
+        raise ServiceUnavailableException("Secure message v2 has timed out", 504)
+    return response.json()

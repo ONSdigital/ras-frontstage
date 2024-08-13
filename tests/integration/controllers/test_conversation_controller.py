@@ -183,7 +183,7 @@ class TestConversationController(unittest.TestCase):
 
     @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
     @requests_mock.Mocker()
-    def test_send_message_v2_timeout(self, headers, request_mock):
+    def test_send_message_v2_threads_timeout(self, headers, request_mock):
         headers.return_value = {"Authorization": "token"}
         app.config["SECURE_MESSAGE_VERSION"] = "v2"
         request_mock.post(url_send_message_v2_threads, exc=Timeout)
@@ -196,7 +196,7 @@ class TestConversationController(unittest.TestCase):
 
     @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
     @requests_mock.Mocker()
-    def test_send_message_v2_connection_error(self, headers, request_mock):
+    def test_send_message_v2_threads_connection_error(self, headers, request_mock):
         headers.return_value = {"Authorization": "token"}
         app.config["SECURE_MESSAGE_VERSION"] = "v2"
         request_mock.post(url_send_message_v2_threads, exc=ConnectionError)
@@ -208,11 +208,67 @@ class TestConversationController(unittest.TestCase):
                 )
 
     @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
-    def test_send_message_v2_http_error(self, headers):
+    def test_send_message_v2_threads_http_error(self, headers):
         headers.return_value = {"Authorization": "token"}
-
+        app.config["SECURE_MESSAGE_VERSION"] = "v2"
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.POST, url_send_message_v2_threads, status=404)
+
+            with app.app_context():
+                app.config["SECURE_MESSAGE_VERSION"] = "v2"
+                with self.assertRaises(ApiError):
+                    send_message(
+                        SM_FORM,
+                        PARTY_ID,
+                        "subject",
+                        "category",
+                        survey_id=SURVEY_ID,
+                        business_id=BUSINESS_ID,
+                        ce_id=CE_ID,
+                    )
+
+    @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
+    @requests_mock.Mocker()
+    def test_send_message_v2_messages_timeout(self, headers, request_mock):
+        headers.return_value = {"Authorization": "token"}
+        app.config["SECURE_MESSAGE_VERSION"] = "v2"
+        request_mock.post(url_send_message_v2_threads, json={"id": "4bd2eb4d-8788-476a-824b-8caf826a70cd"})
+        request_mock.post(url_send_message_v2_messages, exc=Timeout)
+
+        with app.app_context():
+            with self.assertRaises(ServiceUnavailableException):
+                send_message(
+                    SM_FORM, PARTY_ID, "subject", "category", survey_id=SURVEY_ID, business_id=BUSINESS_ID, ce_id=CE_ID
+                )
+
+    @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
+    @requests_mock.Mocker()
+    def test_send_message_v2_messages_connection_error(self, headers, request_mock):
+        headers.return_value = {"Authorization": "token"}
+        app.config["SECURE_MESSAGE_VERSION"] = "v2"
+        request_mock.post(url_send_message_v2_threads, json={"id": "4bd2eb4d-8788-476a-824b-8caf826a70cd"})
+        request_mock.post(url_send_message_v2_messages, exc=ConnectionError)
+
+        with app.app_context():
+            with self.assertRaises(ServiceUnavailableException):
+                send_message(
+                    SM_FORM, PARTY_ID, "subject", "category", survey_id=SURVEY_ID, business_id=BUSINESS_ID, ce_id=CE_ID
+                )
+
+    @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
+    def test_send_message_v2_messages_http_error(self, headers):
+        headers.return_value = {"Authorization": "token"}
+        app.config["SECURE_MESSAGE_VERSION"] = "v2"
+        with responses.RequestsMock() as rsps:
+            rsps.add(
+                rsps.POST,
+                url_send_message_v2_threads,
+                json={"id": "4bd2eb4d-8788-476a-824b-8caf826a70cd"},
+                status=200,
+                headers={"Authorisation": "token"},
+                content_type="application/json",
+            )
+            rsps.add(rsps.POST, url_send_message_v2_messages, status=404)
 
             with app.app_context():
                 app.config["SECURE_MESSAGE_VERSION"] = "v2"

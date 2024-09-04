@@ -18,7 +18,7 @@ jobs:
           scan-type: fs
           hide-progress: true
           output: trivy.txt
-          severity: 'CRITICAL,HIGH'
+          severity: 'UNKNOWN,LOW,MEDIUM,CRITICAL,HIGH'
 
       - name: Publish Trivy Output to Summary
         run: |

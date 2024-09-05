@@ -53,6 +53,8 @@ class Config(object):
     IAC_URL = os.getenv("IAC_URL")
     PARTY_URL = os.getenv("PARTY_URL")
     SECURE_MESSAGE_URL = os.getenv("SECURE_MESSAGE_URL")
+    SECURE_MESSAGE_V2_URL = os.getenv("SECURE_MESSAGE_V2_URL")
+    SECURE_MESSAGE_VERSION = os.getenv("SECURE_MESSAGE_VERSION", "v1")
     SURVEY_URL = os.getenv("SURVEY_URL")
 
     EMAIL_MATCH_ERROR_TEXT = "Your email addresses do not match"
@@ -116,6 +118,7 @@ class DevelopmentConfig(Config):
     IAC_URL = os.getenv("IAC_URL", "http://localhost:8121")
     PARTY_URL = os.getenv("PARTY_URL", "http://localhost:8081")
     SECURE_MESSAGE_URL = os.getenv("SECURE_MESSAGE_URL", "http://localhost:5050")
+    SECURE_MESSAGE_V2_URL = os.getenv("SECURE_MESSAGE_V2_URL", "http://localhost:5051")
     SURVEY_URL = os.getenv("SURVEY_URL", "http://localhost:8080")
 
     WTF_CSRF_TIME_LIMIT = int(os.getenv("WTF_CSRF_TIME_LIMIT", "3200"))

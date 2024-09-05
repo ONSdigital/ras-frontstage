@@ -655,12 +655,12 @@
         },
         "gunicorn": {
             "hashes": [
-                "sha256:350679f91b24062c86e386e198a15438d53a7a8207235a78ba1b53df4c4378d9",
-                "sha256:4a0b436239ff76fb33f11c07a16482c521a7e09c1ce3cc293c2330afe01bec63"
+                "sha256:ec400d38950de4dfd418cff8328b2c8faed0edb0d517d3394e457c317908ca4d",
+                "sha256:f014447a0101dc57e294f6c18ca6b40227a4c90e9bdb586042628030cba004ec"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.7'",
-            "version": "==22.0.0"
+            "version": "==23.0.0"
         },
         "httplib2": {
             "hashes": [
@@ -780,11 +780,11 @@
         },
         "packaging": {
             "hashes": [
-                "sha256:2ddfb553fdf02fb784c234c7ba6ccc288296ceabec964ad2eae3777778130bc5",
-                "sha256:eb82c5e3e56209074766e6885bb04b8c38a0c015d0a30036ebe7ece34c9989e9"
+                "sha256:026ed72c8ed3fcce5bf8950572258698927fd1dbda10a5e981cdf0ac37f4f002",
+                "sha256:5b8f2217dbdbd2f7f384c41c628544e6d52f2d0f53c6d0c3ea61aa5d1d7ff124"
             ],
-            "markers": "python_version >= '3.7'",
-            "version": "==24.0"
+            "markers": "python_version >= '3.8'",
+            "version": "==24.1"
         },
         "phonenumbers": {
             "hashes": [
@@ -1014,11 +1014,11 @@
         },
         "sdc-cryptography": {
             "hashes": [
-                "sha256:1c15e8e412c89c30f129e3b60e2bfc60017a7e9a1e11ef3401e328b154958651",
-                "sha256:b39547b0d80c401e9419e44496430c2e498fd2ff59f76b7b89adf7697d5b23db"
+                "sha256:2b87da178c0d9c6a8add4e2afbe81139bbb056598af0cda61b52f421fb29451f",
+                "sha256:cea2de62e65940efb72bfd3ed677b1e685678521a52eb4c06769ffce506f5847"
             ],
             "index": "pypi",
-            "version": "==1.2.0"
+            "version": "==1.2.1"
         },
         "setuptools": {
             "hashes": [
@@ -1055,11 +1055,11 @@
         },
         "typing-extensions": {
             "hashes": [
-                "sha256:69b1a937c3a517342112fb4c6df7e72fc39a38e7891a5730ed4985b5214b5475",
-                "sha256:b0abd7c89e8fb96f98db18d86106ff1d90ab692004eb746cf6eda2682f91b3cb"
+                "sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d",
+                "sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==4.10.0"
+            "version": "==4.12.2"
         },
         "uritemplate": {
             "hashes": [

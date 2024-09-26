@@ -1,21 +1,42 @@
 
 {% extends "layouts/_block_content.html" %}
 {% from "components/address-output/_macro.njk" import onsAddressOutput %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 
 {% set page_title = "Contact us" %}
+
+{% set breadcrumbsData = [
+    {
+        "text": "Back",
+        "url": "/sign-in/",
+        "id": "b-item"
+    }
+] %}
+{% block breadcrumbs %}
+    {{
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
+    }}
+{% endblock breadcrumbs %}
 
 {% block main %}
 
     <h1 class="ons-u-fs-xl">Contact us</h1>
 
     <h2>
-        Telephone
+        Email
     </h2>
-    <div class="ons-u-fs-r">
-        <p><a href="tel:+44-300-1234-931">0300 1234 931</a></p>
+    <div class="ons-u-mb-xs">
+        <p><a href="mailto:surveys@ons.gov.uk">surveys@ons.gov.uk</a></p>
     </div>
-    <div class="ons-u-fs-r">
-        <p class="ons-u-mb-l">Opening hours:<br />
+    <h2>
+        Phone
+    </h2>
+    <div class="ons-u-mb-xs">
+        <p> +44 300 1234 931<br/>
             Monday to Thursday 8:30am – 5pm<br/>
             Friday 8:30am - 4:30pm</p>
     </div>

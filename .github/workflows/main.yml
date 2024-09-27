@@ -16,8 +16,9 @@ on:
 
 env:
   IMAGE: frontstage
-  REGISTRY_HOSTNAME: eu.gcr.io
+  REGISTRY_HOSTNAME: europe-west2-docker.pkg.dev
   HOST: ${{ secrets.GOOGLE_PROJECT_ID }}
+  GAR_REPOSITORY: ${{ secrets.GAR_REPOSITORY }}
   RELEASE_HOST: ${{ secrets.RELEASE_PROJECT_ID }}
   CHART_DIRECTORY: _infra/helm/frontstage
   SPINNAKER_TOPIC: ${{ secrets.SPINNAKER_TOPIC }}
@@ -71,7 +72,7 @@ jobs:
       - name: Setup Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
       - run: |
-          gcloud auth configure-docker
+          gcloud auth configure-docker europe-west2-docker.pkg.dev
 
       - name: pr docker tag
         if: github.ref != 'refs/heads/main'
@@ -84,11 +85,11 @@ jobs:
       - name: Build Docker Image
         if: github.ref != 'refs/heads/main'
         run: |
-          docker build -t "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":${{ env.pr_number }} -f _infra/docker/Dockerfile .
+          docker build -t "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$GAR_REPOSITORY"/"$IMAGE":${{ env.pr_number }} -f _infra/docker/Dockerfile .
       - name: Push dev image
         if: github.ref != 'refs/heads/main'
         run: |
-          docker push "$REGISTRY_HOSTNAME"/"$HOST"/"$IMAGE":${{ env.pr_number }}
+          docker push "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$GAR_REPOSITORY"/"$IMAGE":${{ env.pr_number }}
       - name: template helm
         run: |
           helm template $CHART_DIRECTORY
@@ -192,12 +193,12 @@ jobs:
       - name: Build Release Image
         if: github.ref == 'refs/heads/main'
         run: |
-          docker build -f _infra/docker/Dockerfile -t "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$IMAGE":latest -t "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$IMAGE":${{ env.version }} .
+          docker build -f _infra/docker/Dockerfile -t "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$GAR_REPOSITORY"/"$IMAGE":latest -t "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$GAR_REPOSITORY"/"$IMAGE":${{ env.version }} .
       - name: Push Release image
         if: github.ref == 'refs/heads/main'
         run: |
-          docker push "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$IMAGE":${{ env.version }}
-          docker push "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$IMAGE":latest
+          docker push "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$GAR_REPOSITORY"/"$IMAGE":${{ env.version }}
+          docker push "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$GAR_REPOSITORY"/"$IMAGE":latest
       
       - name: Publish Charts
         if: github.ref == 'refs/heads/main'

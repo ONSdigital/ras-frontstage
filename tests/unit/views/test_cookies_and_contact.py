@@ -38,4 +38,6 @@ class TestCookiesContact(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue("Contact us".encode() in response.data)
-        self.assertTrue("Opening hours:".encode() in response.data)
+        self.assertTrue('aria-label="Breadcrumbs"'.encode() in response.data)
+        self.assertIn(b'href="mailto:surveys@ons.gov.uk"', response.data)
+        self.assertIn(b'href="/sign-in/"', response.data)

@@ -17,9 +17,9 @@ on:
 env:
   IMAGE: frontstage
   REGISTRY_HOSTNAME: europe-west2-docker.pkg.dev
-  HOST: ${{ secrets.GOOGLE_PROJECT_ID }}
-  GAR_REPOSITORY: ${{ secrets.GAR_REPOSITORY }}
-  RELEASE_HOST: ${{ secrets.RELEASE_PROJECT_ID }}
+  SPINNAKER_GOOGLE_PROJECT_ID: ${{ secrets.GOOGLE_PROJECT_ID }}
+  GAR_REPOSITORY: images
+  GAR_GOOGLE_PROJECT_ID: ${{ secrets.RELEASE_PROJECT_ID }}
   CHART_DIRECTORY: _infra/helm/frontstage
   SPINNAKER_TOPIC: ${{ secrets.SPINNAKER_TOPIC }}
   ARTIFACT_BUCKET: ${{ secrets.ARTIFACT_BUCKET }}
@@ -85,11 +85,11 @@ jobs:
       - name: Build Docker Image
         if: github.ref != 'refs/heads/main'
         run: |
-          docker build -t "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$GAR_REPOSITORY"/"$IMAGE":${{ env.pr_number }} -f _infra/docker/Dockerfile .
+          docker build -t "$REGISTRY_HOSTNAME"/"$GAR_GOOGLE_PROJECT_ID"/"$GAR_REPOSITORY"/"$IMAGE":${{ env.pr_number }} -f _infra/docker/Dockerfile .
       - name: Push dev image
         if: github.ref != 'refs/heads/main'
         run: |
-          docker push "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$GAR_REPOSITORY"/"$IMAGE":${{ env.pr_number }}
+          docker push "$REGISTRY_HOSTNAME"/"$GAR_GOOGLE_PROJECT_ID"/"$GAR_REPOSITORY"/"$IMAGE":${{ env.pr_number }}
       - name: template helm
         run: |
           helm template $CHART_DIRECTORY
@@ -193,12 +193,12 @@ jobs:
       - name: Build Release Image
         if: github.ref == 'refs/heads/main'
         run: |
-          docker build -f _infra/docker/Dockerfile -t "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$GAR_REPOSITORY"/"$IMAGE":latest -t "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$GAR_REPOSITORY"/"$IMAGE":${{ env.version }} .
+          docker build -f _infra/docker/Dockerfile -t "$REGISTRY_HOSTNAME"/"$GAR_GOOGLE_PROJECT_ID"/"$GAR_REPOSITORY"/"$IMAGE":latest -t "$REGISTRY_HOSTNAME"/"$GAR_GOOGLE_PROJECT_ID"/"$GAR_REPOSITORY"/"$IMAGE":${{ env.version }} .
       - name: Push Release image
         if: github.ref == 'refs/heads/main'
         run: |
-          docker push "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$GAR_REPOSITORY"/"$IMAGE":${{ env.version }}
-          docker push "$REGISTRY_HOSTNAME"/"$RELEASE_HOST"/"$GAR_REPOSITORY"/"$IMAGE":latest
+          docker push "$REGISTRY_HOSTNAME"/"$GAR_GOOGLE_PROJECT_ID"/"$GAR_REPOSITORY"/"$IMAGE":${{ env.version }}
+          docker push "$REGISTRY_HOSTNAME"/"$GAR_GOOGLE_PROJECT_ID"/"$GAR_REPOSITORY"/"$IMAGE":latest
       
       - name: Publish Charts
         if: github.ref == 'refs/heads/main'
@@ -215,6 +215,6 @@ jobs:
       - name: CD hook
         if: github.ref == 'refs/heads/main'
         run: |
-          gcloud pubsub topics publish $SPINNAKER_TOPIC --project $HOST \
+          gcloud pubsub topics publish $SPINNAKER_TOPIC --project $SPINNAKER_GOOGLE_PROJECT_ID \
           --message "{ \"kind\": \"storage#object\", \"name\": \"$IMAGE/$IMAGE-${{ env.HELM_VERSION }}.tgz\", \"bucket\": \"$ARTIFACT_BUCKET\" }" \
           --attribute cd="actions"

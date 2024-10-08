@@ -3,8 +3,8 @@ namespace: minikube
 armorPolicy: "ras-cloud-armor-policy"
 
 image:
-  devRepo: eu.gcr.io/ons-rasrmbs-management
-  name: eu.gcr.io/ons-rasrmbs-management
+  devRepo: europe-west2-docker.pkg.dev/ons-rasrmbs-management/images
+  name: europe-west2-docker.pkg.dev/ons-rasrmbs-management/images
   tag: latest
   pullPolicy: Always
 

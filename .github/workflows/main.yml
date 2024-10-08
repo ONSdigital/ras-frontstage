@@ -17,7 +17,7 @@ on:
 env:
   IMAGE: frontstage
   REGISTRY_HOSTNAME: europe-west2-docker.pkg.dev
-  SPINNAKER_GOOGLE_PROJECT_ID: ${{ secrets.GOOGLE_PROJECT_ID }}
+  SPINNAKER_GOOGLE_PROJECT_ID: ${{ secrets.SPINNAKER_GOOGLE_PROJECT_ID }}
   GAR_REPOSITORY: images
   GAR_GOOGLE_PROJECT_ID: ${{ secrets.RELEASE_PROJECT_ID }}
   CHART_DIRECTORY: _infra/helm/frontstage

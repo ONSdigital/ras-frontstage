@@ -116,11 +116,7 @@
                 <p>You are able to use the system and submit data during this period however your response status may not display as completed until after the maintenance has been completed.</p>
             {% endcall %}
         {% endif %}
-
-        <p>New to this service?
-           <a id="create-account" href="/register/create-account/">Create an account</a>
-        </p>
-        <h1 class="ons-u-fs-xl">Sign in</h1>
+        <h1 class="ons-u-fs-xxl">Sign in</h1>
         {% endif %}
 
         {% if errorType == 'failed' %}
@@ -162,17 +158,19 @@
             }}
 
         {% endcall %}
+        <div class="ons-u-fs-r"><p> Need
+            <a href="/passwords/forgot-password">help signing in?</a></p>
+        </div>
         {{
             onsButton({
                 "text": "Sign in",
                 "type": "submit",
-                "classes": "ons-u-mt-l",
+                "classes": "ons-u-mb-l",
                 "id": "sign_in_button",
                 "submitType": "timer"
             })
         }}
-        <div class="ons-u-mt-m">
-            <a href="/passwords/forgot-password">Forgot password?</a>
-        </div>
+        <h1 class="ons-u-fs-l">New to this service?</h1>
+            <a id="create-account" href="/register/create-account/">Create an account</a>
     </form>
 {% endblock main %}

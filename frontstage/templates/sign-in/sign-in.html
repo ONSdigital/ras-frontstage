@@ -12,6 +12,7 @@
 {% if errorType %}
         {% set errorData = {} %}
         {% set errorTitle = 'There is a problem with your answer' %}
+<p>Error Type: {{ errorType }}</p>
         {% if errorType == 'failed' %}
             {% set errorData = {
                     "text": "Sign in details are invalid. Enter an email address and a password",
@@ -19,17 +20,21 @@
                     "classes": "ons-js-inpagelink"
                 } %}
         {% elif errorType['username'] and errorType['password'] %}
-                    <p>Error type 1: {{ errorType }}</p>
             {% set errorData = {
                     "text": "Enter an Email Address",
                     "url": "#username_error",
                     "classes": "ons-js-inpagelink"
                 } %}
         {% elif errorType['password'] %}
-                    <p>Error type 2: {{ errorType }}</p>
             {% set errorData = {
                     "text": "Enter a Password",
                     "url": "#password_error",
+                    "classes": "ons-js-inpagelink"
+                } %}
+        {% elif errorType['username'] %}
+            {% set errorData = {
+                    "text": "Enter an Email Address",
+                    "url": "#username_error",
                     "classes": "ons-js-inpagelink"
                 } %}
         {% endif %}
@@ -127,7 +132,6 @@
                     "error": errorUN
                 })
             }}
-
 
             {% if errorType['password'] and not errorType['username'] %}
                 {% set errorPW = { "text": "Enter a password", "id": 'password_error' } %}

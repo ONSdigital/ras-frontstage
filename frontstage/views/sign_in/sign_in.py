@@ -77,13 +77,23 @@ def login():  # noqa: C901
                 bound_logger.error("Unexpected error was returned from Auth service", auth_error=error_message)
 
             bound_logger.unbind("email")
-            return render_template("sign-in/sign-in.html", form=form, data={"error": {"type": "failed"}}, email=form.username.data,)
+            return render_template(
+                "sign-in/sign-in.html",
+                form=form,
+                data={"error": {"type": "failed"}},
+                email=form.username.data,
+            )
 
         bound_logger.info("Successfully found user in auth service.  Attempting to find user in party service")
         party_json = party_controller.get_respondent_by_email(username)
         if not party_json or "id" not in party_json:
             bound_logger.error("Respondent has an account in auth but not in party")
-            return render_template("sign-in/sign-in.html", form=form, data={"error": {"type": "failed"}}, email=form.username.data,)
+            return render_template(
+                "sign-in/sign-in.html",
+                form=form,
+                data={"error": {"type": "failed"}},
+                email=form.username.data,
+            )
         party_id = party_json["id"]
         bound_logger = bound_logger.bind(party_id=party_id)
 

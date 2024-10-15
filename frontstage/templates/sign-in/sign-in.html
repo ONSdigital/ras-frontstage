@@ -12,7 +12,6 @@
 {% if errorType %}
         {% set errorData = {} %}
         {% set errorTitle = 'There is a problem with your answer' %}
-<p>Error Type: {{ errorType }}</p>
         {% if errorType == 'failed' %}
             {% set errorData = {
                     "text": "Sign in details are invalid. Enter an email address and a password",

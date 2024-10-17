@@ -9,35 +9,41 @@
 
 {% block main %}
 
-{% if errorType %}
-        {% set errorData = {} %}
-        {% set errorTitle = 'There is a problem with your answer' %}
+    {% if errorType %}
+        {% set errorData = [] %}
         {% if errorType == 'failed' %}
-            {% set errorData = {
-                    "text": "Sign in details are invalid. Enter an email address and a password",
+            {% set errorTitle = 'There is 1 error on this page' %}
+            {% do errorData.append(
+                {
+                    "text": "Incorrect email or password",
                     "url": "#username_error",
                     "classes": "ons-js-inpagelink"
-                } %}
-        {% elif errorType['username'] and errorType['password'] %}
-            {% set errorData = {
-                    "text": "Enter an Email Address",
-                    "url": "#username_error",
-                    "classes": "ons-js-inpagelink"
-                } %}
-        {% elif errorType['password'] %}
-            {% set errorData = {
-                    "text": "Enter a Password",
-                    "url": "#password_error",
-                    "classes": "ons-js-inpagelink"
-                } %}
-        {% elif errorType['username'] %}
-            {% set errorData = {
-                    "text": "Enter an Email Address",
-                    "url": "#username_error",
-                    "classes": "ons-js-inpagelink"
-                } %}
+                }
+            ) %}
+        {% elif errorType|length > 1 %}
+            {% set errorTitle = 'There are ' ~ errorType|length ~ ' errors on this page' %}
+            {% for error in errorType %}
+                {% do errorData.append(
+                    {
+                        "text": errorType[error][0],
+                        "url": "#username_error",
+                        "classes": "ons-js-inpagelink"
+                    }
+                ) %}
+            {% endfor %}
+        {% else %}
+            {% set errorTitle = 'There is 1 error on this page' %}
+            {% for error in errorType %}
+                {% do errorData.append(
+                    {
+                        "text": errorType[error][0],
+                        "url": "#username_error",
+                        "classes": "ons-js-inpagelink"
+                    }
+                ) %}
+            {% endfor %}
         {% endif %}
-        
+
         {% call
             onsPanel({
                 "variant": "error",
@@ -45,10 +51,15 @@
                 "title": errorTitle
             })
         %}
+            <p>This <strong>must be corrected</strong> to continue.</p>
 
-            {% if errorData %}
-                <a href="{{ errorData['url'] }}" class="{{ errorData['classes'] }}">{{ errorData['text'] }}</a>
-            {% endif %}
+            {% from "components/list/_macro.njk" import onsList %}
+            {{
+                onsList({
+                    "element": "ol",
+                    "itemsList": errorData
+                })
+            }}
         {% endcall %}
     {% endif %}
 
@@ -109,10 +120,9 @@
         {% endif %}
 
         {% if errorType == 'failed' %}
-            {% set errorUN = { "text": "Sign in details are invalid. Enter an email address and a password", "id": 'username_error' } %}
-            {% set errorPW = { "text": "", "id": 'password_error' } %}
-        {% elif errorType['username'] %}
-            {% set errorUN = { "text": "Enter an email address", "id": 'username_error' } %}
+            {% set errorUN = { "text": "Email Address is required", "id": 'username_error' } %}
+        {% elif errorType %}
+            {% set errorUN = { "text": "Invalid email address", "id": 'username_error' } %}
         {% endif %}
         {%- call onsFieldset({
             "legend": "Sign in",
@@ -127,13 +137,12 @@
                     "label": {
                         "text": "Email Address"
                     },
-                    "value": email if email else '',
                     "error": errorUN
                 })
             }}
 
-            {% if errorType['password'] and not errorType['username'] %}
-                {% set errorPW = { "text": "Enter a password", "id": 'password_error' } %}
+            {% if errorType %}
+                {% set errorPW = { "text": "Password is required", "id": 'password_error' } %}
             {% endif %}
             {{
                 onsPassword({

@@ -87,7 +87,7 @@ class TestSignIn(unittest.TestCase):
         response = self.app.post("/sign-in/", data=self.sign_in_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue("Enter an Email Address".encode() in response.data)
+        self.assertTrue("Email Address is required".encode() in response.data)
 
     @requests_mock.mock()
     def test_sign_in_invalid_username(self, mock_request):
@@ -97,7 +97,7 @@ class TestSignIn(unittest.TestCase):
         response = self.app.post("/sign-in/", data=self.sign_in_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue("Enter an Email Address".encode() in response.data)
+        self.assertTrue("Invalid email address".encode() in response.data)
 
     @requests_mock.mock()
     def test_sign_in_no_password(self, mock_request):
@@ -108,7 +108,7 @@ class TestSignIn(unittest.TestCase):
         response = self.app.post("/sign-in/", data=self.sign_in_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue("Enter a Password".encode() in response.data)
+        self.assertTrue("Password is required".encode() in response.data)
 
     @requests_mock.mock()
     def test_sign_in_success(self, mock_request):
@@ -199,7 +199,7 @@ class TestSignIn(unittest.TestCase):
         mock_request.get(url_get_respondent_email, status_code=404)
         response = self.app.post("/sign-in/", data=self.sign_in_form, follow_redirects=True)
 
-        self.assertTrue("Sign in details are invalid. Enter an email address and a password".encode() in response.data)
+        self.assertTrue("Incorrect email or password".encode() in response.data)
 
     @requests_mock.mock()
     def test_sign_in_unauthorised_auth_credentials(self, mock_request):
@@ -210,7 +210,7 @@ class TestSignIn(unittest.TestCase):
         response = self.app.post("/sign-in/", data=self.sign_in_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue("Sign in details are invalid. Enter an email address and a password".encode() in response.data)
+        self.assertTrue("Incorrect email or password".encode() in response.data)
 
     @requests_mock.mock()
     def test_sign_in_unverified_account(self, mock_request):
@@ -237,7 +237,7 @@ class TestSignIn(unittest.TestCase):
         response = self.app.post("/sign-in/", data=self.sign_in_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue("Sign in details are invalid. Enter an email address and a password".encode() in response.data)
+        self.assertTrue("Incorrect email or password".encode() in response.data)
 
     @requests_mock.mock()
     def test_logout(self, mock_request):

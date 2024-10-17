@@ -81,7 +81,6 @@ def login():  # noqa: C901
                 "sign-in/sign-in.html",
                 form=form,
                 data={"error": {"type": "failed"}},
-                email=form.username.data,
             )
 
         bound_logger.info("Successfully found user in auth service.  Attempting to find user in party service")
@@ -92,7 +91,6 @@ def login():  # noqa: C901
                 "sign-in/sign-in.html",
                 form=form,
                 data={"error": {"type": "failed"}},
-                email=form.username.data,
             )
         party_id = party_json["id"]
         bound_logger = bound_logger.bind(party_id=party_id)

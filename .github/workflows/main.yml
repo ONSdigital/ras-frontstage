@@ -98,7 +98,7 @@ jobs:
         if: github.ref != 'refs/heads/main'
         id: vars
         run: |
-          git fetch --tags
+          git fetch origin survey-respondent-help-journey --tags
           echo "tag=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
       - name: Import BOT GPG key
         run: echo $BOT_GPG_KEY | base64 --decode | gpg --batch --import

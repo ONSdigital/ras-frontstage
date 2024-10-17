@@ -19,7 +19,7 @@ start: load-design-system-templates
 docker-test: REDIS_PORT=6379
 docker-test: test
 
-#remove -i 70612 once jinja2 is upgraded
+#remove -i 70612 once jinja2 is upgraded past v3.1.4
 lint:
 	pipenv check -i 70612
 	pipenv run isort .

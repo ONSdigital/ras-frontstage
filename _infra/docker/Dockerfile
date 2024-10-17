@@ -9,6 +9,7 @@ WORKDIR /app
 COPY . /app
 
 RUN groupadd -r appuser && useradd -r -g appuser -u 9000 appuser && chown -R appuser:appuser .
+RUN mkdir /home/appuser && chown appuser:appuser /home/appuser
 RUN pipenv install --deploy --system
 
 USER appuser

@@ -79,7 +79,7 @@ class TestAccountDelete(unittest.TestCase):
             self.assertTrue("New to this service?".encode() in response.data)
             self.assertTrue("Email Address".encode() in response.data)
             self.assertTrue("Password".encode() in response.data)
-            self.assertTrue("Forgot password?".encode() in response.data)
+            self.assertTrue("Create an account".encode() in response.data)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")

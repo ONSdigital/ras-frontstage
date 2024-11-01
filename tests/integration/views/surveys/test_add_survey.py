@@ -34,7 +34,7 @@ class TestAddSurvey(unittest.TestCase):
         response = self.app.get("/surveys/add-survey")
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue("Add a survey".encode() in response.data)
+        self.assertTrue("Add a new survey".encode() in response.data)
         self.assertNotIn("Help".encode(), response.data)
 
     @patch("frontstage.controllers.iac_controller.get_iac_from_enrolment")

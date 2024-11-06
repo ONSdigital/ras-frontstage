@@ -6,36 +6,11 @@
 {% from "components/button/_macro.njk" import onsButton %}
 {% from "components/panel/_macro.njk" import onsPanel %}
 
-{% set page_title = "Survey share email send instructions" %}
+{% set page_title = "Send instructions" %}
 
 {% set breadcrumbsData = [
     {
-        "text": "Surveys",
-        "url": "/surveys/todo",
-        "id": "b-item-1"
-    },
-    {
-        "text": "Account",
-        "url": "/my-account",
-        "id": "b-item-2"
-    },
-    {
-        "text": "Share Surveys",
-        "url": "/my-account/share-surveys",
-        "id": "b-item-3"
-    },
-    {
-        "text": "Select business",
-        "url": "/my-account/share-surveys/business-selection",
-        "id": "b-item-4"
-    },
-    {
-        "text": "Select survey",
-        "url": "/my-account/share-surveys/survey-selection",
-        "id": "b-item-5"
-    },
-    {
-        "text": "Enter email address",
+        "text": "Back",
         "url": "/my-account/share-surveys/recipient-email-address"
     }
 ] %}
@@ -76,33 +51,32 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-    <h1 class="ons-u-fs-xl">Send instructions</h1>
-    <p>We will send an email to <strong>{{ email }}</strong> with instructions to access the following surveys:</p>
+    <h1 class="ons-u-fs-xl ons-u-mb-s">Send instructions</h1>
+    <p>We will email a link with instructions to <a>{{ email }}</a>.</p>
+    <p class="ons-u-mb-l">Once approved, they will have access to:</p>
     {% for business in share_dict %}
-        <h2 class="ons-u-fs-m">{{ share_dict[business].name }}</h2>
-        {% if share_dict[business] | length > 0 %}
-        <div class="ons-text-indent">
-            {% set surveyList = [] %}
+        <h2 class="ons-u-fs-m">Business: {{ share_dict[business].name }}</h2>
+        {% if share_dict[business] | length > 0 %}{% set surveyList = [] %}
             {% for survey in share_dict[business].surveys %}
                 {% do surveyList.append(
                     {
-                        "text": survey['longName']
+                        "text": survey['longName'],
                     }
                 ) %}
             {% endfor %}
             {{
-                onsList({
-                    "variants": 'bare',
-                    "itemsList": surveyList
-                })
-            }}
-        </div>
+            onsList({
+                "element": 'ul',
+                "itemsList": surveyList,
+                "classes": "ons-u-mb-l",
+            })
+        }}
         {% endif %}
     {% endfor %}
     <form action="" method="post">
         {{ form.csrf_token }}
         <input type="hidden" name="email_address" value="{{ email }}"/>
-        <div class="ons-field ons-u-mt-l">
+        <div class="ons-field">
             <div class="ons-btn-group">
                 {{
                     onsButton({
@@ -110,8 +84,6 @@
                         "submitType": "timer"
                     })
                 }}
-                <a href="{{ url_for('account_bp.share_survey_email_entry') }}"
-                    role="button" class="ons-btn ons-btn--link ons-btn--secondary"><span class="ons-btn__inner">Cancel</span></a>
             </div>
         </div>
     </form>

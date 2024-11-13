@@ -19,8 +19,8 @@ logger = wrap_logger(logging.getLogger(__name__))
 @jwt_authorization(request)
 def add_survey(session):
     form = EnrolmentCodeForm(request.form)
-    error_message = "Enter a valid enrolment code"
-    data = {}
+    error_returned = False
+    error_message = ""
     if request.method == "POST" and form.validate():
         enrolment_code = request.form.get("enrolment_code").lower()
         logger.info("Enrolment code submitted when attempting to add survey", enrolment_code=enrolment_code)
@@ -32,13 +32,13 @@ def add_survey(session):
                     "Enrolment code not found when attempting to add survey",
                     enrolment_code=enrolment_code,
                 )
-                data = error_message
+                error_returned = True
             if iac and not iac["active"]:
                 logger.info(
                     "Enrolment code not active when attempting to add survey",
                     enrolment_code=enrolment_code,
                 )
-                data = error_message
+                error_returned = True
         except ApiError as exc:
             if exc.status_code == 400:
                 logger.info(
@@ -46,7 +46,7 @@ def add_survey(session):
                     status_code=exc.status_code,
                     enrolment_code=enrolment_code,
                 )
-                data = error_message
+                error_returned = True
             else:
                 logger.error(
                     "Failed to submit enrolment code when attempting to add survey",
@@ -54,7 +54,7 @@ def add_survey(session):
                     enrolment_code=enrolment_code,
                 )
                 raise
-        if not data:
+        if not error_returned:
             logger.info("Enrolment code validation complete; now attempting encryption", enrolment_code=enrolment_code)
             cryptographer = Cryptographer()
             encrypted_enrolment_code = cryptographer.encrypt(enrolment_code.encode()).decode()
@@ -68,11 +68,13 @@ def add_survey(session):
                 )
             )
     elif request.method == "POST" and not form.validate():
-        data = error_message
         logger.info(
             "Invalid character length, must be 12 characters",
             enrolment_code=request.form.get("enrolment_code").lower(),
             enrolment_code_length=len(request.form.get("enrolment_code")),
         )
+        error_returned = True
 
-    return render_template("surveys/surveys-add.html", session=session, form=form, data={"error": data})
+    if error_returned:
+        error_message = "Enter a valid enrolment code"
+    return render_template("surveys/surveys-add.html", session=session, form=form, data=error_message)

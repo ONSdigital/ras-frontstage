@@ -25,8 +25,8 @@
 {% endblock breadcrumbs %}
 
 {% block content %}
-    {% if data["error"] %}
-        {% set errorMsg = data["error"] %}
+    {% if data %}
+        {% set errorMsg = data %}
         {% set panelText = { "text": errorMsg, "id": "enrolment_code_error" } %}
         {% set panelVariant = "error" %}
         {% call

@@ -19,7 +19,8 @@ logger = wrap_logger(logging.getLogger(__name__))
 @jwt_authorization(request)
 def add_survey(session):
     form = EnrolmentCodeForm(request.form)
-
+    error_message = "Enter a valid enrolment code"
+    data = {}
     if request.method == "POST" and form.validate():
         enrolment_code = request.form.get("enrolment_code").lower()
         logger.info("Enrolment code submitted when attempting to add survey", enrolment_code=enrolment_code)
@@ -31,22 +32,13 @@ def add_survey(session):
                     "Enrolment code not found when attempting to add survey",
                     enrolment_code=enrolment_code,
                 )
-                template_data = {"error": {"type": "failed"}}
-                return (
-                    render_template("surveys/surveys-add.html", form=form, data=template_data),
-                    200,
-                )
-            if not iac["active"]:
+                data = error_message
+            if iac and not iac["active"]:
                 logger.info(
                     "Enrolment code not active when attempting to add survey",
                     enrolment_code=enrolment_code,
                 )
-                template_data = {"error": {"type": "failed"}}
-                return render_template(
-                    "surveys/surveys-add.html",
-                    form=form,
-                    data=template_data,
-                )
+                data = error_message
         except ApiError as exc:
             if exc.status_code == 400:
                 logger.info(
@@ -54,12 +46,7 @@ def add_survey(session):
                     status_code=exc.status_code,
                     enrolment_code=enrolment_code,
                 )
-                template_data = {"error": {"type": "failed"}}
-                return render_template(
-                    "surveys/surveys-add.html",
-                    form=form,
-                    data=template_data,
-                )
+                data = error_message
             else:
                 logger.error(
                     "Failed to submit enrolment code when attempting to add survey",
@@ -67,27 +54,25 @@ def add_survey(session):
                     enrolment_code=enrolment_code,
                 )
                 raise
-
-        logger.info("Enrolment code validation complete; now attempting encryption", enrolment_code=enrolment_code)
-        cryptographer = Cryptographer()
-        encrypted_enrolment_code = cryptographer.encrypt(enrolment_code.encode()).decode()
-        logger.info("Enrolment code decoding successful", enrolment_code=enrolment_code)
-        return redirect(
-            url_for(
-                "surveys_bp.survey_confirm_organisation",
-                encrypted_enrolment_code=encrypted_enrolment_code,
-                _external=True,
-                _scheme=getenv("SCHEME", "http"),
+        if not data:
+            logger.info("Enrolment code validation complete; now attempting encryption", enrolment_code=enrolment_code)
+            cryptographer = Cryptographer()
+            encrypted_enrolment_code = cryptographer.encrypt(enrolment_code.encode()).decode()
+            logger.info("Enrolment code decoding successful", enrolment_code=enrolment_code)
+            return redirect(
+                url_for(
+                    "surveys_bp.survey_confirm_organisation",
+                    encrypted_enrolment_code=encrypted_enrolment_code,
+                    _external=True,
+                    _scheme=getenv("SCHEME", "http"),
+                )
             )
-        )
-
     elif request.method == "POST" and not form.validate():
+        data = error_message
         logger.info(
             "Invalid character length, must be 12 characters",
             enrolment_code=request.form.get("enrolment_code").lower(),
             enrolment_code_length=len(request.form.get("enrolment_code")),
         )
-        template_data = {"error": {"type": "failed"}}
-        return render_template("surveys/surveys-add.html", session=session, form=form, data=template_data)
 
-    return render_template("surveys/surveys-add.html", session=session, form=form, data={"error": {}})
+    return render_template("surveys/surveys-add.html", session=session, form=form, data={"error": data})

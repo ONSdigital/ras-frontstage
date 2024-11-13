@@ -1,39 +1,33 @@
-
 {% extends "layouts/_block_content.html" %}
 {% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/button/_macro.njk" import onsButton %}
 {% from "components/details/_macro.njk" import onsDetails %}
 {% from "components/input/_macro.njk" import onsInput %}
 {% from "components/panel/_macro.njk" import onsPanel %}
-{% set errorType = data['error']['type'] %}
 {% set panelVariant = "branded" %}
 {% set panelText = "" %}
 
 {% set page_title = "Add a new survey" %}
-
-{% set breadcrumbsData = [
-    {
-        "text": "Back",
-        "url": "/surveys/todo",
-        "id": "b-item-1"
-    }
-] %}
 
 {% block breadcrumbs %}
     {{
         onsBreadcrumbs({
             "ariaLabel": "Breadcrumbs",
             "id": "breadcrumbs",
-            "itemsList": breadcrumbsData
+            "itemsList":
+                [{
+                    "text": "Back",
+                    "url": "/surveys/todo",
+                    "id": "b-item-1"
+                }]
         })
     }}
 {% endblock breadcrumbs %}
 
 {% block content %}
-
-    {% if errorType == "failed" %}
-        {% set errorMsg = 'Enter a valid enrolment code' %}
-        {% set panelText = { "text": errorMsg, "id": 'enrolment_code_error' } %}
+    {% if data["error"] %}
+        {% set errorMsg = data["error"] %}
+        {% set panelText = { "text": errorMsg, "id": "enrolment_code_error" } %}
         {% set panelVariant = "error" %}
         {% call
             onsPanel({
@@ -61,7 +55,7 @@
 
     <section>
         <form id="enrolment-code"
-            action="{{ url_for('surveys_bp.add_survey') }}"
+            action="{{ url_for("surveys_bp.add_survey") }}"
             method="post"
             class="form">
             {{ form.csrf_token }}
@@ -87,8 +81,8 @@
             }}
             {% endcall %}
             {% call onsPanel({
-                "variant": 'bare',
-                "iconType": 'lock'
+                "variant": "bare",
+                "iconType": "lock"
                 })
             %}
                 Your personal information is protected by law
@@ -113,7 +107,7 @@
             })
         %}
             <p>If your enrolment code has been lost, does not work or you did not receive one, request a new code.</p>
-            <p>To do this, call +44 300 1234 931 or <a href='/surveys/help/something-else'>send a message</a></p>
+            <p>To do this, call +44 300 1234 931 or <a href="/surveys/help/something-else">send a message</a></p>
         {% endcall %}
     </section>
 

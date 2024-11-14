@@ -101,8 +101,8 @@ class TestAddSurvey(unittest.TestCase):
 
         response = self.app.post("/surveys/add-survey", data={"enrolment_code": enrolment_code})
 
-        self.assertEqual(response.status_code, 500)
-        self.assertTrue("An error has occurred".encode() in response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("Enter a valid enrolment code".encode() in response.data)
 
     def test_add_survey_invalid_enrolment_code_length(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)

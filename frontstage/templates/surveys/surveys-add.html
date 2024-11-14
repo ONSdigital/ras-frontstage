@@ -25,9 +25,8 @@
 {% endblock breadcrumbs %}
 
 {% block content %}
-    {% if data %}
-        {% set errorMsg = data %}
-        {% set panelText = { "text": errorMsg, "id": "enrolment_code_error" } %}
+    {% if error %}
+        {% set panelText = { "text": error, "id": "enrolment_code_error" } %}
         {% set panelVariant = "error" %}
         {% call
             onsPanel({
@@ -43,7 +42,7 @@
                     "element": "ol",
                     "itemsList": [
                         {
-                            "text": errorMsg,
+                            "text": error,
                             "url": "#enrolment_code_error",
                             "classes": "js-inpagelink"
                         }

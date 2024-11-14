@@ -5,7 +5,6 @@
 {% from "components/input/_macro.njk" import onsInput %}
 {% from "components/panel/_macro.njk" import onsPanel %}
 {% set panelVariant = "branded" %}
-{% set panelText = "" %}
 
 {% set page_title = "Add a new survey" %}
 
@@ -26,7 +25,6 @@
 
 {% block content %}
     {% if error %}
-        {% set panelText = { "text": error, "id": "enrolment_code_error" } %}
         {% set panelVariant = "error" %}
         {% call
             onsPanel({
@@ -64,7 +62,6 @@
             <p>You need the enrolment code that was sent to you to add a new survey</p>
 
             {% call onsPanel({
-                "text": panelText,
                 "variant": panelVariant,
                 }) %}
             {{

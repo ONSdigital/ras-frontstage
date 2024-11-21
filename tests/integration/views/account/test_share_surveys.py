@@ -142,11 +142,14 @@ class TestShareSurvey(unittest.TestCase):
             follow_redirects=True,
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn("New respondents email address".encode(), response.data)
-        self.assertIn("We will send instructions to the email address that you provide.".encode(), response.data)
+        self.assertIn("Enter recipient's email address".encode(), response.data)
+        self.assertIn(
+            "We need the email address of the person who will be responding to your surveys.".encode(), response.data
+        )
         self.assertIn("Enter email address".encode(), response.data)
-        self.assertIn("Make sure you have permission to give us their email address.".encode(), response.data)
+        self.assertIn("Make sure you have their permission to give us their email address.".encode(), response.data)
         self.assertTrue("Continue".encode() in response.data)
+        self.assertTrue("Cancel".encode() in response.data)
 
     @requests_mock.mock()
     def test_share_survey_select_option_selected_fails_max_user_validation(self, mock_request):
@@ -224,11 +227,12 @@ class TestShareSurvey(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Send instructions".encode(), response.data)
         self.assertIn(
-            "We will email a link with instructions to <a>a@a.com</a>.".encode(),
+            "will send an email to <strong>a@a.com</strong> with instructions to access the following surveys:".encode(),
             response.data,
         )
         self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
         self.assertTrue("Send".encode() in response.data)
+        self.assertTrue("Cancel".encode() in response.data)
 
     @requests_mock.mock()
     def test_share_survey_share_instruction_done(self, mock_request):

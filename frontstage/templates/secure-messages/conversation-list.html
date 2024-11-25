@@ -60,7 +60,7 @@
                                 },
                   "fromText": message.from or 'Unavailable',
                   "dateText": message.sent_date or 'Unavailable',
-                  "body": '<xmp>'+ message['body']|truncate(80, False, '...', 0) +'</xmp>'
+                  "body": '<pre>'+ message['body']|truncate(80, False, '...', 0) +'</pre>'
                 }
             ) %}
         {% endfor %}

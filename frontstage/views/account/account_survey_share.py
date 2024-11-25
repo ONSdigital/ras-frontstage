@@ -80,6 +80,7 @@ def share_survey_survey_select(session):
         surveys = get_surveys_listed_against_party_and_business_id(business_id, party_id)
         share_dict[selected_business[0]["id"]] = {
             "name": selected_business[0]["name"],
+            "sampleUnitRef": selected_business[0]["sampleUnitRef"],
             "surveys": surveys,
         }
     error = request.args.get("error", "")

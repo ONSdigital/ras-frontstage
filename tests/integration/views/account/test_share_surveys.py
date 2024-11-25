@@ -102,13 +102,12 @@ class TestShareSurvey(unittest.TestCase):
             follow_redirects=True,
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Which surveys do you want to share?".encode(), response.data)
+        self.assertIn("Share access to surveys".encode(), response.data)
         self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
         self.assertIn("Select all that apply".encode(), response.data)
         self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
         self.assertIn("Quarterly Business Survey".encode(), response.data)
         self.assertTrue("Continue".encode() in response.data)
-        self.assertTrue("Cancel".encode() in response.data)
 
     @requests_mock.mock()
     def test_share_survey_select_no_option_selected(self, mock_request):

@@ -50,7 +50,6 @@
         {% from "components/message-list/_macro.njk" import onsMessageList %}
         {% set messageList = [] %}
         {% for message in messages %}
-        {{ message.subject }}
             {% do messageList.append(
                 {
                   "id": "message-link-" ~ loop.index,

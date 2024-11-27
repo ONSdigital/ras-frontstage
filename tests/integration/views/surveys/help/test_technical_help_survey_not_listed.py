@@ -67,14 +67,14 @@ class TestTechnicalHelpSurveyNotListed(unittest.TestCase):
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
     @patch("frontstage.views.surveys.help.technical_help.send_message")
-    @patch("frontstage.controllers.party_controller.get_respondent_enabled_enrolments")
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
     def test_create_message_page_technical_success(
-        self, mock_request, get_respondent_enabled_enrolments, send_message, get_survey_list
+        self, mock_request, get_respondent_enrolments, send_message, get_survey_list
     ):
         mock_request.get(url_banner_api, status_code=404)
         send_message.return_value = "a5e67f8a-0d90-4d60-a15a-7e334c75402b"
         get_survey_list.return_value = survey_list_todo
-        get_respondent_enabled_enrolments.return_value = respondent_enrolments
+        get_respondent_enrolments.return_value = respondent_enrolments
         form = {"body": "My survey is not listed"}
         response = self.app.post(
             "/surveys/technical/send-message?option=my-survey-is-not-listed",

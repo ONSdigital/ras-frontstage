@@ -31,34 +31,32 @@ class TestSurveyList(unittest.TestCase):
         self.patcher.stop()
 
     @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
-    @patch("frontstage.controllers.party_controller.get_respondent_enabled_enrolments")
-    def test_survey_list_todo(self, mock_request, get_respondent_enabled_enrolments, get_survey_list):
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    def test_survey_list_todo(self, mock_request, get_respondent_enrolments, get_survey_list):
         mock_request.get(url_banner_api, status_code=404)
         get_survey_list.return_value = survey_list_todo
-        get_respondent_enabled_enrolments.return_value = respondent_enrolments
+        get_respondent_enrolments.return_value = respondent_enrolments
 
         response = self.app.get("/surveys/todo")
         self.assertEqual(response.status_code, 200)
 
     @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
-    @patch("frontstage.controllers.party_controller.get_respondent_enabled_enrolments")
-    def test_survey_list_history(self, mock_request, get_respondent_enabled_enrolments, get_survey_list):
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    def test_survey_list_history(self, mock_request, get_respondent_enrolments, get_survey_list):
         mock_request.get(url_banner_api, status_code=404)
         get_survey_list.return_value = survey_list_history
-        get_respondent_enabled_enrolments.return_value = respondent_enrolments
+        get_respondent_enrolments.return_value = respondent_enrolments
 
         response = self.app.get("/surveys/history")
 
         self.assertEqual(response.status_code, 200)
 
     @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
-    @patch("frontstage.controllers.party_controller.get_respondent_enabled_enrolments")
-    def test_survey_list_todo_when_no_enrolments(
-        self, mock_request, get_respondent_enabled_enrolments, get_survey_list
-    ):
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    def test_survey_list_todo_when_no_enrolments(self, mock_request, get_respondent_enrolments, get_survey_list):
         mock_request.get(url_banner_api, status_code=404)
         get_survey_list.return_value = {}
-        get_respondent_enabled_enrolments.return_value = []
+        get_respondent_enrolments.return_value = []
         response = self.app.get("/surveys/todo")
 
         self.assertEqual(response.status_code, 200)

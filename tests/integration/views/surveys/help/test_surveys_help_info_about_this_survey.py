@@ -289,16 +289,14 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("Cancel".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_enabled_enrolments")
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
     @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
     @patch("frontstage.views.surveys.help.surveys_help.send_message")
-    def test_create_message_post_success(
-        self, mock_request, send_message, get_survey_list, get_respondent_enabled_enrolments
-    ):
+    def test_create_message_post_success(self, mock_request, send_message, get_survey_list, get_respondent_enrolments):
         mock_request.get(url_banner_api, status_code=404)
         send_message.return_value = "a5e67f8a-0d90-4d60-a15a-7e334c75402b"
         get_survey_list.return_value = survey_list_todo
-        get_respondent_enabled_enrolments.return_value = respondent_enrolments
+        get_respondent_enrolments.return_value = respondent_enrolments
         form = {"body": "info-something-else"}
         response = self.app.post(
             f"/surveys/help/info-about-this-survey/info-something-else/send-message{self._help_details()}",
@@ -310,12 +308,12 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("Message sent.".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_enabled_enrolments")
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
     @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
-    def test_create_message_post_failure(self, mock_request, get_survey_list, get_respondent_enabled_enrolments):
+    def test_create_message_post_failure(self, mock_request, get_survey_list, get_respondent_enrolments):
         mock_request.get(url_banner_api, status_code=404)
         get_survey_list.return_value = survey_list_todo
-        get_respondent_enabled_enrolments.return_value = respondent_enrolments
+        get_respondent_enrolments.return_value = respondent_enrolments
         form = {"body": ""}
         response = self.app.post(
             f"/surveys/help/info-about-this-survey/info-something-else/send-message{self._help_details()}",

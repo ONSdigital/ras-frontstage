@@ -35,7 +35,7 @@ def get_survey_list(session, tag):
         tag=tag,
     )
 
-    enrolment_data = party_controller.get_respondent_enabled_enrolments(party_id)
+    enrolment_data = party_controller.get_respondent_enrolments(party_id)
     survey_list = party_controller.get_survey_list_details_for_party(
         enrolment_data, tag, business_party_id=business_id, survey_id=survey_id
     )

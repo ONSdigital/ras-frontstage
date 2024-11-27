@@ -31,10 +31,10 @@ class TestAccountDelete(unittest.TestCase):
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
-    @patch("frontstage.controllers.party_controller.get_respondent_enabled_enrolments")
-    def test_account_delete(self, mock_request, get_respondent_enabled_enrolments, get_respondent_party_by_id):
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    def test_account_delete(self, mock_request, get_respondent_enrolments, get_respondent_party_by_id):
         mock_request.get(url_banner_api, status_code=404)
-        get_respondent_enabled_enrolments.return_value = []
+        get_respondent_enrolments.return_value = []
         get_respondent_party_by_id.return_value = {
             "emailAddress": "example@example.com",
             "firstName": "first_name",
@@ -59,11 +59,11 @@ class TestAccountDelete(unittest.TestCase):
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
-    @patch("frontstage.controllers.party_controller.get_respondent_enabled_enrolments")
-    def test_account_delete_confirm(self, mock_request, get_respondent_enabled_enrolments, get_respondent_party_by_id):
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    def test_account_delete_confirm(self, mock_request, get_respondent_enrolments, get_respondent_party_by_id):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.delete(url_auth_delete, status_code=204)
-        get_respondent_enabled_enrolments.return_value = []
+        get_respondent_enrolments.return_value = []
         get_respondent_party_by_id.return_value = {
             "emailAddress": "example@example.com",
             "firstName": "first_name",
@@ -86,13 +86,11 @@ class TestAccountDelete(unittest.TestCase):
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
-    @patch("frontstage.controllers.party_controller.get_respondent_enabled_enrolments")
-    def test_account_delete_not_allowed(
-        self, mock_request, get_respondent_enabled_enrolments, get_respondent_party_by_id
-    ):
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    def test_account_delete_not_allowed(self, mock_request, get_respondent_enrolments, get_respondent_party_by_id):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.delete(url_auth_delete, status_code=204)
-        get_respondent_enabled_enrolments.return_value = respondent_enrolments
+        get_respondent_enrolments.return_value = respondent_enrolments
         get_respondent_party_by_id.return_value = respondent_party
         with app.app_context():
             response = self.app.get("/my-account/delete", follow_redirects=True)

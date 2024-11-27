@@ -66,12 +66,12 @@ class TestTransferSurvey(unittest.TestCase):
         self.patcher.stop()
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_enabled_enrolments")
-    def test_transfer_survey_business_select(self, mock_request, get_respondent_enabled_enrolments):
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    def test_transfer_survey_business_select(self, mock_request, get_respondent_enrolments):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
         mock_request.get(url_get_business_details, status_code=200, json=[dummy_business])
-        get_respondent_enabled_enrolments.return_value = respondent_enrolments
+        get_respondent_enrolments.return_value = respondent_enrolments
         response = self.app.get("/my-account/transfer-surveys/business-selection")
         self.assertEqual(response.status_code, 200)
         self.assertTrue("For which businesses do you want to transfer your surveys?".encode() in response.data)
@@ -81,12 +81,12 @@ class TestTransferSurvey(unittest.TestCase):
         self.assertTrue("Cancel".encode() in response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_enabled_enrolments")
-    def test_transfer_survey_business_select_no_option_selected(self, mock_request, get_respondent_enabled_enrolments):
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    def test_transfer_survey_business_select_no_option_selected(self, mock_request, get_respondent_enrolments):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
         mock_request.get(url_get_business_details, status_code=200, json=[dummy_business])
-        get_respondent_enabled_enrolments.return_value = respondent_enrolments
+        get_respondent_enrolments.return_value = respondent_enrolments
         response = self.app.post(
             "/my-account/transfer-surveys/business-selection", data={"option": None}, follow_redirects=True
         )
@@ -95,14 +95,14 @@ class TestTransferSurvey(unittest.TestCase):
         self.assertIn("You need to choose a business".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_enabled_enrolments")
-    def test_transfer_survey_select(self, mock_request, get_respondent_enabled_enrolments):
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    def test_transfer_survey_select(self, mock_request, get_respondent_enrolments):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
         mock_request.get(url_get_business_details, status_code=200, json=[business_party])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
-        get_respondent_enabled_enrolments.return_value = respondent_enrolments
+        get_respondent_enrolments.return_value = respondent_enrolments
         response = self.app.post(
             "/my-account/transfer-surveys/business-selection",
             data={"checkbox-answer": "99941a3f-8e32-40e4-b78a-e039a2b437ca"},
@@ -118,14 +118,14 @@ class TestTransferSurvey(unittest.TestCase):
         self.assertTrue("Cancel".encode() in response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_enabled_enrolments")
-    def test_transfer_survey_select_no_option_selected(self, mock_request, get_respondent_enabled_enrolments):
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    def test_transfer_survey_select_no_option_selected(self, mock_request, get_respondent_enrolments):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
         mock_request.get(url_get_business_details, status_code=200, json=[business_party])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
-        get_respondent_enabled_enrolments.return_value = respondent_enrolments
+        get_respondent_enrolments.return_value = respondent_enrolments
         with self.app.session_transaction() as mock_session:
             mock_session["transfer_survey_data"] = {business_party["id"]: None}
         response = self.app.post(
@@ -162,9 +162,9 @@ class TestTransferSurvey(unittest.TestCase):
         self.assertTrue("Cancel".encode() in response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_enabled_enrolments")
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
     def test_transfer_survey_select_option_selected_fails_max_user_validation(
-        self, mock_request, get_respondent_enabled_enrolments
+        self, mock_request, get_respondent_enrolments
     ):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
@@ -172,7 +172,7 @@ class TestTransferSurvey(unittest.TestCase):
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         mock_request.get(url_get_user_count, status_code=200, json=52)
-        get_respondent_enabled_enrolments.return_value = respondent_enrolments
+        get_respondent_enrolments.return_value = respondent_enrolments
         with self.app.session_transaction() as mock_session:
             mock_session["transfer_survey_data"] = {business_party["id"]: None}
         response = self.app.post(

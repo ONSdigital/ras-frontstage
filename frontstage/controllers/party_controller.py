@@ -41,7 +41,7 @@ def get_respondent_party_by_id(party_id: str) -> dict:
     return response.json()
 
 
-def get_respondent_enabled_enrolments(party_id: str, payload: dict = {}) -> dict:
+def get_respondent_enrolments(party_id: str, payload: dict = {}) -> dict:
     payload["status"] = "ENABLED"
     url = f"{app.config['PARTY_URL']}/party-api/v1/enrolments/respondent/{party_id}"
 
@@ -418,7 +418,7 @@ def get_survey_list_details_for_party(enrolment_data: dict, tag: str, business_p
     surveys_ids, business_ids = get_unique_survey_and_business_ids(enrolment_data)
 
     # This is a dictionary that will store all the data that is going to be cached instead of making multiple calls
-    # inside the for loop for get_respondent_enabled_enrolments.
+    # inside the for loop for get_respondent_enrolments.
     cache_data = {"cases": dict()}
     redis_cache = RedisCache()
 
@@ -491,7 +491,7 @@ def display_button(status, ci_type):
 
 
 def is_respondent_enrolled(party_id: str, business_party_id: str, survey: dict) -> bool:
-    if get_respondent_enabled_enrolments(party_id, {"business_id": business_party_id, "survey_id": survey["id"]}):
+    if get_respondent_enrolments(party_id, {"business_id": business_party_id, "survey_id": survey["id"]}):
         return True
     return False
 
@@ -523,7 +523,7 @@ def get_list_of_business_for_party(party_id: str) -> list:
     :return: list of businesses
     """
     logger.info("Getting enrolment data for the party", party_id=party_id)
-    enrolment_data = get_respondent_enabled_enrolments(party_id)
+    enrolment_data = get_respondent_enrolments(party_id)
     business_ids = {enrolment["business_id"] for enrolment in enrolment_data}
     logger.info("Getting businesses against business ids", business_ids=business_ids, party_id=party_id)
     return get_business_by_id(business_ids)
@@ -554,7 +554,7 @@ def get_surveys_listed_against_party_and_business_id(business_id: str, party_id:
     :return: list of surveys
     """
 
-    enrolment_data = get_respondent_enabled_enrolments(party_id, {"business_id": business_id})
+    enrolment_data = get_respondent_enrolments(party_id, {"business_id": business_id})
     survey_ids = {enrolment["survey_id"] for enrolment in enrolment_data}
     surveys = []
     for survey in survey_ids:

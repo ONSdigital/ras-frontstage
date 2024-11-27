@@ -142,14 +142,12 @@ class TestShareSurvey(unittest.TestCase):
             follow_redirects=True,
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Enter recipient's email address".encode(), response.data)
-        self.assertIn(
-            "We need the email address of the person who will be responding to your surveys.".encode(), response.data
-        )
+        self.assertIn("Back".encode(), response.data)
+        self.assertIn("New respondents email address".encode(), response.data)
+        self.assertIn("We will send instructions to the email address that you provide.".encode(), response.data)
         self.assertIn("Enter email address".encode(), response.data)
-        self.assertIn("Make sure you have their permission to give us their email address.".encode(), response.data)
+        self.assertIn("Make sure you have permission to give us their email address.".encode(), response.data)
         self.assertTrue("Continue".encode() in response.data)
-        self.assertTrue("Cancel".encode() in response.data)
 
     @requests_mock.mock()
     def test_share_survey_select_option_selected_fails_max_user_validation(self, mock_request):
@@ -225,14 +223,15 @@ class TestShareSurvey(unittest.TestCase):
             follow_redirects=True,
         )
         self.assertEqual(response.status_code, 200)
+        self.assertIn("Back".encode(), response.data)
         self.assertIn("Send instructions".encode(), response.data)
         self.assertIn(
-            "will send an email to <strong>a@a.com</strong> with instructions to access the following surveys:".encode(),
+            "We will email a link with instructions to <strong>a@a.com</strong>.".encode(),
             response.data,
         )
+        self.assertIn("Once approved, they will have access to: ".encode(), response.data)
         self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
         self.assertTrue("Send".encode() in response.data)
-        self.assertTrue("Cancel".encode() in response.data)
 
     @requests_mock.mock()
     def test_share_survey_share_instruction_done(self, mock_request):
@@ -250,16 +249,14 @@ class TestShareSurvey(unittest.TestCase):
             "/my-account/share-surveys/send-instruction", data={"email_address": "a@a.com"}, follow_redirects=True
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn(
-            "We have sent an email to the new person who will be responding to ONS surveys.".encode(), response.data
-        )
+        self.assertIn("An email with instructions has been sent to <strong>a@a.com</strong>.".encode(), response.data)
         self.assertTrue(
-            "They need to follow the link in the email to confirm their email address and finish setting "
-            "up their account.".encode() in response.data
+            "They will need to follow the link in this email to confirm their email address and finish setting up "
+            "their account.".encode() in response.data
         )
-        self.assertIn("Email not arrived? It may be in their junk folder.".encode(), response.data)
+        self.assertIn("This email might go to a junk or spam folder.".encode(), response.data)
         self.assertIn(
-            "If it does not arrive in the next 15 minutes, please call 0300 1234 931.".encode(), response.data
+            "If they do not receive this email in 15 minutes, call us on +44 300 1234 931".encode(), response.data
         )
         self.assertTrue("Back to surveys".encode() in response.data)
 

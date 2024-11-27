@@ -5,32 +5,14 @@
 {% from "components/list/_macro.njk" import onsList %}
 {% from "components/panel/_macro.njk" import onsPanel %}
 {% from "components/button/_macro.njk" import onsButton %}
-{% set page_title = "Survey share email entry" %}
+
+{% set page_title = "New respondents email address" %}
+
 {% set breadcrumbsData = [
     {
-        "text": "Surveys",
-        "url": "/surveys/todo",
-        "id": "b-item-1"
-    },
-    {
-        "text": "Account",
-        "url": "/my-account",
-        "id": "b-item-2"
-    },
-    {
-        "text": "Share Surveys",
-        "url": "/my-account/share-surveys",
-        "id": "b-item-3"
-    },
-    {
-        "text": "Select business",
-        "url": "/my-account/share-surveys/business-selection",
-        "id": "b-item-4"
-    },
-    {
-        "text": "Select survey",
+        "text": "Back",
         "url": "/my-account/share-surveys/survey-selection",
-        "id": "b-item-5"
+        "id": "b-item-4"
     }
 ] %}
 
@@ -77,17 +59,14 @@
             }}
         {% endcall %}
     {% endif %}
-
-    <h1>Enter recipient's email address</h1>
-    <p>We need the email address of the person who will be responding to your surveys.</p>
+    <div id="main_page_text">
+        <h1 class="ons-u-mb-s">New respondents email address</h1>
+        <p>We will send instructions to the email address that you provide.</p>
+        <p class="ons-u-mb-m">Once we confirm the new respondents access, they will be able to respond to the surveys you have selected.</p>
+    </div>
     {% set checkboxData = [] %}
     <form action="" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-        {{
-            onsPanel({
-                "body": '<p>Make sure you have their permission to give us their email address.</p>'
-            })
-        }}
         {% if errors.email_address %}
             {% set errorEmailAddress = { "text": errors['email_address'][0],  "id": 'email_address_error' } %}
             {% set emailAddress = form.email_address.data %}
@@ -104,19 +83,18 @@
                 "value": emailAddress,
             })
         }}
+        {% call onsPanel({
+            "variant": "warn",
+            "classes": "ons-u-mb-l"
+            })
+        %}
+            Make sure you have permission to give us their email address.
+        {% endcall %}
         <div class="ons-field ons-u-mt-l">
             {{
                 onsButton({
                     "text": "Continue",
                     "submitType": "timer"
-                })
-            }}
-            {{
-                onsButton({
-                    "url": url_for('account_bp.share_survey_survey_select'),
-                    "text": 'Cancel',
-                    "variants": 'secondary',
-                    "noIcon": true
                 })
             }}
         </div>

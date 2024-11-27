@@ -315,6 +315,7 @@ def send_instruction(session):
         return redirect(url_for("account_bp.send_instruction_get"))
     return render_template(
         "surveys/surveys-share/almost-done.html",
+        email=email,
     )
 
 

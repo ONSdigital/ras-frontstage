@@ -2,7 +2,9 @@ import unittest
 from collections import namedtuple
 from unittest.mock import patch
 
+import requests_mock
 import responses
+from requests import ConnectionError, Timeout
 
 from config import TestingConfig
 from frontstage import app
@@ -12,14 +14,16 @@ from frontstage.controllers.party_controller import (
     get_respondent_enrolments_for_started_collex,
     get_survey_list_details_for_party,
 )
-from frontstage.exceptions.exceptions import ApiError
+from frontstage.exceptions.exceptions import ApiError, ServiceUnavailableException
 from tests.integration.mocked_services import (
     business_party,
     case,
     collection_exercise,
+    respondent_enrolments,
     respondent_party,
     url_get_business_party,
     url_get_respondent_email,
+    url_get_respondent_enrolments,
     url_get_respondent_party,
     url_notify_party_and_respondent_account_locked,
     url_post_add_survey,
@@ -68,6 +72,45 @@ class TestPartyController(unittest.TestCase):
                 party = party_controller.get_respondent_party_by_id(respondent_party["id"])
 
                 self.assertTrue(party is None)
+
+    @requests_mock.Mocker()
+    def test_get_respondent_enabled_enrolments(self, request_mock):
+        request_mock.get(url_get_respondent_enrolments, json=respondent_enrolments)
+        with app.app_context():
+            party = party_controller.get_respondent_enabled_enrolments(respondent_party["id"])
+            self.assertEqual(respondent_enrolments, party)
+
+    @requests_mock.Mocker()
+    def test_get_respondent_enabled_enrolments_404(self, request_mock):
+        request_mock.get(url_get_respondent_enrolments, status_code=404)
+        with app.app_context():
+            with self.assertRaises(ApiError):
+                party_controller.get_respondent_enabled_enrolments(respondent_party["id"])
+
+    @requests_mock.Mocker()
+    def test_get_respondent_enabled_enrolments_400(self, request_mock):
+        request_mock.get(url_get_respondent_enrolments, status_code=400)
+        with app.app_context():
+            with self.assertRaises(ApiError):
+                party_controller.get_respondent_enabled_enrolments(respondent_party["id"])
+
+    @requests_mock.Mocker()
+    def test_get_respondent_enabled_enrolments_ConnectionError(self, request_mock):
+        request_mock.get(url_get_respondent_enrolments, exc=ConnectionError)
+
+        with app.app_context():
+            with self.assertRaises(ServiceUnavailableException) as exception:
+                party_controller.get_respondent_enabled_enrolments(respondent_party["id"])
+        self.assertEqual(["Party service returned a connection error"], exception.exception.errors)
+
+    @requests_mock.Mocker()
+    def test_get_respondent_enabled_enrolments_timeout(self, request_mock):
+        request_mock.get(url_get_respondent_enrolments, exc=Timeout)
+
+        with app.app_context():
+            with self.assertRaises(ServiceUnavailableException) as exception:
+                party_controller.get_respondent_enabled_enrolments(respondent_party["id"])
+        self.assertEqual(["Party service has timed out"], exception.exception.errors)
 
     def test_add_survey_success(self):
         with responses.RequestsMock() as rsps:

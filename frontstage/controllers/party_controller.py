@@ -41,20 +41,21 @@ def get_respondent_party_by_id(party_id: str) -> dict:
     return response.json()
 
 
-def get_respondent_enabled_enrolments(party_id: str, payload={}) -> dict:
+def get_respondent_enabled_enrolments(party_id: str, payload: dict = {}) -> dict:
     payload["status"] = "ENABLED"
     url = f"{app.config['PARTY_URL']}/party-api/v1/enrolments/respondent/{party_id}"
 
-    response = requests.get(url, auth=app.config["BASIC_AUTH"], json=payload)
     try:
+        response = requests.get(url, auth=app.config["BASIC_AUTH"], json=payload)
         response.raise_for_status()
     except HTTPError as e:
-        if e.response.status_code == 404:
-            logger.error("Failed to find respondent", party_id=party_id)
-            raise ApiError(logger, response)
-        else:
-            logger.error("Bad request")
-
+        logger.error(
+            "HTTPError returned from Party service when getting respondent enabled enrolments",
+            status_code=e.response.status_code,
+            party_id=party_id,
+            payload=payload,
+        )
+        raise ApiError(logger, response)
     except ConnectionError:
         raise ServiceUnavailableException("Party service returned a connection error", 503)
     except Timeout:

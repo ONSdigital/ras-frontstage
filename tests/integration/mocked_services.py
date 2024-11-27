@@ -107,6 +107,7 @@ url_download_ci = f"{app.config['COLLECTION_INSTRUMENT_URL']}/collection-instrum
 url_get_respondent_by_email = f"{app.config['PARTY_URL']}/party-api/v1/respondents/email"
 url_get_business_party = f"{app.config['PARTY_URL']}/party-api/v1/businesses/id/{business_party['id']}"
 url_get_respondent_party = f"{app.config['PARTY_URL']}/party-api/v1/respondents/party_id/{party['id']}"
+url_get_respondent_enrolments = f"{app.config['PARTY_URL']}/party-api/v1/enrolments/respondent/{party['id']}"
 url_get_case = f"{app.config['CASE_URL']}/cases/{case['id']}"
 url_get_case_by_enrolment_code = f"{app.config['CASE_URL']}/cases/iac/{enrolment_code}"
 url_get_case_categories = f"{app.config['CASE_URL']}/categories"

@@ -324,4 +324,4 @@ def send_instruction(session):
 def share_survey_done(_):
     flask_session.pop("share", None)
     flask_session.pop("share_survey_recipient_email_address", None)
-    return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
+    return redirect(url_for("surveys_bp.get_survey_list", tag="todo", survey_shared=True))

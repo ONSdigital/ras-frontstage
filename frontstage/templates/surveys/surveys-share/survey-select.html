@@ -69,7 +69,7 @@
             "classes": "ons-u-mb-m",
         })
     %}
-    <p>You will still have access to surveys you share access to. If you no longer need access to the survey, <a href="{{ url_for('account_bp.transfer_survey_overview') }}">transfer your surveys</a></p>
+    <p>You will still have access to surveys you share access to. If you no longer need access to the survey, <a href="{{ url_for('account_bp.transfer_survey_overview') }}">transfer surveys</a></p>
     {% endcall %}
     {%
         call onsDetails({
@@ -78,11 +78,14 @@
             "title": "How do I share access to a survey?"
         })
     %}
-        <p>Choose the surveys you want to share access to.</p>
+        <p>To share access to a survey:</p>
     {{
         onsList({
             "element": 'ol',
             "itemsList": [
+                {
+                    "text": "Choose the surveys you want to share access to."
+                },
                 {
                     "text": "Enter the email address of the person who will be responding to the surveys."
                 },
@@ -113,6 +116,7 @@
                 "legend": "Organisation: " + share_dict[business].name,
                 "legendClasses": "ons-u-mb-xs",
                 "description": "RU ref: " + share_dict[business].sampleUnitRef,
+                "descriptionClasses": "ons-u-mb-l",
                 "checkboxesLabel": "Select all that apply",
                 "checkboxesLabelClasses": "ons-u-mt-m",
                 "classes": "ons-u-mb-l",
@@ -145,7 +149,7 @@
                 {% do checkboxesData | setAttribute("checkboxes", checkboxData) %}
             {{ onsCheckboxes(checkboxesData) }}
         {% endfor %}
-        <div class="ons-field ons-u-mt-l">
+        <div class="ons-field">
             {{
                 onsButton({
                     "text": "Continue",

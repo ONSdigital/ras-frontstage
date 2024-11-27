@@ -145,7 +145,7 @@ class TestShareSurvey(unittest.TestCase):
         self.assertIn("Back".encode(), response.data)
         self.assertIn("New respondents email address".encode(), response.data)
         self.assertIn("We will send instructions to the email address that you provide.".encode(), response.data)
-        self.assertIn("Enter email address".encode(), response.data)
+        self.assertIn("New respondents email address".encode(), response.data)
         self.assertIn("Make sure you have permission to give us their email address.".encode(), response.data)
         self.assertTrue("Continue".encode() in response.data)
 

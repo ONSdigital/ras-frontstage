@@ -35,9 +35,9 @@ def get_survey_list(session, tag):
         tag=tag,
     )
 
-    enrolment_data = party_controller.get_respondent_enrolments(party_id)
+    respondent_enrolments = party_controller.get_respondent_enrolments(party_id)
     survey_list = party_controller.get_survey_list_details_for_party(
-        enrolment_data, tag, business_party_id=business_id, survey_id=survey_id
+        respondent_enrolments, tag, business_party_id=business_id, survey_id=survey_id
     )
     sorted_survey_list = sorted(survey_list, key=lambda k: datetime.strptime(k["submit_by"], "%d %b %Y"), reverse=True)
     logger.info(
@@ -60,7 +60,7 @@ def get_survey_list(session, tag):
                 added_survey=added_survey,
                 already_enrolled=already_enrolled,
                 unread_message_count=unread_message_count,
-                delete_option_allowed=True if len(enrolment_data) == 0 else False,
+                delete_option_allowed=True if len(respondent_enrolments) == 0 else False,
             )
         )
 

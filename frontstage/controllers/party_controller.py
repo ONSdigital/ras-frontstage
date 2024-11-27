@@ -554,8 +554,8 @@ def get_surveys_listed_against_party_and_business_id(business_id: str, party_id:
     :return: list of surveys
     """
 
-    enrolment_data = get_respondent_enrolments(party_id, {"business_id": business_id})
-    survey_ids = {enrolment["survey_id"] for enrolment in enrolment_data}
+    respondent_enrolments = get_respondent_enrolments(party_id, {"business_id": business_id})
+    survey_ids = {enrolment["survey_id"] for enrolment in respondent_enrolments}
     surveys = []
     for survey in survey_ids:
         response = survey_controller.get_survey(app.config["SURVEY_URL"], app.config["BASIC_AUTH"], survey)

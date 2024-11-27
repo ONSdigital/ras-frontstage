@@ -3,6 +3,7 @@ import logging
 
 import requests
 from flask import current_app as app
+from requests.exceptions import ConnectionError, HTTPError, Timeout
 from structlog import wrap_logger
 from werkzeug.exceptions import NotFound
 
@@ -10,7 +11,11 @@ from frontstage.common.thread_wrapper import ThreadWrapper
 from frontstage.common.utilities import obfuscate_email
 from frontstage.common.verification import decode_email_token
 from frontstage.controllers import case_controller, survey_controller
-from frontstage.exceptions.exceptions import ApiError, UserDoesNotExist
+from frontstage.exceptions.exceptions import (
+    ApiError,
+    ServiceUnavailableException,
+    UserDoesNotExist,
+)
 
 CLOSED_STATE = ["COMPLETE", "COMPLETEDBYPHONE", "NOLONGERREQUIRED"]
 
@@ -20,7 +25,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 def get_respondent_party_by_id(party_id: str) -> dict:
     logger.info("Retrieving party from party service by id", party_id=party_id)
 
-    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/id/{party_id}"
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/party_id/{party_id}"
     response = requests.get(url, auth=app.config["BASIC_AUTH"])
 
     if response.status_code == 404:
@@ -33,6 +38,28 @@ def get_respondent_party_by_id(party_id: str) -> dict:
         raise ApiError(logger, response)
 
     logger.info("Successfully retrieved party details", party_id=party_id)
+    return response.json()
+
+
+def get_respondent_enabled_enrolments(party_id: str, payload={}) -> dict:
+    payload["status"] = "ENABLED"
+    url = f"{app.config['PARTY_URL']}/party-api/v1/enrolments/respondent/{party_id}"
+
+    response = requests.get(url, auth=app.config["BASIC_AUTH"], json=payload)
+    try:
+        response.raise_for_status()
+    except HTTPError as e:
+        if e.response.status_code == 404:
+            logger.error("Failed to find respondent", party_id=party_id)
+            raise ApiError(logger, response)
+        else:
+            logger.error("Bad request")
+
+    except ConnectionError:
+        raise ServiceUnavailableException("Party service returned a connection error", 503)
+    except Timeout:
+        raise ServiceUnavailableException("Party service has timed out", 504)
+
     return response.json()
 
 
@@ -299,20 +326,6 @@ def confirm_pending_survey(batch_number):
     return response
 
 
-def get_respondent_enrolments(respondent: dict):
-    """
-    Returns a generator containing all the business_id and survey_id for all the active enrolments for the
-    respondent.
-
-    :param respondent: A dict containing respondent data
-    """
-    if "associations" in respondent:
-        for association in respondent["associations"]:
-            for enrolment in association["enrolments"]:
-                if enrolment["enrolmentStatus"] == "ENABLED":
-                    yield {"business_id": association["partyId"], "survey_id": enrolment["surveyId"]}
-
-
 def get_respondent_enrolments_for_started_collex(enrolment_data, collection_exercises):
     """This will only filter out enrolments for surveys that have 0 live collection exercises.
 
@@ -365,7 +378,7 @@ def caching_case_data(cache_data, business_ids, tag):
         thread.join()
 
 
-def get_survey_list_details_for_party(respondent: dict, tag: str, business_party_id: str, survey_id: str):
+def get_survey_list_details_for_party(enrolment_data: dict, tag: str, business_party_id: str, survey_id: str):
     """
     Gets a list of cases (and any useful metadata) for a respondent.  Depending on the tag the list of cases will be
     ones that require action (in the form of an EQ or SEFT submission); Or they will be cases that have been completed
@@ -392,20 +405,19 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
               - Create an entry in the returned list for each of these cases as the respondent is implicitly part
                 of the case by being enrolled for the survey with that business.
 
-    :param respondent: A dict containing respondent data
+    :param enrolment_data: A dict containing enrolment data
     :param tag: This is the page that is being called e.g. to-do, history
     :param business_party_id: This is the businesses uuid
     :param survey_id: This is the surveys uuid
 
     """
-    enrolment_data = list(get_respondent_enrolments(respondent))
 
     # Gets the survey ids and business ids from the enrolment data that has been generated.
     # Converted to list to avoid multiple calls to party (and the list size is small).
     surveys_ids, business_ids = get_unique_survey_and_business_ids(enrolment_data)
 
     # This is a dictionary that will store all the data that is going to be cached instead of making multiple calls
-    # inside the for loop for get_respondent_enrolments.
+    # inside the for loop for get_respondent_enabled_enrolments.
     cache_data = {"cases": dict()}
     redis_cache = RedisCache()
 
@@ -478,11 +490,8 @@ def display_button(status, ci_type):
 
 
 def is_respondent_enrolled(party_id: str, business_party_id: str, survey: dict) -> bool:
-    respondent = get_respondent_party_by_id(party_id)
-    enrolments = get_respondent_enrolments(respondent)
-    for enrolment in enrolments:
-        if enrolment["business_id"] == business_party_id and enrolment["survey_id"] == survey["id"]:
-            return True
+    if get_respondent_enabled_enrolments(party_id, {"business_id": business_party_id, "survey_id": survey["id"]}):
+        return True
     return False
 
 
@@ -513,8 +522,7 @@ def get_list_of_business_for_party(party_id: str) -> list:
     :return: list of businesses
     """
     logger.info("Getting enrolment data for the party", party_id=party_id)
-    respondent = get_respondent_party_by_id(party_id)
-    enrolment_data = get_respondent_enrolments(respondent)
+    enrolment_data = get_respondent_enabled_enrolments(party_id)
     business_ids = {enrolment["business_id"] for enrolment in enrolment_data}
     logger.info("Getting businesses against business ids", business_ids=business_ids, party_id=party_id)
     return get_business_by_id(business_ids)
@@ -544,9 +552,9 @@ def get_surveys_listed_against_party_and_business_id(business_id: str, party_id:
     :param party_id: The respondent's party id
     :return: list of surveys
     """
-    respondent = get_respondent_party_by_id(party_id)
-    enrolment_data = get_respondent_enrolments(respondent)
-    survey_ids = {enrolment["survey_id"] for enrolment in enrolment_data if enrolment["business_id"] == business_id}
+
+    enrolment_data = get_respondent_enabled_enrolments(party_id, {"business_id": business_id})
+    survey_ids = {enrolment["survey_id"] for enrolment in enrolment_data}
     surveys = []
     for survey in survey_ids:
         response = survey_controller.get_survey(app.config["SURVEY_URL"], app.config["BASIC_AUTH"], survey)

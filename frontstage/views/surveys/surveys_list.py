@@ -35,13 +35,9 @@ def get_survey_list(session, tag):
         tag=tag,
     )
 
-    # This logic is added to make sure a user is provided an option to delete an account if there is no
-    # active enrolment which is ENABLED
-    respondent = party_controller.get_respondent_party_by_id(party_id)
-    delete_option_allowed = is_delete_account_respondent_allowed(respondent)
-
+    enrolment_data = party_controller.get_respondent_enabled_enrolments(party_id)
     survey_list = party_controller.get_survey_list_details_for_party(
-        respondent, tag, business_party_id=business_id, survey_id=survey_id
+        enrolment_data, tag, business_party_id=business_id, survey_id=survey_id
     )
     sorted_survey_list = sorted(survey_list, key=lambda k: datetime.strptime(k["submit_by"], "%d %b %Y"), reverse=True)
     logger.info(
@@ -64,7 +60,7 @@ def get_survey_list(session, tag):
                 added_survey=added_survey,
                 already_enrolled=already_enrolled,
                 unread_message_count=unread_message_count,
-                delete_option_allowed=delete_option_allowed,
+                delete_option_allowed=True if len(enrolment_data) == 0 else False,
             )
         )
 

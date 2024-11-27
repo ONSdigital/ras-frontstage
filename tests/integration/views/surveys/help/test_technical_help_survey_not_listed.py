@@ -6,6 +6,7 @@ import requests_mock
 from frontstage import app
 from tests.integration.mocked_services import (
     encoded_jwt_token,
+    respondent_enrolments,
     survey,
     survey_list_todo,
     url_banner_api,
@@ -64,15 +65,16 @@ class TestTechnicalHelpSurveyNotListed(unittest.TestCase):
         self.assertIn("Cancel".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
     @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
     @patch("frontstage.views.surveys.help.technical_help.send_message")
+    @patch("frontstage.controllers.party_controller.get_respondent_enabled_enrolments")
     def test_create_message_page_technical_success(
-        self, mock_request, send_message, get_survey_list, get_respondent_party_by_id
+        self, mock_request, get_respondent_enabled_enrolments, send_message, get_survey_list
     ):
         mock_request.get(url_banner_api, status_code=404)
         send_message.return_value = "a5e67f8a-0d90-4d60-a15a-7e334c75402b"
         get_survey_list.return_value = survey_list_todo
+        get_respondent_enabled_enrolments.return_value = respondent_enrolments
         form = {"body": "My survey is not listed"}
         response = self.app.post(
             "/surveys/technical/send-message?option=my-survey-is-not-listed",
@@ -84,10 +86,8 @@ class TestTechnicalHelpSurveyNotListed(unittest.TestCase):
         self.assertIn("Message sent.".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
-    @patch("frontstage.controllers.conversation_controller.send_message")
     @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
-    def test_create_message_page_technical_fail(self, mock_request, get_survey, send_message, get_survey_list):
+    def test_create_message_page_technical_fail(self, mock_request, get_survey):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         form = {"body": ""}

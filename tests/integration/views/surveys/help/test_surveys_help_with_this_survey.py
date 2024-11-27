@@ -6,6 +6,7 @@ import requests_mock
 from frontstage import app
 from tests.integration.mocked_services import (
     encoded_jwt_token,
+    respondent_enrolments,
     respondent_party,
     survey_list_todo,
     url_banner_api,
@@ -212,15 +213,17 @@ class TestSurveyHelpWithThisSurvey(unittest.TestCase):
         self.assertIn("Cancel".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
     @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
     @patch("frontstage.views.surveys.help.surveys_help.send_message")
-    def test_create_message_post_success(self, mock_request, send_message, get_survey_list, get_respondent_party_by_id):
+    @patch("frontstage.controllers.party_controller.get_respondent_enabled_enrolments")
+    def test_create_message_post_success(
+        self, mock_request, get_respondent_enabled_enrolments, send_message, get_survey_list
+    ):
         mock_request.get(url_banner_api, status_code=404)
         send_message.return_value = "a5e67f8a-0d90-4d60-a15a-7e334c75402b"
         get_survey_list.return_value = survey_list_todo
         form = {"body": "completing-this-survey-something-else"}
-        get_respondent_party_by_id.return_value = respondent_party
+        get_respondent_enabled_enrolments.return_value = respondent_enrolments
         response = self.app.post(
             f"/surveys/help/help-completing-this-survey/completing-this-survey-something-else/send-message{self._help_details()}",
             data=form,

@@ -221,13 +221,6 @@ class TestPartyController(unittest.TestCase):
         self.assertDictEqual({"survey_id": "survey1", "enrolment_data": "enrolment1"}, result[0])
         self.assertDictEqual({"survey_id": "survey3", "enrolment_data": "enrolment3"}, result[1])
 
-    def test_get_respondent_enrolments(self):
-        enrolments = party_controller.get_respondent_enrolments(respondent_party)
-
-        for enrolment in enrolments:
-            self.assertTrue(enrolment["business_id"] is not None)
-            self.assertTrue(enrolment["survey_id"] is not None)
-
     def test_display_button(self):
         Combination = namedtuple("Combination", ["status", "ci_type", "expected"])
         combinations = [
@@ -255,7 +248,6 @@ class TestPartyController(unittest.TestCase):
         get_business_party.side_effect = self._business_details_side_effect()
         get_survey.side_effect = self._survey_details_side_effect()
         get_collection_instrument.side_effect = [{"type": "SEFT"}, {"type": "EQ"}, {"type": "EQ"}, {"type": "EQ"}]
-        respondent = self.respondent_details()
 
         expected_response = [
             {
@@ -333,40 +325,37 @@ class TestPartyController(unittest.TestCase):
                     _get_case_return_value_by_business_id,
                 ):
                     # when get_survey_list_details_for_party is called
-                    survey_list_details_for_party = get_survey_list_details_for_party(respondent, "todo", None, None)
+                    survey_list_details_for_party = get_survey_list_details_for_party(
+                        self.enrolment_data(), "todo", None, None
+                    )
 
                     # Then the correct list is returned
                     self.assertEqual(list(survey_list_details_for_party), expected_response)
 
     @staticmethod
-    def respondent_details():
-        return {
-            "associations": [
-                {
-                    "enrolments": [{"enrolmentStatus": "ENABLED", "surveyId": "41320b22-b425-4fba-a90e-718898f718ce"}],
-                    "partyId": "bebee450-46da-4f8b-a7a6-d4632087f2a3",
-                },
-                {
-                    "enrolments": [{"enrolmentStatus": "ENABLED", "surveyId": "02b9c366-7397-42f7-942a-76dc5876d86d"}],
-                    "partyId": "fd4d0444-d40a-4c47-996a-de6f5f20658b",
-                },
-                {
-                    "enrolments": [{"enrolmentStatus": "ENABLED", "surveyId": "02b9c366-7397-42f7-942a-76dc5876d86d"}],
-                    "partyId": "3ab241f7-b5cc-4cab-a7e6-b6ad6283cbe1",
-                },
-                {
-                    "enrolments": [{"enrolmentStatus": "ENABLED", "surveyId": "02b9c366-7397-42f7-942a-76dc5876d86d"}],
-                    "partyId": "4865ad73-684e-4c2c-ba00-aece24f1f27e",
-                },
-            ],
-            "emailAddress": "example@example.com",
-            "firstName": "john",
-            "id": "da457118-b048-403a-99d6-472fad2726fa",
-            "lastName": "doe",
-            "sampleUnitType": "BI",
-            "status": "ACTIVE",
-            "telephone": "07777000000",
-        }
+    def enrolment_data():
+        return [
+            {
+                "business_id": "bebee450-46da-4f8b-a7a6-d4632087f2a3",
+                "survey_id": "41320b22-b425-4fba-a90e-718898f718ce",
+                "status": "ENABLED",
+            },
+            {
+                "business_id": "fd4d0444-d40a-4c47-996a-de6f5f20658b",
+                "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d",
+                "status": "ENABLED",
+            },
+            {
+                "business_id": "3ab241f7-b5cc-4cab-a7e6-b6ad6283cbe1",
+                "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d",
+                "status": "ENABLED",
+            },
+            {
+                "business_id": "4865ad73-684e-4c2c-ba00-aece24f1f27e",
+                "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d",
+                "status": "ENABLED",
+            },
+        ]
 
     @staticmethod
     def _survey_details_side_effect():

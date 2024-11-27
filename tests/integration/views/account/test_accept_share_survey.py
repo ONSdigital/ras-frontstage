@@ -21,7 +21,7 @@ url_get_share_survey_verify = f"{app.config['PARTY_URL']}/party-api/v1/pending-s
 url_post_accept_share_survey = (
     f"{app.config['PARTY_URL']}/party-api/v1/pending-survey/confirm-pending-surveys/" f"{batch_number}"
 )
-url_get_shared_by_respondent_party = f"{app.config['PARTY_URL']}/party-api/v1/respondents/id/sharetest@test.com"
+url_get_shared_by_respondent_party = f"{app.config['PARTY_URL']}/party-api/v1/respondents/party_id/sharetest@test.com"
 url_get_business_details = f"{app.config['PARTY_URL']}/party-api/v1/businesses"
 url_get_user_count = (
     f"{app.config['PARTY_URL']}/party-api/v1/pending-survey-users-count?"

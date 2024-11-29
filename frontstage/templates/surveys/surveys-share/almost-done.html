@@ -1,57 +1,23 @@
 {% extends "layouts/_block_content.html" %}
-{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/button/_macro.njk" import onsButton %}
+{% from "components/panel/_macro.njk" import onsPanel %}
 
-{% set page_title = "Share surveys overview" %}
-{% set breadcrumbsData = [
-    {
-        "text": "Surveys",
-        "url": "/surveys/todo",
-        "id": "b-item-1"
-    },
-    {
-        "text": "Account",
-        "url": "/my-account",
-        "id": "b-item-2"
-    },
-    {
-        "text": "Share Surveys",
-        "url": "/my-account/share-surveys",
-        "id": "b-item-3"
-    },
-    {
-        "text": "Select business",
-        "url": "/my-account/share-surveys/business-selection",
-        "id": "b-item-4"
-    },
-    {
-        "text": "Select survey",
-        "url": "/my-account/share-surveys/survey-selection",
-        "id": "b-item-5"
-    },
-    {
-        "text": "Enter email address",
-        "url": "/my-account/share-surveys/recipient-email-address",
-        "id": "b-item-6"
-    }
-] %}
-
-{% block breadcrumbs %}
-    {{
-        onsBreadcrumbs({
-            "ariaLabel": "Breadcrumbs",
-            "id": "breadcrumbs",
-            "itemsList": breadcrumbsData
-        })
-    }}
-{% endblock breadcrumbs %}
+{% set page_title = "Instructions sent" %}
 
 {% block main %}
-    <h1 class="ons-u-fs-xl">Almost done</h1>
-    <p>We have sent an email to the new person who will be responding to ONS surveys.</p>
-    <p>They need to follow the link in the email to confirm their email address and finish setting up their account.</p>
-    <p>Email not arrived? It may be in their junk folder.</p>
-    <p>If it does not arrive in the next 15 minutes, please call 0300 1234 931.</p>
+    <h1 class="ons-u-mb-s">Instructions sent</h1>
+    <p>An email with instructions has been sent to <strong>{{ email }}</strong>.</p>
+    <p class="ons-u-mb-m">They will need to follow the link in this email to confirm their email address and finish setting up their account.</p>
+
+    {% call onsPanel({
+        "variant": "warn",
+        "classes": "ons-u-mb-s"
+        })
+    %}
+        This email might go to a junk or spam folder.
+    {% endcall %}
+
+    <p class="ons-u-mb-l">If they do not receive this email in 15 minutes, call us on +44 300 1234 931</p>
 
     <div class="ons-field ons-u-mt-l">
         <div class="ons-grid ons-grid--flex ons-grid--gutterless ons-grid--vertical-center ons-grid--no-wrap@s ons-u-mt-m ons-u-mb-m">

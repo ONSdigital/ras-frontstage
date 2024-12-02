@@ -26,6 +26,7 @@ def get_survey_list(session, tag):
     business_id = request.args.get("business_party_id")
     survey_id = request.args.get("survey_id")
     already_enrolled = request.args.get("already_enrolled")
+    survey_shared = request.args.get("survey_shared")
     logger.info(
         "Retrieving survey list",
         party_id=party_id,
@@ -65,6 +66,7 @@ def get_survey_list(session, tag):
                 already_enrolled=already_enrolled,
                 unread_message_count=unread_message_count,
                 delete_option_allowed=delete_option_allowed,
+                survey_shared=survey_shared,
             )
         )
 

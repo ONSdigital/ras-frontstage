@@ -76,18 +76,3 @@ def get_survey_list(session, tag):
             history=True,
             unread_message_count=unread_message_count,
         )
-
-
-def is_delete_account_respondent_allowed(respondent: dict) -> bool:
-    """
-    Determine if the user has any active enrolments for the purpose of displaying the delete account option
-
-    :param respondent: A dict containing respondent data
-    :return: True if allowed, false if not.
-    """
-    if "associations" in respondent:
-        for association in respondent["associations"]:
-            for enrolment in association["enrolments"]:
-                if enrolment["enrolmentStatus"] == "ENABLED":
-                    return False
-    return True

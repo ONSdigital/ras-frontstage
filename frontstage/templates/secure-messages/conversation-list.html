@@ -29,11 +29,11 @@
                 "tabQuery": "closed" if is_closed else "open",
                 "itemsList": [
                     {
-                        "title": "Open",
+                        "text": "Open",
                         "url": url_for('secure_message_bp.view_conversation_list')
                     },
                     {
-                        "title": "Closed",
+                        "text": "Closed",
                         "url": url_for('secure_message_bp.view_conversation_list', is_closed='true')
                     }
                 ]
@@ -54,11 +54,13 @@
                 {
                   "id": "message-link-" ~ loop.index,
                   "unread": true if message['unread'] else false,
-                  "url": url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) ~ "#latest-message",
-                  "subject": message.subject,
+                  "subject": {
+                                "url": url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) ~ "#latest-message",
+                                "text": message.subject
+                                },
                   "fromText": message.from or 'Unavailable',
                   "dateText": message.sent_date or 'Unavailable',
-                  "body": '<xmp>'+ message['body']|truncate(80, False, '...', 0) +'</xmp>'
+                  "body": '<pre>'+ message['body']|truncate(80, False, '...', 0) +'</pre>'
                 }
             ) %}
         {% endfor %}

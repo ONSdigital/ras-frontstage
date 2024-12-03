@@ -57,21 +57,21 @@
                     "error": errorMsgText
                 })
             }}
-            <div class="ons-grid ons-grid--flex ons-grid--gutterless ons-grid--vertical-center ons-grid--no-wrap@s ons-u-mt-m ons-u-mb-m">
-                    <div class="ons-grid__col">
-                        {{
-                            onsButton({
-                                "text": "Continue",
-                                "type": "submit",
-                                "id": "continue_button",
-                                "submitType": "timer"
-                            })
-                        }}
-                    </div>
-                    <div class="ons-grid__col ons-u-ml-m">
-                        <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" id="cancel_button" role="button">Cancel</a>
-                    </div>
+            <div class="ons-grid ons-grid-flex ons-grid--gutterless ons-grid-flex--vertical-center ons-grid--no-wrap@s ons-u-mt-m ons-u-mb-m">
+                <div class="ons-grid__col">
+                    {{
+                        onsButton({
+                            "text": "Continue",
+                            "type": "submit",
+                            "id": "continue_button",
+                            "submitType": "timer"
+                        })
+                    }}
                 </div>
+                <div class="ons-grid__col ons-u-ml-m">
+                    <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" id="cancel_button" role="button">Cancel</a>
+                </div>
+            </div>
         </form>
     </section>
 

@@ -21,7 +21,9 @@ url_get_transfer_survey_verify = f"{app.config['PARTY_URL']}/party-api/v1/pendin
 url_post_accept_transfer_survey = (
     f"{app.config['PARTY_URL']}/party-api/v1/pending-survey/confirm-pending-surveys/" f"{batch_number}"
 )
-url_get_transferd_by_respondent_party = f"{app.config['PARTY_URL']}/party-api/v1/respondents/id/transfertest@test.com"
+url_get_transferd_by_respondent_party = (
+    f"{app.config['PARTY_URL']}/party-api/v1/respondents/party_id/transfertest@test.com"
+)
 url_get_business_details = f"{app.config['PARTY_URL']}/party-api/v1/businesses"
 url_get_user_count = (
     f"{app.config['PARTY_URL']}/party-api/v1/pending-survey-users-count?"

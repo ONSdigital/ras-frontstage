@@ -6,7 +6,7 @@ import requests_mock
 from frontstage import app
 from tests.integration.mocked_services import (
     encoded_jwt_token,
-    respondent_party,
+    respondent_enrolments,
     survey,
     survey_list_todo,
     url_banner_api,
@@ -129,18 +129,18 @@ class TestSurveyHelpInfoAboutThisSurvey(unittest.TestCase):
         self.assertIn("Cancel".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
     @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
     @patch("frontstage.views.surveys.help.surveys_help.send_message")
     @patch("frontstage.controllers.survey_controller.get_survey_by_survey_ref")
     def test_create_message_post_success(
-        self, mock_request, get_survey, send_message, get_survey_list, get_respondent_party_by_id
+        self, mock_request, get_survey, send_message, get_survey_list, get_respondent_enrolments
     ):
         mock_request.get(url_banner_api, status_code=404)
         get_survey.return_value = survey
         send_message.return_value = "a5e67f8a-0d90-4d60-a15a-7e334c75402b"
         get_survey_list.return_value = survey_list_todo
-        get_respondent_party_by_id.return_value = respondent_party
+        get_respondent_enrolments.return_value = respondent_enrolments
         form = {"body": "info-something-else"}
         response = self.app.post(
             "/surveys/help/something-else/my-survey-is-not-listed/send-message",

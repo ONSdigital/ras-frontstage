@@ -35,13 +35,9 @@ def get_survey_list(session, tag):
         tag=tag,
     )
 
-    # This logic is added to make sure a user is provided an option to delete an account if there is no
-    # active enrolment which is ENABLED
-    respondent = party_controller.get_respondent_party_by_id(party_id)
-    delete_option_allowed = is_delete_account_respondent_allowed(respondent)
-
+    respondent_enrolments = party_controller.get_respondent_enrolments(party_id)
     survey_list = party_controller.get_survey_list_details_for_party(
-        respondent, tag, business_party_id=business_id, survey_id=survey_id
+        respondent_enrolments, tag, business_party_id=business_id, survey_id=survey_id
     )
     sorted_survey_list = sorted(survey_list, key=lambda k: datetime.strptime(k["submit_by"], "%d %b %Y"), reverse=True)
     logger.info(
@@ -64,7 +60,7 @@ def get_survey_list(session, tag):
                 added_survey=added_survey,
                 already_enrolled=already_enrolled,
                 unread_message_count=unread_message_count,
-                delete_option_allowed=delete_option_allowed,
+                delete_option_allowed=True if len(respondent_enrolments) == 0 else False,
             )
         )
 
@@ -80,18 +76,3 @@ def get_survey_list(session, tag):
             history=True,
             unread_message_count=unread_message_count,
         )
-
-
-def is_delete_account_respondent_allowed(respondent: dict) -> bool:
-    """
-    Determine if the user has any active enrolments for the purpose of displaying the delete account option
-
-    :param respondent: A dict containing respondent data
-    :return: True if allowed, false if not.
-    """
-    if "associations" in respondent:
-        for association in respondent["associations"]:
-            for enrolment in association["enrolments"]:
-                if enrolment["enrolmentStatus"] == "ENABLED":
-                    return False
-    return True

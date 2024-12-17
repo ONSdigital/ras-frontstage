@@ -43,8 +43,10 @@ registration_data = {
 RESPONDENT_ID = "f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b"
 BUSINESS_ID = "252ffe73-8c97-4ef5-899e-3df092454d31"
 SURVEY_ID = "f82bf312-d677-484b-be57-c83148446095"
-IS_RESPONDENT_ENROLLED_URL= (f"{app.config['PARTY_URL']}/party-api/v1/enrolments/is_respondent_enrolled/{RESPONDENT_ID}"
-                            f"/business_id/{BUSINESS_ID}/survey_id/{SURVEY_ID}")
+IS_RESPONDENT_ENROLLED_URL = (
+    f"{app.config['PARTY_URL']}/party-api/v1/enrolments/is_respondent_enrolled/{RESPONDENT_ID}"
+    f"/business_id/{BUSINESS_ID}/survey_id/{SURVEY_ID}"
+)
 
 
 class TestPartyController(unittest.TestCase):

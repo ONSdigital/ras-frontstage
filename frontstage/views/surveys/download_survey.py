@@ -28,7 +28,7 @@ def download_survey(session):
     # Check if respondent has permission to download for this case
     case = case_controller.get_case_by_case_id(case_id)
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
-    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey):
+    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey["id"]):
         raise NoSurveyPermission(party_id, case_id)
 
     collection_instrument, headers = collection_instrument_controller.download_collection_instrument(

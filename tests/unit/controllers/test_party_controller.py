@@ -40,6 +40,12 @@ registration_data = {
     "status": "CREATED",
 }
 
+RESPONDENT_ID = "f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b"
+BUSINESS_ID = "252ffe73-8c97-4ef5-899e-3df092454d31"
+SURVEY_ID = "f82bf312-d677-484b-be57-c83148446095"
+IS_RESPONDENT_ENROLLED_URL= (f"{app.config['PARTY_URL']}/party-api/v1/enrolments/is_respondent_enrolled/{RESPONDENT_ID}"
+                            f"/business_id/{BUSINESS_ID}/survey_id/{SURVEY_ID}")
+
 
 class TestPartyController(unittest.TestCase):
     def setUp(self):
@@ -77,7 +83,7 @@ class TestPartyController(unittest.TestCase):
     def test_get_respondent_enrolments(self, request_mock):
         request_mock.get(url_get_respondent_enrolments, json=respondent_enrolments)
         with app.app_context():
-            party = party_controller.get_respondent_enrolments(respondent_party["id"])
+            party = party_controller.get_respondent_enrolments(RESPONDENT_ID)
             self.assertEqual(respondent_enrolments, party)
 
     @requests_mock.Mocker()
@@ -85,14 +91,14 @@ class TestPartyController(unittest.TestCase):
         request_mock.get(url_get_respondent_enrolments, status_code=404)
         with app.app_context():
             with self.assertRaises(ApiError):
-                party_controller.get_respondent_enrolments(respondent_party["id"])
+                party_controller.get_respondent_enrolments(RESPONDENT_ID)
 
     @requests_mock.Mocker()
     def test_get_respondent_enrolments_400(self, request_mock):
         request_mock.get(url_get_respondent_enrolments, status_code=400)
         with app.app_context():
             with self.assertRaises(ApiError):
-                party_controller.get_respondent_enrolments(respondent_party["id"])
+                party_controller.get_respondent_enrolments(RESPONDENT_ID)
 
     @requests_mock.Mocker()
     def test_get_respondent_enrolments_ConnectionError(self, request_mock):
@@ -100,7 +106,7 @@ class TestPartyController(unittest.TestCase):
 
         with app.app_context():
             with self.assertRaises(ServiceUnavailableException) as exception:
-                party_controller.get_respondent_enrolments(respondent_party["id"])
+                party_controller.get_respondent_enrolments(RESPONDENT_ID)
         self.assertEqual(["Party service returned a connection error"], exception.exception.errors)
 
     @requests_mock.Mocker()
@@ -109,7 +115,39 @@ class TestPartyController(unittest.TestCase):
 
         with app.app_context():
             with self.assertRaises(ServiceUnavailableException) as exception:
-                party_controller.get_respondent_enrolments(respondent_party["id"])
+                party_controller.get_respondent_enrolments(RESPONDENT_ID)
+        self.assertEqual(["Party service has timed out"], exception.exception.errors)
+
+    @requests_mock.Mocker()
+    def test_is_respondent_enrolled(self, request_mock):
+        request_mock.get(IS_RESPONDENT_ENROLLED_URL, json={"enrolled": True})
+        with app.app_context():
+            is_respondent_enrolled = party_controller.is_respondent_enrolled(RESPONDENT_ID, BUSINESS_ID, SURVEY_ID)
+            self.assertTrue(is_respondent_enrolled)
+
+    @requests_mock.Mocker()
+    def test_is_respondent_enrolled_400(self, request_mock):
+        request_mock.get(IS_RESPONDENT_ENROLLED_URL, status_code=400)
+        with app.app_context():
+            with self.assertRaises(ApiError):
+                party_controller.is_respondent_enrolled(RESPONDENT_ID, BUSINESS_ID, SURVEY_ID)
+
+    @requests_mock.Mocker()
+    def test_is_respondent_enrolled_ConnectionError(self, request_mock):
+        request_mock.get(IS_RESPONDENT_ENROLLED_URL, exc=ConnectionError)
+
+        with app.app_context():
+            with self.assertRaises(ServiceUnavailableException) as exception:
+                party_controller.is_respondent_enrolled(RESPONDENT_ID, BUSINESS_ID, SURVEY_ID)
+        self.assertEqual(["Party service returned a connection error"], exception.exception.errors)
+
+    @requests_mock.Mocker()
+    def test_is_respondent_enrolled_timeout(self, request_mock):
+        request_mock.get(IS_RESPONDENT_ENROLLED_URL, exc=Timeout)
+
+        with app.app_context():
+            with self.assertRaises(ServiceUnavailableException) as exception:
+                party_controller.is_respondent_enrolled(RESPONDENT_ID, BUSINESS_ID, SURVEY_ID)
         self.assertEqual(["Party service has timed out"], exception.exception.errors)
 
     def test_add_survey_success(self):
@@ -254,15 +292,15 @@ class TestPartyController(unittest.TestCase):
         collex = {"survey1": "collex1", "survey3": "collex3"}
 
         enrolment_data = [
-            {"survey_id": "survey1", "enrolment_data": "enrolment1"},
-            {"survey_id": "survey2", "enrolment_data": "enrolment2"},
-            {"survey_id": "survey3", "enrolment_data": "enrolment3"},
+            {"survey_details": {"id": "survey1"}},
+            {"survey_details": {"id": "survey2"}},
+            {"survey_details": {"id": "survey3"}},
         ]
 
         result = get_respondent_enrolments_for_started_collex(enrolment_data, collex)
         self.assertEqual(len(result), 2)
-        self.assertDictEqual({"survey_id": "survey1", "enrolment_data": "enrolment1"}, result[0])
-        self.assertDictEqual({"survey_id": "survey3", "enrolment_data": "enrolment3"}, result[1])
+        self.assertDictEqual({"survey_details": {"id": "survey1"}}, result[0])
+        self.assertDictEqual({"survey_details": {"id": "survey3"}}, result[1])
 
     def test_display_button(self):
         Combination = namedtuple("Combination", ["status", "ci_type", "expected"])
@@ -284,12 +322,8 @@ class TestPartyController(unittest.TestCase):
             self.assertEqual(display_button(combination.status, combination.ci_type), combination.expected)
 
     @patch("frontstage.controllers.party_controller.RedisCache.get_collection_instrument")
-    @patch("frontstage.controllers.party_controller.RedisCache.get_survey")
-    @patch("frontstage.controllers.party_controller.RedisCache.get_business_party")
-    def test_get_survey_list_details_for_party_todo(self, get_business_party, get_survey, get_collection_instrument):
-        # Given party, survey, collection instrument, collection exercise (lower down) and case (lower down) are mocked
-        get_business_party.side_effect = self._business_details_side_effect()
-        get_survey.side_effect = self._survey_details_side_effect()
+    def test_get_survey_list_details_for_party_todo(self, get_collection_instrument):
+        # Given party, collection instrument, collection exercise (lower down) and case (lower down) are mocked
         get_collection_instrument.side_effect = [{"type": "SEFT"}, {"type": "EQ"}, {"type": "EQ"}, {"type": "EQ"}]
 
         expected_response = [
@@ -379,87 +413,64 @@ class TestPartyController(unittest.TestCase):
     def enrolment_data():
         return [
             {
-                "business_id": "bebee450-46da-4f8b-a7a6-d4632087f2a3",
-                "survey_id": "41320b22-b425-4fba-a90e-718898f718ce",
-                "status": "ENABLED",
+                "business_details": {
+                    "id": "bebee450-46da-4f8b-a7a6-d4632087f2a3",
+                    "name": "Test Business 1",
+                    "ref": "49910000014",
+                    "trading_as": "Trading as Test Business 1",
+                },
+                "survey_details": {
+                    "id": "41320b22-b425-4fba-a90e-718898f718ce",
+                    "short_name": "AIFDI",
+                    "long_name": "Annual Inward Foreign Direct Investment Survey",
+                    "ref": "062",
+                },
+                "enrolment_status": "ENABLED",
             },
             {
-                "business_id": "fd4d0444-d40a-4c47-996a-de6f5f20658b",
-                "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d",
-                "status": "ENABLED",
+                "business_details": {
+                    "id": "fd4d0444-d40a-4c47-996a-de6f5f20658b",
+                    "name": "Test Business 2",
+                    "ref": "49900000005",
+                    "trading_as": "Trading as Test Business 2",
+                },
+                "survey_details": {
+                    "id": "02b9c366-7397-42f7-942a-76dc5876d86d",
+                    "short_name": "QBS",
+                    "long_name": "Quarterly Business Survey",
+                    "ref": "139",
+                },
+                "enrolment_status": "ENABLED",
             },
             {
-                "business_id": "3ab241f7-b5cc-4cab-a7e6-b6ad6283cbe1",
-                "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d",
-                "status": "ENABLED",
+                "business_details": {
+                    "id": "3ab241f7-b5cc-4cab-a7e6-b6ad6283cbe1",
+                    "name": "Test Business 3",
+                    "ref": "49900000004",
+                    "trading_as": "Trading as Test Business 3",
+                },
+                "survey_details": {
+                    "id": "02b9c366-7397-42f7-942a-76dc5876d86d",
+                    "short_name": "QBS",
+                    "long_name": "Quarterly Business Survey",
+                    "ref": "139",
+                },
+                "enrolment_status": "ENABLED",
             },
             {
-                "business_id": "4865ad73-684e-4c2c-ba00-aece24f1f27e",
-                "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d",
-                "status": "ENABLED",
-            },
-        ]
-
-    @staticmethod
-    def _survey_details_side_effect():
-        # This isn't a mistake the code calls out to QBS 3 times, but Redis prevents 3 calls to the service.
-        return [
-            {
-                "id": "41320b22-b425-4fba-a90e-718898f718ce",
-                "shortName": "AIFDI",
-                "longName": "Annual Inward Foreign Direct Investment Survey",
-                "surveyRef": "062",
-                "surveyMode": "SEFT",
-            },
-            {
-                "id": "02b9c366-7397-42f7-942a-76dc5876d86d",
-                "shortName": "QBS",
-                "longName": "Quarterly Business Survey",
-                "surveyRef": "139",
-                "surveyMode": "EQ",
-            },
-            {
-                "id": "02b9c366-7397-42f7-942a-76dc5876d86d",
-                "shortName": "QBS",
-                "longName": "Quarterly Business Survey",
-                "surveyRef": "139",
-                "surveyMode": "EQ",
-            },
-            {
-                "id": "02b9c366-7397-42f7-942a-76dc5876d86d",
-                "shortName": "QBS",
-                "longName": "Quarterly Business Survey",
-                "surveyRef": "139",
-                "surveyMode": "EQ",
-            },
-        ]
-
-    @staticmethod
-    def _business_details_side_effect():
-        return [
-            {
-                "id": "bebee450-46da-4f8b-a7a6-d4632087f2a3",
-                "name": "Test Business 1",
-                "sampleUnitRef": "49910000014",
-                "trading_as": "Trading as Test Business 1",
-            },
-            {
-                "id": "fd4d0444-d40a-4c47-996a-de6f5f20658b",
-                "name": "Test Business 2",
-                "sampleUnitRef": "49900000005",
-                "trading_as": "Trading as Test Business 2",
-            },
-            {
-                "id": "3ab241f7-b5cc-4cab-a7e6-b6ad6283cbe1",
-                "name": "Test Business 3",
-                "sampleUnitRef": "49900000004",
-                "trading_as": "Trading as Test Business 3",
-            },
-            {
-                "id": "4865ad73-684e-4c2c-ba00-aece24f1f27e",
-                "name": "Test Business 4",
-                "sampleUnitRef": "49900000001",
-                "trading_as": "Trading as Test Business 4",
+                "business_details": {
+                    "id": "4865ad73-684e-4c2c-ba00-aece24f1f27e",
+                    "name": "Test Business 4",
+                    "ref": "49900000001",
+                    "trading_as": "Trading as Test Business 4",
+                },
+                "survey_details": {
+                    "id": "02b9c366-7397-42f7-942a-76dc5876d86d",
+                    "short_name": "QBS",
+                    "long_name": "Quarterly Business Survey",
+                    "ref": "139",
+                },
+                "enrolment_status": "ENABLED",
             },
         ]
 

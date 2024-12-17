@@ -342,7 +342,7 @@ def get_respondent_enrolments_for_started_collex(enrolment_data, collection_exer
 
     enrolments = []
     for enrolment in enrolment_data:
-        if enrolment["survey_id"] in collection_exercises:
+        if enrolment["survey_details"]["id"] in collection_exercises:
             enrolments.append(enrolment)
     return enrolments
 
@@ -357,8 +357,8 @@ def get_unique_survey_and_business_ids(enrolment_data):
     surveys_ids = set()
     business_ids = set()
     for enrolment in enrolment_data:
-        surveys_ids.add(enrolment["survey_id"])
-        business_ids.add(enrolment["business_id"])
+        surveys_ids.add(enrolment["survey_details"]["id"])
+        business_ids.add(enrolment["business_details"]["id"])
     return surveys_ids, business_ids
 
 
@@ -432,11 +432,9 @@ def get_survey_list_details_for_party(enrolment_data: dict, tag: str, business_p
     enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, collection_exercises)
 
     for enrolment in enrolments:
-        business_party = redis_cache.get_business_party(enrolment["business_id"])
-        survey = redis_cache.get_survey(enrolment["survey_id"])
-
-        live_collection_exercises = collection_exercises[enrolment["survey_id"]]
-
+        business_party = enrolment["business_details"]
+        survey = enrolment["survey_details"]
+        live_collection_exercises = collection_exercises[enrolment["survey_details"]["id"]]
         collection_exercises_by_id = dict((ce["id"], ce) for ce in live_collection_exercises)
         cases_for_business = cache_data["cases"][business_party["id"]]
 
@@ -462,13 +460,13 @@ def get_survey_list_details_for_party(enrolment_data: dict, tag: str, business_p
                 ),
                 "collection_instrument_type": collection_instrument_type,
                 "survey_id": survey["id"],
-                "survey_long_name": survey["longName"],
-                "survey_short_name": survey["shortName"],
-                "survey_ref": survey["surveyRef"],
+                "survey_long_name": survey["long_name"],
+                "survey_short_name": survey["short_name"],
+                "survey_ref": survey["ref"],
                 "business_party_id": business_party["id"],
                 "business_name": business_party["name"],
                 "trading_as": business_party["trading_as"],
-                "business_ref": business_party["sampleUnitRef"],
+                "business_ref": business_party["ref"],
                 "period": collection_exercise["userDescription"],
                 "submit_by": collection_exercise["events"]["return_by"]["date"],
                 "formatted_submit_by": collection_exercise["events"]["return_by"]["formatted_date"],
@@ -490,10 +488,27 @@ def display_button(status, ci_type):
     return not (ci_type == "EQ" and status in CLOSED_STATE)
 
 
-def is_respondent_enrolled(party_id: str, business_party_id: str, survey: dict) -> bool:
-    if get_respondent_enrolments(party_id, {"business_id": business_party_id, "survey_id": survey["id"]}):
-        return True
-    return False
+def is_respondent_enrolled(party_id: str, business_party_id: str, survey_id: str) -> bool:
+    url = (
+        f"{app.config['PARTY_URL']}/party-api/v1/enrolments/is_respondent_enrolled/{party_id}"
+        f"/business_id/{business_party_id}/survey_id/{survey_id}"
+    )
+    try:
+        response = requests.get(url, auth=app.config["BASIC_AUTH"])
+        response.raise_for_status()
+    except HTTPError as e:
+        logger.error(
+            "HTTPError returned from Party service when getting is_respondent_enrolled",
+            status_code=e.response.status_code,
+            party_id=party_id,
+        )
+        raise ApiError(logger, response)
+    except ConnectionError:
+        raise ServiceUnavailableException("Party service returned a connection error", 503)
+    except Timeout:
+        raise ServiceUnavailableException("Party service has timed out", 504)
+
+    return response.json()["enrolled"]
 
 
 def notify_party_and_respondent_account_locked(respondent_id, email_address, status=None):

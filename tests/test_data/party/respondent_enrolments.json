@@ -1,0 +1,9 @@
+[
+  {"business_id":"99941a3f-8e32-40e4-b78a-e039a2b437ca", "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d", "status": "ENABLED"},
+  {"business_id":"99941a3f-8e32-40e4-b78a-e039a2b437ca", "survey_id": "cb8accda-6118-4d3b-85a3-149e28960c54", "status": "ENABLED"},
+  {"business_id":"14ab2c84-acc3-4d2d-84a7-c65cb7c2e49e", "survey_id": "cb8accda-6118-4d3b-85a3-149e28960c54", "status": "ENABLED"},
+  {"business_id":"be3483c3-f5c9-4b13-bdd7-244db78ff687", "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d", "status": "ENABLED"},
+  {"business_id":"be3483c3-f5c9-4b13-bdd7-244db78ff687", "survey_id": "cb8accda-6118-4d3b-85a3-149e28960c54", "status": "ENABLED"},
+  {"business_id":"0008279d-9425-4e28-897d-bfd876aa7f3f", "survey_id": "cb8accda-6118-4d3b-85a3-149e28960c54", "status": "ENABLED"}
+]
+

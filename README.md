@@ -3,7 +3,7 @@
 User interface for Respondent Account Services
 
 ## Setup
-Based on python 3.11
+Based on python 3.12
 
 Use [Pyenv](https://github.com/pyenv/pyenv) to manage installed Python versions
 

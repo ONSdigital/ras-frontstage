@@ -192,7 +192,8 @@ class TestAccessSurvey(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertTrue("An error has occurred".encode() in response.data)
 
-    def test_generate_eq_url(self, mock_request):
+    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
+    def test_generate_eq_url(self, mock_request, _):
         # Given all external services are mocked, and we have an EQ collection instrument
         mock_request.get(url_get_case, json=case)
         mock_request.get(url_get_collection_exercise, json=collection_exercise_v3)

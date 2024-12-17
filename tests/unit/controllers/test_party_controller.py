@@ -2,7 +2,9 @@ import unittest
 from collections import namedtuple
 from unittest.mock import patch
 
+import requests_mock
 import responses
+from requests import ConnectionError, Timeout
 
 from config import TestingConfig
 from frontstage import app
@@ -12,14 +14,16 @@ from frontstage.controllers.party_controller import (
     get_respondent_enrolments_for_started_collex,
     get_survey_list_details_for_party,
 )
-from frontstage.exceptions.exceptions import ApiError
+from frontstage.exceptions.exceptions import ApiError, ServiceUnavailableException
 from tests.integration.mocked_services import (
     business_party,
     case,
     collection_exercise,
+    respondent_enrolments,
     respondent_party,
     url_get_business_party,
     url_get_respondent_email,
+    url_get_respondent_enrolments,
     url_get_respondent_party,
     url_notify_party_and_respondent_account_locked,
     url_post_add_survey,
@@ -68,6 +72,45 @@ class TestPartyController(unittest.TestCase):
                 party = party_controller.get_respondent_party_by_id(respondent_party["id"])
 
                 self.assertTrue(party is None)
+
+    @requests_mock.Mocker()
+    def test_get_respondent_enrolments(self, request_mock):
+        request_mock.get(url_get_respondent_enrolments, json=respondent_enrolments)
+        with app.app_context():
+            party = party_controller.get_respondent_enrolments(respondent_party["id"])
+            self.assertEqual(respondent_enrolments, party)
+
+    @requests_mock.Mocker()
+    def test_get_respondent_enrolments_404(self, request_mock):
+        request_mock.get(url_get_respondent_enrolments, status_code=404)
+        with app.app_context():
+            with self.assertRaises(ApiError):
+                party_controller.get_respondent_enrolments(respondent_party["id"])
+
+    @requests_mock.Mocker()
+    def test_get_respondent_enrolments_400(self, request_mock):
+        request_mock.get(url_get_respondent_enrolments, status_code=400)
+        with app.app_context():
+            with self.assertRaises(ApiError):
+                party_controller.get_respondent_enrolments(respondent_party["id"])
+
+    @requests_mock.Mocker()
+    def test_get_respondent_enrolments_ConnectionError(self, request_mock):
+        request_mock.get(url_get_respondent_enrolments, exc=ConnectionError)
+
+        with app.app_context():
+            with self.assertRaises(ServiceUnavailableException) as exception:
+                party_controller.get_respondent_enrolments(respondent_party["id"])
+        self.assertEqual(["Party service returned a connection error"], exception.exception.errors)
+
+    @requests_mock.Mocker()
+    def test_get_respondent_enrolments_timeout(self, request_mock):
+        request_mock.get(url_get_respondent_enrolments, exc=Timeout)
+
+        with app.app_context():
+            with self.assertRaises(ServiceUnavailableException) as exception:
+                party_controller.get_respondent_enrolments(respondent_party["id"])
+        self.assertEqual(["Party service has timed out"], exception.exception.errors)
 
     def test_add_survey_success(self):
         with responses.RequestsMock() as rsps:
@@ -221,13 +264,6 @@ class TestPartyController(unittest.TestCase):
         self.assertDictEqual({"survey_id": "survey1", "enrolment_data": "enrolment1"}, result[0])
         self.assertDictEqual({"survey_id": "survey3", "enrolment_data": "enrolment3"}, result[1])
 
-    def test_get_respondent_enrolments(self):
-        enrolments = party_controller.get_respondent_enrolments(respondent_party)
-
-        for enrolment in enrolments:
-            self.assertTrue(enrolment["business_id"] is not None)
-            self.assertTrue(enrolment["survey_id"] is not None)
-
     def test_display_button(self):
         Combination = namedtuple("Combination", ["status", "ci_type", "expected"])
         combinations = [
@@ -255,7 +291,6 @@ class TestPartyController(unittest.TestCase):
         get_business_party.side_effect = self._business_details_side_effect()
         get_survey.side_effect = self._survey_details_side_effect()
         get_collection_instrument.side_effect = [{"type": "SEFT"}, {"type": "EQ"}, {"type": "EQ"}, {"type": "EQ"}]
-        respondent = self.respondent_details()
 
         expected_response = [
             {
@@ -333,40 +368,37 @@ class TestPartyController(unittest.TestCase):
                     _get_case_return_value_by_business_id,
                 ):
                     # when get_survey_list_details_for_party is called
-                    survey_list_details_for_party = get_survey_list_details_for_party(respondent, "todo", None, None)
+                    survey_list_details_for_party = get_survey_list_details_for_party(
+                        self.enrolment_data(), "todo", None, None
+                    )
 
                     # Then the correct list is returned
                     self.assertEqual(list(survey_list_details_for_party), expected_response)
 
     @staticmethod
-    def respondent_details():
-        return {
-            "associations": [
-                {
-                    "enrolments": [{"enrolmentStatus": "ENABLED", "surveyId": "41320b22-b425-4fba-a90e-718898f718ce"}],
-                    "partyId": "bebee450-46da-4f8b-a7a6-d4632087f2a3",
-                },
-                {
-                    "enrolments": [{"enrolmentStatus": "ENABLED", "surveyId": "02b9c366-7397-42f7-942a-76dc5876d86d"}],
-                    "partyId": "fd4d0444-d40a-4c47-996a-de6f5f20658b",
-                },
-                {
-                    "enrolments": [{"enrolmentStatus": "ENABLED", "surveyId": "02b9c366-7397-42f7-942a-76dc5876d86d"}],
-                    "partyId": "3ab241f7-b5cc-4cab-a7e6-b6ad6283cbe1",
-                },
-                {
-                    "enrolments": [{"enrolmentStatus": "ENABLED", "surveyId": "02b9c366-7397-42f7-942a-76dc5876d86d"}],
-                    "partyId": "4865ad73-684e-4c2c-ba00-aece24f1f27e",
-                },
-            ],
-            "emailAddress": "example@example.com",
-            "firstName": "john",
-            "id": "da457118-b048-403a-99d6-472fad2726fa",
-            "lastName": "doe",
-            "sampleUnitType": "BI",
-            "status": "ACTIVE",
-            "telephone": "07777000000",
-        }
+    def enrolment_data():
+        return [
+            {
+                "business_id": "bebee450-46da-4f8b-a7a6-d4632087f2a3",
+                "survey_id": "41320b22-b425-4fba-a90e-718898f718ce",
+                "status": "ENABLED",
+            },
+            {
+                "business_id": "fd4d0444-d40a-4c47-996a-de6f5f20658b",
+                "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d",
+                "status": "ENABLED",
+            },
+            {
+                "business_id": "3ab241f7-b5cc-4cab-a7e6-b6ad6283cbe1",
+                "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d",
+                "status": "ENABLED",
+            },
+            {
+                "business_id": "4865ad73-684e-4c2c-ba00-aece24f1f27e",
+                "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d",
+                "status": "ENABLED",
+            },
+        ]
 
     @staticmethod
     def _survey_details_side_effect():

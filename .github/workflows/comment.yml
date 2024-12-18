@@ -22,7 +22,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@v0
         with:
           project_id: ${{ secrets.GOOGLE_PROJECT_ID }}
-      - uses: onsdigital/ras-rm-spinnaker-action@main
+      - uses: onsdigital/ras-rm-spinnaker-action@upgrade-packages
         with:
           comment-body: ${{ github.event.comment.body }}
           gcp-project: ${{ secrets.GOOGLE_PROJECT_ID }}

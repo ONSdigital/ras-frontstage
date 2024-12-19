@@ -99,7 +99,7 @@ def get_case_data(case_id, party_id, business_party_id, survey_short_name):
     # Check if respondent has permission to see case data
     case = get_case_by_case_id(case_id)
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
-    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey):
+    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey["id"]):
         raise NoSurveyPermission(party_id, case_id)
 
     case_data = {
@@ -152,7 +152,7 @@ def get_eq_url(case, collection_exercise, party_id, business_party_id, survey_sh
         abort(403)
 
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
-    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey):
+    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey["id"]):
         raise NoSurveyPermission(party_id, case_id)
 
     payload = EqPayload().create_payload(case, collection_exercise, party_id, business_party_id, survey)

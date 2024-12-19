@@ -19,10 +19,10 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCR_KEY }}
       - name: Setup Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0
+        uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ secrets.GOOGLE_PROJECT_ID }}
-      - uses: onsdigital/ras-rm-spinnaker-action@main
+      - uses: onsdigital/ras-rm-spinnaker-action@upgrade-packages
         with:
           comment-body: ${{ github.event.comment.body }}
           gcp-project: ${{ secrets.GOOGLE_PROJECT_ID }}

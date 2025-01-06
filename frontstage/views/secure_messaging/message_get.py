@@ -7,7 +7,6 @@ from structlog import wrap_logger
 from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.common.message_helper import from_internal, refine
-from strtobool import strtobool
 from frontstage.controllers.conversation_controller import (
     InvalidSecureMessagingForm,
     get_conversation,
@@ -21,6 +20,7 @@ from frontstage.controllers.survey_controller import get_survey
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.views.secure_messaging import secure_message_bp
 from frontstage.views.template_helper import render_template
+from strtobool import strtobool
 
 logger = wrap_logger(logging.getLogger(__name__))
 

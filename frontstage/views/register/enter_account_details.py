@@ -1,10 +1,10 @@
 import logging
-from frontstage.common.strtobool import strtobool
 
 from flask import flash, request
 from structlog import wrap_logger
 
 from frontstage.common.cryptographer import Cryptographer
+from frontstage.common.strtobool import strtobool
 from frontstage.common.utilities import obfuscate_email
 from frontstage.controllers import iac_controller, party_controller
 from frontstage.exceptions.exceptions import ApiError

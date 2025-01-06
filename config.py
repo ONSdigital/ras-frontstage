@@ -2,7 +2,7 @@ import os
 
 # To choose which config to use when running frontstage set environment variable APP_SETTINGS to the name of the
 # config object e.g. for the dev config set APP_SETTINGS=DevelopmentConfig
-from distutils.util import strtobool
+from frontstage.common.strtobool import strtobool
 
 
 class Config(object):

@@ -1,5 +1,5 @@
 import logging
-from distutils.util import strtobool
+from frontstage.common.strtobool import strtobool
 
 from flask import flash, request
 from structlog import wrap_logger

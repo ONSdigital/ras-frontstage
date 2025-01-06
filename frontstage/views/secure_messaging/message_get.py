@@ -1,5 +1,5 @@
 import logging
-from distutils.util import strtobool
+from frontstage.common.strtobool import strtobool
 
 from flask import flash, redirect, request, url_for
 from markupsafe import Markup

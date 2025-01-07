@@ -1,14 +1,12 @@
 def strtobool(val):
-    """Convert a string representation of truth to true (1) or false (0).
-
-    True values are 'y', 'yes', 't', 'true', 'on', and '1'; false values
-    are 'n', 'no', 'f', 'false', 'off', and '0'.  Raises ValueError if
-    'val' is anything else.
+    """This directly replaces the distutils function strtobool. All the redundant checks that were carried out
+    originally by the function are no longer needed. We either need a true or false value. We don't need to compare if
+    there is a I/O, 1/0, Yes/No, Y/N or t/f etc.
     """
     val = val.lower()
-    if val in ("y", "yes", "t", "true", "on", "1"):
-        return 1
-    elif val in ("n", "no", "f", "false", "off", "0"):
-        return 0
+    if val == "true":
+        return True
+    elif val == "false":
+        return False
     else:
         raise ValueError("invalid truth value %r" % (val,))

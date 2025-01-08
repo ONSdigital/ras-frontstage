@@ -1,5 +1,4 @@
 import logging
-from distutils.util import strtobool
 
 from flask import flash, redirect, request, url_for
 from markupsafe import Markup
@@ -21,6 +20,7 @@ from frontstage.controllers.survey_controller import get_survey
 from frontstage.exceptions.exceptions import ApiError
 from frontstage.views.secure_messaging import secure_message_bp
 from frontstage.views.template_helper import render_template
+from strtobool import strtobool
 
 logger = wrap_logger(logging.getLogger(__name__))
 

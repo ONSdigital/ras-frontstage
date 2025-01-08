@@ -1,4 +1,4 @@
-def strtobool(val):
+def strtobool(val: str) -> bool:
     val = val.lower()
     if val == "true":
         return True

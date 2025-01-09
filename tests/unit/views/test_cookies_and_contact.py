@@ -1,14 +1,22 @@
 import unittest
+from unittest.mock import patch
 
 import requests_mock
 
 from frontstage import app
-from tests.integration.mocked_services import url_banner_api
+from frontstage.controllers.conversation_controller import InvalidSecureMessagingForm
+from tests.integration.mocked_services import encoded_jwt_token, url_banner_api
 
 
 class TestCookiesContact(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
+        self.app.set_cookie("authorization", "session_key")
+        self.patcher = patch("redis.StrictRedis.get", return_value=encoded_jwt_token)
+        self.patcher.start()
+        self.headers = {
+            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"  # NOQA
+        }
 
     @requests_mock.mock()
     def test_cookies_success(self, mock_request):
@@ -39,3 +47,16 @@ class TestCookiesContact(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue("Contact us".encode() in response.data)
         self.assertTrue("Opening hours:".encode() in response.data)
+
+    @requests_mock.mock()
+    @patch("frontstage.views.contact_us.secure_message_enrolment_options")
+    @patch("frontstage.views.contact_us.send_secure_message")
+    def test_invalid_secure_message_form(self, mock_request, send_secure_message, secure_message_enrolment_options):
+        secure_message_enrolment_options.return_value = {}
+        mock_request.get(url_banner_api, status_code=404)
+        send_secure_message.side_effect = InvalidSecureMessagingForm({"body": ["Message is required"]})
+
+        response = self.app.post("/contact-us/send-message")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("Message is required".encode() in response.data)

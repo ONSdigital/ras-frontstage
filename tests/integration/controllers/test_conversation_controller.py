@@ -14,10 +14,12 @@ from frontstage.controllers.conversation_controller import (
     IncorrectAccountAccessError,
     InvalidSecureMessagingForm,
     get_message_count_from_api,
-    send_message,
+    secure_message_enrolment_options,
+    send_secure_message,
     try_message_count_from_session,
 )
 from frontstage.exceptions.exceptions import ApiError, ServiceUnavailableException
+from frontstage.models import SecureMessagingForm
 from tests.integration.mocked_services import (
     message_count,
     url_get_conversation_count,
@@ -31,8 +33,6 @@ SURVEY_ID = "1e928626-14f0-4036-8922-d17baa5442da"
 BUSINESS_ID = "d2da6666-58b9-4714-bcdd-4e4f023b7034"
 CE_ID = "2bf53fd0-f3af-45c1-b269-c5b01c623c95"
 MSG_ID = "bd4923d5-573f-4aec-a68d-5847b7b567d3"
-SM_FORM = ImmutableMultiDict([("body", "message"), ("send", "")])
-
 
 class TestConversationController(unittest.TestCase):
     def setUp(self):
@@ -42,6 +42,14 @@ class TestConversationController(unittest.TestCase):
         self.app_config = self.app.application.config
         self.redis = redis
         self.redis.flushall()
+        with app.app_context():
+            self.sm_form = SecureMessagingForm(ImmutableMultiDict([("body", "message"), ("send", "")]))
+            self.sm_form.body = "message"
+            self.sm_form.party_id = PARTY_ID
+            self.sm_form.subject.data = "Help with my survey"
+            self.sm_form.category = "SURVEY"
+            self.sm_form.business_id.data = BUSINESS_ID
+            self.sm_form.survey_id.data = SURVEY_ID
 
     @patch("frontstage.controllers.conversation_controller._create_get_conversation_headers")
     def test_get_message_count_from_api(self, headers):
@@ -144,9 +152,7 @@ class TestConversationController(unittest.TestCase):
 
         with app.app_context():
             app.config["SECURE_MESSAGE_VERSION"] = "v1"
-            msg_id = send_message(
-                SM_FORM, PARTY_ID, "subject", "category", survey_id=SURVEY_ID, business_id=BUSINESS_ID, ce_id=CE_ID
-            )
+            msg_id = send_secure_message(self.sm_form)
 
         self.assertEqual(msg_id, MSG_ID)
 
@@ -159,9 +165,7 @@ class TestConversationController(unittest.TestCase):
         request_mock.post(url_send_message_v2_messages, json={"id": "287e264d-e330-476c-9c39-3b39eef090ae"})
 
         with app.app_context():
-            msg_id = send_message(
-                SM_FORM, PARTY_ID, "subject", "category", survey_id=SURVEY_ID, business_id=BUSINESS_ID, ce_id=CE_ID
-            )
+            msg_id = send_secure_message(self.sm_form)
 
         self.assertEqual(msg_id, "287e264d-e330-476c-9c39-3b39eef090ae")
 
@@ -175,9 +179,7 @@ class TestConversationController(unittest.TestCase):
         request_mock.post(url_send_message_v2_messages, json={"id": "287e264d-e330-476c-9c39-3b39eef090ae"})
 
         with app.app_context():
-            msg_id = send_message(
-                SM_FORM, PARTY_ID, "subject", "category", survey_id=SURVEY_ID, business_id=BUSINESS_ID, ce_id=CE_ID
-            )
+            msg_id = send_secure_message(self.sm_form)
 
         self.assertEqual(msg_id, MSG_ID)
 
@@ -190,9 +192,7 @@ class TestConversationController(unittest.TestCase):
 
         with app.app_context():
             with self.assertRaises(ServiceUnavailableException):
-                send_message(
-                    SM_FORM, PARTY_ID, "subject", "category", survey_id=SURVEY_ID, business_id=BUSINESS_ID, ce_id=CE_ID
-                )
+                send_secure_message(self.sm_form)
 
     @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
     @requests_mock.Mocker()
@@ -203,9 +203,7 @@ class TestConversationController(unittest.TestCase):
 
         with app.app_context():
             with self.assertRaises(ServiceUnavailableException):
-                send_message(
-                    SM_FORM, PARTY_ID, "subject", "category", survey_id=SURVEY_ID, business_id=BUSINESS_ID, ce_id=CE_ID
-                )
+                send_secure_message(self.sm_form)
 
     @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
     def test_send_message_v2_threads_http_error(self, headers):
@@ -217,15 +215,7 @@ class TestConversationController(unittest.TestCase):
             with app.app_context():
                 app.config["SECURE_MESSAGE_VERSION"] = "v2"
                 with self.assertRaises(ApiError):
-                    send_message(
-                        SM_FORM,
-                        PARTY_ID,
-                        "subject",
-                        "category",
-                        survey_id=SURVEY_ID,
-                        business_id=BUSINESS_ID,
-                        ce_id=CE_ID,
-                    )
+                    send_secure_message(self.sm_form)
 
     @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
     @requests_mock.Mocker()
@@ -237,9 +227,7 @@ class TestConversationController(unittest.TestCase):
 
         with app.app_context():
             with self.assertRaises(ServiceUnavailableException):
-                send_message(
-                    SM_FORM, PARTY_ID, "subject", "category", survey_id=SURVEY_ID, business_id=BUSINESS_ID, ce_id=CE_ID
-                )
+                send_secure_message(self.sm_form)
 
     @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
     @requests_mock.Mocker()
@@ -251,9 +239,7 @@ class TestConversationController(unittest.TestCase):
 
         with app.app_context():
             with self.assertRaises(ServiceUnavailableException):
-                send_message(
-                    SM_FORM, PARTY_ID, "subject", "category", survey_id=SURVEY_ID, business_id=BUSINESS_ID, ce_id=CE_ID
-                )
+                send_secure_message(self.sm_form)
 
     @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
     def test_send_message_v2_messages_http_error(self, headers):
@@ -273,32 +259,17 @@ class TestConversationController(unittest.TestCase):
             with app.app_context():
                 app.config["SECURE_MESSAGE_VERSION"] = "v2"
                 with self.assertRaises(ApiError):
-                    send_message(
-                        SM_FORM,
-                        PARTY_ID,
-                        "subject",
-                        "category",
-                        survey_id=SURVEY_ID,
-                        business_id=BUSINESS_ID,
-                        ce_id=CE_ID,
+                    send_secure_message(
+                        self.sm_form,
                     )
 
     @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
     def test_send_message_invalid_secure_message_form(self, headers):
         headers.return_value = {"Authorization": "token"}
-        empty_form = ImmutableMultiDict([("body", ""), ("send", "")])
         with app.app_context():
 
             with self.assertRaises(InvalidSecureMessagingForm):
-                send_message(
-                    empty_form,
-                    PARTY_ID,
-                    "subject",
-                    "category",
-                    survey_id=SURVEY_ID,
-                    business_id=BUSINESS_ID,
-                    ce_id=CE_ID,
-                )
+                send_secure_message(SecureMessagingForm())
 
     @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
     def test_send_message_api_error(self, headers):
@@ -308,12 +279,83 @@ class TestConversationController(unittest.TestCase):
             with app.app_context():
 
                 with self.assertRaises(ApiError):
-                    send_message(
-                        SM_FORM,
-                        PARTY_ID,
-                        "subject",
-                        "category",
-                        survey_id=SURVEY_ID,
-                        business_id=BUSINESS_ID,
-                        ce_id=CE_ID,
-                    )
+                    send_secure_message(self.sm_form)
+
+    @patch("frontstage.controllers.conversation_controller.get_respondent_enrolments")
+    def test_secure_message_multiple_businesses(self, get_respondent_enrolments):
+        get_respondent_enrolments.return_value = [
+            {
+                "business_details": {
+                    "id": "bebee450-46da-4f8b-a7a6-d4632087f2a3",
+                    "name": "Test Business 1",
+                    "ref": "49910000014",
+                    "trading_as": "Trading as Test Business 1",
+                },
+                "survey_details": {
+                    "id": "41320b22-b425-4fba-a90e-718898f718ce",
+                    "short_name": "AIFDI",
+                    "long_name": "Annual Inward Foreign Direct Investment Survey",
+                    "ref": "062",
+                },
+                "enrolment_status": "ENABLED",
+            },
+            {
+                "business_details": {
+                    "id": "aebee450-46da-4f8b-a7a6-d4632087f2a3",
+                    "name": "Test Business 1",
+                    "ref": "49910000014",
+                    "trading_as": "Trading as Test Business 1",
+                },
+                "survey_details": {
+                    "id": "41320b22-b425-4fba-a90e-718898f718ce",
+                    "short_name": "AIFDI",
+                    "long_name": "Annual Inward Foreign Direct Investment Survey",
+                    "ref": "062",
+                },
+                "enrolment_status": "ENABLED",
+            },
+        ]
+        secure_message_enrolment_options(PARTY_ID, self.sm_form)
+
+    @patch("frontstage.controllers.conversation_controller.get_respondent_enrolments")
+    def test_secure_message(self, get_respondent_enrolments):
+        get_respondent_enrolments.return_value = [
+            {
+                "business_details": {
+                    "id": BUSINESS_ID,
+                    "name": "Test Business 1",
+                    "ref": "49910000014",
+                    "trading_as": "Trading as Test Business 1",
+                },
+                "survey_details": {
+                    "id": SURVEY_ID,
+                    "short_name": "AIFDI",
+                    "long_name": "Annual Inward Foreign Direct Investment Survey",
+                    "ref": "062",
+                },
+                "enrolment_status": "ENABLED",
+            }
+        ]
+        secure_message_enrolment_options(PARTY_ID, self.sm_form)
+
+    @patch("frontstage.controllers.conversation_controller.get_respondent_enrolments")
+    def test_secure_message_subject_not_selected(self, get_respondent_enrolments):
+        self.sm_form.subject.data = ""
+        get_respondent_enrolments.return_value = [
+            {
+                "business_details": {
+                    "id": BUSINESS_ID,
+                    "name": "Test Business 1",
+                    "ref": "49910000014",
+                    "trading_as": "Trading as Test Business 1",
+                },
+                "survey_details": {
+                    "id": SURVEY_ID,
+                    "short_name": "AIFDI",
+                    "long_name": "Annual Inward Foreign Direct Investment Survey",
+                    "ref": "062",
+                },
+                "enrolment_status": "ENABLED",
+            }
+        ]
+        secure_message_enrolment_options(PARTY_ID, self.sm_form)

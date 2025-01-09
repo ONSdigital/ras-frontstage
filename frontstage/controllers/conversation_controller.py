@@ -1,5 +1,6 @@
 import json
 import logging
+from collections import namedtuple
 from json import JSONDecodeError
 from uuid import UUID
 
@@ -11,6 +12,7 @@ from structlog import wrap_logger
 from urllib3 import Retry
 
 from frontstage.common.session import Session
+from frontstage.controllers.party_controller import get_respondent_enrolments
 from frontstage.exceptions.exceptions import (
     ApiError,
     AuthorizationTokenMissing,
@@ -28,6 +30,22 @@ class InvalidSecureMessagingForm(Exception):
 
 
 logger = wrap_logger(logging.getLogger(__name__))
+
+
+Options = namedtuple("Options", ["value", "text"])
+
+ORGANISATION_DISABLED_OPTION = {"value": "Choose an organisation", "text": "Choose an organisation", "disabled": True}
+SURVEY_DISABLED_OPTION = {"value": "Choose a survey", "text": "Choose a survey", "disabled": True}
+SUBJECT_DISABLED_OPTION = {"value": "Choose a subject", "text": "Choose a subject", "disabled": True}
+
+SUBJECT_OPTIONS = {
+    Options("Help with my survey", "Help with my survey"),
+    Options("Technical difficulties", "Technical difficulties"),
+    Options("Change business address", "Change business address"),
+    Options("Feedback", "Feedback"),
+    Options("Help transferring or sharing access to a survey", "Help transferring or sharing access to a survey"),
+    Options("Something else", "Something else"),
+}
 
 
 def _get_session():
@@ -90,38 +108,28 @@ def get_conversation_list(params):
         raise NoMessagesError
 
 
-def send_message(
-    form,
-    party_id: UUID,
-    subject: str,
-    category: str,
-    msg_to=["GROUP"],
-    survey_id: UUID = None,
-    business_id: UUID = None,
-    ce_id: UUID = None,
-) -> UUID:
+def send_secure_message(form, msg_to=["GROUP"]) -> UUID:
     """
     Creates a message in the secure-message service
     """
 
-    secure_message_form = SecureMessagingForm(form)
-    if not secure_message_form.validate():
-        raise InvalidSecureMessagingForm(secure_message_form.errors)
+    if not form.validate():
+        raise InvalidSecureMessagingForm(form.errors)
 
-    body = secure_message_form["body"].data
-    thread_id = secure_message_form["thread_id"].data
+    survey_id = form.survey_id.data
+    business_id = form.business_id.data
     sm_version = current_app.config["SECURE_MESSAGE_VERSION"]
     session = _get_session()
     headers = _create_send_message_headers()
 
     if sm_version in ("v1", "both"):
         sm_v1_message_json = {
-            "msg_from": party_id,
+            "msg_from": form.party_id,
             "msg_to": msg_to,
-            "subject": subject,
-            "category": category,
-            "body": body,
-            "thread_id": thread_id,
+            "subject": form.subject.data,
+            "category": form.category,
+            "body": form["body"].data,
+            "thread_id": form.thread_id.data,
         }
 
         if survey_id:
@@ -134,7 +142,7 @@ def send_message(
         try:
             response.raise_for_status()
         except HTTPError:
-            logger.error("Message sending failed due to API Error", party_id=party_id, exc_info=True)
+            logger.error("Message sending failed due to API Error", party_id=form.party_id)
             raise ApiError(logger, response)
 
         sm_v1_msg_id = response.json()["msg_id"]
@@ -142,20 +150,19 @@ def send_message(
         logger.info(
             "Secure message sent successfully",
             message_id=sm_v1_msg_id,
-            party_id=party_id,
-            category=category,
+            party_id=form.party_id,
+            category=form.category,
             survey_id=survey_id,
             business_id=business_id,
-            ce_id=ce_id,
         )
 
     if current_app.config["SECURE_MESSAGE_VERSION"] in ("v2", "both"):
         sm_v2_thread = {
-            "subject": subject,
-            "category": category,
+            "subject": form.subject.data,
+            "category": form.category,
             "ru_ref": business_id,
             "survey_id": survey_id,
-            "respondent_id": party_id,
+            "respondent_id": form.party_id,
             "is_read_by_respondent": False,
             "is_read_by_internal": False,
         }
@@ -163,14 +170,37 @@ def send_message(
 
         sm_v2_message = {
             "thread_id": sm_v2_thread_json["id"],
-            "body": body,
+            "body": form["body"].data,
             "is_from_internal": False,
-            "sent_by": party_id,
+            "sent_by": form.party_id,
         }
 
         sm_v2_message_json = _post_to_secure_message_v2_messages(session, headers, sm_v2_message)
 
     return sm_v2_message_json["id"] if current_app.config["SECURE_MESSAGE_VERSION"] == "v2" else sm_v1_msg_id
+
+
+def secure_message_enrolment_options(party_id: UUID, secure_message_form: SecureMessagingForm) -> dict:
+    """returns a dict of enrolment options based on a respondents party_id"""
+
+    business_options, surveys_options = _get_unique_business_survey_options(party_id)
+
+    sm_enrolment_options = {
+        "survey": _create_formatted_option_list(
+            surveys_options, secure_message_form.survey_id.data, SURVEY_DISABLED_OPTION
+        ),
+        "subject": _create_formatted_option_list(
+            SUBJECT_OPTIONS, secure_message_form.subject.data, SUBJECT_DISABLED_OPTION
+        ),
+    }
+    if len(business_options) > 1:
+        sm_enrolment_options["business"] = _create_formatted_option_list(
+            business_options, secure_message_form.business_id, ORGANISATION_DISABLED_OPTION
+        )
+    else:
+        secure_message_form.business_id = list(business_options)[0].value
+
+    return sm_enrolment_options
 
 
 def try_message_count_from_session(session):
@@ -216,6 +246,33 @@ def get_message_count_from_api(session) -> int:
                 "An unknown error has occurred getting message count from secure-message api", party_id=party_id
             )
         return 0
+
+
+def _get_unique_business_survey_options(party_id: UUID) -> tuple[set, set]:
+    """returns a set of business and survey options that a respondent is enrolled on"""
+
+    enrolments = get_respondent_enrolments(party_id)
+    business_details_set = set()
+    survey_details_set = set()
+    for enrolments in enrolments:
+        business_details_set.add(Options(enrolments["business_details"]["id"], enrolments["business_details"]["name"]))
+        survey_details_set.add(Options(enrolments["survey_details"]["id"], enrolments["survey_details"]["long_name"]))
+    return business_details_set, survey_details_set
+
+
+def _create_formatted_option_list(options, selected, disabled_option) -> list:
+    formatted_option_list = [disabled_option]
+
+    for option in options:
+        option_dict = {"value": option.value, "text": option.text}
+        if selected == option.value:
+            option_dict["selected"] = True
+        formatted_option_list.append(option_dict)
+
+    if not selected:
+        formatted_option_list[0]["selected"] = True
+
+    return formatted_option_list
 
 
 def _create_get_conversation_headers(encoded_jwt=None) -> dict:

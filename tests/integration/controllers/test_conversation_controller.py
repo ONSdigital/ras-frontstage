@@ -34,6 +34,7 @@ BUSINESS_ID = "d2da6666-58b9-4714-bcdd-4e4f023b7034"
 CE_ID = "2bf53fd0-f3af-45c1-b269-c5b01c623c95"
 MSG_ID = "bd4923d5-573f-4aec-a68d-5847b7b567d3"
 
+
 class TestConversationController(unittest.TestCase):
     def setUp(self):
         app_config = TestingConfig()

@@ -150,6 +150,9 @@ def send_message(
         )
 
     if current_app.config["SECURE_MESSAGE_VERSION"] in ("v2", "both"):
+        # This code was added due to an issue between the crossover of SM V1 and SM V2. The problem is outlined below:
+        # SM V1 stores empty survey_ids as empty strings whereas SM V2 uses a 'None' value.
+        # So this will break SM V2 which is implemented to except optional UUIDs.
         if survey_id == "":
             survey_id = None
 

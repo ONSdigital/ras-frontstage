@@ -150,6 +150,9 @@ def send_message(
         )
 
     if current_app.config["SECURE_MESSAGE_VERSION"] in ("v2", "both"):
+        if survey_id == "":
+            survey_id = None
+
         sm_v2_thread = {
             "subject": subject,
             "category": category,

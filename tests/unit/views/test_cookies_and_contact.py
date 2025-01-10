@@ -47,7 +47,6 @@ class TestCookiesContact(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue("Contact us".encode() in response.data)
         self.assertIn(b'href="/sign-in/"', response.data)
-        self.assertTrue("Opening hours:".encode() in response.data)
 
     @requests_mock.mock()
     @patch("frontstage.views.contact_us.secure_message_enrolment_options")

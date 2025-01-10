@@ -54,8 +54,7 @@ def send_message(session) -> str:
         errors=errors,
     )
 
-
-def _errors(errors) -> dict:
+def _errors(errors:dict) -> dict:
     errors_dict = {}
     for key, value in errors.items():
         errors_dict[key] = {"text": value[0], "id": f"{key}_error"}

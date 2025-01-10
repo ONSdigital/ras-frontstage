@@ -282,7 +282,6 @@ class TestConversationController(unittest.TestCase):
                 with self.assertRaises(ApiError):
                     send_secure_message(self.sm_form)
 
-
     @patch("frontstage.controllers.conversation_controller.get_respondent_enrolments")
     def test_secure_message(self, get_respondent_enrolments):
         get_respondent_enrolments.return_value = self._respondent_enrolments_return_value()
@@ -319,7 +318,6 @@ class TestConversationController(unittest.TestCase):
             {"value": "bebee450-46da-4f8b-a7a6-d4632087f2a3", "text": "Test Business 1"},
         ]
         self.assertEqual(options, expected_options)
-
 
     @patch("frontstage.controllers.conversation_controller.get_respondent_enrolments")
     def test_secure_message_subject_not_selected(self, get_respondent_enrolments):

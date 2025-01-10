@@ -48,6 +48,7 @@
                     "label": {
                         "text": "Survey"
                     },
+
                     "options": enrolment_options.survey,
                     "error": errors.survey_id
                 })
@@ -75,13 +76,13 @@
                     "value": form.body.data
                 })
             }}
-                {{
-        onsPanel({
-            "id": '',
-            "iconType": 'lock',
-            "body": "Your personal information is protected by law"
-        })
-    }}
+            {{
+                onsPanel({
+                    "id": '',
+                    "iconType": 'lock',
+                    "body": "Your personal information is protected by law"
+                })
+            }}
             <div class="ons-field ons-u-mt-l">
                 {{
                     onsButton({
@@ -90,7 +91,7 @@
                         "variants": "loader"
                     })
                 }}
-            </div>
+             </div>
              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         </form>
     </div>

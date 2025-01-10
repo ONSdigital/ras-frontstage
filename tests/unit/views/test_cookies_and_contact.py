@@ -50,6 +50,47 @@ class TestCookiesContact(unittest.TestCase):
 
     @requests_mock.mock()
     @patch("frontstage.views.contact_us.secure_message_enrolment_options")
+    def test_secure_message_form(self, mock_request, secure_message_enrolment_options):
+        mock_request.get(url_banner_api, status_code=404)
+        secure_message_enrolment_options.return_value = {
+            "survey": [
+                {
+                    "value": "41320b22-b425-4fba-a90e-718898f718ce",
+                    "text": "Annual Inward Foreign Direct Investment Survey",
+                },
+            ],
+            "subject": [
+                {"value": "Technical difficulties", "text": "Technical difficulties"},
+            ],
+        }
+        response = self.app.get("/contact-us/send-message")
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("Annual Inward Foreign Direct Investment Survey".encode() in response.data)
+        self.assertTrue("Technical difficulties".encode() in response.data)
+        self.assertTrue("Your personal information is protected by law".encode() in response.data)
+        self.assertTrue('input type="hidden" name="business_id"'.encode() in response.data)
+
+    @requests_mock.mock()
+    @patch("frontstage.views.contact_us.secure_message_enrolment_options")
+    def test_secure_message_form_multiple_businesses(self, mock_request, secure_message_enrolment_options):
+        mock_request.get(url_banner_api, status_code=404)
+        secure_message_enrolment_options.return_value = {
+            "survey": [],
+            "subject": [],
+            "business": [
+                {"value": "aebee450-46da-4f8b-a7a6-d4632087f2a3", "text": "Test Business 2"},
+                {"value": "bebee450-46da-4f8b-a7a6-d4632087f2a3", "text": "Test Business 1"},
+            ],
+        }
+
+        response = self.app.get("/contact-us/send-message")
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("Test Business 1".encode() in response.data)
+        self.assertTrue("Test Business 2".encode() in response.data)
+        self.assertFalse('input type="hidden" name="business_id"'.encode() in response.data)
+
+    @requests_mock.mock()
+    @patch("frontstage.views.contact_us.secure_message_enrolment_options")
     @patch("frontstage.views.contact_us.send_secure_message")
     def test_invalid_secure_message_form(self, mock_request, send_secure_message, secure_message_enrolment_options):
         secure_message_enrolment_options.return_value = {}

@@ -15,25 +15,25 @@ class TestRedisCache(unittest.TestCase):
 
     @patch("redis.StrictRedis.get")
     def test_get(self, redis_get):
-        redis_get.return_value = b'{"shortName": "MBS"}'
+        redis_get.return_value = b'{"type": "SEFT"}'
         with app.app_context():
             cache = RedisCache()
-            result = cache.get_survey(test_uuid)
-            self.assertEqual(result, {"shortName": "MBS"})
+            result = cache.get_collection_instrument(test_uuid)
+            self.assertEqual(result, {"type": "SEFT"})
 
     @patch("redis.StrictRedis.get")
     def test_get_not_in_cache(self, redis_get):
         redis_get.return_value = None
-        survey_response = {"shortName": "MBS"}
+        ci_response = {"type": "SEFT"}
         with responses.RequestsMock() as rsps:
             rsps.add(
                 rsps.GET,
-                f"http://localhost:8080/surveys/{test_uuid}",
-                json=survey_response,
+                f"http://localhost:8002/collection-instrument-api/1.0.2/{test_uuid}",
+                json=ci_response,
                 status=200,
                 content_type="application/json",
             )
             with app.app_context():
                 cache = RedisCache()
-                result = cache.get_survey(test_uuid)
-                self.assertEqual(result, {"shortName": "MBS"})
+                result = cache.get_collection_instrument(test_uuid)
+                self.assertEqual(result, {"type": "SEFT"})

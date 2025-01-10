@@ -5,12 +5,12 @@ name: Build
 on:
   push:
     branches:
-      - main
+      - survey-respondent-help-journey
     paths-ignore:
       - _infra/spinnaker/**
   pull_request:
     branches:
-      - main
+      - survey-respondent-help-journey
     paths-ignore:
       - _infra/spinnaker/**
 

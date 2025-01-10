@@ -46,6 +46,16 @@
                 <div id="ALREADY_ADDED_NOTIF">You have already added that <a href="#new-survey">survey</a> </div>
         {% endcall %}
     {% endif %}
+
+    {% if survey_shared %}
+        {% call onsPanel({
+            "variant": "success",
+            "classes": "ons-u-mb-s",
+            "iconType": 'check',
+        }) %}
+                An email with instructions has been sent
+    {% endcall %}
+    {% endif %}
     {% if delete_option_allowed %}
         {{
             onsPanel({

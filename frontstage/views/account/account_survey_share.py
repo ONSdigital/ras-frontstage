@@ -80,6 +80,7 @@ def share_survey_survey_select(session):
         surveys = get_surveys_listed_against_party_and_business_id(business_id, party_id)
         share_dict[selected_business[0]["id"]] = {
             "name": selected_business[0]["name"],
+            "sampleUnitRef": selected_business[0]["sampleUnitRef"],
             "surveys": surveys,
         }
     error = request.args.get("error", "")
@@ -314,6 +315,7 @@ def send_instruction(session):
         return redirect(url_for("account_bp.send_instruction_get"))
     return render_template(
         "surveys/surveys-share/almost-done.html",
+        email=email,
     )
 
 
@@ -322,4 +324,4 @@ def send_instruction(session):
 def share_survey_done(_):
     flask_session.pop("share", None)
     flask_session.pop("share_survey_recipient_email_address", None)
-    return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
+    return redirect(url_for("surveys_bp.get_survey_list", tag="todo", survey_shared=True))

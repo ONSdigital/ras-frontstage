@@ -282,9 +282,60 @@ class TestConversationController(unittest.TestCase):
                 with self.assertRaises(ApiError):
                     send_secure_message(self.sm_form)
 
+
+    @patch("frontstage.controllers.conversation_controller.get_respondent_enrolments")
+    def test_secure_message(self, get_respondent_enrolments):
+        get_respondent_enrolments.return_value = self._respondent_enrolments_return_value()
+        options = secure_message_enrolment_options(PARTY_ID, self.sm_form)
+        self.assertEqual(options, self._expected_options())
+
     @patch("frontstage.controllers.conversation_controller.get_respondent_enrolments")
     def test_secure_message_multiple_businesses(self, get_respondent_enrolments):
-        get_respondent_enrolments.return_value = [
+        respondent_enrolments_return_value = self._respondent_enrolments_return_value()
+        respondent_enrolments_return_value.append(
+            {
+                "business_details": {
+                    "id": "aebee450-46da-4f8b-a7a6-d4632087f2a3",
+                    "name": "Test Business 2",
+                    "ref": "49910000014",
+                    "trading_as": "Trading as Test Business 2",
+                },
+                "survey_details": {
+                    "id": "41320b22-b425-4fba-a90e-718898f718ce",
+                    "short_name": "AIFDI",
+                    "long_name": "Annual Inward Foreign Direct Investment Survey",
+                    "ref": "062",
+                },
+                "enrolment_status": "ENABLED",
+            }
+        )
+        get_respondent_enrolments.return_value = respondent_enrolments_return_value
+        options = secure_message_enrolment_options(PARTY_ID, self.sm_form)
+
+        expected_options = self._expected_options()
+        expected_options["business"] = [
+            {"value": "Choose an organisation", "text": "Choose an organisation", "disabled": True},
+            {"value": "aebee450-46da-4f8b-a7a6-d4632087f2a3", "text": "Test Business 2"},
+            {"value": "bebee450-46da-4f8b-a7a6-d4632087f2a3", "text": "Test Business 1"},
+        ]
+        self.assertEqual(options, expected_options)
+
+
+    @patch("frontstage.controllers.conversation_controller.get_respondent_enrolments")
+    def test_secure_message_subject_not_selected(self, get_respondent_enrolments):
+        self.sm_form.subject.data = ""
+        get_respondent_enrolments.return_value = self._respondent_enrolments_return_value()
+        options = secure_message_enrolment_options(PARTY_ID, self.sm_form)
+
+        expected_options = self._expected_options()
+        expected_options["subject"][0]["selected"] = True
+        expected_options["subject"][4].pop("selected")
+
+        self.assertEqual(options, expected_options)
+
+    @staticmethod
+    def _respondent_enrolments_return_value():
+        return [
             {
                 "business_details": {
                     "id": "bebee450-46da-4f8b-a7a6-d4632087f2a3",
@@ -300,63 +351,29 @@ class TestConversationController(unittest.TestCase):
                 },
                 "enrolment_status": "ENABLED",
             },
-            {
-                "business_details": {
-                    "id": "aebee450-46da-4f8b-a7a6-d4632087f2a3",
-                    "name": "Test Business 1",
-                    "ref": "49910000014",
-                    "trading_as": "Trading as Test Business 1",
-                },
-                "survey_details": {
-                    "id": "41320b22-b425-4fba-a90e-718898f718ce",
-                    "short_name": "AIFDI",
-                    "long_name": "Annual Inward Foreign Direct Investment Survey",
-                    "ref": "062",
-                },
-                "enrolment_status": "ENABLED",
-            },
         ]
-        secure_message_enrolment_options(PARTY_ID, self.sm_form)
 
-    @patch("frontstage.controllers.conversation_controller.get_respondent_enrolments")
-    def test_secure_message(self, get_respondent_enrolments):
-        get_respondent_enrolments.return_value = [
-            {
-                "business_details": {
-                    "id": BUSINESS_ID,
-                    "name": "Test Business 1",
-                    "ref": "49910000014",
-                    "trading_as": "Trading as Test Business 1",
+    @staticmethod
+    def _expected_options():
+        return {
+            "survey": [
+                {"value": "Choose a survey", "text": "Choose a survey", "disabled": True},
+                {
+                    "value": "41320b22-b425-4fba-a90e-718898f718ce",
+                    "text": "Annual Inward Foreign Direct Investment Survey",
                 },
-                "survey_details": {
-                    "id": SURVEY_ID,
-                    "short_name": "AIFDI",
-                    "long_name": "Annual Inward Foreign Direct Investment Survey",
-                    "ref": "062",
+                {"value": "Not survey related", "text": "Not survey related"},
+            ],
+            "subject": [
+                {"value": "Choose a subject", "text": "Choose a subject", "disabled": True},
+                {"value": "Change business address", "text": "Change business address"},
+                {"value": "Feedback", "text": "Feedback"},
+                {
+                    "value": "Help transferring or sharing access to a survey",
+                    "text": "Help transferring or sharing access to a survey",
                 },
-                "enrolment_status": "ENABLED",
-            }
-        ]
-        secure_message_enrolment_options(PARTY_ID, self.sm_form)
-
-    @patch("frontstage.controllers.conversation_controller.get_respondent_enrolments")
-    def test_secure_message_subject_not_selected(self, get_respondent_enrolments):
-        self.sm_form.subject.data = ""
-        get_respondent_enrolments.return_value = [
-            {
-                "business_details": {
-                    "id": BUSINESS_ID,
-                    "name": "Test Business 1",
-                    "ref": "49910000014",
-                    "trading_as": "Trading as Test Business 1",
-                },
-                "survey_details": {
-                    "id": SURVEY_ID,
-                    "short_name": "AIFDI",
-                    "long_name": "Annual Inward Foreign Direct Investment Survey",
-                    "ref": "062",
-                },
-                "enrolment_status": "ENABLED",
-            }
-        ]
-        secure_message_enrolment_options(PARTY_ID, self.sm_form)
+                {"value": "Help with my survey", "text": "Help with my survey", "selected": True},
+                {"value": "Something else", "text": "Something else"},
+                {"value": "Technical difficulties", "text": "Technical difficulties"},
+            ],
+        }

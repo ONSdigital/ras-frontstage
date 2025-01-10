@@ -31,7 +31,9 @@ def send_message(session) -> str:
     errors = {}
     if request.method == "POST":
         secure_message_form.party_id = session.get_party_id()
-        secure_message_form.category = "TECHNICAL" if request.form.get("survey") == "Non-survey" else "SURVEY"
+        secure_message_form.category = (
+            "TECHNICAL" if request.form.get("survey_id") == "Not survey related" else "SURVEY"
+        )
 
         try:
             msg_id = send_secure_message(secure_message_form)

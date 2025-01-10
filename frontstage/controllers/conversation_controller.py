@@ -32,19 +32,19 @@ class InvalidSecureMessagingForm(Exception):
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-Options = namedtuple("Options", ["value", "text"])
+Option = namedtuple("Option", ["value", "text"])
 
 ORGANISATION_DISABLED_OPTION = {"value": "Choose an organisation", "text": "Choose an organisation", "disabled": True}
 SURVEY_DISABLED_OPTION = {"value": "Choose a survey", "text": "Choose a survey", "disabled": True}
 SUBJECT_DISABLED_OPTION = {"value": "Choose a subject", "text": "Choose a subject", "disabled": True}
 
 SUBJECT_OPTIONS = {
-    Options("Help with my survey", "Help with my survey"),
-    Options("Technical difficulties", "Technical difficulties"),
-    Options("Change business address", "Change business address"),
-    Options("Feedback", "Feedback"),
-    Options("Help transferring or sharing access to a survey", "Help transferring or sharing access to a survey"),
-    Options("Something else", "Something else"),
+    Option("Help with my survey", "Help with my survey"),
+    Option("Technical difficulties", "Technical difficulties"),
+    Option("Change business address", "Change business address"),
+    Option("Feedback", "Feedback"),
+    Option("Help transferring or sharing access to a survey", "Help transferring or sharing access to a survey"),
+    Option("Something else", "Something else"),
 }
 
 
@@ -183,11 +183,11 @@ def send_secure_message(form, msg_to=["GROUP"]) -> UUID:
 def secure_message_enrolment_options(party_id: UUID, secure_message_form: SecureMessagingForm) -> dict:
     """returns a dict of enrolment options based on a respondents party_id"""
 
-    business_options, surveys_options = _get_unique_business_survey_options(party_id)
+    business_options, survey_options = _get_unique_business_survey_options(party_id)
 
     sm_enrolment_options = {
         "survey": _create_formatted_option_list(
-            surveys_options, secure_message_form.survey_id.data, SURVEY_DISABLED_OPTION
+            survey_options, secure_message_form.survey_id.data, SURVEY_DISABLED_OPTION
         ),
         "subject": _create_formatted_option_list(
             SUBJECT_OPTIONS, secure_message_form.subject.data, SUBJECT_DISABLED_OPTION
@@ -253,17 +253,18 @@ def _get_unique_business_survey_options(party_id: UUID) -> tuple[set, set]:
 
     enrolments = get_respondent_enrolments(party_id)
     business_details_set = set()
-    survey_details_set = set()
+    survey_details_set = {Option("Not survey related", "Not survey related")}
+
     for enrolments in enrolments:
-        business_details_set.add(Options(enrolments["business_details"]["id"], enrolments["business_details"]["name"]))
-        survey_details_set.add(Options(enrolments["survey_details"]["id"], enrolments["survey_details"]["long_name"]))
+        business_details_set.add(Option(enrolments["business_details"]["id"], enrolments["business_details"]["name"]))
+        survey_details_set.add(Option(enrolments["survey_details"]["id"], enrolments["survey_details"]["long_name"]))
     return business_details_set, survey_details_set
 
 
-def _create_formatted_option_list(options, selected, disabled_option) -> list:
+def _create_formatted_option_list(options: set, selected: str, disabled_option: dict) -> list:
     formatted_option_list = [disabled_option]
 
-    for option in options:
+    for option in sorted(options):
         option_dict = {"value": option.value, "text": option.text}
         if selected == option.value:
             option_dict["selected"] = True

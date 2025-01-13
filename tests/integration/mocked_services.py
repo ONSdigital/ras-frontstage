@@ -91,6 +91,9 @@ with open("tests/test_data/survey/survey_list_history.json") as fp:
 with open("tests/test_data/party/respondent_enrolments.json") as fp:
     respondent_enrolments = json.load(fp)
 
+with open("tests/test_data/party/new_respondent_enrolments.json") as fp:
+    new_respondent_enrolments = json.load(fp)
+
 encoded_jwt_token = (
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXJ0eV9pZCI6ImY5NTZlOGFlLTZ"
     "lMGYtNDQxNC1iMGNmLWEwN2MxYWEzZTM3YiIsImV4cGlyZXNfYXQiOiIxMDAxMjM0NTY"

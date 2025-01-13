@@ -8,9 +8,11 @@ from frontstage.controllers import party_controller
 from tests.integration.mocked_services import (
     business_party,
     encoded_jwt_token,
+    new_respondent_enrolments,
     respondent_party,
     survey,
     url_banner_api,
+    url_get_respondent_enrolments,
     url_get_respondent_party,
     url_get_survey,
 )
@@ -97,30 +99,26 @@ class TestShareSurvey(unittest.TestCase):
         self.assertIn("There is 1 error on this page".encode(), response.data)
         self.assertIn("You need to choose a business".encode(), response.data)
 
-    # @requests_mock.mock()
-    # @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
-    # def test_share_survey_select(self, mock_request, get_respondent_enrolments):
-    #     mock_request.get(url_banner_api, status_code=404)
-    #     mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-    #     mock_request.get(url_get_business_details, status_code=200, json=[business_party])
-    #     mock_request.get(url_get_survey, status_code=200, json=survey)
-    #     mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
-    #     with app.app_context():
-    #         get_respondent_enrolments.return_value = party_controller.get_respondent_enrolments(RESPONDENT_ID)
-    #         print(party_controller.get_respondent_enrolments(RESPONDENT_ID))
-    #     response = self.app.post(
-    #         "/my-account/share-surveys/business-selection",
-    #         data={"checkbox-answer": "99941a3f-8e32-40e4-b78a-e039a2b437ca"},
-    #         follow_redirects=True,
-    #     )
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertIn("Which surveys do you want to share?".encode(), response.data)
-    #     self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
-    #     self.assertIn("Select all that apply".encode(), response.data)
-    #     self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
-    #     self.assertIn("Quarterly Business Survey".encode(), response.data)
-    #     self.assertTrue("Continue".encode() in response.data)
-    #     self.assertTrue("Cancel".encode() in response.data)
+    @requests_mock.mock()
+    def test_share_survey_select(self, mock_request):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
+        mock_request.get(url_get_business_details, status_code=200, json=[business_party])
+        mock_request.get(url_get_survey, status_code=200, json=survey)
+        mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
+        mock_request.get(url_get_respondent_enrolments, status_code=200, json=new_respondent_enrolments)
+        response = self.app.post(
+            "/my-account/share-surveys/business-selection",
+            data={"checkbox-answer": "99941a3f-8e32-40e4-b78a-e039a2b437ca"},
+            follow_redirects=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Which surveys do you want to share?".encode(), response.data)
+        self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
+        self.assertIn("Quarterly Business Survey".encode(), response.data)
+        self.assertIn("Select all that apply".encode(), response.data)
+        self.assertTrue("Continue".encode() in response.data)
+        self.assertTrue("Cancel".encode() in response.data)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_enrolments")

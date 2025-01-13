@@ -539,7 +539,7 @@ def get_list_of_business_for_party(party_id: str) -> list:
     """
     logger.info("Getting enrolment data for the party", party_id=party_id)
     enrolment_data = get_respondent_enrolments(party_id)
-    business_ids = {enrolment["business_id"] for enrolment in enrolment_data}
+    business_ids = {enrolment["business_details"]["id"] for enrolment in enrolment_data}
     logger.info("Getting businesses against business ids", business_ids=business_ids, party_id=party_id)
     return get_business_by_id(business_ids)
 
@@ -570,7 +570,7 @@ def get_surveys_listed_against_party_and_business_id(business_id: str, party_id:
     """
 
     respondent_enrolments = get_respondent_enrolments(party_id, {"business_id": business_id})
-    survey_ids = {enrolment["survey_id"] for enrolment in respondent_enrolments}
+    survey_ids = {enrolment["survey_details"]["id"] for enrolment in respondent_enrolments}
     surveys = []
     for survey in survey_ids:
         response = survey_controller.get_survey(app.config["SURVEY_URL"], app.config["BASIC_AUTH"], survey)

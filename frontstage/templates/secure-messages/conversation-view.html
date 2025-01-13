@@ -97,6 +97,9 @@
                         <form action="{{ url_for('secure_message_bp.view_conversation', thread_id=conversation[0].thread_id) }}" method="post" id="create-message-form">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <input type="hidden" name="thread_id" value="{{ conversation[0].thread_id }}"/>
+                            <input type="hidden" name="business_id" value="{{ business_id }}"/>
+                            <input type="hidden" name="survey_id" value="{{ survey_id }}"/>
+                            <input type="hidden" name="subject" value="{{ subject }}"/>
                             {{
                                 onsTextarea({
                                     "id": "secure-message-body",

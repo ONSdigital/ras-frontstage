@@ -1,9 +1,32 @@
 [
-  {"business_id":"99941a3f-8e32-40e4-b78a-e039a2b437ca", "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d", "status": "ENABLED"},
-  {"business_id":"99941a3f-8e32-40e4-b78a-e039a2b437ca", "survey_id": "cb8accda-6118-4d3b-85a3-149e28960c54", "status": "ENABLED"},
-  {"business_id":"14ab2c84-acc3-4d2d-84a7-c65cb7c2e49e", "survey_id": "cb8accda-6118-4d3b-85a3-149e28960c54", "status": "ENABLED"},
-  {"business_id":"be3483c3-f5c9-4b13-bdd7-244db78ff687", "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d", "status": "ENABLED"},
-  {"business_id":"be3483c3-f5c9-4b13-bdd7-244db78ff687", "survey_id": "cb8accda-6118-4d3b-85a3-149e28960c54", "status": "ENABLED"},
-  {"business_id":"0008279d-9425-4e28-897d-bfd876aa7f3f", "survey_id": "cb8accda-6118-4d3b-85a3-149e28960c54", "status": "ENABLED"}
+  {
+    "business_details": {
+      "id": "e23f232c-c7ea-463c-a1cf-522cf7f33da9",
+      "name": "RUNAME1_COMPANY1 RUNNAME2_COMPANY1",
+      "ref": "49900000001",
+      "trading_as": "TOTAL UK ACTIVITY"
+    },
+    "enrolment_status": "ENABLED",
+    "survey_details": {
+      "id": "02b9c366-7397-42f7-942a-76dc5876d86d",
+      "long_name": "Quarterly Business Survey",
+      "ref": "139",
+      "short_name": "QBS"
+    }
+  },
+  {
+    "business_details": {
+      "id": "e23f232c-c7ea-463c-a1cf-522cf7f33da9",
+      "name": "RUNAME1_COMPANY1 RUNNAME2_COMPANY1",
+      "ref": "49900000001",
+      "trading_as": "TOTAL UK ACTIVITY"
+    },
+    "enrolment_status": "ENABLED",
+    "survey_details": {
+      "id": "cb8accda-6118-4d3b-85a3-149e28960c54",
+      "long_name": "Monthly Survey of Building Materials Bricks",
+      "ref": "074",
+      "short_name": "Bricks"
+    }
+  }
 ]
-

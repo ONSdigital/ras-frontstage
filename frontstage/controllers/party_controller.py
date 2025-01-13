@@ -570,21 +570,7 @@ def get_surveys_listed_against_party_and_business_id(business_id: str, party_id:
     """
 
     respondent_enrolments = get_respondent_enrolments(party_id, {"business_id": business_id})
-    print()
-    print()
-    print()
-    print(respondent_enrolments)
-    print()
-    print()
-    print()
     survey_ids = {enrolment["survey_details"]["id"] for enrolment in respondent_enrolments}
-    print()
-    print()
-    print()
-    print(survey_ids)
-    print()
-    print()
-    print()
     surveys = []
     for survey in survey_ids:
         response = survey_controller.get_survey(app.config["SURVEY_URL"], app.config["BASIC_AUTH"], survey)

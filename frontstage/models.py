@@ -187,18 +187,22 @@ class ResetPasswordForm(FlaskForm):
 
 
 class SecureMessagingForm(FlaskForm):
-    subject = StringField(validators=[DataRequired("Please select a subject")])
-    category = StringField()
+    subject = StringField(validators=[DataRequired("Select the subject")])
     body = TextAreaField(
         validators=[
-            DataRequired(_("Message is required")),
-            Length(max=1000, message="Message must be less than 50000 characters"),
+            DataRequired("Message cannot be left blank"),
+            Length(max=50000, message="Message must be less than 50000 characters"),
         ],
     )
-    thread_id = HiddenField()
-    survey_id = StringField(validators=[DataRequired("Please select a survey")])
+    business_id = StringField(validators=[DataRequired("Select the business")])
+    survey_id = StringField()
+    category = StringField()
     party_id = StringField()
-    business_id = StringField(validators=[DataRequired("Please select a business")])
+    thread_id = HiddenField()
+
+    def validate_survey_id(form, field):
+        if form.category == "SURVEY" and not field.data:
+            raise ValidationError("Select the survey")
 
 
 class RespondentStatus(enum.IntEnum):

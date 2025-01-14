@@ -7,6 +7,7 @@ from werkzeug.utils import redirect
 
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers.conversation_controller import (
+    NOT_SURVEY_RELATED,
     InvalidSecureMessagingForm,
     secure_message_enrolment_options,
     send_secure_message,
@@ -31,14 +32,16 @@ def send_message(session) -> str:
     errors = {}
     if request.method == "POST":
         secure_message_form.party_id = session.get_party_id()
-        secure_message_form.category = (
-            "TECHNICAL" if request.form.get("survey_id") == "Not survey related" else "SURVEY"
-        )
+        secure_message_form.category = "TECHNICAL" if request.form.get("survey_id") == NOT_SURVEY_RELATED else "SURVEY"
 
         try:
             msg_id = send_secure_message(secure_message_form)
             thread_url = url_for("secure_message_bp.view_conversation", thread_id=msg_id) + "#latest-message"
-            flash(Markup(f"Message sent. <a href={thread_url}>View Message</a>"))
+            flash(
+                Markup(
+                    f"Your message has been sent, a request can take up to 5 working days <a href={thread_url}>View Message</a>"
+                )
+            )
             return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
         except InvalidSecureMessagingForm as e:
             errors = _errors(e.errors)

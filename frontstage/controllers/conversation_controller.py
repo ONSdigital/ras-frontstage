@@ -31,6 +31,7 @@ class InvalidSecureMessagingForm(Exception):
 
 logger = wrap_logger(logging.getLogger(__name__))
 
+NOT_SURVEY_RELATED = "Not survey related"
 
 Option = namedtuple("Option", ["value", "text"])
 
@@ -116,7 +117,7 @@ def send_secure_message(form, msg_to=["GROUP"]) -> UUID:
     if not form.validate():
         raise InvalidSecureMessagingForm(form.errors)
 
-    survey_id = form.survey_id.data
+    survey_id = None if form.survey_id.data == NOT_SURVEY_RELATED else form.survey_id.data
     business_id = form.business_id.data
     sm_version = current_app.config["SECURE_MESSAGE_VERSION"]
     session = _get_session()

@@ -267,10 +267,11 @@ class TestConversationController(unittest.TestCase):
     @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
     def test_send_message_invalid_secure_message_form(self, headers):
         headers.return_value = {"Authorization": "token"}
+        self.sm_form.survey_id.data = ""
         with app.app_context():
 
             with self.assertRaises(InvalidSecureMessagingForm):
-                send_secure_message(SecureMessagingForm())
+                send_secure_message(self.sm_form)
 
     @patch("frontstage.controllers.conversation_controller._create_send_message_headers")
     def test_send_message_api_error(self, headers):

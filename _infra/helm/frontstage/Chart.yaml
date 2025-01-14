@@ -14,6 +14,7 @@ type: application
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
+
 # This will be set to an appropriate branch version prior to the final merge to main
 version: 0.0.100
 

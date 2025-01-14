@@ -1,24 +1,18 @@
 import logging
 
 from flask import flash, request, url_for
-from markupsafe import Markup
 from structlog import wrap_logger
 from werkzeug.utils import redirect
 
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.common.utilities import obfuscate_email
 from frontstage.controllers import auth_controller, party_controller
-from frontstage.controllers.conversation_controller import (
-    InvalidSecureMessagingForm,
-    send_message,
-)
 from frontstage.exceptions.exceptions import ApiError, AuthError
 from frontstage.models import (
     ChangePasswordFrom,
     ConfirmEmailChangeForm,
     ContactDetailsChangeForm,
     OptionsForm,
-    SecureMessagingForm,
 )
 from frontstage.views.account import account_bp
 from frontstage.views.template_helper import render_template
@@ -166,33 +160,6 @@ def change_account_details(session):
             errors=form.errors,
             respondent=respondent_details,
         )
-
-
-@account_bp.route("/something-else", methods=["GET"])
-@jwt_authorization(request)
-def something_else(session):
-    """Gets the something else once the option is selected"""
-    return render_template(
-        "account/account-something-else.html",
-        session=session,
-        form=SecureMessagingForm(),
-    )
-
-
-@account_bp.route("/something-else", methods=["POST"])
-@jwt_authorization(request)
-def something_else_post(session):
-    """Sends secure message for the something else pages"""
-    party_id = session.get_party_id()
-    try:
-        msg_id = send_message(request.form, party_id, "My account", "TECHNICAL")
-    except InvalidSecureMessagingForm as e:
-        flash(e.errors["body"][0])
-        return redirect(url_for("account_bp.something_else"))
-
-    thread_url = url_for("secure_message_bp.view_conversation", thread_id=msg_id) + "#latest-message"
-    flash(Markup(f"Message sent. <a href={thread_url}>View Message</a>"))
-    return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
 
 
 def check_attribute_change(form, attributes_changed, respondent_details, update_required_flag):

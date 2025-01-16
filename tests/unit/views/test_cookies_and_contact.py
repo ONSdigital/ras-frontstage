@@ -5,6 +5,7 @@ import requests_mock
 
 from frontstage import app
 from frontstage.controllers.conversation_controller import InvalidSecureMessagingForm
+from frontstage.exceptions.exceptions import JWTValidationError
 from tests.integration.mocked_services import encoded_jwt_token, url_banner_api
 
 
@@ -40,13 +41,28 @@ class TestCookiesContact(unittest.TestCase):
         self.assertTrue("Where can I find out more about how my information will be treated?".encode() in response.data)
 
     @requests_mock.mock()
-    def test_contact_success(self, mock_request):
+    @patch("frontstage.views.contact_us.validate_jwt")
+    def test_contact_authorized(self, mock_request, _):
         mock_request.get(url_banner_api, status_code=404)
         response = self.app.get("/contact-us")
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue("Contact us".encode() in response.data)
-        self.assertIn(b'href="/sign-in/"', response.data)
+        self.assertIn("Message us".encode(), response.data)
+        self.assertIn("Send message".encode(), response.data)
+        self.assertNotIn("Email".encode(), response.data)
+
+    @requests_mock.mock()
+    @patch("frontstage.views.contact_us.validate_jwt")
+    def test_contact_unauthorized(self, mock_request, validate_jwt):
+        validate_jwt.side_effect = JWTValidationError("Unauthorized")
+        mock_request.get(url_banner_api, status_code=404)
+        response = self.app.get("/contact-us")
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("Contact us".encode() in response.data)
+        self.assertIn("Email".encode(), response.data)
+        self.assertNotIn("Message us".encode(), response.data)
+        self.assertNotIn("Send message".encode(), response.data)
 
     @requests_mock.mock()
     @patch("frontstage.views.contact_us.secure_message_enrolment_options")

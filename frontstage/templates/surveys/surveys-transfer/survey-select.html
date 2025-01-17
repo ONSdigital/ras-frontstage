@@ -64,7 +64,7 @@
         {% endif %}
     {% endwith %}
 
-    <h1 class='ons-u-mb-m'>Transfer your surveys</h1>
+    <h1 class="ons-u-mb-m">Transfer your surveys</h1>
     {% call onsPanel({
         'classes': 'ons-u-mb-m',
         })
@@ -103,7 +103,7 @@
     {% endcall %}
 
     <form action='' method='post'>
-        <h2 class='ons-u-mb-l'>Choose the surveys you want to transfer</h2>
+        <h2 class="ons-u-mb-l">Choose the surveys you want to transfer</h2>
         <input type='hidden' name='csrf_token' value='{{ csrf_token() }}'/>
         {% set selected_surveys = [] %}
         {% set selected_businesses_and_surveys = [] %}
@@ -166,7 +166,7 @@
                 {% do checkboxesData | setAttribute('checkboxes', checkboxData) %}
             {{ onsCheckboxes(checkboxesData) }}
         {% endfor %}
-        <div class='ons-field'>
+        <div class="ons-field">
             {{
                 onsButton({
                     'text': 'Continue',

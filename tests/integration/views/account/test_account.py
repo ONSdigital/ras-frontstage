@@ -8,6 +8,7 @@ from tests.integration.mocked_services import (
     encoded_jwt_token,
     respondent_enrolments,
     respondent_party,
+    survey,
     survey_list_todo,
     url_banner_api,
 )
@@ -226,5 +227,3 @@ class TestSurveyList(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Message sent.".encode(), response.data)
-
-

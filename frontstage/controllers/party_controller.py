@@ -619,6 +619,27 @@ def register_pending_shares(payload):
     return response
 
 
+def register_pending_transfers(payload):
+    """
+    register new entries to party for pending transfers
+
+    :param payload: pending transfer entries dict
+    :return: success if post completed
+    :rtype: response object
+    """
+    logger.info("Attempting register pending transfer")
+    url = f'{app.config["PARTY_URL"]}/party-api/v1/pending-surveys'
+    response = requests.post(url, json=json.loads(payload), auth=app.config["BASIC_AUTH"])
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        if response.status_code == 400:
+            logger.info("transferred survey has already been transferred, hence ignoring this request.")
+        else:
+            raise ApiError(logger, response)
+    return response
+
+
 def get_pending_surveys_batch_number(batch_no):
     """
     Gets batch number for the shared survey

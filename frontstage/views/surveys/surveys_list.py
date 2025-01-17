@@ -7,6 +7,10 @@ from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import conversation_controller, party_controller
+from frontstage.controllers.party_controller import (
+    get_business_by_id,
+    get_surveys_listed_against_party_and_business_id,
+)
 from frontstage.views.surveys import surveys_bp
 from frontstage.views.template_helper import render_template
 
@@ -27,6 +31,9 @@ def get_survey_list(session, tag):
     survey_id = request.args.get("survey_id")
     already_enrolled = request.args.get("already_enrolled")
     survey_shared = request.args.get("survey_shared")
+    survey_transferred = request.args.get("survey_transferred")
+    transfer_dict = None
+
     logger.info(
         "Retrieving survey list",
         party_id=party_id,
@@ -53,6 +60,8 @@ def get_survey_list(session, tag):
     unread_message_count = {"unread_message_count": conversation_controller.try_message_count_from_session(session)}
     if tag == "todo":
         added_survey = True if business_id and survey_id and not already_enrolled else None
+        if survey_transferred:
+            transfer_dict = flask_session.get("transferred_surveys")
         response = make_response(
             render_template(
                 "surveys/surveys-todo.html",
@@ -63,6 +72,8 @@ def get_survey_list(session, tag):
                 unread_message_count=unread_message_count,
                 delete_option_allowed=True if len(respondent_enrolments) == 0 else False,
                 survey_shared=survey_shared,
+                survey_transferred=survey_transferred,
+                transfer_dict=transfer_dict,
             )
         )
 

@@ -149,7 +149,6 @@ def is_max_transfer_survey_exceeded(selected_businesses):
 @account_bp.route("/transfer-surveys/survey-selection", methods=["POST"])
 @jwt_authorization(request)
 def transfer_survey_post_survey_select(_):
-    test = request
     business_to_survey = collections.defaultdict(list)
     surveys_selected = request.form.getlist("selected_surveys")
     for business_surveys in surveys_selected:

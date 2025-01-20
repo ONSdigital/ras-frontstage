@@ -55,7 +55,6 @@
     </div>
        {% for business in transfer_dict %}
         <h2 class="ons-u-mb-xs">Organisation: {{ transfer_dict[business].name }}</h2>
-        {% if transfer_dict[business] | length > 0 %}
         <div>
             {% set surveyList = [] %}
             {% for survey in transfer_dict[business].surveys %}
@@ -67,13 +66,12 @@
             {% endfor %}
             {{
                 onsList({
-                    "element": 'ul',
+                    "element": "ul",
                     "classes": "ons-u-mb-l",
                     "itemsList": surveyList
                 })
             }}
         </div>
-        {% endif %}
     {% endfor %}
     <form action="" method="post">
         {{ form.csrf_token }}

@@ -16,7 +16,7 @@ from frontstage.controllers.party_controller import (
     get_list_of_business_for_party,
     get_surveys_listed_against_party_and_business_id,
     get_user_count_registered_against_business_and_survey,
-    register_pending_transfers,
+    register_party_service_pending_transfers,
 )
 from frontstage.exceptions.exceptions import TransferSurveyProcessError
 from frontstage.models import (
@@ -274,7 +274,7 @@ def send_transfer_instruction(session):
     if form["email_address"].data != email:
         raise TransferSurveyProcessError("Process failed due to session error")
     json_data = build_payload(respondent_details["id"])
-    response = register_pending_transfers(json_data)
+    response = register_party_service_pending_transfers(json_data, party_id)
     if response.status_code == 400:
         flash(
             "You have already shared or transferred these surveys with someone with this email address. They have 72 "
@@ -283,7 +283,7 @@ def send_transfer_instruction(session):
         )
         return redirect(url_for("account_bp.send_transfer_instruction_get"))
     return render_template(
-        "surveys/surveys-transfer/almost-done.html",
+        "surveys/surveys-transfer/instructions-sent.html",
         session=session,
         email=email,
     )
@@ -293,4 +293,4 @@ def send_transfer_instruction(session):
 @jwt_authorization(request)
 def transfer_survey_done(session):
     flask_session.pop("transfer_survey_recipient_email_address", None)
-    return redirect(url_for("surveys_bp.get_survey_list", tag="todo", survey_transferred=True))
+    return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))

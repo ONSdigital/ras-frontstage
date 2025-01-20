@@ -1,5 +1,6 @@
 import json
 import logging
+from typing import Any, Self
 
 import requests
 from flask import current_app as app
@@ -618,23 +619,25 @@ def register_pending_shares(payload):
     return response
 
 
-def register_pending_transfers(payload):
-    """
-    register new entries to party for pending transfers
-
-    :param payload: pending transfer entries dict
-    :return: success if post completed
-    :rtype: response object
-    """
-    logger.info("Attempting register pending transfer")
+def register_party_service_pending_transfers(payload: json, party_id: str) -> requests.Response:
+    logger.info("Attempting register pending transfer", party_id=party_id)
     url = f'{app.config["PARTY_URL"]}/party-api/v1/pending-surveys'
     response = requests.post(url, json=json.loads(payload), auth=app.config["BASIC_AUTH"])
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         if response.status_code == 400:
-            logger.info("transferred survey has already been transferred, hence ignoring this request.")
+            logger.info(
+                "Transferring of surveys has failed when calling the party service.",
+                party_id=party_id,
+                status_code=response.status_code,
+            )
         else:
+            logger.info(
+                f"Party service has returned a {response.status_code} for {party_id}",
+                party_id=party_id,
+                status_code=response.status_code,
+            )
             raise ApiError(logger, response)
     return response
 

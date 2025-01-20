@@ -63,10 +63,6 @@
                     {% else %}
                         {% set msgType = 'sent' %}
                     {% endif %}
-                    {% if loop.last %}
-                        <div name="latest-message" id="latest-message">
-                    {% endif %}
-
                     {% call onsMessage({
                         "variant": msgType,
                         "id": 'conversation-message-' + loop.index|string,
@@ -82,9 +78,6 @@
                     }) %}
                         <span style="white-space:pre-line">{{ message.get('body') }}</span>
                     {% endcall %}
-                    {% if loop.last %}
-                        </div>
-                    {% endif %}
                 {% endfor %}
 
                 {% if not conversation_data.is_closed %}

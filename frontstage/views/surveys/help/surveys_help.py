@@ -278,7 +278,7 @@ def send_help_message(session, option: str, sub_option: str):
                 request.form, party_id, subject, category, survey_id=survey_id, business_id=business_id, ce_id=ce_id
             )
 
-            thread_url = url_for("secure_message_bp.view_conversation", thread_id=msg_id) + "#latest-message"
+            thread_url = url_for("secure_message_bp.view_conversation", thread_id=msg_id)
             flash(Markup(f"Message sent. <a href={thread_url}>View Message</a>"))
             return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
 

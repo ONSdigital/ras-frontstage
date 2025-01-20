@@ -64,6 +64,6 @@ def send_help_technical_message(session):
         flash(e.errors["body"][0])
         return redirect(url_for("surveys_bp.get_send_help_technical_message_page", option=option))
 
-    thread_url = url_for("secure_message_bp.view_conversation", thread_id=msg_id) + "#latest-message"
+    thread_url = url_for("secure_message_bp.view_conversation", thread_id=msg_id)
     flash(Markup(f"Message sent. <a href={thread_url}>View Message</a>"))
     return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))

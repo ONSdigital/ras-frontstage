@@ -57,7 +57,7 @@ def view_conversation(session, thread_id):
             send_message(
                 request.form, party_id, subject, category, msg_to=msg_to, survey_id=survey_id, business_id=business_id
             )
-            thread_url = url_for("secure_message_bp.view_conversation", thread_id=thread_id) + "#latest-message"
+            thread_url = url_for("secure_message_bp.view_conversation", thread_id=thread_id)
             flash(Markup(f"Message sent. <a href={thread_url}>View Message</a>"))
             return redirect(url_for("secure_message_bp.view_conversation_list"))
         except InvalidSecureMessagingForm as e:

@@ -53,11 +53,11 @@
         <p>We will email a link with instructions to <strong>{{ email }}</strong>.</p>
         <p class="ons-u-mb-l">Once approved, they will have access to: </p>
     </div>
-       {% for business in transfer_dict %}
-        <h2 class="ons-u-mb-xs">Organisation: {{ transfer_dict[business].name }}</h2>
+       {% for business in surveys_to_be_transferred %}
+        <h2 class="ons-u-mb-xs">Organisation: {{ surveys_to_be_transferred[business].name }}</h2>
         <div>
             {% set surveyList = [] %}
-            {% for survey in transfer_dict[business].surveys %}
+            {% for survey in surveys_to_be_transferred[business].surveys %}
                 {% do surveyList.append(
                     {
                         "text": survey['longName']

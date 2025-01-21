@@ -55,7 +55,7 @@
                   "id": "message-link-" ~ loop.index,
                   "unread": true if message['unread'] else false,
                   "subject": {
-                                "url": url_for('secure_message_bp.view_conversation', thread_id=message.thread_id) ~ "#latest-message",
+                                "url": url_for('secure_message_bp.view_conversation', thread_id=message.thread_id),
                                 "text": message.subject
                                 },
                   "fromText": message.from or 'Unavailable',

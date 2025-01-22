@@ -46,16 +46,15 @@
                 "variant": 'warn'
             })
         %}
-            <p>All of the information about your account will be deleted.</p>
-            <p>Once your data has been removed, it cannot be recovered.</p>
+            <p>Once your account has been deleted, you will not be able to recover any of your data.</p>
             <p>You will not be able to set up a new account until you are selected for a new survey.</p>
         {% endcall %}
+        <h2 class="ons-u-fs-l">Are you sure you want to delete your account?</h2>
     {% endif %}
     <form action="" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div class="ons-grid ons-grid-flex ons-grid--gutterless ons-grid-flex--vertical-center ons-grid--no-wrap@s ons-u-mt-m ons-u-mb-m">
             {% if is_validated %}
-            <div class="ons-grid__col">
                 {{
                     onsButton({
                         "text": "Delete account",
@@ -63,11 +62,16 @@
                         "submitType": "timer"
                     })
                 }}
-            </div>
             {% endif %}
-            <div class="ons-grid__col ons-u-ml-m">
-                <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" id="btn-option-cancel">Cancel</a>
-            </div>
+            {{
+                onsButton({
+                    "id": "btn-cancel",
+                    "url": url_for('surveys_bp.get_survey_list', tag='todo'),
+                    "text": 'Cancel',
+                    "variants": 'secondary',
+                    "noIcon": true
+                })
+            }}
         </div>
     </form>
 {% endblock main %}

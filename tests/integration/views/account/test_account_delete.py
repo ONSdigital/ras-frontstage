@@ -50,8 +50,10 @@ class TestAccountDelete(unittest.TestCase):
 
             self.assertEqual(response.status_code, 200)
             self.assertTrue("Delete account".encode() in response.data)
-            self.assertTrue("All of the information about your account will be deleted.".encode() in response.data)
-            self.assertTrue("Once your data has been removed, it cannot be recovered.".encode() in response.data)
+            self.assertTrue(
+                "Once your account has been deleted, you will not be able to recover any of your data".encode()
+                in response.data
+            )
             self.assertTrue(
                 "You will not be able to set up a new account until you are selected for a new survey.".encode()
                 in response.data

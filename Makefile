@@ -34,7 +34,7 @@ lint-check: load-design-system-templates
 	pipenv run djlint frontstage/ --ignore=H037,H021
 	pipenv run flake8
 
-test: lint-check
+test:
 	APP_SETTINGS=TestingConfig pipenv run pytest $(TESTS) --cov frontstage --cov-report term-missing
 
 test-html: lint-check

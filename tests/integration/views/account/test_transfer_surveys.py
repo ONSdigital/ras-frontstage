@@ -332,7 +332,7 @@ class TestTransferSurvey(unittest.TestCase):
         self.assertIn("You can not transfer surveys to yourself.".encode(), response.data)
 
     @requests_mock.mock()
-    def test_transfer_survey_trasnfer_survey_process_error(self, mock_request):
+    def test_transfer_survey_transfer_survey_process_error(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
 
         with self.app.session_transaction() as mock_session:

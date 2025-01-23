@@ -4,9 +4,11 @@ from unittest.mock import patch
 import requests_mock
 
 from frontstage import app
+from frontstage.exceptions.exceptions import TransferSurveyProcessError
 from tests.integration.mocked_services import (
     business_party,
     encoded_jwt_token,
+    party,
     respondent_enrolments,
     respondent_party,
     survey,
@@ -285,3 +287,58 @@ class TestTransferSurvey(unittest.TestCase):
         self.assertIn("RUNAME1_COMPANY1 RUNNAME2_COMPANY1".encode(), response.data)
         self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
         self.assertTrue("Send".encode() in response.data)
+
+    @requests_mock.mock()
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    def test_transfer_survey(self, mock_request, get_respondent_enrolments):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_get_business_details, status_code=200, json=[business_party])
+        mock_request.get(url_get_survey, status_code=200, json=survey)
+        mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
+        get_respondent_enrolments.return_value = respondent_enrolments
+
+        response = self.app.get(
+            "/my-account/transfer-surveys/", data={"email_address": "a@a.com"}, follow_redirects=True
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Transfer your surveys".encode(), response.data)
+        self.assertIn(
+            "If you transfer a survey, you will no longer have access to it. If you will still need access "
+            "to the survey,".encode(),
+            response.data,
+        )
+        self.assertIn("RUNAME1_COMPANY1 RUNNAME2_COMPANY1".encode(), response.data)
+        self.assertIn("Choose the surveys you want to transfer".encode(), response.data)
+        self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
+        self.assertTrue("Continue".encode() in response.data)
+
+    @requests_mock.mock()
+    @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
+    def test_transfer_survey_recipient_email_same_as_user(self, mock_request, get_respondent_party_by_id):
+        mock_request.get(url_banner_api, status_code=404)
+        get_respondent_party_by_id.return_value = party
+
+        with self.app.session_transaction() as mock_session:
+            mock_session["transfer_survey_data"] = [{"business_id": business_party["id"], "survey_id": [survey["id"]]}]
+        response = self.app.post(
+            "/my-account/transfer-surveys/recipient-email-address",
+            data={"email_address": "example@example.com"},
+            follow_redirects=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("There is 1 error on this page".encode(), response.data)
+        self.assertIn("Problem with the email address".encode(), response.data)
+        self.assertIn("You can not transfer surveys to yourself.".encode(), response.data)
+
+    @requests_mock.mock()
+    def test_transfer_survey_trasnfer_survey_process_error(self, mock_request):
+        mock_request.get(url_banner_api, status_code=404)
+
+        with self.app.session_transaction() as mock_session:
+            mock_session["transfer_survey_data"] = [{"business_id": business_party["id"], "survey_id": [survey["id"]]}]
+            mock_session["transfer_survey_recipient_email_address"] = "a@a.com"
+        response = self.app.post("/my-account/transfer-surveys/send-instruction", data={}, follow_redirects=True)
+        self.assertEqual(response.status_code, 500)
+        self.assertRaises(TransferSurveyProcessError)
+        self.assertLogs("Could not find email address in session", response.data)

@@ -16,7 +16,7 @@ from frontstage.controllers.party_controller import (
     get_list_of_business_for_party,
     get_surveys_listed_against_party_and_business_id,
     get_user_count_registered_against_business_and_survey,
-    register_party_service_pending_transfers,
+    register_pending_surveys,
 )
 from frontstage.exceptions.exceptions import TransferSurveyProcessError
 from frontstage.models import (
@@ -88,33 +88,6 @@ def validate_max_transfer_survey(business_id: str, transfer_survey_surveys_selec
             failed_surveys_list.append(survey_selected)
     flask_session["validation_failure_transfer_surveys_list"] = failed_surveys_list
     return is_valid
-
-
-def get_selected_businesses():
-    """
-    This function returns list of business objects against selected business_ids in flask session
-    return: list
-    """
-    selected_businesses = []
-    for business_id in flask_session["transfer_survey_data"]:
-        selected_businesses.append(get_business_by_id(business_id))
-    return selected_businesses
-
-
-def set_surveys_selected_list(selected_businesses, form):
-    """
-    This function sets the flask session key 'transfer_surveys_selected_list' with users selection
-    param: selected_businesses : list of businesses
-    param: form : request form
-    return:None
-    """
-    flask_session.pop("transfer_surveys_selected_list", None)
-    transfer_surveys_selected_list = []
-    for business in selected_businesses:
-        transfer_surveys_selected_list.append(form.getlist(business[0]["id"]))
-    flask_session["transfer_surveys_selected_list"] = [
-        item for sublist in transfer_surveys_selected_list for item in sublist
-    ]
 
 
 def is_max_transfer_survey_exceeded(selected_businesses):
@@ -262,7 +235,7 @@ def send_transfer_instruction(session):
     if form["email_address"].data != email:
         raise TransferSurveyProcessError("Could not find email address in session")
     json_data = build_payload(respondent_details["id"])
-    response = register_party_service_pending_transfers(json_data, party_id)
+    response = register_pending_surveys(json_data, party_id)
     if response.status_code == 400:
         flash(
             "You have already shared or transferred these surveys with someone with this email address. They have 72 "
@@ -275,10 +248,3 @@ def send_transfer_instruction(session):
         session=session,
         email=email,
     )
-
-
-@account_bp.route("/transfer-surveys/done", methods=["GET"])
-@jwt_authorization(request)
-def transfer_survey_done(session):
-    flask_session.pop("transfer_survey_recipient_email_address", None)
-    return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))

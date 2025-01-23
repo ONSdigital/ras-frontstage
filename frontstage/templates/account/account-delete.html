@@ -5,6 +5,23 @@
 {% from "components/panel/_macro.njk" import onsPanel %}
 
 {% set page_title = "Account delete" %}
+{% set breadcrumbsData = [
+    {
+        "text": "Surveys",
+        "url": "/surveys/todo",
+        "id": "b-item"
+    }
+] %}
+
+{% block breadcrumbs %}
+    {{
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
+    }}
+{% endblock breadcrumbs %}
 
 {% block main %}
     {%- with messages = get_flashed_messages(category_filter=["info"]) -%}

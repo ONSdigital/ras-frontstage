@@ -115,12 +115,6 @@ class ShareSurveyProcessError(Exception):
         self.message = message
 
 
-class TransferSurveyProcessError(Exception):
-    def __init__(self, message):
-        super().__init__()
-        self.message = message
-
-
 class ServiceUnavailableException(Exception):
     status_code = 500
 

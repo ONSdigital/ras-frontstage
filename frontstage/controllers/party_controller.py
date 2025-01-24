@@ -379,7 +379,7 @@ def caching_case_data(cache_data, business_ids, tag):
         thread.join()
 
 
-def get_survey_list_details_for_party(enrolment_data: dict, tag: str, business_party_id: str, survey_id: str):
+def get_survey_list_details_for_party(enrolment_data: list, tag: str, business_party_id: str, survey_id: str):
     """
     Gets a list of cases (and any useful metadata) for a respondent.  Depending on the tag the list of cases will be
     ones that require action (in the form of an EQ or SEFT submission); Or they will be cases that have been completed
@@ -389,7 +389,7 @@ def get_survey_list_details_for_party(enrolment_data: dict, tag: str, business_p
     Collection Instrument services. Without this, respondents with a large number of cases can experience page timeouts
     as it'll take too long to load due to repeated calls for the same information from the services.
 
-    There isn't a direct link between respondent and the cases they're involved in.  Instead we can work out what
+    There isn't a direct link between respondent and the cases they're involved in.  Instead, we can work out what
     cases they're involved in via an implicit and indirect link between:
         - The combination of survey and business a respondent is enrolled for, and;
         - the cases and collection exercises the business is involved in
@@ -406,7 +406,7 @@ def get_survey_list_details_for_party(enrolment_data: dict, tag: str, business_p
               - Create an entry in the returned list for each of these cases as the respondent is implicitly part
                 of the case by being enrolled for the survey with that business.
 
-    :param enrolment_data: A dict containing enrolment data
+    :param enrolment_data: A list containing enrolment data dict
     :param tag: This is the page that is being called e.g. to-do, history
     :param business_party_id: This is the businesses uuid
     :param survey_id: This is the surveys uuid

@@ -533,41 +533,37 @@ def _get_case_return_value_by_business_id(*args):
 
 def _get_ces_return_value_by_survey_id(*args):
     """returns the correct collection exercise details based on the survey_id used in the patched called"""
-    print()
-    print()
-    print(args)
-    print()
-    print()
     survey_id = args[1]
-    if survey_id == "{'41320b22-b425-4fba-a90e-718898f718ce', '02b9c366-7397-42f7-942a-76dc5876d86d'}":
-        return [
-            {
-                "id": "6bea2aa8-53a9-4d68-8160-8cbbabfe2d20",
-                "surveyId": "41320b22-b425-4fba-a90e-718898f718ce",
-                "exerciseRef": "3001",
-                "userDescription": "3001",
-                "events": {
-                    "return_by": {
-                        "date": "01 Jan 2030",
-                        "formatted_date": "1st January 2030",
-                        "due_time": "Due in over 3 months",
-                    }
-                },
-            }
-        ]
-    else:
-        return [
-            {
-                "id": "09286c27-7bba-4b94-8ec1-248c60711ebc",
-                "surveyId": "02b9c366-7397-42f7-942a-76dc5876d86d",
-                "exerciseRef": "1912",
-                "userDescription": "December",
-                "events": {
-                    "return_by": {
-                        "date": "29 Nov 2024",
-                        "formatted_date": "29th November 2024",
-                        "due_time": "Due in 3 days",
-                    }
-                },
-            }
-        ]
+    if survey_id == {"41320b22-b425-4fba-a90e-718898f718ce", "02b9c366-7397-42f7-942a-76dc5876d86d"}:
+        return {
+            "41320b22-b425-4fba-a90e-718898f718ce": [
+                {
+                    "id": "6bea2aa8-53a9-4d68-8160-8cbbabfe2d20",
+                    "surveyId": "41320b22-b425-4fba-a90e-718898f718ce",
+                    "exerciseRef": "3001",
+                    "userDescription": "3001",
+                    "events": {
+                        "return_by": {
+                            "date": "01 Jan 2030",
+                            "formatted_date": "1st January 2030",
+                            "due_time": "Due in over 3 months",
+                        }
+                    },
+                }
+            ],
+            "02b9c366-7397-42f7-942a-76dc5876d86d": [
+                {
+                    "id": "09286c27-7bba-4b94-8ec1-248c60711ebc",
+                    "surveyId": "02b9c366-7397-42f7-942a-76dc5876d86d",
+                    "exerciseRef": "1912",
+                    "userDescription": "December",
+                    "events": {
+                        "return_by": {
+                            "date": "29 Nov 2024",
+                            "formatted_date": "29th November 2024",
+                            "due_time": "Due in 3 days",
+                        }
+                    },
+                }
+            ],
+        }

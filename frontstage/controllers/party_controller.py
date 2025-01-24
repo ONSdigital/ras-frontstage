@@ -426,9 +426,7 @@ def get_survey_list_details_for_party(enrolment_data: dict, tag: str, business_p
     caching_case_data(cache_data, business_ids, tag)
 
     #  Populate the enrolments by creating a dictionary using the redis_cache
-    collection_exercises = {
-        survey_id: redis_cache.get_collection_exercises_by_survey(survey_id) for survey_id in surveys_ids
-    }
+    collection_exercises = redis_cache.get_collection_exercises_by_surveys(surveys_ids)
     enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, collection_exercises)
 
     for enrolment in enrolments:

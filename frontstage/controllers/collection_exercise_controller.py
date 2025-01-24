@@ -68,12 +68,6 @@ def get_collection_exercises_for_surveys(survey_ids, collex_url, collex_auth, li
     logger.info("Successfully retrieved collection exercises", survey_ids=survey_ids)
     surveys_with_collection_exercises = response.json()
 
-    print()
-    print()
-    print(surveys_with_collection_exercises)
-    print()
-    print()
-
     for collection_exercises in surveys_with_collection_exercises.values():
         for collection_exercise in collection_exercises:
             if collection_exercise["events"]:

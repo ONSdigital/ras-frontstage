@@ -396,7 +396,7 @@ class TestPartyController(unittest.TestCase):
 
         with app.app_context():  # the 2 patches are inside the context to capture the args
             with patch(
-                "frontstage.controllers.party_controller.RedisCache.get_collection_exercises_by_survey",
+                "frontstage.controllers.party_controller.RedisCache.get_collection_exercises_by_surveys",
                 _get_ces_return_value_by_survey_id,
             ):
                 with patch(
@@ -533,8 +533,13 @@ def _get_case_return_value_by_business_id(*args):
 
 def _get_ces_return_value_by_survey_id(*args):
     """returns the correct collection exercise details based on the survey_id used in the patched called"""
+    print()
+    print()
+    print(args)
+    print()
+    print()
     survey_id = args[1]
-    if survey_id == "41320b22-b425-4fba-a90e-718898f718ce":
+    if survey_id == "{'41320b22-b425-4fba-a90e-718898f718ce', '02b9c366-7397-42f7-942a-76dc5876d86d'}":
         return [
             {
                 "id": "6bea2aa8-53a9-4d68-8160-8cbbabfe2d20",

@@ -116,9 +116,7 @@ url_get_ci = (
     f"{app.config['COLLECTION_INSTRUMENT_URL']}/collection-instrument-api/1.0.2/{collection_instrument_seft['id']}"
 )
 url_get_collection_exercise = f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/{collection_exercise['id']}"
-url_get_collection_exercises_by_survey = (
-    f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/survey/{collection_exercise['surveyId']}"
-)
+url_get_collection_exercises_by_surveys = f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/surveys"
 url_get_collection_exercise_events = (
     f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/{collection_exercise['id']}/events"
 )

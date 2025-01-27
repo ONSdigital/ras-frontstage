@@ -7,7 +7,7 @@ from structlog import wrap_logger
 
 from frontstage import redis
 from frontstage.controllers.collection_exercise_controller import (
-    get_live_collection_exercises_for_survey,
+    get_live_collection_exercises_for_surveys,
 )
 from frontstage.controllers.collection_instrument_controller import (
     get_collection_instrument,
@@ -42,14 +42,14 @@ class RedisCache:
 
         return json.loads(result.decode("utf-8"))
 
-    def get_collection_exercises_by_survey(self, key):
+    def get_collection_exercises_by_surveys(self, key):
         """
         Gets the collection-exercise from redis or the collection-exercise service
 
-        :param key: Key in redis (for this example will be a frontstage:collection-exercise:id)
+        :param key: Key in redis (for this example will be a frontstage:collection-exercise-by-survey-ids:ids)
         :return: Result from either the cache or collection-exercise service
         """
-        redis_key = f"frontstage:collection-exercise-by-survey-id:{key}"
+        redis_key = f"frontstage:collection-exercise-by-survey-ids:{key}"
         try:
             result = redis.get(redis_key)
         except RedisError:
@@ -58,7 +58,7 @@ class RedisCache:
 
         if not result:
             logger.info("Key not in cache, getting value from collection-exercise service", key=redis_key)
-            result = get_live_collection_exercises_for_survey(
+            result = get_live_collection_exercises_for_surveys(
                 key, app.config["COLLECTION_EXERCISE_URL"], app.config["BASIC_AUTH"]
             )
             self.save(redis_key, result, self.COLLECTION_EXERCISE_CATEGORY_EXPIRY)

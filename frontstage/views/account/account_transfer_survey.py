@@ -114,7 +114,7 @@ def send_transfer_instruction_get(_):
             "name": selected_business[0]["name"],
             "surveys": surveys,
         }
-
+        flask_session["transferred_surveys"] = surveys_to_be_transferred
     return render_template(
         "surveys/surveys-transfer/send-instructions.html",
         email=email,

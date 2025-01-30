@@ -64,11 +64,11 @@
             "classes": 'ons-u-mb-m'
         }) %}
             <p>You have requested a transfer of the following surveys: </p>
-            {% for business in transfer_dict %}
-                <p>Organisation: {{ transfer_dict[business].name }}</p>
+            {% for business in transferred_surveys %}
+                <p>Organisation: {{ transferred_surveys[business].name }}</p>
                 <div>
                     {% set surveyList = [] %}
-                    {% for survey in transfer_dict[business].surveys %}
+                    {% for survey in transferred_surveys[business].surveys %}
                         {% do surveyList.append(
                             {
                                 "text": survey['longName']

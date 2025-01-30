@@ -57,13 +57,14 @@
                 An email with instructions has been sent
     {% endcall %}
     {% endif %}
-    {% if transfer_dict %}
+    {% if transferred_surveys %}
         {% call onsPanel({
             "spacious": true,
             "id": 'transferred-id',
             "classes": 'ons-u-mb-m'
         }) %}
             <p>You have requested a transfer of the following surveys: </p>
+
             {% for business in transferred_surveys %}
                 <p>Organisation: {{ transferred_surveys[business].name }}</p>
                 <div>

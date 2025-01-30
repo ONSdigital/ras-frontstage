@@ -1,5 +1,6 @@
 import json
 import logging
+from collections import defaultdict
 
 import requests
 from flask import current_app as app
@@ -792,3 +793,49 @@ def reset_password_reset_counter(party_id):
 
     logger.info("Successfully reset password reset counter")
     return response.json()
+
+
+def get_business_survey_enrolments_map(party_id: str) -> dict:
+    """
+    creates a map of business ids to business details and surveys enrolled on
+    """
+    respondent_enrolments = get_respondent_enrolments(party_id)
+    business_survey_enrolments_map = defaultdict(_business_survey_details)
+
+    for record in respondent_enrolments:
+        business_details = record["business_details"]
+        survey_details = record["survey_details"]
+        business_survey_enrolments_map[business_details["id"]]["business_name"] = business_details["name"]
+        business_survey_enrolments_map[business_details["id"]]["business_ref"] = business_details["ref"]
+        business_survey_enrolments_map[business_details["id"]]["surveys"].append(survey_details)
+
+    return business_survey_enrolments_map
+
+
+def get_surveys_to_transfer_map(selected_surveys: list) -> tuple[dict, list]:
+    """
+    creates a map of business ids to survey_ids that are to be transferred and whether they are valid
+    """
+    business_survey_map = {}
+    invalid_survey_transfers = []
+
+    for survey in selected_surveys:
+        json_survey = json.loads(survey.replace("'", '"'))
+        business_id = json_survey["business_id"]
+        survey_id = json_survey["survey_id"]
+        business_survey_map.setdefault(business_id, []).append(survey_id)
+        if _has_max_share_for_survey_been_exceeded(business_id, survey_id):
+            invalid_survey_transfers.append(business_id)
+
+    return business_survey_map, invalid_survey_transfers
+
+
+def _has_max_share_for_survey_been_exceeded(business_id: str, survey_id: str) -> bool:
+    count = get_user_count_registered_against_business_and_survey(business_id, survey_id, True)
+    if count > (app.config["MAX_SHARED_SURVEY"] + 1):
+        return True
+    return False
+
+
+def _business_survey_details() -> dict:
+    return {"business_name": None, "business_ref": None, "surveys": []}

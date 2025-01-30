@@ -12,9 +12,8 @@ from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import party_controller, survey_controller
 from frontstage.controllers.party_controller import (
     get_business_by_id,
-    get_list_of_business_for_party,
-    get_respondent_enrolments,
-    get_user_count_registered_against_business_and_survey,
+    get_business_survey_enrolments_map,
+    get_surveys_to_transfer_map,
     register_pending_surveys,
 )
 from frontstage.exceptions.exceptions import TransferSurveyProcessError
@@ -50,10 +49,9 @@ def survey_selection(session):
     invalid_survey_shares = []
 
     if request.method == "POST":
-        surveys_to_transfer_map, invalid_survey_shares = _create_surveys_to_transfer_map(
+        surveys_to_transfer_map, invalid_survey_shares = get_surveys_to_transfer_map(
             request.form.getlist("selected_surveys")
         )
-
         if surveys_to_transfer_map:
             if not invalid_survey_shares:
                 flask_session["surveys_to_transfer_map"] = surveys_to_transfer_map
@@ -65,19 +63,7 @@ def survey_selection(session):
             error = SELECT_A_SURVEY_ERROR
 
     party_id = session.get_party_id()
-    businesses = get_list_of_business_for_party(party_id)
-    business_survey_enrolments = []
-
-    for business in businesses:
-        survey_enrolments = _survey_enrolments_for_business_id(business["id"], party_id)
-        business_survey_enrolments.append(
-            {
-                "business_name": business["name"],
-                "business_id": business["id"],
-                "business_ref": business["sampleUnitRef"],
-                "surveys": survey_enrolments,
-            }
-        )
+    business_survey_enrolments = get_business_survey_enrolments_map(party_id)
 
     return render_template(
         "surveys/surveys-transfer/survey-select.html",
@@ -163,49 +149,7 @@ def send_transfer_instruction(session):
     )
 
 
-def _create_surveys_to_transfer_map(selected_surveys):
-    """
-    creates a map of business ids to survey_ids that are to be transferred and whether they are valid
-    """
-    business_survey_map = {}
-    invalid_survey_transfers = []
-
-    for survey in selected_surveys:
-        json_survey = json.loads(survey.replace("'", '"'))
-        business_id = json_survey["business_id"]
-        survey_id = json_survey["survey_id"]
-        business_survey_map.setdefault(business_id, []).append(survey_id)
-        _can_survey_be_transferred(business_id, survey_id, invalid_survey_transfers)
-
-    return business_survey_map, invalid_survey_transfers
-
-
-def _can_survey_be_transferred(business_id, survey_id, invalid_survey_transfers):
-    count = get_user_count_registered_against_business_and_survey(business_id, survey_id, True)
-    if count > (app.config["MAX_SHARED_SURVEY"] + 1):
-        invalid_survey_transfers.append(business_id)
-
-
-def _survey_enrolments_for_business_id(business_id: str, party_id: str) -> list:
-    """
-    returns the survey enrolments for a business_id and their current state
-    """
-    surveys_to_transfer = flask_session.get("surveys_to_transfer_map", {}).get(business_id, {})
-    respondent_enrolments = get_respondent_enrolments(party_id, {"business_id": business_id})
-    surveys = []
-
-    for enrolment in respondent_enrolments:
-        survey_id = enrolment["survey_details"]["id"]
-        surveys.append(
-            {
-                "survey_details": enrolment["survey_details"],
-                "selected": True if survey_id in surveys_to_transfer else False,
-            }
-        )
-    return surveys
-
-
-def _build_payload(respondent_id):
+def _build_payload(respondent_id) -> json:
     email = flask_session["transfer_survey_recipient_email_address"]
     payload = {}
     pending_shares = []

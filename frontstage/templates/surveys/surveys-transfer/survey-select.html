@@ -91,12 +91,12 @@
         <h2 class="ons-u-mb-l">Choose the surveys you want to transfer</h2>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
-        {% for business in business_survey_enrolments %}
+        {% for business_id, details in business_survey_enrolments.items() %}
             {% set checkboxData = [] %}
-            {% if business.business_id in invalid_survey_shares %}
+            {% if business_id in invalid_survey_shares %}
                     {% set error = {
 
-                    "id": "option_error_"+business.business_id,
+                    "id": "option_error_"+business_id,
                     "text": error
                 } %}
                 {% else %}
@@ -104,32 +104,30 @@
                 {% endif %}
 
             {% set checkboxesData = {
-                "legend": "Organisation: " + business.business_name,
+                "legend": "Organisation: " + details["business_name"],
                 "legendClasses": "ons-u-mb-xs",
-                "description": "RU ref: " + business.business_ref,
+                "description": "RU ref: " + details["business_ref"],
                 "descriptionClasses": "ons-u-mb-l",
                 "checkboxesLabel": "Select all that apply",
                 "checkboxesLabelClasses": "ons-u-mt-m",
                 "classes": "ons-u-mb-l",
                 "error": error,
 
-                "id": business.business_id,
+                "id": business_id,
             } %}
-            {% for survey in business.surveys %}
+            {% for survey in details["surveys"] %}
 
                 {% do checkboxData.append(
                     {
-                        "id": survey["survey_details"]["id"],
+                        "id": survey["id"],
                         "name": "selected_surveys",
                         "label": {
-                            "text": survey["survey_details"]["long_name"]
+                            "text": survey["long_name"]
                         },
                         "value": {
-                            "business_id": business.business_id,
-                            "survey_id": survey["survey_details"]["id"],
-                        },
-                        "checked": survey["selected"],
-                        "classes": "input--error",
+                            "business_id": business_id,
+                            "survey_id": survey["id"],
+                        }
 
                     }
                     ) %}

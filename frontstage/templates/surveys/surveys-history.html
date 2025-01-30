@@ -6,5 +6,12 @@
     {% include "partials/tab_list.html" %}
 
     {% set emptySurveyListLabel = 'No items to show' %}
+<div class="ons-container">
+  <div class="ons-grid">
+    <div class="ons-grid__col ons-col-8@m ">
     {% include "surveys/surveys.html" %}
+    </div>
+      {% include "partials/useful_links.html" %}
+    </div>
+</div>
 {% endblock content %}

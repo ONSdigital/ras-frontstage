@@ -29,7 +29,9 @@
         {% endif %}
     {% endwith %}
     {% include "partials/tab_list.html" %}
-
+<div class="ons-container">
+  <div class="ons-grid">
+    <div class="ons-grid__col ons-col-8@m ">
     {% if added_survey %}
         {% call onsPanel({
             "variant": "success",
@@ -73,4 +75,8 @@
     <p class="ons-u-fs-r ons-u-mt-s ons-u-mb-l">
         Need to add a new survey? Use your enrolment code to <a id="add_survey_button" href="{{ url_for('surveys_bp.add_survey') }}">add a new survey to your account</a>.
     </p>
+    </div>
+      {% include "partials/useful_links.html" %}
+    </div>
+</div>
 {% endblock content %}

@@ -76,40 +76,42 @@ class TestTransferSurvey(unittest.TestCase):
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
-    def test_transfer_survey_select(self, mock_request, get_respondent_enrolments):
+    @patch("frontstage.views.account.account_transfer_survey.get_respondent_enrolments")
+    def test_transfer_survey_select(self, mock_request, get_respondent_enrolments_party, get_respondent_enrolments):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
         mock_request.get(url_get_business_details, status_code=200, json=[business_party])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         get_respondent_enrolments.return_value = respondent_enrolments
+        get_respondent_enrolments_party.return_value = respondent_enrolments
         response = self.app.get("/my-account/transfer-surveys/survey-selection")
         self.assertEqual(response.status_code, 200)
         self.assertIn("Transfer your surveys".encode(), response.data)
         self.assertIn("Choose the surveys you want to transfer".encode(), response.data)
-        self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
+        self.assertIn("Survey 1".encode(), response.data)
         self.assertIn("Select all that apply".encode(), response.data)
-        self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
-        self.assertIn("Quarterly Business Survey".encode(), response.data)
+        self.assertIn("Survey 2".encode(), response.data)
         self.assertTrue("Continue".encode() in response.data)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
-    def test_transfer_survey_select_no_option_selected(self, mock_request, get_respondent_enrolments):
+    @patch("frontstage.views.account.account_transfer_survey.get_respondent_enrolments")
+    def test_transfer_survey_select_no_option_selected(
+        self, mock_request, get_respondent_enrolments_party, get_respondent_enrolments
+    ):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
         mock_request.get(url_get_business_details, status_code=200, json=[business_party])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         get_respondent_enrolments.return_value = respondent_enrolments
-        with self.app.session_transaction() as mock_session:
-            mock_session["transfer_survey_data"] = {business_party["id"]: None}
+        get_respondent_enrolments_party.return_value = respondent_enrolments
         response = self.app.post(
             "/my-account/transfer-surveys/survey-selection", data={"option": None}, follow_redirects=True
         )
         self.assertEqual(response.status_code, 200)
         self.assertIn("There is 1 error on this page".encode(), response.data)
-        self.assertIn("Select an answer".encode(), response.data)
         self.assertIn("You need to select a survey".encode(), response.data)
 
     @requests_mock.mock()
@@ -123,7 +125,7 @@ class TestTransferSurvey(unittest.TestCase):
         mock_request.get(url_get_user_count, status_code=200, json=2)
         get_respondent_enrolments.return_value = respondent_enrolments
         with self.app.session_transaction() as mock_session:
-            mock_session["transfer_survey_data"] = {business_party["id"]: None}
+            mock_session["surveys_to_transfer_map"] = {business_party["id"]: None}
             mock_session["party_id"] = respondent_party["id"]
         response = self.app.post(
             "/my-account/transfer-surveys/survey-selection",
@@ -143,8 +145,9 @@ class TestTransferSurvey(unittest.TestCase):
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    @patch("frontstage.views.account.account_transfer_survey.get_respondent_enrolments")
     def test_transfer_survey_select_option_selected_fails_max_user_validation(
-        self, mock_request, get_respondent_enrolments
+        self, mock_request, get_respondent_enrolments_party, get_respondent_enrolments
     ):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
@@ -152,9 +155,8 @@ class TestTransferSurvey(unittest.TestCase):
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         mock_request.get(url_get_user_count, status_code=200, json=52)
+        get_respondent_enrolments_party.return_value = respondent_enrolments
         get_respondent_enrolments.return_value = respondent_enrolments
-        with self.app.session_transaction() as mock_session:
-            mock_session["transfer_survey_data"] = {business_party["id"]: None}
         response = self.app.post(
             "/my-account/transfer-surveys/survey-selection",
             data=selected_surveys,
@@ -178,7 +180,7 @@ class TestTransferSurvey(unittest.TestCase):
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         with self.app.session_transaction() as mock_session:
-            mock_session["transfer_survey_data"] = {business_party["id"]: [survey["id"]]}
+            mock_session["surveys_to_transfer_map"] = {business_party["id"]: [survey["id"]]}
         response = self.app.post("/my-account/transfer-surveys/recipient-email-address", data={}, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("There is 1 error on this page".encode(), response.data)
@@ -193,7 +195,7 @@ class TestTransferSurvey(unittest.TestCase):
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=[dummy_survey])
         with self.app.session_transaction() as mock_session:
-            mock_session["transfer_survey_data"] = {business_party["id"]: [survey["id"]]}
+            mock_session["surveys_to_transfer_map"] = {business_party["id"]: [survey["id"]]}
         response = self.app.post(
             "/my-account/transfer-surveys/recipient-email-address",
             data={"email_address": "a.a.com"},
@@ -212,7 +214,7 @@ class TestTransferSurvey(unittest.TestCase):
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         with self.app.session_transaction() as mock_session:
-            mock_session["transfer_survey_data"] = [{"business_id": business_party["id"], "survey_id": [survey["id"]]}]
+            mock_session["surveys_to_transfer_map"] = {business_party["id"]: [survey["id"]]}
         response = self.app.post(
             "/my-account/transfer-surveys/recipient-email-address",
             data={"email_address": "a@a.com"},
@@ -239,7 +241,7 @@ class TestTransferSurvey(unittest.TestCase):
         mock_request.post(url_post_pending_transfers, status_code=201, json={"created": "success"})
 
         with self.app.session_transaction() as mock_session:
-            mock_session["transfer_survey_data"] = [{"business_id": business_party["id"], "survey_id": [survey["id"]]}]
+            mock_session["surveys_to_transfer_map"] = {business_party["id"]: [survey["id"]]}
             mock_session["transfer_survey_recipient_email_address"] = "a@a.com"
         response = self.app.post(
             "/my-account/transfer-surveys/send-instruction", data={"email_address": "a@a.com"}, follow_redirects=True
@@ -267,7 +269,7 @@ class TestTransferSurvey(unittest.TestCase):
         mock_request.post(url_post_pending_transfers, status_code=400, json={"error": "error"})
 
         with self.app.session_transaction() as mock_session:
-            mock_session["transfer_survey_data"] = [{"business_id": business_party["id"], "survey_id": [survey["id"]]}]
+            mock_session["surveys_to_transfer_map"] = {business_party["id"]: [survey["id"]]}
             mock_session["transfer_survey_recipient_email_address"] = "a@a.com"
         response = self.app.post(
             "/my-account/transfer-surveys/send-instruction", data={"email_address": "a@a.com"}, follow_redirects=True
@@ -290,11 +292,13 @@ class TestTransferSurvey(unittest.TestCase):
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
-    def test_transfer_survey(self, mock_request, get_respondent_enrolments):
+    @patch("frontstage.views.account.account_transfer_survey.get_respondent_enrolments")
+    def test_transfer_survey(self, mock_request, get_respondent_enrolments_party, get_respondent_enrolments):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_business_details, status_code=200, json=[business_party])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
+        get_respondent_enrolments_party.return_value = respondent_enrolments
         get_respondent_enrolments.return_value = respondent_enrolments
 
         response = self.app.get(
@@ -310,7 +314,7 @@ class TestTransferSurvey(unittest.TestCase):
         )
         self.assertIn("RUNAME1_COMPANY1 RUNNAME2_COMPANY1".encode(), response.data)
         self.assertIn("Choose the surveys you want to transfer".encode(), response.data)
-        self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
+        self.assertIn("Survey 1".encode(), response.data)
         self.assertTrue("Continue".encode() in response.data)
 
     @requests_mock.mock()
@@ -320,7 +324,7 @@ class TestTransferSurvey(unittest.TestCase):
         get_respondent_party_by_id.return_value = party
 
         with self.app.session_transaction() as mock_session:
-            mock_session["transfer_survey_data"] = [{"business_id": business_party["id"], "survey_id": [survey["id"]]}]
+            mock_session["surveys_to_transfer_map"] = {business_party["id"]: [survey["id"]]}
         response = self.app.post(
             "/my-account/transfer-surveys/recipient-email-address",
             data={"email_address": "example@example.com"},
@@ -336,7 +340,7 @@ class TestTransferSurvey(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
 
         with self.app.session_transaction() as mock_session:
-            mock_session["transfer_survey_data"] = [{"business_id": business_party["id"], "survey_id": [survey["id"]]}]
+            mock_session["surveys_to_transfer_map"] = {business_party["id"]: [survey["id"]]}
             mock_session["transfer_survey_recipient_email_address"] = "a@a.com"
         response = self.app.post("/my-account/transfer-surveys/send-instruction", data={}, follow_redirects=True)
         self.assertEqual(response.status_code, 500)

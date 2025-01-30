@@ -1,4 +1,3 @@
-import collections
 import json
 import logging
 
@@ -14,7 +13,7 @@ from frontstage.controllers import party_controller, survey_controller
 from frontstage.controllers.party_controller import (
     get_business_by_id,
     get_list_of_business_for_party,
-    get_surveys_listed_against_party_and_business_id,
+    get_respondent_enrolments,
     get_user_count_registered_against_business_and_survey,
     register_pending_surveys,
 )
@@ -28,201 +27,114 @@ from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 
+INVALID_SURVEY_TRANSFER_ERROR = (
+    "You have reached the maximum amount of emails you can enroll on one or more surveys. "
+    "Deselect the survey/s to continue or call 0300 1234 931 to discuss your options."
+)
+
+SELECT_A_SURVEY_ERROR = "You need to select a survey"
+
 
 @account_bp.route("/transfer-surveys", methods=["GET"])
 @jwt_authorization(request)
-def transfer_survey_overview(session):
-    flask_session.pop("transfer_survey_data", None)
+def transfer_surveys(_):
+    flask_session.pop("surveys_to_transfer_map", None)
     flask_session.pop("transfer_survey_recipient_email_address", None)
-    flask_session.pop("validation_failure_transfer_surveys_list", None)
-    flask_session.pop("transfer_surveys_selected_list", None)
-    return redirect(url_for("account_bp.transfer_survey_survey_select"))
+    return redirect(url_for("account_bp.survey_selection"))
 
 
-@account_bp.route("/transfer-surveys/survey-selection", methods=["GET"])
+@account_bp.route("/transfer-surveys/survey-selection", methods=["GET", "POST"])
 @jwt_authorization(request)
-def transfer_survey_survey_select(session):
+def survey_selection(session):
+    error = None
+    invalid_survey_shares = []
+
+    if request.method == "POST":
+        surveys_to_transfer_map, invalid_survey_shares = _create_surveys_to_transfer_map(
+            request.form.getlist("selected_surveys")
+        )
+
+        if surveys_to_transfer_map:
+            if not invalid_survey_shares:
+                flask_session["surveys_to_transfer_map"] = surveys_to_transfer_map
+                return redirect(url_for("account_bp.transfer_survey_email_entry"))
+            else:
+                error = INVALID_SURVEY_TRANSFER_ERROR
+        else:
+            flask_session.pop("surveys_to_transfer", None)
+            error = SELECT_A_SURVEY_ERROR
+
     party_id = session.get_party_id()
     businesses = get_list_of_business_for_party(party_id)
-    survey_selection = []
+    business_survey_enrolments = []
+
     for business in businesses:
-        surveys = get_surveys_listed_against_party_and_business_id(business["id"], party_id)
-        business_survey_selection = {
-            "business_name": business["name"],
-            "business_id": business["id"],
-            "business_ref": business["sampleUnitRef"],
-            "surveys": surveys,
-        }
-        survey_selection.append(business_survey_selection)
-    error = request.args.get("error", "")
-    failed_surveys_list = flask_session.get("validation_failure_transfer_surveys_list")
-    selected_survey_list = flask_session.get("transfer_surveys_selected_list")
+        survey_enrolments = _survey_enrolments_for_business_id(business["id"], party_id)
+        business_survey_enrolments.append(
+            {
+                "business_name": business["name"],
+                "business_id": business["id"],
+                "business_ref": business["sampleUnitRef"],
+                "surveys": survey_enrolments,
+            }
+        )
+
     return render_template(
         "surveys/surveys-transfer/survey-select.html",
-        session=session,
-        survey_selection=survey_selection,
+        business_survey_enrolments=business_survey_enrolments,
         error=error,
-        failed_surveys_list=failed_surveys_list if failed_surveys_list is not None else [],
-        selected_survey_list=selected_survey_list if selected_survey_list is not None else [],
+        invalid_survey_shares=invalid_survey_shares,
     )
 
 
-def validate_max_transfer_survey(business_id: str, transfer_survey_surveys_selected: list):
-    """
-    This is a validation for maximum user reached against a survey for transfer
-    param: business_id : business id str
-    param: transfer_survey_surveys_selected : selected business list
-    return:boolean
-    """
-    is_valid = True
-    failed_surveys_list = []
-    for survey_selected in transfer_survey_surveys_selected:
-        logger.info(
-            "Getting count of users registered against business and survey",
-            business_id=business_id,
-            survey_id=survey_selected,
-        )
-        user_count = get_user_count_registered_against_business_and_survey(business_id, survey_selected, True)
-        if user_count > (app.config["MAX_SHARED_SURVEY"] + 1):
-            is_valid = False
-            failed_surveys_list.append(survey_selected)
-    flask_session["validation_failure_transfer_surveys_list"] = failed_surveys_list
-    return is_valid
-
-
-def is_max_transfer_survey_exceeded(selected_businesses):
-    """
-    This function validates if selected surveys has not exceeded max transfer and creates a messaged in case of
-    validation failures
-    param: selected_businesses : list of businesses
-    param: form : request form
-    return:boolean
-    """
-    is_max_transfer_survey = False
-    flask_session.pop("validation_failure_transfer_surveys_list", None)
-    for business in selected_businesses:
-        transfer_surveys_selected_against_business = business["survey_id"]
-        if not validate_max_transfer_survey(business["business_id"], transfer_surveys_selected_against_business):
-            flash(
-                "You have reached the maximum amount of emails you can enroll on one or more surveys",
-                business["business_id"],
-            )
-            is_max_transfer_survey = True
-    return is_max_transfer_survey
-
-
-@account_bp.route("/transfer-surveys/survey-selection", methods=["POST"])
-@jwt_authorization(request)
-def transfer_survey_post_survey_select(_):
-    business_to_survey = collections.defaultdict(list)
-    surveys_selected = request.form.getlist("selected_surveys")
-    for business_surveys in surveys_selected:
-        business_surveys_dict = eval(business_surveys)
-        business_to_survey[business_surveys_dict["business_id"]].append(business_surveys_dict["survey_id"])
-    selected_business_surveys = [{"business_id": key, "survey_id": value} for key, value in business_to_survey.items()]
-    surveys_selected = request.form.getlist("selected_surveys")
-    if len(surveys_selected) == 0:
-        flash("Select an answer")
-        return redirect(url_for("account_bp.transfer_survey_post_survey_select", error="surveys_not_selected"))
-    if is_max_transfer_survey_exceeded(selected_business_surveys):
-        return redirect(url_for("account_bp.transfer_survey_survey_select", error="max_transfer_survey_exceeded"))
-    flask_session["transfer_survey_data"] = selected_business_surveys
-    return redirect(url_for("account_bp.transfer_survey_email_entry"))
-
-
-@account_bp.route("/transfer-surveys/recipient-email-address", methods=["GET"])
+@account_bp.route("/transfer-surveys/recipient-email-address", methods=["GET", "POST"])
 @jwt_authorization(request)
 def transfer_survey_email_entry(session):
     form = AccountSurveyShareRecipientEmailForm(request.values)
-    flask_session["transfer_survey_recipient_email_address"] = None
-    return render_template(
-        "surveys/surveys-transfer/recipient-email-address.html", session=session, form=form, errors=form.errors
-    )
 
+    if request.method == "POST":
+        if not form.validate():
+            return render_template(
+                "surveys/surveys-transfer/recipient-email-address.html", form=form, errors=form.errors
+            )
+        party_id = session.get_party_id()
+        respondent_details = party_controller.get_respondent_party_by_id(party_id)
 
-@account_bp.route("/transfer-surveys/recipient-email-address", methods=["POST"])
-@jwt_authorization(request)
-def transfer_survey_post_email_entry(session):
-    form = AccountSurveyShareRecipientEmailForm(request.values)
-    party_id = session.get_party_id()
-    respondent_details = party_controller.get_respondent_party_by_id(party_id)
-    if not form.validate():
-        errors = form.errors
-        return render_template(
-            "surveys/surveys-transfer/recipient-email-address.html", session=session, form=form, errors=errors
-        )
-
-    if "emailAddress" in respondent_details:
         if respondent_details["emailAddress"].lower() == form.data["email_address"].lower():
             errors = {"email_address": ["You can not transfer surveys to yourself."]}
-            return render_template(
-                "surveys/surveys-transfer/recipient-email-address.html", session=session, form=form, errors=errors
-            )
-    flask_session["transfer_survey_recipient_email_address"] = form.data["email_address"]
-    return redirect(url_for("account_bp.send_transfer_instruction_get"))
+
+            return render_template("surveys/surveys-transfer/recipient-email-address.html", form=form, errors=errors)
+
+        flask_session["transfer_survey_recipient_email_address"] = form.data["email_address"]
+        return redirect(url_for("account_bp.send_transfer_instruction_get"))
+
+    return render_template("surveys/surveys-transfer/recipient-email-address.html", form=form)
 
 
 @account_bp.route("/transfer-surveys/send-instruction", methods=["GET"])
 @jwt_authorization(request)
-def send_transfer_instruction_get(session):
+def send_transfer_instruction_get(_):
     email = flask_session["transfer_survey_recipient_email_address"]
     surveys_to_be_transferred = {}
-    for business in flask_session["transfer_survey_data"]:
-        flask_session.pop("transfer_surveys_selected_list", None)
-        selected_business = get_business_by_id(business["business_id"])
+    surveys_to_transfer_map = flask_session["surveys_to_transfer_map"]
+
+    for business_id, survey_ids in surveys_to_transfer_map.items():
+        selected_business = get_business_by_id(business_id)
         surveys = []
-        for survey_id in business["survey_id"]:
+        for survey_id in survey_ids:
             surveys.append(survey_controller.get_survey(app.config["SURVEY_URL"], app.config["BASIC_AUTH"], survey_id))
+
         surveys_to_be_transferred[selected_business[0]["id"]] = {
             "name": selected_business[0]["name"],
             "surveys": surveys,
         }
-        flask_session["transferred_surveys"] = surveys_to_be_transferred
 
     return render_template(
         "surveys/surveys-transfer/send-instructions.html",
-        session=session,
         email=email,
         surveys_to_be_transferred=surveys_to_be_transferred,
         form=ConfirmEmailChangeForm(),
     )
-
-
-def build_payload(respondent_id):
-    """
-    This method builds payload required for the party endpoint to register new pending surveys.
-    payload example:
-    {  pending_transfers: [{
-        "business_id": "business_id"
-        "survey_id": "survey_id",
-        "email_address": "email_address",
-        "shared_by": "party_uuid"
-    },
-    {
-        "business_id": "business_id":
-        "survey_id": "survey_id",
-        "email_address": "email_address",
-        "shared_by": "party_uuid"
-    }]
-    }
-    """
-    email = flask_session["transfer_survey_recipient_email_address"]
-    payload = {}
-    pending_shares = []
-    transfer_dictionary = flask_session["transfer_survey_data"]
-    for business in transfer_dictionary:
-        business_id = business["business_id"]
-        for survey_id in business["survey_id"]:
-            survey_id = survey_id
-            pending_share = {
-                "business_id": business_id,
-                "survey_id": survey_id,
-                "email_address": email,
-                "shared_by": respondent_id,
-            }
-            pending_shares.append(pending_share)
-    payload["pending_transfers"] = pending_shares
-    return json.dumps(payload)
 
 
 @account_bp.route("/transfer-surveys/send-instruction", methods=["POST"])
@@ -232,9 +144,11 @@ def send_transfer_instruction(session):
     email = flask_session["transfer_survey_recipient_email_address"]
     party_id = session.get_party_id()
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
+
     if form["email_address"].data != email:
         raise TransferSurveyProcessError("Could not find email address in session")
-    json_data = build_payload(respondent_details["id"])
+
+    json_data = _build_payload(respondent_details["id"])
     response = register_pending_surveys(json_data, party_id)
     if response.status_code == 400:
         flash(
@@ -245,6 +159,66 @@ def send_transfer_instruction(session):
         return redirect(url_for("account_bp.send_transfer_instruction_get"))
     return render_template(
         "surveys/surveys-transfer/instructions-sent.html",
-        session=session,
         email=email,
     )
+
+
+def _create_surveys_to_transfer_map(selected_surveys):
+    """
+    creates a map of business ids to survey_ids that are to be transferred and whether they are valid
+    """
+    business_survey_map = {}
+    invalid_survey_transfers = []
+
+    for survey in selected_surveys:
+        json_survey = json.loads(survey.replace("'", '"'))
+        business_id = json_survey["business_id"]
+        survey_id = json_survey["survey_id"]
+        business_survey_map.setdefault(business_id, []).append(survey_id)
+        _can_survey_be_transferred(business_id, survey_id, invalid_survey_transfers)
+
+    return business_survey_map, invalid_survey_transfers
+
+
+def _can_survey_be_transferred(business_id, survey_id, invalid_survey_transfers):
+    count = get_user_count_registered_against_business_and_survey(business_id, survey_id, True)
+    if count > (app.config["MAX_SHARED_SURVEY"] + 1):
+        invalid_survey_transfers.append(business_id)
+
+
+def _survey_enrolments_for_business_id(business_id: str, party_id: str) -> list:
+    """
+    returns the survey enrolments for a business_id and their current state
+    """
+    surveys_to_transfer = flask_session.get("surveys_to_transfer_map", {}).get(business_id, {})
+    respondent_enrolments = get_respondent_enrolments(party_id, {"business_id": business_id})
+    surveys = []
+
+    for enrolment in respondent_enrolments:
+        survey_id = enrolment["survey_details"]["id"]
+        surveys.append(
+            {
+                "survey_details": enrolment["survey_details"],
+                "selected": True if survey_id in surveys_to_transfer else False,
+            }
+        )
+    return surveys
+
+
+def _build_payload(respondent_id):
+    email = flask_session["transfer_survey_recipient_email_address"]
+    payload = {}
+    pending_shares = []
+    surveys_to_transfer_map = flask_session["surveys_to_transfer_map"]
+
+    for business_id, survey_ids in surveys_to_transfer_map.items():
+        for survey_id in survey_ids:
+            pending_share = {
+                "business_id": business_id,
+                "survey_id": survey_id,
+                "email_address": email,
+                "shared_by": respondent_id,
+            }
+            pending_shares.append(pending_share)
+    payload["pending_transfers"] = pending_shares
+    return json.dumps(payload)

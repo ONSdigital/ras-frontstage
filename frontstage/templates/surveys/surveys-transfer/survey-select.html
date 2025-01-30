@@ -25,51 +25,37 @@
 {% endblock breadcrumbs %}
 
 {% block main %}
-    {% set ns = namespace (businesses = []) %}
-    {% set selected_businesses_and_surveys = [] %}
-    {% set failed_business_ids = [] %}
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% if messages|length == 1 %}
-                {% set errorTitle = "There is 1 error on this page" %}
-            {% elif messages|length > 1 %}
-                {% set errorTitle = "There are " ~ messages|length ~ " errors on this page" %}
-            {% endif %}
+        {% if error %}
             {% call
                 onsPanel({
                     "variant": "error",
                     "classes": "ons-u-mb-s",
-                    "title": errorTitle
+                    "title": "There is 1 error on this page"
                 })
             %}
-                {% set errorData = [] %}
-                {% for business_id, message in messages %}
-                    {% do ns.businesses.append(category) %}
-                    {% do errorData.append(
-                        {
-                            "text": message,
-                            "url": "#option_error_"~business_id,
-                            "classes": "ons-js-inpagelink"
-                        }
-                    ) %}
-                    {% do failed_business_ids.append(business_id) %}
-                {% endfor %}
+
+            {% set errorData = [] %}
                 {{
                     onsList({
                         "element": "ol",
-                        "itemsList": errorData
+                        "itemsList": [{
+                            "text": error,
+                            "classes": "ons-js-inpagelink"
+                        }]
                     })
                 }}
+
             {% endcall %}
         {% endif %}
-    {% endwith %}
+
     <h1 class="ons-u-mb-m">Transfer your surveys</h1>
     {% call onsPanel({
         "classes": "ons-u-mb-m",
         })
     %}
-    <p >
-        If you transfer a survey, you will no longer have access to it. If you will still need access to the survey, <a href="{{ url_for("account_bp.share_survey_overview") }}">share access to surveys</a>.
+    <p>
+        If you transfer a survey, you will no longer have access to it. If you will still need access to the survey,
+        <a href="{{ url_for("account_bp.share_survey_overview") }}">share access to surveys</a>.
     </p>
     {% endcall %}
        {%
@@ -101,27 +87,22 @@
     }}
     {% endcall %}
 
-    <form action='' method="post">
+    <form method="post">
         <h2 class="ons-u-mb-l">Choose the surveys you want to transfer</h2>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-        {% set selected_surveys = [] %}
-        {% set selected_businesses_and_surveys = [] %}
-        {% for business in survey_selection %}
-            {% set failed_surveys = [] %}
+
+        {% for business in business_survey_enrolments %}
             {% set checkboxData = [] %}
-            {% set selected_businesses_and_surveys = (
-                {
-                    "business_id": business["business_id"]
-                }
-            ) %}
-            {% if get_flashed_messages(with_categories=true) | length %}
-                {% if error == "surveys_not_selected" and business %}
-                    {% set errorOption = { "text": "You need to select a survey",  "id": "option_error_"~business["business_id"] } %}
+            {% if business.business_id in invalid_survey_shares %}
+                    {% set error = {
+
+                    "id": "option_error_"+business.business_id,
+                    "text": error
+                } %}
+                {% else %}
+                    {% set error = '' %}
                 {% endif %}
-                {% if error == "max_transfer_survey_exceeded" and (business["business_id"] in failed_business_ids) %}
-                    {% set errorOption = { "text": "Deselect the survey/s to continue or call 0300 1234 931 to discuss your options.",  "id": "option_error_"~business["business_id"] } %}
-                {% endif %}
-            {% endif %}
+
             {% set checkboxesData = {
                 "legend": "Organisation: " + business.business_name,
                 "legendClasses": "ons-u-mb-xs",
@@ -130,40 +111,30 @@
                 "checkboxesLabel": "Select all that apply",
                 "checkboxesLabelClasses": "ons-u-mt-m",
                 "classes": "ons-u-mb-l",
-                "error": errorOption,
-                "id": business["id"],
+                "error": error,
+
+                "id": business.business_id,
             } %}
             {% for survey in business.surveys %}
-                {% set business_and_survey = (
-                    {
-                        "business_id": business.business_id,
-                        "survey_id": survey["id"],
-                    })
-                %}
-                {% if survey["id"] in failed_surveys_list %}
-                    {% set params = "input--error" %}
-                {% else %}
-                    {% set params = '' %}
-                {% endif %}
-                {% if survey["id"] in selected_survey_list %}
-                    {% set checked = true %}
-                {% else %}
-                    {% set checked = false %}
-                {% endif %}
+
                 {% do checkboxData.append(
                     {
-                        "id": survey["id"],
+                        "id": survey["survey_details"]["id"],
                         "name": "selected_surveys",
                         "label": {
-                            "text": survey["longName"]
+                            "text": survey["survey_details"]["long_name"]
                         },
-                        "value": business_and_survey,
-                        "classes": params,
-                        "checked": checked
+                        "value": {
+                            "business_id": business.business_id,
+                            "survey_id": survey["survey_details"]["id"],
+                        },
+                        "checked": survey["selected"],
+                        "classes": "input--error",
+
                     }
                     ) %}
             {% endfor %}
-            <input type="hidden" name="business_and_surveys" value={{ business.business_id }} />
+
             {% do checkboxesData | setAttribute("checkboxes", checkboxData) %}
             {{ onsCheckboxes(checkboxesData) }}
         {% endfor %}

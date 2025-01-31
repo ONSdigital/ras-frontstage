@@ -1,6 +1,7 @@
 {% if 'authorization' in request.cookies %}
     {% set banner_menu = {
         "id": "navigation-menu",
+        "currentPath": request.path,
         "ariaLabel": "Navigation menu",
         "ariraListLabel": "Navigation menu list",
         "toggleNavigationButton":{

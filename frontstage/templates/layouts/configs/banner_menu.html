@@ -1,0 +1,27 @@
+{% if 'authorization' in request.cookies %}
+    {% set banner_menu = {
+        "id": "navigation-menu",
+        "ariaLabel": "Navigation menu",
+        "ariraListLabel": "Navigation menu list",
+        "toggleNavigationButton":{
+            "text": "Navigation menu",
+            "ariaLabel": "Navigation menu",
+        },
+        "itemsList": [
+            {
+                "title": "Surveys",
+                "url": "/surveys/todo"
+            },
+            {
+                "title": "Completed Surveys",
+                "url": "/surveys/history"
+            },
+            {
+                "title": "Messages",
+                "url": "/secure-message/threads"
+            },
+            ]
+    } %}
+
+    {% do pageConfig.header | setAttribute("navigation", banner_menu) %}
+{% endif %}

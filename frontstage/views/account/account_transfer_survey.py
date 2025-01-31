@@ -97,32 +97,30 @@ def transfer_survey_email_entry(session):
         existing_pending_surveys = get_existing_pending_surveys(party_id)
 
         # This POC obviously wouldn't go here.... move to a controller or somthing
+        duplicate_transfers = []
         if existing_pending_surveys:
             # iterate over each existing pending_survey DB record
             for existing_pending_survey in existing_pending_surveys:
-                logger.info(existing_pending_survey)
                 # iterate over each selected business to transfer
-                for businesses in flask_session["surveys_to_transfer_map"].values():
-                    logger.info(businesses)
+                for selected_business_id, selected_survey_ids in flask_session["surveys_to_transfer_map"].items():
                     # iterate over each survey for the selected business
-                    for surveys in businesses:
-                        logger.info(surveys)
-                        # check if the email address is the same as the one being shared with
-                        if existing_pending_survey["email_address"].lower() == form.data["email_address"].lower():
-                            logger.info(
-                                "A transfer to this email address already exists for this business and survey",
-                                survey=surveys,
-                                business=businesses,
-                            )
+                    for selected_survey_id in selected_survey_ids:
+                        # check if the existing pending survey is the same as the one being shared
+                        if (existing_pending_survey["email_address"].lower() == form.data["email_address"].lower() and
+                            existing_pending_survey["business_id"] == selected_business_id and
+                            existing_pending_survey["survey_id"] == selected_survey_id):
                             # Add this combination to a list of transfers that already exist to write out in the view error message below !!
-                            errors = {
-                                "email_address": [
-                                    "You've already shared these with this email address [LIST_GOES_HERE]."
-                                ]
-                            }
-                            return render_template(
-                                "surveys/surveys-transfer/recipient-email-address.html", form=form, errors=errors
-                            )
+                            duplicate_transfers.append({"business_id": selected_business_id,
+                                                        "survey_id": selected_survey_id,
+                                                        "email_address": form.data["email_address"].lower()})
+        # Of course we would NEVER do this !!
+        if duplicate_transfers:
+            errors = {
+                "email_address": ["</br></br>".join(str(transfer) for transfer in duplicate_transfers)]
+            }
+            return render_template(
+                "surveys/surveys-transfer/recipient-email-address.html", form=form, errors=errors
+            )
 
         return redirect(url_for("account_bp.send_transfer_instruction_get"))
 

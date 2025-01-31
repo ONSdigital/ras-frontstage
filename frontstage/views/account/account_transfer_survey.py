@@ -13,6 +13,7 @@ from frontstage.controllers import party_controller, survey_controller
 from frontstage.controllers.party_controller import (
     get_business_by_id,
     get_business_survey_enrolments_map,
+    get_existing_pending_surveys,
     get_surveys_to_transfer_map,
     register_pending_surveys,
 )
@@ -92,6 +93,36 @@ def transfer_survey_email_entry(session):
             return render_template("surveys/surveys-transfer/recipient-email-address.html", form=form, errors=errors)
 
         flask_session["transfer_survey_recipient_email_address"] = form.data["email_address"]
+
+        existing_pending_surveys = get_existing_pending_surveys(party_id)
+
+        if existing_pending_surveys:
+            # iterate over each existing pending_survey DB record
+            for existing_pending_survey in existing_pending_surveys:
+                logger.info(existing_pending_survey)
+                # iterate over each selected business to transfer
+                for businesses in flask_session["surveys_to_transfer_map"].values():
+                    logger.info(businesses)
+                    # iterate over each survey for the selected business
+                    for surveys in businesses:
+                        logger.info(surveys)
+                        # check if the email address is the same as the one being shared with
+                        if existing_pending_survey["email_address"].lower() == form.data["email_address"].lower():
+                            logger.info(
+                                "A transfer to this email address already exists for this business and survey",
+                                survey=surveys,
+                                business=businesses,
+                            )
+                            # Add this combination to a list of transfers that already exist to write out in the view error message below !!
+                            errors = {
+                                "email_address": [
+                                    "This is a list of businesses and surveys you've already shared with this email address."
+                                ]
+                            }
+                            return render_template(
+                                "surveys/surveys-transfer/recipient-email-address.html", form=form, errors=errors
+                            )
+
         return redirect(url_for("account_bp.send_transfer_instruction_get"))
 
     return render_template("surveys/surveys-transfer/recipient-email-address.html", form=form)

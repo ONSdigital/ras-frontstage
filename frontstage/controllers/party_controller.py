@@ -812,6 +812,22 @@ def get_business_survey_enrolments_map(party_id: str) -> dict:
     return business_survey_enrolments_map
 
 
+def get_existing_pending_surveys(party_id: str) -> dict:
+    """
+    Returns a list of pending_surveys that already exist in the DB for this user
+    """
+    url = f"{app.config['PARTY_URL']}/party-api/v1/pending-surveys/originator/{party_id}"
+    response = requests.get(url, auth=app.config["BASIC_AUTH"])
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        logger.error("Failed to get pending surveys for respondent", party_id=party_id)
+        raise ApiError(logger, response)
+
+    logger.info("Successfully retrieved pending surveys for respondent", party_id=party_id)
+    return response.json()
+
+
 def get_surveys_to_transfer_map(selected_surveys: list) -> tuple[dict, list]:
     """
     creates a map of business ids to survey_ids that are to be transferred and whether they are valid

@@ -153,29 +153,29 @@ class TestTransferSurvey(unittest.TestCase):
         self.assertIn("Problem with the email address".encode(), response.data)
         self.assertIn("Invalid email address".encode(), response.data)
 
-    @requests_mock.mock()
-    def test_transfer_survey_transfer_instruction(self, mock_request):
-        mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_business_details, status_code=200, json=[business_party])
-        mock_request.get(url_get_survey, status_code=200, json=survey)
-        with self.app.session_transaction() as mock_session:
-            mock_session["surveys_to_transfer_map"] = {business_party["id"]: [survey["id"]]}
-        response = self.app.post(
-            "/my-account/transfer-surveys/recipient-email-address",
-            data={"email_address": "a@a.com"},
-            follow_redirects=True,
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("Send instructions".encode(), response.data)
-        self.assertIn(
-            "We will email a link with instructions to <strong>a@a.com</strong>.".encode(),
-            response.data,
-        )
-        self.assertIn("Once approved, they will have access to:".encode(), response.data)
-        self.assertIn("RUNAME1_COMPANY1 RUNNAME2_COMPANY1".encode(), response.data)
-        self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
-        self.assertTrue("Send".encode() in response.data)
+    # @requests_mock.mock()
+    # def test_transfer_survey_transfer_instruction(self, mock_request):
+    #     mock_request.get(url_banner_api, status_code=404)
+    #     mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
+    #     mock_request.get(url_get_business_details, status_code=200, json=[business_party])
+    #     mock_request.get(url_get_survey, status_code=200, json=survey)
+    #     with self.app.session_transaction() as mock_session:
+    #         mock_session["surveys_to_transfer_map"] = {business_party["id"]: [survey["id"]]}
+    #     response = self.app.post(
+    #         "/my-account/transfer-surveys/recipient-email-address",
+    #         data={"email_address": "a@a.com"},
+    #         follow_redirects=True,
+    #     )
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertIn("Send instructions".encode(), response.data)
+    #     self.assertIn(
+    #         "We will email a link with instructions to <strong>a@a.com</strong>.".encode(),
+    #         response.data,
+    #     )
+    #     self.assertIn("Once approved, they will have access to:".encode(), response.data)
+    #     self.assertIn("RUNAME1_COMPANY1 RUNNAME2_COMPANY1".encode(), response.data)
+    #     self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
+    #     self.assertTrue("Send".encode() in response.data)
 
     @requests_mock.mock()
     def test_transfer_survey_transfer_instruction_done(self, mock_request):

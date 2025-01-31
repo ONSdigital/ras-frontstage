@@ -96,6 +96,7 @@ def transfer_survey_email_entry(session):
 
         existing_pending_surveys = get_existing_pending_surveys(party_id)
 
+        # This POC obviously wouldn't go here.... move to a controller or somthing
         if existing_pending_surveys:
             # iterate over each existing pending_survey DB record
             for existing_pending_survey in existing_pending_surveys:
@@ -116,7 +117,7 @@ def transfer_survey_email_entry(session):
                             # Add this combination to a list of transfers that already exist to write out in the view error message below !!
                             errors = {
                                 "email_address": [
-                                    "This is a list of businesses and surveys you've already shared with this email address."
+                                    "You've already shared these with this email address [LIST_GOES_HERE]."
                                 ]
                             }
                             return render_template(

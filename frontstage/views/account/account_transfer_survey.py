@@ -96,35 +96,66 @@ def transfer_survey_email_entry(session):
 
         existing_pending_surveys = get_existing_pending_surveys(party_id)
 
-        # This POC obviously wouldn't go here.... move to a controller or somthing
-        duplicate_transfers = []
         if existing_pending_surveys:
-            # iterate over each existing pending_survey DB record
-            for existing_pending_survey in existing_pending_surveys:
-                # iterate over each selected business to transfer
-                for selected_business_id, selected_survey_ids in flask_session["surveys_to_transfer_map"].items():
-                    # iterate over each survey for the selected business
-                    for selected_survey_id in selected_survey_ids:
-                        # check if the existing pending survey is the same as the one being shared
-                        if (existing_pending_survey["email_address"].lower() == form.data["email_address"].lower() and
-                            existing_pending_survey["business_id"] == selected_business_id and
-                            existing_pending_survey["survey_id"] == selected_survey_id):
-                            # Add this combination to a list of transfers that already exist to write out in the view error message below !!
-                            duplicate_transfers.append({"business_id": selected_business_id,
-                                                        "survey_id": selected_survey_id,
-                                                        "email_address": form.data["email_address"].lower()})
-        # Of course we would NEVER do this !!
-        if duplicate_transfers:
-            errors = {
-                "email_address": ["</br></br>".join(str(transfer) for transfer in duplicate_transfers)]
-            }
-            return render_template(
-                "surveys/surveys-transfer/recipient-email-address.html", form=form, errors=errors
-            )
+            duplicate_transfers = _get_duplicate_transfers(existing_pending_surveys, form.data["email_address"])
+            if duplicate_transfers:
+                business_survey_enrolments = get_business_survey_enrolments_map(party_id)
+                errors = {
+                    "email_address": [
+                        _build_duplicate_transfer_error_message(duplicate_transfers, business_survey_enrolments)
+                    ]
+                }
+                return render_template(
+                    "surveys/surveys-transfer/recipient-email-address.html", form=form, errors=errors
+                )
 
         return redirect(url_for("account_bp.send_transfer_instruction_get"))
 
     return render_template("surveys/surveys-transfer/recipient-email-address.html", form=form)
+
+
+def _get_duplicate_transfers(existing_pending_surveys, email_address):
+    duplicate_transfers = []
+    for existing_pending_survey in existing_pending_surveys:
+        if (
+            _pending_survey_for_business_exists(
+                flask_session["surveys_to_transfer_map"],
+                existing_pending_survey["business_id"],
+                existing_pending_survey["survey_id"],
+            )
+            and existing_pending_survey["email_address"].lower() == email_address.lower()
+        ):
+            duplicate_transfers.append(
+                {
+                    "business_id": existing_pending_survey["business_id"],
+                    "survey_id": existing_pending_survey["survey_id"],
+                    "email_address": existing_pending_survey["email_address"].lower(),
+                }
+            )
+    return duplicate_transfers
+
+
+def _build_duplicate_transfer_error_message(duplicate_transfers, business_survey_enrolments):
+    error_message = "You have already shared or transferred the following surveys to this email address. "
+    error_message += "They have 72 hours to accept your request. "
+    error_message += "<br /><br />If you have made an error then wait for the share/transfer to expire or contact us."
+    error_message += "<ul>"
+    for transfer in duplicate_transfers:
+        business_name = business_survey_enrolments[transfer["business_id"]]["business_name"]
+        survey_name = next(
+            survey["long_name"]
+            for survey in business_survey_enrolments[transfer["business_id"]]["surveys"]
+            if survey["id"] == transfer["survey_id"]
+        )
+        error_message += "<li>" + business_name + " - " + survey_name + "</li>"
+    error_message += "</ul>"
+    return error_message
+
+
+def _pending_survey_for_business_exists(surveys_to_transfer_map, business_id, survey_id):
+    if business_id in surveys_to_transfer_map:
+        return survey_id in surveys_to_transfer_map[business_id]
+    return False
 
 
 @account_bp.route("/transfer-surveys/send-instruction", methods=["GET"])

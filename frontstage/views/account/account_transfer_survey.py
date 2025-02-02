@@ -118,7 +118,7 @@ def _get_duplicate_transfers(existing_pending_surveys, email_address):
     duplicate_transfers = []
     for existing_pending_survey in existing_pending_surveys:
         if (
-            _pending_survey_for_business_exists(
+            _existing_pending_survey_is_in_selection(
                 flask_session["surveys_to_transfer_map"],
                 existing_pending_survey["business_id"],
                 existing_pending_survey["survey_id"],
@@ -152,7 +152,7 @@ def _build_duplicate_transfer_error_message(duplicate_transfers, business_survey
     return error_message
 
 
-def _pending_survey_for_business_exists(surveys_to_transfer_map, business_id, survey_id):
+def _existing_pending_survey_is_in_selection(surveys_to_transfer_map, business_id, survey_id):
     if business_id in surveys_to_transfer_map:
         return survey_id in surveys_to_transfer_map[business_id]
     return False

@@ -64,7 +64,7 @@
         "title": "I want to delete my account"
     })
 %}
-    <p>If you wish to delete your account, you must <a href="{{ url_for('account_bp.transfer_survey_overview') }}">transfer</a> all surveys to someone who will respond to them, and they must accept the transfer.</p>
+    <p>If you wish to delete your account, you must <a href='{{ url_for("account_bp.transfer_survey_overview") }}'>transfer</a> all surveys to someone who will respond to them, and they must accept the transfer.</p>
     <p>Your account will be deleted after 36 months of inactivity.</p>
 {% endcall %}
 </div>

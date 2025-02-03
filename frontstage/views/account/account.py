@@ -24,7 +24,7 @@ form_redirect_mapper = {
     "contact_details": "account_bp.change_account_details",
     "change_password": "account_bp.change_password",
     "share_surveys": "account_bp.share_survey_overview",
-    "transfer_surveys": "account_bp.transfer_survey_overview",
+    "transfer_surveys": "account_bp.transfer_surveys",
     "something_else": "account_bp.something_else",
 }
 

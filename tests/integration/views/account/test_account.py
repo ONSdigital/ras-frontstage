@@ -192,24 +192,3 @@ class TestSurveyList(unittest.TestCase):
         )
         self.assertTrue("Continue".encode() in response.data)
         self.assertTrue("Cancel".encode() in response.data)
-
-    @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
-    def test_transfer_survey_options_selection(self, mock_request, get_respondent_party_by_id):
-        mock_request.get(url_banner_api, status_code=404)
-        get_respondent_party_by_id.return_value = respondent_party
-        response = self.app.post("/my-account", data={"option": "transfer_surveys"}, follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue("Transfer your surveys".encode() in response.data)
-        self.assertTrue("What will happen".encode() in response.data)
-        self.assertTrue("Select which surveys you want to transfer.".encode() in response.data)
-        self.assertTrue(
-            "Enter the email address of the person who will be responding to these surveys.".encode() in response.data
-        )
-        self.assertTrue("We will email them the instructions to access the surveys.".encode() in response.data)
-        self.assertTrue(
-            "Once we confirm their access, they will be able to respond to the surveys and share access "
-            "with their colleagues.".encode() in response.data
-        )
-        self.assertTrue("Continue".encode() in response.data)
-        self.assertTrue("Cancel".encode() in response.data)

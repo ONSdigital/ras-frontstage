@@ -1,4 +1,5 @@
 {% extends 'layouts/_base.html' %}
+{% from "components/list/_macro.njk" import onsList %}
 
 {% set page_title = "Surveys to complete" %}
 
@@ -57,6 +58,38 @@
         }) %}
                 An email with instructions has been sent
     {% endcall %}
+    {% endif %}
+    {% if transferred_surveys %}
+        {% call onsPanel({
+            "spacious": true,
+            "id": 'transferred-id',
+            "classes": 'ons-u-mb-m'
+        }) %}
+            <p>You have requested a transfer of the following surveys: </p>
+
+            {% for business in transferred_surveys %}
+                <p>Organisation: {{ transferred_surveys[business].name }}</p>
+                <div>
+                    {% set surveyList = [] %}
+                    {% for survey in transferred_surveys[business].surveys %}
+                        {% do surveyList.append(
+                            {
+                                "text": survey['longName']
+                            }
+                        )
+                    %}
+                    {% endfor %}
+                    {{
+                        onsList({
+                            "element": 'ul',
+                            "classes": "ons-u-mb-l",
+                            "itemsList": surveyList
+                        })
+                    }}
+                </div>
+            {% endfor %}
+            <p>They will be removed from your account once the new respondents has accepted</p>
+        {% endcall %}
     {% endif %}
     {% if delete_option_allowed %}
         {{

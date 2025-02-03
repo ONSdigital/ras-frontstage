@@ -15,7 +15,7 @@ from frontstage.controllers.party_controller import (
     get_list_of_business_for_party,
     get_surveys_listed_against_party_and_business_id,
     get_user_count_registered_against_business_and_survey,
-    register_pending_shares,
+    register_pending_surveys,
 )
 from frontstage.exceptions.exceptions import ShareSurveyProcessError
 from frontstage.models import (
@@ -305,7 +305,7 @@ def send_instruction(session):
     if form["email_address"].data != email:
         raise ShareSurveyProcessError("Process failed due to session error")
     json_data = build_payload(respondent_details["id"])
-    response = register_pending_shares(json_data)
+    response = register_pending_surveys(json_data, party_id)
     if response.status_code == 400:
         flash(
             "You have already transferred or shared these surveys with someone with this email address. They have 72 "

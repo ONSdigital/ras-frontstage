@@ -1,108 +1,72 @@
 {% extends "layouts/_block_content.html" %}
-{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/fieldset/_macro.njk" import onsFieldset %}
 {% from "components/radios/_macro.njk" import onsRadios %}
 {% from "components/button/_macro.njk" import onsButton %}
-
-{% set breadcrumbsData = [
-    {
-        "text": "Surveys",
-        "url": "/surveys/todo",
-        "id": "b-item"
-    }
-] %}
-{% block breadcrumbs %}
-    {{
-        onsBreadcrumbs({
-            "ariaLabel": "Breadcrumbs",
-            "id": "breadcrumbs",
-            "itemsList": breadcrumbsData
-        })
-    }}
-{% endblock breadcrumbs %}
+{% from "components/description-list/_macro.njk" import onsDescriptionList %}
+{% from "components/details/_macro.njk" import onsDetails %}
 
 {% block main %}
-    {% set ns = namespace() %}
-    {% include "radio-option-select-error-panel.html" %}
-    <h1 class="ons-u-fs-xl">Account details</h1>
-    <dl class="ons-metadata ons-metadata__list ons-grid ons-grid--gutterless ons-u-cf ons-u-mb-l" title="" aria-label="">
-    <dt class="ons-metadata__term ons-grid__col ons-col-4@m"><strong>Name:</strong></dt>
-    <dd class="ons-metadata__value ons-grid__col ons-col-8@m">{{ respondent.firstName }} {{ respondent.lastName }}</dd>
-    <dt class="ons-metadata__term ons-grid__col ons-col-4@m"><strong>Email address:</strong></dt>
-    <dd class="ons-metadata__value ons-grid__col ons-col-8@m">{{ respondent.emailAddress }}</dd>
-    <dt class="ons-metadata__term ons-grid__col ons-col-4@m"><strong>Phone number:</strong></dt>
-    <dd class="ons-metadata__value ons-grid__col ons-col-8@m">{{ respondent.telephone }}</dd>
-    </dl>
-        <hr class="ons-u-mb-l"/>
-    <h1 class="ons-u-fs-xl">Help with your account</h1>
-    <form action="{{ url_for('account_bp.account')}}" method="post">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            {% if ns.optionError %}
-                {% set errorOption = { "text": ns.optionErrorMessage,  "id": 'option_error' } %}
-            {% endif %}
-            {% set radioComponent = {
-                "legend": "Choose an option",
-                "name": "option",
-                "id": "option",
-                "error": errorOption,
-            } %}
-            {% set radios = [] %}
-            {% do radios.append(
-                {
-                    "id": "contact_details",
-                    "label": {
-                        "text": "Change my contact details"
-                    },
-                    "value": "contact_details"
-                }) %}
-            {% do radios.append(
-                {
-                    "id": "change_password",
-                    "label": {
-                        "text": "Change password"
-                    },
-                    "value": "change_password"
-                }
-                ) %}
-            {% do radios.append(
+{% include "radio-option-select-error-panel.html" %}
+<div class=" ons-push-1@m">
+<h1 class="ons-u-fs-xl">My Account</h1>
+{{
+    onsDescriptionList({
+        "classes": "ons-u-mb-no",
+        "descriptionListLabel": "My account information",
+        "termCol": "4",
+        "descriptionCol": "6",
+        "itemsList": [
             {
-                "id": "share_surveys",
-                "label": {
-                    "text": "Share access to my surveys"
-                },
-                "value": "share_surveys"
-            }
-            ) %}
-            {% do radios.append(
+                "term": "Name:",
+                "descriptions": [
+                    {
+                        "description": respondent.firstName ~ " " ~ respondent.lastName
+                    }
+                ]
+            },
             {
-                "id": "transfer_surveys",
-                "label": {
-                    "text": "I am no longer required to complete any surveys"
-                },
-                "value": "transfer_surveys"
+                "term": "Email address:",
+                "descriptions": [
+                    {
+                        "description": respondent.emailAddress
+                    }
+                ]
+            },
+            {
+                "term": "Phone number:",
+                "descriptions": [
+                    {
+                        "description": respondent.telephone
+                    },
+                    {
+                        "description": "<a href='/my-account/change-account-details'>Edit content details</a>"
+                    }
+                ]
+            },
+            {
+                "term": " ",
+            },
+            {
+                "term": "Password:",
+                "descriptions": [
+                    {
+                        "description": "<a href='/my-account/change-password'>Change password</a>"
+                    }
+                ],
             }
-            ) %}
-            {% do radioComponent | setAttribute("radios", radios) %}
-            {{
-                onsRadios(radioComponent)
-            }}
-        <div class="ons-field ons-u-mt-l">
-            {{
-                onsButton({
-                    "text": "Continue",
-                    "id": "btn-option-continue",
-                    "submitType": "timer"
-                })
-            }}
-            {{
-                onsButton({
-                    "id": "btn-option-cancel",
-                    "url": url_for('surveys_bp.get_survey_list', tag='todo'),
-                    "text": 'Cancel',
-                    "variants": 'secondary',
-                    "noIcon": true
-                })
-            }}
-        </div>
-    </form>
+        ]
+    })
+}}
+<div class="ons-u-mb-xl 54px"></div>
+{%
+    call onsDetails({
+        "id": "delete account",
+        "title": "I want to delete my account"
+    })
+%}
+    <p>If you wish to delete your account, you must <a href="{{ url_for('account_bp.transfer_survey_overview') }}">transfer</a> all surveys to someone who will respond to them, and they must accept the transfer.</p>
+    <p>Your account will be deleted after 36 months of inactivity.</p>
+{% endcall %}
+</div>
+
 {% endblock main %}

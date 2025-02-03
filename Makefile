@@ -21,7 +21,7 @@ docker-test: test
 
 #remove -i 70612 once jinja2 is upgraded past v3.1.4
 lint:
-	pipenv check -i 70612  -i 74735
+	pipenv check -i 70612 -i 74735
 	pipenv run isort .
 	pipenv run black --line-length 120 .
 	pipenv run djlint frontstage/ --ignore=H037,H021

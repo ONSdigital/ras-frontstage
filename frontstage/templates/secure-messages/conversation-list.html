@@ -3,7 +3,6 @@
 {% set page_title = "Messages" %}
 
 {% block content %}
-    {% include "partials/tab_list.html" %}
 
     {% with messages = get_flashed_messages() %}
         {% if messages %}

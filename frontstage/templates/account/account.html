@@ -82,15 +82,6 @@
                 "value": "transfer_surveys"
             }
             ) %}
-            {% do radios.append(
-            {
-                "id": "something_else",
-                "label": {
-                    "text": "Something else"
-                },
-                "value": "something_else"
-            }
-            ) %}
             {% do radioComponent | setAttribute("radios", radios) %}
             {{
                 onsRadios(radioComponent)

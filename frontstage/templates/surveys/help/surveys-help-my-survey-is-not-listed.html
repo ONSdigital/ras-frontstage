@@ -39,7 +39,7 @@
         You should <a href="{{ url_for('surveys_bp.add_survey') }}">add the new survey to your account</a> using the code in the letter.</p>
     <p>
         {% if is_survey_help_page is defined and  is_survey_help_page %}
-        <a href="{{ url_for('surveys_bp.send_help_message', option=option, sub_option='my-survey-is-not-listed', survey_name=survey_name, business_id=business_id, survey_id=survey_id, ce_id=ce_id) }}"> Send us a message</a>
+        <a href="{{ url_for('contact_us_bp.send_message', option=option, sub_option='my-survey-is-not-listed', survey_name=survey_name, business_id=business_id, survey_id=survey_id, ce_id=ce_id) }}"> Send us a message</a>
         {% else %}
         <a href="{{ url_for('surveys_bp.get_send_help_technical_message_page', option=option, survey_name=survey_name, business_id=business_id, survey_id=survey_id, ce_id=ce_id) }}"> Send us a message</a>
         {% endif %} if you have not received the enrolment letter.</p>

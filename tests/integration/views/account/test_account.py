@@ -52,7 +52,7 @@ class TestSurveyList(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertIn(b"example@example.com", response.data)
             self.assertIn(b"My Account", response.data)
-            self.assertIn(b"<a href='/my-account/change-account-details'>Edit content details</a>", response.data)
+            self.assertIn(b"<a href='/my-account/change-account-details'>Edit contact details</a>", response.data)
             self.assertIn(b"<a href='/my-account/change-password'>Change password</a>", response.data)
             self.assertIn(b"I want to delete my account", response.data)
 

@@ -48,7 +48,7 @@
                 </dd>
                 <dt style="float: left; clear: left;" class="ons-u-vh">Help: </dt>
                 <dd class="ons-u-ml-no ons-u-mb-s">
-                    <a id="create-message-link-{{loop.index}}" href="{{ url_for('surveys_bp.surveys_help_page', survey_id=survey.survey_id, ce_id=survey.collection_exercise_id, business_id=survey.business_party_id, survey_name=survey.survey_long_name) }}">Get help with this survey <span class="ons-u-vh"> about {{ survey.survey_long_name }}</span></a>
+                    <a id="create-message-link-{{loop.index}}" href="{{ url_for('contact_us_bp.send_message') }}">Get help with this survey <span class="ons-u-vh"> about {{ survey.survey_long_name }}</span></a>
                 </dd>
             </div>
         </dl>

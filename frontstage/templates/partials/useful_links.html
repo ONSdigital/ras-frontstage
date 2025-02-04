@@ -1,0 +1,43 @@
+{% from "components/related-content/_macro.njk" import onsRelatedContent %}
+
+<div class="ons-grid__col ons-col-4@m ons-push-1@m">
+      {%
+                call onsRelatedContent({
+                    "ariaLabel": 'Related content',
+                    "rows": [
+                        {
+                            "id": "useful-links",
+                            "title": "Useful links",
+                            "itemsList": [
+                                {
+                                    "id": "add_survey_button",
+                                    "url": url_for("surveys_bp.add_survey"),
+                                    "text": "Add a new survey",
+                                },
+                                {
+                                    "url": url_for("account_bp.share_survey_overview"),
+                                    "text": "Share access to surveys",
+                                },
+                                {
+                                    "url": url_for("account_bp.transfer_surveys"),
+                                    "text": "Transfer surveys"
+                                },
+                                {
+                                    "url": url_for("contact_us_bp.send_message"),
+                                    "text": "Help completing a survey"
+                                },
+                                {
+                                    "url": url_for("help_bp.info_ons_page"),
+                                    "text": "Information about ONS"
+                                },
+                                {
+                                    "url": url_for("contact_us_bp.contact_us"),
+                                    "text": "Contact us"
+                                }
+                            ]
+                        },
+                    ]
+                })
+            %}
+            {% endcall %}
+</div>

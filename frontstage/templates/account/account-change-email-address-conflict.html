@@ -35,6 +35,6 @@
 {% block main %}
     <h1 class="ons-u-fs-l">We are not able to change your email address</h1>
     <p>This is because the new address you have provided is being used on another account in our system.</p>
-    <p>If you are no longer required to respond to your surveys, you can <a href="{{ url_for('account_bp.transfer_survey_overview') }}">transfer surveys</a> to a colleague instead.</p>
+    <p>If you are no longer required to respond to your surveys, you can <a href="{{ url_for('account_bp.transfer_surveys') }}">transfer surveys</a> to a colleague instead.</p>
     <p>If you need further help, please <a href="{{ url_for('contact_us_bp.contact_us') }}" rel="noopener">contact us</a>.</p>
 {% endblock main %}

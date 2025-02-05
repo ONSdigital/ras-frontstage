@@ -116,10 +116,9 @@
                 "id": business_id,
             } %}
             {% for survey in details["surveys"] %}
-
                 {% do checkboxData.append(
                     {
-                        "id": survey["id"],
+                        "id": details["business_ref"] + "-" + survey["id"],
                         "name": "selected_surveys",
                         "label": {
                             "text": survey["long_name"]

@@ -4,9 +4,11 @@ from unittest.mock import patch
 import requests_mock
 
 from frontstage import app
+from frontstage.exceptions.exceptions import TransferSurveyProcessError
 from tests.integration.mocked_services import (
     business_party,
     encoded_jwt_token,
+    party,
     respondent_enrolments,
     respondent_party,
     survey,
@@ -21,31 +23,12 @@ url_get_user_count = (
     f"business_id={business_party['id']}&survey_id={'02b9c366-7397-42f7-942a-76dc5876d86d'}"
 )
 url_post_pending_transfers = f"{app.config['PARTY_URL']}/party-api/v1/pending-surveys"
-url_get_survey_second = f"{app.config['SURVEY_URL']}/surveys/02b9c366-7397-42f7-942a-76dc5876d86d"
-dummy_business = {
-    "associations": [
-        {
-            "businessRespondentStatus": "ACTIVE",
-            "enrolments": [{"enrolmentStatus": "ENABLED", "surveyId": "02b9c366-7397-42f7-942a-76dc5876d86d"}],
-            "partyId": "9f26eb0e-7db7-41fd-9c4c-3ee9f562aa35",
-        }
-    ],
-    "id": "d7813ec7-10c3-4872-8717-c0b9135f917c",
-    "name": "RUNAME1_COMPANY1 RUNNAME2_COMPANY1",
-    "sampleSummaryId": "e502324d-6e49-4fcb-8c68-e6553f45fae1",
-    "sampleUnitRef": "49900000001",
-    "sampleUnitType": "B",
-    "trading_as": "TOTAL UK ACTIVITY",
-}
-dummy_survey = {
-    "id": "02b9c366-7397-42f7-942a-76dc5876d86d",
-    "shortName": "QBS",
-    "longName": "Quarterly Business Survey",
-    "surveyRef": "139",
-    "legalBasis": "Statistics of Trade Act 1947",
-    "surveyType": "Business",
-    "surveyMode": "EQ",
-    "legalBasisRef": "STA1947",
+
+selected_surveys = {
+    "selected_surveys": [
+        "{'business_id': 'be3483c3-f5c9-4b13-bdd7-244db78ff687', 'survey_id': "
+        "'02b9c366-7397-42f7-942a-76dc5876d86d'}"
+    ]
 }
 
 
@@ -67,99 +50,55 @@ class TestTransferSurvey(unittest.TestCase):
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
-    def test_transfer_survey_business_select(self, mock_request, get_respondent_enrolments):
-        mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_business_details, status_code=200, json=[dummy_business])
-        get_respondent_enrolments.return_value = respondent_enrolments
-        response = self.app.get("/my-account/transfer-surveys/business-selection")
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue("For which businesses do you want to transfer your surveys?".encode() in response.data)
-        self.assertTrue("Select all that apply".encode() in response.data)
-        self.assertTrue("RUNAME1_COMPANY1 RUNNAME2_COMPANY1".encode() in response.data)
-        self.assertTrue("Continue".encode() in response.data)
-        self.assertTrue("Cancel".encode() in response.data)
-
-    @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
-    def test_transfer_survey_business_select_no_option_selected(self, mock_request, get_respondent_enrolments):
-        mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_business_details, status_code=200, json=[dummy_business])
-        get_respondent_enrolments.return_value = respondent_enrolments
-        response = self.app.post(
-            "/my-account/transfer-surveys/business-selection", data={"option": None}, follow_redirects=True
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("There is 1 error on this page".encode(), response.data)
-        self.assertIn("You need to choose a business".encode(), response.data)
-
-    @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
     def test_transfer_survey_select(self, mock_request, get_respondent_enrolments):
         mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_business_details, status_code=200, json=[business_party])
-        mock_request.get(url_get_survey, status_code=200, json=survey)
-        mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         get_respondent_enrolments.return_value = respondent_enrolments
-        response = self.app.post(
-            "/my-account/transfer-surveys/business-selection",
-            data={"checkbox-answer": "99941a3f-8e32-40e4-b78a-e039a2b437ca"},
-            follow_redirects=True,
-        )
+
+        response = self.app.get("/my-account/transfer-surveys/survey-selection")
+
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Which surveys do you want to transfer?".encode(), response.data)
-        self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
+        self.assertIn("Transfer your surveys".encode(), response.data)
+        self.assertIn("Choose the surveys you want to transfer".encode(), response.data)
+        self.assertIn("Survey 1".encode(), response.data)
         self.assertIn("Select all that apply".encode(), response.data)
-        self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
-        self.assertIn("Quarterly Business Survey".encode(), response.data)
+        self.assertIn("Survey 2".encode(), response.data)
         self.assertTrue("Continue".encode() in response.data)
-        self.assertTrue("Cancel".encode() in response.data)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
     def test_transfer_survey_select_no_option_selected(self, mock_request, get_respondent_enrolments):
         mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_business_details, status_code=200, json=[business_party])
-        mock_request.get(url_get_survey, status_code=200, json=survey)
-        mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         get_respondent_enrolments.return_value = respondent_enrolments
-        with self.app.session_transaction() as mock_session:
-            mock_session["transfer_survey_data"] = {business_party["id"]: None}
+
         response = self.app.post(
             "/my-account/transfer-surveys/survey-selection", data={"option": None}, follow_redirects=True
         )
+
         self.assertEqual(response.status_code, 200)
         self.assertIn("There is 1 error on this page".encode(), response.data)
-        self.assertIn("Select an answer".encode(), response.data)
         self.assertIn("You need to select a survey".encode(), response.data)
 
     @requests_mock.mock()
     def test_transfer_survey_select_option_selected(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_business_details, status_code=200, json=[business_party])
-        mock_request.get(url_get_survey, status_code=200, json=survey)
-        mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         mock_request.get(url_get_user_count, status_code=200, json=2)
-        with self.app.session_transaction() as mock_session:
-            mock_session["transfer_survey_data"] = {business_party["id"]: None}
+
         response = self.app.post(
             "/my-account/transfer-surveys/survey-selection",
-            data={business_party["id"]: ["02b9c366-7397-42f7-942a-76dc5876d86d"]},
+            data=selected_surveys,
             follow_redirects=True,
         )
+
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Enter recipient's email address".encode(), response.data)
+        self.assertIn("New respondents email address".encode(), response.data)
+        self.assertIn("We will send instructions to the email address that you provide.".encode(), response.data)
         self.assertIn(
-            "We need the email address of the person who will be responding to the surveys.".encode(), response.data
+            "Once we confirm the new respondents access, they will be able to respond to the surveys you have selected.".encode(),
+            response.data,
         )
-        self.assertIn("Recipient's email address".encode(), response.data)
-        self.assertIn("Make sure you have their permission to give us their email address.".encode(), response.data)
+        self.assertIn("New respondents email address".encode(), response.data)
+        self.assertIn("Make sure you have permission to give us their email address.".encode(), response.data)
         self.assertTrue("Continue".encode() in response.data)
-        self.assertTrue("Cancel".encode() in response.data)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
@@ -167,19 +106,15 @@ class TestTransferSurvey(unittest.TestCase):
         self, mock_request, get_respondent_enrolments
     ):
         mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_business_details, status_code=200, json=[business_party])
-        mock_request.get(url_get_survey, status_code=200, json=survey)
-        mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         mock_request.get(url_get_user_count, status_code=200, json=52)
         get_respondent_enrolments.return_value = respondent_enrolments
-        with self.app.session_transaction() as mock_session:
-            mock_session["transfer_survey_data"] = {business_party["id"]: None}
+
         response = self.app.post(
             "/my-account/transfer-surveys/survey-selection",
-            data={business_party["id"]: ["02b9c366-7397-42f7-942a-76dc5876d86d"]},
+            data=selected_surveys,
             follow_redirects=True,
         )
+
         self.assertEqual(response.status_code, 200)
         self.assertIn("There is 1 error on this page".encode(), response.data)
         self.assertIn(
@@ -194,12 +129,9 @@ class TestTransferSurvey(unittest.TestCase):
     def test_transfer_survey_recipient_email_not_entered(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_business_details, status_code=200, json=[business_party])
-        mock_request.get(url_get_survey, status_code=200, json=survey)
-        mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
-        with self.app.session_transaction() as mock_session:
-            mock_session["transfer_survey_data"] = {business_party["id"]: [survey["id"]]}
+
         response = self.app.post("/my-account/transfer-surveys/recipient-email-address", data={}, follow_redirects=True)
+
         self.assertEqual(response.status_code, 200)
         self.assertIn("There is 1 error on this page".encode(), response.data)
         self.assertIn("Problem with the email address".encode(), response.data)
@@ -209,16 +141,13 @@ class TestTransferSurvey(unittest.TestCase):
     def test_transfer_survey_recipient_email_invalid(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_business_details, status_code=200, json=business_party)
-        mock_request.get(url_get_survey, status_code=200, json=survey)
-        mock_request.get(url_get_survey_second, status_code=200, json=[dummy_survey])
-        with self.app.session_transaction() as mock_session:
-            mock_session["transfer_survey_data"] = {business_party["id"]: [survey["id"]]}
+
         response = self.app.post(
             "/my-account/transfer-surveys/recipient-email-address",
             data={"email_address": "a.a.com"},
             follow_redirects=True,
         )
+
         self.assertEqual(response.status_code, 200)
         self.assertIn("There is 1 error on this page".encode(), response.data)
         self.assertIn("Problem with the email address".encode(), response.data)
@@ -230,9 +159,8 @@ class TestTransferSurvey(unittest.TestCase):
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
         mock_request.get(url_get_business_details, status_code=200, json=[business_party])
         mock_request.get(url_get_survey, status_code=200, json=survey)
-        mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         with self.app.session_transaction() as mock_session:
-            mock_session["transfer_survey_data"] = {business_party["id"]: [survey["id"]]}
+            mock_session["surveys_to_transfer_map"] = {business_party["id"]: [survey["id"]]}
         response = self.app.post(
             "/my-account/transfer-surveys/recipient-email-address",
             data={"email_address": "a@a.com"},
@@ -241,12 +169,13 @@ class TestTransferSurvey(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Send instructions".encode(), response.data)
         self.assertIn(
-            "will send an email to <strong>a@a.com</strong> with instructions to access the following surveys:".encode(),
+            "We will email a link with instructions to <strong>a@a.com</strong>.".encode(),
             response.data,
         )
+        self.assertIn("Once approved, they will have access to:".encode(), response.data)
+        self.assertIn("RUNAME1_COMPANY1 RUNNAME2_COMPANY1".encode(), response.data)
         self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
         self.assertTrue("Send".encode() in response.data)
-        self.assertTrue("Cancel".encode() in response.data)
 
     @requests_mock.mock()
     def test_transfer_survey_transfer_instruction_done(self, mock_request):
@@ -254,26 +183,24 @@ class TestTransferSurvey(unittest.TestCase):
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
         mock_request.get(url_get_business_details, status_code=200, json=[business_party])
         mock_request.get(url_get_survey, status_code=200, json=survey)
-        mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         mock_request.post(url_post_pending_transfers, status_code=201, json={"created": "success"})
 
         with self.app.session_transaction() as mock_session:
-            mock_session["transfer_survey_data"] = {business_party["id"]: [survey["id"]]}
+            mock_session["surveys_to_transfer_map"] = {business_party["id"]: [survey["id"]]}
             mock_session["transfer_survey_recipient_email_address"] = "a@a.com"
         response = self.app.post(
             "/my-account/transfer-surveys/send-instruction", data={"email_address": "a@a.com"}, follow_redirects=True
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn(
-            "We have sent an email to the new person who will be responding to ONS surveys.".encode(), response.data
-        )
+        self.assertIn("Instructions sent".encode(), response.data)
+        self.assertIn("An email with instructions has been sent to <strong>a@a.com</strong>.".encode(), response.data)
         self.assertTrue(
-            "They need to follow the link in the email to confirm their email address and finish setting "
-            "up their account.".encode() in response.data
+            "They will need to follow the link in this email to confirm their email address and finish setting up "
+            "their account.".encode() in response.data
         )
-        self.assertIn("Email not arrived? It may be in their junk folder.".encode(), response.data)
+        self.assertIn("This email might go to a junk or spam folder.".encode(), response.data)
         self.assertIn(
-            "If it does not arrive in the next 15 minutes, please call 0300 1234 931.".encode(), response.data
+            "If they do not receive this email in 15 minutes, call us on +44 300 1234 931".encode(), response.data
         )
         self.assertTrue("Back to surveys".encode() in response.data)
 
@@ -283,19 +210,79 @@ class TestTransferSurvey(unittest.TestCase):
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
         mock_request.get(url_get_business_details, status_code=200, json=[business_party])
         mock_request.get(url_get_survey, status_code=200, json=survey)
-        mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         mock_request.post(url_post_pending_transfers, status_code=400, json={"error": "error"})
-
         with self.app.session_transaction() as mock_session:
-            mock_session["transfer_survey_data"] = {business_party["id"]: [survey["id"]]}
+            mock_session["surveys_to_transfer_map"] = {business_party["id"]: [survey["id"]]}
             mock_session["transfer_survey_recipient_email_address"] = "a@a.com"
+
         response = self.app.post(
             "/my-account/transfer-surveys/send-instruction", data={"email_address": "a@a.com"}, follow_redirects=True
         )
         self.assertEqual(response.status_code, 200)
         self.assertIn(
-            "You have already shared or transferred these surveys with someone with this email address. They have 72 "
-            "hours to accept your request. If you have made an error then wait for the share/transfer to expire or "
-            "contact us.".encode(),
+            "You have already shared or transferred these surveys with someone with this email address. "
+            "They have 72 hours to accept your request. If you have made an error then wait for the "
+            "share/transfer to expire or contact us.".encode(),
             response.data,
         )
+        self.assertIn(
+            "We will email a link with instructions to <strong>a@a.com</strong>.".encode(),
+            response.data,
+        )
+        self.assertIn("Once approved, they will have access to:".encode(), response.data)
+        self.assertIn("RUNAME1_COMPANY1 RUNNAME2_COMPANY1".encode(), response.data)
+        self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
+        self.assertTrue("Send".encode() in response.data)
+
+    @requests_mock.mock()
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    def test_transfer_survey(self, mock_request, get_respondent_enrolments):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_get_survey, status_code=200, json=survey)
+        get_respondent_enrolments.return_value = respondent_enrolments
+
+        response = self.app.get(
+            "/my-account/transfer-surveys/", data={"email_address": "a@a.com"}, follow_redirects=True
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Transfer your surveys".encode(), response.data)
+        self.assertIn(
+            "If you transfer a survey, you will no longer have access to it. If you will still need access "
+            "to the survey,".encode(),
+            response.data,
+        )
+        self.assertIn("Business 1".encode(), response.data)
+        self.assertIn("Choose the surveys you want to transfer".encode(), response.data)
+        self.assertIn("Survey 1".encode(), response.data)
+        self.assertTrue("Continue".encode() in response.data)
+
+    @requests_mock.mock()
+    @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
+    def test_transfer_survey_recipient_email_same_as_user(self, mock_request, get_respondent_party_by_id):
+        mock_request.get(url_banner_api, status_code=404)
+        get_respondent_party_by_id.return_value = party
+
+        response = self.app.post(
+            "/my-account/transfer-surveys/recipient-email-address",
+            data={"email_address": "example@example.com"},
+            follow_redirects=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("There is 1 error on this page".encode(), response.data)
+        self.assertIn("Problem with the email address".encode(), response.data)
+        self.assertIn("You can not transfer surveys to yourself.".encode(), response.data)
+
+    @requests_mock.mock()
+    def test_transfer_survey_transfer_survey_process_error(self, mock_request):
+        mock_request.get(url_banner_api, status_code=404)
+
+        with self.app.session_transaction() as mock_session:
+            mock_session["transfer_survey_recipient_email_address"] = "a@a.com"
+
+        response = self.app.post("/my-account/transfer-surveys/send-instruction", data={}, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 500)
+        self.assertRaises(TransferSurveyProcessError)
+        self.assertLogs("Could not find email address in session", response.data)

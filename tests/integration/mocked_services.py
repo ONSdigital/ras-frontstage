@@ -79,6 +79,9 @@ with open("tests/test_data/party/party.json") as fp:
 with open("tests/test_data/survey/bricks_survey.json") as fp:
     survey = json.load(fp)
 
+with open("tests/test_data/party/pending_surveys.json") as fp:
+    pending_surveys = json.load(fp)
+
 with open("tests/test_data/survey/qbs_survey.json") as fp:
     survey_eq = json.load(fp)
 
@@ -108,6 +111,7 @@ url_get_respondent_by_email = f"{app.config['PARTY_URL']}/party-api/v1/responden
 url_get_business_party = f"{app.config['PARTY_URL']}/party-api/v1/businesses/id/{business_party['id']}"
 url_get_respondent_party = f"{app.config['PARTY_URL']}/party-api/v1/respondents/party_id/{party['id']}"
 url_get_respondent_enrolments = f"{app.config['PARTY_URL']}/party-api/v1/enrolments/respondent/{party['id']}"
+url_get_existing_pending_surveys = f"{app.config['PARTY_URL']}/party-api/v1/pending-surveys/originator/{party['id']}"
 url_get_case = f"{app.config['CASE_URL']}/cases/{case['id']}"
 url_get_case_by_enrolment_code = f"{app.config['CASE_URL']}/cases/iac/{enrolment_code}"
 url_get_case_categories = f"{app.config['CASE_URL']}/categories"
@@ -137,6 +141,7 @@ url_get_threads = app.config["SECURE_MESSAGE_URL"] + "/threads"
 url_auth_token = f"{app.config['AUTH_URL']}/api/v1/tokens/"
 url_password_change = f"{app.config['PARTY_URL']}/party-api/v1/respondents/change_password"
 url_post_add_survey = f"{app.config['PARTY_URL']}/party-api/v1/respondents/add_survey"
+url_get_post_add_survey = f"{app.config['PARTY_URL']}/party-api/v1/respondents/add_survey"
 url_post_case_event_uuid = f"{app.config['CASE_URL']}/cases/{case['id']}/events"
 url_reset_password_request = f"{app.config['PARTY_URL']}/party-api/v1/respondents/request_password_change"
 url_send_message = app.config["SECURE_MESSAGE_URL"] + "/messages"

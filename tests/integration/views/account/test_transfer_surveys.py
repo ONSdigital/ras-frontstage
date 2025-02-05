@@ -9,10 +9,13 @@ from tests.integration.mocked_services import (
     business_party,
     encoded_jwt_token,
     party,
+    pending_surveys,
     respondent_enrolments,
     respondent_party,
     survey,
     url_banner_api,
+    url_get_existing_pending_surveys,
+    url_get_respondent_enrolments,
     url_get_respondent_party,
     url_get_survey,
 )
@@ -154,11 +157,39 @@ class TestTransferSurvey(unittest.TestCase):
         self.assertIn("Invalid email address".encode(), response.data)
 
     @requests_mock.mock()
+    def test_transfer_survey_transfer_duplicates(self, mock_request):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
+        mock_request.get(url_get_business_details, status_code=200, json=[business_party])
+        mock_request.get(url_get_survey, status_code=200, json=survey)
+        mock_request.get(url_get_existing_pending_surveys, status_code=200, json=pending_surveys)
+        mock_request.get(url_get_respondent_enrolments, json=respondent_enrolments)
+        with self.app.session_transaction() as mock_session:
+            mock_session["surveys_to_transfer_map"] = {business_party["id"]: [survey["id"]]}
+        response = self.app.post(
+            "/my-account/transfer-surveys/recipient-email-address",
+            data={"email_address": "bob@here.com"},
+            follow_redirects=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            "You have already shared or transferred the following surveys to this email address.".encode(),
+            response.data,
+        )
+        self.assertIn("They have 72 hours to accept your request.".encode(), response.data)
+        self.assertIn(
+            "<br /><br />If you have made an error then wait for the share/transfer to expire or contact us.".encode(),
+            response.data,
+        )
+        self.assertIn("<ul><li>Business 3 - Survey 2</li></ul>".encode(), response.data)
+
+    @requests_mock.mock()
     def test_transfer_survey_transfer_instruction(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
         mock_request.get(url_get_business_details, status_code=200, json=[business_party])
         mock_request.get(url_get_survey, status_code=200, json=survey)
+        mock_request.get(url_get_existing_pending_surveys, status_code=200, json=pending_surveys)
         with self.app.session_transaction() as mock_session:
             mock_session["surveys_to_transfer_map"] = {business_party["id"]: [survey["id"]]}
         response = self.app.post(

@@ -15,6 +15,7 @@ from frontstage.controllers.conversation_controller import (
     secure_message_enrolment_options,
     send_secure_message,
 )
+from frontstage.controllers.party_controller import get_respondent_enrolments
 from frontstage.exceptions.exceptions import JWTTimeoutError, JWTValidationError
 from frontstage.models import SecureMessagingForm
 from frontstage.views.template_helper import render_template
@@ -59,10 +60,13 @@ def send_message(session) -> str:
         except InvalidSecureMessagingForm as e:
             errors = _errors(e.errors)
 
-    enrolment_options = secure_message_enrolment_options(
-        session.get_party_id(),
-        secure_message_form,
-    )
+    enrolments = get_respondent_enrolments(session.get_party_id())
+
+    if len(enrolments) > 2:
+        return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
+
+    enrolment_options = secure_message_enrolment_options(enrolments[0], secure_message_form)
+
     return render_template(
         "secure-messages/help/secure-message-send-messages-view.html",
         enrolment_options=enrolment_options,

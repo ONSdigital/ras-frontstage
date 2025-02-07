@@ -66,26 +66,24 @@ class TestShareSurvey(unittest.TestCase):
         self.patcher.stop()
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    @patch("frontstage.views.account.account_survey_share.get_respondent_enrolments")
     def test_share_survey_business_select(self, mock_request, get_respondent_enrolments):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_business_details, status_code=200, json=[dummy_business])
         get_respondent_enrolments.return_value = respondent_enrolments
         response = self.app.get("/my-account/share-surveys/business-selection")
         self.assertEqual(response.status_code, 200)
         self.assertTrue("For which business do you want to share your surveys?".encode() in response.data)
         self.assertTrue("Select all that apply".encode() in response.data)
-        self.assertTrue("RUNAME1_COMPANY1 RUNNAME2_COMPANY1".encode() in response.data)
+        self.assertTrue("Business 1".encode() in response.data)
         self.assertTrue("Continue".encode() in response.data)
         self.assertTrue("Cancel".encode() in response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    @patch("frontstage.views.account.account_survey_share.get_respondent_enrolments")
     def test_share_survey_business_select_no_option_selected(self, mock_request, get_respondent_enrolments):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_business_details, status_code=200, json=[dummy_business])
         get_respondent_enrolments.return_value = respondent_enrolments
         response = self.app.post(
             "/my-account/share-surveys/business-selection", data={"option": None}, follow_redirects=True
@@ -110,10 +108,9 @@ class TestShareSurvey(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertIn("Share access to surveys".encode(), response.data)
-        self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
+        self.assertIn("Survey 1".encode(), response.data)
         self.assertIn("Select all that apply".encode(), response.data)
-        self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
-        self.assertIn("Quarterly Business Survey".encode(), response.data)
+        self.assertIn("Survey 2".encode(), response.data)
         self.assertTrue("Continue".encode() in response.data)
 
     @requests_mock.mock()

@@ -25,22 +25,7 @@
     <p>Describe your issue, and we will get back to you within 5 working days.</p>
     <div class="ons-col-10@m" id="secure-message-form">
         <form method="post">
-            {% if enrolment_options.business %}
-               {{
-                    onsSelect({
-                    "id": "business_id",
-                    "name": "business_id",
-                    "label": {
-                        "text": "Business"
-                    },
-                    "options": enrolment_options.business,
-                    "error": errors.business_id
-                    })
-                }}
-            {% else %}
                 <input type="hidden" name="business_id" value="{{ form.business_id }}"/>
-            {% endif %}
-
             {{
                 onsSelect({
                     "id": "survey_id",

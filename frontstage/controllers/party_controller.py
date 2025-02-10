@@ -11,6 +11,9 @@ from frontstage.common.thread_wrapper import ThreadWrapper
 from frontstage.common.utilities import obfuscate_email
 from frontstage.common.verification import decode_email_token
 from frontstage.controllers import case_controller, survey_controller
+from frontstage.controllers.collection_exercise_controller import (
+    get_collection_exercises_for_surveys,
+)
 from frontstage.exceptions.exceptions import (
     ApiError,
     ServiceUnavailableException,
@@ -425,8 +428,8 @@ def get_survey_list_details_for_party(enrolment_data: list, tag: str, business_p
     # Populate the cache with all case data
     caching_case_data(cache_data, business_ids, tag)
 
-    #  Populate the enrolments by creating a dictionary using the redis_cache
-    collection_exercises = redis_cache.get_collection_exercises_by_surveys(surveys_ids)
+    #  Populate the enrolments by creating a dict of enrolled collection exercises
+    collection_exercises = get_collection_exercises_for_surveys(surveys_ids) if surveys_ids else []
     enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, collection_exercises)
 
     for enrolment in enrolments:

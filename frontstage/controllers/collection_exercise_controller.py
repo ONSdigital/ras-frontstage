@@ -50,11 +50,15 @@ def get_collection_exercise_events(collection_exercise_id):
     return response.json()
 
 
-def get_collection_exercises_for_surveys(survey_ids, collex_url, collex_auth, live_only=None):
+def get_collection_exercises_for_surveys(survey_ids, live_only=None):
     logger.info("Retrieving collection exercises for surveys", survey_ids=survey_ids)
     params = {"surveyIds": survey_ids, "liveOnly": live_only}
 
-    response = requests.get(f"{collex_url}/collectionexercises/surveys", params=params, auth=collex_auth)
+    response = requests.get(
+        f"{app.config["COLLECTION_EXERCISE_URL"]}/collectionexercises/surveys",
+        params=params,
+        auth=app.config["BASIC_AUTH"],
+    )
 
     try:
         response.raise_for_status()
@@ -74,10 +78,6 @@ def get_collection_exercises_for_surveys(survey_ids, collex_url, collex_auth, li
                 collection_exercise["events"] = convert_events_to_new_format(collection_exercise["events"])
 
     return surveys_with_collection_exercises
-
-
-def get_live_collection_exercises_for_surveys(survey_ids, collex_url, collex_auth):
-    return get_collection_exercises_for_surveys(survey_ids, collex_url, collex_auth, True)
 
 
 def convert_events_to_new_format(events):

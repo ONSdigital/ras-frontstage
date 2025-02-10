@@ -33,8 +33,6 @@ class TestCollectionExerciseController(unittest.TestCase):
             with app.app_context():
                 collection_exercises = collection_exercise_controller.get_collection_exercises_for_surveys(
                     [collection_exercise["surveyId"]],
-                    self.app_config["COLLECTION_EXERCISE_URL"],
-                    self.app_config["BASIC_AUTH"],
                 )
 
                 self.assertTrue(collection_exercises is not None)
@@ -46,8 +44,6 @@ class TestCollectionExerciseController(unittest.TestCase):
                 with self.assertRaises(ApiError):
                     collection_exercise_controller.get_collection_exercises_for_surveys(
                         [collection_exercise["surveyId"]],
-                        self.app_config["COLLECTION_EXERCISE_URL"],
-                        self.app_config["BASIC_AUTH"],
                     )
 
     def test_get_collection_exercises_for_survey_no_exercises(self):
@@ -57,8 +53,6 @@ class TestCollectionExerciseController(unittest.TestCase):
             with app.app_context():
                 collection_exercises = collection_exercise_controller.get_collection_exercises_for_surveys(
                     [collection_exercise["surveyId"]],
-                    self.app_config["COLLECTION_EXERCISE_URL"],
-                    self.app_config["BASIC_AUTH"],
                 )
 
                 self.assertListEqual(collection_exercises, [])

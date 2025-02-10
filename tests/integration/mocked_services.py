@@ -40,6 +40,9 @@ with open("tests/test_data/collection_exercise/collection_exercise_with_suppleme
 with open("tests/test_data/collection_exercise/collection_exercise_list_by_survey.json") as fp:
     collection_exercise_by_survey = json.load(fp)
 
+with open("tests/test_data/collection_exercise/collection_exercises_for_survey_ids.json") as fp:
+    collection_exercises_for_survey_ids = json.load(fp)
+
 with open("tests/test_data/collection_exercise/collection_exercise_events.json") as json_data:
     collection_exercise_events = json.load(json_data)
 

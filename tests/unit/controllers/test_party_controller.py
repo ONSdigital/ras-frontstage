@@ -412,6 +412,29 @@ class TestPartyController(unittest.TestCase):
                     # Then the correct list is returned
                     self.assertEqual(list(survey_list_details_for_party), expected_response)
 
+    @patch("frontstage.controllers.party_controller.RedisCache.get_collection_instrument")
+    def test_get_survey_list_details_for_party_without_enrolments(self, get_collection_instrument):
+        # Given party, collection instrument and case (lower down) are mocked
+        get_collection_instrument.side_effect = [{"type": "SEFT"}, {"type": "EQ"}, {"type": "EQ"}, {"type": "EQ"}]
+
+        expected_response = []
+
+        with app.app_context():  # the 2 patches are inside the context to capture the args
+            with patch(
+                "frontstage.controllers.case_controller.get_cases_for_list_type_by_party_id",
+                _get_case_return_value_by_business_id,
+            ):
+                # when get_survey_list_details_for_party is called
+                survey_list_details_for_party = get_survey_list_details_for_party(
+                    [],
+                    "todo",
+                    None,
+                    None,
+                )
+
+                # Then the correct list is returned
+                self.assertEqual(list(survey_list_details_for_party), expected_response)
+
     @staticmethod
     def enrolment_data():
         return [

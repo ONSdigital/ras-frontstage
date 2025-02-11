@@ -50,18 +50,11 @@ class TestSurveyList(unittest.TestCase):
             response = self.app.get("/my-account")
 
             self.assertEqual(response.status_code, 200)
-            self.assertTrue("example@example.com".encode() in response.data)
-            self.assertIn("Help with your account".encode(), response.data)
-
-    @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
-    def test_account_options_not_selection(self, mock_request, get_respondent_party_by_id):
-        mock_request.get(url_banner_api, status_code=404)
-        get_respondent_party_by_id.return_value = respondent_party
-        response = self.app.post("/my-account", data={"option": None}, follow_redirects=True)
-        self.assertIn("Error: ".encode(), response.data)
-        self.assertIn('<span class="ons-panel__assistive-text ons-u-vh">Error: </span>'.encode(), response.data)
-        self.assertIn("You need to choose an option".encode(), response.data)
+            self.assertIn(b"example@example.com", response.data)
+            self.assertIn(b"My Account", response.data)
+            self.assertIn(b"<a href='/my-account/change-account-details'>Edit contact details</a>", response.data)
+            self.assertIn(b"<a href='/my-account/change-password'>Change password</a>", response.data)
+            self.assertIn(b"I want to delete my account", response.data)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")

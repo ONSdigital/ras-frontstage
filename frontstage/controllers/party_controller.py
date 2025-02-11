@@ -429,7 +429,7 @@ def get_survey_list_details_for_party(enrolment_data: list, tag: str, business_p
     caching_case_data(cache_data, business_ids, tag)
 
     #  Populate the enrolments by creating a dict of enrolled collection exercises
-    collection_exercises = get_collection_exercises_for_surveys(surveys_ids) if surveys_ids else []
+    collection_exercises = get_collection_exercises_for_surveys(surveys_ids)
     enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, collection_exercises)
 
     for enrolment in enrolments:

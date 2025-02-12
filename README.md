@@ -1,5 +1,5 @@
 # ras-frontstage
-bump
+
 User interface for Respondent Account Services
 
 ## Setup

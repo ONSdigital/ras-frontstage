@@ -60,12 +60,12 @@ def send_message(session) -> str:
         except InvalidSecureMessagingForm as e:
             errors = _errors(e.errors)
 
-    enrolments = get_respondent_enrolments(session.get_party_id())
+    respondent_enrolments = get_respondent_enrolments(session.get_party_id())
 
-    if len(enrolments) > 2:
+    if len(respondent_enrolments) > 2:
         return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
 
-    enrolment_options = secure_message_enrolment_options(enrolments[0], secure_message_form)
+    enrolment_options = secure_message_enrolment_options(respondent_enrolments[0], secure_message_form)
 
     return render_template(
         "secure-messages/help/secure-message-send-messages-view.html",

@@ -63,11 +63,11 @@ def survey_selection(session):
             error = SELECT_A_SURVEY_ERROR
 
     party_id = session.get_party_id()
-    business_survey_enrolments = get_respondent_enrolments(party_id)
+    respondent_enrolments = get_respondent_enrolments(party_id)
 
     return render_template(
         "surveys/surveys-transfer/survey-select.html",
-        business_survey_enrolments=business_survey_enrolments,
+        respondent_enrolments=respondent_enrolments,
         error=error,
         invalid_survey_shares=invalid_survey_shares,
     )

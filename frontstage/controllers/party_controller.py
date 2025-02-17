@@ -327,7 +327,7 @@ def confirm_pending_survey(batch_number):
     return response
 
 
-def get_unique_survey_and_business_ids(enrolments):
+def get_unique_survey_and_business_ids(respondent_enrolments):
     """Takes a list of enrolment data and returns 2 unique sets of business_id and party_id's
 
     :param enrolment_data: A list of enrolments
@@ -336,10 +336,10 @@ def get_unique_survey_and_business_ids(enrolments):
     surveys_ids = set()
     business_ids = set()
 
-    for enrolment in enrolments:
-        for survey in enrolment["survey_details"]:
+    for respond_enrolment in respondent_enrolments:
+        for survey in respond_enrolment["survey_details"]:
             surveys_ids.add(survey["id"])
-        business_ids.add(enrolment["business_id"])
+        business_ids.add(respond_enrolment["business_id"])
     return surveys_ids, business_ids
 
 
@@ -360,7 +360,7 @@ def caching_case_data(cache_data, business_ids, tag):
         thread.join()
 
 
-def get_survey_list_details_for_party(enrolments: list, tag: str, business_party_id: str, survey_id: str):
+def get_survey_list_details_for_party(respondent_enrolments: list, tag: str, business_party_id: str, survey_id: str):
     """
     Gets a list of cases for a respondent.
 
@@ -379,7 +379,7 @@ def get_survey_list_details_for_party(enrolments: list, tag: str, business_party
             - Create an entry in the returned list for each of these cases as the respondent is implicitly part
             of the case by being enrolled for the survey with that business.
 
-    :param enrolments: A list containing enrolment data
+    :param respondent_enrolments: A list containing enrolment data
     :param tag: This is the page that is being called e.g. to-do, history
     :param business_party_id: This is the businesses uuid
     :param survey_id: This is the surveys uuid
@@ -388,7 +388,7 @@ def get_survey_list_details_for_party(enrolments: list, tag: str, business_party
 
     # Gets the survey ids and business ids from the enrolment data that has been generated.
     # Converted to list to avoid multiple calls to party (and the list size is small).
-    surveys_ids, business_ids = get_unique_survey_and_business_ids(enrolments)
+    surveys_ids, business_ids = get_unique_survey_and_business_ids(respondent_enrolments)
 
     # This is a dictionary that will store all the data that is going to be cached instead of making multiple calls
     # inside the for loop for get_respondent_enrolments.
@@ -402,15 +402,15 @@ def get_survey_list_details_for_party(enrolments: list, tag: str, business_party
     collection_exercises = {
         survey_id: redis_cache.get_collection_exercises_by_survey(survey_id) for survey_id in surveys_ids
     }
-    for enrolment in enrolments:
+    for respondent_enrolment in respondent_enrolments:
 
-        for survey in enrolment["survey_details"]:
+        for survey in respondent_enrolment["survey_details"]:
             if survey["id"] not in collection_exercises:
                 continue
 
             live_collection_exercises = collection_exercises[survey["id"]]
             collection_exercises_by_id = dict((ce["id"], ce) for ce in live_collection_exercises)
-            cases_for_business = cache_data["cases"][enrolment["business_id"]]
+            cases_for_business = cache_data["cases"][respondent_enrolment["business_id"]]
 
             # Gets all the cases for reporting unit, and by extension the user (because it's related to the business)
             enrolled_cases = [
@@ -424,7 +424,9 @@ def get_survey_list_details_for_party(enrolments: list, tag: str, business_party
                 collection_instrument = redis_cache.get_collection_instrument(case["collectionInstrumentId"])
                 collection_instrument_type = collection_instrument["type"]
                 added_survey = (
-                    True if business_party_id == enrolment["business_id"] and survey_id == survey["id"] else None
+                    True
+                    if business_party_id == respondent_enrolment["business_id"] and survey_id == survey["id"]
+                    else None
                 )
                 display_access_button = display_button(case["caseGroup"]["caseGroupStatus"], collection_instrument_type)
 
@@ -439,10 +441,10 @@ def get_survey_list_details_for_party(enrolments: list, tag: str, business_party
                     "survey_long_name": survey["long_name"],
                     "survey_short_name": survey["short_name"],
                     "survey_ref": survey["ref"],
-                    "business_party_id": enrolment["business_id"],
-                    "business_name": enrolment["business_name"],
-                    "trading_as": enrolment["trading_as"],
-                    "business_ref": enrolment["ru_ref"],
+                    "business_party_id": respondent_enrolment["business_id"],
+                    "business_name": respondent_enrolment["business_name"],
+                    "trading_as": respondent_enrolment["trading_as"],
+                    "business_ref": respondent_enrolment["ru_ref"],
                     "period": collection_exercise["userDescription"],
                     "submit_by": collection_exercise["events"]["return_by"]["date"],
                     "formatted_submit_by": collection_exercise["events"]["return_by"]["formatted_date"],

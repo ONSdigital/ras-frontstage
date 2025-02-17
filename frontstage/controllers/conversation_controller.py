@@ -186,10 +186,10 @@ def send_secure_message(form, msg_to=["GROUP"]) -> UUID:
     return sm_v2_message_json["id"] if current_app.config["SECURE_MESSAGE_VERSION"] == "v2" else sm_v1_msg_id
 
 
-def secure_message_enrolment_options(business_enrolments: dict, secure_message_form: SecureMessagingForm) -> dict:
+def secure_message_enrolment_options(respondent_enrolments: dict, secure_message_form: SecureMessagingForm) -> dict:
     """returns a dict of secure message options based on a business_enrolments"""
 
-    survey_options = _create_survey_options(business_enrolments)
+    survey_options = _create_survey_options(respondent_enrolments)
 
     sm_enrolment_options = {
         "survey": _create_formatted_option_list(
@@ -200,7 +200,7 @@ def secure_message_enrolment_options(business_enrolments: dict, secure_message_f
         ),
     }
 
-    secure_message_form.business_id = business_enrolments["business_id"]
+    secure_message_form.business_id = respondent_enrolments["business_id"]
 
     return sm_enrolment_options
 
@@ -250,9 +250,9 @@ def get_message_count_from_api(session) -> int:
         return 0
 
 
-def _create_survey_options(business_enrolments: dict) -> list:
+def _create_survey_options(respondent_enrolments: dict) -> list:
     survey_options = [Option("Not survey related", "Not survey related")]
-    for survey in business_enrolments["survey_details"]:
+    for survey in respondent_enrolments["survey_details"]:
         survey_options.append(Option(survey["id"], survey["long_name"]))
     return survey_options
 

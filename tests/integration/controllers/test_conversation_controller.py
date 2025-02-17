@@ -284,12 +284,12 @@ class TestConversationController(unittest.TestCase):
                     send_secure_message(self.sm_form)
 
     def test_secure_message(self):
-        options = secure_message_enrolment_options(self._business_enrolments(), self.sm_form)
+        options = secure_message_enrolment_options(self._respondent_enrolments(), self.sm_form)
         self.assertEqual(options, self._expected_options())
 
     def test_secure_message_subject_not_selected(self):
         self.sm_form.subject.data = ""
-        options = secure_message_enrolment_options(self._business_enrolments(), self.sm_form)
+        options = secure_message_enrolment_options(self._respondent_enrolments(), self.sm_form)
 
         expected_options = self._expected_options()
         expected_options["subject"][0]["selected"] = True
@@ -298,7 +298,7 @@ class TestConversationController(unittest.TestCase):
         self.assertEqual(options, expected_options)
 
     @staticmethod
-    def _business_enrolments():
+    def _respondent_enrolments():
         return {
             "business_id": "bebee450-46da-4f8b-a7a6-d4632087f2a3",
             "business_name": "Test Business 1",

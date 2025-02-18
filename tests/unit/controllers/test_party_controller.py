@@ -419,21 +419,23 @@ class TestPartyController(unittest.TestCase):
 
         expected_response = []
 
-        with app.app_context():  # the 2 patches are inside the context to capture the args
-            with patch(
-                "frontstage.controllers.case_controller.get_cases_for_list_type_by_party_id",
-                _get_case_return_value_by_business_id,
-            ):
-                # when get_survey_list_details_for_party is called
-                survey_list_details_for_party = get_survey_list_details_for_party(
-                    [],
-                    "todo",
-                    None,
-                    None,
-                )
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.GET, url_get_collection_exercises_by_surveys, status=204)
+            with app.app_context():  # the 2 patches are inside the context to capture the args
+                with patch(
+                    "frontstage.controllers.case_controller.get_cases_for_list_type_by_party_id",
+                    _get_case_return_value_by_business_id,
+                ):
+                    # when get_survey_list_details_for_party is called
+                    survey_list_details_for_party = get_survey_list_details_for_party(
+                        [],
+                        "todo",
+                        None,
+                        None,
+                    )
 
-                # Then the correct list is returned
-                self.assertEqual(list(survey_list_details_for_party), expected_response)
+                    # Then the correct list is returned
+                    self.assertEqual(list(survey_list_details_for_party), expected_response)
 
     @staticmethod
     def enrolment_data():

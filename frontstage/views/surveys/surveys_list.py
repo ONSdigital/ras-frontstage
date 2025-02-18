@@ -39,7 +39,7 @@ def get_survey_list(session, tag):
     )
 
     respondent_enrolments = party_controller.get_respondent_enrolments(party_id)
-    survey_list = party_controller.get_survey_list_details_for_party(
+    survey_list = party_controller.get_case_list_for_respondent(
         respondent_enrolments, tag, business_party_id=business_id, survey_id=survey_id
     )
     sorted_survey_list = sorted(survey_list, key=lambda k: datetime.strptime(k["submit_by"], "%d %b %Y"), reverse=True)

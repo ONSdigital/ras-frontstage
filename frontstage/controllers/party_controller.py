@@ -360,7 +360,7 @@ def caching_case_data(cache_data, business_ids, tag):
         thread.join()
 
 
-def get_survey_list_details_for_party(respondent_enrolments: list, tag: str, business_party_id: str, survey_id: str):
+def get_case_list_for_respondent(respondent_enrolments: list, tag: str, business_party_id: str, survey_id: str):
     """
     Gets a list of cases for a respondent.
 

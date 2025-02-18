@@ -11,7 +11,7 @@ from frontstage import app
 from frontstage.controllers import party_controller
 from frontstage.controllers.party_controller import (
     display_button,
-    get_survey_list_details_for_party,
+    get_case_list_for_respondent,
 )
 from frontstage.exceptions.exceptions import ApiError, ServiceUnavailableException
 from tests.integration.mocked_services import (
@@ -306,7 +306,7 @@ class TestPartyController(unittest.TestCase):
             self.assertEqual(display_button(combination.status, combination.ci_type), combination.expected)
 
     @patch("frontstage.controllers.party_controller.RedisCache.get_collection_instrument")
-    def test_get_survey_list_details_for_party_todo(self, get_collection_instrument):
+    def test_get_case_list_for_respondent_todo(self, get_collection_instrument):
         # Given party, collection instrument, collection exercise (lower down) and case (lower down) are mocked
         get_collection_instrument.side_effect = [{"type": "SEFT"}, {"type": "EQ"}, {"type": "EQ"}, {"type": "EQ"}]
 
@@ -385,8 +385,8 @@ class TestPartyController(unittest.TestCase):
                     "frontstage.controllers.case_controller.get_cases_for_list_type_by_party_id",
                     _get_case_return_value_by_business_id,
                 ):
-                    # when get_survey_list_details_for_party is called
-                    survey_list_details_for_party = get_survey_list_details_for_party(
+                    # when get_case_list_for_respondent is called
+                    survey_list_details_for_party = get_case_list_for_respondent(
                         self.enrolment_data(), "todo", None, None
                     )
 

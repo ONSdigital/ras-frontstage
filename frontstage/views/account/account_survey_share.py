@@ -12,7 +12,7 @@ from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import party_controller, survey_controller
 from frontstage.controllers.party_controller import (
     get_business_by_id,
-    get_list_of_business_for_party,
+    get_respondent_enrolments,
     get_surveys_listed_against_party_and_business_id,
     get_user_count_registered_against_business_and_survey,
     register_pending_surveys,
@@ -52,7 +52,7 @@ def share_survey_business_select(session):
     flask_session.pop("share_surveys_selected_list", None)
     form = AccountSurveySelectBusinessForm(request.values)
     party_id = session.get_party_id()
-    businesses = get_list_of_business_for_party(party_id)
+    businesses = get_respondent_enrolments(party_id)
     return render_template(
         "surveys/surveys-share/business-select.html", session=session, businesses=businesses, form=form
     )

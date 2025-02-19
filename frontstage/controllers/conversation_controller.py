@@ -12,7 +12,6 @@ from structlog import wrap_logger
 from urllib3 import Retry
 
 from frontstage.common.session import Session
-from frontstage.controllers.party_controller import get_respondent_enrolments
 from frontstage.exceptions.exceptions import (
     ApiError,
     AuthorizationTokenMissing,
@@ -39,14 +38,14 @@ ORGANISATION_DISABLED_OPTION = {"value": "Choose an organisation", "text": "Choo
 SURVEY_DISABLED_OPTION = {"value": "Choose a survey", "text": "Choose a survey", "disabled": True}
 SUBJECT_DISABLED_OPTION = {"value": "Choose a subject", "text": "Choose a subject", "disabled": True}
 
-SUBJECT_OPTIONS = {
+SUBJECT_OPTIONS = [
     Option("Help with my survey", "Help with my survey"),
     Option("Technical difficulties", "Technical difficulties"),
     Option("Change business address", "Change business address"),
     Option("Feedback", "Feedback"),
     Option("Help transferring or sharing access to a survey", "Help transferring or sharing access to a survey"),
     Option("Something else", "Something else"),
-}
+]
 
 
 def _get_session():
@@ -187,10 +186,10 @@ def send_secure_message(form, msg_to=["GROUP"]) -> UUID:
     return sm_v2_message_json["id"] if current_app.config["SECURE_MESSAGE_VERSION"] == "v2" else sm_v1_msg_id
 
 
-def secure_message_enrolment_options(party_id: UUID, secure_message_form: SecureMessagingForm) -> dict:
-    """returns a dict of enrolment options based on a respondents party_id"""
+def secure_message_enrolment_options(respondent_enrolments: dict, secure_message_form: SecureMessagingForm) -> dict:
+    """returns a dict of secure message options based on a business_enrolments"""
 
-    business_options, survey_options = _get_unique_business_survey_options(party_id)
+    survey_options = _create_survey_options(respondent_enrolments)
 
     sm_enrolment_options = {
         "survey": _create_formatted_option_list(
@@ -200,12 +199,8 @@ def secure_message_enrolment_options(party_id: UUID, secure_message_form: Secure
             SUBJECT_OPTIONS, secure_message_form.subject.data, SUBJECT_DISABLED_OPTION
         ),
     }
-    if len(business_options) > 1:
-        sm_enrolment_options["business"] = _create_formatted_option_list(
-            business_options, secure_message_form.business_id, ORGANISATION_DISABLED_OPTION
-        )
-    else:
-        secure_message_form.business_id = list(business_options)[0].value
+
+    secure_message_form.business_id = respondent_enrolments["business_id"]
 
     return sm_enrolment_options
 
@@ -255,20 +250,14 @@ def get_message_count_from_api(session) -> int:
         return 0
 
 
-def _get_unique_business_survey_options(party_id: UUID) -> tuple[set, set]:
-    """returns a set of business and survey options that a respondent is enrolled on"""
-
-    enrolments = get_respondent_enrolments(party_id)
-    business_details_set = set()
-    survey_details_set = {Option("Not survey related", "Not survey related")}
-
-    for enrolments in enrolments:
-        business_details_set.add(Option(enrolments["business_details"]["id"], enrolments["business_details"]["name"]))
-        survey_details_set.add(Option(enrolments["survey_details"]["id"], enrolments["survey_details"]["long_name"]))
-    return business_details_set, survey_details_set
+def _create_survey_options(respondent_enrolments: dict) -> list:
+    survey_options = [Option("Not survey related", "Not survey related")]
+    for survey in respondent_enrolments["survey_details"]:
+        survey_options.append(Option(survey["id"], survey["long_name"]))
+    return survey_options
 
 
-def _create_formatted_option_list(options: set, selected: str, disabled_option: dict) -> list:
+def _create_formatted_option_list(options: list, selected: str, disabled_option: dict) -> list:
     formatted_option_list = [disabled_option]
 
     for option in sorted(options):

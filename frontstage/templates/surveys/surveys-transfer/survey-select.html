@@ -91,8 +91,9 @@
         <h2 class="ons-u-mb-l">Choose the surveys you want to transfer</h2>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
-        {% for business_id, details in business_survey_enrolments.items() %}
+        {% for respondent_enrolment in respondent_enrolments %}
             {% set checkboxData = [] %}
+            {% set business_id = respondent_enrolment["business_id"] %}
             {% if business_id in invalid_survey_shares %}
                     {% set error = {
 
@@ -104,9 +105,9 @@
                 {% endif %}
 
             {% set checkboxesData = {
-                "legend": "Organisation: " + details["business_name"],
+                "legend": "Organisation: " + respondent_enrolment["business_name"],
                 "legendClasses": "ons-u-mb-xs",
-                "description": "RU ref: " + details["business_ref"],
+                "description": "RU ref: " + respondent_enrolment["ru_ref"],
                 "descriptionClasses": "ons-u-mb-l",
                 "checkboxesLabel": "Select all that apply",
                 "checkboxesLabelClasses": "ons-u-mt-m",
@@ -115,10 +116,10 @@
 
                 "id": business_id,
             } %}
-            {% for survey in details["surveys"] %}
+            {% for survey in respondent_enrolment["survey_details"] %}
                 {% do checkboxData.append(
                     {
-                        "id": details["business_ref"] + "-" + survey["id"],
+                        "id": respondent_enrolment["ru_ref"] + "-" + survey["id"],
                         "name": "selected_surveys",
                         "label": {
                             "text": survey["long_name"]

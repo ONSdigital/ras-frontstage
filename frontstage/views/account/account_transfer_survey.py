@@ -12,7 +12,6 @@ from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import party_controller, survey_controller
 from frontstage.controllers.party_controller import (
     get_business_by_id,
-    get_business_survey_enrolments_map,
     get_existing_pending_surveys,
     get_respondent_enrolments,
     get_surveys_to_transfer_map,
@@ -100,7 +99,7 @@ def transfer_survey_email_entry(session):
         if existing_pending_surveys:
             duplicate_transfers = _get_duplicate_transfers(existing_pending_surveys, form.data["email_address"])
             if duplicate_transfers:
-                business_survey_enrolments = get_business_survey_enrolments_map(party_id)
+                business_survey_enrolments = get_respondent_enrolments(party_id)
                 errors = {
                     "email_address": [
                         _build_duplicate_transfer_error_message(duplicate_transfers, business_survey_enrolments)
@@ -142,11 +141,23 @@ def _build_duplicate_transfer_error_message(duplicate_transfers, business_survey
     error_message += "<br /><br />If you have made an error then wait for the share/transfer to expire or contact us."
     error_message += "<ul>"
     for transfer in duplicate_transfers:
-        business_name = business_survey_enrolments[transfer["business_id"]]["business_name"]
+        business_name = next(
+            (
+                business["business_name"]
+                for business in business_survey_enrolments
+                if business["business_id"] == transfer["business_id"]
+            ),
+            None,
+        )
         survey_name = next(
-            survey["long_name"]
-            for survey in business_survey_enrolments[transfer["business_id"]]["surveys"]
-            if survey["id"] == transfer["survey_id"]
+            (
+                survey["long_name"]
+                for business in business_survey_enrolments
+                if business["business_id"] == transfer["business_id"]
+                for survey in business["survey_details"]
+                if survey["id"] == transfer["survey_id"]
+            ),
+            None,
         )
         error_message += "<li>" + business_name + " - " + survey_name + "</li>"
     error_message += "</ul>"

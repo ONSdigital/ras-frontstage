@@ -93,6 +93,7 @@
 
         {% for respondent_enrolment in respondent_enrolments %}
             {% set checkboxData = [] %}
+            {% set business_id = respondent_enrolment["business_id"] %}
             {% if business_id in invalid_survey_shares %}
                     {% set error = {
 

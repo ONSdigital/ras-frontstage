@@ -52,7 +52,7 @@ class TestTransferSurvey(unittest.TestCase):
         self.patcher.stop()
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    @patch("frontstage.views.account.account_transfer_survey.get_respondent_enrolments")
     def test_transfer_survey_select(self, mock_request, get_respondent_enrolments):
         mock_request.get(url_banner_api, status_code=404)
         get_respondent_enrolments.return_value = respondent_enrolments
@@ -68,7 +68,7 @@ class TestTransferSurvey(unittest.TestCase):
         self.assertTrue("Continue".encode() in response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    @patch("frontstage.views.account.account_transfer_survey.get_respondent_enrolments")
     def test_transfer_survey_select_no_option_selected(self, mock_request, get_respondent_enrolments):
         mock_request.get(url_banner_api, status_code=404)
         get_respondent_enrolments.return_value = respondent_enrolments
@@ -104,7 +104,7 @@ class TestTransferSurvey(unittest.TestCase):
         self.assertTrue("Continue".encode() in response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    @patch("frontstage.views.account.account_transfer_survey.get_respondent_enrolments")
     def test_transfer_survey_select_option_selected_fails_max_user_validation(
         self, mock_request, get_respondent_enrolments
     ):
@@ -266,7 +266,7 @@ class TestTransferSurvey(unittest.TestCase):
         self.assertTrue("Send".encode() in response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    @patch("frontstage.views.account.account_transfer_survey.get_respondent_enrolments")
     def test_transfer_survey(self, mock_request, get_respondent_enrolments):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_survey, status_code=200, json=survey)

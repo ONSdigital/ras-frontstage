@@ -8,6 +8,24 @@ from frontstage.controllers.conversation_controller import InvalidSecureMessagin
 from frontstage.exceptions.exceptions import JWTValidationError
 from tests.integration.mocked_services import encoded_jwt_token, url_banner_api
 
+RESPONDENT_ENROLMENTS = [
+    {
+        "business_id": "bebee450-46da-4f8b-a7a6-d4632087f2a3",
+        "business_name": "Test Business 1",
+        "ru_ref": "49910000014",
+        "trading_as": "Trading as Test Business 1",
+        "survey_details": [
+            {
+                "id": "41320b22-b425-4fba-a90e-718898f718ce",
+                "short_name": "AIFDI",
+                "long_name": "Annual Inward Foreign Direct Investment Survey",
+                "ref": "062",
+                "enrolment_status": "ENABLED",
+            }
+        ],
+    }
+]
+
 
 class TestCookiesContact(unittest.TestCase):
     def setUp(self):
@@ -65,8 +83,10 @@ class TestCookiesContact(unittest.TestCase):
         self.assertNotIn("Send message".encode(), response.data)
 
     @requests_mock.mock()
+    @patch("frontstage.views.contact_us.get_respondent_enrolments")
     @patch("frontstage.views.contact_us.secure_message_enrolment_options")
-    def test_secure_message_form(self, mock_request, secure_message_enrolment_options):
+    def test_secure_message_form(self, mock_request, secure_message_enrolment_options, get_respondent_enrolments):
+        get_respondent_enrolments.return_value = RESPONDENT_ENROLMENTS
         mock_request.get(url_banner_api, status_code=404)
         secure_message_enrolment_options.return_value = {
             "survey": [
@@ -87,28 +107,43 @@ class TestCookiesContact(unittest.TestCase):
         self.assertTrue('input type="hidden" name="business_id"'.encode() in response.data)
 
     @requests_mock.mock()
+    @patch("frontstage.views.contact_us.get_respondent_enrolments")
     @patch("frontstage.views.contact_us.secure_message_enrolment_options")
-    def test_secure_message_form_multiple_businesses(self, mock_request, secure_message_enrolment_options):
+    def test_secure_message_form_multiple_businesses(
+        self, mock_request, secure_message_enrolment_options, get_respondent_enrolments
+    ):
+        RESPONDENT_ENROLMENTS.append(
+            {
+                "business_id": "10228767-361b-4bb3-be93-c001e669eaaf",
+                "business_name": "Test Business 2",
+                "ru_ref": "49910000014",
+                "trading_as": "Trading as Test Business 2",
+                "survey_details": [
+                    {
+                        "id": "31e067dc-b597-48bd-bc0f-aef583da317c",
+                        "short_name": "AIFDI",
+                        "long_name": "Annual Inward Foreign Direct Investment Survey",
+                        "ref": "062",
+                        "enrolment_status": "ENABLED",
+                    }
+                ],
+            }
+        )
+        get_respondent_enrolments.return_value = RESPONDENT_ENROLMENTS
         mock_request.get(url_banner_api, status_code=404)
-        secure_message_enrolment_options.return_value = {
-            "survey": [],
-            "subject": [],
-            "business": [
-                {"value": "aebee450-46da-4f8b-a7a6-d4632087f2a3", "text": "Test Business 2"},
-                {"value": "bebee450-46da-4f8b-a7a6-d4632087f2a3", "text": "Test Business 1"},
-            ],
-        }
 
         response = self.app.get("/contact-us/send-message")
         self.assertEqual(response.status_code, 200)
-        self.assertTrue("Test Business 1".encode() in response.data)
-        self.assertTrue("Test Business 2".encode() in response.data)
-        self.assertFalse('input type="hidden" name="business_id"'.encode() in response.data)
+        self.assertTrue("/surveys/todo".encode() in response.data)
 
     @requests_mock.mock()
+    @patch("frontstage.views.contact_us.get_respondent_enrolments")
     @patch("frontstage.views.contact_us.secure_message_enrolment_options")
     @patch("frontstage.views.contact_us.send_secure_message")
-    def test_invalid_secure_message_form(self, mock_request, send_secure_message, secure_message_enrolment_options):
+    def test_invalid_secure_message_form(
+        self, mock_request, send_secure_message, secure_message_enrolment_options, get_respondent_enrolments
+    ):
+        get_respondent_enrolments.return_value = RESPONDENT_ENROLMENTS
         secure_message_enrolment_options.return_value = {}
         mock_request.get(url_banner_api, status_code=404)
         send_secure_message.side_effect = InvalidSecureMessagingForm({"body": ["Message is required"]})

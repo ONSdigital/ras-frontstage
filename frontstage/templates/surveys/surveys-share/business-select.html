@@ -53,12 +53,12 @@
         {% for business in businesses %}
             {% do checkboxData.append(
                 {
-                    "id": business['business_id']|string,
+                    "id": business["business_id"],
                     "name": "checkbox-answer",
                     "label": {
-                        "text": business['business_name']
+                        "text": business["business_name"]
                     },
-                    "value": business['id']|string
+                    "value": business["business_id"]
                 }
             ) %}
         {% endfor %}

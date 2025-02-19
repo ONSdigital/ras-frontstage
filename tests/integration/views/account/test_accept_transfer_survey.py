@@ -138,7 +138,7 @@ class TestAcceptTransferSurvey(unittest.TestCase):
         )
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
+    @patch("frontstage.controllers.party_controller.get_case_list_for_respondent")
     def test_get_accept_transfer_surveys_success_existing_account(self, mock_request, get_survey_list):
         survey_list = [
             {
@@ -173,7 +173,7 @@ class TestAcceptTransferSurvey(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
+    @patch("frontstage.controllers.party_controller.get_case_list_for_respondent")
     def test_get_accept_transfer_surveys_success_non_existing_account(self, mock_request, get_survey_list):
         survey_list = [
             {

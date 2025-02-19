@@ -12,10 +12,10 @@ from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import party_controller, survey_controller
 from frontstage.controllers.party_controller import (
     get_business_by_id,
-    get_list_of_business_for_party,
+    get_respondent_enrolments,
     get_surveys_listed_against_party_and_business_id,
     get_user_count_registered_against_business_and_survey,
-    register_pending_shares,
+    register_pending_surveys,
 )
 from frontstage.exceptions.exceptions import ShareSurveyProcessError
 from frontstage.models import (
@@ -52,7 +52,7 @@ def share_survey_business_select(session):
     flask_session.pop("share_surveys_selected_list", None)
     form = AccountSurveySelectBusinessForm(request.values)
     party_id = session.get_party_id()
-    businesses = get_list_of_business_for_party(party_id)
+    businesses = get_respondent_enrolments(party_id)
     return render_template(
         "surveys/surveys-share/business-select.html", session=session, businesses=businesses, form=form
     )
@@ -80,6 +80,7 @@ def share_survey_survey_select(session):
         surveys = get_surveys_listed_against_party_and_business_id(business_id, party_id)
         share_dict[selected_business[0]["id"]] = {
             "name": selected_business[0]["name"],
+            "sampleUnitRef": selected_business[0]["sampleUnitRef"],
             "surveys": surveys,
         }
     error = request.args.get("error", "")
@@ -304,7 +305,7 @@ def send_instruction(session):
     if form["email_address"].data != email:
         raise ShareSurveyProcessError("Process failed due to session error")
     json_data = build_payload(respondent_details["id"])
-    response = register_pending_shares(json_data)
+    response = register_pending_surveys(json_data, party_id)
     if response.status_code == 400:
         flash(
             "You have already transferred or shared these surveys with someone with this email address. They have 72 "
@@ -314,6 +315,7 @@ def send_instruction(session):
         return redirect(url_for("account_bp.send_instruction_get"))
     return render_template(
         "surveys/surveys-share/almost-done.html",
+        email=email,
     )
 
 
@@ -322,4 +324,4 @@ def send_instruction(session):
 def share_survey_done(_):
     flask_session.pop("share", None)
     flask_session.pop("share_survey_recipient_email_address", None)
-    return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
+    return redirect(url_for("surveys_bp.get_survey_list", tag="todo", survey_shared=True))

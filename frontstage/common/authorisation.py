@@ -28,17 +28,7 @@ def jwt_authorization(request, refresh_session=True):
                 raise Unauthorized(NO_AUTHORIZATION_COOKIE)
 
             redis_session = Session.from_session_key(session_key)
-            encoded_jwt = redis_session.get_encoded_jwt()
-
-            if not encoded_jwt:
-                raise Unauthorized(NO_ENCODED_JWT)
-
-            try:
-                jwt = decode(encoded_jwt, app.config["JWT_SECRET"], algorithms="HS256")
-            except DecodeError:
-                raise JWTValidationError(f"{JWT_DECODE_ERROR} {session_key}")
-
-            _validate_jwt_date(jwt)
+            validate_jwt(redis_session, session_key)
 
             if refresh_session:
                 redis_session.refresh_session()
@@ -48,6 +38,17 @@ def jwt_authorization(request, refresh_session=True):
         return extract_session_wrapper
 
     return extract_session
+
+
+def validate_jwt(redis_session, session_key):
+    encoded_jwt = redis_session.get_encoded_jwt()
+    if not encoded_jwt:
+        raise Unauthorized(NO_ENCODED_JWT)
+    try:
+        jwt = decode(encoded_jwt, app.config["JWT_SECRET"], algorithms="HS256")
+    except DecodeError:
+        raise JWTValidationError(f"{JWT_DECODE_ERROR} {session_key}")
+    _validate_jwt_date(jwt)
 
 
 def _validate_jwt_date(token):

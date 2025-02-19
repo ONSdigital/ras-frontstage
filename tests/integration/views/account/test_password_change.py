@@ -32,7 +32,7 @@ class TestSurveyList(unittest.TestCase):
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
-    @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
+    @patch("frontstage.controllers.party_controller.get_case_list_for_respondent")
     def test_account_password_change_success(self, mock_request, get_survey_list, get_respondent_party_by_id):
         survey_list = [
             {

@@ -4,29 +4,16 @@
 {% from "components/checkboxes/_macro.njk" import onsCheckboxes %}
 {% from "components/button/_macro.njk" import onsButton %}
 {% from "components/list/_macro.njk" import onsList %}
-{% set page_title = "Survey transfer survey select" %}
+{% from "components/details/_macro.njk" import onsDetails %}
+{% set page_title = "Transfer your surveys" %}
 {% set breadcrumbsData = [
     {
-        "text": "Surveys",
+        "text": "Back",
         "url": "/surveys/todo",
         "id": "b-item-1"
     },
-    {
-        "text": "Account",
-        "url": "/my-account",
-        "id": "b-item-2"
-    },
-    {
-        "text": "Transfer Surveys",
-        "url": "/my-account/transfer-surveys",
-        "id": "b-item-3"
-    },
-    {
-        "text": "Select business",
-        "url": "/my-account/transfer-surveys/business-selection",
-        "id": "b-item-4"
-    }
 ] %}
+
 {% block breadcrumbs %}
     {{
         onsBreadcrumbs({
@@ -38,99 +25,122 @@
 {% endblock breadcrumbs %}
 
 {% block main %}
-    {% set ns = namespace (businesses = []) %}
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% if messages|length == 1 %}
-                {% set errorTitle = 'There is 1 error on this page' %}
-            {% elif messages|length > 1 %}
-                {% set errorTitle = 'There are ' ~ messages|length ~ ' errors on this page' %}
-            {% endif %}
+        {% if error %}
             {% call
                 onsPanel({
                     "variant": "error",
                     "classes": "ons-u-mb-s",
-                    "title": errorTitle
+                    "title": "There is 1 error on this page"
                 })
             %}
-                {% set errorData = [] %}
-                {% for category, message in messages %}
-                    {% do ns.businesses.append(category) %}
-                    {% do errorData.append(
-                        {
-                            "text": message,
-                            "url": "#option_error_"~category,
-                            "classes": "ons-js-inpagelink"
-                        }
-                    ) %}
-                {% endfor %}
+
+            {% set errorData = [] %}
                 {{
                     onsList({
                         "element": "ol",
-                        "itemsList": errorData
+                        "itemsList": [{
+                            "text": error,
+                            "classes": "ons-js-inpagelink"
+                        }]
                     })
                 }}
+
             {% endcall %}
         {% endif %}
-    {% endwith %}
 
-    <h1>Which surveys do you want to transfer?</h1>
-    <form action="" method="post">
+    <h1 class="ons-u-mb-m">Transfer your surveys</h1>
+    {% call onsPanel({
+        "classes": "ons-u-mb-m",
+        })
+    %}
+    <p>
+        If you transfer a survey, you will no longer have access to it. If you will still need access to the survey,
+        <a href="{{ url_for("account_bp.share_survey_overview") }}">share access to surveys</a>.
+    </p>
+    {% endcall %}
+       {%
+        call onsDetails({
+            "classes": "ons-u-mb-xl",
+            "id": "details-example-with-warning",
+            "title": "How do I transfer a survey?"
+        })
+    %}
+    <p>To transfer a survey:</p>
+    {{
+        onsList({
+            "element": "ol",
+            "itemsList": [
+                {
+                    "text": "Choose the surveys you want to transfer."
+                },
+                {
+                    "text": "Enter the email address of the person who will be responding to the surveys."
+                },
+                {
+                    "text": "We will email them instructions to access the surveys."
+                },
+                {
+                    "text": "Once we confirm their access, they will be able to respond to the surveys and share access with their colleagues."
+                }
+            ]
+        })
+    }}
+    {% endcall %}
+
+    <form method="post">
+        <h2 class="ons-u-mb-l">Choose the surveys you want to transfer</h2>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-        {% for business in transfer_dict %}
+
+        {% for respondent_enrolment in respondent_enrolments %}
             {% set checkboxData = [] %}
-            {% if error == 'surveys_not_selected' and business in ns.businesses %}
-                {% set errorOption = { "text": 'You need to select a survey',  "id": 'option_error_'~business } %}
-            {% endif %}
-            {% if error == 'max_transfer_survey_exceeded' and business in ns.businesses %}
-                {% set errorOption = { "text": 'You have reached the maximum amount of emails you can enroll on one or more surveys.<br/><br/>
-            Deselect the survey/s to continue or call 0300 1234 931 to discuss your options.',  "id": 'option_error_'~business } %}
-            {% endif %}
+            {% set business_id = respondent_enrolment["business_id"] %}
+            {% if business_id in invalid_survey_shares %}
+                    {% set error = {
+
+                    "id": "option_error_"+business_id,
+                    "text": error
+                } %}
+                {% else %}
+                    {% set error = '' %}
+                {% endif %}
+
             {% set checkboxesData = {
-                "legend": transfer_dict[business].name,
+                "legend": "Organisation: " + respondent_enrolment["business_name"],
+                "legendClasses": "ons-u-mb-xs",
+                "description": "RU ref: " + respondent_enrolment["ru_ref"],
+                "descriptionClasses": "ons-u-mb-l",
                 "checkboxesLabel": "Select all that apply",
-                "error": errorOption,
+                "checkboxesLabelClasses": "ons-u-mt-m",
+                "classes": "ons-u-mb-l",
+                "error": error,
+
+                "id": business_id,
             } %}
-            {% for survey in transfer_dict[business].surveys %}
-                {% if survey['id'] in failed_surveys_list %}
-                    {% set params = 'input--error' %}
-                {% else %}
-                    {% set params = '' %}
-                {% endif %}
-                {% if survey['id'] in selected_survey_list %}
-                    {% set checked = true %}
-                {% else %}
-                    {% set checked = false %}
-                {% endif %}
+            {% for survey in respondent_enrolment["survey_details"] %}
                 {% do checkboxData.append(
                     {
-                        "id": survey['id'],
-                        "name": business,
+                        "id": respondent_enrolment["ru_ref"] + "-" + survey["id"],
+                        "name": "selected_surveys",
                         "label": {
-                            "text": survey['longName']
+                            "text": survey["long_name"]
                         },
-                        "value": survey['id'],
-                        "classes": params,
-                        "checked": checked
+                        "value": {
+                            "business_id": business_id,
+                            "survey_id": survey["id"],
+                        }
+
                     }
                     ) %}
-                {% endfor %}
-                {% do checkboxesData | setAttribute("checkboxes", checkboxData) %}
+            {% endfor %}
+
+            {% do checkboxesData | setAttribute("checkboxes", checkboxData) %}
             {{ onsCheckboxes(checkboxesData) }}
         {% endfor %}
-        <div class="ons-field ons-u-mt-l">
+        <div class="ons-field">
             {{
                 onsButton({
                     "text": "Continue",
                     "submitType": "timer"
-                })
-            }}
-            {{
-                onsButton({
-                    "url": url_for('account_bp.transfer_survey_business_select'),
-                    "text": 'Cancel',
-                    "variants": 'secondary',
-                    "noIcon": true
                 })
             }}
         </div>

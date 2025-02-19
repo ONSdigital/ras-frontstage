@@ -8,7 +8,6 @@ from tests.integration.mocked_services import (
     encoded_jwt_token,
     respondent_enrolments,
     respondent_party,
-    survey,
     survey_list_todo,
     url_banner_api,
 )
@@ -51,18 +50,11 @@ class TestSurveyList(unittest.TestCase):
             response = self.app.get("/my-account")
 
             self.assertEqual(response.status_code, 200)
-            self.assertTrue("example@example.com".encode() in response.data)
-            self.assertIn("Help with your account".encode(), response.data)
-
-    @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
-    def test_account_options_not_selection(self, mock_request, get_respondent_party_by_id):
-        mock_request.get(url_banner_api, status_code=404)
-        get_respondent_party_by_id.return_value = respondent_party
-        response = self.app.post("/my-account", data={"option": None}, follow_redirects=True)
-        self.assertIn("Error: ".encode(), response.data)
-        self.assertIn('<span class="ons-panel__assistive-text ons-u-vh">Error: </span>'.encode(), response.data)
-        self.assertIn("You need to choose an option".encode(), response.data)
+            self.assertIn(b"example@example.com", response.data)
+            self.assertIn(b"My Account", response.data)
+            self.assertIn(b"<a href='/my-account/change-account-details'>Edit contact details</a>", response.data)
+            self.assertIn(b"<a href='/my-account/change-password'>Change password</a>", response.data)
+            self.assertIn(b"I want to delete my account", response.data)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
@@ -88,7 +80,7 @@ class TestSurveyList(unittest.TestCase):
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
     @patch("frontstage.controllers.party_controller.update_account")
-    @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
+    @patch("frontstage.controllers.party_controller.get_case_list_for_respondent")
     @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
     def test_account_contact_details_success(
         self, mock_request, get_respondent_enrolments, get_survey_list, _, get_respondent_party_by_id
@@ -112,7 +104,7 @@ class TestSurveyList(unittest.TestCase):
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
     @patch("frontstage.controllers.party_controller.update_account")
-    @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
+    @patch("frontstage.controllers.party_controller.get_case_list_for_respondent")
     def test_account_change_account_email_address(
         self, mock_request, get_survey_list, update_account, get_respondent_party_by_id
     ):
@@ -138,7 +130,7 @@ class TestSurveyList(unittest.TestCase):
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
     @patch("frontstage.controllers.party_controller.update_account")
-    @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
+    @patch("frontstage.controllers.party_controller.get_case_list_for_respondent")
     def test_account_change_account_email_address_almost_done(
         self, mock_request, get_survey_list, update_account, get_respondent_party_by_id
     ):
@@ -193,58 +185,3 @@ class TestSurveyList(unittest.TestCase):
         )
         self.assertTrue("Continue".encode() in response.data)
         self.assertTrue("Cancel".encode() in response.data)
-
-    @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
-    def test_transfer_survey_options_selection(self, mock_request, get_respondent_party_by_id):
-        mock_request.get(url_banner_api, status_code=404)
-        get_respondent_party_by_id.return_value = respondent_party
-        response = self.app.post("/my-account", data={"option": "transfer_surveys"}, follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue("Transfer your surveys".encode() in response.data)
-        self.assertTrue("What will happen".encode() in response.data)
-        self.assertTrue("Select which surveys you want to transfer.".encode() in response.data)
-        self.assertTrue(
-            "Enter the email address of the person who will be responding to these surveys.".encode() in response.data
-        )
-        self.assertTrue("We will email them the instructions to access the surveys.".encode() in response.data)
-        self.assertTrue(
-            "Once we confirm their access, they will be able to respond to the surveys and share access "
-            "with their colleagues.".encode() in response.data
-        )
-        self.assertTrue("Continue".encode() in response.data)
-        self.assertTrue("Cancel".encode() in response.data)
-
-    @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
-    def test_something_else_options_selection(self, mock_request, get_respondent_party_by_id):
-        mock_request.get(url_banner_api, status_code=404)
-        get_respondent_party_by_id.return_value = respondent_party
-        response = self.app.post("/my-account", data={"option": "something_else"}, follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue("Send a message".encode() in response.data)
-        self.assertTrue(
-            "Send us a message with a description of your issue and we will get back to you.".encode() in response.data
-        )
-        self.assertTrue("My account".encode() in response.data)
-        self.assertTrue("Send".encode() in response.data)
-        self.assertTrue("Cancel".encode() in response.data)
-
-    @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
-    @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
-    @patch("frontstage.controllers.survey_controller.get_survey_by_short_name")
-    @patch("frontstage.views.account.account.send_message")
-    def test_create_message_post_success(
-        self, mock_request, send_message, get_survey, get_survey_list, get_respondent_enrolments
-    ):
-        mock_request.get(url_banner_api, status_code=404)
-        send_message.return_value = "a5e67f8a-0d90-4d60-a15a-7e334c75402b"
-        get_survey.return_value = survey
-        get_survey_list.return_value = survey_list_todo
-        get_respondent_enrolments.return_value = respondent_enrolments
-        form = {"body": "something-else"}
-        response = self.app.post("/my-account/something-else", data=form, follow_redirects=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("Message sent.".encode(), response.data)

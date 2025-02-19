@@ -1,95 +1,77 @@
-[{
-                    "enrolment_status": "ENABLED",
-                    "business_details": {
-                        "id": "99941a3f-8e32-40e4-b78a-e039a2b437ca",
-                        "name": "Business 1",
-                        "trading_as": "1 Business",
-                        "ref": "001"
-                    },
-                    "survey_details": {
-                        "id": "02b9c366-7397-42f7-942a-76dc5876d86d",
-                        "long_name": "Survey 1",
-                        "short_name": "S1",
-                        "ref": "S001"
-                    }
-                },
+[
+
   {
-                    "enrolment_status": "ENABLED",
-                    "business_details": {
-                        "id": "99941a3f-8e32-40e4-b78a-e039a2b437ca",
-                        "name": "Business 1",
-                        "trading_as": "1 Business",
-                        "ref": "001"
-                    },
-                    "survey_details": {
-                        "id": "cb8accda-6118-4d3b-85a3-149e28960c54",
-                        "long_name": "Survey 2",
-                        "short_name": "S2",
-                        "ref": "S002"
-                    }
-                },
-   {
-                    "enrolment_status": "ENABLED",
-                    "business_details": {
-                        "id": "14ab2c84-acc3-4d2d-84a7-c65cb7c2e49e",
-                        "name": "Business 2",
-                        "trading_as": "2 Business",
-                        "ref": "002"
-                    },
-                    "survey_details": {
-                        "id": "cb8accda-6118-4d3b-85a3-149e28960c54",
-                        "long_name": "Survey 2",
-                        "short_name": "S2",
-                        "ref": "S002"
-                    }
-                },
-   {
-                    "enrolment_status": "ENABLED",
-                    "business_details": {
-                        "id": "be3483c3-f5c9-4b13-bdd7-244db78ff687",
-                        "name": "Business 3",
-                        "trading_as": "3 Business",
-                        "ref": "003"
-                    },
-                    "survey_details": {
-                        "id": "02b9c366-7397-42f7-942a-76dc5876d86d",
-                        "long_name": "Survey 3",
-                        "short_name": "S3",
-                        "ref": "S003"
-                    }
-                },
-   {
-                    "enrolment_status": "ENABLED",
-                    "business_details": {
-                        "id": "be3483c3-f5c9-4b13-bdd7-244db78ff687",
-                        "name": "Business 3",
-                        "trading_as": "3 Business",
-                        "ref": "003"
-                    },
-                    "survey_details": {
-                        "id": "cb8accda-6118-4d3b-85a3-149e28960c54",
-                        "long_name": "Survey 2",
-                        "short_name": "S2",
-                        "ref": "S002"
-                    }
-                },
-   {
-                    "enrolment_status": "ENABLED",
-                    "business_details": {
-                        "id": "0008279d-9425-4e28-897d-bfd876aa7f3f",
-                        "name": "Business 4",
-                        "trading_as": "4 Business",
-                        "ref": "004"
-                    },
-                    "survey_details": {
-                        "id": "cb8accda-6118-4d3b-85a3-149e28960c54",
-                        "long_name": "Survey 2",
-                        "short_name": "S2",
-                        "ref": "S002"
-                    }
-                }
-
-
-
-   ]
-
+    "business_id": "99941a3f-8e32-40e4-b78a-e039a2b437ca",
+    "business_name": "Business 1",
+    "trading_as": "1 Business",
+    "ru_ref": "001",
+    "survey_details": [
+      {
+        "id": "02b9c366-7397-42f7-942a-76dc5876d86d",
+        "long_name": "Survey 1",
+        "short_name": "S1",
+        "ref": "S001",
+        "enrolment_status": "ENABLED"
+      },
+      {
+        "id": "cb8accda-6118-4d3b-85a3-149e28960c54",
+        "long_name": "Survey 2",
+        "short_name": "S2",
+        "ref": "S002",
+        "enrolment_status": "ENABLED"
+      }
+    ]
+  },
+  {
+    "business_id": "14ab2c84-acc3-4d2d-84a7-c65cb7c2e49e",
+    "business_name": "Business 2",
+    "trading_as": "2 Business",
+    "ru_ref": "002",
+    "survey_details": [
+      {
+        "id": "cb8accda-6118-4d3b-85a3-149e28960c54",
+        "long_name": "Survey 2",
+        "short_name": "S2",
+        "ref": "S002",
+        "enrolment_status": "ENABLED"
+      }
+    ]
+  },
+  {
+    "business_id": "be3483c3-f5c9-4b13-bdd7-244db78ff687",
+    "business_name": "Business 3",
+    "trading_as": "3 Business",
+    "ru_ref": "003",
+    "survey_details": [
+      {
+        "id": "02b9c366-7397-42f7-942a-76dc5876d86d",
+        "long_name": "Survey 3",
+        "short_name": "S3",
+        "ref": "S003",
+        "enrolment_status": "ENABLED"
+      },
+      {
+        "id": "cb8accda-6118-4d3b-85a3-149e28960c54",
+        "long_name": "Survey 2",
+        "short_name": "S2",
+        "ref": "S002",
+        "enrolment_status": "ENABLED"
+      }
+      ]
+  },
+  {
+    "business_id": "0008279d-9425-4e28-897d-bfd876aa7f3f",
+    "business_name": "Business 4",
+    "trading_as": "4 Business",
+    "ru_ref": "004",
+    "survey_details": [
+      {
+        "id": "cb8accda-6118-4d3b-85a3-149e28960c54",
+        "long_name": "Survey 2",
+        "short_name": "S2",
+        "ref": "S002",
+        "enrolment_status": "ENABLED"
+      }
+    ]
+  }
+  ]

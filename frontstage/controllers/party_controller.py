@@ -11,9 +11,6 @@ from frontstage.common.thread_wrapper import ThreadWrapper
 from frontstage.common.utilities import obfuscate_email
 from frontstage.common.verification import decode_email_token
 from frontstage.controllers import case_controller, survey_controller
-from frontstage.controllers.collection_exercise_controller import (
-    get_collection_exercises_for_surveys,
-)
 from frontstage.exceptions.exceptions import (
     ApiError,
     ServiceUnavailableException,
@@ -382,7 +379,7 @@ def caching_case_data(cache_data, business_ids, tag):
         thread.join()
 
 
-def get_survey_list_details_for_party(enrolment_data: list, tag: str, business_party_id: str, survey_id: str):
+def get_survey_list_details_for_party(enrolment_data: dict, tag: str, business_party_id: str, survey_id: str):
     """
     Gets a list of cases (and any useful metadata) for a respondent.  Depending on the tag the list of cases will be
     ones that require action (in the form of an EQ or SEFT submission); Or they will be cases that have been completed
@@ -392,7 +389,7 @@ def get_survey_list_details_for_party(enrolment_data: list, tag: str, business_p
     Collection Instrument services. Without this, respondents with a large number of cases can experience page timeouts
     as it'll take too long to load due to repeated calls for the same information from the services.
 
-    There isn't a direct link between respondent and the cases they're involved in.  Instead, we can work out what
+    There isn't a direct link between respondent and the cases they're involved in.  Instead we can work out what
     cases they're involved in via an implicit and indirect link between:
         - The combination of survey and business a respondent is enrolled for, and;
         - the cases and collection exercises the business is involved in
@@ -409,7 +406,7 @@ def get_survey_list_details_for_party(enrolment_data: list, tag: str, business_p
               - Create an entry in the returned list for each of these cases as the respondent is implicitly part
                 of the case by being enrolled for the survey with that business.
 
-    :param enrolment_data: A list containing enrolment data dict
+    :param enrolment_data: A dict containing enrolment data
     :param tag: This is the page that is being called e.g. to-do, history
     :param business_party_id: This is the businesses uuid
     :param survey_id: This is the surveys uuid
@@ -428,8 +425,10 @@ def get_survey_list_details_for_party(enrolment_data: list, tag: str, business_p
     # Populate the cache with all case data
     caching_case_data(cache_data, business_ids, tag)
 
-    #  Populate the enrolments by creating a dict of enrolled collection exercises
-    collection_exercises = get_collection_exercises_for_surveys(surveys_ids)
+    #  Populate the enrolments by creating a dictionary using the redis_cache
+    collection_exercises = {
+        survey_id: redis_cache.get_collection_exercises_by_survey(survey_id) for survey_id in surveys_ids
+    }
     enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, collection_exercises)
 
     for enrolment in enrolments:

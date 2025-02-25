@@ -6,9 +6,6 @@ from redis.exceptions import RedisError
 from structlog import wrap_logger
 
 from frontstage import redis
-from frontstage.controllers.collection_exercise_controller import (
-    get_live_collection_exercises_for_survey,
-)
 from frontstage.controllers.collection_instrument_controller import (
     get_collection_instrument,
 )
@@ -38,30 +35,6 @@ class RedisCache:
             logger.info("Key not in cache, getting value from collection instrument service", key=redis_key)
             result = get_collection_instrument(key, app.config["COLLECTION_INSTRUMENT_URL"], app.config["BASIC_AUTH"])
             self.save(redis_key, result, self.COLLECTION_INSTRUMENT_CATEGORY_EXPIRY)
-            return result
-
-        return json.loads(result.decode("utf-8"))
-
-    def get_collection_exercises_by_survey(self, key):
-        """
-        Gets the collection-exercise from redis or the collection-exercise service
-
-        :param key: Key in redis (for this example will be a frontstage:collection-exercise:id)
-        :return: Result from either the cache or collection-exercise service
-        """
-        redis_key = f"frontstage:collection-exercise-by-survey-id:{key}"
-        try:
-            result = redis.get(redis_key)
-        except RedisError:
-            logger.error("Error getting value from cache, please investigate", key=redis_key, exc_info=True)
-            result = None
-
-        if not result:
-            logger.info("Key not in cache, getting value from collection-exercise service", key=redis_key)
-            result = get_live_collection_exercises_for_survey(
-                key, app.config["COLLECTION_EXERCISE_URL"], app.config["BASIC_AUTH"]
-            )
-            self.save(redis_key, result, self.COLLECTION_EXERCISE_CATEGORY_EXPIRY)
             return result
 
         return json.loads(result.decode("utf-8"))

@@ -19,9 +19,11 @@ from tests.integration.mocked_services import (
     business_party,
     case,
     collection_exercise,
+    collection_exercises_for_survey_ids,
     respondent_enrolments,
     respondent_party,
     url_get_business_party,
+    url_get_collection_exercises_by_surveys,
     url_get_respondent_email,
     url_get_respondent_enrolments,
     url_get_respondent_party,
@@ -342,9 +344,9 @@ class TestPartyController(unittest.TestCase):
                 "trading_as": "Trading as Test Business 1",
                 "business_ref": "49910000014",
                 "period": "3001",
-                "submit_by": "01 Jan 2030",
-                "formatted_submit_by": "1st January 2030",
-                "due_in": "Due in over 3 months",
+                "submit_by": "09 Feb 2018",
+                "formatted_submit_by": "9th February 2018",
+                "due_in": None,
                 "collection_exercise_ref": "3001",
                 "collection_exercise_id": "6bea2aa8-53a9-4d68-8160-8cbbabfe2d20",
                 "added_survey": None,
@@ -363,9 +365,9 @@ class TestPartyController(unittest.TestCase):
                 "trading_as": "Trading as Test Business 2",
                 "business_ref": "49900000005",
                 "period": "December",
-                "submit_by": "29 Nov 2024",
-                "formatted_submit_by": "29th November 2024",
-                "due_in": "Due in 3 days",
+                "submit_by": "09 Feb 2018",
+                "formatted_submit_by": "9th February 2018",
+                "due_in": None,
                 "collection_exercise_ref": "1912",
                 "collection_exercise_id": "09286c27-7bba-4b94-8ec1-248c60711ebc",
                 "added_survey": None,
@@ -384,21 +386,20 @@ class TestPartyController(unittest.TestCase):
                 "trading_as": "Trading as Test Business 3",
                 "business_ref": "49900000004",
                 "period": "December",
-                "submit_by": "29 Nov 2024",
-                "formatted_submit_by": "29th November 2024",
-                "due_in": "Due in 3 days",
+                "submit_by": "09 Feb 2018",
+                "formatted_submit_by": "9th February 2018",
+                "due_in": None,
                 "collection_exercise_ref": "1912",
                 "collection_exercise_id": "09286c27-7bba-4b94-8ec1-248c60711ebc",
                 "added_survey": None,
                 "display_button": True,
             },
         ]
-
-        with app.app_context():  # the 2 patches are inside the context to capture the args
-            with patch(
-                "frontstage.controllers.party_controller.RedisCache.get_collection_exercises_by_survey",
-                _get_ces_return_value_by_survey_id,
-            ):
+        with responses.RequestsMock() as rsps:
+            rsps.add(
+                rsps.GET, url_get_collection_exercises_by_surveys, json=collection_exercises_for_survey_ids, status=200
+            )
+            with app.app_context():  # the 2 patches are inside the context to capture the args
                 with patch(
                     "frontstage.controllers.case_controller.get_cases_for_list_type_by_party_id",
                     _get_case_return_value_by_business_id,
@@ -406,6 +407,31 @@ class TestPartyController(unittest.TestCase):
                     # when get_survey_list_details_for_party is called
                     survey_list_details_for_party = get_survey_list_details_for_party(
                         self.enrolment_data(), "todo", None, None
+                    )
+
+                    # Then the correct list is returned
+                    self.assertEqual(list(survey_list_details_for_party), expected_response)
+
+    @patch("frontstage.controllers.party_controller.RedisCache.get_collection_instrument")
+    def test_get_survey_list_details_for_party_without_enrolments(self, get_collection_instrument):
+        # Given party, collection instrument and case (lower down) are mocked
+        get_collection_instrument.side_effect = [{"type": "SEFT"}, {"type": "EQ"}, {"type": "EQ"}, {"type": "EQ"}]
+
+        expected_response = []
+
+        with responses.RequestsMock() as rsps:
+            rsps.add(rsps.GET, url_get_collection_exercises_by_surveys, status=204)
+            with app.app_context():  # the 2 patches are inside the context to capture the args
+                with patch(
+                    "frontstage.controllers.case_controller.get_cases_for_list_type_by_party_id",
+                    _get_case_return_value_by_business_id,
+                ):
+                    # when get_survey_list_details_for_party is called
+                    survey_list_details_for_party = get_survey_list_details_for_party(
+                        [],
+                        "todo",
+                        None,
+                        None,
                     )
 
                     # Then the correct list is returned
@@ -529,40 +555,3 @@ def _get_case_return_value_by_business_id(*args):
         ]
     else:
         return []
-
-
-def _get_ces_return_value_by_survey_id(*args):
-    """returns the correct collection exercise details based on the survey_id used in the patched called"""
-    survey_id = args[1]
-    if survey_id == "41320b22-b425-4fba-a90e-718898f718ce":
-        return [
-            {
-                "id": "6bea2aa8-53a9-4d68-8160-8cbbabfe2d20",
-                "surveyId": "41320b22-b425-4fba-a90e-718898f718ce",
-                "exerciseRef": "3001",
-                "userDescription": "3001",
-                "events": {
-                    "return_by": {
-                        "date": "01 Jan 2030",
-                        "formatted_date": "1st January 2030",
-                        "due_time": "Due in over 3 months",
-                    }
-                },
-            }
-        ]
-    else:
-        return [
-            {
-                "id": "09286c27-7bba-4b94-8ec1-248c60711ebc",
-                "surveyId": "02b9c366-7397-42f7-942a-76dc5876d86d",
-                "exerciseRef": "1912",
-                "userDescription": "December",
-                "events": {
-                    "return_by": {
-                        "date": "29 Nov 2024",
-                        "formatted_date": "29th November 2024",
-                        "due_time": "Due in 3 days",
-                    }
-                },
-            }
-        ]

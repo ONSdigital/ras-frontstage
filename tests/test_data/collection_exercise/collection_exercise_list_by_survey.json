@@ -1,759 +1,757 @@
-{
-  "cb8accda-6118-4d3b-85a3-149e28960c54": [
+[
     {
-      "id": "8d990a74-5f07-4765-ac66-df7e1a96505b",
-      "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
-      "name": "Monthly Survey of Bu",
-      "actualExecutionDateTime": "2018-07-12T08:59:30.554Z",
-      "scheduledExecutionDateTime": "2018-01-16T00:00:00.000Z",
-      "scheduledStartDateTime": "2018-01-16T00:00:00.000Z",
-      "actualPublishDateTime": "2018-07-12T08:59:31.685Z",
-      "periodStartDateTime": "2018-01-16T00:00:00.000Z",
-      "periodEndDateTime": "2020-02-28T00:00:00.000Z",
-      "scheduledReturnDateTime": "2018-02-09T00:00:00.000Z",
-      "scheduledEndDateTime": "2020-02-28T00:00:00.000Z",
-      "executedBy": null,
-      "state": "READY_FOR_LIVE",
-      "exerciseRef": "201801",
-      "userDescription": "January 2018",
-      "created": "2018-07-12T08:59:04.047Z",
-      "updated": "2018-07-12T08:59:30.809Z",
-      "deleted": null,
-      "validationErrors": null,
-      "events": [
-        {
-          "id": "caf38ee6-f148-49fa-9c77-ea816278a9cd",
-          "collectionExerciseId": "a41373a6-633c-49e1-9e7b-c56d97aad52a",
-          "tag": "go_live",
-          "timestamp": "2018-01-21T00:00:00.000Z"
-        },
-        {
-          "id": "1aeeffe7-320b-4a74-a16d-e093bb74d16e",
-          "collectionExerciseId": "a41373a6-633c-49e1-9e7b-c56d97aad52a",
-          "tag": "ref_period_start",
-          "timestamp": "2018-01-01T00:00:00.000Z"
-        },
-        {
-          "id": "54b615de-3145-4f81-b1e3-97f191f96f68",
-          "collectionExerciseId": "a41373a6-633c-49e1-9e7b-c56d97aad52a",
-          "tag": "mps",
-          "timestamp": "2018-01-16T00:00:00.000Z"
-        },
-        {
-          "id": "a8d15ca4-777f-4333-9756-6903212c9201",
-          "collectionExerciseId": "a41373a6-633c-49e1-9e7b-c56d97aad52a",
-          "tag": "ref_period_end",
-          "timestamp": "2018-01-28T00:00:00.000Z"
-        },
-        {
-          "id": "e076a9a9-61d5-4da9-9894-05ea410f99ea",
-          "collectionExerciseId": "a41373a6-633c-49e1-9e7b-c56d97aad52a",
-          "tag": "return_by",
-          "timestamp": "2018-02-09T00:00:00.000Z"
-        },
-        {
-          "id": "87ab15b1-41fd-47e2-9cde-ce9a404487ca",
-          "collectionExerciseId": "a41373a6-633c-49e1-9e7b-c56d97aad52a",
-          "tag": "exercise_end",
-          "timestamp": "2020-02-28T00:00:00.000Z"
-        }
-      ]
+        "id": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+        "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
+        "name": "Monthly Survey of Bu",
+        "actualExecutionDateTime": "2018-07-12T08:59:30.554Z",
+        "scheduledExecutionDateTime": "2018-01-16T00:00:00.000Z",
+        "scheduledStartDateTime": "2018-01-16T00:00:00.000Z",
+        "actualPublishDateTime": "2018-07-12T08:59:31.685Z",
+        "periodStartDateTime": "2018-01-16T00:00:00.000Z",
+        "periodEndDateTime": "2020-02-28T00:00:00.000Z",
+        "scheduledReturnDateTime": "2018-02-09T00:00:00.000Z",
+        "scheduledEndDateTime": "2020-02-28T00:00:00.000Z",
+        "executedBy": null,
+        "state": "READY_FOR_LIVE",
+        "exerciseRef": "201801",
+        "userDescription": "January 2018",
+        "created": "2018-07-12T08:59:04.047Z",
+        "updated": "2018-07-12T08:59:30.809Z",
+        "deleted": null,
+        "validationErrors": null,
+        "events": [
+            {
+                "id": "caf38ee6-f148-49fa-9c77-ea816278a9cd",
+                "collectionExerciseId": "a41373a6-633c-49e1-9e7b-c56d97aad52a",
+                "tag": "go_live",
+                "timestamp": "2018-01-21T00:00:00.000Z"
+            },
+            {
+                "id": "1aeeffe7-320b-4a74-a16d-e093bb74d16e",
+                "collectionExerciseId": "a41373a6-633c-49e1-9e7b-c56d97aad52a",
+                "tag": "ref_period_start",
+                "timestamp": "2018-01-01T00:00:00.000Z"
+            },
+            {
+                "id": "54b615de-3145-4f81-b1e3-97f191f96f68",
+                "collectionExerciseId": "a41373a6-633c-49e1-9e7b-c56d97aad52a",
+                "tag": "mps",
+                "timestamp": "2018-01-16T00:00:00.000Z"
+            },
+            {
+                "id": "a8d15ca4-777f-4333-9756-6903212c9201",
+                "collectionExerciseId": "a41373a6-633c-49e1-9e7b-c56d97aad52a",
+                "tag": "ref_period_end",
+                "timestamp": "2018-01-28T00:00:00.000Z"
+            },
+            {
+                "id": "e076a9a9-61d5-4da9-9894-05ea410f99ea",
+                "collectionExerciseId": "a41373a6-633c-49e1-9e7b-c56d97aad52a",
+                "tag": "return_by",
+                "timestamp": "2018-02-09T00:00:00.000Z"
+            },
+            {
+                "id": "87ab15b1-41fd-47e2-9cde-ce9a404487ca",
+                "collectionExerciseId": "a41373a6-633c-49e1-9e7b-c56d97aad52a",
+                "tag": "exercise_end",
+                "timestamp": "2020-02-28T00:00:00.000Z"
+            }
+        ]
     },
     {
-      "id": "4a1dbb15-823c-481b-892d-8882a5742a7c",
-      "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
-      "name": "Monthly Survey of Bu",
-      "actualExecutionDateTime": null,
-      "scheduledExecutionDateTime": "2018-02-16T00:00:00.000Z",
-      "scheduledStartDateTime": "2018-02-16T00:00:00.000Z",
-      "actualPublishDateTime": null,
-      "periodStartDateTime": "2018-02-16T00:00:00.000Z",
-      "periodEndDateTime": "2020-03-31T00:00:00.000Z",
-      "scheduledReturnDateTime": "2018-03-09T00:00:00.000Z",
-      "scheduledEndDateTime": "2020-03-31T00:00:00.000Z",
-      "executedBy": null,
-      "state": "SCHEDULED",
-      "exerciseRef": "201802",
-      "userDescription": "February 2018",
-      "created": "2018-07-12T08:59:04.098Z",
-      "updated": "2018-07-12T08:59:13.267Z",
-      "deleted": null,
-      "validationErrors": null,
-      "events": [
-        {
-          "id": "f478928d-d23a-443d-93bd-e6b641e8f8cc",
-          "collectionExerciseId": "4a1dbb15-823c-481b-892d-8882a5742a7c",
-          "tag": "ref_period_end",
-          "timestamp": "2018-02-28T00:00:00.000Z"
-        },
-        {
-          "id": "9fe50826-4516-4428-a18c-449cd3a5ce5e",
-          "collectionExerciseId": "4a1dbb15-823c-481b-892d-8882a5742a7c",
-          "tag": "go_live",
-          "timestamp": "2018-02-21T00:00:00.000Z"
-        },
-        {
-          "id": "78ac1012-4944-4444-a144-7c950ff8728b",
-          "collectionExerciseId": "4a1dbb15-823c-481b-892d-8882a5742a7c",
-          "tag": "ref_period_start",
-          "timestamp": "2018-02-01T00:00:00.000Z"
-        },
-        {
-          "id": "15b223d1-9c84-4921-aa5f-7ca930d01da9",
-          "collectionExerciseId": "4a1dbb15-823c-481b-892d-8882a5742a7c",
-          "tag": "mps",
-          "timestamp": "2018-02-16T00:00:00.000Z"
-        },
-        {
-          "id": "e6b90f98-e9eb-48a7-bc10-742bd1cc2286",
-          "collectionExerciseId": "4a1dbb15-823c-481b-892d-8882a5742a7c",
-          "tag": "return_by",
-          "timestamp": "2018-03-09T00:00:00.000Z"
-        },
-        {
-          "id": "aee857c4-dd3e-4003-84a1-59e6dec9ede5",
-          "collectionExerciseId": "4a1dbb15-823c-481b-892d-8882a5742a7c",
-          "tag": "exercise_end",
-          "timestamp": "2020-03-31T00:00:00.000Z"
-        }
-      ]
+        "id": "4a1dbb15-823c-481b-892d-8882a5742a7c",
+        "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
+        "name": "Monthly Survey of Bu",
+        "actualExecutionDateTime": null,
+        "scheduledExecutionDateTime": "2018-02-16T00:00:00.000Z",
+        "scheduledStartDateTime": "2018-02-16T00:00:00.000Z",
+        "actualPublishDateTime": null,
+        "periodStartDateTime": "2018-02-16T00:00:00.000Z",
+        "periodEndDateTime": "2020-03-31T00:00:00.000Z",
+        "scheduledReturnDateTime": "2018-03-09T00:00:00.000Z",
+        "scheduledEndDateTime": "2020-03-31T00:00:00.000Z",
+        "executedBy": null,
+        "state": "SCHEDULED",
+        "exerciseRef": "201802",
+        "userDescription": "February 2018",
+        "created": "2018-07-12T08:59:04.098Z",
+        "updated": "2018-07-12T08:59:13.267Z",
+        "deleted": null,
+        "validationErrors": null,
+        "events": [
+            {
+                "id": "f478928d-d23a-443d-93bd-e6b641e8f8cc",
+                "collectionExerciseId": "4a1dbb15-823c-481b-892d-8882a5742a7c",
+                "tag": "ref_period_end",
+                "timestamp": "2018-02-28T00:00:00.000Z"
+            },
+            {
+                "id": "9fe50826-4516-4428-a18c-449cd3a5ce5e",
+                "collectionExerciseId": "4a1dbb15-823c-481b-892d-8882a5742a7c",
+                "tag": "go_live",
+                "timestamp": "2018-02-21T00:00:00.000Z"
+            },
+            {
+                "id": "78ac1012-4944-4444-a144-7c950ff8728b",
+                "collectionExerciseId": "4a1dbb15-823c-481b-892d-8882a5742a7c",
+                "tag": "ref_period_start",
+                "timestamp": "2018-02-01T00:00:00.000Z"
+            },
+            {
+                "id": "15b223d1-9c84-4921-aa5f-7ca930d01da9",
+                "collectionExerciseId": "4a1dbb15-823c-481b-892d-8882a5742a7c",
+                "tag": "mps",
+                "timestamp": "2018-02-16T00:00:00.000Z"
+            },
+            {
+                "id": "e6b90f98-e9eb-48a7-bc10-742bd1cc2286",
+                "collectionExerciseId": "4a1dbb15-823c-481b-892d-8882a5742a7c",
+                "tag": "return_by",
+                "timestamp": "2018-03-09T00:00:00.000Z"
+            },
+            {
+                "id": "aee857c4-dd3e-4003-84a1-59e6dec9ede5",
+                "collectionExerciseId": "4a1dbb15-823c-481b-892d-8882a5742a7c",
+                "tag": "exercise_end",
+                "timestamp": "2020-03-31T00:00:00.000Z"
+            }
+        ]
     },
     {
-      "id": "ed5972f6-d17d-4408-bb9a-7af54f13c88b",
-      "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
-      "name": "Monthly Survey of Bu",
-      "actualExecutionDateTime": null,
-      "scheduledExecutionDateTime": "2018-04-18T00:00:00.000Z",
-      "scheduledStartDateTime": "2018-04-18T00:00:00.000Z",
-      "actualPublishDateTime": null,
-      "periodStartDateTime": "2018-04-18T00:00:00.000Z",
-      "periodEndDateTime": "2020-05-31T00:00:00.000Z",
-      "scheduledReturnDateTime": "2018-05-08T00:00:00.000Z",
-      "scheduledEndDateTime": "2020-05-31T00:00:00.000Z",
-      "executedBy": null,
-      "state": "LIVE",
-      "exerciseRef": "201804",
-      "userDescription": "April 2018",
-      "created": "2018-07-12T08:59:04.165Z",
-      "updated": "2018-07-12T08:59:13.493Z",
-      "deleted": null,
-      "validationErrors": null,
-      "events": [
-        {
-          "id": "0e7f326e-0dbe-4152-9cc4-2e14f9e14c25",
-          "collectionExerciseId": "ed5972f6-d17d-4408-bb9a-7af54f13c88b",
-          "tag": "exercise_end",
-          "timestamp": "2020-05-31T00:00:00.000Z"
-        },
-        {
-          "id": "c55e14d1-0b16-4bea-b2de-46b5c8ad6ab5",
-          "collectionExerciseId": "ed5972f6-d17d-4408-bb9a-7af54f13c88b",
-          "tag": "mps",
-          "timestamp": "2018-04-18T00:00:00.000Z"
-        },
-        {
-          "id": "a8b944a4-c7df-4791-a91d-efb08a416b1f",
-          "collectionExerciseId": "ed5972f6-d17d-4408-bb9a-7af54f13c88b",
-          "tag": "go_live",
-          "timestamp": "2018-04-23T00:00:00.000Z"
-        },
-        {
-          "id": "d71da958-dada-4faf-aae1-af38e15e170c",
-          "collectionExerciseId": "ed5972f6-d17d-4408-bb9a-7af54f13c88b",
-          "tag": "ref_period_start",
-          "timestamp": "2018-04-01T00:00:00.000Z"
-        },
-        {
-          "id": "e2c23203-94a6-47ab-a493-e6c7265a957b",
-          "collectionExerciseId": "ed5972f6-d17d-4408-bb9a-7af54f13c88b",
-          "tag": "ref_period_end",
-          "timestamp": "2018-04-30T00:00:00.000Z"
-        },
-        {
-          "id": "d8a88a50-0d4f-48ed-b036-90ecde5e9c1d",
-          "collectionExerciseId": "ed5972f6-d17d-4408-bb9a-7af54f13c88b",
-          "tag": "return_by",
-          "timestamp": "2018-05-08T00:00:00.000Z"
-        }
-      ]
+        "id": "ed5972f6-d17d-4408-bb9a-7af54f13c88b",
+        "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
+        "name": "Monthly Survey of Bu",
+        "actualExecutionDateTime": null,
+        "scheduledExecutionDateTime": "2018-04-18T00:00:00.000Z",
+        "scheduledStartDateTime": "2018-04-18T00:00:00.000Z",
+        "actualPublishDateTime": null,
+        "periodStartDateTime": "2018-04-18T00:00:00.000Z",
+        "periodEndDateTime": "2020-05-31T00:00:00.000Z",
+        "scheduledReturnDateTime": "2018-05-08T00:00:00.000Z",
+        "scheduledEndDateTime": "2020-05-31T00:00:00.000Z",
+        "executedBy": null,
+        "state": "LIVE",
+        "exerciseRef": "201804",
+        "userDescription": "April 2018",
+        "created": "2018-07-12T08:59:04.165Z",
+        "updated": "2018-07-12T08:59:13.493Z",
+        "deleted": null,
+        "validationErrors": null,
+        "events": [
+            {
+                "id": "0e7f326e-0dbe-4152-9cc4-2e14f9e14c25",
+                "collectionExerciseId": "ed5972f6-d17d-4408-bb9a-7af54f13c88b",
+                "tag": "exercise_end",
+                "timestamp": "2020-05-31T00:00:00.000Z"
+            },
+            {
+                "id": "c55e14d1-0b16-4bea-b2de-46b5c8ad6ab5",
+                "collectionExerciseId": "ed5972f6-d17d-4408-bb9a-7af54f13c88b",
+                "tag": "mps",
+                "timestamp": "2018-04-18T00:00:00.000Z"
+            },
+            {
+                "id": "a8b944a4-c7df-4791-a91d-efb08a416b1f",
+                "collectionExerciseId": "ed5972f6-d17d-4408-bb9a-7af54f13c88b",
+                "tag": "go_live",
+                "timestamp": "2018-04-23T00:00:00.000Z"
+            },
+            {
+                "id": "d71da958-dada-4faf-aae1-af38e15e170c",
+                "collectionExerciseId": "ed5972f6-d17d-4408-bb9a-7af54f13c88b",
+                "tag": "ref_period_start",
+                "timestamp": "2018-04-01T00:00:00.000Z"
+            },
+            {
+                "id": "e2c23203-94a6-47ab-a493-e6c7265a957b",
+                "collectionExerciseId": "ed5972f6-d17d-4408-bb9a-7af54f13c88b",
+                "tag": "ref_period_end",
+                "timestamp": "2018-04-30T00:00:00.000Z"
+            },
+            {
+                "id": "d8a88a50-0d4f-48ed-b036-90ecde5e9c1d",
+                "collectionExerciseId": "ed5972f6-d17d-4408-bb9a-7af54f13c88b",
+                "tag": "return_by",
+                "timestamp": "2018-05-08T00:00:00.000Z"
+            }
+        ]
     },
     {
-      "id": "f20dbf21-0c0e-43bd-ad02-b87d65690a4c",
-      "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
-      "name": "Monthly Survey of Bu",
-      "actualExecutionDateTime": null,
-      "scheduledExecutionDateTime": "2018-05-17T00:00:00.000Z",
-      "scheduledStartDateTime": "2018-05-17T00:00:00.000Z",
-      "actualPublishDateTime": null,
-      "periodStartDateTime": "2018-05-17T00:00:00.000Z",
-      "periodEndDateTime": "2020-06-30T00:00:00.000Z",
-      "scheduledReturnDateTime": "2018-06-08T00:00:00.000Z",
-      "scheduledEndDateTime": "2020-06-30T00:00:00.000Z",
-      "executedBy": null,
-      "state": "SCHEDULED",
-      "exerciseRef": "201805",
-      "userDescription": "May 2018",
-      "created": "2018-07-12T08:59:04.190Z",
-      "updated": "2018-07-12T08:59:13.591Z",
-      "deleted": null,
-      "validationErrors": null,
-      "events": [
-        {
-          "id": "91928efc-0599-4238-90ce-9b724a8beeb8",
-          "collectionExerciseId": "f20dbf21-0c0e-43bd-ad02-b87d65690a4c",
-          "tag": "mps",
-          "timestamp": "2018-05-17T00:00:00.000Z"
-        },
-        {
-          "id": "e7614532-343e-452d-bf3f-26d0ec8d5cf4",
-          "collectionExerciseId": "f20dbf21-0c0e-43bd-ad02-b87d65690a4c",
-          "tag": "go_live",
-          "timestamp": "2018-05-22T00:00:00.000Z"
-        },
-        {
-          "id": "c1fe04d3-9830-47c1-a0fa-6bb85648e1ee",
-          "collectionExerciseId": "f20dbf21-0c0e-43bd-ad02-b87d65690a4c",
-          "tag": "ref_period_start",
-          "timestamp": "2018-05-01T00:00:00.000Z"
-        },
-        {
-          "id": "6a64cefe-7568-4898-84a8-476e7a093a9c",
-          "collectionExerciseId": "f20dbf21-0c0e-43bd-ad02-b87d65690a4c",
-          "tag": "ref_period_end",
-          "timestamp": "2018-05-31T00:00:00.000Z"
-        },
-        {
-          "id": "beacbb0c-cd11-4d0f-baf2-b7308ee44b11",
-          "collectionExerciseId": "f20dbf21-0c0e-43bd-ad02-b87d65690a4c",
-          "tag": "exercise_end",
-          "timestamp": "2020-06-30T00:00:00.000Z"
-        },
-        {
-          "id": "bb2ad141-78a3-4f32-84d2-51c2d252bdca",
-          "collectionExerciseId": "f20dbf21-0c0e-43bd-ad02-b87d65690a4c",
-          "tag": "return_by",
-          "timestamp": "2018-06-08T00:00:00.000Z"
-        }
-      ]
+        "id": "f20dbf21-0c0e-43bd-ad02-b87d65690a4c",
+        "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
+        "name": "Monthly Survey of Bu",
+        "actualExecutionDateTime": null,
+        "scheduledExecutionDateTime": "2018-05-17T00:00:00.000Z",
+        "scheduledStartDateTime": "2018-05-17T00:00:00.000Z",
+        "actualPublishDateTime": null,
+        "periodStartDateTime": "2018-05-17T00:00:00.000Z",
+        "periodEndDateTime": "2020-06-30T00:00:00.000Z",
+        "scheduledReturnDateTime": "2018-06-08T00:00:00.000Z",
+        "scheduledEndDateTime": "2020-06-30T00:00:00.000Z",
+        "executedBy": null,
+        "state": "SCHEDULED",
+        "exerciseRef": "201805",
+        "userDescription": "May 2018",
+        "created": "2018-07-12T08:59:04.190Z",
+        "updated": "2018-07-12T08:59:13.591Z",
+        "deleted": null,
+        "validationErrors": null,
+        "events": [
+            {
+                "id": "91928efc-0599-4238-90ce-9b724a8beeb8",
+                "collectionExerciseId": "f20dbf21-0c0e-43bd-ad02-b87d65690a4c",
+                "tag": "mps",
+                "timestamp": "2018-05-17T00:00:00.000Z"
+            },
+            {
+                "id": "e7614532-343e-452d-bf3f-26d0ec8d5cf4",
+                "collectionExerciseId": "f20dbf21-0c0e-43bd-ad02-b87d65690a4c",
+                "tag": "go_live",
+                "timestamp": "2018-05-22T00:00:00.000Z"
+            },
+            {
+                "id": "c1fe04d3-9830-47c1-a0fa-6bb85648e1ee",
+                "collectionExerciseId": "f20dbf21-0c0e-43bd-ad02-b87d65690a4c",
+                "tag": "ref_period_start",
+                "timestamp": "2018-05-01T00:00:00.000Z"
+            },
+            {
+                "id": "6a64cefe-7568-4898-84a8-476e7a093a9c",
+                "collectionExerciseId": "f20dbf21-0c0e-43bd-ad02-b87d65690a4c",
+                "tag": "ref_period_end",
+                "timestamp": "2018-05-31T00:00:00.000Z"
+            },
+            {
+                "id": "beacbb0c-cd11-4d0f-baf2-b7308ee44b11",
+                "collectionExerciseId": "f20dbf21-0c0e-43bd-ad02-b87d65690a4c",
+                "tag": "exercise_end",
+                "timestamp": "2020-06-30T00:00:00.000Z"
+            },
+            {
+                "id": "bb2ad141-78a3-4f32-84d2-51c2d252bdca",
+                "collectionExerciseId": "f20dbf21-0c0e-43bd-ad02-b87d65690a4c",
+                "tag": "return_by",
+                "timestamp": "2018-06-08T00:00:00.000Z"
+            }
+        ]
     },
     {
-      "id": "727228b1-e37b-4c57-9c0e-86a05bb5bae5",
-      "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
-      "name": "Monthly Survey of Bu",
-      "actualExecutionDateTime": null,
-      "scheduledExecutionDateTime": "2018-07-18T00:00:00.000Z",
-      "scheduledStartDateTime": "2018-07-18T00:00:00.000Z",
-      "actualPublishDateTime": null,
-      "periodStartDateTime": "2018-07-18T00:00:00.000Z",
-      "periodEndDateTime": "2020-08-31T00:00:00.000Z",
-      "scheduledReturnDateTime": "2018-08-08T00:00:00.000Z",
-      "scheduledEndDateTime": "2020-08-31T00:00:00.000Z",
-      "executedBy": null,
-      "state": "SCHEDULED",
-      "exerciseRef": "201807",
-      "userDescription": "July 2018",
-      "created": "2018-07-12T08:59:04.240Z",
-      "updated": "2018-07-12T08:59:13.759Z",
-      "deleted": null,
-      "validationErrors": null,
-      "events": [
-        {
-          "id": "5aa4496a-fdda-4297-bfb5-ed394bd96f9e",
-          "collectionExerciseId": "727228b1-e37b-4c57-9c0e-86a05bb5bae5",
-          "tag": "mps",
-          "timestamp": "2018-07-18T00:00:00.000Z"
-        },
-        {
-          "id": "caaebf22-e79b-4c55-8158-40b995094b4a",
-          "collectionExerciseId": "727228b1-e37b-4c57-9c0e-86a05bb5bae5",
-          "tag": "go_live",
-          "timestamp": "2018-07-23T00:00:00.000Z"
-        },
-        {
-          "id": "64d79ce2-c889-4107-affb-eb9ef8c6504d",
-          "collectionExerciseId": "727228b1-e37b-4c57-9c0e-86a05bb5bae5",
-          "tag": "ref_period_start",
-          "timestamp": "2018-07-01T00:00:00.000Z"
-        },
-        {
-          "id": "3fa3c36c-21cd-4527-bb34-739da82478fb",
-          "collectionExerciseId": "727228b1-e37b-4c57-9c0e-86a05bb5bae5",
-          "tag": "ref_period_end",
-          "timestamp": "2018-07-31T00:00:00.000Z"
-        },
-        {
-          "id": "e3cd73bc-367d-4589-befd-0d07e2efaaae",
-          "collectionExerciseId": "727228b1-e37b-4c57-9c0e-86a05bb5bae5",
-          "tag": "return_by",
-          "timestamp": "2018-08-08T00:00:00.000Z"
-        },
-        {
-          "id": "df557267-da5f-45fd-a1ef-adb86a6fc4d8",
-          "collectionExerciseId": "727228b1-e37b-4c57-9c0e-86a05bb5bae5",
-          "tag": "exercise_end",
-          "timestamp": "2020-08-31T00:00:00.000Z"
-        }
-      ]
+        "id": "727228b1-e37b-4c57-9c0e-86a05bb5bae5",
+        "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
+        "name": "Monthly Survey of Bu",
+        "actualExecutionDateTime": null,
+        "scheduledExecutionDateTime": "2018-07-18T00:00:00.000Z",
+        "scheduledStartDateTime": "2018-07-18T00:00:00.000Z",
+        "actualPublishDateTime": null,
+        "periodStartDateTime": "2018-07-18T00:00:00.000Z",
+        "periodEndDateTime": "2020-08-31T00:00:00.000Z",
+        "scheduledReturnDateTime": "2018-08-08T00:00:00.000Z",
+        "scheduledEndDateTime": "2020-08-31T00:00:00.000Z",
+        "executedBy": null,
+        "state": "SCHEDULED",
+        "exerciseRef": "201807",
+        "userDescription": "July 2018",
+        "created": "2018-07-12T08:59:04.240Z",
+        "updated": "2018-07-12T08:59:13.759Z",
+        "deleted": null,
+        "validationErrors": null,
+        "events": [
+            {
+                "id": "5aa4496a-fdda-4297-bfb5-ed394bd96f9e",
+                "collectionExerciseId": "727228b1-e37b-4c57-9c0e-86a05bb5bae5",
+                "tag": "mps",
+                "timestamp": "2018-07-18T00:00:00.000Z"
+            },
+            {
+                "id": "caaebf22-e79b-4c55-8158-40b995094b4a",
+                "collectionExerciseId": "727228b1-e37b-4c57-9c0e-86a05bb5bae5",
+                "tag": "go_live",
+                "timestamp": "2018-07-23T00:00:00.000Z"
+            },
+            {
+                "id": "64d79ce2-c889-4107-affb-eb9ef8c6504d",
+                "collectionExerciseId": "727228b1-e37b-4c57-9c0e-86a05bb5bae5",
+                "tag": "ref_period_start",
+                "timestamp": "2018-07-01T00:00:00.000Z"
+            },
+            {
+                "id": "3fa3c36c-21cd-4527-bb34-739da82478fb",
+                "collectionExerciseId": "727228b1-e37b-4c57-9c0e-86a05bb5bae5",
+                "tag": "ref_period_end",
+                "timestamp": "2018-07-31T00:00:00.000Z"
+            },
+            {
+                "id": "e3cd73bc-367d-4589-befd-0d07e2efaaae",
+                "collectionExerciseId": "727228b1-e37b-4c57-9c0e-86a05bb5bae5",
+                "tag": "return_by",
+                "timestamp": "2018-08-08T00:00:00.000Z"
+            },
+            {
+                "id": "df557267-da5f-45fd-a1ef-adb86a6fc4d8",
+                "collectionExerciseId": "727228b1-e37b-4c57-9c0e-86a05bb5bae5",
+                "tag": "exercise_end",
+                "timestamp": "2020-08-31T00:00:00.000Z"
+            }
+        ]
     },
     {
-      "id": "886ed522-9905-470a-923d-dfa1d8e67bea",
-      "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
-      "name": "Monthly Survey of Bu",
-      "actualExecutionDateTime": null,
-      "scheduledExecutionDateTime": "2018-09-18T00:00:00.000Z",
-      "scheduledStartDateTime": "2018-09-18T00:00:00.000Z",
-      "actualPublishDateTime": null,
-      "periodStartDateTime": "2018-09-18T00:00:00.000Z",
-      "periodEndDateTime": "2020-10-31T00:00:00.000Z",
-      "scheduledReturnDateTime": "2018-10-09T00:00:00.000Z",
-      "scheduledEndDateTime": "2020-10-31T00:00:00.000Z",
-      "executedBy": null,
-      "state": "SCHEDULED",
-      "exerciseRef": "201809",
-      "userDescription": "September 2018",
-      "created": "2018-07-12T08:59:04.300Z",
-      "updated": "2018-07-12T08:59:13.915Z",
-      "deleted": null,
-      "validationErrors": null,
-      "events": [
-        {
-          "id": "241998c3-74d7-49d9-9ea8-820bc9e40aa1",
-          "collectionExerciseId": "886ed522-9905-470a-923d-dfa1d8e67bea",
-          "tag": "mps",
-          "timestamp": "2018-09-18T00:00:00.000Z"
-        },
-        {
-          "id": "3b4f4776-9819-42f4-9644-db4191cb2d9d",
-          "collectionExerciseId": "886ed522-9905-470a-923d-dfa1d8e67bea",
-          "tag": "go_live",
-          "timestamp": "2018-09-24T00:00:00.000Z"
-        },
-        {
-          "id": "819a9095-5282-4713-a763-3152805a6b6a",
-          "collectionExerciseId": "886ed522-9905-470a-923d-dfa1d8e67bea",
-          "tag": "ref_period_start",
-          "timestamp": "2018-09-01T00:00:00.000Z"
-        },
-        {
-          "id": "2245203b-d7ff-4e2e-9325-74b7eabc1fd7",
-          "collectionExerciseId": "886ed522-9905-470a-923d-dfa1d8e67bea",
-          "tag": "ref_period_end",
-          "timestamp": "2018-09-30T00:00:00.000Z"
-        },
-        {
-          "id": "4a40659b-23e7-4f1e-98e2-360fdf5102b0",
-          "collectionExerciseId": "886ed522-9905-470a-923d-dfa1d8e67bea",
-          "tag": "return_by",
-          "timestamp": "2018-10-09T00:00:00.000Z"
-        },
-        {
-          "id": "968d1212-249a-483d-ad99-876b094c014b",
-          "collectionExerciseId": "886ed522-9905-470a-923d-dfa1d8e67bea",
-          "tag": "exercise_end",
-          "timestamp": "2020-10-31T00:00:00.000Z"
-        }
-      ]
+        "id": "886ed522-9905-470a-923d-dfa1d8e67bea",
+        "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
+        "name": "Monthly Survey of Bu",
+        "actualExecutionDateTime": null,
+        "scheduledExecutionDateTime": "2018-09-18T00:00:00.000Z",
+        "scheduledStartDateTime": "2018-09-18T00:00:00.000Z",
+        "actualPublishDateTime": null,
+        "periodStartDateTime": "2018-09-18T00:00:00.000Z",
+        "periodEndDateTime": "2020-10-31T00:00:00.000Z",
+        "scheduledReturnDateTime": "2018-10-09T00:00:00.000Z",
+        "scheduledEndDateTime": "2020-10-31T00:00:00.000Z",
+        "executedBy": null,
+        "state": "SCHEDULED",
+        "exerciseRef": "201809",
+        "userDescription": "September 2018",
+        "created": "2018-07-12T08:59:04.300Z",
+        "updated": "2018-07-12T08:59:13.915Z",
+        "deleted": null,
+        "validationErrors": null,
+        "events": [
+            {
+                "id": "241998c3-74d7-49d9-9ea8-820bc9e40aa1",
+                "collectionExerciseId": "886ed522-9905-470a-923d-dfa1d8e67bea",
+                "tag": "mps",
+                "timestamp": "2018-09-18T00:00:00.000Z"
+            },
+            {
+                "id": "3b4f4776-9819-42f4-9644-db4191cb2d9d",
+                "collectionExerciseId": "886ed522-9905-470a-923d-dfa1d8e67bea",
+                "tag": "go_live",
+                "timestamp": "2018-09-24T00:00:00.000Z"
+            },
+            {
+                "id": "819a9095-5282-4713-a763-3152805a6b6a",
+                "collectionExerciseId": "886ed522-9905-470a-923d-dfa1d8e67bea",
+                "tag": "ref_period_start",
+                "timestamp": "2018-09-01T00:00:00.000Z"
+            },
+            {
+                "id": "2245203b-d7ff-4e2e-9325-74b7eabc1fd7",
+                "collectionExerciseId": "886ed522-9905-470a-923d-dfa1d8e67bea",
+                "tag": "ref_period_end",
+                "timestamp": "2018-09-30T00:00:00.000Z"
+            },
+            {
+                "id": "4a40659b-23e7-4f1e-98e2-360fdf5102b0",
+                "collectionExerciseId": "886ed522-9905-470a-923d-dfa1d8e67bea",
+                "tag": "return_by",
+                "timestamp": "2018-10-09T00:00:00.000Z"
+            },
+            {
+                "id": "968d1212-249a-483d-ad99-876b094c014b",
+                "collectionExerciseId": "886ed522-9905-470a-923d-dfa1d8e67bea",
+                "tag": "exercise_end",
+                "timestamp": "2020-10-31T00:00:00.000Z"
+            }
+        ]
     },
     {
-      "id": "1612a14b-203c-497e-8c0e-d454f032b3e9",
-      "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
-      "name": "Monthly Survey of Bu",
-      "actualExecutionDateTime": null,
-      "scheduledExecutionDateTime": "2018-10-17T00:00:00.000Z",
-      "scheduledStartDateTime": "2018-10-17T00:00:00.000Z",
-      "actualPublishDateTime": null,
-      "periodStartDateTime": "2018-10-17T00:00:00.000Z",
-      "periodEndDateTime": "2020-11-30T00:00:00.000Z",
-      "scheduledReturnDateTime": "2018-11-09T00:00:00.000Z",
-      "scheduledEndDateTime": "2020-11-30T00:00:00.000Z",
-      "executedBy": null,
-      "state": "SCHEDULED",
-      "exerciseRef": "201810",
-      "userDescription": "October 2018",
-      "created": "2018-07-12T08:59:04.326Z",
-      "updated": "2018-07-12T08:59:13.989Z",
-      "deleted": null,
-      "validationErrors": null,
-      "events": [
-        {
-          "id": "5d43cc16-518a-4b74-8417-2fe182c04ae6",
-          "collectionExerciseId": "1612a14b-203c-497e-8c0e-d454f032b3e9",
-          "tag": "mps",
-          "timestamp": "2018-10-17T00:00:00.000Z"
-        },
-        {
-          "id": "75140add-d368-4671-a710-28ef37b4127c",
-          "collectionExerciseId": "1612a14b-203c-497e-8c0e-d454f032b3e9",
-          "tag": "go_live",
-          "timestamp": "2018-10-22T00:00:00.000Z"
-        },
-        {
-          "id": "b009f5db-6b4e-4ef6-a183-1f3f034320a8",
-          "collectionExerciseId": "1612a14b-203c-497e-8c0e-d454f032b3e9",
-          "tag": "ref_period_start",
-          "timestamp": "2018-10-01T00:00:00.000Z"
-        },
-        {
-          "id": "e002b59d-43f4-410e-9855-efca294c37c0",
-          "collectionExerciseId": "1612a14b-203c-497e-8c0e-d454f032b3e9",
-          "tag": "ref_period_end",
-          "timestamp": "2018-10-31T00:00:00.000Z"
-        },
-        {
-          "id": "f4ea8e74-7a99-41cf-ba67-3241482c8457",
-          "collectionExerciseId": "1612a14b-203c-497e-8c0e-d454f032b3e9",
-          "tag": "return_by",
-          "timestamp": "2018-11-09T00:00:00.000Z"
-        },
-        {
-          "id": "6c7055be-ba8c-494e-b082-fc1ef0ffd2ef",
-          "collectionExerciseId": "1612a14b-203c-497e-8c0e-d454f032b3e9",
-          "tag": "exercise_end",
-          "timestamp": "2020-11-30T00:00:00.000Z"
-        }
-      ]
+        "id": "1612a14b-203c-497e-8c0e-d454f032b3e9",
+        "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
+        "name": "Monthly Survey of Bu",
+        "actualExecutionDateTime": null,
+        "scheduledExecutionDateTime": "2018-10-17T00:00:00.000Z",
+        "scheduledStartDateTime": "2018-10-17T00:00:00.000Z",
+        "actualPublishDateTime": null,
+        "periodStartDateTime": "2018-10-17T00:00:00.000Z",
+        "periodEndDateTime": "2020-11-30T00:00:00.000Z",
+        "scheduledReturnDateTime": "2018-11-09T00:00:00.000Z",
+        "scheduledEndDateTime": "2020-11-30T00:00:00.000Z",
+        "executedBy": null,
+        "state": "SCHEDULED",
+        "exerciseRef": "201810",
+        "userDescription": "October 2018",
+        "created": "2018-07-12T08:59:04.326Z",
+        "updated": "2018-07-12T08:59:13.989Z",
+        "deleted": null,
+        "validationErrors": null,
+        "events": [
+            {
+                "id": "5d43cc16-518a-4b74-8417-2fe182c04ae6",
+                "collectionExerciseId": "1612a14b-203c-497e-8c0e-d454f032b3e9",
+                "tag": "mps",
+                "timestamp": "2018-10-17T00:00:00.000Z"
+            },
+            {
+                "id": "75140add-d368-4671-a710-28ef37b4127c",
+                "collectionExerciseId": "1612a14b-203c-497e-8c0e-d454f032b3e9",
+                "tag": "go_live",
+                "timestamp": "2018-10-22T00:00:00.000Z"
+            },
+            {
+                "id": "b009f5db-6b4e-4ef6-a183-1f3f034320a8",
+                "collectionExerciseId": "1612a14b-203c-497e-8c0e-d454f032b3e9",
+                "tag": "ref_period_start",
+                "timestamp": "2018-10-01T00:00:00.000Z"
+            },
+            {
+                "id": "e002b59d-43f4-410e-9855-efca294c37c0",
+                "collectionExerciseId": "1612a14b-203c-497e-8c0e-d454f032b3e9",
+                "tag": "ref_period_end",
+                "timestamp": "2018-10-31T00:00:00.000Z"
+            },
+            {
+                "id": "f4ea8e74-7a99-41cf-ba67-3241482c8457",
+                "collectionExerciseId": "1612a14b-203c-497e-8c0e-d454f032b3e9",
+                "tag": "return_by",
+                "timestamp": "2018-11-09T00:00:00.000Z"
+            },
+            {
+                "id": "6c7055be-ba8c-494e-b082-fc1ef0ffd2ef",
+                "collectionExerciseId": "1612a14b-203c-497e-8c0e-d454f032b3e9",
+                "tag": "exercise_end",
+                "timestamp": "2020-11-30T00:00:00.000Z"
+            }
+        ]
     },
     {
-      "id": "82351b56-eeaa-4643-a4d9-298500656d0e",
-      "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
-      "name": "Monthly Survey of Bu",
-      "actualExecutionDateTime": null,
-      "scheduledExecutionDateTime": "2018-08-16T00:00:00.000Z",
-      "scheduledStartDateTime": "2018-08-16T00:00:00.000Z",
-      "actualPublishDateTime": null,
-      "periodStartDateTime": "2018-08-16T00:00:00.000Z",
-      "periodEndDateTime": "2020-09-30T00:00:00.000Z",
-      "scheduledReturnDateTime": "2018-09-10T00:00:00.000Z",
-      "scheduledEndDateTime": "2020-09-30T00:00:00.000Z",
-      "executedBy": null,
-      "state": "SCHEDULED",
-      "exerciseRef": "201808",
-      "userDescription": "August 2018",
-      "created": "2018-07-12T08:59:04.278Z",
-      "updated": "2018-07-12T08:59:13.840Z",
-      "deleted": null,
-      "validationErrors": null,
-      "events": [
-        {
-          "id": "0c3c7c9e-56a6-49dd-a4b4-64361ad32025",
-          "collectionExerciseId": "82351b56-eeaa-4643-a4d9-298500656d0e",
-          "tag": "mps",
-          "timestamp": "2018-08-16T00:00:00.000Z"
-        },
-        {
-          "id": "640dda7a-d2cf-49f8-b622-dec85f0a0566",
-          "collectionExerciseId": "82351b56-eeaa-4643-a4d9-298500656d0e",
-          "tag": "go_live",
-          "timestamp": "2018-08-21T00:00:00.000Z"
-        },
-        {
-          "id": "47bf6b43-25ce-45af-8da3-f3e7aa2d66bb",
-          "collectionExerciseId": "82351b56-eeaa-4643-a4d9-298500656d0e",
-          "tag": "ref_period_start",
-          "timestamp": "2018-08-01T00:00:00.000Z"
-        },
-        {
-          "id": "bcab586b-6c93-4e96-8ff1-cc0fa1111c2b",
-          "collectionExerciseId": "82351b56-eeaa-4643-a4d9-298500656d0e",
-          "tag": "ref_period_end",
-          "timestamp": "2018-08-31T00:00:00.000Z"
-        },
-        {
-          "id": "55b38080-c162-405b-acfa-d9ddc6706d83",
-          "collectionExerciseId": "82351b56-eeaa-4643-a4d9-298500656d0e",
-          "tag": "return_by",
-          "timestamp": "2018-09-10T00:00:00.000Z"
-        },
-        {
-          "id": "02fa9891-3d34-4dec-a2c0-775cefb9e3c3",
-          "collectionExerciseId": "82351b56-eeaa-4643-a4d9-298500656d0e",
-          "tag": "exercise_end",
-          "timestamp": "2020-09-30T00:00:00.000Z"
-        }
-      ]
+        "id": "82351b56-eeaa-4643-a4d9-298500656d0e",
+        "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
+        "name": "Monthly Survey of Bu",
+        "actualExecutionDateTime": null,
+        "scheduledExecutionDateTime": "2018-08-16T00:00:00.000Z",
+        "scheduledStartDateTime": "2018-08-16T00:00:00.000Z",
+        "actualPublishDateTime": null,
+        "periodStartDateTime": "2018-08-16T00:00:00.000Z",
+        "periodEndDateTime": "2020-09-30T00:00:00.000Z",
+        "scheduledReturnDateTime": "2018-09-10T00:00:00.000Z",
+        "scheduledEndDateTime": "2020-09-30T00:00:00.000Z",
+        "executedBy": null,
+        "state": "SCHEDULED",
+        "exerciseRef": "201808",
+        "userDescription": "August 2018",
+        "created": "2018-07-12T08:59:04.278Z",
+        "updated": "2018-07-12T08:59:13.840Z",
+        "deleted": null,
+        "validationErrors": null,
+        "events": [
+            {
+                "id": "0c3c7c9e-56a6-49dd-a4b4-64361ad32025",
+                "collectionExerciseId": "82351b56-eeaa-4643-a4d9-298500656d0e",
+                "tag": "mps",
+                "timestamp": "2018-08-16T00:00:00.000Z"
+            },
+            {
+                "id": "640dda7a-d2cf-49f8-b622-dec85f0a0566",
+                "collectionExerciseId": "82351b56-eeaa-4643-a4d9-298500656d0e",
+                "tag": "go_live",
+                "timestamp": "2018-08-21T00:00:00.000Z"
+            },
+            {
+                "id": "47bf6b43-25ce-45af-8da3-f3e7aa2d66bb",
+                "collectionExerciseId": "82351b56-eeaa-4643-a4d9-298500656d0e",
+                "tag": "ref_period_start",
+                "timestamp": "2018-08-01T00:00:00.000Z"
+            },
+            {
+                "id": "bcab586b-6c93-4e96-8ff1-cc0fa1111c2b",
+                "collectionExerciseId": "82351b56-eeaa-4643-a4d9-298500656d0e",
+                "tag": "ref_period_end",
+                "timestamp": "2018-08-31T00:00:00.000Z"
+            },
+            {
+                "id": "55b38080-c162-405b-acfa-d9ddc6706d83",
+                "collectionExerciseId": "82351b56-eeaa-4643-a4d9-298500656d0e",
+                "tag": "return_by",
+                "timestamp": "2018-09-10T00:00:00.000Z"
+            },
+            {
+                "id": "02fa9891-3d34-4dec-a2c0-775cefb9e3c3",
+                "collectionExerciseId": "82351b56-eeaa-4643-a4d9-298500656d0e",
+                "tag": "exercise_end",
+                "timestamp": "2020-09-30T00:00:00.000Z"
+            }
+        ]
     },
     {
-      "id": "8d990a74-5f07-4765-ac66-df7e1a96505b",
-      "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
-      "name": null,
-      "actualExecutionDateTime": "2018-07-12T09:00:27.458Z",
-      "scheduledExecutionDateTime": "2018-07-12T09:00:18.000Z",
-      "scheduledStartDateTime": "2018-07-12T09:00:18.000Z",
-      "actualPublishDateTime": "2018-07-12T09:00:29.051Z",
-      "periodStartDateTime": "2018-07-12T09:00:18.000Z",
-      "periodEndDateTime": "2018-07-23T09:00:13.000Z",
-      "scheduledReturnDateTime": "2018-07-22T09:00:13.000Z",
-      "scheduledEndDateTime": "2018-07-23T09:00:13.000Z",
-      "executedBy": null,
-      "state": "LIVE",
-      "exerciseRef": "204901",
-      "userDescription": "test_exercise",
-      "created": "2018-07-12T09:00:21.568Z",
-      "updated": "2018-07-12T09:01:13.004Z",
-      "deleted": null,
-      "validationErrors": null,
-      "events": [
-        {
-          "id": "b3651d8b-bb0b-42f7-a2a3-d05d85822226",
-          "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
-          "tag": "mps",
-          "timestamp": "2018-07-12T09:00:18.000Z"
-        },
-        {
-          "id": "052328b1-65ea-4778-a788-ec1ecc846802",
-          "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
-          "tag": "go_live",
-          "timestamp": "2018-07-12T09:01:13.000Z"
-        },
-        {
-          "id": "186e1a0f-0a49-4e4a-8e0a-c8db7593117e",
-          "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
-          "tag": "return_by",
-          "timestamp": "2018-07-22T09:00:13.000Z"
-        },
-        {
-          "id": "e5c34d4e-e7eb-4e38-a14a-7ca16cca4787",
-          "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
-          "tag": "exercise_end",
-          "timestamp": "2018-07-23T09:00:13.000Z"
-        }
-      ]
+        "id": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+        "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
+        "name": null,
+        "actualExecutionDateTime": "2018-07-12T09:00:27.458Z",
+        "scheduledExecutionDateTime": "2018-07-12T09:00:18.000Z",
+        "scheduledStartDateTime": "2018-07-12T09:00:18.000Z",
+        "actualPublishDateTime": "2018-07-12T09:00:29.051Z",
+        "periodStartDateTime": "2018-07-12T09:00:18.000Z",
+        "periodEndDateTime": "2018-07-23T09:00:13.000Z",
+        "scheduledReturnDateTime": "2018-07-22T09:00:13.000Z",
+        "scheduledEndDateTime": "2018-07-23T09:00:13.000Z",
+        "executedBy": null,
+        "state": "LIVE",
+        "exerciseRef": "204901",
+        "userDescription": "test_exercise",
+        "created": "2018-07-12T09:00:21.568Z",
+        "updated": "2018-07-12T09:01:13.004Z",
+        "deleted": null,
+        "validationErrors": null,
+        "events": [
+            {
+                "id": "b3651d8b-bb0b-42f7-a2a3-d05d85822226",
+                "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+                "tag": "mps",
+                "timestamp": "2018-07-12T09:00:18.000Z"
+            },
+            {
+                "id": "052328b1-65ea-4778-a788-ec1ecc846802",
+                "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+                "tag": "go_live",
+                "timestamp": "2018-07-12T09:01:13.000Z"
+            },
+            {
+                "id": "186e1a0f-0a49-4e4a-8e0a-c8db7593117e",
+                "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+                "tag": "return_by",
+                "timestamp": "2018-07-22T09:00:13.000Z"
+            },
+            {
+                "id": "e5c34d4e-e7eb-4e38-a14a-7ca16cca4787",
+                "collectionExerciseId": "8d990a74-5f07-4765-ac66-df7e1a96505b",
+                "tag": "exercise_end",
+                "timestamp": "2018-07-23T09:00:13.000Z"
+            }
+        ]
     },
     {
-      "id": "7b21c894-6d4c-4770-8de3-17f69f575262",
-      "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
-      "name": "Monthly Survey of Bu",
-      "actualExecutionDateTime": null,
-      "scheduledExecutionDateTime": "2018-03-16T00:00:00.000Z",
-      "scheduledStartDateTime": "2018-03-16T00:00:00.000Z",
-      "actualPublishDateTime": null,
-      "periodStartDateTime": "2018-03-16T00:00:00.000Z",
-      "periodEndDateTime": "2020-04-30T00:00:00.000Z",
-      "scheduledReturnDateTime": "2018-04-09T00:00:00.000Z",
-      "scheduledEndDateTime": "2020-04-30T00:00:00.000Z",
-      "executedBy": null,
-      "state": "SCHEDULED",
-      "exerciseRef": "201803",
-      "userDescription": "March 2018",
-      "created": "2018-07-12T08:59:04.129Z",
-      "updated": "2018-07-12T08:59:13.383Z",
-      "deleted": null,
-      "validationErrors": null,
-      "events": [
-        {
-          "id": "c98b5557-0a4f-4117-9a82-646ce25e0ccc",
-          "collectionExerciseId": "7b21c894-6d4c-4770-8de3-17f69f575262",
-          "tag": "return_by",
-          "timestamp": "2018-04-09T00:00:00.000Z"
-        },
-        {
-          "id": "2c90d253-cbc6-4a33-9d79-f2f3afac3d74",
-          "collectionExerciseId": "7b21c894-6d4c-4770-8de3-17f69f575262",
-          "tag": "go_live",
-          "timestamp": "2018-03-21T00:00:00.000Z"
-        },
-        {
-          "id": "1dc7f5ab-94d1-46fb-96ed-3907d77a7f35",
-          "collectionExerciseId": "7b21c894-6d4c-4770-8de3-17f69f575262",
-          "tag": "ref_period_end",
-          "timestamp": "2018-03-31T00:00:00.000Z"
-        },
-        {
-          "id": "62034968-ab52-4869-9d28-33e6802523b1",
-          "collectionExerciseId": "7b21c894-6d4c-4770-8de3-17f69f575262",
-          "tag": "mps",
-          "timestamp": "2018-03-16T00:00:00.000Z"
-        },
-        {
-          "id": "984a71e2-df52-4f47-856d-de8d78a5274e",
-          "collectionExerciseId": "7b21c894-6d4c-4770-8de3-17f69f575262",
-          "tag": "ref_period_start",
-          "timestamp": "2018-03-01T00:00:00.000Z"
-        },
-        {
-          "id": "e9737d5d-49d9-442d-b762-939601574bf2",
-          "collectionExerciseId": "7b21c894-6d4c-4770-8de3-17f69f575262",
-          "tag": "exercise_end",
-          "timestamp": "2020-04-30T00:00:00.000Z"
-        }
-      ]
+        "id": "7b21c894-6d4c-4770-8de3-17f69f575262",
+        "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
+        "name": "Monthly Survey of Bu",
+        "actualExecutionDateTime": null,
+        "scheduledExecutionDateTime": "2018-03-16T00:00:00.000Z",
+        "scheduledStartDateTime": "2018-03-16T00:00:00.000Z",
+        "actualPublishDateTime": null,
+        "periodStartDateTime": "2018-03-16T00:00:00.000Z",
+        "periodEndDateTime": "2020-04-30T00:00:00.000Z",
+        "scheduledReturnDateTime": "2018-04-09T00:00:00.000Z",
+        "scheduledEndDateTime": "2020-04-30T00:00:00.000Z",
+        "executedBy": null,
+        "state": "SCHEDULED",
+        "exerciseRef": "201803",
+        "userDescription": "March 2018",
+        "created": "2018-07-12T08:59:04.129Z",
+        "updated": "2018-07-12T08:59:13.383Z",
+        "deleted": null,
+        "validationErrors": null,
+        "events": [
+            {
+                "id": "c98b5557-0a4f-4117-9a82-646ce25e0ccc",
+                "collectionExerciseId": "7b21c894-6d4c-4770-8de3-17f69f575262",
+                "tag": "return_by",
+                "timestamp": "2018-04-09T00:00:00.000Z"
+            },
+            {
+                "id": "2c90d253-cbc6-4a33-9d79-f2f3afac3d74",
+                "collectionExerciseId": "7b21c894-6d4c-4770-8de3-17f69f575262",
+                "tag": "go_live",
+                "timestamp": "2018-03-21T00:00:00.000Z"
+            },
+            {
+                "id": "1dc7f5ab-94d1-46fb-96ed-3907d77a7f35",
+                "collectionExerciseId": "7b21c894-6d4c-4770-8de3-17f69f575262",
+                "tag": "ref_period_end",
+                "timestamp": "2018-03-31T00:00:00.000Z"
+            },
+            {
+                "id": "62034968-ab52-4869-9d28-33e6802523b1",
+                "collectionExerciseId": "7b21c894-6d4c-4770-8de3-17f69f575262",
+                "tag": "mps",
+                "timestamp": "2018-03-16T00:00:00.000Z"
+            },
+            {
+                "id": "984a71e2-df52-4f47-856d-de8d78a5274e",
+                "collectionExerciseId": "7b21c894-6d4c-4770-8de3-17f69f575262",
+                "tag": "ref_period_start",
+                "timestamp": "2018-03-01T00:00:00.000Z"
+            },
+            {
+                "id": "e9737d5d-49d9-442d-b762-939601574bf2",
+                "collectionExerciseId": "7b21c894-6d4c-4770-8de3-17f69f575262",
+                "tag": "exercise_end",
+                "timestamp": "2020-04-30T00:00:00.000Z"
+            }
+        ]
     },
     {
-      "id": "285d0b42-51ac-42aa-aade-1a56258a7758",
-      "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
-      "name": "Monthly Survey of Bu",
-      "actualExecutionDateTime": null,
-      "scheduledExecutionDateTime": "2018-06-15T00:00:00.000Z",
-      "scheduledStartDateTime": "2018-06-15T00:00:00.000Z",
-      "actualPublishDateTime": null,
-      "periodStartDateTime": "2018-06-15T00:00:00.000Z",
-      "periodEndDateTime": "2020-07-31T00:00:00.000Z",
-      "scheduledReturnDateTime": "2018-07-09T00:00:00.000Z",
-      "scheduledEndDateTime": "2020-07-31T00:00:00.000Z",
-      "executedBy": null,
-      "state": "SCHEDULED",
-      "exerciseRef": "201806",
-      "userDescription": "June 2018",
-      "created": "2018-07-12T08:59:04.219Z",
-      "updated": "2018-07-12T08:59:13.683Z",
-      "deleted": null,
-      "validationErrors": null,
-      "events": [
-        {
-          "id": "0cf42d32-9560-4e2d-afda-61fc79489905",
-          "collectionExerciseId": "285d0b42-51ac-42aa-aade-1a56258a7758",
-          "tag": "mps",
-          "timestamp": "2018-06-15T00:00:00.000Z"
-        },
-        {
-          "id": "143ae11e-f85e-4f78-8514-24f22d8d98d9",
-          "collectionExerciseId": "285d0b42-51ac-42aa-aade-1a56258a7758",
-          "tag": "go_live",
-          "timestamp": "2018-06-21T00:00:00.000Z"
-        },
-        {
-          "id": "bc1daaf2-b69e-4b92-b184-a648f0038e2e",
-          "collectionExerciseId": "285d0b42-51ac-42aa-aade-1a56258a7758",
-          "tag": "ref_period_start",
-          "timestamp": "2018-06-01T00:00:00.000Z"
-        },
-        {
-          "id": "5f37274c-d7f8-4c0c-98ea-e6b36192fc61",
-          "collectionExerciseId": "285d0b42-51ac-42aa-aade-1a56258a7758",
-          "tag": "ref_period_end",
-          "timestamp": "2018-06-30T00:00:00.000Z"
-        },
-        {
-          "id": "da8afa92-f5ce-4b12-ab96-e934302015ff",
-          "collectionExerciseId": "285d0b42-51ac-42aa-aade-1a56258a7758",
-          "tag": "return_by",
-          "timestamp": "2018-07-09T00:00:00.000Z"
-        },
-        {
-          "id": "8f94b2a3-e81a-4a84-82a3-5a1b700ae7a5",
-          "collectionExerciseId": "285d0b42-51ac-42aa-aade-1a56258a7758",
-          "tag": "exercise_end",
-          "timestamp": "2020-07-31T00:00:00.000Z"
-        }
-      ]
+        "id": "285d0b42-51ac-42aa-aade-1a56258a7758",
+        "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
+        "name": "Monthly Survey of Bu",
+        "actualExecutionDateTime": null,
+        "scheduledExecutionDateTime": "2018-06-15T00:00:00.000Z",
+        "scheduledStartDateTime": "2018-06-15T00:00:00.000Z",
+        "actualPublishDateTime": null,
+        "periodStartDateTime": "2018-06-15T00:00:00.000Z",
+        "periodEndDateTime": "2020-07-31T00:00:00.000Z",
+        "scheduledReturnDateTime": "2018-07-09T00:00:00.000Z",
+        "scheduledEndDateTime": "2020-07-31T00:00:00.000Z",
+        "executedBy": null,
+        "state": "SCHEDULED",
+        "exerciseRef": "201806",
+        "userDescription": "June 2018",
+        "created": "2018-07-12T08:59:04.219Z",
+        "updated": "2018-07-12T08:59:13.683Z",
+        "deleted": null,
+        "validationErrors": null,
+        "events": [
+            {
+                "id": "0cf42d32-9560-4e2d-afda-61fc79489905",
+                "collectionExerciseId": "285d0b42-51ac-42aa-aade-1a56258a7758",
+                "tag": "mps",
+                "timestamp": "2018-06-15T00:00:00.000Z"
+            },
+            {
+                "id": "143ae11e-f85e-4f78-8514-24f22d8d98d9",
+                "collectionExerciseId": "285d0b42-51ac-42aa-aade-1a56258a7758",
+                "tag": "go_live",
+                "timestamp": "2018-06-21T00:00:00.000Z"
+            },
+            {
+                "id": "bc1daaf2-b69e-4b92-b184-a648f0038e2e",
+                "collectionExerciseId": "285d0b42-51ac-42aa-aade-1a56258a7758",
+                "tag": "ref_period_start",
+                "timestamp": "2018-06-01T00:00:00.000Z"
+            },
+            {
+                "id": "5f37274c-d7f8-4c0c-98ea-e6b36192fc61",
+                "collectionExerciseId": "285d0b42-51ac-42aa-aade-1a56258a7758",
+                "tag": "ref_period_end",
+                "timestamp": "2018-06-30T00:00:00.000Z"
+            },
+            {
+                "id": "da8afa92-f5ce-4b12-ab96-e934302015ff",
+                "collectionExerciseId": "285d0b42-51ac-42aa-aade-1a56258a7758",
+                "tag": "return_by",
+                "timestamp": "2018-07-09T00:00:00.000Z"
+            },
+            {
+                "id": "8f94b2a3-e81a-4a84-82a3-5a1b700ae7a5",
+                "collectionExerciseId": "285d0b42-51ac-42aa-aade-1a56258a7758",
+                "tag": "exercise_end",
+                "timestamp": "2020-07-31T00:00:00.000Z"
+            }
+        ]
     },
     {
-      "id": "5ef78ece-5068-4b58-800a-c883a64d10cd",
-      "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
-      "name": "Monthly Survey of Bu",
-      "actualExecutionDateTime": null,
-      "scheduledExecutionDateTime": "2018-11-16T00:00:00.000Z",
-      "scheduledStartDateTime": "2018-11-16T00:00:00.000Z",
-      "actualPublishDateTime": null,
-      "periodStartDateTime": "2018-11-16T00:00:00.000Z",
-      "periodEndDateTime": "2020-12-31T00:00:00.000Z",
-      "scheduledReturnDateTime": "2018-12-10T00:00:00.000Z",
-      "scheduledEndDateTime": "2020-12-31T00:00:00.000Z",
-      "executedBy": null,
-      "state": "SCHEDULED",
-      "exerciseRef": "201811",
-      "userDescription": "November 2018",
-      "created": "2018-07-12T08:59:04.356Z",
-      "updated": "2018-07-12T08:59:14.068Z",
-      "deleted": null,
-      "validationErrors": null,
-      "events": [
-        {
-          "id": "14dd2d4a-1069-4d2b-8898-fa02769f09ac",
-          "collectionExerciseId": "5ef78ece-5068-4b58-800a-c883a64d10cd",
-          "tag": "mps",
-          "timestamp": "2018-11-16T00:00:00.000Z"
-        },
-        {
-          "id": "e4313080-c098-4872-8854-849a405ac560",
-          "collectionExerciseId": "5ef78ece-5068-4b58-800a-c883a64d10cd",
-          "tag": "go_live",
-          "timestamp": "2018-11-22T00:00:00.000Z"
-        },
-        {
-          "id": "ee435dbb-e8ed-4977-8122-3ae4a6057949",
-          "collectionExerciseId": "5ef78ece-5068-4b58-800a-c883a64d10cd",
-          "tag": "ref_period_start",
-          "timestamp": "2018-11-01T00:00:00.000Z"
-        },
-        {
-          "id": "caf6e3ef-ff93-48fd-b20d-0364159ea67d",
-          "collectionExerciseId": "5ef78ece-5068-4b58-800a-c883a64d10cd",
-          "tag": "ref_period_end",
-          "timestamp": "2018-11-30T00:00:00.000Z"
-        },
-        {
-          "id": "01e5ad8f-7bcc-4145-8cc6-3b245c145a0c",
-          "collectionExerciseId": "5ef78ece-5068-4b58-800a-c883a64d10cd",
-          "tag": "return_by",
-          "timestamp": "2018-12-10T00:00:00.000Z"
-        },
-        {
-          "id": "a79430d2-5baf-4459-ab2b-327cb6c6b4f7",
-          "collectionExerciseId": "5ef78ece-5068-4b58-800a-c883a64d10cd",
-          "tag": "exercise_end",
-          "timestamp": "2020-12-31T00:00:00.000Z"
-        }
-      ]
+        "id": "5ef78ece-5068-4b58-800a-c883a64d10cd",
+        "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
+        "name": "Monthly Survey of Bu",
+        "actualExecutionDateTime": null,
+        "scheduledExecutionDateTime": "2018-11-16T00:00:00.000Z",
+        "scheduledStartDateTime": "2018-11-16T00:00:00.000Z",
+        "actualPublishDateTime": null,
+        "periodStartDateTime": "2018-11-16T00:00:00.000Z",
+        "periodEndDateTime": "2020-12-31T00:00:00.000Z",
+        "scheduledReturnDateTime": "2018-12-10T00:00:00.000Z",
+        "scheduledEndDateTime": "2020-12-31T00:00:00.000Z",
+        "executedBy": null,
+        "state": "SCHEDULED",
+        "exerciseRef": "201811",
+        "userDescription": "November 2018",
+        "created": "2018-07-12T08:59:04.356Z",
+        "updated": "2018-07-12T08:59:14.068Z",
+        "deleted": null,
+        "validationErrors": null,
+        "events": [
+            {
+                "id": "14dd2d4a-1069-4d2b-8898-fa02769f09ac",
+                "collectionExerciseId": "5ef78ece-5068-4b58-800a-c883a64d10cd",
+                "tag": "mps",
+                "timestamp": "2018-11-16T00:00:00.000Z"
+            },
+            {
+                "id": "e4313080-c098-4872-8854-849a405ac560",
+                "collectionExerciseId": "5ef78ece-5068-4b58-800a-c883a64d10cd",
+                "tag": "go_live",
+                "timestamp": "2018-11-22T00:00:00.000Z"
+            },
+            {
+                "id": "ee435dbb-e8ed-4977-8122-3ae4a6057949",
+                "collectionExerciseId": "5ef78ece-5068-4b58-800a-c883a64d10cd",
+                "tag": "ref_period_start",
+                "timestamp": "2018-11-01T00:00:00.000Z"
+            },
+            {
+                "id": "caf6e3ef-ff93-48fd-b20d-0364159ea67d",
+                "collectionExerciseId": "5ef78ece-5068-4b58-800a-c883a64d10cd",
+                "tag": "ref_period_end",
+                "timestamp": "2018-11-30T00:00:00.000Z"
+            },
+            {
+                "id": "01e5ad8f-7bcc-4145-8cc6-3b245c145a0c",
+                "collectionExerciseId": "5ef78ece-5068-4b58-800a-c883a64d10cd",
+                "tag": "return_by",
+                "timestamp": "2018-12-10T00:00:00.000Z"
+            },
+            {
+                "id": "a79430d2-5baf-4459-ab2b-327cb6c6b4f7",
+                "collectionExerciseId": "5ef78ece-5068-4b58-800a-c883a64d10cd",
+                "tag": "exercise_end",
+                "timestamp": "2020-12-31T00:00:00.000Z"
+            }
+        ]
     },
     {
-      "id": "867df153-5714-4218-b58a-ca11ad2686ef",
-      "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
-      "name": "Monthly Survey of Bu",
-      "actualExecutionDateTime": "2018-07-12T08:59:35.590Z",
-      "scheduledExecutionDateTime": "2018-12-07T00:00:00.000Z",
-      "scheduledStartDateTime": "2018-12-07T00:00:00.000Z",
-      "actualPublishDateTime": "2018-07-12T08:59:36.755Z",
-      "periodStartDateTime": "2018-12-07T00:00:00.000Z",
-      "periodEndDateTime": "2021-01-31T00:00:00.000Z",
-      "scheduledReturnDateTime": "2019-01-09T00:00:00.000Z",
-      "scheduledEndDateTime": "2021-01-31T00:00:00.000Z",
-      "executedBy": null,
-      "state": "READY_FOR_LIVE",
-      "exerciseRef": "201812",
-      "userDescription": "December 2018",
-      "created": "2018-07-12T08:59:04.389Z",
-      "updated": "2018-07-12T08:59:36.132Z",
-      "deleted": null,
-      "validationErrors": null,
-      "events": [
-        {
-          "id": "3bf96e52-eaae-4143-bc20-a7f47526a52e",
-          "collectionExerciseId": "867df153-5714-4218-b58a-ca11ad2686ef",
-          "tag": "mps",
-          "timestamp": "2018-12-07T00:00:00.000Z"
-        },
-        {
-          "id": "a8e9873a-f0b4-4f43-98b1-182b198ddc5b",
-          "collectionExerciseId": "867df153-5714-4218-b58a-ca11ad2686ef",
-          "tag": "go_live",
-          "timestamp": "2018-12-14T00:00:00.000Z"
-        },
-        {
-          "id": "dbc7afe9-4770-47da-aec3-bc5d4adc062f",
-          "collectionExerciseId": "867df153-5714-4218-b58a-ca11ad2686ef",
-          "tag": "ref_period_start",
-          "timestamp": "2018-12-01T00:00:00.000Z"
-        },
-        {
-          "id": "42bf65c1-455d-45cd-bc77-82080af1564d",
-          "collectionExerciseId": "867df153-5714-4218-b58a-ca11ad2686ef",
-          "tag": "ref_period_end",
-          "timestamp": "2018-12-31T00:00:00.000Z"
-        },
-        {
-          "id": "a717d124-9ea1-49d0-a282-f7b0a6c04afe",
-          "collectionExerciseId": "867df153-5714-4218-b58a-ca11ad2686ef",
-          "tag": "return_by",
-          "timestamp": "2019-01-09T00:00:00.000Z"
-        },
-        {
-          "id": "a21f97fb-fea8-44c6-9051-b03e563840d0",
-          "collectionExerciseId": "867df153-5714-4218-b58a-ca11ad2686ef",
-          "tag": "exercise_end",
-          "timestamp": "2021-01-31T00:00:00.000Z"
-        }
-      ]
+        "id": "867df153-5714-4218-b58a-ca11ad2686ef",
+        "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54",
+        "name": "Monthly Survey of Bu",
+        "actualExecutionDateTime": "2018-07-12T08:59:35.590Z",
+        "scheduledExecutionDateTime": "2018-12-07T00:00:00.000Z",
+        "scheduledStartDateTime": "2018-12-07T00:00:00.000Z",
+        "actualPublishDateTime": "2018-07-12T08:59:36.755Z",
+        "periodStartDateTime": "2018-12-07T00:00:00.000Z",
+        "periodEndDateTime": "2021-01-31T00:00:00.000Z",
+        "scheduledReturnDateTime": "2019-01-09T00:00:00.000Z",
+        "scheduledEndDateTime": "2021-01-31T00:00:00.000Z",
+        "executedBy": null,
+        "state": "READY_FOR_LIVE",
+        "exerciseRef": "201812",
+        "userDescription": "December 2018",
+        "created": "2018-07-12T08:59:04.389Z",
+        "updated": "2018-07-12T08:59:36.132Z",
+        "deleted": null,
+        "validationErrors": null,
+        "events": [
+            {
+                "id": "3bf96e52-eaae-4143-bc20-a7f47526a52e",
+                "collectionExerciseId": "867df153-5714-4218-b58a-ca11ad2686ef",
+                "tag": "mps",
+                "timestamp": "2018-12-07T00:00:00.000Z"
+            },
+            {
+                "id": "a8e9873a-f0b4-4f43-98b1-182b198ddc5b",
+                "collectionExerciseId": "867df153-5714-4218-b58a-ca11ad2686ef",
+                "tag": "go_live",
+                "timestamp": "2018-12-14T00:00:00.000Z"
+            },
+            {
+                "id": "dbc7afe9-4770-47da-aec3-bc5d4adc062f",
+                "collectionExerciseId": "867df153-5714-4218-b58a-ca11ad2686ef",
+                "tag": "ref_period_start",
+                "timestamp": "2018-12-01T00:00:00.000Z"
+            },
+            {
+                "id": "42bf65c1-455d-45cd-bc77-82080af1564d",
+                "collectionExerciseId": "867df153-5714-4218-b58a-ca11ad2686ef",
+                "tag": "ref_period_end",
+                "timestamp": "2018-12-31T00:00:00.000Z"
+            },
+            {
+                "id": "a717d124-9ea1-49d0-a282-f7b0a6c04afe",
+                "collectionExerciseId": "867df153-5714-4218-b58a-ca11ad2686ef",
+                "tag": "return_by",
+                "timestamp": "2019-01-09T00:00:00.000Z"
+            },
+            {
+                "id": "a21f97fb-fea8-44c6-9051-b03e563840d0",
+                "collectionExerciseId": "867df153-5714-4218-b58a-ca11ad2686ef",
+                "tag": "exercise_end",
+                "timestamp": "2021-01-31T00:00:00.000Z"
+            }
+        ]
     }
-  ]
-}
+]

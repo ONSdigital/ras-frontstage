@@ -94,7 +94,7 @@ class TestSurveyList(unittest.TestCase):
                 "last_name": "test_account",
                 "phone_number": "07772257773",
                 "email_address": "exampleone@example.com",
-                "confirm_email_address": "exampleone@example.com"
+                "confirm_email_address": "exampleone@example.com",
             },
             follow_redirects=True,
         )

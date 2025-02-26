@@ -34,6 +34,7 @@ NOT_SURVEY_RELATED = "Not survey related"
 
 Option = namedtuple("Option", ["value", "text"])
 
+BUSINESS_DISABLED_OPTION = {"value": "Choose a organisation", "text": "Choose a organisation", "disabled": True}
 ORGANISATION_DISABLED_OPTION = {"value": "Choose an organisation", "text": "Choose an organisation", "disabled": True}
 SURVEY_DISABLED_OPTION = {"value": "Choose a survey", "text": "Choose a survey", "disabled": True}
 SUBJECT_DISABLED_OPTION = {"value": "Choose a subject", "text": "Choose a subject", "disabled": True}
@@ -205,6 +206,14 @@ def secure_message_enrolment_options(respondent_enrolments: dict, secure_message
     return sm_enrolment_options
 
 
+def secure_message_business_options(business_selection: dict) -> dict:
+    business_options = _create_business_options(business_selection)
+
+    sm_business_options = {"businesses": _create_formatted_option_list(business_options, "", BUSINESS_DISABLED_OPTION)}
+
+    return sm_business_options
+
+
 def try_message_count_from_session(session):
     """Attempts to get the unread message count from the session,
     will fall back to the secure-message api if unsuccessful"""
@@ -255,6 +264,13 @@ def _create_survey_options(respondent_enrolments: dict) -> list:
     for survey in respondent_enrolments["survey_details"]:
         survey_options.append(Option(survey["id"], survey["long_name"]))
     return survey_options
+
+
+def _create_business_options(business_selection: dict) -> list:
+    business_options = [Option("Not business related", "Not business related")]
+    for business in business_selection:
+        business_options.append(Option(business["business_id"], business["business_name"]))
+    return business_options
 
 
 def _create_formatted_option_list(options: list, selected: str, disabled_option: dict) -> list:

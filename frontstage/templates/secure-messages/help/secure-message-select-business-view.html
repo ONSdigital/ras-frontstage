@@ -1,0 +1,55 @@
+{% extends "layouts/_block_content.html" %}
+{% from "components/button/_macro.njk" import onsButton %}
+{% from "components/textarea/_macro.njk" import onsTextarea %}
+{% from "components/select/_macro.njk" import onsSelect %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
+{% from "components/panel/_macro.njk" import onsPanel %}
+
+{% block breadcrumbs %}
+    {{
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": [{
+                "text": "Back",
+                "url": "/surveys/todo",
+                "id": "b-item"
+            }]
+        })
+    }}
+
+{% endblock breadcrumbs %}
+
+{% block main %}
+    <h1>Select Organisation</h1>
+    <p class="ons-u-mb-l">Please select the organisation you wish to contact us about.</p>
+    <div class="ons-col-10@m" id="secure-message-form">
+        <form method="post">
+            <input type="hidden" name="business_id" value="{{ form.business_id }}"/>
+            {{
+                onsSelect({
+                    "id": "business_id",
+                    "name": "business_id",
+                    "label": {
+                        "text": "Organisation",
+                        "description": "Choose the organization the message is related to",
+                    },
+
+                    "options": business_selection.businesses,
+                    "error": errors.survey_id,
+                    "classes": "ons-u-mb-xl",
+                })
+            }}
+            <div class="ons-field">
+                {{
+                    onsButton({
+                        "text": "Send message",
+                        "id": "send-message-ons-btn",
+                        "variants": "loader"
+                    })
+                }}
+             </div>
+             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        </form>
+    </div>
+{% endblock main %}

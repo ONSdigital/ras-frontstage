@@ -12,6 +12,7 @@ from frontstage.common.session import Session
 from frontstage.controllers.conversation_controller import (
     NOT_SURVEY_RELATED,
     InvalidSecureMessagingForm,
+    secure_message_business_options,
     secure_message_enrolment_options,
     send_secure_message,
 )
@@ -44,6 +45,7 @@ def contact_us():
 def send_message(session) -> str:
     secure_message_form = SecureMessagingForm(request.form)
     errors = {}
+    business_selection = []
     if request.method == "POST":
         secure_message_form.party_id = session.get_party_id()
         secure_message_form.category = "TECHNICAL" if request.form.get("survey_id") == NOT_SURVEY_RELATED else "SURVEY"
@@ -61,6 +63,19 @@ def send_message(session) -> str:
             errors = _errors(e.errors)
 
     respondent_enrolments = get_respondent_enrolments(session.get_party_id())
+
+    for businesses in respondent_enrolments:
+        business = {"business_id": businesses["business_id"], "business_name": businesses["business_name"]}
+        if businesses["business_id"] not in business_selection:
+            business_selection.append(business)
+
+    if len(business_selection) > 1:
+        business_options = secure_message_business_options(business_selection)
+        return render_template(
+            "secure-messages/help/secure-message-select-business-view.html",
+            business_selection=business_options,
+            errors=errors,
+        )
 
     if len(respondent_enrolments) > 2:
         return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))

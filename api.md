@@ -121,7 +121,6 @@ This page documents the Fronstage ui endpoints that can be hit.
 `/account`
 * GET and POST
 * GET and POST `/change-password`
-* POST `/change-account-email-address`
 * GET and POST `/change-account-details`
 * GET `/something-else` Gets the something else once the option is selected
 * POST `/something-else` Sends secure message for the something else pages

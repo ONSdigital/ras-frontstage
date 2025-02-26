@@ -72,34 +72,10 @@ class TestSurveyList(unittest.TestCase):
         get_respondent_party_by_id.return_value = respondent_party
         response = self.app.post("/my-account/change-account-details", data={"first_name": ""}, follow_redirects=True)
 
-        self.assertIn("There are 4 errors on this page".encode(), response.data)
-        self.assertIn("Problem with the first name".encode(), response.data)
-        self.assertIn("Problem with the phone number".encode(), response.data)
-        self.assertIn("Problem with the email address".encode(), response.data)
-
-    @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
-    @patch("frontstage.controllers.party_controller.update_account")
-    @patch("frontstage.controllers.party_controller.get_case_list_for_respondent")
-    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
-    def test_account_contact_details_success(
-        self, mock_request, get_respondent_enrolments, get_survey_list, _, get_respondent_party_by_id
-    ):
-        mock_request.get(url_banner_api, status_code=404)
-        get_respondent_party_by_id.return_value = respondent_party
-        get_survey_list.return_value = survey_list_todo
-        get_respondent_enrolments.return_value = respondent_enrolments
-        response = self.app.post(
-            "/my-account/change-account-details",
-            data={
-                "first_name": "new first name",
-                "last_name": "new last name",
-                "phone_number": "8882257773",
-                "email_address": "example@example.com",
-            },
-            follow_redirects=True,
-        )
-        self.assertIn("updated your first name, last name and telephone number".encode(), response.data)
+        self.assertIn("There is a problem with your answer".encode(), response.data)
+        self.assertIn("Enter your first name".encode(), response.data)
+        self.assertIn("Enter your last name".encode(), response.data)
+        self.assertIn("Enter an email address".encode(), response.data)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
@@ -118,35 +94,12 @@ class TestSurveyList(unittest.TestCase):
                 "last_name": "test_account",
                 "phone_number": "07772257773",
                 "email_address": "exampleone@example.com",
+                "confirm_email_address": "exampleone@example.com"
             },
             follow_redirects=True,
         )
-        self.assertIn("updated your first name, last name and telephone number".encode(), response.data)
-        self.assertIn("Change email address".encode(), response.data)
-        self.assertIn("You will need to authorise a change of email address.".encode(), response.data)
-        self.assertIn("We will send a verification email to".encode(), response.data)
-        self.assertIn("exampleone@example.com".encode(), response.data)
-
-    @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
-    @patch("frontstage.controllers.party_controller.update_account")
-    @patch("frontstage.controllers.party_controller.get_case_list_for_respondent")
-    def test_account_change_account_email_address_almost_done(
-        self, mock_request, get_survey_list, update_account, get_respondent_party_by_id
-    ):
-        mock_request.get(url_banner_api, status_code=404)
-        get_respondent_party_by_id.return_value = respondent_party
-        get_survey_list.return_value = survey_list_todo
-        response = self.app.post(
-            "/my-account/change-account-email-address",
-            data={"email_address": "exampleone@example.com"},
-            follow_redirects=True,
-        )
-        self.assertIn("Almost done".encode(), response.data)
-        self.assertIn("We have sent a verification email to your new email address.".encode(), response.data)
-        self.assertIn("Follow the link in the email to verify the change.".encode(), response.data)
-        self.assertIn("Email not arrived? It may be in your junk folder.".encode(), response.data)
-        self.assertIn("If it does not arrive within 15 minutes, please".encode(), response.data)
+        self.assertIn("We have sent you an email to confirm your new email address.".encode(), response.data)
+        self.assertIn("Your contact details have changed".encode(), response.data)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")

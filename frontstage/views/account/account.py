@@ -8,12 +8,7 @@ from frontstage.common.authorisation import jwt_authorization
 from frontstage.common.utilities import obfuscate_email
 from frontstage.controllers import auth_controller, party_controller
 from frontstage.exceptions.exceptions import ApiError, AuthError
-from frontstage.models import (
-    ChangePasswordFrom,
-    ConfirmEmailChangeForm,
-    ContactDetailsChangeForm,
-    OptionsForm,
-)
+from frontstage.models import ChangePasswordFrom, ContactDetailsChangeForm, OptionsForm
 from frontstage.views.account import account_bp
 from frontstage.views.template_helper import render_template
 
@@ -96,14 +91,11 @@ def change_password(session):
     return render_template("account/account-change-password.html", session=session, form=form, errors=errors)
 
 
-@account_bp.route("/change-account-email-address", methods=["POST"])
-@jwt_authorization(request)
-def change_email_address(session):
-    form = ConfirmEmailChangeForm(request.values)
+def change_email_address(session, new_email_address):
     party_id = session.get_party_id()
     respondent_details = party_controller.get_respondent_party_by_id(party_id)
     respondent_details["email_address"] = respondent_details["emailAddress"]
-    respondent_details["new_email_address"] = form["email_address"].data
+    respondent_details["new_email_address"] = new_email_address
     respondent_details["change_requested_by_respondent"] = True
     logger.info("Attempting to update email address changes on the account", party_id=party_id)
     try:
@@ -113,11 +105,11 @@ def change_email_address(session):
         logger.error("Failed to updated email on account", status=exc.status_code, party_id=party_id)
         if exc.status_code == 409:
             logger.info("The email requested already registered in our system. Request denied", party_id=party_id)
-            return render_template("account/account-change-email-address-conflict.html")
+            return False
         else:
             raise exc
     logger.info("Successfully updated email on account", party_id=party_id)
-    return render_template("account/account-change-email-address-almost-done.html", session=session)
+    return True
 
 
 @account_bp.route("/change-account-details", methods=["GET", "POST"])
@@ -146,12 +138,19 @@ def change_account_details(session):
             flash(success_panel)
         is_email_update_required = form["email_address"].data != respondent_details["emailAddress"]
         if is_email_update_required:
-            return render_template(
-                "account/account-change-email-address.html",
-                new_email=form["email_address"].data,
-                form=ConfirmEmailChangeForm(),
-            )
-        return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
+            if not change_email_address(session=session, new_email_address=form["email_address"].data):
+                form.errors["email_address"] = ["Email address has already been used to register an account"]
+                return render_template(
+                    "account/account-contact-detail-change.html",
+                    session=session,
+                    form=form,
+                    errors=form.errors,
+                    respondent=respondent_details,
+                )
+            else:
+                flash("We have sent you an email to confirm your new email address.")
+        flash("Your contact details have changed")
+        return redirect(url_for("account_bp.account"))
     else:
         return render_template(
             "account/account-contact-detail-change.html",

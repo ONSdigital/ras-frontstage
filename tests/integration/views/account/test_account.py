@@ -6,7 +6,6 @@ import requests_mock
 from frontstage import app
 from tests.integration.mocked_services import (
     encoded_jwt_token,
-    respondent_enrolments,
     respondent_party,
     survey_list_todo,
     url_banner_api,

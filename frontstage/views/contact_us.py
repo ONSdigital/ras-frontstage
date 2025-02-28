@@ -74,6 +74,7 @@ def send_message(session) -> str:
         return render_template(
             "secure-messages/help/secure-message-select-business-view.html",
             business_selection=business_options,
+            back_url=request.referrer,
             errors=errors,
         )
 

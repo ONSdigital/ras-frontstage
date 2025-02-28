@@ -267,7 +267,7 @@ def _create_survey_options(respondent_enrolments: dict) -> list:
 
 
 def _create_business_options(business_selection: dict) -> list:
-    business_options = [Option("Not business related", "Not business related")]
+    business_options = []
     for business in business_selection:
         business_options.append(Option(business["business_id"], business["business_name"]))
     return business_options

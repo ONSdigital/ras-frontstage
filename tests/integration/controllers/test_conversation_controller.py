@@ -374,7 +374,6 @@ class TestConversationController(unittest.TestCase):
         return {
             "businesses": [
                 {"value": "Choose a organisation", "text": "Choose a organisation", "disabled": True},
-                {"value": "Not business related", "text": "Not business related"},
                 {
                     "value": "bebee450-46da-4f8b-a7a6-d4632087f2a3",
                     "text": "Test Business 1",

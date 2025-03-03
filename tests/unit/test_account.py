@@ -2,9 +2,7 @@ import unittest
 
 from werkzeug.datastructures import ImmutableMultiDict
 
-from frontstage.views.account.account import (
-    check_attribute_change,
-)
+from frontstage.views.account.account import check_attribute_change
 
 
 class TestAccount(unittest.TestCase):

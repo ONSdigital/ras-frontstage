@@ -7,6 +7,39 @@
 
 {% block main %}
 <div class=" ons-push-1@m">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category == "error" %}
+                    {% call onsPanel({
+                        "variant": 'error',
+                        "id": 'error-id',
+                        "iconType": 'lock',
+                        "classes": 'ons-u-mb-m'
+                    }) %}
+                        <p class="ons-u-fs-r" id="flashed-error-message-{{ loop.index }}">{{ message }}</p>
+                    {% endcall %}
+                {% elif category == "warn" %}
+                    {% call onsPanel({
+                        "variant": 'warn',
+                        "id": 'info-id',
+                        "classes": 'ons-u-mb-m'
+                    }) %}
+                        <p class="ons-u-fs-r" id="flashed-error-message-{{ loop.index }}"><b>{{ message }}</b></p>
+                    {% endcall %}
+                {% else %}
+                    {% call onsPanel({
+                        "variant": 'success',
+                        "id": 'success-id',
+                        "iconType": 'check',
+                        "classes": 'ons-u-mb-m'
+                    }) %}
+                        <p class="ons-u-fs-r" id="flashed-message-{{ loop.index }}">{{ message }}</p>
+                    {% endcall %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 <h1 class="ons-u-fs-xl">My Account</h1>
 {{
     onsDescriptionList({

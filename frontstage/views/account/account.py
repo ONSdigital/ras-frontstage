@@ -134,8 +134,6 @@ def change_account_details(session):
                 logger.error("Failed to updated account", status=exc.status_code)
                 raise exc
             logger.info("Successfully updated account", party_id=party_id)
-            success_panel = create_success_message(attributes_changed, "We have updated your ")
-            flash(success_panel)
         is_email_update_required = form["email_address"].data != respondent_details["emailAddress"]
         if is_email_update_required:
             if not change_email_address(session=session, new_email_address=form["email_address"].data):
@@ -149,7 +147,8 @@ def change_account_details(session):
                 )
             else:
                 flash("We have sent you an email to confirm your new email address.")
-        flash("Your contact details have changed")
+        else:
+            flash("Your contact details have changed")
         return redirect(url_for("account_bp.account"))
     else:
         return render_template(
@@ -183,28 +182,3 @@ def check_attribute_change(form, attributes_changed, respondent_details, update_
         update_required_flag = True
         attributes_changed.append("telephone number")
     return update_required_flag
-
-
-def create_success_message(attr, message):
-    """
-    Takes a string as message and a list of strings attr
-    to append message with attributes adding ',' and 'and'
-
-    for example: if message = "I ate "
-    and attr = ["apple","banana","grapes"]
-    result will be = "I ate apple, banana and grapes."
-
-    :param attr: list of string
-    :param message: string
-    :returns: A string formatted using the two supplied variables
-    :rtype: str
-    """
-    for x in attr:
-        if x == attr[-1] and len(attr) >= 2:
-            message += " and " + x
-        elif x != attr[0] and len(attr) > 2:
-            message += ", " + x
-        else:
-            message += x
-
-    return message

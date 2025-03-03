@@ -33,13 +33,11 @@
                 "title": "There is a problem with your answer"
             })
         %}
-            <p>These <strong>must be corrected</strong> to continue.</p>
             {% set errorData = [] %}
             {% for error in errors %}
-                {% set error_text =  error %}
                 {% do errorData.append(
                     {
-                        "text": 'Problem with the ' ~ error_text.replace('_', ' '),
+                        "text": error[0],
                         "url": "#" ~ error ~ '_error',
                         "classes": "ons-js-inpagelink"
                     }

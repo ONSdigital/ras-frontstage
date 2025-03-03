@@ -147,8 +147,7 @@ def change_account_details(session):
                 )
             else:
                 flash("We have sent you an email to confirm your new email address.")
-        else:
-            flash("Your contact details have changed")
+        flash("Your contact details have changed")
         return redirect(url_for("account_bp.account"))
     else:
         return render_template(

@@ -71,10 +71,14 @@ def send_message(session) -> str:
 
     if len(business_selection) > 1:
         business_options = secure_message_business_options(business_selection)
+        if "todo" in request.referrer:
+            base_url = "/surveys/todo"
+        else:
+            base_url = "/contact-us"
         return render_template(
             "secure-messages/help/secure-message-select-business-view.html",
             business_selection=business_options,
-            back_url=request.referrer,
+            back_url=base_url,
             errors=errors,
         )
 

@@ -131,8 +131,7 @@ class TestCookiesContact(unittest.TestCase):
         )
         get_respondent_enrolments.return_value = RESPONDENT_ENROLMENTS
         mock_request.get(url_banner_api, status_code=404)
-
-        response = self.app.get("/contact-us/send-message")
+        response = self.app.get("/contact-us/send-message", headers={"referer": "/surveys/todo"})
         self.assertEqual(response.status_code, 200)
         self.assertTrue("/surveys/todo".encode() in response.data)
 

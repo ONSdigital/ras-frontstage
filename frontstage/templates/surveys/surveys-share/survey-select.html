@@ -8,20 +8,16 @@
 
 {% set page_title = "Share access to surveys" %}
 
-{% set breadcrumbsData = [
-    {
-        "text": "Back",
-        "url": "/my-account/share-surveys/business-selection",
-        "id": "b-item-4"
-    }
-] %}
-
 {% block breadcrumbs %}
     {{
         onsBreadcrumbs({
             "ariaLabel": "Breadcrumbs",
             "id": "breadcrumbs",
-            "itemsList": breadcrumbsData
+            "itemsList": [{
+                "text": "Back",
+                "url": "/my-account/share-surveys/business-selection",
+                "id": "b-item"
+            }]
         })
     }}
 {% endblock breadcrumbs %}

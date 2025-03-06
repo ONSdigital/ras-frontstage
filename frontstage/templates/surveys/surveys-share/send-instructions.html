@@ -8,20 +8,16 @@
 
 {% set page_title = "Send instructions" %}
 
-{% set breadcrumbsData = [
-    {
-        "text": "Back",
-        "url": "/my-account/share-surveys/recipient-email-address",
-        "id": "b-item-4"
-    }
-] %}
-
 {% block breadcrumbs %}
     {{
         onsBreadcrumbs({
             "ariaLabel": "Breadcrumbs",
             "id": "breadcrumbs",
-            "itemsList": breadcrumbsData
+            "itemsList": [{
+                "text": "Back",
+                "url": "/my-account/share-surveys/recipient-email-address",
+                "id": "b-item"
+            }]
         })
     }}
 {% endblock breadcrumbs %}

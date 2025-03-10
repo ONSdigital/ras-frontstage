@@ -326,7 +326,12 @@ class TestConversationController(unittest.TestCase):
         self.assertEqual(
             options,
             [
-                {"value": "Choose an organisation", "text": "Choose an organisation", "disabled": True, "selected": True},
+                {
+                    "value": "Choose an organisation",
+                    "text": "Choose an organisation",
+                    "disabled": True,
+                    "selected": True,
+                },
                 {"value": "bebee450-46da-4f8b-a7a6-d4632087f2a4", "text": "Aardvark Enterprises"},
                 {"value": "bebee450-46da-4f8b-a7a6-d4632087f2a3", "text": "Test Business 1"},
             ],

@@ -194,7 +194,7 @@ class SecureMessagingForm(FlaskForm):
             Length(max=50000, message="Message must be less than 50000 characters"),
         ],
     )
-    business_id = StringField(validators=[DataRequired("Select the organisation")])
+    business_id = StringField(validators=[DataRequired("Select the business")])
     survey_id = StringField()
     category = StringField()
     party_id = StringField()

@@ -206,7 +206,7 @@ def secure_message_enrolment_options(respondent_enrolments: dict, secure_message
 
 
 def secure_message_organisation_options(business_details: list) -> list:
-    """returns a dict of business_options based on a business_details"""
+    """returns a dict of organisation_options based on a business_details"""
     organisation_options = _create_organisation_options(business_details)
     return _create_formatted_option_list(organisation_options, "", ORGANISATION_DISABLED_OPTION)
 

@@ -14,8 +14,8 @@ from frontstage.controllers.conversation_controller import (
     IncorrectAccountAccessError,
     InvalidSecureMessagingForm,
     get_message_count_from_api,
-    secure_message_business_options,
     secure_message_enrolment_options,
+    secure_message_organisation_options,
     send_secure_message,
     try_message_count_from_session,
 )
@@ -298,14 +298,17 @@ class TestConversationController(unittest.TestCase):
 
         self.assertEqual(options, expected_options)
 
-    def test_secure_message_business_selection(self):
+    def test_secure_message_business_ordered_selection(self):
+        # Given respondent enrolments
         enrolments = self._respondent_enrolments()
+
+        # When another business is added in second spot of the list
         enrolments.append(
             {
                 "business_id": "bebee450-46da-4f8b-a7a6-d4632087f2a4",
-                "business_name": "Test Business 2",
+                "business_name": "Aardvark Enterprises",
                 "ru_ref": "49910000015",
-                "trading_as": "Trading as Test Business 2",
+                "trading_as": "Trading as Aardvark Enterprises",
                 "survey_details": [
                     {
                         "id": "41320b22-b425-4fba-a90e-718898f718ce",
@@ -317,12 +320,17 @@ class TestConversationController(unittest.TestCase):
                 ],
             }
         )
-        options = secure_message_business_options(enrolments)
+        options = secure_message_organisation_options(enrolments)
 
-        expected_options = self._expected_business_options()
-        expected_options["businesses"][0]["selected"] = True
-
-        self.assertEqual(options, expected_options)
+        # Then the correct list of options is returned, and ordered appropriately
+        self.assertEqual(
+            options,
+            [
+                {"value": "Choose an organisation", "text": "Choose an organisation", "disabled": True, "selected": True},
+                {"value": "bebee450-46da-4f8b-a7a6-d4632087f2a4", "text": "Aardvark Enterprises"},
+                {"value": "bebee450-46da-4f8b-a7a6-d4632087f2a3", "text": "Test Business 1"},
+            ],
+        )
 
     @staticmethod
     def _respondent_enrolments():
@@ -367,20 +375,4 @@ class TestConversationController(unittest.TestCase):
                 {"value": "Something else", "text": "Something else"},
                 {"value": "Technical difficulties", "text": "Technical difficulties"},
             ],
-        }
-
-    @staticmethod
-    def _expected_business_options():
-        return {
-            "businesses": [
-                {"value": "Choose a organisation", "text": "Choose a organisation", "disabled": True},
-                {
-                    "value": "bebee450-46da-4f8b-a7a6-d4632087f2a3",
-                    "text": "Test Business 1",
-                },
-                {
-                    "value": "bebee450-46da-4f8b-a7a6-d4632087f2a4",
-                    "text": "Test Business 2",
-                },
-            ]
         }

@@ -34,7 +34,6 @@ NOT_SURVEY_RELATED = "Not survey related"
 
 Option = namedtuple("Option", ["value", "text"])
 
-BUSINESS_DISABLED_OPTION = {"value": "Choose a organisation", "text": "Choose a organisation", "disabled": True}
 ORGANISATION_DISABLED_OPTION = {"value": "Choose an organisation", "text": "Choose an organisation", "disabled": True}
 SURVEY_DISABLED_OPTION = {"value": "Choose a survey", "text": "Choose a survey", "disabled": True}
 SUBJECT_DISABLED_OPTION = {"value": "Choose a subject", "text": "Choose a subject", "disabled": True}
@@ -188,7 +187,7 @@ def send_secure_message(form, msg_to=["GROUP"]) -> UUID:
 
 
 def secure_message_enrolment_options(respondent_enrolments: dict, secure_message_form: SecureMessagingForm) -> dict:
-    """returns a dict of secure message options based on a business_enrolments"""
+    """returns a dict of secure message options based on a respondent_enrolments"""
 
     survey_options = _create_survey_options(respondent_enrolments)
 
@@ -206,12 +205,10 @@ def secure_message_enrolment_options(respondent_enrolments: dict, secure_message
     return sm_enrolment_options
 
 
-def secure_message_business_options(business_selection: dict) -> dict:
-    business_options = _create_business_options(business_selection)
-
-    sm_business_options = {"businesses": _create_formatted_option_list(business_options, "", BUSINESS_DISABLED_OPTION)}
-
-    return sm_business_options
+def secure_message_organisation_options(business_details: list) -> list:
+    """returns a dict of business_options based on a business_details"""
+    organisation_options = _create_organisation_options(business_details)
+    return _create_formatted_option_list(organisation_options, "", ORGANISATION_DISABLED_OPTION)
 
 
 def try_message_count_from_session(session):
@@ -266,17 +263,17 @@ def _create_survey_options(respondent_enrolments: dict) -> list:
     return survey_options
 
 
-def _create_business_options(business_selection: dict) -> list:
-    business_options = []
-    for business in business_selection:
-        business_options.append(Option(business["business_id"], business["business_name"]))
-    return business_options
+def _create_organisation_options(business_details: list) -> list:
+    organisation_options = []
+    for business in business_details:
+        organisation_options.append(Option(business["business_id"], business["business_name"]))
+    return organisation_options
 
 
 def _create_formatted_option_list(options: list, selected: str, disabled_option: dict) -> list:
     formatted_option_list = [disabled_option]
 
-    for option in sorted(options):
+    for option in sorted(options, key=lambda k: k.text):
         option_dict = {"value": option.value, "text": option.text}
         if selected == option.value:
             option_dict["selected"] = True

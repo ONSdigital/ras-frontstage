@@ -1,4 +1,5 @@
 import logging
+import urllib.parse as urlparse
 
 from flask import Blueprint, flash, request, url_for
 from jwt.exceptions import DecodeError
@@ -12,13 +13,13 @@ from frontstage.common.session import Session
 from frontstage.controllers.conversation_controller import (
     NOT_SURVEY_RELATED,
     InvalidSecureMessagingForm,
-    secure_message_business_options,
     secure_message_enrolment_options,
+    secure_message_organisation_options,
     send_secure_message,
 )
 from frontstage.controllers.party_controller import get_respondent_enrolments
 from frontstage.exceptions.exceptions import JWTTimeoutError, JWTValidationError
-from frontstage.models import SecureMessagingForm
+from frontstage.models import OrganisationForm, SecureMessagingForm
 from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -45,7 +46,7 @@ def contact_us():
 def send_message(session) -> str:
     secure_message_form = SecureMessagingForm(request.form)
     errors = {}
-    business_selection = []
+
     if request.method == "POST":
         secure_message_form.party_id = session.get_party_id()
         secure_message_form.category = "TECHNICAL" if request.form.get("survey_id") == NOT_SURVEY_RELATED else "SURVEY"
@@ -62,36 +63,52 @@ def send_message(session) -> str:
         except InvalidSecureMessagingForm as e:
             errors = _errors(e.errors)
 
-    respondent_enrolments = get_respondent_enrolments(session.get_party_id())
+    url_parts = urlparse.urlparse(request.url)
+    url_business_id = urlparse.parse_qs(url_parts.query).get("business_id")
+    payload = {"business_id": url_business_id[0]} if url_business_id else {}
 
-    for businesses in respondent_enrolments:
-        business = {"business_id": businesses["business_id"], "business_name": businesses["business_name"]}
-        if businesses["business_id"] not in business_selection:
-            business_selection.append(business)
+    respondent_enrolments = get_respondent_enrolments(session.get_party_id(), payload=payload)
 
-    if len(business_selection) > 1:
-        business_options = secure_message_business_options(business_selection)
-        if "todo" in request.referrer:
-            base_url = "/surveys/todo"
-        else:
-            base_url = "/contact-us"
-        return render_template(
-            "secure-messages/help/secure-message-select-business-view.html",
-            business_selection=business_options,
-            back_url=base_url,
-            errors=errors,
-        )
-
-    if len(respondent_enrolments) > 2:
-        return redirect(url_for("surveys_bp.get_survey_list", tag="todo"))
+    if len(respondent_enrolments) > 1:
+        return redirect(url_for("contact_us_bp.select_organisation"))
 
     enrolment_options = secure_message_enrolment_options(respondent_enrolments[0], secure_message_form)
+    back_url = (
+        url_for("contact_us_bp.select_organisation")
+        if url_business_id
+        else url_for("surveys_bp.get_survey_list", tag="todo")
+    )
 
     return render_template(
         "secure-messages/help/secure-message-send-messages-view.html",
         enrolment_options=enrolment_options,
+        back_url=back_url,
         form=secure_message_form,
         errors=errors,
+    )
+
+
+@contact_us_bp.route("/select-organisation", methods=["GET", "POST"])
+@jwt_authorization(request)
+def select_organisation(session) -> str:
+    organisation_form = OrganisationForm(request.form)
+
+    if request.method == "POST" and organisation_form.validate():
+        return redirect(url_for("contact_us_bp.send_message", business_id=organisation_form.business_id.data))
+
+    respondent_enrolments = get_respondent_enrolments(session.get_party_id())
+
+    business_details = []
+    for enrolment in respondent_enrolments:
+        business_details.append({"business_id": enrolment["business_id"], "business_name": enrolment["business_name"]})
+
+    organisation_options = secure_message_organisation_options(business_details)
+
+    return render_template(
+        "secure-messages/help/secure-message-select-organisation.html",
+        organisation_options=organisation_options,
+        back_url=url_for("surveys_bp.get_survey_list", tag="todo"),
+        error=_errors(organisation_form.errors),
     )
 
 

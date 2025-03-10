@@ -107,11 +107,29 @@ class TestCookiesContact(unittest.TestCase):
         self.assertTrue('input type="hidden" name="business_id"'.encode() in response.data)
 
     @requests_mock.mock()
+    @patch("frontstage.views.contact_us.send_secure_message")
+    def test_secure_message_form_post(self, mock_request, _):
+        mock_request.get(url_banner_api, status_code=404)
+
+        response = self.app.post("/contact-us/send-message")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue("/surveys/todo".encode() in response.data)
+
+    @requests_mock.mock()
     @patch("frontstage.views.contact_us.get_respondent_enrolments")
-    @patch("frontstage.views.contact_us.secure_message_enrolment_options")
-    def test_secure_message_form_multiple_businesses(
-        self, mock_request, secure_message_enrolment_options, get_respondent_enrolments
-    ):
+    def test_secure_message_form_business_id_in_url(self, mock_request, get_respondent_enrolments):
+        get_respondent_enrolments.return_value = RESPONDENT_ENROLMENTS
+        mock_request.get(url_banner_api, status_code=404)
+
+        response = self.app.get("/contact-us/send-message?business_id=bebee450-46da-4f8b-a7a6-d4632087f2a3")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("Annual Inward Foreign Direct Investment Survey".encode() in response.data)
+
+    @requests_mock.mock()
+    @patch("frontstage.views.contact_us.get_respondent_enrolments")
+    def test_secure_message_form_multiple_organisations(self, mock_request, get_respondent_enrolments):
         RESPONDENT_ENROLMENTS.append(
             {
                 "business_id": "10228767-361b-4bb3-be93-c001e669eaaf",
@@ -131,9 +149,11 @@ class TestCookiesContact(unittest.TestCase):
         )
         get_respondent_enrolments.return_value = RESPONDENT_ENROLMENTS
         mock_request.get(url_banner_api, status_code=404)
-        response = self.app.get("/contact-us/send-message", headers={"referer": "/surveys/todo"})
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue("/surveys/todo".encode() in response.data)
+
+        response = self.app.get("/contact-us/send-message")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue("contact-us/select-organisation".encode() in response.data)
 
     @requests_mock.mock()
     @patch("frontstage.views.contact_us.get_respondent_enrolments")
@@ -151,3 +171,38 @@ class TestCookiesContact(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue("Message is required".encode() in response.data)
+
+    @requests_mock.mock()
+    @patch("frontstage.views.contact_us.get_respondent_enrolments")
+    def test_secure_message_select_organisation(self, mock_request, get_respondent_enrolments):
+        get_respondent_enrolments.return_value = RESPONDENT_ENROLMENTS
+        mock_request.get(url_banner_api, status_code=404)
+
+        response = self.app.get("/contact-us/select-organisation")
+        print(response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("Test Business 1".encode() in response.data)
+
+    @requests_mock.mock()
+    def test_secure_message_select_organisation_post(self, mock_request):
+        mock_request.get(url_banner_api, status_code=404)
+
+        response = self.app.post(
+            "/contact-us/select-organisation", data={"business_id": "294bbe51-5905-4948-a883-ba3c22bff45f"}
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(
+            "/contact-us/send-message?business_id=294bbe51-5905-4948-a883-ba3c22bff45f".encode() in response.data
+        )
+
+    @requests_mock.mock()
+    @patch("frontstage.views.contact_us.get_respondent_enrolments")
+    def test_secure_message_select_organisation_invalid(self, mock_request, get_respondent_enrolments):
+        mock_request.get(url_banner_api, status_code=404)
+        get_respondent_enrolments.return_value = RESPONDENT_ENROLMENTS
+
+        response = self.app.post("/contact-us/select-organisation")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("Select the organisation".encode() in response.data)

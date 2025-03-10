@@ -205,6 +205,10 @@ class SecureMessagingForm(FlaskForm):
             raise ValidationError("Select the survey")
 
 
+class OrganisationForm(FlaskForm):
+    business_id = StringField(validators=[DataRequired("Select the organisation")])
+
+
 class RespondentStatus(enum.IntEnum):
     CREATED = 0
     ACTIVE = 1

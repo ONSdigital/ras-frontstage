@@ -15,7 +15,7 @@ from frontstage.exceptions.exceptions import ApiError
 from tests.integration.mocked_services import (
     collection_exercise,
     collection_exercise_by_survey,
-    url_get_collection_exercises_by_survey,
+    url_get_collection_exercises_by_surveys,
 )
 
 
@@ -28,37 +28,31 @@ class TestCollectionExerciseController(unittest.TestCase):
 
     def test_get_collection_exercises_for_survey_success(self):
         with responses.RequestsMock() as rsps:
-            rsps.add(rsps.GET, url_get_collection_exercises_by_survey, json=collection_exercise_by_survey, status=200)
+            rsps.add(rsps.GET, url_get_collection_exercises_by_surveys, json=collection_exercise_by_survey, status=200)
 
             with app.app_context():
-                collection_exercises = collection_exercise_controller.get_collection_exercises_for_survey(
-                    collection_exercise["surveyId"],
-                    self.app_config["COLLECTION_EXERCISE_URL"],
-                    self.app_config["BASIC_AUTH"],
+                collection_exercises = collection_exercise_controller.get_collection_exercises_for_surveys(
+                    [collection_exercise["surveyId"]],
                 )
 
                 self.assertTrue(collection_exercises is not None)
 
     def test_get_collection_exercises_for_survey_fail(self):
         with responses.RequestsMock() as rsps:
-            rsps.add(rsps.GET, url_get_collection_exercises_by_survey, status=400)
+            rsps.add(rsps.GET, url_get_collection_exercises_by_surveys, status=400)
             with app.app_context():
                 with self.assertRaises(ApiError):
-                    collection_exercise_controller.get_collection_exercises_for_survey(
-                        collection_exercise["surveyId"],
-                        self.app_config["COLLECTION_EXERCISE_URL"],
-                        self.app_config["BASIC_AUTH"],
+                    collection_exercise_controller.get_collection_exercises_for_surveys(
+                        [collection_exercise["surveyId"]],
                     )
 
     def test_get_collection_exercises_for_survey_no_exercises(self):
         with responses.RequestsMock() as rsps:
-            rsps.add(rsps.GET, url_get_collection_exercises_by_survey, status=204)
+            rsps.add(rsps.GET, url_get_collection_exercises_by_surveys, status=204)
 
             with app.app_context():
-                collection_exercises = collection_exercise_controller.get_collection_exercises_for_survey(
-                    collection_exercise["surveyId"],
-                    self.app_config["COLLECTION_EXERCISE_URL"],
-                    self.app_config["BASIC_AUTH"],
+                collection_exercises = collection_exercise_controller.get_collection_exercises_for_surveys(
+                    [collection_exercise["surveyId"]],
                 )
 
                 self.assertListEqual(collection_exercises, [])

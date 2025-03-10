@@ -395,7 +395,7 @@ class TestPartyController(unittest.TestCase):
                     self.assertEqual(list(survey_list_details_for_party), expected_response)
 
     @patch("frontstage.controllers.party_controller.RedisCache.get_collection_instrument")
-    def test_get_survey_list_details_for_party_without_enrolments(self, get_collection_instrument):
+    def test_get_case_list_for_respondents_without_enrolments(self, get_collection_instrument):
         # Given party, collection instrument and case (lower down) are mocked
         get_collection_instrument.side_effect = [{"type": "SEFT"}, {"type": "EQ"}, {"type": "EQ"}, {"type": "EQ"}]
 
@@ -408,8 +408,8 @@ class TestPartyController(unittest.TestCase):
                     "frontstage.controllers.case_controller.get_cases_for_list_type_by_party_id",
                     _get_case_return_value_by_business_id,
                 ):
-                    # when get_survey_list_details_for_party is called
-                    survey_list_details_for_party = get_survey_list_details_for_party(
+                    # when get_case_list_for_respondents is called
+                    survey_list_details_for_party = get_case_list_for_respondent(
                         [],
                         "todo",
                         None,

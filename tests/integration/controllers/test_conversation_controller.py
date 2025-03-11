@@ -15,6 +15,7 @@ from frontstage.controllers.conversation_controller import (
     InvalidSecureMessagingForm,
     get_message_count_from_api,
     secure_message_enrolment_options,
+    secure_message_organisation_options,
     send_secure_message,
     try_message_count_from_session,
 )
@@ -284,12 +285,12 @@ class TestConversationController(unittest.TestCase):
                     send_secure_message(self.sm_form)
 
     def test_secure_message(self):
-        options = secure_message_enrolment_options(self._respondent_enrolments(), self.sm_form)
+        options = secure_message_enrolment_options(self._respondent_enrolments()[0], self.sm_form)
         self.assertEqual(options, self._expected_options())
 
     def test_secure_message_subject_not_selected(self):
         self.sm_form.subject.data = ""
-        options = secure_message_enrolment_options(self._respondent_enrolments(), self.sm_form)
+        options = secure_message_enrolment_options(self._respondent_enrolments()[0], self.sm_form)
 
         expected_options = self._expected_options()
         expected_options["subject"][0]["selected"] = True
@@ -297,23 +298,64 @@ class TestConversationController(unittest.TestCase):
 
         self.assertEqual(options, expected_options)
 
+    def test_secure_message_business_ordered_selection(self):
+        # Given respondent enrolments
+        enrolments = self._respondent_enrolments()
+
+        # When another business is added in second spot of the list
+        enrolments.append(
+            {
+                "business_id": "bebee450-46da-4f8b-a7a6-d4632087f2a4",
+                "business_name": "Aardvark Enterprises",
+                "ru_ref": "49910000015",
+                "trading_as": "Trading as Aardvark Enterprises",
+                "survey_details": [
+                    {
+                        "id": "41320b22-b425-4fba-a90e-718898f718ce",
+                        "short_name": "AIFDI",
+                        "long_name": "Annual Inward Foreign Direct Investment Survey",
+                        "ref": "062",
+                        "enrolment_status": "ENABLED",
+                    }
+                ],
+            }
+        )
+        options = secure_message_organisation_options(enrolments)
+
+        # Then the correct list of options is returned, and ordered appropriately
+        self.assertEqual(
+            options,
+            [
+                {
+                    "value": "Choose an organisation",
+                    "text": "Choose an organisation",
+                    "disabled": True,
+                    "selected": True,
+                },
+                {"value": "bebee450-46da-4f8b-a7a6-d4632087f2a4", "text": "Aardvark Enterprises"},
+                {"value": "bebee450-46da-4f8b-a7a6-d4632087f2a3", "text": "Test Business 1"},
+            ],
+        )
+
     @staticmethod
     def _respondent_enrolments():
-        return {
-            "business_id": "bebee450-46da-4f8b-a7a6-d4632087f2a3",
-            "business_name": "Test Business 1",
-            "ru_ref": "49910000014",
-            "trading_as": "Trading as Test Business 1",
-            "survey_details": [
-                {
-                    "id": "41320b22-b425-4fba-a90e-718898f718ce",
-                    "short_name": "AIFDI",
-                    "long_name": "Annual Inward Foreign Direct Investment Survey",
-                    "ref": "062",
-                    "enrolment_status": "ENABLED",
-                }
-            ],
-        }
+        return [
+            {
+                "business_id": "bebee450-46da-4f8b-a7a6-d4632087f2a3",
+                "business_name": "Test Business 1",
+                "ru_ref": "49910000014",
+                "trading_as": "Trading as Test Business 1",
+                "survey_details": [
+                    {
+                        "id": "41320b22-b425-4fba-a90e-718898f718ce",
+                        "short_name": "AIFDI",
+                        "long_name": "Annual Inward Foreign Direct Investment Survey",
+                        "ref": "062",
+                        "enrolment_status": "ENABLED",
+                    }
+                ],
+            }
+        ]
 
     @staticmethod
     def _expected_options():

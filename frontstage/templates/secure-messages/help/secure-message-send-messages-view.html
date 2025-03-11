@@ -12,7 +12,7 @@
             "id": "breadcrumbs",
             "itemsList": [{
                 "text": "Back",
-                "url": "/surveys/todo",
+                "url": back_url,
                 "id": "b-item"
             }]
         })
@@ -31,7 +31,8 @@
                     "id": "survey_id",
                     "name": "survey_id",
                     "label": {
-                        "text": "Survey"
+                        "text": "Survey",
+                        "description": "Choose the survey the message is related to",
                     },
 
                     "options": enrolment_options.survey,
@@ -43,7 +44,8 @@
                     "id": "subject",
                     "name": "subject",
                     "label": {
-                        "text": "Subject"
+                        "text": "Subject",
+                        "description": "Choose a subject that best describes your query",
                     },
                     "options": enrolment_options.subject,
                     "error": errors.subject,
@@ -55,6 +57,7 @@
                     "name": "body",
                     "label": {
                         "text": "Enter message",
+                        "description": "It is safe to include confidential information in this secure message",
                     },
                     "charCheckLimit": false,
                     "error": errors.body,

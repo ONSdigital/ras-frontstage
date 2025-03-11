@@ -187,7 +187,7 @@ def send_secure_message(form, msg_to=["GROUP"]) -> UUID:
 
 
 def secure_message_enrolment_options(respondent_enrolments: dict, secure_message_form: SecureMessagingForm) -> dict:
-    """returns a dict of secure message options based on a business_enrolments"""
+    """returns a dict of secure message options based on a respondent_enrolments"""
 
     survey_options = _create_survey_options(respondent_enrolments)
 
@@ -203,6 +203,12 @@ def secure_message_enrolment_options(respondent_enrolments: dict, secure_message
     secure_message_form.business_id = respondent_enrolments["business_id"]
 
     return sm_enrolment_options
+
+
+def secure_message_organisation_options(business_details: list) -> list:
+    """returns a dict of organisation_options based on a business_details"""
+    organisation_options = _create_organisation_options(business_details)
+    return _create_formatted_option_list(organisation_options, "", ORGANISATION_DISABLED_OPTION)
 
 
 def try_message_count_from_session(session):
@@ -257,10 +263,17 @@ def _create_survey_options(respondent_enrolments: dict) -> list:
     return survey_options
 
 
+def _create_organisation_options(business_details: list) -> list:
+    organisation_options = []
+    for business in business_details:
+        organisation_options.append(Option(business["business_id"], business["business_name"]))
+    return organisation_options
+
+
 def _create_formatted_option_list(options: list, selected: str, disabled_option: dict) -> list:
     formatted_option_list = [disabled_option]
 
-    for option in sorted(options):
+    for option in sorted(options, key=lambda k: k.text):
         option_dict = {"value": option.value, "text": option.text}
         if selected == option.value:
             option_dict["selected"] = True

@@ -50,39 +50,34 @@ def get_collection_exercise_events(collection_exercise_id):
     return response.json()
 
 
-def get_collection_exercises_for_survey(survey_id, collex_url, collex_auth, live_only=None):
-    logger.info("Retrieving collection exercises for survey", survey_id=survey_id)
+def get_collection_exercises_for_surveys(survey_ids, live_only=None):
+    logger.info("Retrieving collection exercises for surveys", survey_ids=survey_ids)
+    params = {"surveyIds": survey_ids, "liveOnly": live_only}
 
-    if live_only is True:
-        url = f"{collex_url}/collectionexercises/survey/{survey_id}?liveOnly=true"
-    else:
-        url = f"{collex_url}/collectionexercises/survey/{survey_id}"
-
-    response = requests.get(url, auth=collex_auth)
+    response = requests.get(
+        f"{app.config["COLLECTION_EXERCISE_URL"]}/collectionexercises/surveys",
+        params=params,
+        auth=app.config["BASIC_AUTH"],
+    )
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error("Failed to retrieve collection exercises for survey", survey_id=survey_id)
+        logger.error("Failed to retrieve collection exercises for surveys", survey_ids=survey_ids)
         raise ApiError(logger, response)
 
     if response.status_code == 204:
-        logger.info(
-            "No live exercises found, returning empty list for collection exercises by survey", survey_id=survey_id
-        )
+        logger.info("No live exercises found for surveys", survey_ids=survey_ids)
         return []
-    logger.info("Successfully retrieved collection exercises for survey", survey_id=survey_id)
-    collection_exercises = response.json()
+    logger.info("Successfully retrieved collection exercises", survey_ids=survey_ids)
+    surveys_with_collection_exercises = response.json()
 
-    for collection_exercise in collection_exercises:
-        if collection_exercise["events"]:
-            collection_exercise["events"] = convert_events_to_new_format(collection_exercise["events"])
+    for collection_exercises in surveys_with_collection_exercises.values():
+        for collection_exercise in collection_exercises:
+            if collection_exercise["events"]:
+                collection_exercise["events"] = convert_events_to_new_format(collection_exercise["events"])
 
-    return collection_exercises
-
-
-def get_live_collection_exercises_for_survey(survey_id, collex_url, collex_auth):
-    return get_collection_exercises_for_survey(survey_id, collex_url, collex_auth, True)
+    return surveys_with_collection_exercises
 
 
 def convert_events_to_new_format(events):

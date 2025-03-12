@@ -285,12 +285,22 @@ class TestConversationController(unittest.TestCase):
                     send_secure_message(self.sm_form)
 
     def test_secure_message(self):
-        options = secure_message_enrolment_options(self._respondent_enrolments()[0], self.sm_form)
+        options = secure_message_enrolment_options(self._respondent_enrolments(), self.sm_form)
         self.assertEqual(options, self._expected_options())
+
+    def test_secure_message_no_enrolments(self):
+        # Given a respondent has no enrolments
+        # When secure_message_enrolment_options is called
+        options = secure_message_enrolment_options([], self.sm_form)
+        expected_options = self._expected_options()
+        expected_options["survey"].pop(1)
+
+        # Then survey should only be populated with non-survey related options (Choose a survey and Not survey related)
+        self.assertEqual(options, expected_options)
 
     def test_secure_message_subject_not_selected(self):
         self.sm_form.subject.data = ""
-        options = secure_message_enrolment_options(self._respondent_enrolments()[0], self.sm_form)
+        options = secure_message_enrolment_options(self._respondent_enrolments(), self.sm_form)
 
         expected_options = self._expected_options()
         expected_options["subject"][0]["selected"] = True

@@ -186,7 +186,7 @@ def send_secure_message(form, msg_to=["GROUP"]) -> UUID:
     return sm_v2_message_json["id"] if current_app.config["SECURE_MESSAGE_VERSION"] == "v2" else sm_v1_msg_id
 
 
-def secure_message_enrolment_options(respondent_enrolments: dict, secure_message_form: SecureMessagingForm) -> dict:
+def secure_message_enrolment_options(respondent_enrolments: list, secure_message_form: SecureMessagingForm) -> dict:
     """returns a dict of secure message options based on a respondent_enrolments"""
 
     survey_options = _create_survey_options(respondent_enrolments)
@@ -200,7 +200,7 @@ def secure_message_enrolment_options(respondent_enrolments: dict, secure_message
         ),
     }
 
-    secure_message_form.business_id = respondent_enrolments["business_id"]
+    secure_message_form.business_id = respondent_enrolments[0]["business_id"] if respondent_enrolments else None
 
     return sm_enrolment_options
 
@@ -256,10 +256,12 @@ def get_message_count_from_api(session) -> int:
         return 0
 
 
-def _create_survey_options(respondent_enrolments: dict) -> list:
+def _create_survey_options(respondent_enrolments: list) -> list:
     survey_options = [Option("Not survey related", "Not survey related")]
-    for survey in respondent_enrolments["survey_details"]:
-        survey_options.append(Option(survey["id"], survey["long_name"]))
+
+    if respondent_enrolments:
+        for survey in respondent_enrolments[0]["survey_details"]:
+            survey_options.append(Option(survey["id"], survey["long_name"]))
     return survey_options
 
 
@@ -272,8 +274,9 @@ def _create_organisation_options(business_details: list) -> list:
 
 def _create_formatted_option_list(options: list, selected: str, disabled_option: dict) -> list:
     formatted_option_list = [disabled_option]
+    sorted_options = sorted(options, key=lambda k: k.text)
 
-    for option in sorted(options, key=lambda k: k.text):
+    for option in sorted_options:
         option_dict = {"value": option.value, "text": option.text}
         if selected == option.value:
             option_dict["selected"] = True

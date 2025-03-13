@@ -5,11 +5,11 @@ metadata:
   name: {{ .Chart.Name }}-ingress
   annotations:
     kubernetes.io/ingress.global-static-ip-name: frontstage-ip
-    kubernetes.io/ingress.class: gce
     networking.gke.io/managed-certificates: {{ .Values.ingress.certNameSurveys }}
     networking.gke.io/v1beta1.FrontendConfig: {{ .Values.ingress.frontendConfigName }}
 
 spec:
+  ingressClassName: gce
   rules:
   - host: {{ .Values.ingress.host | quote }}
     http:

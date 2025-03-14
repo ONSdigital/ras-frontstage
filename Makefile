@@ -19,16 +19,15 @@ start: load-design-system-templates
 docker-test: REDIS_PORT=6379
 docker-test: test
 
-#remove -i 74735 once jinja2 is upgraded past v3.1.4
 lint:
-	pipenv check -i 74735
+	pipenv check
 	pipenv run isort .
 	pipenv run black --line-length 120 .
 	pipenv run djlint frontstage/ --ignore=H037,H021
 	pipenv run flake8
 
 lint-check: load-design-system-templates
-	pipenv check -i 74735
+	pipenv check
 	pipenv run isort . --check-only
 	pipenv run black --line-length 120 --check .
 	pipenv run djlint frontstage/ --ignore=H037,H021

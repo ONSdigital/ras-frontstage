@@ -72,7 +72,7 @@ def send_message(session) -> str:
     if len(respondent_enrolments) > 1:
         return redirect(url_for("contact_us_bp.select_organisation"))
 
-    enrolment_options = secure_message_enrolment_options(respondent_enrolments[0], secure_message_form)
+    enrolment_options = secure_message_enrolment_options(respondent_enrolments, secure_message_form)
     back_url = (
         url_for("contact_us_bp.select_organisation")
         if url_business_id

@@ -12,6 +12,7 @@ from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import party_controller, survey_controller
 from frontstage.controllers.party_controller import (
     get_business_by_id,
+    get_existing_pending_surveys,
     get_respondent_enrolments,
     get_surveys_to_transfer_map,
     register_pending_surveys,
@@ -92,9 +93,81 @@ def transfer_survey_email_entry(session):
             return render_template("surveys/surveys-transfer/recipient-email-address.html", form=form, errors=errors)
 
         flask_session["transfer_survey_recipient_email_address"] = form.data["email_address"]
+
+        existing_pending_surveys = get_existing_pending_surveys(party_id)
+
+        if existing_pending_surveys:
+            duplicate_transfers = _get_duplicate_transfers(existing_pending_surveys, form.data["email_address"])
+            if duplicate_transfers:
+                business_survey_enrolments = get_respondent_enrolments(party_id)
+                errors = {
+                    "email_address": [
+                        _build_duplicate_transfer_error_message(duplicate_transfers, business_survey_enrolments)
+                    ]
+                }
+                return render_template(
+                    "surveys/surveys-transfer/recipient-email-address.html", form=form, errors=errors
+                )
+
         return redirect(url_for("account_bp.send_transfer_instruction_get"))
 
     return render_template("surveys/surveys-transfer/recipient-email-address.html", form=form)
+
+
+def _get_duplicate_transfers(existing_pending_surveys, email_address):
+    duplicate_transfers = []
+    for existing_pending_survey in existing_pending_surveys:
+        if (
+            _existing_pending_survey_is_in_selection(
+                flask_session["surveys_to_transfer_map"],
+                existing_pending_survey["business_id"],
+                existing_pending_survey["survey_id"],
+            )
+            and existing_pending_survey["email_address"].lower() == email_address.lower()
+        ):
+            duplicate_transfers.append(
+                {
+                    "business_id": existing_pending_survey["business_id"],
+                    "survey_id": existing_pending_survey["survey_id"],
+                    "email_address": existing_pending_survey["email_address"].lower(),
+                }
+            )
+    return duplicate_transfers
+
+
+def _build_duplicate_transfer_error_message(duplicate_transfers, business_survey_enrolments):
+    error_message = "You have already shared or transferred the following surveys to this email address. "
+    error_message += "They have 72 hours to accept your request. "
+    error_message += "<br /><br />If you have made an error then wait for the share/transfer to expire or contact us."
+    error_message += "<ul>"
+    for transfer in duplicate_transfers:
+        business_name = next(
+            (
+                business["business_name"]
+                for business in business_survey_enrolments
+                if business["business_id"] == transfer["business_id"]
+            ),
+            None,
+        )
+        survey_name = next(
+            (
+                survey["long_name"]
+                for business in business_survey_enrolments
+                if business["business_id"] == transfer["business_id"]
+                for survey in business["survey_details"]
+                if survey["id"] == transfer["survey_id"]
+            ),
+            None,
+        )
+        error_message += "<li>" + business_name + " - " + survey_name + "</li>"
+    error_message += "</ul>"
+    return error_message
+
+
+def _existing_pending_survey_is_in_selection(surveys_to_transfer_map, business_id, survey_id):
+    if business_id in surveys_to_transfer_map:
+        return survey_id in surveys_to_transfer_map[business_id]
+    return False
 
 
 @account_bp.route("/transfer-surveys/send-instruction", methods=["GET"])

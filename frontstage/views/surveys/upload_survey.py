@@ -62,10 +62,10 @@ def upload_survey(session):
 
     try:
         # Upload the file to the collection instrument service
-        success, response = collection_instrument_controller.upload_collection_instrument(
+        response = collection_instrument_controller.upload_collection_instrument(
             upload_file, case, business_party, party_id, survey
         )
-        if not success:
+        if response is not None:
             # Something was wrong with the file in the CI upload process
             return redirect(
                 url_for(

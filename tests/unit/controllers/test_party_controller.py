@@ -11,8 +11,7 @@ from frontstage import app
 from frontstage.controllers import party_controller
 from frontstage.controllers.party_controller import (
     display_button,
-    get_respondent_enrolments_for_started_collex,
-    get_survey_list_details_for_party,
+    get_case_list_for_respondent,
 )
 from frontstage.exceptions.exceptions import ApiError, ServiceUnavailableException
 from tests.integration.mocked_services import (
@@ -289,23 +288,6 @@ class TestPartyController(unittest.TestCase):
                         respondent_party["id"], respondent_party["emailAddress"], status="ACTIVE"
                     )
 
-    def test_get_respondent_enrolments_for_started_collex(self):
-        """test that get_respondent_enrolments_for_started_collex will only return enrolment data
-        if we have a corresponding collex"""
-
-        collex = {"survey1": "collex1", "survey3": "collex3"}
-
-        enrolment_data = [
-            {"survey_details": {"id": "survey1"}},
-            {"survey_details": {"id": "survey2"}},
-            {"survey_details": {"id": "survey3"}},
-        ]
-
-        result = get_respondent_enrolments_for_started_collex(enrolment_data, collex)
-        self.assertEqual(len(result), 2)
-        self.assertDictEqual({"survey_details": {"id": "survey1"}}, result[0])
-        self.assertDictEqual({"survey_details": {"id": "survey3"}}, result[1])
-
     def test_display_button(self):
         Combination = namedtuple("Combination", ["status", "ci_type", "expected"])
         combinations = [
@@ -326,7 +308,7 @@ class TestPartyController(unittest.TestCase):
             self.assertEqual(display_button(combination.status, combination.ci_type), combination.expected)
 
     @patch("frontstage.controllers.party_controller.RedisCache.get_collection_instrument")
-    def test_get_survey_list_details_for_party_todo(self, get_collection_instrument):
+    def test_get_case_list_for_respondent_todo(self, get_collection_instrument):
         # Given party, collection instrument, collection exercise (lower down) and case (lower down) are mocked
         get_collection_instrument.side_effect = [{"type": "SEFT"}, {"type": "EQ"}, {"type": "EQ"}, {"type": "EQ"}]
 
@@ -404,8 +386,8 @@ class TestPartyController(unittest.TestCase):
                     "frontstage.controllers.case_controller.get_cases_for_list_type_by_party_id",
                     _get_case_return_value_by_business_id,
                 ):
-                    # when get_survey_list_details_for_party is called
-                    survey_list_details_for_party = get_survey_list_details_for_party(
+                    # when get_case_list_for_respondent is called
+                    survey_list_details_for_party = get_case_list_for_respondent(
                         self.enrolment_data(), "todo", None, None
                     )
 
@@ -413,7 +395,7 @@ class TestPartyController(unittest.TestCase):
                     self.assertEqual(list(survey_list_details_for_party), expected_response)
 
     @patch("frontstage.controllers.party_controller.RedisCache.get_collection_instrument")
-    def test_get_survey_list_details_for_party_without_enrolments(self, get_collection_instrument):
+    def test_get_case_list_for_respondents_without_enrolments(self, get_collection_instrument):
         # Given party, collection instrument and case (lower down) are mocked
         get_collection_instrument.side_effect = [{"type": "SEFT"}, {"type": "EQ"}, {"type": "EQ"}, {"type": "EQ"}]
 
@@ -426,8 +408,8 @@ class TestPartyController(unittest.TestCase):
                     "frontstage.controllers.case_controller.get_cases_for_list_type_by_party_id",
                     _get_case_return_value_by_business_id,
                 ):
-                    # when get_survey_list_details_for_party is called
-                    survey_list_details_for_party = get_survey_list_details_for_party(
+                    # when get_case_list_for_respondents is called
+                    survey_list_details_for_party = get_case_list_for_respondent(
                         [],
                         "todo",
                         None,
@@ -441,64 +423,64 @@ class TestPartyController(unittest.TestCase):
     def enrolment_data():
         return [
             {
-                "business_details": {
-                    "id": "bebee450-46da-4f8b-a7a6-d4632087f2a3",
-                    "name": "Test Business 1",
-                    "ref": "49910000014",
-                    "trading_as": "Trading as Test Business 1",
-                },
-                "survey_details": {
-                    "id": "41320b22-b425-4fba-a90e-718898f718ce",
-                    "short_name": "AIFDI",
-                    "long_name": "Annual Inward Foreign Direct Investment Survey",
-                    "ref": "062",
-                },
-                "enrolment_status": "ENABLED",
+                "business_id": "bebee450-46da-4f8b-a7a6-d4632087f2a3",
+                "business_name": "Test Business 1",
+                "ru_ref": "49910000014",
+                "trading_as": "Trading as Test Business 1",
+                "survey_details": [
+                    {
+                        "id": "41320b22-b425-4fba-a90e-718898f718ce",
+                        "short_name": "AIFDI",
+                        "long_name": "Annual Inward Foreign Direct Investment Survey",
+                        "ref": "062",
+                        "enrolment_status": "ENABLED",
+                    }
+                ],
             },
             {
-                "business_details": {
-                    "id": "fd4d0444-d40a-4c47-996a-de6f5f20658b",
-                    "name": "Test Business 2",
-                    "ref": "49900000005",
-                    "trading_as": "Trading as Test Business 2",
-                },
-                "survey_details": {
-                    "id": "02b9c366-7397-42f7-942a-76dc5876d86d",
-                    "short_name": "QBS",
-                    "long_name": "Quarterly Business Survey",
-                    "ref": "139",
-                },
-                "enrolment_status": "ENABLED",
+                "business_id": "fd4d0444-d40a-4c47-996a-de6f5f20658b",
+                "business_name": "Test Business 2",
+                "ru_ref": "49900000005",
+                "trading_as": "Trading as Test Business 2",
+                "survey_details": [
+                    {
+                        "id": "02b9c366-7397-42f7-942a-76dc5876d86d",
+                        "short_name": "QBS",
+                        "long_name": "Quarterly Business Survey",
+                        "ref": "139",
+                        "enrolment_status": "ENABLED",
+                    }
+                ],
             },
             {
-                "business_details": {
-                    "id": "3ab241f7-b5cc-4cab-a7e6-b6ad6283cbe1",
-                    "name": "Test Business 3",
-                    "ref": "49900000004",
-                    "trading_as": "Trading as Test Business 3",
-                },
-                "survey_details": {
-                    "id": "02b9c366-7397-42f7-942a-76dc5876d86d",
-                    "short_name": "QBS",
-                    "long_name": "Quarterly Business Survey",
-                    "ref": "139",
-                },
-                "enrolment_status": "ENABLED",
+                "business_id": "3ab241f7-b5cc-4cab-a7e6-b6ad6283cbe1",
+                "business_name": "Test Business 3",
+                "ru_ref": "49900000004",
+                "trading_as": "Trading as Test Business 3",
+                "survey_details": [
+                    {
+                        "id": "02b9c366-7397-42f7-942a-76dc5876d86d",
+                        "short_name": "QBS",
+                        "long_name": "Quarterly Business Survey",
+                        "ref": "139",
+                        "enrolment_status": "ENABLED",
+                    }
+                ],
             },
             {
-                "business_details": {
-                    "id": "4865ad73-684e-4c2c-ba00-aece24f1f27e",
-                    "name": "Test Business 4",
-                    "ref": "49900000001",
-                    "trading_as": "Trading as Test Business 4",
-                },
-                "survey_details": {
-                    "id": "02b9c366-7397-42f7-942a-76dc5876d86d",
-                    "short_name": "QBS",
-                    "long_name": "Quarterly Business Survey",
-                    "ref": "139",
-                },
-                "enrolment_status": "ENABLED",
+                "business_id": "4865ad73-684e-4c2c-ba00-aece24f1f27e",
+                "business_name": "Test Business 4",
+                "ru_ref": "49900000001",
+                "trading_as": "Trading as Test Business 4",
+                "survey_details": [
+                    {
+                        "id": "02b9c366-7397-42f7-942a-76dc5876d86d",
+                        "short_name": "QBS",
+                        "long_name": "Quarterly Business Survey",
+                        "ref": "139",
+                        "enrolment_status": "ENABLED",
+                    }
+                ],
             },
         ]
 

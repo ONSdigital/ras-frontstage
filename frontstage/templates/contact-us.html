@@ -1,23 +1,47 @@
 
 {% extends "layouts/_block_content.html" %}
 {% from "components/address-output/_macro.njk" import onsAddressOutput %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 
 {% set page_title = "Contact us" %}
 
-{% block main %}
+{% set breadcrumbsData = [
+    {
+        "text": "Back",
+        "url": "/sign-in/" if not authorization else request.referrer,
+        "id": "b-item"
+    }
+] %}
+{% block breadcrumbs %}
+    {{
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
+    }}
+{% endblock breadcrumbs %}
 
-    <h1 class="ons-u-fs-xl">Contact us</h1>
+{% block main %}
+    <h1 class="ons-u-fs-2xl">Contact us</h1>
+
+    {% if authorization %}
+        <h2>Message us</h2>
+        <p>We will get back to you within 5 working days</p>
+        <p><a id="contact_us" href="{{ url_for('contact_us_bp.send_message') }}">Send message</a>
+     </p>
+    {% else %}
+         <h2>Email</h2>
+         <p><a href="mailto:surveys@ons.gov.uk">surveys@ons.gov.uk</a></p>
+    {% endif %}
 
     <h2>
-        Telephone
+        Phone
     </h2>
-    <div class="ons-u-fs-r">
-        <p><a href="tel:+44-300-1234-931">0300 1234 931</a></p>
-    </div>
-    <div class="ons-u-fs-r">
-        <p class="ons-u-mb-l">Opening hours:<br />
-            Monday to Thursday 8:30am – 5pm<br/>
-            Friday 8:30am - 4:30pm</p>
+    <div class="ons-u-mb-xs">
+        <p> +44 300 1234 931<br/>
+            Monday to Thursday 8:30am to 5:00pm<br/>
+            Friday 8:30am to 4:00pm</p>
     </div>
     <h2>
         Post

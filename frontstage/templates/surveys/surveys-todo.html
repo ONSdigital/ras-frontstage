@@ -1,4 +1,5 @@
 {% extends 'layouts/_base.html' %}
+{% from "components/list/_macro.njk" import onsList %}
 
 {% set page_title = "Surveys to complete" %}
 
@@ -28,8 +29,10 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-    {% include "partials/tab_list.html" %}
 
+<div class="ons-container">
+  <div class="ons-grid">
+    <div class="ons-grid__col ons-col-8@m ">
     {% if added_survey %}
         {% call onsPanel({
             "variant": "success",
@@ -44,6 +47,48 @@
             "classes": "ons-u-mb-s"
         }) %}
                 <div id="ALREADY_ADDED_NOTIF">You have already added that <a href="#new-survey">survey</a> </div>
+        {% endcall %}
+    {% endif %}
+
+    {% if survey_shared %}
+        {% call onsPanel({
+            "variant": "success",
+            "classes": "ons-u-mb-s",
+            "iconType": 'check',
+        }) %}
+                An email with instructions has been sent
+    {% endcall %}
+    {% endif %}
+    {% if transferred_surveys %}
+        {% call onsPanel({
+            "spacious": true,
+            "id": 'transferred-id',
+            "classes": 'ons-u-mb-m'
+        }) %}
+            <p>You have requested a transfer of the following surveys: </p>
+
+            {% for business in transferred_surveys %}
+                <p>Organisation: {{ transferred_surveys[business].name }}</p>
+                <div>
+                    {% set surveyList = [] %}
+                    {% for survey in transferred_surveys[business].surveys %}
+                        {% do surveyList.append(
+                            {
+                                "text": survey['longName']
+                            }
+                        )
+                    %}
+                    {% endfor %}
+                    {{
+                        onsList({
+                            "element": 'ul',
+                            "classes": "ons-u-mb-l",
+                            "itemsList": surveyList
+                        })
+                    }}
+                </div>
+            {% endfor %}
+            <p>They will be removed from your account once the new respondents has accepted</p>
         {% endcall %}
     {% endif %}
     {% if delete_option_allowed %}
@@ -63,4 +108,8 @@
     <p class="ons-u-fs-r ons-u-mt-s ons-u-mb-l">
         Need to add a new survey? Use your enrolment code to <a id="add_survey_button" href="{{ url_for('surveys_bp.add_survey') }}">add a new survey to your account</a>.
     </p>
+    </div>
+      {% include "partials/useful_links.html" %}
+    </div>
+</div>
 {% endblock content %}

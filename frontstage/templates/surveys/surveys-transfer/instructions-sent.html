@@ -1,8 +1,25 @@
 {% extends "layouts/_block_content.html" %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/button/_macro.njk" import onsButton %}
-{% from "components/panel/_macro.njk" import onsPanel %}
 
 {% set page_title = "Instructions sent" %}
+{% set breadcrumbsData = [
+  {
+        "text": "Back",
+        "url": "/my-account/transfer-surveys/recipient-email-address",
+        "id": "b-item-1"
+    }
+] %}
+
+{% block breadcrumbs %}
+    {{
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
+    }}
+{% endblock breadcrumbs %}
 
 {% block main %}
     <h1 class="ons-u-mb-s">Instructions sent</h1>
@@ -19,10 +36,10 @@
 
     <p class="ons-u-mb-l">If they do not receive this email in 15 minutes, call us on +44 300 1234 931</p>
 
-    <div class="ons-field ons-u-mt-l">
+    <div class="ons-field">
         <div class="ons-grid ons-grid-flex ons-grid--gutterless ons-grid-flex--vertical-center ons-grid--no-wrap@s ons-u-mt-m ons-u-mb-m">
             <div class="ons-grid__col">
-                <a href="{{ url_for('account_bp.share_survey_done') }}" role="button" class="ons-btn ons-btn--link"><span class="ons-btn__inner">Back to surveys</span></a>
+                <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" role="button" class="ons-btn ons-btn--link"><span class="ons-btn__inner">Back to surveys</span></a>
             </div>
         </div>
     </div>

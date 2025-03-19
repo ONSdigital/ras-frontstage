@@ -4,25 +4,17 @@
 {% from "components/list/_macro.njk" import onsList %}
 
 {% set page_title = "Share surveys overview" %}
-{% set breadcrumbsData = [
-    {
-        "text": "Surveys",
-        "url": "/surveys/todo",
-        "id": "b-item-1"
-    },
-    {
-        "text": "Account",
-        "url": "/my-account",
-        "id": "b-item-2"
-    },
-] %}
 
 {% block breadcrumbs %}
     {{
         onsBreadcrumbs({
             "ariaLabel": "Breadcrumbs",
             "id": "breadcrumbs",
-            "itemsList": breadcrumbsData
+            "itemsList": [{
+                "text": "Back",
+                "url": "/surveys/todo",
+                "id": "b-item"
+            }]
         })
     }}
 {% endblock breadcrumbs %}
@@ -31,7 +23,7 @@
     <h1>Share access to your surveys</h1>
     {% call onsPanel({}) %}
         <p>
-            If you no longer want access to the surveys once you share them, you should <a href="{{ url_for('account_bp.transfer_survey_overview') }}">transfer your surveys</a>.
+            If you no longer want access to the surveys once you share them, you should <a href="{{ url_for('account_bp.transfer_surveys') }}">transfer your surveys</a>.
         </p>
     {% endcall %}
     <h2 class="ons-u-fs-m ons-u-mt-m">What will happen</h2>
@@ -64,7 +56,7 @@
         }}
         {{
             onsButton({
-                "url": url_for('account_bp.account'),
+                "url": "/surveys/todo",
                 "text": 'Cancel',
                 "variants": 'secondary',
                 "noIcon": true

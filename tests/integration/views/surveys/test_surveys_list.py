@@ -30,7 +30,7 @@ class TestSurveyList(unittest.TestCase):
     def tearDown(self):
         self.patcher.stop()
 
-    @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
+    @patch("frontstage.controllers.party_controller.get_case_list_for_respondent")
     @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
     def test_survey_list_todo(self, mock_request, get_respondent_enrolments, get_survey_list):
         mock_request.get(url_banner_api, status_code=404)
@@ -40,7 +40,7 @@ class TestSurveyList(unittest.TestCase):
         response = self.app.get("/surveys/todo")
         self.assertEqual(response.status_code, 200)
 
-    @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
+    @patch("frontstage.controllers.party_controller.get_case_list_for_respondent")
     @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
     def test_survey_list_history(self, mock_request, get_respondent_enrolments, get_survey_list):
         mock_request.get(url_banner_api, status_code=404)
@@ -51,7 +51,7 @@ class TestSurveyList(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
+    @patch("frontstage.controllers.party_controller.get_case_list_for_respondent")
     @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
     def test_survey_list_todo_when_no_enrolments(self, mock_request, get_respondent_enrolments, get_survey_list):
         mock_request.get(url_banner_api, status_code=404)

@@ -13,11 +13,12 @@ from frontstage.controllers.conversation_controller import (
     get_conversation_list,
     get_message_count_from_api,
     remove_unread_label,
-    send_message,
+    send_secure_message,
     try_message_count_from_session,
 )
 from frontstage.controllers.survey_controller import get_survey
 from frontstage.exceptions.exceptions import ApiError
+from frontstage.models import SecureMessagingForm
 from frontstage.views.secure_messaging import secure_message_bp
 from frontstage.views.template_helper import render_template
 from strtobool import strtobool
@@ -39,6 +40,7 @@ def view_conversation(session, thread_id):
     # sets appropriate message category
     category = "SURVEY" if is_survey_category else conversation["category"]
     logger.info("Successfully retrieved conversation", thread_id=thread_id, party_id=party_id)
+
     try:
         refined_conversation = [refine(message) for message in reversed(conversation["messages"])]
     except KeyError:
@@ -48,15 +50,19 @@ def view_conversation(session, thread_id):
     if refined_conversation[-1]["unread"]:
         remove_unread_label(refined_conversation[-1]["message_id"])
     error = None
+
+    business_id = refined_conversation[0].get("ru_ref")
+    survey_id = refined_conversation[0].get("survey_id")
+    subject = refined_conversation[0].get("subject")
+
     if not conversation["is_closed"] and request.method == "POST":
-        subject = refined_conversation[0].get("subject")
-        survey_id = refined_conversation[0].get("survey_id")
-        business_id = refined_conversation[0].get("ru_ref")
         msg_to = get_msg_to(refined_conversation)
+        secure_message_form = SecureMessagingForm(request.form)
+        secure_message_form.party_id = party_id
+        secure_message_form.category = category
+
         try:
-            send_message(
-                request.form, party_id, subject, category, msg_to=msg_to, survey_id=survey_id, business_id=business_id
-            )
+            send_secure_message(secure_message_form, msg_to=msg_to)
             thread_url = url_for("secure_message_bp.view_conversation", thread_id=thread_id)
             flash(Markup(f"Message sent. <a href={thread_url}>View Message</a>"))
             return redirect(url_for("secure_message_bp.view_conversation_list"))
@@ -88,6 +94,9 @@ def view_conversation(session, thread_id):
         survey_name=survey_name,
         business_name=business_name,
         category=category,
+        business_id=business_id,
+        survey_id=survey_id,
+        subject=subject,
     )
 
 

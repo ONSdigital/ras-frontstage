@@ -65,6 +65,18 @@ def upload_survey(session):
         response = collection_instrument_controller.upload_collection_instrument(
             upload_file, case, business_party, party_id, survey
         )
+        if response is not None:
+            # Something was wrong with the file in the CI upload process
+            return redirect(
+                url_for(
+                    "surveys_bp.upload_failed",
+                    _external=True,
+                    case_id=case_id,
+                    business_party_id=business_party_id,
+                    survey_short_name=survey_short_name,
+                    error_info=response,
+                )
+            )
     except CiUploadError as ex:
         # Something went wrong in the CI service
         error_type = determine_error_type(ex)
@@ -86,18 +98,7 @@ def upload_survey(session):
                 error_info=error_type,
             )
         )
-    if response is not None:
-        # Something was wrong with the file in the CI upload process
-        return redirect(
-            url_for(
-                "surveys_bp.upload_failed",
-                _external=True,
-                case_id=case_id,
-                business_party_id=business_party_id,
-                survey_short_name=survey_short_name,
-                error_info=response,
-            )
-        )
+
     logger.info("Successfully uploaded collection instrument", party_id=party_id, case_id=case_id)
     unread_message_count = {"unread_message_count": conversation_controller.try_message_count_from_session(session)}
     return render_template(

@@ -8,14 +8,9 @@
 {% set page_title = "Change contact details" %}
 {% set breadcrumbsData = [
     {
-        "text": "Surveys",
-        "url": "/surveys/todo",
-        "id": "b-item-1"
-    },
-    {
-        "text": "Account",
+        "text": "Back",
         "url": "/my-account",
-        "id": "b-item-2"
+        "id": "b-item-1"
     }
 ] %}
 
@@ -31,25 +26,18 @@
 
 {% block main %}
     {% if errors|length > 0 %}
-        {% if errors|length == 1 %}
-            {% set errorTitle = 'There is 1 error on this page' %}
-        {% elif errors|length > 1 %}
-            {% set errorTitle = 'There are ' ~ errors|length ~ ' errors on this page' %}
-        {% endif %}
         {% call
             onsPanel({
                 "variant": "error",
                 "classes": "ons-u-mb-s",
-                "title": errorTitle
+                "title": "There is a problem with your answer"
             })
         %}
-            <p>These <strong>must be corrected</strong> to continue.</p>
             {% set errorData = [] %}
             {% for error in errors %}
-                {% set error_text =  error %}
                 {% do errorData.append(
                     {
-                        "text": 'Problem with the ' ~ error_text.replace('_', ' '),
+                        "text": error[0],
                         "url": "#" ~ error ~ '_error',
                         "classes": "ons-js-inpagelink"
                     }
@@ -117,6 +105,22 @@
                 "value": emailAddress,
             })
         }}
+        {% if errors.email_address %}
+            {% set confirmErrorEmailAddress = { "text": errors['confirm_email_address'][0],  "id": 'confirm_email_address_error' } %}
+            {% set confirmEmailAddress = form.confirm_email_address.data %}
+        {% endif %}
+        {{
+            onsInput({
+                "id": "confirm_email_address",
+                "name": "confirm_email_address",
+                "type": "text",
+                "label": {
+                    "text": 'Confirm email address'
+                },
+                "error": errorConfirmEmailAddress,
+                "value": confirmEmailAddress,
+            })
+        }}
         {% set phoneNumber = respondent.telephone %}
         {% if errors.phone_number %}
             {% set errorPhoneNumber = { "text": errors['phone_number'][0],  "id": 'phone_number_error' } %}
@@ -130,7 +134,8 @@
                 "autocomplete": "tel",
                 "classes": "input--w-8",
                 "label": {
-                    "text": 'Phone number'
+                    "text": "Phone number",
+                    "description": "We will use this number if we need to contact you about your answers. </br>For international numbers include the country code."
                 },
                 "error": errorPhoneNumber,
                 "value": phoneNumber
@@ -139,18 +144,9 @@
         <div class="ons-field ons-u-mt-l">
             {{
                 onsButton({
-                    "text": "Save",
+                    "text": "Change details",
                     "id": "btn-option-save",
                     "submitType": "timer"
-                })
-            }}
-            {{
-                onsButton({
-                    "id": "btn-account-change-detail-cancel",
-                    "url": url_for('account_bp.account'),
-                    "text": 'Cancel',
-                    "variants": 'secondary',
-                    "noIcon": true
                 })
             }}
         </div>

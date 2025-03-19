@@ -292,30 +292,38 @@ class ContactDetailsChangeForm(FlaskForm):
     first_name = StringField(
         _("First name"),
         validators=[
-            DataRequired(_("First name is required")),
+            DataRequired(_("Enter your first name")),
             Length(max=254, message=_("Your first name must be less than 254 " "characters")),
         ],
     )
     last_name = StringField(
         _("Last name"),
         validators=[
-            DataRequired(_("Last name is required")),
+            DataRequired(_("Enter your last name")),
             Length(max=254, message=_("Your last name must be less than 254 characters")),
         ],
     )
     phone_number = StringField(
         _("Telephone number"),
         validators=[
-            DataRequired(_("Phone number is required")),
-            Length(min=9, max=15, message=_("This should be a valid phone number between 9 and 15 " "digits")),
+            DataRequired(_("Enter a phone number")),
+            Length(min=9, max=15, message=_("Enter a 9 to 15 digit number")),
         ],
         default=None,
     )
     email_address = StringField(
         _("Email address"),
         validators=[
-            DataRequired(_("Email address is required")),
-            Email(message=_("Invalid email address")),
+            DataRequired(_("Enter an email address")),
+            Email(message=_("Enter an email address in the correct format, for example, name@example.com")),
+            Length(max=254, message=_("Your email must have fewer than 254 characters")),
+        ],
+    )
+    confirm_email_address = StringField(
+        _("Confirm email address"),
+        validators=[
+            DataRequired(_("Enter email addresses that match")),
+            EqualTo("email_address", "Enter email addresses that match"),
             Length(max=254, message=_("Your email must have fewer than 254 characters")),
         ],
     )

@@ -40,7 +40,7 @@ class TestUploadSurvey(unittest.TestCase):
 
     @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
     @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
-    def test_upload_survey_success(self, mock_request, *_, upload_collection_instrument):
+    def test_upload_survey_success(self, mock_request, _, upload_collection_instrument):
         mock_request.get(
             f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True",
             json=business_party,

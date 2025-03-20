@@ -62,10 +62,10 @@ def upload_survey(session):
 
     try:
         # Upload the file to the collection instrument service
-        response = collection_instrument_controller.upload_collection_instrument(
+        error_text = collection_instrument_controller.upload_collection_instrument(
             upload_file, case, business_party, party_id, survey
         )
-        if response is not None:
+        if error_text is not None:
             # Something was wrong with the file in the CI upload process
             return redirect(
                 url_for(
@@ -74,7 +74,7 @@ def upload_survey(session):
                     case_id=case_id,
                     business_party_id=business_party_id,
                     survey_short_name=survey_short_name,
-                    error_info=response,
+                    error_info=error_text,
                 )
             )
     except CiUploadError as ex:

@@ -16,7 +16,7 @@ from frontstage.exceptions.exceptions import ApiError, CiUploadError
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-INVALID_UPLOAD = "The upload must have valid case_id and a file attached"
+INVALID_UPLOAD = "The upload must have a file attached"
 MISSING_DATA = "Data needed to create the file name is missing"
 UPLOAD_SUCCESSFUL = "Upload successful"
 UPLOAD_UNSUCCESSFUL = "Upload failed"
@@ -101,7 +101,7 @@ def upload_collection_instrument(file, case: dict, business_party: dict, party_i
 
         if not is_valid_file:
             ci_post_case_event(case_id, party_id, "UNSUCCESSFUL_RESPONSE_UPLOAD")
-            raise CiUploadError(msg)
+            return msg
 
         survey_ref = survey.get("surveyRef")
         file_name = gcp_survey_response.create_file_name_for_upload(case, business_party, file_extension, survey_ref)
@@ -113,16 +113,17 @@ def upload_collection_instrument(file, case: dict, business_party: dict, party_i
             gcp_survey_response.upload_seft_survey_response(case, file_contents, file_name, survey_ref)
             ci_post_case_event(case_id, party_id, "SUCCESSFUL_RESPONSE_UPLOAD")
             logger.info("Successfully uploaded collection instrument", case_id=case_id, party_id=party_id)
+            return None
         except FileTooSmallError:
             ci_post_case_event(case_id, party_id, "UNSUCCESSFUL_RESPONSE_UPLOAD")
-            raise CiUploadError(FILE_TOO_SMALL)
+            return FILE_TOO_SMALL
         except SurveyResponseError:
             ci_post_case_event(case_id, party_id, "UNSUCCESSFUL_RESPONSE_UPLOAD")
             raise CiUploadError(UPLOAD_UNSUCCESSFUL)
     else:
-        logger.info("Either case_id, file or file attributes are missing.")
+        logger.info(INVALID_UPLOAD, case_id=case_id, party_id=party_id)
         ci_post_case_event(case_id, party_id, "UNSUCCESSFUL_RESPONSE_UPLOAD")
-        raise CiUploadError(INVALID_UPLOAD)
+        return INVALID_UPLOAD
 
 
 def ci_post_case_event(case_id, party_id, category):

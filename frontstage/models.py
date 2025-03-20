@@ -5,14 +5,7 @@ import phonenumbers
 from flask_wtf import FlaskForm
 from phonenumbers.phonenumberutil import NumberParseException
 from structlog import wrap_logger
-from wtforms import (
-    HiddenField,
-    PasswordField,
-    RadioField,
-    StringField,
-    SubmitField,
-    TextAreaField,
-)
+from wtforms import HiddenField, PasswordField, RadioField, StringField, TextAreaField
 from wtforms.validators import Email, EqualTo, Length, ValidationError
 
 from frontstage import app
@@ -194,18 +187,26 @@ class ResetPasswordForm(FlaskForm):
 
 
 class SecureMessagingForm(FlaskForm):
-    send = SubmitField(label=_("Send"), id="send-message-btn")
-    subject = StringField(_("Subject"))
+    subject = StringField(validators=[DataRequired("Select the subject")])
     body = TextAreaField(
-        _("Message"),
         validators=[
-            DataRequired(_("Message is required")),
-            Length(max=50000, message=_("Message must be less than 50000 " "characters")),
+            DataRequired("Message cannot be left blank"),
+            Length(max=50000, message="Message must be less than 50000 characters"),
         ],
     )
-    msg_id = HiddenField("Message id")
-    thread_id = HiddenField("Thread id")
-    hidden_subject = HiddenField("Hidden Subject")
+    business_id = StringField(validators=[DataRequired("Select the business")])
+    survey_id = StringField()
+    category = StringField()
+    party_id = StringField()
+    thread_id = HiddenField()
+
+    def validate_survey_id(form, field):
+        if form.category == "SURVEY" and not field.data:
+            raise ValidationError("Select the survey")
+
+
+class OrganisationForm(FlaskForm):
+    business_id = StringField(validators=[DataRequired("Select the organisation")])
 
 
 class RespondentStatus(enum.IntEnum):

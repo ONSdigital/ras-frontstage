@@ -63,10 +63,6 @@
                     {% else %}
                         {% set msgType = 'sent' %}
                     {% endif %}
-                    {% if loop.last %}
-                        <div name="latest-message" id="latest-message">
-                    {% endif %}
-
                     {% call onsMessage({
                         "variant": msgType,
                         "id": 'conversation-message-' + loop.index|string,
@@ -78,13 +74,10 @@
                         "sentValue": message.get('sent_date'),
                         "sentName": 'sm-sent-date',
                         "sentId": 'sm-sent-date-' + loop.index|string,
-                        "messageID": 'conversation-message-body-' + loop.index|string
+                        "messageId": 'conversation-message-body-' + loop.index|string
                     }) %}
                         <span style="white-space:pre-line">{{ message.get('body') }}</span>
                     {% endcall %}
-                    {% if loop.last %}
-                        </div>
-                    {% endif %}
                 {% endfor %}
 
                 {% if not conversation_data.is_closed %}
@@ -97,6 +90,9 @@
                         <form action="{{ url_for('secure_message_bp.view_conversation', thread_id=conversation[0].thread_id) }}" method="post" id="create-message-form">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <input type="hidden" name="thread_id" value="{{ conversation[0].thread_id }}"/>
+                            <input type="hidden" name="business_id" value="{{ business_id }}"/>
+                            <input type="hidden" name="survey_id" value="{{ survey_id }}"/>
+                            <input type="hidden" name="subject" value="{{ subject }}"/>
                             {{
                                 onsTextarea({
                                     "id": "secure-message-body",
@@ -105,7 +101,7 @@
                                         "text": "Reply"
                                     },
                                     "charCheckLimit": false,
-                                    "maxlength": '50000',
+                                    "maxLength": '50000',
                                     "error": form_error
                                 })
                             }}

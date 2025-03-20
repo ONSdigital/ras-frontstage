@@ -1,5 +1,6 @@
 import json
 import logging
+from collections import namedtuple
 from json import JSONDecodeError
 from uuid import UUID
 
@@ -28,6 +29,23 @@ class InvalidSecureMessagingForm(Exception):
 
 
 logger = wrap_logger(logging.getLogger(__name__))
+
+NOT_SURVEY_RELATED = "Not survey related"
+
+Option = namedtuple("Option", ["value", "text"])
+
+ORGANISATION_DISABLED_OPTION = {"value": "Choose an organisation", "text": "Choose an organisation", "disabled": True}
+SURVEY_DISABLED_OPTION = {"value": "Choose a survey", "text": "Choose a survey", "disabled": True}
+SUBJECT_DISABLED_OPTION = {"value": "Choose a subject", "text": "Choose a subject", "disabled": True}
+
+SUBJECT_OPTIONS = [
+    Option("Help with my survey", "Help with my survey"),
+    Option("Technical difficulties", "Technical difficulties"),
+    Option("Change business address", "Change business address"),
+    Option("Feedback", "Feedback"),
+    Option("Help transferring or sharing access to a survey", "Help transferring or sharing access to a survey"),
+    Option("Something else", "Something else"),
+]
 
 
 def _get_session():
@@ -90,38 +108,28 @@ def get_conversation_list(params):
         raise NoMessagesError
 
 
-def send_message(
-    form,
-    party_id: UUID,
-    subject: str,
-    category: str,
-    msg_to=["GROUP"],
-    survey_id: UUID = None,
-    business_id: UUID = None,
-    ce_id: UUID = None,
-) -> UUID:
+def send_secure_message(form, msg_to=["GROUP"]) -> UUID:
     """
     Creates a message in the secure-message service
     """
 
-    secure_message_form = SecureMessagingForm(form)
-    if not secure_message_form.validate():
-        raise InvalidSecureMessagingForm(secure_message_form.errors)
+    if not form.validate():
+        raise InvalidSecureMessagingForm(form.errors)
 
-    body = secure_message_form["body"].data
-    thread_id = secure_message_form["thread_id"].data
+    survey_id = None if form.survey_id.data == NOT_SURVEY_RELATED else form.survey_id.data
+    business_id = form.business_id.data
     sm_version = current_app.config["SECURE_MESSAGE_VERSION"]
     session = _get_session()
     headers = _create_send_message_headers()
 
     if sm_version in ("v1", "both"):
         sm_v1_message_json = {
-            "msg_from": party_id,
+            "msg_from": form.party_id,
             "msg_to": msg_to,
-            "subject": subject,
-            "category": category,
-            "body": body,
-            "thread_id": thread_id,
+            "subject": form.subject.data,
+            "category": form.category,
+            "body": form["body"].data,
+            "thread_id": form.thread_id.data,
         }
 
         if survey_id:
@@ -134,7 +142,7 @@ def send_message(
         try:
             response.raise_for_status()
         except HTTPError:
-            logger.error("Message sending failed due to API Error", party_id=party_id, exc_info=True)
+            logger.error("Message sending failed due to API Error", party_id=form.party_id)
             raise ApiError(logger, response)
 
         sm_v1_msg_id = response.json()["msg_id"]
@@ -142,20 +150,25 @@ def send_message(
         logger.info(
             "Secure message sent successfully",
             message_id=sm_v1_msg_id,
-            party_id=party_id,
-            category=category,
+            party_id=form.party_id,
+            category=form.category,
             survey_id=survey_id,
             business_id=business_id,
-            ce_id=ce_id,
         )
 
     if current_app.config["SECURE_MESSAGE_VERSION"] in ("v2", "both"):
+        # This code was added due to an issue between the crossover of SM V1 and SM V2. The problem is outlined below:
+        # SM V1 stores empty survey_ids as empty strings whereas SM V2 uses a 'None' value.
+        # So this will break SM V2 which is implemented to except optional UUIDs.
+        if survey_id == "":
+            survey_id = None
+
         sm_v2_thread = {
-            "subject": subject,
-            "category": category,
+            "subject": form.subject.data,
+            "category": form.category,
             "ru_ref": business_id,
             "survey_id": survey_id,
-            "respondent_id": party_id,
+            "respondent_id": form.party_id,
             "is_read_by_respondent": False,
             "is_read_by_internal": False,
         }
@@ -163,14 +176,39 @@ def send_message(
 
         sm_v2_message = {
             "thread_id": sm_v2_thread_json["id"],
-            "body": body,
+            "body": form["body"].data,
             "is_from_internal": False,
-            "sent_by": party_id,
+            "sent_by": form.party_id,
         }
 
         sm_v2_message_json = _post_to_secure_message_v2_messages(session, headers, sm_v2_message)
 
     return sm_v2_message_json["id"] if current_app.config["SECURE_MESSAGE_VERSION"] == "v2" else sm_v1_msg_id
+
+
+def secure_message_enrolment_options(respondent_enrolments: list, secure_message_form: SecureMessagingForm) -> dict:
+    """returns a dict of secure message options based on a respondent_enrolments"""
+
+    survey_options = _create_survey_options(respondent_enrolments)
+
+    sm_enrolment_options = {
+        "survey": _create_formatted_option_list(
+            survey_options, secure_message_form.survey_id.data, SURVEY_DISABLED_OPTION
+        ),
+        "subject": _create_formatted_option_list(
+            SUBJECT_OPTIONS, secure_message_form.subject.data, SUBJECT_DISABLED_OPTION
+        ),
+    }
+
+    secure_message_form.business_id = respondent_enrolments[0]["business_id"] if respondent_enrolments else None
+
+    return sm_enrolment_options
+
+
+def secure_message_organisation_options(business_details: list) -> list:
+    """returns a dict of organisation_options based on a business_details"""
+    organisation_options = _create_organisation_options(business_details)
+    return _create_formatted_option_list(organisation_options, "", ORGANISATION_DISABLED_OPTION)
 
 
 def try_message_count_from_session(session):
@@ -216,6 +254,38 @@ def get_message_count_from_api(session) -> int:
                 "An unknown error has occurred getting message count from secure-message api", party_id=party_id
             )
         return 0
+
+
+def _create_survey_options(respondent_enrolments: list) -> list:
+    survey_options = [Option("Not survey related", "Not survey related")]
+
+    if respondent_enrolments:
+        for survey in respondent_enrolments[0]["survey_details"]:
+            survey_options.append(Option(survey["id"], survey["long_name"]))
+    return survey_options
+
+
+def _create_organisation_options(business_details: list) -> list:
+    organisation_options = []
+    for business in business_details:
+        organisation_options.append(Option(business["business_id"], business["business_name"]))
+    return organisation_options
+
+
+def _create_formatted_option_list(options: list, selected: str, disabled_option: dict) -> list:
+    formatted_option_list = [disabled_option]
+    sorted_options = sorted(options, key=lambda k: k.text)
+
+    for option in sorted_options:
+        option_dict = {"value": option.value, "text": option.text}
+        if selected == option.value:
+            option_dict["selected"] = True
+        formatted_option_list.append(option_dict)
+
+    if not selected:
+        formatted_option_list[0]["selected"] = True
+
+    return formatted_option_list
 
 
 def _create_get_conversation_headers(encoded_jwt=None) -> dict:

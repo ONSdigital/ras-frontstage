@@ -4,30 +4,16 @@
 {% from "components/checkboxes/_macro.njk" import onsCheckboxes %}
 {% from "components/button/_macro.njk" import onsButton %}
 {% set page_title = "Survey share business select" %}
-{% set breadcrumbsData = [
-    {
-        "text": "Surveys",
-        "url": "/surveys/todo",
-        "id": "b-item-1"
-    },
-    {
-        "text": "Account",
-        "url": "/my-account",
-        "id": "b-item-2"
-    },
-    {
-        "text": "Share Surveys",
-        "url": "/my-account/share-surveys",
-        "id": "b-item-3"
-    }
-] %}
-
 {% block breadcrumbs %}
     {{
         onsBreadcrumbs({
             "ariaLabel": "Breadcrumbs",
             "id": "breadcrumbs",
-            "itemsList": breadcrumbsData
+            "itemsList": [{
+                "text": "Back",
+                "url": "/my-account/share-surveys",
+                "id": "b-item"
+            }]
         })
     }}
 {% endblock breadcrumbs %}
@@ -53,12 +39,12 @@
         {% for business in businesses %}
             {% do checkboxData.append(
                 {
-                    "id": business['id']|string,
+                    "id": business["business_id"],
                     "name": "checkbox-answer",
                     "label": {
-                        "text": business['name']
+                        "text": business["business_name"]
                     },
-                    "value": business['id']|string
+                    "value": business["business_id"]
                 }
             ) %}
         {% endfor %}

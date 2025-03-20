@@ -7,6 +7,7 @@ from frontstage import app
 from tests.integration.mocked_services import (
     business_party,
     encoded_jwt_token,
+    respondent_enrolments,
     respondent_party,
     survey,
     url_banner_api,
@@ -65,23 +66,25 @@ class TestShareSurvey(unittest.TestCase):
         self.patcher.stop()
 
     @requests_mock.mock()
-    def test_share_survey_business_select(self, mock_request):
+    @patch("frontstage.views.account.account_survey_share.get_respondent_enrolments")
+    def test_share_survey_business_select(self, mock_request, get_respondent_enrolments):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_business_details, status_code=200, json=[dummy_business])
+        get_respondent_enrolments.return_value = respondent_enrolments
         response = self.app.get("/my-account/share-surveys/business-selection")
         self.assertEqual(response.status_code, 200)
         self.assertTrue("For which business do you want to share your surveys?".encode() in response.data)
         self.assertTrue("Select all that apply".encode() in response.data)
-        self.assertTrue("RUNAME1_COMPANY1 RUNNAME2_COMPANY1".encode() in response.data)
+        self.assertTrue("Business 1".encode() in response.data)
         self.assertTrue("Continue".encode() in response.data)
         self.assertTrue("Cancel".encode() in response.data)
 
     @requests_mock.mock()
-    def test_share_survey_business_select_no_option_selected(self, mock_request):
+    @patch("frontstage.views.account.account_survey_share.get_respondent_enrolments")
+    def test_share_survey_business_select_no_option_selected(self, mock_request, get_respondent_enrolments):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_get_business_details, status_code=200, json=[dummy_business])
+        get_respondent_enrolments.return_value = respondent_enrolments
         response = self.app.post(
             "/my-account/share-surveys/business-selection", data={"option": None}, follow_redirects=True
         )
@@ -90,33 +93,35 @@ class TestShareSurvey(unittest.TestCase):
         self.assertIn("You need to choose a business".encode(), response.data)
 
     @requests_mock.mock()
-    def test_share_survey_select(self, mock_request):
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    def test_share_survey_select(self, mock_request, get_respondent_enrolments):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
         mock_request.get(url_get_business_details, status_code=200, json=[business_party])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
+        get_respondent_enrolments.return_value = respondent_enrolments
         response = self.app.post(
             "/my-account/share-surveys/business-selection",
             data={"checkbox-answer": "99941a3f-8e32-40e4-b78a-e039a2b437ca"},
             follow_redirects=True,
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Which surveys do you want to share?".encode(), response.data)
-        self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
+        self.assertIn("Share access to surveys".encode(), response.data)
+        self.assertIn("Survey 1".encode(), response.data)
         self.assertIn("Select all that apply".encode(), response.data)
-        self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
-        self.assertIn("Quarterly Business Survey".encode(), response.data)
+        self.assertIn("Survey 2".encode(), response.data)
         self.assertTrue("Continue".encode() in response.data)
-        self.assertTrue("Cancel".encode() in response.data)
 
     @requests_mock.mock()
-    def test_share_survey_select_no_option_selected(self, mock_request):
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    def test_share_survey_select_no_option_selected(self, mock_request, get_respondent_enrolments):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
         mock_request.get(url_get_business_details, status_code=200, json=[business_party])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
+        get_respondent_enrolments.return_value = respondent_enrolments
         with self.app.session_transaction() as mock_session:
             mock_session["share_survey_data"] = {business_party["id"]: None}
         response = self.app.post(
@@ -143,23 +148,25 @@ class TestShareSurvey(unittest.TestCase):
             follow_redirects=True,
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Enter recipient's email address".encode(), response.data)
-        self.assertIn(
-            "We need the email address of the person who will be responding to your surveys.".encode(), response.data
-        )
-        self.assertIn("Enter email address".encode(), response.data)
-        self.assertIn("Make sure you have their permission to give us their email address.".encode(), response.data)
+        self.assertIn("Back".encode(), response.data)
+        self.assertIn("New respondents email address".encode(), response.data)
+        self.assertIn("We will send instructions to the email address that you provide.".encode(), response.data)
+        self.assertIn("New respondents email address".encode(), response.data)
+        self.assertIn("Make sure you have permission to give us their email address.".encode(), response.data)
         self.assertTrue("Continue".encode() in response.data)
-        self.assertTrue("Cancel".encode() in response.data)
 
     @requests_mock.mock()
-    def test_share_survey_select_option_selected_fails_max_user_validation(self, mock_request):
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    def test_share_survey_select_option_selected_fails_max_user_validation(
+        self, mock_request, get_respondent_enrolments
+    ):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
         mock_request.get(url_get_business_details, status_code=200, json=[business_party])
         mock_request.get(url_get_survey, status_code=200, json=survey)
         mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
         mock_request.get(url_get_user_count, status_code=200, json=52)
+        get_respondent_enrolments.return_value = respondent_enrolments
         with self.app.session_transaction() as mock_session:
             mock_session["share_survey_data"] = {business_party["id"]: None}
         response = self.app.post(
@@ -226,14 +233,15 @@ class TestShareSurvey(unittest.TestCase):
             follow_redirects=True,
         )
         self.assertEqual(response.status_code, 200)
+        self.assertIn("Back".encode(), response.data)
         self.assertIn("Send instructions".encode(), response.data)
         self.assertIn(
-            "will send an email to <strong>a@a.com</strong> with instructions to access the following surveys:".encode(),
+            "We will email a link with instructions to <strong>a@a.com</strong>.".encode(),
             response.data,
         )
+        self.assertIn("Once approved, they will have access to: ".encode(), response.data)
         self.assertIn("Monthly Survey of Building Materials Bricks".encode(), response.data)
         self.assertTrue("Send".encode() in response.data)
-        self.assertTrue("Cancel".encode() in response.data)
 
     @requests_mock.mock()
     def test_share_survey_share_instruction_done(self, mock_request):
@@ -251,16 +259,14 @@ class TestShareSurvey(unittest.TestCase):
             "/my-account/share-surveys/send-instruction", data={"email_address": "a@a.com"}, follow_redirects=True
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn(
-            "We have sent an email to the new person who will be responding to ONS surveys.".encode(), response.data
-        )
+        self.assertIn("An email with instructions has been sent to <strong>a@a.com</strong>.".encode(), response.data)
         self.assertTrue(
-            "They need to follow the link in the email to confirm their email address and finish setting "
-            "up their account.".encode() in response.data
+            "They will need to follow the link in this email to confirm their email address and finish setting up "
+            "their account.".encode() in response.data
         )
-        self.assertIn("Email not arrived? It may be in their junk folder.".encode(), response.data)
+        self.assertIn("This email might go to a junk or spam folder.".encode(), response.data)
         self.assertIn(
-            "If it does not arrive in the next 15 minutes, please call 0300 1234 931.".encode(), response.data
+            "If they do not receive this email in 15 minutes, call us on +44 300 1234 931".encode(), response.data
         )
         self.assertTrue("Back to surveys".encode() in response.data)
 

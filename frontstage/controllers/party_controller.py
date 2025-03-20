@@ -3,14 +3,22 @@ import logging
 
 import requests
 from flask import current_app as app
+from requests.exceptions import ConnectionError, HTTPError, Timeout
 from structlog import wrap_logger
 from werkzeug.exceptions import NotFound
 
 from frontstage.common.thread_wrapper import ThreadWrapper
 from frontstage.common.utilities import obfuscate_email
 from frontstage.common.verification import decode_email_token
-from frontstage.controllers import case_controller, survey_controller
-from frontstage.exceptions.exceptions import ApiError, UserDoesNotExist
+from frontstage.controllers import case_controller
+from frontstage.controllers.collection_exercise_controller import (
+    get_collection_exercises_for_surveys,
+)
+from frontstage.exceptions.exceptions import (
+    ApiError,
+    ServiceUnavailableException,
+    UserDoesNotExist,
+)
 
 CLOSED_STATE = ["COMPLETE", "COMPLETEDBYPHONE", "NOLONGERREQUIRED"]
 
@@ -20,7 +28,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 def get_respondent_party_by_id(party_id: str) -> dict:
     logger.info("Retrieving party from party service by id", party_id=party_id)
 
-    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/id/{party_id}"
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/party_id/{party_id}"
     response = requests.get(url, auth=app.config["BASIC_AUTH"])
 
     if response.status_code == 404:
@@ -33,6 +41,29 @@ def get_respondent_party_by_id(party_id: str) -> dict:
         raise ApiError(logger, response)
 
     logger.info("Successfully retrieved party details", party_id=party_id)
+    return response.json()
+
+
+def get_respondent_enrolments(party_id: str, payload: dict = {}) -> dict:
+    payload["status"] = "ENABLED"
+    url = f"{app.config['PARTY_URL']}/party-api/v1/enrolments/respondent/{party_id}"
+
+    try:
+        response = requests.get(url, auth=app.config["BASIC_AUTH"], json=payload)
+        response.raise_for_status()
+    except HTTPError as e:
+        logger.error(
+            "HTTPError returned from Party service when getting respondent enabled enrolments",
+            status_code=e.response.status_code,
+            party_id=party_id,
+            payload=payload,
+        )
+        raise ApiError(logger, response)
+    except ConnectionError:
+        raise ServiceUnavailableException("Party service returned a connection error", 503)
+    except Timeout:
+        raise ServiceUnavailableException("Party service has timed out", 504)
+
     return response.json()
 
 
@@ -299,52 +330,19 @@ def confirm_pending_survey(batch_number):
     return response
 
 
-def get_respondent_enrolments(respondent: dict):
-    """
-    Returns a generator containing all the business_id and survey_id for all the active enrolments for the
-    respondent.
-
-    :param respondent: A dict containing respondent data
-    """
-    if "associations" in respondent:
-        for association in respondent["associations"]:
-            for enrolment in association["enrolments"]:
-                if enrolment["enrolmentStatus"] == "ENABLED":
-                    yield {"business_id": association["partyId"], "survey_id": enrolment["surveyId"]}
-
-
-def get_respondent_enrolments_for_started_collex(enrolment_data, collection_exercises):
-    """This will only filter out enrolments for surveys that have 0 live collection exercises.
-
-    Needed because enrolment_data includes not started enrolments ,
-    but cache_collex only contains started collex. Hence indexing collex by enrolment[survey] causes a 500
-
-    :param enrolment_data: A list of enrolments.
-    :type enrolment_data: list
-    :param collection_exercises: A list of collection exercises.
-    :type collection_exercises: list
-    :return: list of enrolments corresponding to the known collection exercises
-    """
-
-    enrolments = []
-    for enrolment in enrolment_data:
-        if enrolment["survey_id"] in collection_exercises:
-            enrolments.append(enrolment)
-    return enrolments
-
-
-def get_unique_survey_and_business_ids(enrolment_data):
+def get_unique_survey_and_business_ids(respondent_enrolments):
     """Takes a list of enrolment data and returns 2 unique sets of business_id and party_id's
 
     :param enrolment_data: A list of enrolments
     :return: A pair of sets with deduplicated survey_id's and business_id's
     """
-
     surveys_ids = set()
     business_ids = set()
-    for enrolment in enrolment_data:
-        surveys_ids.add(enrolment["survey_id"])
-        business_ids.add(enrolment["business_id"])
+
+    for respond_enrolment in respondent_enrolments:
+        for survey in respond_enrolment["survey_details"]:
+            surveys_ids.add(survey["id"])
+        business_ids.add(respond_enrolment["business_id"])
     return surveys_ids, business_ids
 
 
@@ -365,44 +363,35 @@ def caching_case_data(cache_data, business_ids, tag):
         thread.join()
 
 
-def get_survey_list_details_for_party(respondent: dict, tag: str, business_party_id: str, survey_id: str):
+def get_case_list_for_respondent(respondent_enrolments: list, tag: str, business_party_id: str, survey_id: str):
     """
-    Gets a list of cases (and any useful metadata) for a respondent.  Depending on the tag the list of cases will be
-    ones that require action (in the form of an EQ or SEFT submission); Or they will be cases that have been completed
-    and are used to see what has been submitted in the past.
+    Gets a list of cases for a respondent.
 
-    This function uses caching to get data from Case, Party, Collection exercise, Survey and
-    Collection Instrument services. Without this, respondents with a large number of cases can experience page timeouts
-    as it'll take too long to load due to repeated calls for the same information from the services.
-
-    There isn't a direct link between respondent and the cases they're involved in.  Instead we can work out what
+    There isn't a direct link between respondent and the cases they're involved in, but we can work out what
     cases they're involved in via an implicit and indirect link between:
         - The combination of survey and business a respondent is enrolled for, and;
         - the cases and collection exercises the business is involved in
 
     The algorithm for determining this is roughly:
       - Get all survey enrolments for the respondent
-      - For each enrolment:
-          - Get the business details the enrolment is for
-          - Get the live collection exercises for the survey the enrolment is for
-          - Get the cases the business is part of, from the list of collection exercises. Note, this isn't every case
+      - Get the live collection exercises for the survey the enrolment is for
+      - Get the cases the business is part of, from the list of collection exercises. Note, this isn't every case
             against the business; depending on if you're looking at the to-do or history page, you'll get a different
             subset of them.
-          - For each case in this list:
-              - Create an entry in the returned list for each of these cases as the respondent is implicitly part
-                of the case by being enrolled for the survey with that business.
+         - For each case in this list:
+            - Create an entry in the returned list for each of these cases as the respondent is implicitly part
+            of the case by being enrolled for the survey with that business.
 
-    :param respondent: A dict containing respondent data
+    :param respondent_enrolments: A list containing enrolment data
     :param tag: This is the page that is being called e.g. to-do, history
     :param business_party_id: This is the businesses uuid
     :param survey_id: This is the surveys uuid
 
     """
-    enrolment_data = list(get_respondent_enrolments(respondent))
 
     # Gets the survey ids and business ids from the enrolment data that has been generated.
     # Converted to list to avoid multiple calls to party (and the list size is small).
-    surveys_ids, business_ids = get_unique_survey_and_business_ids(enrolment_data)
+    surveys_ids, business_ids = get_unique_survey_and_business_ids(respondent_enrolments)
 
     # This is a dictionary that will store all the data that is going to be cached instead of making multiple calls
     # inside the for loop for get_respondent_enrolments.
@@ -413,58 +402,59 @@ def get_survey_list_details_for_party(respondent: dict, tag: str, business_party
     caching_case_data(cache_data, business_ids, tag)
 
     #  Populate the enrolments by creating a dictionary using the redis_cache
-    collection_exercises = {
-        survey_id: redis_cache.get_collection_exercises_by_survey(survey_id) for survey_id in surveys_ids
-    }
-    enrolments = get_respondent_enrolments_for_started_collex(enrolment_data, collection_exercises)
+    collection_exercises = get_collection_exercises_for_surveys(surveys_ids, live_only=True)
+    for respondent_enrolment in respondent_enrolments:
 
-    for enrolment in enrolments:
-        business_party = redis_cache.get_business_party(enrolment["business_id"])
-        survey = redis_cache.get_survey(enrolment["survey_id"])
+        for survey in respondent_enrolment["survey_details"]:
+            if survey["id"] not in collection_exercises:
+                continue
 
-        live_collection_exercises = collection_exercises[enrolment["survey_id"]]
+            live_collection_exercises = collection_exercises[survey["id"]]
+            collection_exercises_by_id = dict((ce["id"], ce) for ce in live_collection_exercises)
+            cases_for_business = cache_data["cases"][respondent_enrolment["business_id"]]
 
-        collection_exercises_by_id = dict((ce["id"], ce) for ce in live_collection_exercises)
-        cases_for_business = cache_data["cases"][business_party["id"]]
+            # Gets all the cases for reporting unit, and by extension the user (because it's related to the business)
+            enrolled_cases = [
+                case
+                for case in cases_for_business
+                if case["caseGroup"]["collectionExerciseId"] in collection_exercises_by_id.keys()
+            ]
 
-        # Gets all the cases for reporting unit, and by extension the user (because it's related to the business)
-        enrolled_cases = [
-            case
-            for case in cases_for_business
-            if case["caseGroup"]["collectionExerciseId"] in collection_exercises_by_id.keys()
-        ]
+            for case in enrolled_cases:
+                collection_exercise = collection_exercises_by_id[case["caseGroup"]["collectionExerciseId"]]
+                collection_instrument = redis_cache.get_collection_instrument(case["collectionInstrumentId"])
+                collection_instrument_type = collection_instrument["type"]
+                added_survey = (
+                    True
+                    if business_party_id == respondent_enrolment["business_id"] and survey_id == survey["id"]
+                    else None
+                )
+                display_access_button = display_button(case["caseGroup"]["caseGroupStatus"], collection_instrument_type)
 
-        for case in enrolled_cases:
-            collection_exercise = collection_exercises_by_id[case["caseGroup"]["collectionExerciseId"]]
-            collection_instrument = redis_cache.get_collection_instrument(case["collectionInstrumentId"])
-            collection_instrument_type = collection_instrument["type"]
-            added_survey = True if business_party_id == business_party["id"] and survey_id == survey["id"] else None
-            display_access_button = display_button(case["caseGroup"]["caseGroupStatus"], collection_instrument_type)
-
-            yield {
-                "case_id": case["id"],
-                "status": case_controller.calculate_case_status(
-                    case["caseGroup"]["caseGroupStatus"],
-                    collection_instrument_type,
-                ),
-                "collection_instrument_type": collection_instrument_type,
-                "survey_id": survey["id"],
-                "survey_long_name": survey["longName"],
-                "survey_short_name": survey["shortName"],
-                "survey_ref": survey["surveyRef"],
-                "business_party_id": business_party["id"],
-                "business_name": business_party["name"],
-                "trading_as": business_party["trading_as"],
-                "business_ref": business_party["sampleUnitRef"],
-                "period": collection_exercise["userDescription"],
-                "submit_by": collection_exercise["events"]["return_by"]["date"],
-                "formatted_submit_by": collection_exercise["events"]["return_by"]["formatted_date"],
-                "due_in": collection_exercise["events"]["return_by"]["due_time"],
-                "collection_exercise_ref": collection_exercise["exerciseRef"],
-                "collection_exercise_id": collection_exercise["id"],
-                "added_survey": added_survey,
-                "display_button": display_access_button,
-            }
+                yield {
+                    "case_id": case["id"],
+                    "status": case_controller.calculate_case_status(
+                        case["caseGroup"]["caseGroupStatus"],
+                        collection_instrument_type,
+                    ),
+                    "collection_instrument_type": collection_instrument_type,
+                    "survey_id": survey["id"],
+                    "survey_long_name": survey["long_name"],
+                    "survey_short_name": survey["short_name"],
+                    "survey_ref": survey["ref"],
+                    "business_party_id": respondent_enrolment["business_id"],
+                    "business_name": respondent_enrolment["business_name"],
+                    "trading_as": respondent_enrolment["trading_as"],
+                    "business_ref": respondent_enrolment["ru_ref"],
+                    "period": collection_exercise["userDescription"],
+                    "submit_by": collection_exercise["events"]["return_by"]["date"],
+                    "formatted_submit_by": collection_exercise["events"]["return_by"]["formatted_date"],
+                    "due_in": collection_exercise["events"]["return_by"]["due_time"],
+                    "collection_exercise_ref": collection_exercise["exerciseRef"],
+                    "collection_exercise_id": collection_exercise["id"],
+                    "added_survey": added_survey,
+                    "display_button": display_access_button,
+                }
 
 
 def get_case(cache_data, business_id, case_url, case_auth, tag):
@@ -477,13 +467,27 @@ def display_button(status, ci_type):
     return not (ci_type == "EQ" and status in CLOSED_STATE)
 
 
-def is_respondent_enrolled(party_id: str, business_party_id: str, survey: dict) -> bool:
-    respondent = get_respondent_party_by_id(party_id)
-    enrolments = get_respondent_enrolments(respondent)
-    for enrolment in enrolments:
-        if enrolment["business_id"] == business_party_id and enrolment["survey_id"] == survey["id"]:
-            return True
-    return False
+def is_respondent_enrolled(party_id: str, business_party_id: str, survey_id: str) -> bool:
+    url = (
+        f"{app.config['PARTY_URL']}/party-api/v1/enrolments/is_respondent_enrolled/{party_id}"
+        f"/business_id/{business_party_id}/survey_id/{survey_id}"
+    )
+    try:
+        response = requests.get(url, auth=app.config["BASIC_AUTH"])
+        response.raise_for_status()
+    except HTTPError as e:
+        logger.error(
+            "HTTPError returned from Party service when getting is_respondent_enrolled",
+            status_code=e.response.status_code,
+            party_id=party_id,
+        )
+        raise ApiError(logger, response)
+    except ConnectionError:
+        raise ServiceUnavailableException("Party service returned a connection error", 503)
+    except Timeout:
+        raise ServiceUnavailableException("Party service has timed out", 504)
+
+    return response.json()["enrolled"]
 
 
 def notify_party_and_respondent_account_locked(respondent_id, email_address, status=None):
@@ -504,20 +508,6 @@ def notify_party_and_respondent_account_locked(respondent_id, email_address, sta
 
     bound_logger.info("Successfully notified respondent and party service that account is locked")
     bound_logger.unbind("respondent_id", "email", "status")
-
-
-def get_list_of_business_for_party(party_id: str) -> list:
-    """
-    Gets the details for the businesses associated with a respondent
-    :param party_id: respondent party id
-    :return: list of businesses
-    """
-    logger.info("Getting enrolment data for the party", party_id=party_id)
-    respondent = get_respondent_party_by_id(party_id)
-    enrolment_data = get_respondent_enrolments(respondent)
-    business_ids = {enrolment["business_id"] for enrolment in enrolment_data}
-    logger.info("Getting businesses against business ids", business_ids=business_ids, party_id=party_id)
-    return get_business_by_id(business_ids)
 
 
 def get_business_by_id(business_ids: list) -> list:
@@ -544,14 +534,8 @@ def get_surveys_listed_against_party_and_business_id(business_id: str, party_id:
     :param party_id: The respondent's party id
     :return: list of surveys
     """
-    respondent = get_respondent_party_by_id(party_id)
-    enrolment_data = get_respondent_enrolments(respondent)
-    survey_ids = {enrolment["survey_id"] for enrolment in enrolment_data if enrolment["business_id"] == business_id}
-    surveys = []
-    for survey in survey_ids:
-        response = survey_controller.get_survey(app.config["SURVEY_URL"], app.config["BASIC_AUTH"], survey)
-        surveys.append(response)
-    return surveys
+    respondent_enrolments = get_respondent_enrolments(party_id, {"business_id": business_id})
+    return respondent_enrolments[0]["survey_details"]
 
 
 def get_user_count_registered_against_business_and_survey(business_id: str, survey_id: str, is_transfer) -> int:
@@ -574,23 +558,19 @@ def get_user_count_registered_against_business_and_survey(business_id: str, surv
     return response.json()
 
 
-def register_pending_shares(payload):
-    """
-    register new entries to party for pending shares
-
-    :param payload: pending shares entries dict
-    :return: success if post completed
-    :rtype: response object
-    """
-    logger.info("Attempting register pending shares")
+def register_pending_surveys(payload: json, party_id: str) -> requests.Response:
+    logger.info("Attempting register pending transfer", party_id=party_id)
     url = f'{app.config["PARTY_URL"]}/party-api/v1/pending-surveys'
     response = requests.post(url, json=json.loads(payload), auth=app.config["BASIC_AUTH"])
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        if response.status_code == 400:
-            logger.info("share survey has already been shared, hence ignoring this request.")
-        else:
+        logger.error(
+            f"Party service has returned a {response.status_code} for {party_id}",
+            party_id=party_id,
+            status_code=response.status_code,
+        )
+        if response.status_code != 400:
             raise ApiError(logger, response)
     return response
 
@@ -773,3 +753,28 @@ def reset_password_reset_counter(party_id):
 
     logger.info("Successfully reset password reset counter")
     return response.json()
+
+
+def get_surveys_to_transfer_map(selected_surveys: list) -> tuple[dict, list]:
+    """
+    creates a map of business ids to survey_ids that are to be transferred and whether they are valid
+    """
+    business_survey_map = {}
+    invalid_survey_transfers = []
+
+    for survey in selected_surveys:
+        json_survey = json.loads(survey.replace("'", '"'))
+        business_id = json_survey["business_id"]
+        survey_id = json_survey["survey_id"]
+        business_survey_map.setdefault(business_id, []).append(survey_id)
+        if _has_max_share_for_survey_been_exceeded(business_id, survey_id):
+            invalid_survey_transfers.append(business_id)
+
+    return business_survey_map, invalid_survey_transfers
+
+
+def _has_max_share_for_survey_been_exceeded(business_id: str, survey_id: str) -> bool:
+    count = get_user_count_registered_against_business_and_survey(business_id, survey_id, True)
+    if count > (app.config["MAX_SHARED_SURVEY"] + 1):
+        return True
+    return False

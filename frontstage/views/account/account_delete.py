@@ -17,15 +17,14 @@ logger = wrap_logger(logging.getLogger(__name__))
 @jwt_authorization(request)
 def delete_user_account(session):
     party_id = session.get_party_id()
-    respondent_details = party_controller.get_respondent_party_by_id(party_id)
-    if "associations" in respondent_details:
-        for association in respondent_details["associations"]:
-            for enrolment in association["enrolments"]:
-                if enrolment["enrolmentStatus"] == "ENABLED":
-                    flash("This operation is not allowed as you are currently assigned to a survey.", "info")
-                    return render_template("account/account-delete.html", is_validated=False)
+    enrolments = party_controller.get_respondent_enrolments(party_id)
+    if enrolments:
+        flash("This operation is not allowed as you are currently assigned to a survey.", "info")
+        return render_template("account/account-delete.html", is_validated=False)
     if request.method == "POST":
-        delete_account(respondent_details["emailAddress"])
+        respondent = party_controller.get_respondent_party_by_id(party_id)
+        delete_account(respondent["emailAddress"])
+        flash("Your account is deleted.", "success")
         return redirect(url_for("sign_in_bp.logout"))
 
     return render_template("account/account-delete.html", session=session, is_validated=True)

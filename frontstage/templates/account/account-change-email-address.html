@@ -63,13 +63,13 @@
     <p>We will send a verification email to <strong>{{ new_email }}</strong>.</p>
     {% call onsPanel({}) %}
         <p>
-            If you are longer required to respond to your surveys, you can <a href="{{ url_for('account_bp.transfer_survey_overview') }}">transfer your surveys</a> to a colleague.
+            If you are longer required to respond to your surveys, you can <a href="{{ url_for('account_bp.transfer_surveys') }}">transfer your surveys</a> to a colleague.
         </p>
     {% endcall %}
     <form action="{{ url_for('account_bp.change_email_address')}}" method="post">
         {{ form.csrf_token }}
         <input type="hidden" name="email_address" value="{{ new_email }}"/>
-        <div class="ons-grid ons-grid--flex ons-grid--gutterless ons-grid--vertical-center ons-grid--no-wrap@s ons-u-mt-m ons-u-mb-m">
+        <div class="ons-grid ons-grid-flex ons-grid--gutterless ons-grid-flex--vertical-center ons-grid--no-wrap@s ons-u-mt-m ons-u-mb-m">
             <div class="ons-grid__col">
                 {{
                     onsButton({

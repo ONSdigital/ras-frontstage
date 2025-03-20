@@ -6,6 +6,7 @@ import requests_mock
 from frontstage import app
 from tests.integration.mocked_services import (
     encoded_jwt_token,
+    respondent_enrolments,
     respondent_party,
     url_auth_delete,
     url_banner_api,
@@ -30,10 +31,11 @@ class TestAccountDelete(unittest.TestCase):
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
-    def test_account_delete(self, mock_request, get_respondent_party_by_id):
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    def test_account_delete(self, mock_request, get_respondent_enrolments, get_respondent_party_by_id):
         mock_request.get(url_banner_api, status_code=404)
+        get_respondent_enrolments.return_value = []
         get_respondent_party_by_id.return_value = {
-            "associations": [],
             "emailAddress": "example@example.com",
             "firstName": "first_name",
             "id": "f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b",
@@ -48,8 +50,10 @@ class TestAccountDelete(unittest.TestCase):
 
             self.assertEqual(response.status_code, 200)
             self.assertTrue("Delete account".encode() in response.data)
-            self.assertTrue("All of the information about your account will be deleted.".encode() in response.data)
-            self.assertTrue("Once your data has been removed, it cannot be recovered.".encode() in response.data)
+            self.assertTrue(
+                "Once your account has been deleted, you will not be able to recover any of your data".encode()
+                in response.data
+            )
             self.assertTrue(
                 "You will not be able to set up a new account until you are selected for a new survey.".encode()
                 in response.data
@@ -57,11 +61,12 @@ class TestAccountDelete(unittest.TestCase):
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
-    def test_account_delete_confirm(self, mock_request, get_respondent_party_by_id):
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    def test_account_delete_confirm(self, mock_request, get_respondent_enrolments, get_respondent_party_by_id):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.delete(url_auth_delete, status_code=204)
+        get_respondent_enrolments.return_value = []
         get_respondent_party_by_id.return_value = {
-            "associations": [],
             "emailAddress": "example@example.com",
             "firstName": "first_name",
             "id": "f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b",
@@ -79,13 +84,15 @@ class TestAccountDelete(unittest.TestCase):
             self.assertTrue("New to this service?".encode() in response.data)
             self.assertTrue("Email Address".encode() in response.data)
             self.assertTrue("Password".encode() in response.data)
-            self.assertTrue("Forgot password?".encode() in response.data)
+            self.assertTrue("Create an account".encode() in response.data)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_respondent_party_by_id")
-    def test_account_delete_not_allowed(self, mock_request, get_respondent_party_by_id):
+    @patch("frontstage.controllers.party_controller.get_respondent_enrolments")
+    def test_account_delete_not_allowed(self, mock_request, get_respondent_enrolments, get_respondent_party_by_id):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.delete(url_auth_delete, status_code=204)
+        get_respondent_enrolments.return_value = respondent_enrolments
         get_respondent_party_by_id.return_value = respondent_party
         with app.app_context():
             response = self.app.get("/my-account/delete", follow_redirects=True)

@@ -3,7 +3,7 @@
 User interface for Respondent Account Services
 
 ## Setup
-Based on python 3.11
+Based on python 3.12
 
 Use [Pyenv](https://github.com/pyenv/pyenv) to manage installed Python versions
 
@@ -13,6 +13,7 @@ Install dependencies to a new virtual environment using [Pipenv](https://docs.pi
 pip install -U pipenv
 pipenv install
 ```
+
 
 ## Redis
 ras-frontstage requires a redis instance to store user jwt's when they are logged in

@@ -49,10 +49,10 @@ jobs:
         with:
           fetch-depth: '0'
           token: ${{ secrets.BOT_TOKEN }}
-      - name: Set up Python 3.11
+      - name: Set up Python 3.12
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.12'
       - name: Build
         run: |
           python -m pip install --upgrade pip
@@ -93,7 +93,7 @@ jobs:
       - name: template helm
         run: |
           helm template $CHART_DIRECTORY
-    
+
       - name: Set current tag
         if: github.ref != 'refs/heads/main'
         id: vars
@@ -199,7 +199,7 @@ jobs:
         run: |
           docker push "$REGISTRY_HOSTNAME"/"$GAR_GOOGLE_PROJECT_ID"/"$GAR_REPOSITORY"/"$IMAGE":${{ env.version }}
           docker push "$REGISTRY_HOSTNAME"/"$GAR_GOOGLE_PROJECT_ID"/"$GAR_REPOSITORY"/"$IMAGE":latest
-      
+
       - name: Publish Charts
         if: github.ref == 'refs/heads/main'
         run: |

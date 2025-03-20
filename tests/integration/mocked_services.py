@@ -7,9 +7,6 @@ survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
 with open("tests/test_data/party/business_party.json") as fp:
     business_party = json.load(fp)
 
-with open("tests/test_data/party/business_party_no_trading_as.json") as fp:
-    business_party_no_trading_as = json.load(fp)
-
 with open("tests/test_data/party/party.json") as fp:
     respondent_party = json.load(fp)
 
@@ -43,17 +40,14 @@ with open("tests/test_data/collection_exercise/collection_exercise_with_suppleme
 with open("tests/test_data/collection_exercise/collection_exercise_list_by_survey.json") as fp:
     collection_exercise_by_survey = json.load(fp)
 
-with open("tests/test_data/collection_exercise/collection_exercise_before_go_live.json") as fp:
-    collection_exercise_before_go_live = json.load(fp)
+with open("tests/test_data/collection_exercise/collection_exercises_for_survey_ids.json") as fp:
+    collection_exercises_for_survey_ids = json.load(fp)
 
 with open("tests/test_data/collection_exercise/collection_exercise_events.json") as json_data:
     collection_exercise_events = json.load(json_data)
 
 with open("tests/test_data/collection_exercise/go_live_event.json") as fp:
     collection_exercise_go_live_event = json.load(fp)
-
-with open("tests/test_data/collection_exercise/go_live_event_before.json") as fp:
-    collection_exercise_go_live_event_before = json.load(fp)
 
 with open("tests/test_data/collection_instrument/collection_instrument_eq.json") as fp:
     collection_instrument_eq = json.load(fp)
@@ -64,14 +58,8 @@ with open("tests/test_data/collection_instrument/collection_instrument_seft.json
 with open("tests/test_data/case/completed_case.json") as fp:
     completed_case = json.load(fp)
 
-with open("tests/test_data/case/completed_by_phone_case.json") as fp:
-    completed_by_phone_case = [json.load(fp)]
-
 with open("tests/test_data/message.json") as fp:
     message_json = json.load(fp)
-
-with open("tests/test_data/conversation_list.json") as fp:
-    conversation_list_json = json.load(fp)
 
 with open("tests/test_data/eq_payload.json") as fp:
     eq_payload = json.load(fp)
@@ -97,14 +85,14 @@ with open("tests/test_data/survey/bricks_survey.json") as fp:
 with open("tests/test_data/survey/qbs_survey.json") as fp:
     survey_eq = json.load(fp)
 
-with open("tests/test_data/survey/rsi_survey.json") as fp:
-    survey_rsi = json.load(fp)
-
 with open("tests/test_data/survey/survey_list_todo.json") as fp:
     survey_list_todo = json.load(fp)
 
 with open("tests/test_data/survey/survey_list_history.json") as fp:
     survey_list_history = json.load(fp)
+
+with open("tests/test_data/party/respondent_enrolments.json") as fp:
+    respondent_enrolments = json.load(fp)
 
 encoded_jwt_token = (
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXJ0eV9pZCI6ImY5NTZlOGFlLTZ"
@@ -121,7 +109,8 @@ url_create_account = f"{app.config['PARTY_URL']}/party-api/v1/respondents"
 url_download_ci = f"{app.config['COLLECTION_INSTRUMENT_URL']}/collection-instrument-api/1.0.2/download/{case['collectionInstrumentId']}"
 url_get_respondent_by_email = f"{app.config['PARTY_URL']}/party-api/v1/respondents/email"
 url_get_business_party = f"{app.config['PARTY_URL']}/party-api/v1/businesses/id/{business_party['id']}"
-url_get_respondent_party = f"{app.config['PARTY_URL']}/party-api/v1/respondents/id/{party['id']}"
+url_get_respondent_party = f"{app.config['PARTY_URL']}/party-api/v1/respondents/party_id/{party['id']}"
+url_get_respondent_enrolments = f"{app.config['PARTY_URL']}/party-api/v1/enrolments/respondent/{party['id']}"
 url_get_case = f"{app.config['CASE_URL']}/cases/{case['id']}"
 url_get_case_by_enrolment_code = f"{app.config['CASE_URL']}/cases/iac/{enrolment_code}"
 url_get_case_categories = f"{app.config['CASE_URL']}/categories"
@@ -130,6 +119,7 @@ url_get_ci = (
     f"{app.config['COLLECTION_INSTRUMENT_URL']}/collection-instrument-api/1.0.2/{collection_instrument_seft['id']}"
 )
 url_get_collection_exercise = f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/{collection_exercise['id']}"
+url_get_collection_exercises_by_surveys = f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/surveys"
 url_get_collection_exercises_by_survey = (
     f"{app.config['COLLECTION_EXERCISE_URL']}/collectionexercises/survey/{collection_exercise['surveyId']}"
 )
@@ -143,7 +133,7 @@ url_get_respondent_email = f"{app.config['PARTY_URL']}/party-api/v1/respondents/
 url_get_survey = f"{app.config['SURVEY_URL']}/surveys/{survey['id']}"
 url_get_survey_by_short_name = f"{app.config['SURVEY_URL']}/surveys/shortname/{survey['shortName']}"
 url_get_survey_by_short_name_eq = f"{app.config['SURVEY_URL']}/surveys/shortname/{survey_eq['shortName']}"
-url_get_survey_by_short_name_rsi = f"{app.config['SURVEY_URL']}/surveys/shortname/{survey_rsi['shortName']}"
+url_get_survey_by_short_name_rsi = f"{app.config['SURVEY_URL']}/surveys/shortname/rsi"
 url_get_survey_long_name = app.config["SURVEY_URL"] + "/surveys/02b9c366-7397-42f7-942a-76dc5876d86d"
 url_get_thread = app.config["SECURE_MESSAGE_URL"] + "/threads/9e3465c0-9172-4974-a7d1-3a01592d1594"
 url_get_conversation_count = f"{app.config['SECURE_MESSAGE_URL']}/messages/count?unread_conversations=true"

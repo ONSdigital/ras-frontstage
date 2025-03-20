@@ -42,7 +42,7 @@ def upload_survey(session):
 
     # Check if respondent has permission to upload for this case
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
-    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey):
+    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey["id"]):
         raise NoSurveyPermission(party_id, case_id)
 
     case = case_controller.get_case_by_case_id(case_id)

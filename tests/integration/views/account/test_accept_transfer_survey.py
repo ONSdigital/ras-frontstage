@@ -21,7 +21,9 @@ url_get_transfer_survey_verify = f"{app.config['PARTY_URL']}/party-api/v1/pendin
 url_post_accept_transfer_survey = (
     f"{app.config['PARTY_URL']}/party-api/v1/pending-survey/confirm-pending-surveys/" f"{batch_number}"
 )
-url_get_transferd_by_respondent_party = f"{app.config['PARTY_URL']}/party-api/v1/respondents/id/transfertest@test.com"
+url_get_transferd_by_respondent_party = (
+    f"{app.config['PARTY_URL']}/party-api/v1/respondents/party_id/transfertest@test.com"
+)
 url_get_business_details = f"{app.config['PARTY_URL']}/party-api/v1/businesses"
 url_get_user_count = (
     f"{app.config['PARTY_URL']}/party-api/v1/pending-survey-users-count?"
@@ -136,7 +138,7 @@ class TestAcceptTransferSurvey(unittest.TestCase):
         )
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
+    @patch("frontstage.controllers.party_controller.get_case_list_for_respondent")
     def test_get_accept_transfer_surveys_success_existing_account(self, mock_request, get_survey_list):
         survey_list = [
             {
@@ -171,7 +173,7 @@ class TestAcceptTransferSurvey(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.get_survey_list_details_for_party")
+    @patch("frontstage.controllers.party_controller.get_case_list_for_respondent")
     def test_get_accept_transfer_surveys_success_non_existing_account(self, mock_request, get_survey_list):
         survey_list = [
             {

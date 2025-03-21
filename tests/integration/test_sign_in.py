@@ -1,5 +1,6 @@
 import os
 import unittest
+from unittest.mock import patch
 
 import requests_mock
 from bs4 import BeautifulSoup
@@ -348,3 +349,21 @@ class TestSignIn(unittest.TestCase):
 
         for test in testAddresses:
             self.assertEqual(obfuscate_email(test), testAddresses[test])
+
+    @requests_mock.mock()
+    @patch("frontstage.views.help.is_authorization")
+    def test_sign_in_help_post_who_is_ons(self, mock_request, is_authorization):
+        mock_request.get(url_banner_api, status_code=404)
+        is_authorization.return_value = True
+
+        form = {"option": "ons"}
+        response = self.app.post("/help/info-ons", data=form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Who is the Office for National Statistics (ONS)?".encode(), response.data)
+
+        self.assertIn(
+            'Send a <a id="contact_us" href="/contact-us/send-message">secure message</a>'.encode(), response.data
+        )
+        self.assertNotIn("Sign in to your account".encode(), response.data)
+        self.assertNotIn("If you are having problems signing in, please ".encode(), response.data)

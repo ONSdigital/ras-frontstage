@@ -59,7 +59,7 @@ class TestCookiesContact(unittest.TestCase):
         self.assertTrue("Where can I find out more about how my information will be treated?".encode() in response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.views.contact_us.validate_jwt")
+    @patch("frontstage.common.authorisation.validate_jwt")
     def test_contact_authorized(self, mock_request, _):
         mock_request.get(url_banner_api, status_code=404)
         response = self.app.get("/contact-us")
@@ -71,7 +71,7 @@ class TestCookiesContact(unittest.TestCase):
         self.assertNotIn("Email".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.views.contact_us.validate_jwt")
+    @patch("frontstage.common.authorisation.validate_jwt")
     def test_contact_unauthorized(self, mock_request, validate_jwt):
         validate_jwt.side_effect = JWTValidationError("Unauthorized")
         mock_request.get(url_banner_api, status_code=404)

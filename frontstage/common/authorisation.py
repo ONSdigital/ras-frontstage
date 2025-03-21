@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 from functools import wraps
 
+from flask import request
 from jwt import decode
 from jwt.exceptions import DecodeError
 from structlog import wrap_logger
@@ -59,3 +60,15 @@ def _validate_jwt_date(token):
         raise JWTTimeoutError(f"{JWT_DATE_EXPIRED} {token.get('party_id')}")
 
     raise JWTValidationError(f"{EXPIRES_IN_MISSING_FROM_PAYLOAD} {token.get('party_id')}")
+
+
+def is_authorization() -> bool:
+    authorization = False
+    if session_key := request.cookies.get("authorization"):
+        redis_session = Session.from_session_key(session_key)
+        try:
+            validate_jwt(redis_session, session_key)
+            authorization = True
+        except (Unauthorized, DecodeError, JWTValidationError, JWTTimeoutError):
+            pass
+    return authorization

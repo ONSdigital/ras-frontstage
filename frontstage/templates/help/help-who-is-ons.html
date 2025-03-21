@@ -39,6 +39,11 @@
         <path d="M8.83,7.88a.51.51,0,0,0,.71,0l2.31-2.32,1.28,1.28A.51.51,0,0,0,14,6.49v-4a.52.52,0,0,0-.5-.5h-4A.51.51,0,0,0,9,2.52a.58.58,0,0,0,.14.33l1.28,1.28L8.12,6.46a.51.51,0,0,0,0,.71Z" transform="translate(-2 -1.99)" />
       </svg></a></p>
     <h2>Need more information?</h2>
-    <p><a href="{{ url_for('sign_in_bp.login') }}" rel="noopener">Sign in to your account</a> to send a secure message.</p>
-    <p>If you are having problems signing in, please <a href="{{ url_for('contact_us_bp.contact_us') }}" rel="noopener">contact us</a>.</p>
+    {% if authorization %}
+        <p>Send a <a id="contact_us" href="{{ url_for('contact_us_bp.send_message') }}">secure message</a></p>
+    {% else %}
+        <p><a href="{{ url_for('sign_in_bp.login') }}" rel="noopener">Sign in to your account</a> to send a secure message.</p>
+        <p>If you are having problems signing in, please <a href="{{ url_for('contact_us_bp.contact_us') }}" rel="noopener">contact us</a>.</p>
+    {% endif %}
+
 {% endblock main %}

@@ -3,8 +3,8 @@ import logging
 from flask import Blueprint, flash, request
 from structlog import wrap_logger
 
-from frontstage.models import HelpInfoOnsForm
 from frontstage.common.authorisation import is_authorization
+from frontstage.models import HelpInfoOnsForm
 from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))

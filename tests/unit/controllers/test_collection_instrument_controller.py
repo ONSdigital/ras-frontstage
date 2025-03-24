@@ -104,6 +104,15 @@ class TestCollectionInstrumentController(unittest.TestCase):
                     self.fail("Unexpected error thrown when uploading collection instrument")
 
     @patch("frontstage.controllers.case_controller.post_case_event")
+    def test_upload_collection_instrument_ci_missing_filename(self, _):
+        file = FileStorage(io.BytesIO(b"my file contents"))
+        with app.app_context():
+            error_message = collection_instrument_controller.upload_collection_instrument(
+                file, case, business_party, party["id"], survey
+            )
+            self.assertEqual(error_message, "The upload must have valid case_id and a file attached")
+
+    @patch("frontstage.controllers.case_controller.post_case_event")
     def test_upload_collection_instrument_missing_business_party(self, _):
         FileStorage(filename="testfile.xlsx")
         with app.app_context():

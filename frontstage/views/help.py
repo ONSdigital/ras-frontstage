@@ -4,6 +4,7 @@ from flask import Blueprint, flash, request
 from structlog import wrap_logger
 
 from frontstage.models import HelpInfoOnsForm
+from frontstage.common.authorisation import is_authorization
 from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -23,7 +24,7 @@ def info_ons_page():
     form = HelpInfoOnsForm(request.values)
     if request.method == "POST":
         if form.validate():
-            return render_template(form_render_page_mapper.get(form.data["option"]))
+            return render_template(form_render_page_mapper.get(form.data["option"]), authorization=is_authorization())
         else:
             flash("At least one option should be selected.")
             page_title = "Error: " + page_title

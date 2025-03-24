@@ -27,8 +27,11 @@ class TestSignOutHelp(unittest.TestCase):
         response = self.app.post("/help/info-ons", data=form, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn("Who is the Office for National Statistics (ONS)?".encode(), response.data)
-        self.assertNotIn("Continue".encode(), response.data)
-        self.assertNotIn("Cancel".encode(), response.data)
+        self.assertIn("Sign in to your account".encode(), response.data)
+        self.assertIn("If you are having problems signing in, please ".encode(), response.data)
+        self.assertNotIn(
+            'Send a <a id="contact_us" href="/contact-us/send-message">secure message</a>'.encode(), response.data
+        )
 
     @requests_mock.mock()
     def test_sign_out_help_post_ons_info_data_safe(self, mock_request):

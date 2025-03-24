@@ -2,14 +2,11 @@ import logging
 import urllib.parse as urlparse
 
 from flask import Blueprint, flash, request, url_for
-from jwt.exceptions import DecodeError
 from markupsafe import Markup
 from structlog import wrap_logger
-from werkzeug.exceptions import Unauthorized
 from werkzeug.utils import redirect
 
-from frontstage.common.authorisation import jwt_authorization, validate_jwt
-from frontstage.common.session import Session
+from frontstage.common.authorisation import is_authorization, jwt_authorization
 from frontstage.controllers.conversation_controller import (
     NOT_SURVEY_RELATED,
     InvalidSecureMessagingForm,
@@ -18,7 +15,6 @@ from frontstage.controllers.conversation_controller import (
     send_secure_message,
 )
 from frontstage.controllers.party_controller import get_respondent_enrolments
-from frontstage.exceptions.exceptions import JWTTimeoutError, JWTValidationError
 from frontstage.models import OrganisationForm, SecureMessagingForm
 from frontstage.views.template_helper import render_template
 
@@ -29,16 +25,7 @@ contact_us_bp = Blueprint("contact_us_bp", __name__, static_folder="static", tem
 
 @contact_us_bp.route("/", methods=["GET"])
 def contact_us():
-    authorization = False
-    if session_key := request.cookies.get("authorization"):
-        redis_session = Session.from_session_key(session_key)
-        try:
-            validate_jwt(redis_session, session_key)
-            authorization = True
-        except (Unauthorized, DecodeError, JWTValidationError, JWTTimeoutError):
-            pass
-
-    return render_template("contact-us.html", authorization=authorization)
+    return render_template("contact-us.html", authorization=is_authorization())
 
 
 @contact_us_bp.route("/send-message", methods=["GET", "POST"])

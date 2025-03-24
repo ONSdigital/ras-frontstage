@@ -575,6 +575,22 @@ def register_pending_surveys(payload: json, party_id: str) -> requests.Response:
     return response
 
 
+def get_existing_pending_surveys(party_id: str) -> dict:
+    """
+    Returns a list of pending_surveys that already exist in the DB for this user
+    """
+    url = f"{app.config['PARTY_URL']}/party-api/v1/pending-surveys/originator/{party_id}"
+    response = requests.get(url, auth=app.config["BASIC_AUTH"])
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        logger.error("Failed to get pending surveys for respondent", party_id=party_id)
+        raise ApiError(logger, response)
+
+    logger.info("Successfully retrieved pending surveys for respondent", party_id=party_id)
+    return response.json()
+
+
 def get_pending_surveys_batch_number(batch_no):
     """
     Gets batch number for the shared survey

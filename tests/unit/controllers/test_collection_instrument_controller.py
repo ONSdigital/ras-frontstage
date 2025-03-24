@@ -110,7 +110,7 @@ class TestCollectionInstrumentController(unittest.TestCase):
             error_message = collection_instrument_controller.upload_collection_instrument(
                 file, case, business_party, party["id"], survey
             )
-            self.assertEqual(error_message, "The upload must have valid case_id and a file attached")
+            self.assertEqual(error_message, "The upload must have a file attached")
 
     @patch("frontstage.controllers.case_controller.post_case_event")
     def test_upload_collection_instrument_missing_business_party(self, _):

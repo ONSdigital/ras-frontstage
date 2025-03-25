@@ -5,12 +5,8 @@
 {% from "components/button/_macro.njk" import onsButton %}
 {% set breadcrumbsData = [
     {
-        "text": "Sign in",
-        "url": "/sign-in"
-    },
-    {
-        "text": "Help",
-        "url": "/help"
+        "text": "Back",
+        "url": "/surveys/todo"
     }
 ] %}
 
@@ -75,7 +71,7 @@
                         "submitType": "timer"
                     })
                 }}
-                <a href="{{ url_for('help_bp.help_page') }}"
+                <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}"
                     role="button" class="ons-btn ons-btn--link ons-btn--secondary" id="btn-who-ons-option-cancel"><span class="ons-btn__inner">Cancel</span></a>
             </div>
         </div>

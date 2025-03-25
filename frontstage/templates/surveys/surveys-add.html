@@ -1,17 +1,31 @@
-
 {% extends "layouts/_block_content.html" %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/button/_macro.njk" import onsButton %}
+{% from "components/details/_macro.njk" import onsDetails %}
 {% from "components/input/_macro.njk" import onsInput %}
+{% from "components/panel/_macro.njk" import onsPanel %}
+{% set panelVariant = "branded" %}
 
-{% set errorType = data['error']['type'] %}
+{% set page_title = "Add a new survey" %}
 
-{% set page_title = "Add a survey" %}
+{% block breadcrumbs %}
+    {{
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList":
+                [{
+                    "text": "Back",
+                    "url": "/surveys/todo",
+                    "id": "b-item-1"
+                }]
+        })
+    }}
+{% endblock breadcrumbs %}
 
 {% block content %}
-
-    {% if errorType == "failed" %}
-        {% set errorMsg = 'Enter a valid enrolment code' %}
-        {% set errorMsgText = { "text": errorMsg, "id": 'enrolment_code_error' } %}
+    {% if error %}
+        {% set panelVariant = "error" %}
         {% call
             onsPanel({
                 "variant": "error",
@@ -26,7 +40,7 @@
                     "element": "ol",
                     "itemsList": [
                         {
-                            "text": errorMsg,
+                            "text": error,
                             "url": "#enrolment_code_error",
                             "classes": "js-inpagelink"
                         }
@@ -38,41 +52,60 @@
 
     <section>
         <form id="enrolment-code"
-            action="{{ url_for('surveys_bp.add_survey') }}"
+            action="{{ url_for("surveys_bp.add_survey") }}"
             method="post"
             class="form">
             {{ form.csrf_token }}
 
-            <h1 class="u-fs-xl ons-u-mt-s">Add a survey</h1>
+            <h1 class="u-fs-xl ons-u-mt-s">Add a new survey</h1>
 
+            <p>You need the enrolment code that was sent to you to add a new survey</p>
+
+            {% call onsPanel({
+                "variant": panelVariant,
+                }) %}
             {{
                 onsInput({
                     "id": "enrolment_code",
                     "name": "enrolment_code",
                     "type": "text",
                     "label": {
-                        "text": "Enrolment Code",
-                        "description": "You'll find this in the letter we sent you"
+                        "text": "Enter your enrolment code",
+                        "description": "The enrolment code is 12 mixed letters and numbers"
                     },
-                    "error": errorMsgText
                 })
             }}
+
+            {% endcall %}
+            {% call onsPanel({
+                "variant": "bare",
+                "iconType": "lock"
+                })
+            %}
+                Your personal information is protected by law
+            {% endcall %}
             <div class="ons-grid ons-grid-flex ons-grid--gutterless ons-grid-flex--vertical-center ons-grid--no-wrap@s ons-u-mt-m ons-u-mb-m">
-                <div class="ons-grid__col">
-                    {{
-                        onsButton({
-                            "text": "Continue",
-                            "type": "submit",
-                            "id": "continue_button",
-                            "submitType": "timer"
-                        })
-                    }}
-                </div>
-                <div class="ons-grid__col ons-u-ml-m">
-                    <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}" id="cancel_button" role="button">Cancel</a>
-                </div>
+                  <div class="ons-grid__col">
+                      {{
+                          onsButton({
+                              "text": "Continue",
+                              "type": "submit",
+                              "id": "continue_button",
+                              "submitType": "timer"
+                          })
+                      }}
+                  </div>
             </div>
         </form>
+        {%
+            call onsDetails({
+                "id": "details-example-with-warning",
+                "title": "Need help with the enrolment code?"
+            })
+        %}
+            <p>If your enrolment code has been lost, does not work or you did not receive one, request a new code.</p>
+            <p>To do this, call +44 300 1234 931 or <a href="{{ url_for('contact_us_bp.send_message') }}">send a message</a></p>
+        {% endcall %}
     </section>
 
 {% endblock content %}

@@ -1,106 +1,76 @@
 {% extends "layouts/_block_content.html" %}
-{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 {% from "components/button/_macro.njk" import onsButton %}
-{% from "components/list/_macro.njk" import onsList %}
-{% from "components/panel/_macro.njk" import onsPanel %}
 {% from "components/textarea/_macro.njk" import onsTextarea %}
-
-{% set breadcrumbsData = [
-    {
-        "text": "Surveys",
-        "url": "/surveys/todo",
-        "id": "b-item-1"
-    },
-    {
-        "text": "Help",
-        "url": breadcrumbs["help"],
-        "id": "b-item-2"
-    }
-] %}
-
-{% if breadcrumb_title_one is defined and  breadcrumb_title_one != None %}
-    {% do breadcrumbsData.append({
-        "text": breadcrumb_title_one,
-        "url": breadcrumbs["option"],
-        "id": "b-item-8"
-    },) %}
-{% endif %}
-{% if breadcrumb_title_two is defined and breadcrumb_title_two != None %}
-    {% do breadcrumbsData.append({
-        "text": breadcrumb_title_two,
-        "url": breadcrumbs["sub_option"],
-        "id": "b-item-7"
-    },) %}
-{% endif %}
+{% from "components/select/_macro.njk" import onsSelect %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
+{% from "components/panel/_macro.njk" import onsPanel %}
 
 {% block breadcrumbs %}
     {{
         onsBreadcrumbs({
             "ariaLabel": "Breadcrumbs",
             "id": "breadcrumbs",
-            "itemsList": breadcrumbsData
+            "itemsList": [{
+                "text": "Back",
+                "url": back_url,
+                "id": "b-item"
+            }]
         })
     }}
+
 {% endblock breadcrumbs %}
 
 {% block main %}
-    {% if sub_option is not defined %}
-        {% set sub_option = "not_defined" %}
-    {% endif %}
-    {% set ns = namespace(bodyError = false) %}
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-                {% set errorTitle = 'There is 1 error on this page' %}
-                {% set ns.bodyError = true %}
-                {% set ns.errorMessage = message %}
-                    {% call
-                        onsPanel({
-                            "variant": "error",
-                            "classes": "ons-u-mb-s",
-                            "title": errorTitle
-                        })
-                    %}
-                        {{
-                            onsList({
-                                "element": "ol",
-                                "itemsList": [
-                                    {
-                                        "text": message,
-                                        "url": "#secure-message-body_error",
-                                        "classes": "ons-js-inpagelink"
-                                    }
-                                ]
-                            })
-                        }}
-                    {% endcall %}
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
     <h1>Send a message</h1>
-    <p>Describe your issue and we will get back to you.</p>
-    <dl class="ons-metadata ons-metadata__list ons-grid ons-grid--gutterless ons-u-cf ons-u-mb-l" title="Message subject" aria-label="Message subject">
-        <dt class="ons-metadata__term ons-grid__col ons-col-2@m"><strong>Subject:</strong></dt>
-        <dd class="ons-metadata__value ons-grid__col ons-col-10@m">{{ subject }}</dd>
-    </dl>
+    <p>Describe your issue, and we will get back to you within 5 working days.</p>
     <div class="ons-col-10@m" id="secure-message-form">
         <form method="post">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            {% if ns.bodyError %}
-                {% set error = { "text": ns.errorMessage, "id": 'secure-message-body_error' } %}
-            {% endif %}
+                <input type="hidden" name="business_id" value="{{ form.business_id }}"/>
+            {{
+                onsSelect({
+                    "id": "survey_id",
+                    "name": "survey_id",
+                    "label": {
+                        "text": "Survey",
+                        "description": "Choose the survey the message is related to",
+                    },
+
+                    "options": enrolment_options.survey,
+                    "error": errors.survey_id
+                })
+            }}
+            {{
+                onsSelect({
+                    "id": "subject",
+                    "name": "subject",
+                    "label": {
+                        "text": "Subject",
+                        "description": "Choose a subject that best describes your query",
+                    },
+                    "options": enrolment_options.subject,
+                    "error": errors.subject,
+                })
+            }}
             {{
                 onsTextarea({
                     "id": "secure-message-body",
                     "name": "body",
                     "label": {
                         "text": "Enter message",
+                        "description": "It is safe to include confidential information in this secure message",
                     },
                     "charCheckLimit": false,
-                    "error": error,
+                    "error": errors.body,
+                    "value": form.body.data
                 })
             }}
-
+            {{
+                onsPanel({
+                    "id": '',
+                    "iconType": 'lock',
+                    "body": "Your personal information is protected by law"
+                })
+            }}
             <div class="ons-field ons-u-mt-l">
                 {{
                     onsButton({
@@ -109,28 +79,8 @@
                         "variants": "loader"
                     })
                 }}
-                {% if breadcrumb_title_two != None %}
-                    {{
-                        onsButton({
-                            "id": "btn-sub-option-cancel",
-                            "url": breadcrumbs["sub_option"],
-                            "text": 'Cancel',
-                            "variants": 'secondary',
-                            "noIcon": true
-                        })
-                    }}
-                {% else %}
-                    {{
-                        onsButton({
-                            "id": "btn-option-cancel",
-                            "url": breadcrumbs["option"],
-                            "text": 'Cancel',
-                            "variants": 'secondary',
-                            "noIcon": true
-                        })
-                    }}
-                {% endif %}
-            </div>
+             </div>
+             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         </form>
     </div>
 {% endblock main %}

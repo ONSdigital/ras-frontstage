@@ -24,6 +24,7 @@ def delete_user_account(session):
     if request.method == "POST":
         respondent = party_controller.get_respondent_party_by_id(party_id)
         delete_account(respondent["emailAddress"])
+        flash("Your account is deleted.", "success")
         return redirect(url_for("sign_in_bp.logout"))
 
     return render_template("account/account-delete.html", session=session, is_validated=True)

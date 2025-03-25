@@ -4,38 +4,20 @@
 {% from "components/checkboxes/_macro.njk" import onsCheckboxes %}
 {% from "components/button/_macro.njk" import onsButton %}
 {% from "components/list/_macro.njk" import onsList %}
+{% from "components/details/_macro.njk" import onsDetails %}
 
-{% set page_title = "Survey share survey select" %}
-
-{% set breadcrumbsData = [
-    {
-        "text": "Surveys",
-        "url": "/surveys/todo",
-        "id": "b-item-1"
-    },
-    {
-        "text": "Account",
-        "url": "/my-account",
-        "id": "b-item-2"
-    },
-    {
-        "text": "Share Surveys",
-        "url": "/my-account/share-surveys",
-        "id": "b-item-3"
-    },
-    {
-        "text": "Select business",
-        "url": "/my-account/share-surveys/business-selection",
-        "id": "b-item-4"
-    }
-] %}
+{% set page_title = "Share access to surveys" %}
 
 {% block breadcrumbs %}
     {{
         onsBreadcrumbs({
             "ariaLabel": "Breadcrumbs",
             "id": "breadcrumbs",
-            "itemsList": breadcrumbsData
+            "itemsList": [{
+                "text": "Back",
+                "url": "/my-account/share-surveys/business-selection",
+                "id": "b-item"
+            }]
         })
     }}
 {% endblock breadcrumbs %}
@@ -77,8 +59,45 @@
         {% endif %}
     {% endwith %}
 
-    <h1>Which surveys do you want to share?</h1>
+    <h1 class="ons-u-mb-m">Share access to surveys</h1>
+
+    {% call onsPanel({
+            "classes": "ons-u-mb-m",
+        })
+    %}
+    <p>You will still have access to surveys you share access to. If you no longer need access to the survey, <a href="{{ url_for('account_bp.transfer_surveys') }}">transfer surveys</a></p>
+    {% endcall %}
+    {%
+        call onsDetails({
+            "classes": "ons-u-mb-xl",
+            "id": "details-example-with-warning",
+            "title": "How do I share access to a survey?"
+        })
+    %}
+        <p>To share access to a survey:</p>
+    {{
+        onsList({
+            "element": 'ol',
+            "itemsList": [
+                {
+                    "text": "Choose the surveys you want to share access to."
+                },
+                {
+                    "text": "Enter the email address of the person who will be responding to the surveys."
+                },
+                {
+                    "text": "We will email them instructions to access the surveys."
+                },
+                {
+                    "text": "Once we confirm their access, they will be able to respond to the surveys and share access with their colleagues."
+                }
+            ]
+        })
+    }}
+    {% endcall %}
+
     <form action="" method="post">
+        <h2 class="ons-u-mb-l">Choose the surveys you want to share access to</h2>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         {% for business in share_dict %}
             {% set checkboxData = [] %}
@@ -90,8 +109,13 @@
             Deselect the survey/s to continue or call 0300 1234 931 to discuss your options.',  "id": 'option_error_'~business } %}
             {% endif %}
             {% set checkboxesData = {
-                "legend": share_dict[business].name,
+                "legend": "Organisation: " + share_dict[business].name,
+                "legendClasses": "ons-u-mb-xs",
+                "description": "RU ref: " + share_dict[business].sampleUnitRef,
+                "descriptionClasses": "ons-u-mb-l",
                 "checkboxesLabel": "Select all that apply",
+                "checkboxesLabelClasses": "ons-u-mt-m",
+                "classes": "ons-u-mb-l",
                 "error": errorOption,
             } %}
             {% for survey in share_dict[business].surveys %}
@@ -110,7 +134,7 @@
                         "id": range(1, 10000) | random | string,
                         "name": business,
                         "label": {
-                            "text": survey['longName']
+                            "text": survey['long_name']
                         },
                         "value": survey['id'],
                         "classes": params,
@@ -121,19 +145,11 @@
                 {% do checkboxesData | setAttribute("checkboxes", checkboxData) %}
             {{ onsCheckboxes(checkboxesData) }}
         {% endfor %}
-        <div class="ons-field ons-u-mt-l">
+        <div class="ons-field">
             {{
                 onsButton({
                     "text": "Continue",
                     "submitType": "timer"
-                })
-            }}
-            {{
-                onsButton({
-                    "url": url_for('account_bp.share_survey_business_select'),
-                    "text": 'Cancel',
-                    "variants": 'secondary',
-                    "noIcon": true
                 })
             }}
         </div>

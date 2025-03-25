@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 from functools import wraps
 
+from flask import request
 from jwt import decode
 from jwt.exceptions import DecodeError
 from structlog import wrap_logger
@@ -28,17 +29,7 @@ def jwt_authorization(request, refresh_session=True):
                 raise Unauthorized(NO_AUTHORIZATION_COOKIE)
 
             redis_session = Session.from_session_key(session_key)
-            encoded_jwt = redis_session.get_encoded_jwt()
-
-            if not encoded_jwt:
-                raise Unauthorized(NO_ENCODED_JWT)
-
-            try:
-                jwt = decode(encoded_jwt, app.config["JWT_SECRET"], algorithms="HS256")
-            except DecodeError:
-                raise JWTValidationError(f"{JWT_DECODE_ERROR} {session_key}")
-
-            _validate_jwt_date(jwt)
+            validate_jwt(redis_session, session_key)
 
             if refresh_session:
                 redis_session.refresh_session()
@@ -50,6 +41,17 @@ def jwt_authorization(request, refresh_session=True):
     return extract_session
 
 
+def validate_jwt(redis_session, session_key):
+    encoded_jwt = redis_session.get_encoded_jwt()
+    if not encoded_jwt:
+        raise Unauthorized(NO_ENCODED_JWT)
+    try:
+        jwt = decode(encoded_jwt, app.config["JWT_SECRET"], algorithms="HS256")
+    except DecodeError:
+        raise JWTValidationError(f"{JWT_DECODE_ERROR} {session_key}")
+    _validate_jwt_date(jwt)
+
+
 def _validate_jwt_date(token):
     if expires_in := token.get("expires_in"):
         if datetime.now().timestamp() <= expires_in:
@@ -58,3 +60,15 @@ def _validate_jwt_date(token):
         raise JWTTimeoutError(f"{JWT_DATE_EXPIRED} {token.get('party_id')}")
 
     raise JWTValidationError(f"{EXPIRES_IN_MISSING_FROM_PAYLOAD} {token.get('party_id')}")
+
+
+def is_authorization() -> bool:
+    authorization = False
+    if session_key := request.cookies.get("authorization"):
+        redis_session = Session.from_session_key(session_key)
+        try:
+            validate_jwt(redis_session, session_key)
+            authorization = True
+        except (Unauthorized, DecodeError, JWTValidationError, JWTTimeoutError):
+            pass
+    return authorization

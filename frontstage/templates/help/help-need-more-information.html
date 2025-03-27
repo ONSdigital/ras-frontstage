@@ -1,7 +1,8 @@
 <h2>Need more information?</h2>
-    {% if authorization %}
-        <p>Send a <a id="contact_us" href="{{ url_for('contact_us_bp.send_message') }}">secure message</a></p>
-    {% else %}
-        <p><a href="{{ url_for('sign_in_bp.login') }}" rel="noopener">Sign in to your account</a> to send a secure message.</p>
-        <p>If you are having problems signing in, please <a href="{{ url_for('contact_us_bp.contact_us') }}" rel="noopener">contact us</a>.</p>
-    {% endif %}
+
+{% if authorization %}
+    <p>Send a <a id="contact_us" href="{{ url_for('contact_us_bp.send_message') }}">secure message</a></p>
+{% else %}
+    <p><a href="{{ url_for('sign_in_bp.login') }}" rel="noopener">Sign in to your account</a> to send a secure message.</p>
+    <p>If you are having problems signing in, please <a href="{{ url_for('contact_us_bp.contact_us') }}" rel="noopener">contact us</a>.</p>
+{% endif %}

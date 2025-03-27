@@ -10,6 +10,7 @@ metadata:
     networking.gke.io/v1beta1.FrontendConfig: {{ .Values.ingress.frontendConfigName }}
 
 spec:
+  ingressClassName: gce
   rules:
   - host: {{ .Values.ingress.host | quote }}
     http:

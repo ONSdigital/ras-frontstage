@@ -8,7 +8,6 @@ from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import (
     case_controller,
     collection_instrument_controller,
-    conversation_controller,
     party_controller,
     survey_controller,
 )
@@ -100,12 +99,10 @@ def upload_survey(session):
         )
 
     logger.info("Successfully uploaded collection instrument", party_id=party_id, case_id=case_id)
-    unread_message_count = {"unread_message_count": conversation_controller.try_message_count_from_session(session)}
     return render_template(
         "surveys/surveys-upload-success.html",
         session=session,
         upload_filename=upload_file.filename,
-        unread_message_count=unread_message_count,
     )
 
 

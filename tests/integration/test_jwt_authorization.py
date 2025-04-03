@@ -118,4 +118,4 @@ class TestJWTAuthorization(unittest.TestCase):
 
     def _update_session_token(self, token=valid_jwt):
         self.session.encoded_jwt_token = token
-        self.session.save()
+        self.session.set()

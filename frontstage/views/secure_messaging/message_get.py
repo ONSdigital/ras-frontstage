@@ -11,10 +11,8 @@ from frontstage.controllers.conversation_controller import (
     InvalidSecureMessagingForm,
     get_conversation,
     get_conversation_list,
-    get_message_count_from_api,
     remove_unread_label,
     send_secure_message,
-    try_message_count_from_session,
 )
 from frontstage.controllers.survey_controller import get_survey
 from frontstage.exceptions.exceptions import ApiError
@@ -69,7 +67,6 @@ def view_conversation(session, thread_id):
         except InvalidSecureMessagingForm as e:
             error = e.errors["body"][0]
 
-    unread_message_count = {"unread_message_count": get_message_count_from_api(session)}
     survey_name = None
     business_name = None
     if is_survey_category:
@@ -90,7 +87,6 @@ def view_conversation(session, thread_id):
         error=error,
         conversation=refined_conversation,
         conversation_data=conversation,
-        unread_message_count=unread_message_count,
         survey_name=survey_name,
         business_name=business_name,
         category=category,
@@ -115,13 +111,11 @@ def view_conversation_list(session):
         logger.error("A key error occurred", party_id=party_id)
         raise
     logger.info("Retrieving and refining conversation successful", party_id=party_id)
-    unread_message_count = {"unread_message_count": try_message_count_from_session(session)}
     return render_template(
         "secure-messages/conversation-list.html",
         session=session,
         messages=refined_conversation,
         is_closed=strtobool(is_closed),
-        unread_message_count=unread_message_count,
     )
 
 

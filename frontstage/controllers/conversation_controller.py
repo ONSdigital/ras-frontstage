@@ -211,51 +211,6 @@ def secure_message_organisation_options(business_details: list) -> list:
     return _create_formatted_option_list(organisation_options, "", ORGANISATION_DISABLED_OPTION)
 
 
-def try_message_count_from_session(session):
-    """Attempts to get the unread message count from the session,
-    will fall back to the secure-message api if unsuccessful"""
-    party_id = session.get_party_id()
-    logger.debug("Getting message count from session", party_id=party_id)
-    try:
-        if not session.message_count_expired():
-            return session.get_unread_message_count()
-        logger.debug("Unread Message count timer has expired", party_id=party_id)
-    except KeyError:
-        logger.warn("Unread message count does not exist in the session", party_id=party_id)
-    return get_message_count_from_api(session)
-
-
-def get_message_count_from_api(session) -> int:
-    """Gets the unread message count from the secure-message api.
-    A successful get will update the session."""
-    party_id = session.get_party_id()
-    logger.info("Getting message count from secure-message api", party_id=party_id)
-    params = {"unread_conversations": "true"}
-    headers = _create_get_conversation_headers(session.get_encoded_jwt())
-    url = f"{current_app.config['SECURE_MESSAGE_URL']}/messages/count"
-    with _get_session() as requestSession:
-        response = requestSession.get(url, headers=headers, params=params)
-        try:
-            response.raise_for_status()
-            count = response.json()["total"]
-            logger.debug("Got unread message count, updating session", party_id=party_id, count=count)
-            if session.is_persisted():
-                session.set_unread_message_total(count)
-            return count
-        except HTTPError as exception:
-            if exception.response.status_code == 403:
-                raise IncorrectAccountAccessError(
-                    message="User is unauthorized to perform this action", thread_id=party_id
-                )
-            else:
-                logger.exception("An error has occurred retrieving the new message count", party_id=party_id)
-        except Exception:
-            logger.exception(
-                "An unknown error has occurred getting message count from secure-message api", party_id=party_id
-            )
-        return 0
-
-
 def _create_survey_options(respondent_enrolments: list) -> list:
     survey_options = [Option("Not survey related", "Not survey related")]
 

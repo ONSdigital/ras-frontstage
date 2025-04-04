@@ -4,11 +4,7 @@ from flask import redirect, request
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
-from frontstage.controllers import (
-    case_controller,
-    collection_exercise_controller,
-    conversation_controller,
-)
+from frontstage.controllers import case_controller, collection_exercise_controller
 from frontstage.views.surveys import surveys_bp
 from frontstage.views.template_helper import render_template
 
@@ -39,7 +35,6 @@ def access_survey(session):
     referer_header = request.headers.get("referer", {})
 
     logger.info("Successfully retrieved case data", party_id=party_id, case_id=case_id)
-    unread_message_count = {"unread_message_count": conversation_controller.try_message_count_from_session(session)}
     return render_template(
         "surveys/surveys-access.html",
         session=session,
@@ -50,5 +45,4 @@ def access_survey(session):
         collection_exercise_info=case_data["collection_exercise"],
         business_info=case_data["business_party"],
         referer_header=referer_header,
-        unread_message_count=unread_message_count,
     )

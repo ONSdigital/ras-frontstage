@@ -71,10 +71,8 @@ class TestSecureMessage(unittest.TestCase):
         self.assertIn("You can now make changes to your name".encode(), response.data)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
-    def test_get_thread_failure(self, mock_request, message_count):
+    def test_get_thread_failure(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        message_count.return_value = 0
         message_json_copy = message_json.copy()
         del message_json_copy["@business_details"]
         mock_request.get(url_get_thread, json={"messages": [message_json_copy]})
@@ -85,20 +83,16 @@ class TestSecureMessage(unittest.TestCase):
         self.assertEqual(response.status_code, 500)
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
-    def test_get_thread_wrong_account(self, mock_request, message_count):
+    def test_get_thread_wrong_account(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        message_count.return_value = 0
         mock_request.get(url_get_thread, status_code=404, json={"messages": [message_json], "is_closed": False})
 
         self.assertRaises(IncorrectAccountAccessError)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.conversation_controller._create_get_conversation_headers")
-    @patch("frontstage.controllers.conversation_controller.try_message_count_from_session")
-    def test_secure_message_unauthorized_return(self, mock_request, authorization, message_count):
+    def test_secure_message_unauthorized_return(self, mock_request, authorization):
         mock_request.get(url_banner_api, status_code=404)
-        message_count.return_value = 0
         authorization.return_value = {"Authorization": "wrong authorization"}
 
         mock_request.get(url_get_thread, status_code=403)

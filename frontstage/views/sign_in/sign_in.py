@@ -7,11 +7,7 @@ from structlog import wrap_logger
 from frontstage import app
 from frontstage.common.session import Session
 from frontstage.common.utilities import obfuscate_email
-from frontstage.controllers import (
-    auth_controller,
-    conversation_controller,
-    party_controller,
-)
+from frontstage.controllers import auth_controller, party_controller
 from frontstage.controllers.party_controller import (
     notify_party_and_respondent_account_locked,
 )
@@ -115,8 +111,7 @@ def login():  # noqa: C901
             httponly=True,
             samesite="strict",
         )
-        count = conversation_controller.get_message_count_from_api(redis_session)
-        redis_session.set_unread_message_total(count)
+
         bound_logger.info("Successfully created session", session_key=redis_session.session_key)
         bound_logger.unbind("email")
         return response

@@ -247,7 +247,7 @@ spec:
             value: "{{ .Values.password.attemptTimeout }}"
           - name: PROFILER_ENABLED
             value: "{{- if .Values.profiler.enabled -}}True{{- else -}}False{{- end -}}"
-          - name: PR_TEST
+          - name: PR_TESTING
             value: "working"
           resources:
             {{ toYaml .Values.resources | nindent 12 }}

@@ -118,7 +118,7 @@ def login():  # noqa: C901
 
     account_activated = request.args.get("account_activated", None)
     template_data = {"error": {"type": form.errors, "logged_in": "False"}, "account_activated": account_activated}
-    return render_template("sign-in/sign-in.html", form=form, data=template_data)
+    return render_template("sign-in/sign-in.html", form=form, data=template_data, pr_test=app.config["PR_TESTING"])
 
 
 @sign_in_bp.route("/resend_verification/<party_id>", methods=["GET"])  # Deprecated: to be removed when not in use

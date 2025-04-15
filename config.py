@@ -28,6 +28,7 @@ class Config(object):
     BANNER_SERVICE_HOST = os.getenv("BANNER_API_SERVICE_HOST", "http://localhost")
     BANNER_SERVICE_PORT = os.getenv("BANNER_API_SERVICE_PORT", "8000")
     BANNER_SERVICE_URL = os.getenv("BANNER_SERVICE_URL", f"{BANNER_SERVICE_HOST}:{BANNER_SERVICE_PORT}")
+    PR_TESTING = os.getenv("PR_TESTING", "not working")
 
     ACCESS_CONTROL_ALLOW_ORIGIN = os.getenv("ACCESS_CONTROL_ALLOW_ORIGIN", "*")
     ACCOUNT_SERVICE_URL = os.getenv("ACCOUNT_SERVICE_URL")

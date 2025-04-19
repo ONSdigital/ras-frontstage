@@ -6,7 +6,7 @@ from flask import session as flask_session
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
-from frontstage.controllers import conversation_controller, party_controller
+from frontstage.controllers import party_controller
 from frontstage.views.surveys import surveys_bp
 from frontstage.views.template_helper import render_template
 
@@ -52,7 +52,6 @@ def get_survey_list(session, tag):
         tag=tag,
     )
 
-    unread_message_count = {"unread_message_count": conversation_controller.try_message_count_from_session(session)}
     if tag == "todo":
         added_survey = True if business_id and survey_id and not already_enrolled else None
         if flask_session.get("transferred_surveys"):
@@ -65,7 +64,6 @@ def get_survey_list(session, tag):
                 sorted_surveys_list=sorted_survey_list,
                 added_survey=added_survey,
                 already_enrolled=already_enrolled,
-                unread_message_count=unread_message_count,
                 delete_option_allowed=True if len(respondent_enrolments) == 0 else False,
                 survey_shared=survey_shared,
                 transferred_surveys=transferred_surveys,
@@ -82,5 +80,4 @@ def get_survey_list(session, tag):
             session=session,
             sorted_surveys_list=sorted_survey_list,
             history=True,
-            unread_message_count=unread_message_count,
         )

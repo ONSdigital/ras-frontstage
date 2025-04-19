@@ -8,7 +8,6 @@ from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import (
     case_controller,
     collection_instrument_controller,
-    conversation_controller,
     party_controller,
     survey_controller,
 )
@@ -62,10 +61,23 @@ def upload_survey(session):
 
     try:
         # Upload the file to the collection instrument service
-        collection_instrument_controller.upload_collection_instrument(
+        error_text = collection_instrument_controller.upload_collection_instrument(
             upload_file, case, business_party, party_id, survey
         )
+        if error_text is not None:
+            # Something was wrong with the file in the CI upload process
+            return redirect(
+                url_for(
+                    "surveys_bp.upload_failed",
+                    _external=True,
+                    case_id=case_id,
+                    business_party_id=business_party_id,
+                    survey_short_name=survey_short_name,
+                    error_info=error_text,
+                )
+            )
     except CiUploadError as ex:
+        # Something went wrong in the CI service
         error_type = determine_error_type(ex)
         if not error_type:
             logger.error(
@@ -87,12 +99,10 @@ def upload_survey(session):
         )
 
     logger.info("Successfully uploaded collection instrument", party_id=party_id, case_id=case_id)
-    unread_message_count = {"unread_message_count": conversation_controller.try_message_count_from_session(session)}
     return render_template(
         "surveys/surveys-upload-success.html",
         session=session,
         upload_filename=upload_file.filename,
-        unread_message_count=unread_message_count,
     )
 
 

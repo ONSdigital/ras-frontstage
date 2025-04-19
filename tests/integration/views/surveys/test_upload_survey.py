@@ -40,7 +40,7 @@ class TestUploadSurvey(unittest.TestCase):
 
     @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
     @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
-    def test_upload_survey_success(self, mock_request, *_):
+    def test_upload_survey_success(self, mock_request, _, upload_collection_instrument):
         mock_request.get(
             f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True",
             json=business_party,
@@ -49,6 +49,7 @@ class TestUploadSurvey(unittest.TestCase):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
         mock_request.get(url_get_case, json=case, status_code=200)
+        upload_collection_instrument.return_value = None
         self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
         response = self.app.post(
             f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'

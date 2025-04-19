@@ -6,18 +6,11 @@
 {% set page_title = "Help how safe is my data" %}
 {% set breadcrumbsData = [
     {
-        "text": "Sign in",
-        "url": "/sign-in"
-    },
-    {
-        "text": "Help",
-        "url": "/help"
-    },
-    {
-        "text": "Information about the ONS",
+        "text": "Back",
         "url": "/help/info-ons"
     }
 ] %}
+
 {% block breadcrumbs %}
     {{
         onsBreadcrumbs({
@@ -68,8 +61,5 @@
     }}
     <p>We only share your data with  authorised ONS staff who need to be aware of them to compile statistics.</p>
     <p>Any unauthorised disclosure of data would be a disciplinary and, in some cases criminal, offence.</p>
-
-    <h2>Need more information?</h2>
-    <p><a href="{{ url_for('sign_in_bp.login') }}" rel="noopener">Sign in to your account</a> to send us a secure message.</p>
-    <p>If you are having problems signing in, please <a href="{{ url_for('contact_us_bp.contact_us') }}" rel="noopener">contact us</a>.</p>
+    {% include "help/help-need-more-information.html" %}
 {% endblock main %}

@@ -45,12 +45,12 @@ jobs:
           # Maps port 6379 on service container to the host
           - 6379:6379
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
         with:
           fetch-depth: '0'
           token: ${{ secrets.BOT_TOKEN }}
       - name: Set up Python 3.12
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@b64ffcaf5b410884ad320a9cfac8866006a109aa # v4.8.0
         with:
           python-version: '3.12'
       - name: Build
@@ -66,11 +66,11 @@ jobs:
           make test
       - name: Authenticate with Google Cloud
         id: auth
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@71f986410dfbc7added4569d411d040a91dc6935 # v2.1.8
         with:
           credentials_json: ${{ secrets.GCR_KEY }}
       - name: Setup Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@6189d56e4096ee891640bb02ac264be376592d6a # v2.1.2
       - run: |
           gcloud auth configure-docker europe-west2-docker.pkg.dev
 

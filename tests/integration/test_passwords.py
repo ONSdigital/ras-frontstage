@@ -1,11 +1,16 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
+import itsdangerous
 import requests_mock
+from itsdangerous import BadSignature, BadTimeSignature, SignatureExpired
+from requests.exceptions import HTTPError
 
 from config import TestingConfig
 from frontstage import app
 from frontstage.common import verification
+from frontstage.controllers import party_controller
+from frontstage.exceptions.exceptions import ApiError
 from tests.integration.mocked_services import (
     token,
     url_banner_api,
@@ -59,6 +64,123 @@ class TestPasswords(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         mock_notify.assert_called_once()
         self.assertTrue("Check your email".encode() in response.data)
+
+    @requests_mock.mock()
+    @patch("frontstage.controllers.notify_controller.NotifyGateway.request_to_notify")
+    def test_forgot_password_post_success_with_4_try_warning(self, mock_request, mock_notify):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.post(url_reset_password_request, status_code=200)
+        mock_request.get(url_get_respondent_by_email, status_code=200, json={"firstName": "Bob", "id": "123456"})
+        mock_request.get(url_password_reset_counter, status_code=200, json={"counter": 4})
+        mock_request.delete(url_password_reset_counter, status_code=200, json={})
+        mock_request.post(
+            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-token",
+            status_code=200,
+            json={"message": "Successfully added token"},
+        )
+
+        response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
+        print(response.data)
+        self.assertEqual(response.status_code, 200)
+        mock_notify.assert_called_once()
+        self.assertTrue("Check your email".encode() in response.data)
+        self.assertTrue("You have 1 try left to reset your password".encode() in response.data)
+
+    @requests_mock.mock()
+    @patch("frontstage.controllers.notify_controller.NotifyGateway.request_to_notify")
+    def test_forgot_password_post_success_with_removed_token_and_counter_not_0(self, mock_request, mock_notify):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.post(url_reset_password_request, status_code=200)
+        mock_request.get(url_get_respondent_by_email, status_code=200, json={"firstName": "Bob", "id": "123456"})
+        mock_request.get(url_password_reset_counter, status_code=200, json={"counter": 1})
+        mock_request.post(
+            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-token",
+            status_code=200,
+            json={"message": "Successfully added token"},
+        )
+
+        response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        mock_notify.assert_called_once()
+        self.assertTrue("Check your email".encode() in response.data)
+
+    @requests_mock.mock()
+    @patch("frontstage.controllers.notify_controller.NotifyGateway.request_to_notify")
+    @patch.object(verification, "decode_email_token", Mock(return_value="test@test.com"))
+    @patch.object(verification, "generate_email_token", Mock(return_value=token))
+    @patch.object(party_controller, "post_verification_token", Mock(return_value="test@test.com"))
+    def test_forgot_password_post_success_with_token_and_counter_not_1(self, mock_request, mock_notify):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.post(url_reset_password_request, status_code=200)
+        mock_request.get(
+            url_get_respondent_by_email,
+            status_code=200,
+            json={"firstName": "Bob", "id": "123456", "password_verification_token": token},
+        )
+        mock_request.get(url_password_reset_counter, status_code=200, json={"counter": 1})
+        mock_request.post(
+            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-token",
+            status_code=200,
+            json={"message": "Successfully added token"},
+        )
+        # decode_email_token(token, 2).return_value = "test@test.com"
+        response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        mock_notify.assert_called_once()
+        self.assertTrue("Check your email".encode() in response.data)
+
+    @requests_mock.mock()
+    @patch("frontstage.controllers.notify_controller.NotifyGateway.request_to_notify")
+    @patch("frontstage.common.verification.decode_email_token")
+    @patch("frontstage.controllers.party_controller.post_verification_token")
+    @patch.object(verification, "generate_email_token", Mock(return_value=token))
+    def test_forgot_password_post_success_with_token_and_counter_not_1_and_expired_signature(
+        self, mock_request, mock_notify, decode_email_token, post_verification_token
+    ):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.post(url_reset_password_request, status_code=200)
+        mock_request.get(
+            url_get_respondent_by_email,
+            status_code=200,
+            json={"firstName": "Bob", "id": "123456", "password_verification_token": token},
+        )
+        mock_request.get(url_password_reset_counter, status_code=200, json={"counter": 1})
+        mock_request.post(
+            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-token",
+            status_code=200,
+            json={"message": "Successfully added token"},
+        )
+        decode_email_token(token, 2).side_effect = SignatureExpired
+        response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        mock_notify.assert_called_once()
+        self.assertTrue("Check your email".encode() in response.data)
+
+    @requests_mock.mock()
+    @patch.object(verification, "decode_email_token", Mock(return_value=""))
+    @patch.object(verification, "generate_email_token", Mock(return_value=token))
+    @patch.object(party_controller, "post_verification_token", Mock(return_value=token))
+    def test_forgot_password_post_failure_where_counter_greater_than_5(self, mock_request):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.post(url_reset_password_request, status_code=200)
+        mock_request.get(
+            url_get_respondent_by_email,
+            status_code=200,
+            json={"firstName": "Bob", "id": "123456", "password_verification_token": token},
+        )
+        mock_request.get(url_password_reset_counter, status_code=200, json={"counter": 5})
+        mock_request.post(
+            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/123456/password-verification-token",
+            status_code=200,
+            json={"message": "Successfully added token"},
+        )
+        response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("You've tried to reset your password too many times".encode() in response.data)
 
     @requests_mock.mock()
     def test_forgot_password_post_no_email(self, mock_request):

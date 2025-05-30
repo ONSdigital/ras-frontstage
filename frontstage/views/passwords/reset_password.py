@@ -123,7 +123,7 @@ def request_password_change(email):
     # >0 and the the try below would be entered (when only the passworrd_reset_counter was in the if). When this
     # occurred, the code would error as the password_verfication_token would be missing from the dictionary. I've added
     # a check to ensure that this never enters the try when this is missing from the dict.
-    if password_reset_counter != 0 and "password_verification_token" in respondent:
+    if password_reset_counter != 0 and respondent.get("password_verification_token") is not None:
         try:
             email = verification.decode_email_token(
                 respondent["password_verification_token"], app.config["PASSWORD_RESET_ATTEMPTS_TIMEOUT"]

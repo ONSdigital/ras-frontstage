@@ -120,8 +120,8 @@ def request_password_change(email):
     password_reset_counter = party_controller.get_password_reset_counter(party_id)["counter"]
 
     # When the password verification token has expired, it is deleted from the DB. The password counter would always be
-    # >0 and the the try below would be entered (when only the passworrd_reset_counter was in the if). When this
-    # occurred, the code would error as the password_verfication_token would be missing from the dictionary. I've added
+    # >0 and the try below would be entered (when only the password_reset_counter was in the if). When this
+    # occurred, the code would error as the password_verification_token would be missing from the dictionary. I've added
     # a check to ensure that this never enters the try when this is missing from the dict.
     if password_reset_counter != 0 and respondent.get("password_verification_token") is not None:
         try:

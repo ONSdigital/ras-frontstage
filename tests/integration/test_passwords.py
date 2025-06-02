@@ -1,16 +1,13 @@
 import unittest
 from unittest.mock import Mock, patch
 
-import itsdangerous
 import requests_mock
-from itsdangerous import BadSignature, BadTimeSignature, SignatureExpired
-from requests.exceptions import HTTPError
+from itsdangerous import SignatureExpired
 
 from config import TestingConfig
 from frontstage import app
 from frontstage.common import verification
 from frontstage.controllers import party_controller
-from frontstage.exceptions.exceptions import ApiError
 from tests.integration.mocked_services import (
     token,
     url_banner_api,

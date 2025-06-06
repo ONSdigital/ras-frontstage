@@ -7,5 +7,8 @@
     "status": "ACTIVE",
     "telephone": "0987654321",
     "respondent_id": 1,
-    "password_reset_counter": 0
+    "password_reset_counter": 0,
+    "pendingEmailAddress": null,
+    "markForDeletion": false,
+    "password_verification_token": "test_token"
 }

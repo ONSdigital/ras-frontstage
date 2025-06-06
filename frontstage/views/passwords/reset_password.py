@@ -118,12 +118,12 @@ def request_password_change(email):
 
     party_id = str(respondent["id"])
     password_reset_counter = party_controller.get_password_reset_counter(party_id)["counter"]
-
-    # When the password verification token has expired, it is deleted from the DB. The password counter would always be
-    # >0 and the try below would be entered (when only the password_reset_counter was in the if). When this
-    # occurred, the code would error as the password_verification_token would be missing from the dictionary. I've added
-    # a check to ensure that this never enters the try when this is missing from the dict.
-    if password_reset_counter != 0 and respondent.get("password_verification_token") is not None:
+    # When the password_verification_token has expired, it will be deleted from the DB, however, the
+    # password_reset_counter is not reset and will be > 0. This led to an error 500 when the below 'if' statement
+    # was entered as a result of the password_verification_token being null. The statement has been updated to check
+    # that there is an actual string present and not null or an empty string. This should minimise the chances of an
+    # error 500 occurring.
+    if password_reset_counter > 0 and respondent.get("password_verification_token"):
         try:
             email = verification.decode_email_token(
                 respondent["password_verification_token"], app.config["PASSWORD_RESET_ATTEMPTS_TIMEOUT"]

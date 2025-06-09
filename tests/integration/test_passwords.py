@@ -421,7 +421,7 @@ class TestPasswords(unittest.TestCase):
     def test_reset_password_reset_counter(self, mock_request, mock_notify):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.post(url_reset_password_request)
-        mock_request.get(url_password_reset_counter, json={"counter": 5})
+        mock_request.get(url_password_reset_counter, json={"counter": 4})
         mock_request.delete(url_password_reset_counter, json={})
         mock_request.get(url_get_respondent_by_email, json=respondent_party)
         mock_request.post(

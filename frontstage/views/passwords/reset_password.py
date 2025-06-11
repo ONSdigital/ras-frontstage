@@ -119,23 +119,13 @@ def request_password_change(email):
     party_id = str(respondent["id"])
     password_reset_counter = party_controller.get_password_reset_counter(party_id)["counter"]
 
-    if password_reset_counter >= 5:
-        verification_token = respondent.get("password_verification_token")
-        try:
-            verification.decode_email_token(verification_token, app.config["PASSWORD_RESET_ATTEMPTS_TIMEOUT"])
-            logger.error("Password reset attempts exceeded")
-            return redirect(url_for("passwords_bp.exceeded_number_of_reset_attempts"))
-        except (BadSignature, SignatureExpired):
-            try:
-                party_controller.reset_password_reset_counter(party_id)
-            except ApiError:
-                logger.error("Error resetting password reset counter")
-                return redirect(url_for("passwords_bp.reset_password_trouble"))
-
     # When the password_verification_token has expired, it will be deleted from the DB
     if verification_token := respondent.get("password_verification_token"):
+        if password_reset_counter >= 5:
+            logger.error("Password reset attempts exceeded")
+            return redirect(url_for("passwords_bp.exceeded_number_of_reset_attempts"))
         try:
-            email = verification.decode_email_token(verification_token, app.config["PASSWORD_RESET_ATTEMPTS_TIMEOUT"])
+            verification.decode_email_token(verification_token, app.config["PASSWORD_RESET_ATTEMPTS_TIMEOUT"])
         except SignatureExpired:
             try:
                 party_controller.reset_password_reset_counter(party_id)

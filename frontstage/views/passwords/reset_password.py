@@ -119,7 +119,6 @@ def request_password_change(email):
     party_id = str(respondent["id"])
     password_reset_counter = party_controller.get_password_reset_counter(party_id)["counter"]
 
-    # When the password_verification_token has expired, it will be deleted from the DB
     if verification_token := respondent.get("password_verification_token"):
         try:
             verification.decode_email_token(verification_token, app.config["PASSWORD_RESET_ATTEMPTS_TIMEOUT"])

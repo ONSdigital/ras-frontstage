@@ -119,26 +119,18 @@ def request_password_change(email):
     party_id = str(respondent["id"])
     password_reset_counter = party_controller.get_password_reset_counter(party_id)["counter"]
 
-    # When the password verification token has expired, it is deleted from the DB. The password counter would always be
-    # >0 and the the try below would be entered (when only the passworrd_reset_counter was in the if). When this
-    # occurred, the code would error as the password_verfication_token would be missing from the dictionary. I've added
-    # a check to ensure that this never enters the try when this is missing from the dict.
-    if password_reset_counter != 0 and "password_verification_token" in respondent:
+    if verification_token := respondent.get("password_verification_token"):
         try:
-            email = verification.decode_email_token(
-                respondent["password_verification_token"], app.config["PASSWORD_RESET_ATTEMPTS_TIMEOUT"]
-            )
+            verification.decode_email_token(verification_token, app.config["PASSWORD_RESET_ATTEMPTS_TIMEOUT"])
+            if password_reset_counter >= 5:
+                logger.error("Password reset attempts exceeded")
+                return redirect(url_for("passwords_bp.exceeded_number_of_reset_attempts"))
         except SignatureExpired:
             try:
                 party_controller.reset_password_reset_counter(party_id)
-                password_reset_counter = 0
             except ApiError:
                 logger.error("Error resetting password reset counter")
                 return redirect(url_for("passwords_bp.reset_password_trouble"))
-
-    if password_reset_counter >= 5:
-        logger.error("Password reset attempts exceeded")
-        return redirect(url_for("passwords_bp.exceeded_number_of_reset_attempts"))
 
     logger.info("Requesting password change", party_id=party_id)
 

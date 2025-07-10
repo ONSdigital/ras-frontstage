@@ -8,12 +8,12 @@ on:
       - main
     paths-ignore:
       - _infra/spinnaker/**
-  if: github.actor=='anwilkie'
     pull_request:
-      branches:
-        - main
-      paths-ignore:
-        - _infra/spinnaker/**
+      if: github.actor == 'anwilkie'
+        branches:
+          - main
+        paths-ignore:
+          - _infra/spinnaker/**
   workflow_dispatch:
 
 env:

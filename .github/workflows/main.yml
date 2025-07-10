@@ -8,7 +8,7 @@ on:
       - main
     paths-ignore:
       - _infra/spinnaker/**
-  if: github.actor=='this is not a real user'
+  if: github.actor=='anwilkie'
     pull_request:
       branches:
         - main

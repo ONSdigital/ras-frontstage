@@ -1,0 +1,50 @@
+name: Build
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the main branch
+on:
+  pull_request:
+    if: github.actor=='dependabot'
+    branches:
+      - main
+    paths-ignore:
+      - _infra/spinnaker/**
+
+jobs:
+  # This workflow contains a single job called "build & package"
+  build:
+    name: Build & Package
+    runs-on: ubuntu-latest
+    services:
+      # Label used to access the service container
+      redis:
+        # Docker Hub image
+        image: redis
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps port 6379 on service container to the host
+          - 6379:6379
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	 # v4.2.2
+        with:
+          fetch-depth: '0'
+      - name: Set up Python 3.12
+        uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4.9.1
+        with:
+          python-version: '3.12'
+      - name: Build
+        run: |
+          python -m pip install --upgrade pip
+          pip install pipenv
+          pipenv install --dev
+      - name: Load Design System templates
+        run: |
+          make load-design-system-templates
+      - name: Test
+        run: |
+          make test

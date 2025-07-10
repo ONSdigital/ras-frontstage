@@ -9,10 +9,12 @@ on:
     paths-ignore:
       - _infra/spinnaker/**
   pull_request:
+    if: github.actor!='dependabot'
     branches:
       - main
     paths-ignore:
       - _infra/spinnaker/**
+  workflow_dispatch:
 
 env:
   IMAGE: frontstage

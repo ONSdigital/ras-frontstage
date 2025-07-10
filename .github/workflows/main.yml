@@ -8,12 +8,12 @@ on:
       - main
     paths-ignore:
       - _infra/spinnaker/**
-  pull_request:
-    if: github.actor!='dependabot'
-    branches:
-      - main
-    paths-ignore:
-      - _infra/spinnaker/**
+  if: github.actor=='this is not a real user'
+    pull_request:
+      branches:
+        - main
+      paths-ignore:
+        - _infra/spinnaker/**
   workflow_dispatch:
 
 env:

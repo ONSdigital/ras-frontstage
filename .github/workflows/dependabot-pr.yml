@@ -1,14 +1,14 @@
-name: Build
+name: Dependabot Build
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the main branch
 on:
-  pull_request:
-    if: github.actor=='dependabot'
-    branches:
-      - main
-    paths-ignore:
-      - _infra/spinnaker/**
+  if: github.actor=='dependabot'
+    pull_request:
+      branches:
+        - main
+      paths-ignore:
+        - _infra/spinnaker/**
 
 jobs:
   # This workflow contains a single job called "build & package"

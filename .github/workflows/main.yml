@@ -74,7 +74,7 @@ jobs:
       - name: Setup Google Cloud SDK
         if: github.event.pull_request.user.login == 'dependabot[bot]'
         uses: google-github-actions/setup-gcloud@77e7a554d41e2ee56fc945c52dfd3f33d12def9a # v2.1.4
-      - run: |
+        run: |
           gcloud auth configure-docker europe-west2-docker.pkg.dev
 
       - name: pr docker tag

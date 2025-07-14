@@ -9,7 +9,6 @@ on:
     paths-ignore:
       - _infra/spinnaker/**
   pull_request:
-    if: ${{ github.event.pull_request.user.login == 'anwilkie' }}
     branches:
       - main
     paths-ignore:
@@ -67,6 +66,7 @@ jobs:
         run: |
           make test
       - name: Authenticate with Google Cloud
+        if: github.event.pull_request.user.login == 'dependabot[bot]'
         id: auth
         uses: google-github-actions/auth@ba79af03959ebeac9769e648f473a284504d9193 # v2.1.10
         with:

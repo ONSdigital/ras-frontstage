@@ -9,7 +9,7 @@ on:
     paths-ignore:
       - _infra/spinnaker/**
   pull_request:
-    if: github.actor=='dependabot[bot]'
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
     branches:
       - main
     paths-ignore:

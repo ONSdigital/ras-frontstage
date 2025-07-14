@@ -78,7 +78,7 @@ jobs:
           gcloud auth configure-docker europe-west2-docker.pkg.dev
 
       - name: pr docker tag
-        if: github.ref != 'refs/heads/main'
+        if: github.ref != 'refs/heads/main' && github.event.pull_request.user.login == 'dependabot[bot]'
         id: tag
         run: |
           PR=$(echo "$GITHUB_REF" | awk -F / '{print $3}')
@@ -94,7 +94,7 @@ jobs:
         run: |
           docker push "$REGISTRY_HOSTNAME"/"$GAR_GOOGLE_PROJECT_ID"/"$GAR_REPOSITORY"/"$IMAGE":${{ env.pr_number }}
       - name: template helm
-        if: github.event.pull_request.user.login != 'dependabot[bot]'
+        if: github.event.pull_request.user.login == 'dependabot[bot]'
         run: |
           helm template $CHART_DIRECTORY
 

@@ -8,11 +8,11 @@ on:
       - main
     paths-ignore:
       - _infra/spinnaker/**
-    pull_request:
-      branches:
-        - main
-      paths-ignore:
-        - _infra/spinnaker/**
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - _infra/spinnaker/**
   workflow_dispatch:
 
 env:
@@ -65,7 +65,6 @@ jobs:
       - name: Test
         run: |
           make test
-      if: github.event.pull_request.user.login == 'dependabot[bot]'
       - name: Authenticate with Google Cloud
         id: auth
         uses: google-github-actions/auth@ba79af03959ebeac9769e648f473a284504d9193 # v2.1.10

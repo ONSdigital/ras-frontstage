@@ -31,7 +31,7 @@ class EqPayload(object):
         """
         tx_id = str(uuid.uuid4())
         logger.info("Creating payload for JWT", case_id=case["id"], tx_id=tx_id)
-
+        ce_id = ce["id"]
         ci_id = case["collectionInstrumentId"]
         ci = collection_instrument_controller.get_collection_instrument(
             ci_id, current_app.config["COLLECTION_INSTRUMENT_URL"], current_app.config["BASIC_AUTH"]
@@ -43,9 +43,14 @@ class EqPayload(object):
         if not classifiers or not classifiers.get("eq_id") or not classifiers.get("form_type"):
             raise InvalidEqPayLoad(f"Collection instrument {ci_id} classifiers are incorrect or missing")
 
+        form_type = classifiers["form_type"]
+
+        registry_instrument = collection_instrument_controller.get_registry_instrument(
+            exercise_id=ce_id, form_type=form_type
+        )
+
         eq_id = ci["classifiers"]["eq_id"]
-        form_type = ci["classifiers"]["form_type"]
-        ce_id = ce["id"]
+        cir_instrument_id = registry_instrument["guid"] if registry_instrument["guid"] else None
         party = party_controller.get_party_by_business_id(
             business_party_id,
             current_app.config["PARTY_URL"],
@@ -68,6 +73,7 @@ class EqPayload(object):
             "collection_exercise_sid": ce_id,
             "response_id": f"{ru_ref}{ce_id}{eq_id}{form_type}",
             "response_expires_at": self._find_event_date_by_tag("exercise_end", ce_events, ce_id),
+            "cir_instrument_id": cir_instrument_id,
             "schema_name": f"{eq_id}_{form_type}",
             "survey_metadata": {
                 "data": {

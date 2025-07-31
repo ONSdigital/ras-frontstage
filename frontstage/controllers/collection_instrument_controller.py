@@ -1,5 +1,6 @@
 import logging
 import os
+from functools import lru_cache
 
 import requests
 from flask import current_app as app
@@ -79,6 +80,37 @@ def get_collection_instrument(collection_instrument_id, collection_instrument_ur
         raise ApiError(logger, response)
 
     logger.info("Successfully retrieved collection instrument", collection_instrument_id=collection_instrument_id)
+    return response.json()
+
+
+@lru_cache
+def get_registry_instrument(exercise_id, form_type):
+    logger.info(
+        "Attempting to retrieve registry instrument by exercise_id and form_type",
+        collection_exercise_id=exercise_id,
+        form_type=form_type,
+    )
+
+    url = (
+        f"{app.config["COLLECTION_INSTRUMENT_URL"]}/collection-instrument-api/1.0.2/registry-instrument/exercise-id/"
+        f"{exercise_id}/formtype/{form_type}"
+    )
+    response = requests.get(url, auth=app.config["BASIC_AUTH"])
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        logger.error(
+            "Failed to retrieve registry instrument by exercise_id and form_type",
+            collection_exercise_id=exercise_id,
+            form_type=form_type,
+        )
+
+    logger.info(
+        "Successfully retrieved registry instrument by exercise_id and form_type",
+        collection_exercise_id=exercise_id,
+        form_type=form_type,
+    )
     return response.json()
 
 

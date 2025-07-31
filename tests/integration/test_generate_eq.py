@@ -2,7 +2,8 @@ import json
 import unittest
 import uuid
 from datetime import datetime, timezone
-from unittest.mock import patch
+from http import HTTPStatus
+from unittest.mock import MagicMock, Mock, patch
 
 import requests_mock
 from freezegun import freeze_time
@@ -27,6 +28,7 @@ from tests.integration.mocked_services import (
     url_get_collection_exercise,
     url_get_collection_exercise_events,
     url_get_survey,
+    url_registry_instrument,
 )
 
 encoded_jwt_token = (
@@ -69,6 +71,9 @@ PAYLOAD = {
     },
 }
 
+with open("tests/test_data/registry_instrument/registry_instrument.json") as fp:
+    registry_instrument = json.load(fp)
+
 
 class TestGenerateEqURL(unittest.TestCase):
     def setUp(self):
@@ -93,6 +98,7 @@ class TestGenerateEqURL(unittest.TestCase):
         mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
         mock_request.get(url_get_business_party, json=business_party)
         mock_request.get(url_get_ci, json=collection_instrument_eq)
+        mock_request.get(url_registry_instrument, json=registry_instrument)
 
         # When a payload is created
         with app.app_context():
@@ -122,6 +128,7 @@ class TestGenerateEqURL(unittest.TestCase):
         mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
         mock_request.get(url_get_business_party, json=business_party)
         mock_request.get(url_get_ci, json=collection_instrument_eq)
+        mock_request.get(url_registry_instrument, json=registry_instrument)
 
         # When a payload is created
         with app.app_context():
@@ -169,6 +176,7 @@ class TestGenerateEqURL(unittest.TestCase):
 
         mock_request.get(url_get_ci, json=collection_instrument_eq_no_eq_id)
         mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_registry_instrument, json=registry_instrument)
 
         # When create_payload is called
         # Then an InvalidEqPayLoad is raised
@@ -196,6 +204,7 @@ class TestGenerateEqURL(unittest.TestCase):
 
         mock_request.get(url_get_ci, json=collection_instrument_eq)
         mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_registry_instrument, json=registry_instrument)
 
         # When create_payload is called
         # Then an InvalidEqPayLoad is raised
@@ -218,6 +227,7 @@ class TestGenerateEqURL(unittest.TestCase):
 
         mock_request.get(url_get_ci, json=collection_instrument_eq_no_form_type)
         mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_registry_instrument, json=None)
 
         # When create_payload is called
         # Then an InvalidEqPayLoad is raised
@@ -349,6 +359,7 @@ class TestGenerateEqURL(unittest.TestCase):
         mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
         mock_request.get(url_get_business_party, json=business_party)
         mock_request.get(url_get_ci, json=collection_instrument_eq)
+        mock_request.get(url_registry_instrument, json=registry_instrument)
         # When a payload is created
         with app.app_context():
             payload_created = EqPayload().create_payload(
@@ -382,6 +393,7 @@ class TestGenerateEqURL(unittest.TestCase):
         mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
         mock_request.get(url_get_business_party, json=business_party)
         mock_request.get(url_get_ci, json=collection_instrument_eq)
+        mock_request.get(url_registry_instrument, json=registry_instrument)
         # When a payload is created
         with app.app_context():
             payload_created = EqPayload().create_payload(
@@ -394,6 +406,57 @@ class TestGenerateEqURL(unittest.TestCase):
 
         # Then the payload is as expected
         self.assertNotIn("b9a87999-fcc0-4085-979f-06390fb5dddd", payload_created["survey_metadata"]["data"])
+
+    @requests_mock.mock()
+    def test_collection_with_registry_instrument(self, mock_request):
+        # Given a collection exercise is without a registry instrument
+        mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
+        mock_request.get(url_get_business_party, json=business_party)
+        mock_request.get(url_get_ci, json=collection_instrument_eq)
+        mock_request.get(url_registry_instrument, json=registry_instrument)
+
+        # When a payload is created
+        with app.app_context():
+            response_mock = MagicMock()
+            logger_mock = MagicMock()
+            with patch(
+                "frontstage.controllers.collection_instrument_controller.get_registry_instrument",
+                Mock(side_effect=ApiError(logger_mock, response_mock)),
+            ):
+                with self.assertRaises(ApiError):
+                    payload_created = EqPayload().create_payload(
+                        case, collection_exercise, respondent_party["id"], business_party["id"], survey_eq
+                    )
+
+                    # Then the payload is as expected and doesn't have a registry version
+                    self.assertTrue(PAYLOAD.items() <= payload_created.items())
+                    self.assertIn("8d990a74-5f07-4765-ac66-df7e1a96505b", payload_created)
+                    self.assertIn("cir_instrument_id", payload_created)
+
+    @requests_mock.mock()
+    def test_collection_without_registry_instrument(self, mock_request):
+        # Given a collection exercise is without a registry instrument
+        mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
+        mock_request.get(url_get_business_party, json=business_party)
+        mock_request.get(url_get_ci, json=collection_instrument_eq)
+
+        # When a payload is created
+        with app.app_context():
+            response_mock = MagicMock()
+            logger_mock = MagicMock()
+            with patch(
+                "frontstage.controllers.collection_instrument_controller.get_registry_instrument",
+                Mock(side_effect=ApiError(logger_mock, response_mock)),
+            ):
+                with self.assertRaises(ApiError):
+                    payload_created = EqPayload().create_payload(
+                        case, collection_exercise, respondent_party["id"], business_party["id"], survey_eq
+                    )
+
+                    # Then the payload is as expected and doesn't have a registry version
+                    self.assertTrue(PAYLOAD.items() <= payload_created.items())
+                    self.assertIn("8d990a74-5f07-4765-ac66-df7e1a96505b", payload_created)
+                    self.assertNotIn("cir_instrument_id", payload_created)
 
 
 def _is_valid_uuid(uuid_string: str) -> bool:

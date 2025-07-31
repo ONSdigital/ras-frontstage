@@ -8,6 +8,7 @@ from structlog import wrap_logger
 from frontstage import redis
 from frontstage.controllers.collection_instrument_controller import (
     get_collection_instrument,
+    get_registry_instrument,
 )
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -16,6 +17,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 class RedisCache:
     COLLECTION_INSTRUMENT_CATEGORY_EXPIRY = 600  # 10 mins
     COLLECTION_EXERCISE_CATEGORY_EXPIRY = 600  # 10 mins
+    COLLECTION_REGISTRY_CATEGORY_EXPIRY = 600  # 10 mins
 
     def get_collection_instrument(self, key):
         """
@@ -34,6 +36,29 @@ class RedisCache:
         if not result:
             logger.info("Key not in cache, getting value from collection instrument service", key=redis_key)
             result = get_collection_instrument(key, app.config["COLLECTION_INSTRUMENT_URL"], app.config["BASIC_AUTH"])
+            self.save(redis_key, result, self.COLLECTION_INSTRUMENT_CATEGORY_EXPIRY)
+            return result
+
+        return json.loads(result.decode("utf-8"))
+
+    def get_registry_instrument(self, collection_exercise_id, form_type):
+        """
+        Gets the registry-instrument from redis or the collection-instrument service
+
+        :param collection_exercise_id: Key in redis
+        :param form_type: Key in redis
+        :return: Result from either the cache or collection instrument service
+        """
+        redis_key = f"frontstage:registry-instrument:{collection_exercise_id}:{form_type})"
+        try:
+            result = redis.get(redis_key)
+        except RedisError:
+            logger.error("Error getting value from cache, please investigate", key=redis_key, exc_info=True)
+            result = None
+
+        if not result:
+            logger.info("Key not in cache, getting value from collection instrument service", key=redis_key)
+            result = get_registry_instrument(collection_exercise_id, form_type)
             self.save(redis_key, result, self.COLLECTION_INSTRUMENT_CATEGORY_EXPIRY)
             return result
 

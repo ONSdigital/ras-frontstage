@@ -2,7 +2,6 @@ import json
 import unittest
 import uuid
 from datetime import datetime, timezone
-from http import HTTPStatus
 from unittest.mock import MagicMock, Mock, patch
 
 import requests_mock

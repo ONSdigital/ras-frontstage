@@ -101,10 +101,11 @@ def get_registry_instrument(exercise_id, form_type):
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error(
-            "Failed to retrieve registry instrument by exercise_id and form_type",
+            "No registry instrument found for exercise_id and form_type",
             collection_exercise_id=exercise_id,
             form_type=form_type,
         )
+        return None
 
     logger.info(
         "Successfully retrieved registry instrument by exercise_id and form_type",

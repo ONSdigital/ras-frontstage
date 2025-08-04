@@ -41,7 +41,7 @@ class RedisCache:
 
         return json.loads(result.decode("utf-8"))
 
-    def get_registry_instrument(self, collection_exercise_id, form_type):
+    def get_registry_instrument(self, exercise_id, form_type):
         """
         Gets the registry-instrument from redis or the collection-instrument service
 
@@ -49,7 +49,7 @@ class RedisCache:
         :param form_type: Key in redis
         :return: Result from either the cache or collection instrument service
         """
-        redis_key = f"frontstage:registry-instrument:{collection_exercise_id}:{form_type})"
+        redis_key = f"frontstage:registry-instrument:{exercise_id}:{form_type})"
         try:
             result = redis.get(redis_key)
         except RedisError:
@@ -58,7 +58,7 @@ class RedisCache:
 
         if not result:
             logger.info("Key not in cache, getting value from collection instrument service", key=redis_key)
-            result = get_registry_instrument(collection_exercise_id, form_type)
+            result = get_registry_instrument(exercise_id, form_type)
             self.save(redis_key, result, self.COLLECTION_INSTRUMENT_CATEGORY_EXPIRY)
             return result
 

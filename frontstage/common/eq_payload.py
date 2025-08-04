@@ -7,6 +7,7 @@ import iso8601
 from flask import current_app
 from structlog import wrap_logger
 
+from frontstage.common.redis_cache import RedisCache
 from frontstage.controllers import (
     collection_exercise_controller,
     collection_instrument_controller,
@@ -44,13 +45,15 @@ class EqPayload(object):
             raise InvalidEqPayLoad(f"Collection instrument {ci_id} classifiers are incorrect or missing")
 
         form_type = classifiers["form_type"]
-
-        registry_instrument = collection_instrument_controller.get_registry_instrument(
-            exercise_id=ce_id, form_type=form_type
-        )
-
         eq_id = ci["classifiers"]["eq_id"]
-        cir_instrument_id = registry_instrument["guid"] if registry_instrument["guid"] else None
+
+        redis_cache = RedisCache()
+        registry_instrument = redis_cache.get_registry_instrument(exercise_id=ce_id, form_type=form_type)
+
+        if registry_instrument:
+            cir_instrument_id = registry_instrument["guid"]
+        else:
+            cir_instrument_id = None
         party = party_controller.get_party_by_business_id(
             business_party_id,
             current_app.config["PARTY_URL"],

@@ -30,6 +30,7 @@ class EqPayload(object):
         :param survey: A dict containing information about the survey
         :returns: Payload for EQ
         """
+        redis_cache = RedisCache()
         tx_id = str(uuid.uuid4())
         logger.info("Creating payload for JWT", case_id=case["id"], tx_id=tx_id)
         ce_id = ce["id"]
@@ -47,13 +48,8 @@ class EqPayload(object):
         form_type = classifiers["form_type"]
         eq_id = ci["classifiers"]["eq_id"]
 
-        redis_cache = RedisCache()
-        registry_instrument = redis_cache.get_registry_instrument(exercise_id=ce_id, form_type=form_type)
+        registry_instrument = redis_cache.get_registry_instrument(ce_id, form_type)
 
-        if registry_instrument:
-            cir_instrument_id = registry_instrument["guid"]
-        else:
-            cir_instrument_id = None
         party = party_controller.get_party_by_business_id(
             business_party_id,
             current_app.config["PARTY_URL"],
@@ -76,7 +72,6 @@ class EqPayload(object):
             "collection_exercise_sid": ce_id,
             "response_id": f"{ru_ref}{ce_id}{eq_id}{form_type}",
             "response_expires_at": self._find_event_date_by_tag("exercise_end", ce_events, ce_id),
-            "cir_instrument_id": cir_instrument_id,
             "schema_name": f"{eq_id}_{form_type}",
             "survey_metadata": {
                 "data": {
@@ -94,6 +89,9 @@ class EqPayload(object):
                 }
             },
         }
+
+        if registry_instrument:
+            payload["cir_instrument_id"] = registry_instrument["guid"]
 
         if employment_date := self._find_event_date_by_tag("employment", ce_events, ce_id, False):
             payload["survey_metadata"]["data"]["employment_date"] = employment_date

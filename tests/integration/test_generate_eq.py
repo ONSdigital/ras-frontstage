@@ -2,13 +2,14 @@ import json
 import unittest
 import uuid
 from datetime import datetime, timezone
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import patch
 
 import requests_mock
 from freezegun import freeze_time
 
 from frontstage import app
 from frontstage.common.eq_payload import EqPayload
+from frontstage.common.redis_cache import RedisCache
 from frontstage.controllers import collection_exercise_controller
 from frontstage.exceptions.exceptions import ApiError, InvalidEqPayLoad
 from tests.integration.mocked_services import (
@@ -423,22 +424,14 @@ class TestGenerateEqURL(unittest.TestCase):
         self.assertNotIn("b9a87999-fcc0-4085-979f-06390fb5dddd", payload_created["survey_metadata"]["data"])
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.RedisCache.get_registry_instrument")
-    def test_collection_with_registry_instrument(self, mock_request, mock_cache):
-        # Given a collection exercise is without a registry instrument
-        mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
-        mock_request.get(url_get_business_party, json=business_party)
-        mock_request.get(url_get_ci, json=collection_instrument_eq)
-        mock_request.get(url_registry_instrument, json=registry_instrument)
-        mock_cache.return_value = registry_instrument
-        # When a payload is created
+    def test_collection_with_registry_instrument(self, mock_request):
         with app.app_context():
-            response_mock = MagicMock()
-            logger_mock = MagicMock()
-            with patch(
-                "frontstage.controllers.collection_instrument_controller.get_registry_instrument",
-                Mock(side_effect=ApiError(logger_mock, response_mock)),
-            ):
+            # Given a collection exercise is without a registry instrument
+            mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
+            mock_request.get(url_get_business_party, json=business_party)
+            mock_request.get(url_get_ci, json=collection_instrument_eq)
+            # When a payload is created
+            with patch.object(RedisCache, "get_registry_instrument", return_value=registry_instrument):
                 payload_created = EqPayload().create_payload(
                     case, collection_exercise, respondent_party["id"], business_party["id"], survey_eq
                 )
@@ -447,21 +440,14 @@ class TestGenerateEqURL(unittest.TestCase):
                 self.assertIn("e9b3ddcd-bfdc-4c20-aa1b-397b10b4f9d8", payload_created["cir_instrument_id"])
 
     @requests_mock.mock()
-    @patch("frontstage.controllers.party_controller.RedisCache.get_registry_instrument")
-    def test_collection_without_registry_instrument(self, mock_request, mock_cache):
-        # Given a collection exercise is without a registry instrument
-        mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
-        mock_request.get(url_get_business_party, json=business_party)
-        mock_request.get(url_get_ci, json=collection_instrument_eq)
-        mock_cache.return_value = None
-        # When a payload is created
+    def test_collection_without_registry_instrument(self, mock_request):
         with app.app_context():
-            response_mock = MagicMock()
-            logger_mock = MagicMock()
-            with patch(
-                "frontstage.controllers.collection_instrument_controller.get_registry_instrument",
-                Mock(side_effect=ApiError(logger_mock, response_mock)),
-            ):
+            # Given a collection exercise is without a registry instrument
+            mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
+            mock_request.get(url_get_business_party, json=business_party)
+            mock_request.get(url_get_ci, json=collection_instrument_eq)
+            # When a payload is created
+            with patch.object(RedisCache, "get_registry_instrument", return_value=None):
                 payload_created = EqPayload().create_payload(
                     case, collection_exercise, respondent_party["id"], business_party["id"], survey_eq
                 )

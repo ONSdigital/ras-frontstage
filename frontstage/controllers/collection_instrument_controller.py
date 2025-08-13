@@ -84,13 +84,7 @@ def get_collection_instrument(collection_instrument_id, collection_instrument_ur
 
 
 @lru_cache
-def get_registry_instrument(exercise_id, form_type):
-    logger.info(
-        "Attempting to retrieve registry instrument by exercise_id and form_type",
-        collection_exercise_id=exercise_id,
-        form_type=form_type,
-    )
-
+def get_registry_instrument(exercise_id, form_type) -> dict or None:
     url = (
         f"{app.config["COLLECTION_INSTRUMENT_URL"]}/collection-instrument-api/1.0.2/registry-instrument/exercise-id/"
         f"{exercise_id}/formtype/{form_type}"

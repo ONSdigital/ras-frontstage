@@ -15,9 +15,8 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 class RedisCache:
-    COLLECTION_INSTRUMENT_CATEGORY_EXPIRY = 600  # 10 mins
-    COLLECTION_EXERCISE_CATEGORY_EXPIRY = 600  # 10 mins
-    COLLECTION_REGISTRY_CATEGORY_EXPIRY = 600  # 10 mins
+    COLLECTION_INSTRUMENT_EXPIRY_IN_SECONDS = 600
+    COLLECTION_REGISTRY_EXPIRY_IN_SECONDS = 600
 
     def get_collection_instrument(self, key):
         """
@@ -36,12 +35,12 @@ class RedisCache:
         if not result:
             logger.info("Key not in cache, getting value from collection instrument service", key=redis_key)
             result = get_collection_instrument(key, app.config["COLLECTION_INSTRUMENT_URL"], app.config["BASIC_AUTH"])
-            self.save(redis_key, result, self.COLLECTION_INSTRUMENT_CATEGORY_EXPIRY)
+            self.save(redis_key, result, self.COLLECTION_INSTRUMENT_EXPIRY_IN_SECONDS)
             return result
 
         return json.loads(result.decode("utf-8"))
 
-    def get_registry_instrument(self, exercise_id, form_type):
+    def get_registry_instrument(self, exercise_id, form_type) -> dict:
         """
         Gets the registry-instrument from redis or the collection-instrument service
 
@@ -50,16 +49,11 @@ class RedisCache:
         :return: Result from either the cache or collection instrument service
         """
         redis_key = f"frontstage:registry-instrument:{exercise_id}:{form_type})"
-        try:
-            result = redis.get(redis_key)
-        except RedisError:
-            logger.error("Error getting value from cache, please investigate", key=redis_key, exc_info=True)
-            result = None
-
+        result = redis.get(redis_key)
         if not result:
             logger.info("Key not in cache, getting value from collection instrument service", key=redis_key)
             result = get_registry_instrument(exercise_id, form_type)
-            self.save(redis_key, result, self.COLLECTION_INSTRUMENT_CATEGORY_EXPIRY)
+            self.save(redis_key, result, self.COLLECTION_REGISTRY_EXPIRY_IN_SECONDS)
             return result
 
         return json.loads(result.decode("utf-8"))

@@ -26,7 +26,7 @@ class TestRedisCache(unittest.TestCase):
 
     @patch("redis.StrictRedis.get")
     @patch("frontstage.common.redis_cache.RedisCache.save")
-    def test__collection_instrument_not_in_cache(self, redis_save, redis_get):
+    def test_collection_instrument_not_in_cache(self, redis_save, redis_get):
         redis_get.return_value = None
         ci_response = {"type": "SEFT"}
         with responses.RequestsMock() as rsps:
@@ -54,7 +54,7 @@ class TestRedisCache(unittest.TestCase):
 
     @patch("redis.StrictRedis.get")
     @patch("frontstage.common.redis_cache.RedisCache.save")
-    def test_registry_instrument_not_in_cache_test(self, redis_save, redis_get):
+    def test_registry_instrument_not_in_cache(self, redis_save, redis_get):
         redis_get.return_value = None
         registry_response = json.dumps({"collection_exercise_id": test_uuid, "form_type": test_form_type})
         with responses.RequestsMock() as rsps:

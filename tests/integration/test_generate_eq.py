@@ -424,37 +424,38 @@ class TestGenerateEqURL(unittest.TestCase):
         self.assertNotIn("b9a87999-fcc0-4085-979f-06390fb5dddd", payload_created["survey_metadata"]["data"])
 
     @requests_mock.mock()
-    def test_collection_with_registry_instrument(self, mock_request):
+    @patch.object(RedisCache, "get_registry_instrument", return_value=registry_instrument)
+    def test_collection_with_registry_instrument(self, mock_request, mock_redis):
         with app.app_context():
-            # Given a collection exercise is without a registry instrument
+            # Given a collection exercise is with a registry instrument
             mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
             mock_request.get(url_get_business_party, json=business_party)
             mock_request.get(url_get_ci, json=collection_instrument_eq)
             # When a payload is created
-            with patch.object(RedisCache, "get_registry_instrument", return_value=registry_instrument):
-                payload_created = EqPayload().create_payload(
-                    case, collection_exercise, respondent_party["id"], business_party["id"], survey_eq
-                )
-                # Then the payload is as expected and doesn't have a registry version
-                self.assertIn("8d990a74-5f07-4765-ac66-df7e1a96505b", payload_created["collection_exercise_sid"])
-                self.assertIn("e9b3ddcd-bfdc-4c20-aa1b-397b10b4f9d8", payload_created["cir_instrument_id"])
+            payload_created = EqPayload().create_payload(
+                case, collection_exercise, respondent_party["id"], business_party["id"], survey_eq
+            )
+            # Then the payload is as expected and has a registry version
+            self.assertIn("8d990a74-5f07-4765-ac66-df7e1a96505b", payload_created["collection_exercise_sid"])
+            self.assertIn("cir_instrument_id", payload_created.keys())
+            self.assertIn("e9b3ddcd-bfdc-4c20-aa1b-397b10b4f9d8", payload_created["cir_instrument_id"])
 
     @requests_mock.mock()
-    def test_collection_without_registry_instrument(self, mock_request):
+    @patch.object(RedisCache, "get_registry_instrument", return_value=None)
+    def test_collection_without_registry_instrument(self, mock_request, mock_redis):
         with app.app_context():
             # Given a collection exercise is without a registry instrument
             mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
             mock_request.get(url_get_business_party, json=business_party)
             mock_request.get(url_get_ci, json=collection_instrument_eq)
             # When a payload is created
-            with patch.object(RedisCache, "get_registry_instrument", return_value=None):
-                payload_created = EqPayload().create_payload(
-                    case, collection_exercise, respondent_party["id"], business_party["id"], survey_eq
-                )
+            payload_created = EqPayload().create_payload(
+                case, collection_exercise, respondent_party["id"], business_party["id"], survey_eq
+            )
 
-                # Then the payload is as expected and doesn't have a registry version
-                self.assertIn("8d990a74-5f07-4765-ac66-df7e1a96505b", payload_created["collection_exercise_sid"])
-                self.assertNotIn("e9b3ddcd-bfdc-4c20-aa1b-397b10b4f9d8", payload_created)
+            # Then the payload is as expected and doesn't have a registry version
+            self.assertIn("8d990a74-5f07-4765-ac66-df7e1a96505b", payload_created["collection_exercise_sid"])
+            self.assertNotIn("cir_instrument_id", payload_created.keys())
 
 
 def _is_valid_uuid(uuid_string: str) -> bool:

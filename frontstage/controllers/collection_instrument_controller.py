@@ -84,7 +84,7 @@ def get_collection_instrument(collection_instrument_id, collection_instrument_ur
 
 
 @lru_cache
-def get_registry_instrument(exercise_id, form_type) -> dict or None:
+def get_registry_instrument(exercise_id: str, form_type: str) -> dict | None:
     url = (
         f"{app.config["COLLECTION_INSTRUMENT_URL"]}/collection-instrument-api/1.0.2/registry-instrument/exercise-id/"
         f"{exercise_id}/formtype/{form_type}"

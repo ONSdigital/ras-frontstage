@@ -9,6 +9,7 @@ from freezegun import freeze_time
 
 from frontstage import app
 from frontstage.common.eq_payload import EqPayload
+from frontstage.common.redis_cache import RedisCache
 from frontstage.controllers import collection_exercise_controller
 from frontstage.exceptions.exceptions import ApiError, InvalidEqPayLoad
 from tests.integration.mocked_services import (
@@ -27,6 +28,7 @@ from tests.integration.mocked_services import (
     url_get_collection_exercise,
     url_get_collection_exercise_events,
     url_get_survey,
+    url_registry_instrument,
 )
 
 encoded_jwt_token = (
@@ -69,6 +71,9 @@ PAYLOAD = {
     },
 }
 
+with open("tests/test_data/registry_instrument/registry_instrument.json") as fp:
+    registry_instrument = json.load(fp)
+
 
 class TestGenerateEqURL(unittest.TestCase):
     def setUp(self):
@@ -88,11 +93,14 @@ class TestGenerateEqURL(unittest.TestCase):
 
     @freeze_time(TIME_TO_FREEZE)
     @requests_mock.mock()
-    def test_create_payload_without_employment_date(self, mock_request):
+    @patch("frontstage.controllers.party_controller.RedisCache.get_registry_instrument")
+    def test_create_payload_without_employment_date(self, mock_request, mock_cache):
         # Given a collection exercise without an employment date event
         mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
         mock_request.get(url_get_business_party, json=business_party)
         mock_request.get(url_get_ci, json=collection_instrument_eq)
+        mock_request.get(url_registry_instrument, json=None)
+        mock_cache.return_value = None
 
         # When a payload is created
         with app.app_context():
@@ -109,7 +117,8 @@ class TestGenerateEqURL(unittest.TestCase):
 
     @freeze_time(TIME_TO_FREEZE)
     @requests_mock.mock()
-    def test_create_payload_with_employment_date(self, mock_request):
+    @patch("frontstage.controllers.party_controller.RedisCache.get_registry_instrument")
+    def test_create_payload_with_employment_date(self, mock_request, mock_cache):
         # Given a collection exercise with an employment date event
         collection_exercise_event_employment_date = {
             "id": "5629d715-ec3e-4ca2-9232-be5c1d56cf32",
@@ -122,6 +131,8 @@ class TestGenerateEqURL(unittest.TestCase):
         mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
         mock_request.get(url_get_business_party, json=business_party)
         mock_request.get(url_get_ci, json=collection_instrument_eq)
+        mock_request.get(url_registry_instrument, json=registry_instrument)
+        mock_cache.return_value = None
 
         # When a payload is created
         with app.app_context():
@@ -137,7 +148,8 @@ class TestGenerateEqURL(unittest.TestCase):
         self.assertTrue(_is_valid_uuid(payload_created["tx_id"]))
 
     @requests_mock.mock()
-    def test_generate_eq_url_seft(self, mock_request):
+    @patch("frontstage.controllers.party_controller.RedisCache.get_registry_instrument")
+    def test_generate_eq_url_seft(self, mock_request, mock_cache):
         # Given all external services are mocked and we have seft collection instrument
         mock_request.get(url_get_collection_exercise, json=collection_exercise)
         mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
@@ -145,6 +157,7 @@ class TestGenerateEqURL(unittest.TestCase):
         mock_request.get(url_get_survey, json=survey)
         mock_request.get(url_get_ci, json=collection_instrument_seft)
         mock_request.get(url_banner_api, status_code=404)
+        mock_cache.return_value = None
 
         # When create_payload is called
         # Then an InvalidEqPayLoad is raised
@@ -162,13 +175,16 @@ class TestGenerateEqURL(unittest.TestCase):
         )
 
     @requests_mock.mock()
-    def test_generate_eq_url_no_eq_id(self, mock_request):
+    @patch("frontstage.controllers.party_controller.RedisCache.get_registry_instrument")
+    def test_generate_eq_url_no_eq_id(self, mock_request, mock_cache):
         # Given all external services are mocked and we have an EQ collection instrument without an EQ ID
         with open("tests/test_data/collection_instrument/collection_instrument_eq_no_eq_id.json") as json_data:
             collection_instrument_eq_no_eq_id = json.load(json_data)
 
         mock_request.get(url_get_ci, json=collection_instrument_eq_no_eq_id)
         mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_registry_instrument, json=registry_instrument)
+        mock_cache.return_value = None
 
         # When create_payload is called
         # Then an InvalidEqPayLoad is raised
@@ -187,7 +203,8 @@ class TestGenerateEqURL(unittest.TestCase):
         )
 
     @requests_mock.mock()
-    def test_generate_eq_url_contains_response_id(self, mock_request):
+    @patch("frontstage.controllers.party_controller.RedisCache.get_registry_instrument")
+    def test_generate_eq_url_contains_response_id(self, mock_request, mock_cache):
         # Given all external services are mocked and we have an EQ collection instrument without an EQ ID
         mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
         mock_request.get(url_get_business_party, json=business_party)
@@ -196,6 +213,8 @@ class TestGenerateEqURL(unittest.TestCase):
 
         mock_request.get(url_get_ci, json=collection_instrument_eq)
         mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_registry_instrument, json=registry_instrument)
+        mock_cache.return_value = None
 
         # When create_payload is called
         # Then an InvalidEqPayLoad is raised
@@ -211,13 +230,16 @@ class TestGenerateEqURL(unittest.TestCase):
         self.assertEqual("49900000001F8d990a74-5f07-4765-ac66-df7e1a96505b20001", payload["response_id"])
 
     @requests_mock.mock()
-    def test_generate_eq_url_no_form_type(self, mock_request):
+    @patch("frontstage.controllers.party_controller.RedisCache.get_registry_instrument")
+    def test_generate_eq_url_no_form_type(self, mock_request, mock_cache):
         # Given all external services are mocked and we have an EQ collection instrument without a Form_type
         with open("tests/test_data/collection_instrument/collection_instrument_eq_no_form_type.json") as json_data:
             collection_instrument_eq_no_form_type = json.load(json_data)
 
         mock_request.get(url_get_ci, json=collection_instrument_eq_no_form_type)
         mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_registry_instrument, json=None)
+        mock_cache.return_value = None
 
         # When create_payload is called
         # Then an InvalidEqPayLoad is raised
@@ -236,10 +258,12 @@ class TestGenerateEqURL(unittest.TestCase):
         )
 
     @requests_mock.mock()
-    def test_access_collection_exercise_events_fail(self, mock_request):
+    @patch("frontstage.controllers.party_controller.RedisCache.get_registry_instrument")
+    def test_access_collection_exercise_events_fail(self, mock_request, mock_cache):
         # Given a failing collection exercise events service
         mock_request.get(url_get_collection_exercise_events, status_code=500)
         mock_request.get(url_banner_api, status_code=404)
+        mock_cache.return_value = None
 
         # When get collection exercise events is called
         # Then an ApiError is raised
@@ -343,12 +367,14 @@ class TestGenerateEqURL(unittest.TestCase):
 
     @freeze_time(TIME_TO_FREEZE)
     @requests_mock.mock()
-    def test_create_payload_with_supplementary_data(self, mock_request):
+    @patch("frontstage.controllers.party_controller.RedisCache.get_registry_instrument")
+    def test_create_payload_with_supplementary_data(self, mock_request, mock_cache):
         # Given a collection exercise contains supplementary data
-        collection_exercise_with_supplementary_dataset
         mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
         mock_request.get(url_get_business_party, json=business_party)
         mock_request.get(url_get_ci, json=collection_instrument_eq)
+        mock_request.get(url_registry_instrument, json=registry_instrument)
+        mock_cache.return_value = None
         # When a payload is created
         with app.app_context():
             payload_created = EqPayload().create_payload(
@@ -367,7 +393,8 @@ class TestGenerateEqURL(unittest.TestCase):
 
     @freeze_time(TIME_TO_FREEZE)
     @requests_mock.mock()
-    def test_create_payload_with_supplementary_data_but_different_form_type(self, mock_request):
+    @patch("frontstage.controllers.party_controller.RedisCache.get_registry_instrument")
+    def test_create_payload_with_supplementary_data_but_different_form_type(self, mock_request, mock_cache):
         # Given a collection exercise contains supplementary data
         different_form_type = {
             "supplementaryDatasetJson": '{"survey_id":"001","period_id":"220823",'
@@ -382,6 +409,7 @@ class TestGenerateEqURL(unittest.TestCase):
         mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
         mock_request.get(url_get_business_party, json=business_party)
         mock_request.get(url_get_ci, json=collection_instrument_eq)
+        mock_request.get(url_registry_instrument, json=registry_instrument)
         # When a payload is created
         with app.app_context():
             payload_created = EqPayload().create_payload(
@@ -394,6 +422,40 @@ class TestGenerateEqURL(unittest.TestCase):
 
         # Then the payload is as expected
         self.assertNotIn("b9a87999-fcc0-4085-979f-06390fb5dddd", payload_created["survey_metadata"]["data"])
+
+    @requests_mock.mock()
+    @patch.object(RedisCache, "get_registry_instrument", return_value=registry_instrument)
+    def test_collection_with_registry_instrument(self, mock_request, mock_redis):
+        with app.app_context():
+            # Given a collection exercise is with a registry instrument
+            mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
+            mock_request.get(url_get_business_party, json=business_party)
+            mock_request.get(url_get_ci, json=collection_instrument_eq)
+            # When a payload is created
+            payload_created = EqPayload().create_payload(
+                case, collection_exercise, respondent_party["id"], business_party["id"], survey_eq
+            )
+            # Then the payload is as expected and has a registry version
+            self.assertIn("8d990a74-5f07-4765-ac66-df7e1a96505b", payload_created["collection_exercise_sid"])
+            self.assertIn("cir_instrument_id", payload_created.keys())
+            self.assertIn("e9b3ddcd-bfdc-4c20-aa1b-397b10b4f9d8", payload_created["cir_instrument_id"])
+
+    @requests_mock.mock()
+    @patch.object(RedisCache, "get_registry_instrument", return_value=None)
+    def test_collection_without_registry_instrument(self, mock_request, mock_redis):
+        with app.app_context():
+            # Given a collection exercise is without a registry instrument
+            mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
+            mock_request.get(url_get_business_party, json=business_party)
+            mock_request.get(url_get_ci, json=collection_instrument_eq)
+            # When a payload is created
+            payload_created = EqPayload().create_payload(
+                case, collection_exercise, respondent_party["id"], business_party["id"], survey_eq
+            )
+
+            # Then the payload is as expected and doesn't have a registry version
+            self.assertIn("8d990a74-5f07-4765-ac66-df7e1a96505b", payload_created["collection_exercise_sid"])
+            self.assertNotIn("cir_instrument_id", payload_created.keys())
 
 
 def _is_valid_uuid(uuid_string: str) -> bool:

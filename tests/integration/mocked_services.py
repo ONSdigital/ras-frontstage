@@ -94,6 +94,9 @@ with open("tests/test_data/survey/survey_list_history.json") as fp:
 with open("tests/test_data/party/respondent_enrolments.json") as fp:
     respondent_enrolments = json.load(fp)
 
+with open("tests/test_data/registry_instrument/registry_instrument.json") as fp:
+    registry_instrument = json.load(fp)
+
 encoded_jwt_token = (
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXJ0eV9pZCI6ImY5NTZlOGFlLTZ"
     "lMGYtNDQxNC1iMGNmLWEwN2MxYWEzZTM3YiIsImV4cGlyZXNfYXQiOiIxMDAxMjM0NTY"
@@ -157,3 +160,8 @@ url_notify_party_and_respondent_account_locked = (
 )
 url_banner_api = f"{app.config['BANNER_SERVICE_URL']}/banner"
 url_auth_delete = f'{app.config["AUTH_URL"]}/api/account/user'
+url_registry_instrument = (
+    f"{app.config['COLLECTION_INSTRUMENT_URL']}/collection-instrument-api/1.0.2/registry"
+    f"-instrument/exercise-id/{registry_instrument['exercise_id']}"
+    f"/formtype/{registry_instrument['classifier_value']}"
+)

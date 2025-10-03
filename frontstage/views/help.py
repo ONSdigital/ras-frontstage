@@ -18,6 +18,7 @@ form_render_page_mapper = {
 }
 
 
+@help_bp.route("/", methods=["GET", "POST"])
 @help_bp.route("/info-ons", methods=["GET", "POST"])
 def info_ons_page():
     page_title = "Help info ONS"

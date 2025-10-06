@@ -10,7 +10,7 @@ on:
       - _infra/spinnaker/**
   pull_request:
     branches:
-      - main
+      - 2_5_63_fix-help-link
     paths-ignore:
       - _infra/spinnaker/**
 

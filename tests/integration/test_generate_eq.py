@@ -435,10 +435,12 @@ class TestGenerateEqURL(unittest.TestCase):
             payload_created = EqPayload().create_payload(
                 case, collection_exercise, respondent_party["id"], business_party["id"], survey_eq
             )
-            # Then the payload is as expected and has a registry version
+            # Then the payload is as expected and has a cir_instrument_id
             self.assertIn("8d990a74-5f07-4765-ac66-df7e1a96505b", payload_created["collection_exercise_sid"])
             self.assertIn("cir_instrument_id", payload_created.keys())
             self.assertIn("e9b3ddcd-bfdc-4c20-aa1b-397b10b4f9d8", payload_created["cir_instrument_id"])
+            # and the payload doesn't have a schema_name
+            self.assertNotIn("schema_name", payload_created.keys())
 
     @requests_mock.mock()
     @patch.object(RedisCache, "get_registry_instrument", return_value=None)
@@ -453,8 +455,10 @@ class TestGenerateEqURL(unittest.TestCase):
                 case, collection_exercise, respondent_party["id"], business_party["id"], survey_eq
             )
 
-            # Then the payload is as expected and doesn't have a registry version
+            # Then the payload is as expected and has a schema_name
+            self.assertIn("schema_name", payload_created.keys())
             self.assertIn("8d990a74-5f07-4765-ac66-df7e1a96505b", payload_created["collection_exercise_sid"])
+            # and the payload doesn't have a cir_instrument_id
             self.assertNotIn("cir_instrument_id", payload_created.keys())
 
 

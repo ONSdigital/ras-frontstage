@@ -72,7 +72,6 @@ class EqPayload(object):
             "collection_exercise_sid": ce_id,
             "response_id": f"{ru_ref}{ce_id}{eq_id}{form_type}",
             "response_expires_at": self._find_event_date_by_tag("exercise_end", ce_events, ce_id),
-            "schema_name": f"{eq_id}_{form_type}",
             "survey_metadata": {
                 "data": {
                     "case_ref": case["caseRef"],
@@ -92,6 +91,8 @@ class EqPayload(object):
 
         if registry_instrument:
             payload["cir_instrument_id"] = registry_instrument["guid"]
+        else:
+            payload["schema_name"] = f"{eq_id}_{form_type}"
 
         if employment_date := self._find_event_date_by_tag("employment", ce_events, ce_id, False):
             payload["survey_metadata"]["data"]["employment_date"] = employment_date

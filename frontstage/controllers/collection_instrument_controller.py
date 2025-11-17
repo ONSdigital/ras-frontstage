@@ -34,7 +34,6 @@ def download_collection_instrument(collection_instrument_id, case_id, party_id):
     :return: A tuple containing the collection instrument and the headers
     """
     bound_logger = logger.bind(collection_instrument_id=collection_instrument_id, party_id=party_id, case_id=case_id)
-    bound_logger.info("Attempting to download collection instrument")
 
     url = (
         f"{app.config['COLLECTION_INSTRUMENT_URL']}/collection-instrument-api/1.0.2/download/{collection_instrument_id}"
@@ -118,7 +117,6 @@ def upload_collection_instrument(file, case: dict, business_party: dict, party_i
     :raises CiUploadError: Raised on a validation error
     """
     case_id = case["id"]
-    logger.info("Attempting to upload collection instrument", case_id=case_id, party_id=party_id)
     if case_id and file and file.filename:
         file_name, file_extension = os.path.splitext(secure_filename(file.filename))
         gcp_survey_response = GcpSurveyResponse(app.config)

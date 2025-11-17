@@ -57,8 +57,6 @@ def download_collection_instrument(collection_instrument_id, case_id, party_id):
         bound_logger.unbind("collection_instrument_id", "party_id", "case_id")
         raise ApiError(logger, response)
 
-    bound_logger.info("Successfully downloaded collection instrument")
-
     headers = response.headers
     acao = app.config["ACCESS_CONTROL_ALLOW_ORIGIN"]
     bound_logger.debug(f"Setting Access-Control-Allow-Origin header to {acao}")
@@ -139,7 +137,6 @@ def upload_collection_instrument(file, case: dict, business_party: dict, party_i
             file_contents = file.read()
             gcp_survey_response.upload_seft_survey_response(case, file_contents, file_name, survey_ref)
             ci_post_case_event(case_id, party_id, "SUCCESSFUL_RESPONSE_UPLOAD")
-            logger.info("Successfully uploaded collection instrument", case_id=case_id, party_id=party_id)
             return None
         except FileTooSmallError:
             ci_post_case_event(case_id, party_id, "UNSUCCESSFUL_RESPONSE_UPLOAD")

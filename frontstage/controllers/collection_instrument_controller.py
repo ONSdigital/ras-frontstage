@@ -34,7 +34,6 @@ def download_collection_instrument(collection_instrument_id, case_id, party_id):
     :return: A tuple containing the collection instrument and the headers
     """
     bound_logger = logger.bind(collection_instrument_id=collection_instrument_id, party_id=party_id, case_id=case_id)
-    bound_logger.info("Attempting to download collection instrument")
 
     url = (
         f"{app.config['COLLECTION_INSTRUMENT_URL']}/collection-instrument-api/1.0.2/download/{collection_instrument_id}"
@@ -56,8 +55,6 @@ def download_collection_instrument(collection_instrument_id, case_id, party_id):
         bound_logger.error("Failed to download collection instrument")
         bound_logger.unbind("collection_instrument_id", "party_id", "case_id")
         raise ApiError(logger, response)
-
-    bound_logger.info("Successfully downloaded collection instrument")
 
     headers = response.headers
     acao = app.config["ACCESS_CONTROL_ALLOW_ORIGIN"]
@@ -120,7 +117,6 @@ def upload_collection_instrument(file, case: dict, business_party: dict, party_i
     :raises CiUploadError: Raised on a validation error
     """
     case_id = case["id"]
-    logger.info("Attempting to upload collection instrument", case_id=case_id, party_id=party_id)
     if case_id and file and file.filename:
         file_name, file_extension = os.path.splitext(secure_filename(file.filename))
         gcp_survey_response = GcpSurveyResponse(app.config)
@@ -139,7 +135,6 @@ def upload_collection_instrument(file, case: dict, business_party: dict, party_i
             file_contents = file.read()
             gcp_survey_response.upload_seft_survey_response(case, file_contents, file_name, survey_ref)
             ci_post_case_event(case_id, party_id, "SUCCESSFUL_RESPONSE_UPLOAD")
-            logger.info("Successfully uploaded collection instrument", case_id=case_id, party_id=party_id)
             return None
         except FileTooSmallError:
             ci_post_case_event(case_id, party_id, "UNSUCCESSFUL_RESPONSE_UPLOAD")

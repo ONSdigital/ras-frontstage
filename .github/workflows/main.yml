@@ -65,17 +65,21 @@ jobs:
         run: |
           make test
       - name: Authenticate with Google Cloud
+        if: github.actor != 'anwilkie'
         id: auth
         uses: google-github-actions/auth@ba79af03959ebeac9769e648f473a284504d9193 # v2.1.10
         with:
           credentials_json: ${{ secrets.GCR_KEY }}
       - name: Setup Google Cloud SDK
+        if: github.actor != 'anwilkie'
         uses: google-github-actions/setup-gcloud@77e7a554d41e2ee56fc945c52dfd3f33d12def9a # v2.1.4
-      - run: |
+      - name: Configure Docker for Artifact Registry
+        if: github.actor != 'dependabot[bot]'
+        run: |
           gcloud auth configure-docker europe-west2-docker.pkg.dev
 
       - name: pr docker tag
-        if: github.ref != 'refs/heads/main'
+        if: github.ref != 'refs/heads/main' && github.actor != 'anwilkie'
         id: tag
         run: |
           PR=$(echo "$GITHUB_REF" | awk -F / '{print $3}')
@@ -83,14 +87,15 @@ jobs:
           echo "pr_number=pr-$PR" >> $GITHUB_ENV
         # Build the Docker image
       - name: Build Docker Image
-        if: github.ref != 'refs/heads/main'
+        if: github.ref != 'refs/heads/main' && github.actor != 'anwilkie'
         run: |
           docker build -t "$REGISTRY_HOSTNAME"/"$GAR_GOOGLE_PROJECT_ID"/"$GAR_REPOSITORY"/"$IMAGE":${{ env.pr_number }} -f _infra/docker/Dockerfile .
       - name: Push dev image
-        if: github.ref != 'refs/heads/main'
+        if: github.ref != 'refs/heads/main' && github.actor != 'anwilkie'
         run: |
           docker push "$REGISTRY_HOSTNAME"/"$GAR_GOOGLE_PROJECT_ID"/"$GAR_REPOSITORY"/"$IMAGE":${{ env.pr_number }}
       - name: template helm
+        if: github.actor != 'anwilkie'
         run: |
           helm template $CHART_DIRECTORY
 
@@ -179,13 +184,14 @@ jobs:
           echo "version=$(grep -E "appVersion:\s+" $CHART_DIRECTORY/Chart.yaml | cut -d" " -f2 | sed -r 's/"//g')" >> $GITHUB_ENV
 
       - name: package helm
+        if: github.actor != 'anwilkie'
         run: |
           echo HELM_VERSION=$(grep -E "version:\s+" $CHART_DIRECTORY/Chart.yaml | cut -d" " -f2 | sed -r 's/"//g') >> $GITHUB_ENV
           helm dep up $CHART_DIRECTORY
           helm package $CHART_DIRECTORY
 
       - name: Publish dev Chart
-        if: github.ref != 'refs/heads/main'
+        if: github.ref != 'refs/heads/main' && github.actor != 'anwilkie'
         run: |
           mv $IMAGE-${{ env.HELM_VERSION }}.tgz $IMAGE-${{ env.pr_number }}.tgz
           gsutil cp $IMAGE-*.tgz gs://$ARTIFACT_BUCKET/$IMAGE/

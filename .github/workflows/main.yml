@@ -76,7 +76,7 @@ jobs:
       - name: Configure Docker for Artifact Registry
         if: github.actor != 'dependabot[bot]'
         run: |
-          gcloud auth configure-docker europe-west2-docker.pkg.dev
+          gcloud auth configure-docker "$REGISTRY_HOSTNAME"
 
       - name: pr docker tag
         if: github.ref != 'refs/heads/main' && github.actor != 'dependabot[bot]'

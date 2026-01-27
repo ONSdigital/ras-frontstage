@@ -18,23 +18,25 @@ from frontstage.views.template_helper import render_template
 logger = wrap_logger(logging.getLogger(__name__))
 
 SINGLE_VALIDATION_ERROR = "There is 1 error on this page"
+UPLOAD_FAILED_ERROR = "Upload failed"
 
 
 @surveys_bp.route("/upload-survey", methods=["POST"])
 @jwt_authorization(request)
 def upload_survey(session):
     party_id = session.get_party_id()
-    case_id = request.args["case_id"]
-    business_party_id = request.args["business_party_id"]
-    survey_short_name = request.args["survey_short_name"]
+    case_id = request.args.get("case_id")
+    business_party_id = request.args.get("business_party_id")
+    survey_short_name = request.args.get("survey_short_name")
 
     logger.info("Attempting to upload collection instrument", case_id=case_id, party_id=party_id)
 
-    if not (case_id or business_party_id or survey_short_name):
+    if not (case_id and business_party_id and survey_short_name):
         logger.error(
-            "upload_survey did not include case_id, business_party_id or survey_short_name",
+            "upload survey did not include required request args, case_id, business_party_id and survey_short_name",
             case_id=case_id,
-            party_id=party_id,
+            business_party_id=business_party_id,
+            survey_short_name=survey_short_name,
         )
         abort(400)
 
@@ -78,21 +80,18 @@ def upload_survey(session):
             )
 
     except CiUploadError as ex:
-        upload_error = determine_error_type(ex)
-        if not upload_error:
-            logger.error(
-                "Unexpected error message returned from collection instrument service",
-                error_message=ex.error_message,
-                party_id=party_id,
-                case_id=case_id,
-            )
-            upload_error = "unexpected"
+        logger.error(
+            f"upload failure: {ex.error_message}",
+            party_id=party_id,
+            case_id=case_id,
+        )
+
         return render_template(
             "surveys/surveys-upload-failure.html",
             session=session,
             business_info=business_party,
             survey_info=survey,
-            errors=[upload_error],
+            errors=[UPLOAD_FAILED_ERROR],
             case_id=case_id,
             error_title=SINGLE_VALIDATION_ERROR,
         )
@@ -103,16 +102,3 @@ def upload_survey(session):
         session=session,
         upload_filename=upload_file.filename,
     )
-
-
-def determine_error_type(ex):
-    error_type = ""
-    if ".xlsx format" in ex.error_message:
-        error_type = "type"
-    elif "50 characters" in ex.error_message:
-        error_type = "charLimit"
-    elif "File too large" in ex.error_message:
-        error_type = "size"
-    elif "File too small" in ex.error_message:
-        error_type = "sizeSmall"
-    return error_type

@@ -5,6 +5,7 @@ from functools import lru_cache
 import requests
 from flask import current_app as app
 from structlog import wrap_logger
+from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 
 from frontstage.controllers import case_controller
@@ -16,7 +17,7 @@ from frontstage.exceptions.exceptions import ApiError, CiUploadError
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-INVALID_UPLOAD = "The upload must have a file attached"
+MISSING_FILE_ERROR = "Select a file that follows guidance for uploading."
 MISSING_DATA = "Data needed to create the file name is missing"
 UPLOAD_SUCCESSFUL = "Upload successful"
 UPLOAD_UNSUCCESSFUL = "Upload failed"
@@ -105,7 +106,9 @@ def get_registry_instrument(exercise_id: str, form_type: str) -> dict | None:
     return response.json()
 
 
-def upload_collection_instrument(file, file_size: int, case: dict, business_party: dict, party_id: str, survey: dict):
+def upload_collection_instrument(
+    file: FileStorage, file_size: int, case: dict, business_party: dict, party_id: str, survey: dict
+) -> list | None:
     """
     :param file: The uploaded file
     :param file_size: The size of the file in bytes
@@ -115,11 +118,10 @@ def upload_collection_instrument(file, file_size: int, case: dict, business_part
     :param survey: A dict containing information about the survey
     :raises CiUploadError: Raised on a validation error
     """
-
     case_id = case["id"]
     if not file:
         ci_post_case_event(case_id, party_id, "UNSUCCESSFUL_RESPONSE_UPLOAD")
-        return [INVALID_UPLOAD]
+        return [MISSING_FILE_ERROR]
 
     file_name, file_extension = os.path.splitext(secure_filename(file.filename))
     file_contents = file.read()

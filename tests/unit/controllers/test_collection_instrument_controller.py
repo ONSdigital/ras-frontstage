@@ -8,7 +8,12 @@ from werkzeug.datastructures import FileStorage
 
 from config import TestingConfig
 from frontstage import app
-from frontstage.controllers import collection_instrument_controller
+from frontstage.controllers.collection_instrument_controller import (
+    MISSING_FILE_ERROR,
+    download_collection_instrument,
+    get_collection_instrument,
+    upload_collection_instrument,
+)
 from frontstage.controllers.gcp_survey_response import SurveyResponseError
 from frontstage.exceptions.exceptions import ApiError, CiUploadError
 from tests.integration.mocked_services import (
@@ -39,9 +44,9 @@ class TestCollectionInstrumentController(unittest.TestCase):
             rsps.add(rsps.GET, url_download_ci, json=collection_instrument_seft, status=200)
             with app.app_context():
                 downloaded_ci = json.loads(
-                    collection_instrument_controller.download_collection_instrument(
-                        collection_instrument_seft["id"], case["id"], business_party["id"]
-                    )[0]
+                    download_collection_instrument(collection_instrument_seft["id"], case["id"], business_party["id"])[
+                        0
+                    ]
                 )
 
                 self.assertEqual(downloaded_ci["id"], collection_instrument_seft["id"])
@@ -51,7 +56,7 @@ class TestCollectionInstrumentController(unittest.TestCase):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_download_ci, json=collection_instrument_seft, status=200)
             with app.app_context():
-                _, headers = collection_instrument_controller.download_collection_instrument(
+                _, headers = download_collection_instrument(
                     collection_instrument_seft["id"], case["id"], business_party["id"]
                 )
 
@@ -64,15 +69,13 @@ class TestCollectionInstrumentController(unittest.TestCase):
             rsps.add(rsps.GET, url_download_ci, status=400)
             with app.app_context():
                 with self.assertRaises(ApiError):
-                    collection_instrument_controller.download_collection_instrument(
-                        collection_instrument_seft["id"], case["id"], business_party["id"]
-                    )
+                    download_collection_instrument(collection_instrument_seft["id"], case["id"], business_party["id"])
 
     def test_collection_instrument_success(self):
         with responses.RequestsMock() as rsps:
             rsps.add(rsps.GET, url_get_ci, json=collection_instrument_seft, status=200)
             with app.app_context():
-                returned_ci = collection_instrument_controller.get_collection_instrument(
+                returned_ci = get_collection_instrument(
                     collection_instrument_seft["id"],
                     self.app_config["COLLECTION_INSTRUMENT_URL"],
                     self.app_config["BASIC_AUTH"],
@@ -85,7 +88,7 @@ class TestCollectionInstrumentController(unittest.TestCase):
             rsps.add(rsps.GET, url_get_ci, status=400)
             with app.app_context():
                 with self.assertRaises(ApiError):
-                    collection_instrument_controller.get_collection_instrument(
+                    get_collection_instrument(
                         collection_instrument_seft["id"],
                         self.app_config["COLLECTION_INSTRUMENT_URL"],
                         self.app_config["BASIC_AUTH"],
@@ -99,7 +102,7 @@ class TestCollectionInstrumentController(unittest.TestCase):
 
             with app.app_context():
                 try:
-                    collection_instrument_controller.upload_collection_instrument(
+                    upload_collection_instrument(
                         self.survey_file, self.survey_file_size, case, business_party, party["id"], survey
                     )
                 except (ApiError, CiUploadError):
@@ -107,17 +110,17 @@ class TestCollectionInstrumentController(unittest.TestCase):
 
     @patch("frontstage.controllers.case_controller.post_case_event")
     def test_upload_collection_instrument_success_1(self, *_):
-        validation_errors = collection_instrument_controller.upload_collection_instrument(
+        validation_errors = upload_collection_instrument(
             None, self.survey_file_size, case, business_party, party["id"], survey
         )
-        self.assertEqual(validation_errors, ["The upload must have a file attached"])
+        self.assertEqual(validation_errors, [MISSING_FILE_ERROR])
 
     @patch("frontstage.controllers.case_controller.post_case_event")
     @patch("frontstage.controllers.gcp_survey_response.GcpSurveyResponse.validate_file")
     def test_upload_collection_instrument_validation_error(self, validate_file, _):
         validate_file.return_value = ["error"]
         with app.app_context():
-            validation_errors = collection_instrument_controller.upload_collection_instrument(
+            validation_errors = upload_collection_instrument(
                 self.survey_file, self.survey_file_size, case, business_party, party["id"], survey
             )
         self.assertEqual(validation_errors, ["error"])
@@ -128,7 +131,7 @@ class TestCollectionInstrumentController(unittest.TestCase):
         create_file_name_for_upload.return_value = None
         with app.app_context():
             with self.assertRaises(CiUploadError):
-                collection_instrument_controller.upload_collection_instrument(
+                upload_collection_instrument(
                     self.survey_file, self.survey_file_size, case, business_party, party["id"], survey
                 )
 
@@ -139,6 +142,6 @@ class TestCollectionInstrumentController(unittest.TestCase):
         upload_seft_survey_response.side_effect = SurveyResponseError()
         with app.app_context():
             with self.assertRaises(CiUploadError):
-                collection_instrument_controller.upload_collection_instrument(
+                upload_collection_instrument(
                     self.survey_file, self.survey_file_size, case, business_party, party["id"], survey
                 )

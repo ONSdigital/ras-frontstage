@@ -11,7 +11,7 @@ from frontstage.views.template_helper import render_template
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-@surveys_bp.route("/upload-failed", methods=["GET"])
+@surveys_bp.route("/upload_failed", methods=["GET"])
 @jwt_authorization(request)
 def upload_failed(session):
     case_id = request.args.get("case_id")
@@ -23,28 +23,9 @@ def upload_failed(session):
     case_data = case_controller.get_case_data(case_id, party_id, business_party_id, survey_short_name)
 
     # Select correct error text depending on error_info
-    if error_info == "type":
-        error_info = {
-            "header": "Error uploading - incorrect file type",
-            "body": "The spreadsheet must be in .xls or .xlsx format",
-        }
-    elif error_info == "charLimit":
-        error_info = {
-            "header": "Error uploading - file name too long",
-            "body": "The file name of your spreadsheet must be " "less than 50 characters long",
-        }
-    elif error_info == "size":
-        error_info = {
-            "header": "Error uploading - file size too large",
-            "body": "The spreadsheet must be smaller than 20MB in size",
-        }
-    elif error_info == "sizeSmall":
-        error_info = {
-            "header": "Error uploading - file size too small",
-            "body": "The spreadsheet must be larger than 6KB in size",
-        }
-    else:
-        error_info = {"header": "Something went wrong", "body": "Please try uploading your spreadsheet again"}
+
+    print(error_info)
+
     return render_template(
         "surveys/surveys-upload-failure.html",
         session=session,

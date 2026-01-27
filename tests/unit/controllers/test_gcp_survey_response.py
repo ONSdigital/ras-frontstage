@@ -1,4 +1,3 @@
-import io
 import json
 from unittest import TestCase
 from unittest.mock import MagicMock
@@ -8,7 +7,10 @@ import responses
 from config import TestingConfig
 from frontstage import app
 from frontstage.controllers.gcp_survey_response import (
-    FileTooSmallError,
+    FILE_EXTENSION_ERROR,
+    FILE_NAME_LENGTH_ERROR,
+    MAX_FILE_SIZE_ERROR,
+    MIN_FILE_SIZE_ERROR,
     GcpSurveyResponse,
     SurveyResponseError,
 )
@@ -62,12 +64,6 @@ class TestGcpSurveyResponse(TestCase):
         app.config.from_object(app_config)
         self.app = app.test_client()
         self.app_config = self.app.application.config
-
-    def test_is_file_size_too_small(self):
-        survey_response = GcpSurveyResponse(self.config)
-        test_file_contents = io.BytesIO().read()
-        with self.assertRaises(FileTooSmallError):
-            survey_response.upload_seft_survey_response(case, test_file_contents, "filename", "survey_ref")
 
     @responses.activate
     def test_failed_api_call_raises_http_exception(self):
@@ -142,3 +138,46 @@ class TestGcpSurveyResponse(TestCase):
             self.assertTrue(split_on_dot[0].isdigit())
             self.assertTrue(len(split_on_dot[0]), 14)
             self.assertEqual(split_on_dot[1], expected_file_extension)
+
+    def test_validate_file(self):
+        with app.app_context():
+            survey_response = GcpSurveyResponse(self.config)
+            validation_errors = survey_response.validate_file("valid_file_name", "xls", 50000)
+        self.assertEqual(validation_errors, [])
+
+    def test_validate_file_extension_error(self):
+        with app.app_context():
+            survey_response = GcpSurveyResponse(self.config)
+            validation_errors = survey_response.validate_file("valid_file_name", "txt", 50000)
+        self.assertEqual(validation_errors, [FILE_EXTENSION_ERROR])
+
+    def test_validate_file_name_length_error(self):
+        with app.app_context():
+            app.config["MAX_UPLOAD_FILE_NAME_LENGTH"] = 1
+            survey_response = GcpSurveyResponse(self.config)
+            validation_errors = survey_response.validate_file("invalid_length", "xls", 50000)
+        self.assertEqual(validation_errors, [FILE_NAME_LENGTH_ERROR])
+
+    def test_validate_file_max_file_size_error(self):
+        with app.app_context():
+            survey_response = GcpSurveyResponse(self.config)
+            validation_errors = survey_response.validate_file(
+                "valid_file_name", "xls", app.config["MAX_UPLOAD_LENGTH"] + 1
+            )
+        self.assertEqual(validation_errors, [MAX_FILE_SIZE_ERROR])
+
+    def test_validate_file_min_file_size_error(self):
+        with app.app_context():
+            survey_response = GcpSurveyResponse(self.config)
+            validation_errors = survey_response.validate_file(
+                "valid_file_name", "xls", app.config["MIN_UPLOAD_LENGTH"] - 1
+            )
+        self.assertEqual(validation_errors, [MIN_FILE_SIZE_ERROR])
+
+    def test_validate_file_multiple(self):
+        with app.app_context():
+            survey_response = GcpSurveyResponse(self.config)
+            validation_errors = survey_response.validate_file(
+                "valid_file_name", "txt", app.config["MAX_UPLOAD_LENGTH"] + 1
+            )
+        self.assertEqual(validation_errors, [FILE_EXTENSION_ERROR, MAX_FILE_SIZE_ERROR])

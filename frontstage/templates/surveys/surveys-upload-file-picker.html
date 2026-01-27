@@ -12,7 +12,7 @@
         {{
             onsUpload({
                 "id": "selected-file",
-                "accept": ".xls,.xlsx",
+
                 "name": "file",
                 "label": {
                     "description": "File types accepted are .xls and .xlsx",
@@ -20,27 +20,13 @@
                 }
             })
         }}
-    <script {% if csp_nonce %} nonce="{{ csp_nonce() }}"{% endif %}>
-        function clickEvent(button){
-            try {
-                ga('send', 'event', 'survey', 'upload', 'survey_ref = {{ survey_info.surveyRef }} collection_exercise_ref = {{ collection_exercise_info.exerciseRef }}');
-            } catch {}
-
-            let form = document.getElementById("surveys_upload_form");
-            form.submit();
-        }
-    </script>
-
     {{
         onsButton({
             "text": "Upload",
             "type": "submit",
             "classes": "ons-u-mt-s",
             "id": "upload_survey_button",
-            "submitType": "loader",
-            "attributes": {
-                "onclick": "clickEvent(this)"
-            }
+            "submitType": "loader"
         })
     }}
 </form>

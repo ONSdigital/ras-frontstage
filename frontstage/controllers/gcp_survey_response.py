@@ -20,11 +20,8 @@ log = structlog.wrap_logger(logging.getLogger(__name__))
 FILE_EXTENSION_ERROR = "The spreadsheet must be in .xls or .xlsx format"
 FILE_NAME_LENGTH_ERROR = "The file name of your spreadsheet must be less than 50 characters long"
 UPLOAD_FILE_EXTENSIONS = "xls,xlsx"
-MAX_UPLOAD_FILE_NAME_LENGTH = 50
-
-
-class FileTooSmallError(Exception):
-    pass
+MAX_FILE_SIZE_ERROR = "The file must be smaller than 20MB"
+MIN_FILE_SIZE_ERROR = "The file must be larger than 6KB"
 
 
 class SurveyResponseError(Exception):
@@ -63,11 +60,6 @@ class GcpSurveyResponse:
         tx_id = str(uuid.uuid4())
         bound_log = log.bind(filename=file_name, case_id=case["id"], survey_id=survey_ref, tx_id=tx_id)
         bound_log.info("Putting response into bucket and sending pubsub message")
-        file_size = len(file_contents)
-
-        if self.check_if_file_size_too_small(file_size):
-            bound_log.info("File size is too small")
-            raise FileTooSmallError()
 
         try:
             results = self.put_file_into_gcp_bucket(file_contents, file_name)
@@ -225,30 +217,30 @@ class GcpSurveyResponse:
 
         return file_name
 
-    def is_valid_file(self, file_name: str, file_extension: str) -> tuple[bool, str]:
+    def validate_file(self, file_name: str, file_extension: str, file_size: int) -> list:
         """
         Check a file is valid
-
         :param file_name: The file_name to check
         :param file_extension: The file extension
-        :return: (boolean, String)
+        :param file_size: The size of the file in bytes
+        :return: list of validation_errors
         """
 
-        log.info("Checking if file is valid")
+        validation_errors = []
 
         if not self.is_valid_file_extension(file_extension, UPLOAD_FILE_EXTENSIONS):
-            log.info("File extension not valid", file_extension=file_extension)
-            return False, FILE_EXTENSION_ERROR
+            validation_errors.append(FILE_EXTENSION_ERROR)
 
-        if not self.is_valid_file_name_length(file_name, MAX_UPLOAD_FILE_NAME_LENGTH):
-            log.info("File name too long", file_name=file_name)
-            return False, FILE_NAME_LENGTH_ERROR
+        if len(file_name) > current_app.config["MAX_UPLOAD_FILE_NAME_LENGTH"]:
+            validation_errors.append(FILE_NAME_LENGTH_ERROR)
 
-        return True, ""
+        if file_size > current_app.config["MAX_UPLOAD_LENGTH"]:
+            validation_errors.append(MAX_FILE_SIZE_ERROR)
 
-    @staticmethod
-    def check_if_file_size_too_small(file_size) -> bool:
-        return file_size < 1
+        if file_size < current_app.config["MIN_UPLOAD_LENGTH"]:
+            validation_errors.append(MIN_FILE_SIZE_ERROR)
+
+        return validation_errors
 
     @staticmethod
     def _format_exercise_ref(exercise_ref: str) -> str:
@@ -274,14 +266,3 @@ class GcpSurveyResponse:
         :return: boolean
         """
         return file_name.endswith(tuple(ext.strip() for ext in extensions.split(",")))
-
-    @staticmethod
-    def is_valid_file_name_length(file_name, length):
-        """
-        Check the file name length is valid
-
-        :param file_name: The file name to be checked
-        :param length: The length of file name which is valid
-        :return: boolean
-        """
-        return len(file_name) <= int(length)

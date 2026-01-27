@@ -9,7 +9,6 @@ from werkzeug.utils import secure_filename
 
 from frontstage.controllers import case_controller
 from frontstage.controllers.gcp_survey_response import (
-    FileTooSmallError,
     GcpSurveyResponse,
     SurveyResponseError,
 )
@@ -106,46 +105,43 @@ def get_registry_instrument(exercise_id: str, form_type: str) -> dict | None:
     return response.json()
 
 
-def upload_collection_instrument(file, case: dict, business_party: dict, party_id: str, survey: dict):
+def upload_collection_instrument(file, file_size: int, case: dict, business_party: dict, party_id: str, survey: dict):
     """
-
-    :param file: A dict containing the
-    :param case: The case that relates to the upload
+    :param file: The uploaded file
+    :param file_size: The size of the file in bytes
+    :param case: the case associated to the upload
     :param business_party: The record of the business the upload is for
     :param party_id: The party id of the respondent that uploaded the instrument
     :param survey: A dict containing information about the survey
     :raises CiUploadError: Raised on a validation error
     """
+
     case_id = case["id"]
-    if case_id and file and file.filename:
-        file_name, file_extension = os.path.splitext(secure_filename(file.filename))
-        gcp_survey_response = GcpSurveyResponse(app.config)
-        is_valid_file, msg = gcp_survey_response.is_valid_file(file_name, file_extension)
-
-        if not is_valid_file:
-            ci_post_case_event(case_id, party_id, "UNSUCCESSFUL_RESPONSE_UPLOAD")
-            return msg
-
-        survey_ref = survey.get("surveyRef")
-        file_name = gcp_survey_response.create_file_name_for_upload(case, business_party, file_extension, survey_ref)
-
-        if not file_name:
-            raise CiUploadError(MISSING_DATA)
-        try:
-            file_contents = file.read()
-            gcp_survey_response.upload_seft_survey_response(case, file_contents, file_name, survey_ref)
-            ci_post_case_event(case_id, party_id, "SUCCESSFUL_RESPONSE_UPLOAD")
-            return None
-        except FileTooSmallError:
-            ci_post_case_event(case_id, party_id, "UNSUCCESSFUL_RESPONSE_UPLOAD")
-            return FILE_TOO_SMALL
-        except SurveyResponseError:
-            ci_post_case_event(case_id, party_id, "UNSUCCESSFUL_RESPONSE_UPLOAD")
-            raise CiUploadError(UPLOAD_UNSUCCESSFUL)
-    else:
-        logger.info(INVALID_UPLOAD, case_id=case_id, party_id=party_id)
+    if not file:
         ci_post_case_event(case_id, party_id, "UNSUCCESSFUL_RESPONSE_UPLOAD")
-        return INVALID_UPLOAD
+        return [INVALID_UPLOAD]
+
+    file_name, file_extension = os.path.splitext(secure_filename(file.filename))
+    file_contents = file.read()
+    gcp_survey_response = GcpSurveyResponse(app.config)
+    validation_errors = gcp_survey_response.validate_file(file_name, file_extension, file_size)
+
+    if validation_errors:
+        ci_post_case_event(case_id, party_id, "UNSUCCESSFUL_RESPONSE_UPLOAD")
+        return validation_errors
+
+    survey_ref = survey.get("surveyRef")
+    file_name = gcp_survey_response.create_file_name_for_upload(case, business_party, file_extension, survey_ref)
+
+    if not file_name:
+        raise CiUploadError(MISSING_DATA)
+    try:
+        gcp_survey_response.upload_seft_survey_response(case, file_contents, file_name, survey_ref)
+        ci_post_case_event(case_id, party_id, "SUCCESSFUL_RESPONSE_UPLOAD")
+        return None
+    except SurveyResponseError:
+        ci_post_case_event(case_id, party_id, "UNSUCCESSFUL_RESPONSE_UPLOAD")
+        raise CiUploadError(UPLOAD_UNSUCCESSFUL)
 
 
 def ci_post_case_event(case_id, party_id, category):

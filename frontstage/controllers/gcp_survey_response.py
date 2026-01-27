@@ -17,11 +17,11 @@ from frontstage.controllers.survey_controller import get_survey
 
 log = structlog.wrap_logger(logging.getLogger(__name__))
 
-FILE_EXTENSION_ERROR = "The spreadsheet must be in .xls or .xlsx format"
-FILE_NAME_LENGTH_ERROR = "The file name of your spreadsheet must be less than 50 characters long"
+FILE_EXTENSION_ERROR = "The spreadsheet must be in .xls or .xlsx format."
+FILE_NAME_LENGTH_ERROR = "The file name of your spreadsheet must be less than 50 characters long."
 UPLOAD_FILE_EXTENSIONS = "xls,xlsx"
-MAX_FILE_SIZE_ERROR = "The file must be smaller than 20MB"
-MIN_FILE_SIZE_ERROR = "The file must be larger than 6KB"
+MAX_FILE_SIZE_ERROR = "The file must be smaller than 20MB."
+MIN_FILE_SIZE_ERROR = "The file must be larger than 6KB."
 
 
 class SurveyResponseError(Exception):

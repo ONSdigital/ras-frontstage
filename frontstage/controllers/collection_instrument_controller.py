@@ -21,7 +21,6 @@ MISSING_FILE_ERROR = "Select a file that follows guidance for uploading."
 MISSING_DATA = "Data needed to create the file name is missing"
 UPLOAD_SUCCESSFUL = "Upload successful"
 UPLOAD_UNSUCCESSFUL = "Upload failed"
-FILE_TOO_SMALL = "File too small"
 
 
 def download_collection_instrument(collection_instrument_id, case_id, party_id):

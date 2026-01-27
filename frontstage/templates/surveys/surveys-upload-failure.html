@@ -12,6 +12,7 @@
             "url": "#selected-file"
         }
     ) %}
+
 {% endfor %}
 
 {% block content %}
@@ -26,7 +27,7 @@
                 "itemsList": errorData
             })
         }}
-        <p><span class="ons-panel__assistive-text ons-u-vh">Error: </span> {{ error_info.body }}</p>
+        <p><span class="ons-panel__assistive-text ons-u-vh">Errors: {{ errors|join(" ") }}</span></p>
         <div>
             {% include "surveys/surveys-upload-file-picker.html" %}
         </div>
@@ -35,7 +36,6 @@
     <div class="ons-u-mb-s ons-u-mb-m@s">
         <p class="ons-u-fs-r--b">We will treat your data securely and confidentially</p>
     </div>
-
     <div>
         <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}">Back</a>
     </div>

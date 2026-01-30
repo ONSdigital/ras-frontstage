@@ -1,6 +1,6 @@
 import logging
 
-from flask import redirect, request, url_for
+from flask import abort, request
 from structlog import wrap_logger
 
 from frontstage import app
@@ -17,27 +17,28 @@ from frontstage.views.template_helper import render_template
 
 logger = wrap_logger(logging.getLogger(__name__))
 
+SINGLE_VALIDATION_ERROR = "There is 1 error on this page"
+UPLOAD_FAILED_ERROR = "Upload failed"
+
 
 @surveys_bp.route("/upload-survey", methods=["POST"])
 @jwt_authorization(request)
 def upload_survey(session):
     party_id = session.get_party_id()
-    case_id = request.args["case_id"]
-    business_party_id = request.args["business_party_id"]
-    survey_short_name = request.args["survey_short_name"]
+    case_id = request.args.get("case_id")
+    business_party_id = request.args.get("business_party_id")
+    survey_short_name = request.args.get("survey_short_name")
+
     logger.info("Attempting to upload collection instrument", case_id=case_id, party_id=party_id)
 
-    if request.content_length > app.config["MAX_UPLOAD_LENGTH"]:
-        return redirect(
-            url_for(
-                "surveys_bp.upload_failed",
-                _external=True,
-                case_id=case_id,
-                business_party_id=business_party_id,
-                survey_short_name=survey_short_name,
-                error_info="size",
-            )
+    if not (case_id and business_party_id and survey_short_name):
+        logger.error(
+            "upload survey did not include required request args, case_id, business_party_id and survey_short_name",
+            case_id=case_id,
+            business_party_id=business_party_id,
+            survey_short_name=survey_short_name,
         )
+        abort(400)
 
     # Check if respondent has permission to upload for this case
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
@@ -45,7 +46,6 @@ def upload_survey(session):
         raise NoSurveyPermission(party_id, case_id)
 
     case = case_controller.get_case_by_case_id(case_id)
-
     case_group = case.get("caseGroup")
     collection_exercise_id = case_group.get("collectionExerciseId")
     business_party = party_controller.get_party_by_business_id(
@@ -56,46 +56,44 @@ def upload_survey(session):
         verbose=True,
     )
 
-    # Get the uploaded file
     upload_file = request.files["file"]
+    content_length = request.content_length
 
     try:
-        # Upload the file to the collection instrument service
-        error_text = collection_instrument_controller.upload_collection_instrument(
-            upload_file, case, business_party, party_id, survey
+        validation_errors = collection_instrument_controller.upload_collection_instrument(
+            upload_file, content_length, case, business_party, party_id, survey
         )
-        if error_text is not None:
-            # Something was wrong with the file in the CI upload process
-            return redirect(
-                url_for(
-                    "surveys_bp.upload_failed",
-                    _external=True,
-                    case_id=case_id,
-                    business_party_id=business_party_id,
-                    survey_short_name=survey_short_name,
-                    error_info=error_text,
-                )
+        if validation_errors is not None:
+            error_title = (
+                SINGLE_VALIDATION_ERROR
+                if len(validation_errors) == 1
+                else f"There are {len(validation_errors)} problems with your answer."
             )
+            return render_template(
+                "surveys/surveys-upload-failure.html",
+                session=session,
+                business_info=business_party,
+                survey_info=survey,
+                errors=validation_errors,
+                case_id=case_id,
+                error_title=error_title,
+            )
+
     except CiUploadError as ex:
-        # Something went wrong in the CI service
-        error_type = determine_error_type(ex)
-        if not error_type:
-            logger.error(
-                "Unexpected error message returned from collection instrument service",
-                error_message=ex.error_message,
-                party_id=party_id,
-                case_id=case_id,
-            )
-            error_type = "unexpected"
-        return redirect(
-            url_for(
-                "surveys_bp.upload_failed",
-                _external=True,
-                case_id=case_id,
-                business_party_id=business_party_id,
-                survey_short_name=survey_short_name,
-                error_info=error_type,
-            )
+        logger.error(
+            f"upload failure: {ex.error_message}",
+            party_id=party_id,
+            case_id=case_id,
+        )
+
+        return render_template(
+            "surveys/surveys-upload-failure.html",
+            session=session,
+            business_info=business_party,
+            survey_info=survey,
+            errors=[UPLOAD_FAILED_ERROR],
+            case_id=case_id,
+            error_title=SINGLE_VALIDATION_ERROR,
         )
 
     logger.info("Successfully uploaded collection instrument", party_id=party_id, case_id=case_id)
@@ -104,16 +102,3 @@ def upload_survey(session):
         session=session,
         upload_filename=upload_file.filename,
     )
-
-
-def determine_error_type(ex):
-    error_type = ""
-    if ".xlsx format" in ex.error_message:
-        error_type = "type"
-    elif "50 characters" in ex.error_message:
-        error_type = "charLimit"
-    elif "File too large" in ex.error_message:
-        error_type = "size"
-    elif "File too small" in ex.error_message:
-        error_type = "sizeSmall"
-    return error_type

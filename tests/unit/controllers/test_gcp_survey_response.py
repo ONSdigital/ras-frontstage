@@ -162,7 +162,7 @@ class TestGcpSurveyResponse(TestCase):
         with app.app_context():
             survey_response = GcpSurveyResponse(self.config)
             validation_errors = survey_response.validate_file(
-                "valid_file_name", "xls", app.config["MAX_UPLOAD_LENGTH"] + 1
+                "valid_file_name", "xls", app.config["MAX_UPLOAD_SIZE"] + 1
             )
         self.assertEqual(validation_errors, [MAX_FILE_SIZE_ERROR])
 
@@ -170,7 +170,7 @@ class TestGcpSurveyResponse(TestCase):
         with app.app_context():
             survey_response = GcpSurveyResponse(self.config)
             validation_errors = survey_response.validate_file(
-                "valid_file_name", "xls", app.config["MIN_UPLOAD_LENGTH"] - 1
+                "valid_file_name", "xls", app.config["MIN_UPLOAD_SIZE"] - 1
             )
         self.assertEqual(validation_errors, [MIN_FILE_SIZE_ERROR])
 
@@ -178,6 +178,6 @@ class TestGcpSurveyResponse(TestCase):
         with app.app_context():
             survey_response = GcpSurveyResponse(self.config)
             validation_errors = survey_response.validate_file(
-                "valid_file_name", "txt", app.config["MAX_UPLOAD_LENGTH"] + 1
+                "valid_file_name", "txt", app.config["MAX_UPLOAD_SIZE"] + 1
             )
         self.assertEqual(validation_errors, [FILE_EXTENSION_ERROR, MAX_FILE_SIZE_ERROR])

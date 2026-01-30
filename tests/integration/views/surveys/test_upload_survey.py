@@ -81,7 +81,7 @@ class TestUploadSurvey(unittest.TestCase):
             data=self.survey_file,
         )
 
-        self.assertIn("There are 2 errors on this page".encode(), response.data)
+        self.assertIn("There are 2 problems with your answer.".encode(), response.data)
         self.assertIn("The spreadsheet must be in .xls or .xlsx format".encode(), response.data)
         self.assertIn("The file name of your spreadsheet must be less than 50 characters long".encode(), response.data)
         self.assertEqual(response.status_code, 200)

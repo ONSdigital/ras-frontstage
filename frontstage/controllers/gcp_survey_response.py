@@ -234,10 +234,10 @@ class GcpSurveyResponse:
         if len(file_name) > current_app.config["MAX_UPLOAD_FILE_NAME_LENGTH"]:
             validation_errors.append(FILE_NAME_LENGTH_ERROR)
 
-        if file_size > current_app.config["MAX_UPLOAD_LENGTH"]:
+        if file_size > current_app.config["MAX_UPLOAD_SIZE"]:
             validation_errors.append(MAX_FILE_SIZE_ERROR)
 
-        if file_size < current_app.config["MIN_UPLOAD_LENGTH"]:
+        if file_size < current_app.config["MIN_UPLOAD_SIZE"]:
             validation_errors.append(MIN_FILE_SIZE_ERROR)
 
         return validation_errors

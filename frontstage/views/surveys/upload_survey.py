@@ -67,7 +67,7 @@ def upload_survey(session):
             error_title = (
                 SINGLE_VALIDATION_ERROR
                 if len(validation_errors) == 1
-                else f"There are {len(validation_errors)} errors on this page"
+                else f"There are {len(validation_errors)} problems with your answer."
             )
             return render_template(
                 "surveys/surveys-upload-failure.html",

@@ -10,8 +10,8 @@ class Config(object):
     TESTING = False
     PREFERRED_URL_SCHEME = "https"
     PORT = os.getenv("PORT", 8082)
-    MAX_UPLOAD_LENGTH = os.getenv("MAX_UPLOAD_LENGTH", 20 * 1024 * 1024)
-    MIN_UPLOAD_LENGTH = os.getenv("MIN_UPLOAD_LENGTH", 6000)
+    MAX_UPLOAD_SIZE = os.getenv("MAX_UPLOAD_SIZE", 20 * 1024 * 1024)
+    MIN_UPLOAD_SIZE = os.getenv("MIN_UPLOAD_SIZE", 6000)
     MAX_UPLOAD_FILE_NAME_LENGTH = os.getenv("MAX_UPLOAD_FILE_NAME_LENGTH", 50)
     LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "INFO")
 

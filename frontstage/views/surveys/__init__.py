@@ -10,5 +10,4 @@ from frontstage.views.surveys import (  # noqa
     download_survey,
     surveys_list,
     upload_survey,
-    upload_survey_failed,
 )

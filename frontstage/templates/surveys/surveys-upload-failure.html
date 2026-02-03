@@ -1,25 +1,41 @@
-{% extends 'layouts/_base.html' %}
+{% from "components/panel/_macro.njk" import onsPanel %}
+{% from "components/list/_macro.njk" import onsList %}
 
+{% extends 'layouts/_base.html' %}
 {% set page_title = "Error uploading file" %}
+{% set errorData = [] %}
+
+{% for error in errors %}
+    {% do errorData.append(
+        {
+            "text": error,
+            "url": "#selected-file"
+        }
+    ) %}
+
+{% endfor %}
 
 {% block content %}
-    {% call
-        onsPanel({
-            "variant": "error",
-            "classes": "ons-u-mb-s",
-            "title": error_info.header
+    {% call onsPanel({
+            "title": error_title,
+            "variant": 'error'
         })
     %}
-
-        <p><span class="ons-panel__assistive-text ons-u-vh">Error: </span> {{ error_info.body }}</p>
+        {{
+            onsList({
+                "element": 'ol',
+                "itemsList": errorData
+            })
+        }}
+        <p><span class="ons-panel__assistive-text ons-u-vh">Errors: {{ errors|join(" ") }}</span></p>
         <div>
             {% include "surveys/surveys-upload-file-picker.html" %}
         </div>
     {% endcall %}
+
     <div class="ons-u-mb-s ons-u-mb-m@s">
         <p class="ons-u-fs-r--b">We will treat your data securely and confidentially</p>
     </div>
-
     <div>
         <a href="{{ url_for('surveys_bp.get_survey_list', tag='todo') }}">Back</a>
     </div>

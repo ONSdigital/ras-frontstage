@@ -18,7 +18,7 @@ from frontstage.views.template_helper import render_template
 logger = wrap_logger(logging.getLogger(__name__))
 
 SINGLE_VALIDATION_ERROR = "There is 1 error on this page"
-UPLOAD_FAILED_ERROR = "Upload failed"
+UPLOAD_FAILED_ERROR = "The selected file could not be uploaded. Please try again."
 
 
 @surveys_bp.route("/upload-survey", methods=["POST"])

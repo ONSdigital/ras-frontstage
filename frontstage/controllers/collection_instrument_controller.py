@@ -90,7 +90,7 @@ def get_registry_instrument(exercise_id: str, form_type: str) -> dict | None:
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logger.error(
+        logger.info(
             "No registry instrument found for exercise_id and form_type",
             collection_exercise_id=exercise_id,
             form_type=form_type,

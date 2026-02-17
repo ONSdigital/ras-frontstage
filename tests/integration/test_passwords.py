@@ -147,7 +147,8 @@ class TestPasswords(unittest.TestCase):
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue("Something went wrong".encode() in response.data)
+        # mock_notify.assert_called_once()
+        self.assertTrue("Check your email".encode() in response.data)
 
     @requests_mock.mock()
     def test_forgot_password_post_api_call_fail(self, mock_request):

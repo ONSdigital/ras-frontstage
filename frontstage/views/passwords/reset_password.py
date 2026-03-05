@@ -111,10 +111,10 @@ def resend_password_email_expired_token(token):
 
 def request_password_change(email):
     respondent = party_controller.get_respondent_by_email(email)
-
+    token = verification.generate_email_token(email)
     if not respondent:
         logger.info("Respondent does not exist")
-        return redirect(url_for("passwords_bp.reset_password_trouble"))
+        return redirect(url_for("passwords_bp.reset_password_check_email", token=token))
 
     party_id = str(respondent["id"])
     password_reset_counter = party_controller.get_password_reset_counter(party_id)["counter"]
@@ -133,8 +133,6 @@ def request_password_change(email):
                 return redirect(url_for("passwords_bp.reset_password_trouble"))
 
     logger.info("Requesting password change", party_id=party_id)
-
-    token = verification.generate_email_token(email)
 
     url_root = request.url_root
     # url_for comes with a leading slash, so strip off the trailing slash in url_root if there is one

@@ -114,7 +114,7 @@ class TestUploadSurvey(unittest.TestCase):
             data=self.survey_file,
         )
         self.assertIn("There is 1 error on this page".encode(), response.data)
-        self.assertIn("Upload failed".encode(), response.data)
+        self.assertIn("The selected file could not be uploaded. Please try again.".encode(), response.data)
 
     @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
     def test_upload_survey_no_permission(self, mock_request, is_respondent_enrolled):

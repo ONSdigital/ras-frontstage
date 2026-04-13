@@ -45,6 +45,8 @@ def create_app_object():
     logger = wrap_logger(logging.getLogger(__name__))
     logger.debug("App configuration set", config=app_config)
 
+    logger.debug("Test message for deployment purposes")
+
     # If any required variables are not set abort launch
     for var in app.config["NON_DEFAULT_VARIABLES"]:
         if not app.config[var]:

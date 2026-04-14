@@ -104,3 +104,6 @@ profiler:
 
 secureMessage:
   version: both
+
+logging:
+  level: DEBUG

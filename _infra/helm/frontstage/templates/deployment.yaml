@@ -63,7 +63,7 @@ spec:
             timeoutSeconds: 5
           env:
           - name: LOGGING_LEVEL
-            value : "{{ .Values.loggingLevel }}"
+            value : "{{ .Values.logging.level }}"
           - name: APP_SETTINGS
             value: {{ .Values.config }}
           - name: ACCOUNT_SERVICE_URL

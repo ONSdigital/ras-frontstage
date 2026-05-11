@@ -3,24 +3,34 @@
 {% from "components/message/_macro.njk" import onsMessage %}
 {% from "components/textarea/_macro.njk" import onsTextarea %}
 {% from "components/list/_macro.njk" import onsList %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
+
 
 {% set page_title = "View message" %}
 {% set subject = conversation[-1]["subject"] or "No Subject" %}
 {% set survey = survey_name or "No Survey" %}
 {% set business = business_name or "No Business" %}
 
-{% block messages %}
 
-    {% if conversation_data.is_closed %}
-        {% call onsPanel({
-            "classes": "ons-u-mb-s"
-        }) %}
-            <p class="ons-u-fs-r ons-u-mb-xs">This conversation has now been closed. </p> <br/>
-            You can still send a message from your
-            <a href="/surveys/todo">to do list</a> or
-            <a href="/surveys/history">history</a>
-        {% endcall %}
-    {% endif %}
+{% set breadcrumbsData = [
+    {
+        "text": "Back",
+        "url": breadcrumbs_url,
+        "id": "b-item-1"
+    }
+] %}
+
+{% block breadcrumbs %}
+    {{
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
+    }}
+{% endblock breadcrumbs %}
+
+{% block messages %}
     {% set ns = namespace() %}
     {% if error %}
         {% set errorTitle = 'This page has 1 error' %}
@@ -47,10 +57,19 @@
 
         {% endcall %}
     {% endif %}
+    <h1 class="ons-u-fs-xl" name="page-messages-title">{{ subject }}</h1>
+    <div class="ons-u-mb-l">
+        {% if conversation_data.is_closed %}
+            {% call onsPanel({
+                    "variant": 'warn'
+            }) %}
+            <p>This conversation was closed on {{ closed_at }}. Closed messages are deleted after 30 days. </p>
+        {% endcall %}
+    {% endif %}
+    </div>
     <div class="ons-grid">
         <div class="ons-grid__col ons-col-8@m">
             <section role="region" aria-label="Conversation: {{ subject }}">
-                <h1 class="ons-u-fs-xl" name="page-messages-title">{{ subject }}</h1>
                 {% if category == 'SURVEY' %}
                     <div class="ons-u-fs-r--b">Survey: </div>
                     <p>{{ survey }}</p>

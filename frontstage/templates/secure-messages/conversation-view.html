@@ -5,12 +5,10 @@
 {% from "components/list/_macro.njk" import onsList %}
 {% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
 
-
 {% set page_title = "View message" %}
 {% set subject = conversation[-1]["subject"] or "No Subject" %}
 {% set survey = survey_name or "No Survey" %}
 {% set business = business_name or "No Business" %}
-
 
 {% set breadcrumbsData = [
     {

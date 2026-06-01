@@ -1,6 +1,5 @@
 {
   "thread_id": "9e3465c0-9172-4974-a7d1-3a01592d1594",
-  "_links": "",
   "@msg_to": [
     {
       "firstName": "ONS",
@@ -34,7 +33,6 @@
     "id": "0282d2f8-d96d-4fd9-bb7a-c1d781c0978f",
     "lastName": "Griffin"
   },
-  "collection_exercise": "",
   "labels": [
     "SENT"
   ],
@@ -78,6 +76,5 @@
     "sampleUnitRef": "49900000005",
     "name": "OFFICE FOR NATIONAL STATISTICS"
   },
-  "collection_case": "",
   "body": "something else"
 }

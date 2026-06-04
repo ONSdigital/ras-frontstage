@@ -1,7 +1,7 @@
 import logging
 import os
 
-from googlecloudprofilerwheels import googlecloudprofiler
+import googlecloudprofiler
 from flask import Flask, request
 from flask_wtf.csrf import CSRFProtect
 from structlog import wrap_logger

@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 from flask import flash, redirect, request, url_for
 from markupsafe import Markup
@@ -52,6 +53,8 @@ def view_conversation(session, thread_id):
     business_id = refined_conversation[0].get("ru_ref")
     survey_id = refined_conversation[0].get("survey_id")
     subject = refined_conversation[0].get("subject")
+    closed_at = None
+    breadcrumbs_url = "/secure-message/threads"
 
     if not conversation["is_closed"] and request.method == "POST":
         msg_to = get_msg_to(refined_conversation)
@@ -66,6 +69,11 @@ def view_conversation(session, thread_id):
             return redirect(url_for("secure_message_bp.view_conversation_list"))
         except InvalidSecureMessagingForm as e:
             error = e.errors["body"][0]
+    elif conversation["is_closed"]:
+        closed_at = datetime.strftime(
+            datetime.strptime(conversation.get("closed_at"), "%Y-%m-%dT%H:%M:%S.%f"), "%d %B %Y"
+        )
+        breadcrumbs_url = breadcrumbs_url + "?is_closed=true"
 
     survey_name = None
     business_name = None
@@ -93,6 +101,8 @@ def view_conversation(session, thread_id):
         business_id=business_id,
         survey_id=survey_id,
         subject=subject,
+        closed_at=closed_at,
+        breadcrumbs_url=breadcrumbs_url,
     )
 
 

@@ -33,14 +33,7 @@
     }
   ],
   "@business_details": "None",
-  "_links": {
-    "self": {
-      "href": "http://ras-secure-messaging-sit.apps.devtest.onsclofo.uk/message/dfcb2b2c-a1d8-4d86-a974-7ffe05a3141b"
-    }
-  },
   "body": "TEsdfdsfST",
-  "collection_case": "ACollectionCase",
-  "collection_exercise": "ACollectionExercise",
   "labels": ["INBOX"],
   "msg_from": "BRES",
   "msg_id": "dfcb2b2c-a1d8-4d86-a974-7ffe05a3141b",

@@ -1,7 +1,6 @@
 import logging
 import os
 
-import googlecloudprofiler
 from flask import Flask, request
 from flask_wtf.csrf import CSRFProtect
 from structlog import wrap_logger
@@ -57,12 +56,6 @@ def create_app_object():
 
     csrf = CSRFProtect(app)
     csrf.exempt("frontstage.views.session.session_refresh_expires_at")
-
-    if app.config["PROFILER_ENABLED"]:
-        try:
-            googlecloudprofiler.start(verbose=3, service="frontstage")
-        except (ValueError, NotImplementedError) as exc:
-            logger.error(exc)  # Handle errors here
 
     @app.after_request
     def apply_headers(response):

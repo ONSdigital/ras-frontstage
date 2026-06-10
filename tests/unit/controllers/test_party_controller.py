@@ -186,7 +186,7 @@ class TestPartyController(unittest.TestCase):
                 self.assertEqual(business["name"], business_party["name"])
 
     def test_get_party_by_business_id_success_with_collection_exercise_id(self):
-        """Tests the function is successful when we supply the optional collection_excercise_id"""
+        """Tests the function is successful when we supply the optional collection_exercise_id"""
         with responses.RequestsMock() as rsps:
             url = f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True"
             rsps.add(rsps.GET, url, json=business_party, status=200)

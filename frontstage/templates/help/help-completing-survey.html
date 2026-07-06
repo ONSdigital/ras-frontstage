@@ -1,0 +1,76 @@
+{% extends "layouts/_block_content.html" %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
+{% from "components/list/_macro.njk" import onsList %}
+{% from "components/accordion/_macro.njk" import onsAccordion %}
+
+{% set page_title = "Help completing a survey" %}
+{% set breadcrumbsData = [
+    {
+        "text": "Back",
+        "url": "/surveys/todo"
+    }
+] %}
+
+{% block breadcrumbs %}
+    {{
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
+    }}
+{% endblock breadcrumbs %}
+
+{% block main %}
+{# djlint:off H025 #}
+{{
+    onsAccordion({
+        "id": "accordion-example",
+        "itemsList": [
+            {
+                "title": "Starting your survey",
+                "content": "<p>To start your survey, select the survey name on the <a href='/surveys/todo'>Surveys</a> tab in your account.</p>
+                            <p>If you are selected for a new survey that you have not completed before, you will receive an enrolment code by post to add that survey to your account.</p>
+                            <p> For any survey you have previously added, you do not need an enrolment code again. Simply select the survey name under the <a href='/surveys/todo'>Surveys</a> tab.</p>
+                            <p> You will receive an email notification when a new survey period is ready to complete if you are selected again.</p>"
+            },
+            {
+                "title": "Sharing your survey with a colleague",
+                "content": "<p>You can share access so someone else can help you complete the survey. In your account, go to <a href='/my-account/share-surveys'>Share access to your surveys</a>.</p>"
+            },
+            {
+                "title": "Providing estimates",
+                "content": "<p>If you do not have exact data for the period requested, you can use an informed estimate.</p>
+                            <p>Use the comment boxes in your survey to tell us where you have used estimates and why. This will reduce the need for us to contact you in the future.</p>"
+            },
+            {
+                "title": "Save and submit your survey",
+                "content": "<p>When you have answered all mandatory questions, you will be taken to a screen titled ‘Check your answers and submit’. Please select Submit Survey to send your survey.</p>
+                            <ul class=\"ons-list\">
+                                <li class=\"ons-list__item\">You cannot submit your survey until you have answered all mandatory questions</li>
+                                <li class=\"ons-list__item\">Save and Exit Survey does not submit your survey. If you Save and Exit Survey, please ensure you return to complete the survey and submit before the survey return-by date.</li>
+                            </ul>
+
+                            <p>After you submit, you can save a copy of your answers as a PDF or print them.</p>
+                            <p>You have 45 minutes to do this before you are logged out automatically for security reasons.</p>"
+            },
+            {
+                "title": "Change your contact details",
+                "content": "<p>If you are no longer responsible for the survey, please provide the contact details for the person who will be completing it instead.</p>
+                            <p>In your account, go to <a href='/my-account/transfer-surveys/survey-selection'>Transfer surveys</a> to give access to a colleague.</p>
+                            <p>To update your business details, please call us on 0300 1234 931. When contacting us please provide your reference number and survey ID.</p>"
+            },
+            {
+                "title": "Correcting data after submission",
+                "content": "<p>If, after submission of your survey, you wish to amend any of your answers, please call us on 0300 1234 931. When contacting us please provide your reference number and survey ID.</p>"
+            },
+            {
+                "title": "Get help",
+                "content": "<p>If you need help with your business survey, please <a href='/contact-us/send-message'>send a secure message</a> to the ONS survey help team for support.</p>"
+            }
+        ]
+    })
+}}
+{# djlint:on #}
+
+{% endblock main %}

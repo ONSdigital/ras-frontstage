@@ -30,7 +30,7 @@ werkzeug = "*"
 fakeredis = "*"
 email-validator = "*"
 pyjwt = "*"
-# Pinned to 3.10.0 due to newer versions of google-cloud-storage make get requests to GCS when posting completed
+# Pinned to 3.10.0 due to newer versions of google-cloud-storage making GET requests to GCS when posting completed
 # SEFT files to SDX bucket which we don't have permission to do
 google-cloud-storage = "==3.10.0"
 

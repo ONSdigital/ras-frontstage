@@ -33,6 +33,11 @@ def help_completing_survey():
     return render_template("help/help-completing-survey.html", authorization=is_authorization())
 
 
+@contact_us_bp.route("/help-general-survey-information", methods=["GET"])
+def help_general_survey_information():
+    return render_template("help/help-general-survey-information.html", authorization=is_authorization())
+
+
 @contact_us_bp.route("/send-message", methods=["GET", "POST"])
 @jwt_authorization(request)
 def send_message(session) -> str:

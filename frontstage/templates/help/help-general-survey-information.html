@@ -1,0 +1,72 @@
+{% extends "layouts/_block_content.html" %}
+{% from "components/breadcrumbs/_macro.njk" import onsBreadcrumbs %}
+{% from "components/list/_macro.njk" import onsList %}
+{% from "components/accordion/_macro.njk" import onsAccordion %}
+
+{% set page_title = "General survey information" %}
+{% set breadcrumbsData = [
+    {
+        "text": "Back",
+        "url": "/surveys/todo"
+    }
+] %}
+
+{% block breadcrumbs %}
+    {{
+        onsBreadcrumbs({
+            "ariaLabel": "Breadcrumbs",
+            "id": "breadcrumbs",
+            "itemsList": breadcrumbsData
+        })
+    }}
+{% endblock breadcrumbs %}
+
+{% block main %}
+<h2 class="ons-u-fs-l">General survey information</h2>
+
+{# djlint:off H025 #}
+{{
+    onsAccordion({
+        "id": "accordion-example",
+        "itemsList": [
+            {
+                "title": "Find information about your survey",
+                "content": "<p>You can find information about each survey and what information is required on the <a href='https://www.ons.gov.uk/surveys/informationforbusinesses/businesssurveys/staticlist'>Information pages related to business surveys</a>.</p>"
+            },
+            {
+                "title": "About ONS business surveys",
+                "content": "<p>ONS is the executive office of the UK Statistics Authority. The data we collect from UK businesses are a vital way to measure the UK economy.</p>"
+                           "<p>Where this data cannot be collected from alternative sources, your information gives policy makers the clarity needed to make effective decisions. For this reason, the completion of most ONS business surveys is a requirement for businesses under the Statistics of Trade Act 1947.</p>"
+                           "<p>ONS business survey data are used to produce important statistics about the economy such as the Retail Sales Index, Gross Domestic Product and the UK Balance of Payments. You can visit the <a href='https://www.ons.gov.uk/'>ONS website</a> to find information on the statistics we produce.</p>"
+                            "<p>To find out more about how each survey contributes to economic statistics, visit the <a href='https://www.ons.gov.uk/surveys/informationforbusinesses/businesssurveys/staticlist'>Information pages related to business surveys</a></p>"
+            },
+            {
+                "title": "Selection for ONS Surveys",
+                "content":  "<p>Businesses are selected from the Inter-Departmental Business Register (IDBR), which includes businesses and organisations registered for Pay As You Earn (PAYE), Value Added Tax (VAT), or with Companies House.</p>"
+                            "<p>Selection is based on several factors, including:</p>"
+                            "<ul class=\"ons-list\">
+                                <li class=\"ons-list__item\">number of employees</li>
+                                <li class=\"ons-list__item\">how many similar businesses exist</li>
+                                <li class=\"ons-list__item\">business size</li>
+                            </ul>"
+                            "<p>Large businesses (generally those with 100 or more employees) will typically be included because their data have a substantial impact. Medium and small businesses are selected mainly on a rotational basis to maintain balanced and representative results.</p>"
+                            "<p>For further information about how businesses are selected for ONS business surveys, please visit the <a href='https://www.ons.gov.uk/surveys/informationforbusinesses/aboutonsbusinesssurveys#selection-for-ons-surveys'>Selection for ONS business surveys page of the ONS website</a></p>"
+            },
+            {
+                "title": "Alternative Data Sources",
+                "content": "<p>We are continually seeking to reduce the impact of surveys on businesses. Improving access to data to support the production of official and National Statistics, and statistical research, for better decision making is a key objective of the UK Statistics Authority and ONS.</p>"
+                           "<p>The Digital Economy Act 2017 has established a legal gateway for HMRC and other government departments to share data with ONS to support UK statistics. For example, this includes data held by HMRC on VAT, PAYE Real Time Information and Corporation Tax data.</p>"
+                           "<p>It is anticipated that once these legal gateways are operational, there should be a noticeable reduction in the burden imposed on businesses by ONS's statistical surveys.</p>"
+            },
+            {
+                "title": "Legal basis for completion of ONS Business Surveys",
+                "content": "<p>The introduction page of your survey will state whether completion of the survey is mandatory.</p>"
+                           "<p>For mandatory surveys, these are conducted under the provisions of the Statistics of Trade Act 1947. Once selected, your business is legally obliged to complete the survey. There is no exemption or appeal process once a business has been selected, but you can contact ONS if there are circumstances we should be aware of.  Failure to comply may result in fines of up to £2,500.</p>"
+
+            }
+        ]
+    })
+}}
+{# djlint:on #}
+
+{% endblock main %}

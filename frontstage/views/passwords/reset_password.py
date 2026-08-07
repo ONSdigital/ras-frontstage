@@ -63,6 +63,14 @@ def post_reset_password(token):
     try:
         duration = app.config["EMAIL_TOKEN_EXPIRY"]
         email = verification.decode_email_token(token, duration)
+        respondent = party_controller.get_respondent_by_email(email)
+        party_token = respondent.get("password_verification_token") if respondent else None
+
+        if not party_token or token != party_token:
+            respondent_id = respondent.get("id") if respondent else None
+            logger.warning("Token not found for respondent", token=token, respondent_id=respondent_id)
+            return render_template("passwords/password-token-not-found.html", token=token)
+
         party_controller.change_password(email, password)
         party_controller.delete_verification_token(token)
     except ApiError as exc:

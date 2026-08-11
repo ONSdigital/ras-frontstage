@@ -71,8 +71,7 @@ def post_reset_password(token):
             logger.warning("Token not found for respondent", token=token, respondent_id=respondent_id)
             return render_template("passwords/password-token-not-found.html", token=token)
 
-        party_controller.change_password(email, password)
-        party_controller.delete_verification_token(token)
+        party_controller.reset_password(email, password, token)
     except ApiError as exc:
         if exc.status_code == 409:
             logger.warning("Token expired", api_url=exc.url, api_status_code=exc.status_code, token=token)

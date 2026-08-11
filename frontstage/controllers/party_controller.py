@@ -100,6 +100,23 @@ def change_password(email, password):
     bound_logger.info("Successfully changed password through the party service")
 
 
+def reset_password(email, password, token):
+    bound_logger = logger.bind(email=obfuscate_email(email))
+    bound_logger.info("Attempting to reset password through the party service")
+
+    data = {"email_address": email, "new_password": password, "token": token}
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/reset_password"
+    response = requests.put(url, auth=app.config["BASIC_AUTH"], json=data)
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        bound_logger.error("Failed to send reset password request to party service")
+        raise ApiError(logger, response)
+
+    bound_logger.info("Successfully reset password through the party service")
+
+
 def create_account(registration_data: dict) -> None:
     obfuscated_email = obfuscate_email(registration_data["emailAddress"])
     enrolment_code = registration_data["enrolmentCode"]

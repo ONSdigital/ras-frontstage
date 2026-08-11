@@ -66,14 +66,13 @@ def post_reset_password(token):
     except ApiError as exc:
         if exc.status_code == 409:
             logger.warning("Token expired", api_url=exc.url, api_status_code=exc.status_code, token=token)
-            return render_template("passwords/password-expired.html", token=token)
         elif exc.status_code == 404:
             logger.warning(
                 "Invalid token sent to party service", api_url=exc.url, api_status_code=exc.status_code, token=token
             )
-            return render_template("passwords/password-token-not-found.html", token=token)
         else:
             raise exc
+        return render_template("passwords/password-token-not-found.html", token=token)
 
     logger.info("Successfully changed user password", token=token)
     return redirect(url_for("passwords_bp.reset_password_confirmation"))

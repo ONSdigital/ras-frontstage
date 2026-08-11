@@ -289,7 +289,7 @@ class TestPasswords(unittest.TestCase):
         response = self.app.post(f"passwords/reset-password/{token}", data=password_form, follow_redirects=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue("Your link has expired".encode() in response.data)
+        self.assertIn("Your link is invalid or has already been used".encode(), response.data)
 
     @requests_mock.mock()
     def test_reset_password_post_token_invalid(self, mock_request):

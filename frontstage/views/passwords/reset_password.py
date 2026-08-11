@@ -1,6 +1,5 @@
 import logging
 
-from flask import abort
 from flask import current_app as app
 from flask import flash, redirect, request, url_for
 from itsdangerous import BadData, BadSignature, SignatureExpired
@@ -63,14 +62,6 @@ def post_reset_password(token):
     try:
         duration = app.config["EMAIL_TOKEN_EXPIRY"]
         email = verification.decode_email_token(token, duration)
-        respondent = party_controller.get_respondent_by_email(email)
-        party_token = respondent.get("password_verification_token") if respondent else None
-
-        if not party_token or token != party_token:
-            respondent_id = respondent.get("id") if respondent else None
-            logger.warning("Token not found for respondent", token=token, respondent_id=respondent_id)
-            return render_template("passwords/password-token-not-found.html", token=token)
-
         party_controller.reset_password(email, password, token)
     except ApiError as exc:
         if exc.status_code == 409:
@@ -80,7 +71,7 @@ def post_reset_password(token):
             logger.warning(
                 "Invalid token sent to party service", api_url=exc.url, api_status_code=exc.status_code, token=token
             )
-            abort(404)
+            return render_template("passwords/password-token-not-found.html", token=token)
         else:
             raise exc
 

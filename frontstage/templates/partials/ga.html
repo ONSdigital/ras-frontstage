@@ -1,12 +1,21 @@
 <!-- Google tag (gtag.js) -->
-<script nonce="{{ csp_nonce() }}" async src="https://www.googletagmanager.com/gtag/js?id={{config['GOOGLE_ANALYTICS_MEASUREMENT_ID']}}"></script>
-
 <script nonce="{{ csp_nonce() }}">
-    var allowTrackingCookies = /^(.*)?\s*'usage':true\s*[^;]+(.*)?$/;
+    var allowTrackingCookies = /'usage':true/;
+
     if (document.cookie.match(allowTrackingCookies)) {
+        var script = document.createElement('script');
+        script.async = true;
+        script.src = "https://www.googletagmanager.com/gtag/js?id={{ config['GOOGLE_ANALYTICS_MEASUREMENT_ID'] }}";
+        document.head.appendChild(script);
+
         window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);} gtag('js', new Date());
-        gtag({{ config['GOOGLE_ANALYTICS_MEASUREMENT_ID']|tojson }});
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+        gtag('config', {{ config['GOOGLE_ANALYTICS_MEASUREMENT_ID']|tojson }});
     }
 </script>
 

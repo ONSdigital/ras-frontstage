@@ -57,14 +57,18 @@ def post_reset_password(token):
     if not form.validate():
         return get_reset_password(token, form_errors=form.errors)
 
-    password = request.form.get("password")
+    password = request.form["password"]
 
     try:
         duration = app.config["EMAIL_TOKEN_EXPIRY"]
         email = verification.decode_email_token(token, duration)
         party_controller.reset_password(email, password, token)
     except ApiError as exc:
-        if exc.status_code == 409:
+        if exc.status_code == 400:
+            logger.warning(
+                "Invalid password sent to party service", api_url=exc.url, api_status_code=exc.status_code, token=token
+            )
+        elif exc.status_code == 409:
             logger.warning("Token expired", api_url=exc.url, api_status_code=exc.status_code, token=token)
         elif exc.status_code == 404:
             logger.warning(

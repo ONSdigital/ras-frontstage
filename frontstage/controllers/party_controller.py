@@ -105,7 +105,7 @@ def reset_password(email: str, password: str, token: str) -> None:
 
     data = {"email_address": email, "new_password": password, "token": token}
     url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/reset_password"
-    response = requests.post(url, auth=app.config["BASIC_AUTH"], json=data)
+    response = requests.put(url, auth=app.config["BASIC_AUTH"], json=data)
 
     try:
         response.raise_for_status()

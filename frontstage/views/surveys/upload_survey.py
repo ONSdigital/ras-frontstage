@@ -1,8 +1,6 @@
 import logging
 
 from flask import abort, request
-from structlog import wrap_logger
-
 from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
 from frontstage.controllers import (
@@ -11,9 +9,14 @@ from frontstage.controllers import (
     party_controller,
     survey_controller,
 )
-from frontstage.exceptions.exceptions import CiUploadError, InvalidDetails, NoSurveyPermission
+from frontstage.exceptions.exceptions import (
+    CiUploadError,
+    InvalidDetails,
+    NoSurveyPermission,
+)
 from frontstage.views.surveys import surveys_bp
 from frontstage.views.template_helper import render_template
+from structlog import wrap_logger
 
 logger = wrap_logger(logging.getLogger(__name__))
 

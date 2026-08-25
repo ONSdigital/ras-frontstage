@@ -11,7 +11,7 @@ from frontstage.controllers import (
     party_controller,
     survey_controller,
 )
-from frontstage.exceptions.exceptions import CiUploadError, NoSurveyPermission, InvalidDetails
+from frontstage.exceptions.exceptions import CiUploadError, InvalidDetails, NoSurveyPermission
 from frontstage.views.surveys import surveys_bp
 from frontstage.views.template_helper import render_template
 

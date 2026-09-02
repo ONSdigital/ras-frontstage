@@ -1,6 +1,5 @@
 import logging
 
-from flask import abort
 from flask import current_app as app
 from flask import flash, redirect, request, url_for
 from itsdangerous import BadData, BadSignature, SignatureExpired
@@ -8,6 +7,7 @@ from structlog import wrap_logger
 from werkzeug.exceptions import NotFound
 
 from frontstage.common import verification
+from frontstage.common.utilities import obfuscate_email
 from frontstage.controllers import party_controller
 from frontstage.controllers.notify_controller import NotifyGateway
 from frontstage.exceptions.exceptions import ApiError, RasNotifyError
@@ -58,24 +58,43 @@ def post_reset_password(token):
     if not form.validate():
         return get_reset_password(token, form_errors=form.errors)
 
-    password = request.form.get("password")
+    password = request.form["password"]
 
     try:
         duration = app.config["EMAIL_TOKEN_EXPIRY"]
         email = verification.decode_email_token(token, duration)
-        party_controller.change_password(email, password)
-        party_controller.delete_verification_token(token)
+    except SignatureExpired:
+        logger.warning("Token expired", token=token, exc_info=True)
+        return render_template("passwords/password-expired.html", token=token)
+    except BadSignature:
+        logger.warning("Invalid token", token=token, exc_info=True)
+        return render_template("passwords/password-token-not-found.html", token=token)
+
+    try:
+        party_controller.reset_password(email, password, token)
     except ApiError as exc:
-        if exc.status_code == 409:
-            logger.warning("Token expired", api_url=exc.url, api_status_code=exc.status_code, token=token)
-            return render_template("passwords/password-expired.html", token=token)
+        if exc.status_code == 400:
+            logger.warning(
+                "Invalid password sent to party service",
+                email=obfuscate_email(email),
+                api_status_code=exc.status_code,
+                token=token,
+            )
+        elif exc.status_code == 409:
+            logger.warning("Token expired", email=obfuscate_email(email), api_status_code=exc.status_code, token=token)
         elif exc.status_code == 404:
             logger.warning(
-                "Invalid token sent to party service", api_url=exc.url, api_status_code=exc.status_code, token=token
+                "Invalid token sent to party service",
+                email=obfuscate_email(email),
+                api_status_code=exc.status_code,
+                token=token,
             )
-            abort(404)
         else:
-            raise exc
+            logger.error(
+                "Another error occured", email=obfuscate_email(email), api_status_code=exc.status_code, token=token
+            )
+            return render_template("passwords/reset-password-trouble.html")
+        return render_template("passwords/password-token-not-found.html", token=token)
 
     logger.info("Successfully changed user password", token=token)
     return redirect(url_for("passwords_bp.reset_password_confirmation"))

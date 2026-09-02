@@ -153,7 +153,7 @@ class TestPasswords(unittest.TestCase):
     @requests_mock.mock()
     def test_forgot_password_post_api_call_fail(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        mock_request.post(url_reset_password_request, status_code=500)
+        mock_request.get(url_get_respondent_by_email, status_code=500)
 
         response = self.app.post("passwords/forgot-password", data=self.email_form, follow_redirects=True)
 
@@ -360,13 +360,15 @@ class TestPasswords(unittest.TestCase):
     @requests_mock.mock()
     def test_reset_password_put_party_service_fail(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
-        mock_request.put(url_password_change, status_code=500)
+        mock_request.put(url_password_reset, status_code=500)
         password_form = {"password": "Gizmo007!Gizmo", "password_confirm": "Gizmo007!Gizmo"}
+        with app.app_context():
+            token = verification.generate_email_token("test.com")
 
         response = self.app.post(f"passwords/reset-password/{token}", data=password_form, follow_redirects=True)
 
-        self.assertEqual(response.status_code, 500)
-        self.assertTrue("An error has occurred".encode() in response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("Something went wrong".encode() in response.data)
 
     @requests_mock.mock()
     @patch("frontstage.controllers.notify_controller.NotifyGateway.request_to_notify")

@@ -10,7 +10,9 @@ from frontstage import app
 from frontstage.exceptions.exceptions import CiUploadError
 from tests.integration.mocked_services import (
     business_party,
+    business_party_mismatch,
     case,
+    case_diff_businessId,
     collection_exercise,
     encoded_jwt_token,
     survey,
@@ -29,7 +31,9 @@ class TestUploadSurvey(unittest.TestCase):
         self.app = app.test_client()
         self.app.set_cookie("authorization", "session_key")
         self.headers = {
-            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"  # NOQA
+            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2Vy"
+            + "X3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"
+            # NOQA
         }
         self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
         self.patcher = patch("redis.StrictRedis.get", return_value=encoded_jwt_token)
@@ -126,3 +130,22 @@ class TestUploadSurvey(unittest.TestCase):
             f'&survey_short_name={survey["shortName"]}'
         )
         self.assertEqual(response.status_code, 500)
+
+    def test_upload_survey_ci_upload_with_mismatched_details(self, mock_request):
+        mock_request.get(
+            f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True",
+            json=business_party_mismatch,
+            status_code=200,
+        )
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
+        mock_request.get(url_get_case, json=case_diff_businessId, status_code=200)
+
+        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
+        response = self.app.post(
+            f'/surveys/upload-survey?case_id={case_diff_businessId["id"]}'
+            f'&business_party_id={business_party_mismatch["id"]}&survey_short_name={survey["shortName"]}',
+            data=self.survey_file,
+        )
+        self.assertEqual(response.status_code, 500)
+        self.assertLogs("Party ID and/or Survey ID do not match", response.data)

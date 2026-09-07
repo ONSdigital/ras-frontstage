@@ -280,6 +280,19 @@ class TestPasswords(unittest.TestCase):
         self.assertTrue("Your link is invalid or has already been used".encode() in response.data)
 
     @requests_mock.mock()
+    def test_reset_password_post_invalid_payload(self, mock_request):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.put(url_password_reset, status_code=400)
+        password_form = {"password": "Gizmo007!Gizmo", "password_confirm": "Gizmo007!Gizmo"}
+        with app.app_context():
+            token = verification.generate_email_token("test.com")
+
+        response = self.app.post(f"passwords/reset-password/{token}", data=password_form, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Your link is invalid or has already been used".encode(), response.data)
+
+    @requests_mock.mock()
     def test_reset_password_post_token_expired(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.put(url_password_reset, status_code=409)

@@ -59,9 +59,9 @@ def post_reset_password(token):
         return get_reset_password(token, form_errors=form.errors)
 
     password = request.form["password"]
+    duration = app.config["EMAIL_TOKEN_EXPIRY"]
 
     try:
-        duration = app.config["EMAIL_TOKEN_EXPIRY"]
         email = verification.decode_email_token(token, duration)
     except SignatureExpired:
         logger.warning("Token expired", token=token, exc_info=True)
@@ -75,13 +75,13 @@ def post_reset_password(token):
     except ApiError as exc:
         if exc.status_code == 400:
             logger.warning(
-                "Invalid password sent to party service",
+                "Invalid payload sent to party service",
                 email=obfuscate_email(email),
                 api_status_code=exc.status_code,
                 token=token,
             )
         elif exc.status_code == 409:
-            logger.warning("Token expired", email=obfuscate_email(email), api_status_code=exc.status_code, token=token)
+            logger.warning("Token conflict", email=obfuscate_email(email), api_status_code=exc.status_code, token=token)
         elif exc.status_code == 404:
             logger.warning(
                 "Invalid token sent to party service",

@@ -100,6 +100,30 @@ def change_password(email, password):
     bound_logger.info("Successfully changed password through the party service")
 
 
+def reset_password(email: str, password: str, token: str) -> None:
+    bound_logger = logger.bind(email=obfuscate_email(email))
+
+    data = {"email_address": email, "new_password": password, "token": token}
+    url = f"{app.config['PARTY_URL']}/party-api/v1/respondents/reset_password"
+    response = requests.put(url, auth=app.config["BASIC_AUTH"], json=data)
+
+    try:
+        response.raise_for_status()
+    except HTTPError as e:
+        bound_logger.error(
+            "HTTPError returned from Party service when resetting password",
+            status_code=e.response.status_code,
+            email=obfuscate_email(email),
+        )
+        raise ApiError(logger, response)
+    except ConnectionError:
+        raise ServiceUnavailableException("Party service returned a connection error", 503)
+    except Timeout:
+        raise ServiceUnavailableException("Party service has timed out", 504)
+
+    bound_logger.info("Successfully reset password through the party service")
+
+
 def create_account(registration_data: dict) -> None:
     obfuscated_email = obfuscate_email(registration_data["emailAddress"])
     enrolment_code = registration_data["enrolmentCode"]

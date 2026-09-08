@@ -143,6 +143,7 @@ url_get_conversation_count = f"{app.config['SECURE_MESSAGE_URL']}/messages/count
 url_get_threads = app.config["SECURE_MESSAGE_URL"] + "/threads"
 url_auth_token = f"{app.config['AUTH_URL']}/api/v1/tokens/"
 url_password_change = f"{app.config['PARTY_URL']}/party-api/v1/respondents/change_password"
+url_password_reset = f"{app.config['PARTY_URL']}/party-api/v1/respondents/reset_password"
 url_post_add_survey = f"{app.config['PARTY_URL']}/party-api/v1/respondents/add_survey"
 url_post_case_event_uuid = f"{app.config['CASE_URL']}/cases/{case['id']}/events"
 url_reset_password_request = f"{app.config['PARTY_URL']}/party-api/v1/respondents/request_password_change"

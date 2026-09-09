@@ -7,11 +7,17 @@ survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
 with open("tests/test_data/party/business_party.json") as fp:
     business_party = json.load(fp)
 
+with open("tests/test_data/party/business_party.json") as fp:
+    business_party_mismatch = json.load(fp)
+
 with open("tests/test_data/party/party.json") as fp:
     respondent_party = json.load(fp)
 
 with open("tests/test_data/case/case.json") as fp:
     case = json.load(fp)
+
+with open("tests/test_data/case/case_diff_businessId.json") as fp:
+    case_diff_businessId = json.load(fp)
 
 with open("tests/test_data/case/case_diff_surveyId.json") as fp:
     case_diff_surveyId = json.load(fp)

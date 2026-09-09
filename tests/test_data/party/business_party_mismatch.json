@@ -1,0 +1,32 @@
+{
+    "associations": [
+        {
+            "businessRespondentStatus": "ACTIVE",
+            "enrolments": [
+                {
+                    "enrolmentStatus": "ENABLED",
+                    "name": "Monthly Survey of Building Materials Bricks",
+                    "surveyId": "cb8accda-6118-4d3b-85a3-149e28960c54"
+                }
+            ],
+            "partyId": "0008279d-9425-4e28-897d-bfd876aa7f3f"
+        }
+    ],
+    "name": "RUNAME1_COMPANY1 RUNNAME2_COMPANY1",
+    "sampleSummaryId": "bf9477c9-ea0b-498a-87f1-c1a76d77bd29",
+    "sampleUnitRef": "49900000001",
+    "sampleUnitType": "B",
+    "trading_as": "TOTAL UK ACTIVITY",
+    "frosic92": "50300",
+    "frotover": 7,
+    "inclexcl": "D",
+    "birthdate": "24/01/2017",
+    "entrepmkr": "E",
+    "rusic2007": "45320",
+    "froempment": 8478,
+    "frosic2007": "45320",
+    "checkletter": "F",
+    "tradstyle1": "",
+    "tradstyle2": "",
+    "tradstyle3": ""
+}

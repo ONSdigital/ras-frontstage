@@ -88,6 +88,14 @@ class InvalidEqPayLoad(Exception):
         self.message = message
 
 
+class InvalidDetails(Exception):
+    def __init__(self, party_id, case_id, survey_id):
+        super().__init__()
+        self.party_id = party_id
+        self.case_id = case_id
+        self.suvey_id = survey_id
+
+
 class UserDoesNotExist(Exception):
     def __init__(self, message):
         super().__init__()

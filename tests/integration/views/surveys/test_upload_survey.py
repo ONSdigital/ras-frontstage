@@ -1,5 +1,4 @@
 import io
-import json
 import logging
 import unittest
 from unittest.mock import patch
@@ -19,7 +18,8 @@ from tests.integration.mocked_services import (
     url_banner_api,
     url_get_business_party,
     url_get_case,
-    url_get_survey_by_short_name, url_get_survey_by_short_name_eq,
+    url_get_survey_by_short_name,
+    url_get_survey_by_short_name_eq,
 )
 
 logger = wrap_logger(logging.getLogger(__name__))

@@ -50,7 +50,9 @@ def upload_survey(session):
     survey_id = survey["id"]
 
     if business_party_id != case_group["partyId"]:
-        logger.error(f"business_party_id {business_party_id} does not match case_group['partyId'] {case_group['partyId']}")
+        logger.error(
+            f"business_party_id {business_party_id} does not match case_group['partyId'] {case_group['partyId']}"
+        )
         abort(400)
     if survey_id != case_group["surveyId"]:
         logger.error(f"survey_id{survey_id} and case_group['surveyId'] {case_group['surveyId']}")

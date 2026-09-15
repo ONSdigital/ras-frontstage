@@ -150,8 +150,10 @@ class TestUploadSurvey(unittest.TestCase):
             data=self.survey_file,
         )
         self.assertEqual(response.status_code, 400)
-        self.assertLogs(f"business_party_id {business_party_id} does not match case_group['partyId'] "
-                        f"{case["partyId"]}", response.data)
+        self.assertLogs(
+            f"business_party_id {business_party_id} does not match case_group['partyId'] " f"{case["partyId"]}",
+            response.data,
+        )
 
     def test_upload_survey_ci_upload_with_mismatched_survey_id(self, mock_request):
         mock_request.get(
@@ -171,5 +173,6 @@ class TestUploadSurvey(unittest.TestCase):
             data=self.survey_file,
         )
         self.assertEqual(response.status_code, 400)
-        self.assertLogs(f"survey_id{survey_eq["id"]} and case_group['surveyId'] {case["caseGroup"]['surveyId']}",
-                        response.data)
+        self.assertLogs(
+            f"survey_id{survey_eq["id"]} and case_group['surveyId'] {case["caseGroup"]['surveyId']}", response.data
+        )

@@ -55,7 +55,7 @@ def upload_survey(session):
         )
         abort(400)
     if survey_id != case_group["surveyId"]:
-        logger.error(f"survey_id{survey_id} and case_group['surveyId'] {case_group['surveyId']}")
+        logger.error(f"survey_id {survey_id} and case_group['surveyId'] {case_group['surveyId']}")
         abort(400)
 
     business_party = party_controller.get_party_by_business_id(

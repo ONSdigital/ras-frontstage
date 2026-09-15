@@ -13,7 +13,6 @@ from frontstage.controllers import (
 )
 from frontstage.exceptions.exceptions import (
     CiUploadError,
-    InvalidDetails,
     NoSurveyPermission,
 )
 from frontstage.views.surveys import surveys_bp
@@ -49,7 +48,13 @@ def upload_survey(session):
     collection_exercise_id = case_group.get("collectionExerciseId")
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
     survey_id = survey["id"]
-    held_survey_id = case_group.get("surveyId")
+
+    if business_party_id != case_group["partyId"]:
+        logger.error(f"business_party_id {business_party_id} does not match case_group['partyId'] {case_group['partyId']}")
+        abort(400)
+    if survey_id != case_group["surveyId"]:
+        logger.error(f"survey_id{survey_id} and case_group['surveyId'] {case_group['surveyId']}")
+        abort(400)
 
     business_party = party_controller.get_party_by_business_id(
         case_group["partyId"],
@@ -58,12 +63,6 @@ def upload_survey(session):
         collection_exercise_id=collection_exercise_id,
         verbose=True,
     )
-
-    held_business_party_id = business_party["id"]
-
-    if business_party_id != held_business_party_id or survey_id != held_survey_id:
-        logger.error("Party ID and/or Survey ID do not match", party_id=party_id, survey_id=survey_id)
-        raise InvalidDetails(party_id, case_id, survey_id)
 
     # Check if respondent has permission to upload for this case
     if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey["id"]):

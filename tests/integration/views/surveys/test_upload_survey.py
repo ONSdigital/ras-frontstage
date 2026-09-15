@@ -1,4 +1,5 @@
 import io
+import json
 import logging
 import unittest
 from unittest.mock import patch
@@ -10,16 +11,15 @@ from frontstage import app
 from frontstage.exceptions.exceptions import CiUploadError
 from tests.integration.mocked_services import (
     business_party,
-    business_party_mismatch,
     case,
-    case_diff_businessId,
     collection_exercise,
     encoded_jwt_token,
     survey,
+    survey_eq,
     url_banner_api,
     url_get_business_party,
     url_get_case,
-    url_get_survey_by_short_name,
+    url_get_survey_by_short_name, url_get_survey_by_short_name_eq,
 )
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -131,21 +131,45 @@ class TestUploadSurvey(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 500)
 
-    def test_upload_survey_ci_upload_with_mismatched_details(self, mock_request):
+    def test_upload_survey_ci_upload_with_mismatched_business_id(self, mock_request):
         mock_request.get(
             f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True",
-            json=business_party_mismatch,
+            json=business_party,
             status_code=200,
         )
+
         mock_request.get(url_banner_api, status_code=404)
         mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
-        mock_request.get(url_get_case, json=case_diff_businessId, status_code=200)
+        mock_request.get(url_get_case, json=case, status_code=200)
+        business_party_id = "f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b"
 
         self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
         response = self.app.post(
-            f'/surveys/upload-survey?case_id={case_diff_businessId["id"]}'
-            f'&business_party_id={business_party_mismatch["id"]}&survey_short_name={survey["shortName"]}',
+            f'/surveys/upload-survey?case_id={case["id"]}'
+            f'&business_party_id={business_party_id}&survey_short_name={survey["shortName"]}',
             data=self.survey_file,
         )
-        self.assertEqual(response.status_code, 500)
-        self.assertLogs("Party ID and/or Survey ID do not match", response.data)
+        self.assertEqual(response.status_code, 400)
+        self.assertLogs(f"business_party_id {business_party_id} does not match case_group['partyId'] "
+                        f"{case["partyId"]}", response.data)
+
+    def test_upload_survey_ci_upload_with_mismatched_survey_id(self, mock_request):
+        mock_request.get(
+            f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True",
+            json=business_party,
+            status_code=200,
+        )
+
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_get_survey_by_short_name_eq, json=survey_eq, status_code=200)
+        mock_request.get(url_get_case, json=case, status_code=200)
+
+        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
+        response = self.app.post(
+            f'/surveys/upload-survey?case_id={case["id"]}'
+            f'&business_party_id={business_party["id"]}&survey_short_name=QBS',
+            data=self.survey_file,
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertLogs(f"survey_id{survey_eq["id"]} and case_group['surveyId'] {case["caseGroup"]['surveyId']}",
+                        response.data)

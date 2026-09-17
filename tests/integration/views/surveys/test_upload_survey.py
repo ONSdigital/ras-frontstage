@@ -14,10 +14,12 @@ from tests.integration.mocked_services import (
     collection_exercise,
     encoded_jwt_token,
     survey,
+    survey_eq,
     url_banner_api,
     url_get_business_party,
     url_get_case,
     url_get_survey_by_short_name,
+    url_get_survey_by_short_name_eq,
 )
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -29,7 +31,9 @@ class TestUploadSurvey(unittest.TestCase):
         self.app = app.test_client()
         self.app.set_cookie("authorization", "session_key")
         self.headers = {
-            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2VyX3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"  # NOQA
+            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2Vy"
+            + "X3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"
+            # NOQA
         }
         self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
         self.patcher = patch("redis.StrictRedis.get", return_value=encoded_jwt_token)
@@ -126,3 +130,49 @@ class TestUploadSurvey(unittest.TestCase):
             f'&survey_short_name={survey["shortName"]}'
         )
         self.assertEqual(response.status_code, 500)
+
+    def test_upload_survey_ci_upload_with_mismatched_business_id(self, mock_request):
+        mock_request.get(
+            f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True",
+            json=business_party,
+            status_code=200,
+        )
+
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
+        mock_request.get(url_get_case, json=case, status_code=200)
+        business_party_id = "f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b"
+
+        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
+        response = self.app.post(
+            f'/surveys/upload-survey?case_id={case["id"]}'
+            f'&business_party_id={business_party_id}&survey_short_name={survey["shortName"]}',
+            data=self.survey_file,
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertLogs(
+            f"business_party_id {business_party_id} does not match case_group['partyId'] " f"{case["partyId"]}",
+            response.data,
+        )
+
+    def test_upload_survey_ci_upload_with_mismatched_survey_id(self, mock_request):
+        mock_request.get(
+            f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True",
+            json=business_party,
+            status_code=200,
+        )
+
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_get_survey_by_short_name_eq, json=survey_eq, status_code=200)
+        mock_request.get(url_get_case, json=case, status_code=200)
+
+        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
+        response = self.app.post(
+            f'/surveys/upload-survey?case_id={case["id"]}'
+            f'&business_party_id={business_party["id"]}&survey_short_name=QBS',
+            data=self.survey_file,
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertLogs(
+            f"survey_id{survey_eq["id"]} and case_group['surveyId'] {case["caseGroup"]['surveyId']}", response.data
+        )

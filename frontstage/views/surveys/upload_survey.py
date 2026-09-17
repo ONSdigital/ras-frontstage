@@ -11,7 +11,10 @@ from frontstage.controllers import (
     party_controller,
     survey_controller,
 )
-from frontstage.exceptions.exceptions import CiUploadError, NoSurveyPermission
+from frontstage.exceptions.exceptions import (
+    CiUploadError,
+    NoSurveyPermission,
+)
 from frontstage.views.surveys import surveys_bp
 from frontstage.views.template_helper import render_template
 
@@ -40,14 +43,21 @@ def upload_survey(session):
         )
         abort(400)
 
-    # Check if respondent has permission to upload for this case
-    survey = survey_controller.get_survey_by_short_name(survey_short_name)
-    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey["id"]):
-        raise NoSurveyPermission(party_id, case_id)
-
     case = case_controller.get_case_by_case_id(case_id)
     case_group = case.get("caseGroup")
     collection_exercise_id = case_group.get("collectionExerciseId")
+    survey = survey_controller.get_survey_by_short_name(survey_short_name)
+    survey_id = survey["id"]
+
+    if business_party_id != case_group["partyId"]:
+        logger.error(
+            f"business_party_id {business_party_id} does not match case_group['partyId'] {case_group['partyId']}"
+        )
+        abort(400)
+    if survey_id != case_group["surveyId"]:
+        logger.error(f"survey_id {survey_id} and case_group['surveyId'] {case_group['surveyId']}")
+        abort(400)
+
     business_party = party_controller.get_party_by_business_id(
         case_group["partyId"],
         app.config["PARTY_URL"],
@@ -55,6 +65,10 @@ def upload_survey(session):
         collection_exercise_id=collection_exercise_id,
         verbose=True,
     )
+
+    # Check if respondent has permission to upload for this case
+    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey["id"]):
+        raise NoSurveyPermission(party_id, case_id)
 
     upload_file = request.files["file"]
     content_length = request.content_length

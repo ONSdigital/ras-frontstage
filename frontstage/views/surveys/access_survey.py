@@ -1,10 +1,13 @@
 import logging
 
-from flask import redirect, request
+from flask import abort, redirect, request
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
-from frontstage.controllers import case_controller, collection_exercise_controller
+from frontstage.controllers import (
+    case_controller,
+    collection_exercise_controller,
+)
 from frontstage.views.surveys import surveys_bp
 from frontstage.views.template_helper import render_template
 
@@ -15,26 +18,71 @@ logger = wrap_logger(logging.getLogger(__name__))
 @jwt_authorization(request)
 def access_survey(session):
     party_id = session.get_party_id()
-    case_id = request.args["case_id"]
-    business_party_id = request.args["business_party_id"]
-    survey_short_name = request.args["survey_short_name"]
-    collection_instrument_type = request.args["ci_type"]
+
+    case_id = request.args.get("case_id")
+    business_party_id = request.args.get("business_party_id")
+    survey_short_name = request.args.get("survey_short_name")
+    collection_instrument_type = request.args.get("ci_type")
+
+    if not all(
+        (
+            case_id,
+            business_party_id,
+            survey_short_name,
+            collection_instrument_type,
+        )
+    ):
+        logger.warning(
+            "Missing required access survey parameters",
+            party_id=party_id,
+            case_id=case_id,
+        )
+        abort(400)
 
     if collection_instrument_type == "EQ":
-        logger.info("Attempting to redirect to EQ", party_id=party_id, case_id=case_id)
+        logger.info(
+            "Attempting to redirect to EQ",
+            party_id=party_id,
+            case_id=case_id,
+        )
+
         case = case_controller.get_case_by_case_id(case_id)
+
         collection_exercise = collection_exercise_controller.get_collection_exercise(
             case["caseGroup"]["collectionExerciseId"]
         )
-        return redirect(
-            case_controller.get_eq_url(case, collection_exercise, party_id, business_party_id, survey_short_name)
+
+        eq_url = case_controller.get_eq_url(
+            case=case,
+            collection_exercise=collection_exercise,
+            party_id=party_id,
+            business_party_id=business_party_id,
+            survey_short_name=survey_short_name,
         )
 
-    logger.info("Retrieving case data", party_id=party_id, case_id=case_id)
-    case_data = case_controller.get_case_data(case_id, party_id, business_party_id, survey_short_name)
+        return redirect(eq_url)
+
+    logger.info(
+        "Retrieving case data",
+        party_id=party_id,
+        case_id=case_id,
+    )
+
+    case_data = case_controller.get_case_data(
+        case_id,
+        party_id,
+        business_party_id,
+        survey_short_name,
+    )
+
     referer_header = request.headers.get("referer", {})
 
-    logger.info("Successfully retrieved case data", party_id=party_id, case_id=case_id)
+    logger.info(
+        "Successfully retrieved case data",
+        party_id=party_id,
+        case_id=case_id,
+    )
+
     return render_template(
         "surveys/surveys-access.html",
         session=session,

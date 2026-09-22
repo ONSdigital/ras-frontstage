@@ -196,8 +196,12 @@ class TestAccessSurvey(unittest.TestCase):
     @patch("frontstage.controllers.party_controller.RedisCache.get_registry_instrument")
     def test_generate_eq_url(self, mock_request, mock_cache, _):
         # Given all external services are mocked, and we have an EQ collection instrument
+        collection_exercise_copy = {
+            **collection_exercise_v3,
+            "surveyId": survey_eq["id"],
+        }
         mock_request.get(url_get_case, json=case)
-        mock_request.get(url_get_collection_exercise, json=collection_exercise_v3)
+        mock_request.get(url_get_collection_exercise, json=collection_exercise_copy)
         mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
         mock_request.get(url_get_business_party, json=business_party)
         mock_request.get(url_get_survey_by_short_name_eq, json=survey_eq)

@@ -27,10 +27,9 @@ def calculate_case_status(case_group_status: str, collection_instrument_type: st
     Given a case group status and instrument type, this will generate user readable text to describe the status.
 
     :param case_group_status: Status of the case group
-    :param collection_instrument_type: The type of collection instrument.  Either EQ or SEFT
+    :param collection_instrument_type: The type of collection instrument. Either EQ or SEFT
     :return: A user readable description of the status.
     """
-
     if case_group_status == "COMPLETE":
         return "Complete"
     elif case_group_status == "COMPLETEDBYPHONE":
@@ -96,7 +95,6 @@ def get_case_categories():
 def get_case_data(case_id, party_id, business_party_id, survey_short_name):
     logger.info("Attempting to retrieve detailed case data", case_id=case_id, party_id=party_id)
 
-    # Check if respondent has permission to see case data
     case = get_case_by_case_id(case_id)
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
     if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey["id"]):
@@ -143,6 +141,57 @@ def get_cases_by_party_id(party_id, case_url, case_auth, case_events=False, iac=
     return response.json()
 
 
+def authorize_case_access(case, collection_exercise, party_id, business_party_id, survey_short_name):
+    """Authorize EQ access using relationships derived from the fetched case."""
+    case_id = case["id"]
+    case_business_party_id = case["caseGroup"]["partyId"]
+    case_collection_exercise_id = case["caseGroup"]["collectionExerciseId"]
+
+    if business_party_id != case_business_party_id:
+        logger.warning(
+            "Supplied business does not belong to case",
+            case_id=case_id,
+            party_id=party_id,
+            supplied_business_party_id=business_party_id,
+            case_business_party_id=case_business_party_id,
+        )
+        raise NoSurveyPermission(party_id, case_id)
+
+    if collection_exercise["id"] != case_collection_exercise_id:
+        logger.warning(
+            "Collection exercise does not belong to case",
+            case_id=case_id,
+            party_id=party_id,
+            collection_exercise_id=collection_exercise["id"],
+            case_collection_exercise_id=case_collection_exercise_id,
+        )
+        raise NoSurveyPermission(party_id, case_id)
+
+    survey = survey_controller.get_survey_by_short_name(survey_short_name)
+
+    if survey["id"] != collection_exercise["surveyId"]:
+        logger.warning(
+            "Survey does not belong to collection exercise",
+            case_id=case_id,
+            party_id=party_id,
+            supplied_survey_id=survey["id"],
+            collection_exercise_survey_id=collection_exercise["surveyId"],
+        )
+        raise NoSurveyPermission(party_id, case_id)
+
+    if not party_controller.is_respondent_enrolled(party_id, case_business_party_id, survey["id"]):
+        logger.warning(
+            "Respondent is not enrolled for case business and survey",
+            case_id=case_id,
+            party_id=party_id,
+            business_party_id=case_business_party_id,
+            survey_id=survey["id"],
+        )
+        raise NoSurveyPermission(party_id, case_id)
+
+    return case_business_party_id, survey
+
+
 def get_eq_url(case, collection_exercise, party_id, business_party_id, survey_short_name):
     case_id = case["id"]
     logger.info("Attempting to generate EQ URL", case_id=case_id, party_id=party_id)
@@ -151,11 +200,11 @@ def get_eq_url(case, collection_exercise, party_id, business_party_id, survey_sh
         logger.info("The case group status is complete, opening an EQ is forbidden", case_id=case_id, party_id=party_id)
         abort(403)
 
-    survey = survey_controller.get_survey_by_short_name(survey_short_name)
-    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey["id"]):
-        raise NoSurveyPermission(party_id, case_id)
+    authorized_business_party_id, survey = authorize_case_access(
+        case, collection_exercise, party_id, business_party_id, survey_short_name
+    )
 
-    payload = EqPayload().create_payload(case, collection_exercise, party_id, business_party_id, survey)
+    payload = EqPayload().create_payload(case, collection_exercise, party_id, authorized_business_party_id, survey)
 
     json_secret_keys = app.config["JSON_SECRET_KEYS"]
     encrypter = Encrypter(json_secret_keys)
@@ -172,13 +221,12 @@ def get_eq_url(case, collection_exercise, party_id, business_party_id, survey_sh
         description=f"Instrument {ci_id} launched by {party_id} for case {case_id}",
     )
 
-    # This log is associated with a custom log metric
     logger.info(
         "Successfully generated EQ URL",
         case_id=case_id,
         ci_id=ci_id,
         party_id=party_id,
-        business_party_id=business_party_id,
+        business_party_id=authorized_business_party_id,
         survey_short_name=survey_short_name,
         tx_id=payload["tx_id"],
     )

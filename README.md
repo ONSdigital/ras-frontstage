@@ -14,7 +14,6 @@ pip install -U pipenv
 pipenv install
 ```
 
-
 ## Redis
 ras-frontstage requires a redis instance to store user jwt's when they are logged in
 

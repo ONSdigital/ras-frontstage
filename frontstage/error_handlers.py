@@ -14,7 +14,7 @@ from frontstage.exceptions.exceptions import (
     IncorrectAccountAccessError,
     InvalidEqPayLoad,
     JWTTimeoutError,
-    JWTValidationError,
+    JWTValidationError, NoSurveyPermission,
 )
 from frontstage.views.template_helper import render_template
 
@@ -24,6 +24,12 @@ logger = wrap_logger(logging.getLogger(__name__))
 @app.errorhandler(400)
 def client_error(error):
     logger.info("Client error", url=request.url, status_code=error.code)
+    return render_template("errors/400-error.html"), 400
+
+
+@app.errorhandler(NoSurveyPermission)
+def no_survey_permission(error):
+    logger.info("Missing required access survey parameters", url=request.url, status_code=error.code)
     return render_template("errors/400-error.html"), 400
 
 

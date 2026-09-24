@@ -24,21 +24,6 @@ def access_survey(session):
     survey_short_name = request.args.get("survey_short_name")
     collection_instrument_type = request.args.get("ci_type")
 
-    if not all(
-        (
-            case_id,
-            business_party_id,
-            survey_short_name,
-            collection_instrument_type,
-        )
-    ):
-        logger.warning(
-            "Missing required access survey parameters",
-            party_id=party_id,
-            case_id=case_id,
-        )
-        abort(400)
-
     if collection_instrument_type == "EQ":
         logger.info(
             "Attempting to redirect to EQ",

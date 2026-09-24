@@ -1,6 +1,6 @@
 import logging
 
-from flask import abort, redirect, request
+from flask import redirect, request
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
@@ -18,7 +18,6 @@ logger = wrap_logger(logging.getLogger(__name__))
 @jwt_authorization(request)
 def access_survey(session):
     party_id = session.get_party_id()
-
     case_id = request.args.get("case_id")
     business_party_id = request.args.get("business_party_id")
     survey_short_name = request.args.get("survey_short_name")

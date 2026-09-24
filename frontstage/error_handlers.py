@@ -14,7 +14,8 @@ from frontstage.exceptions.exceptions import (
     IncorrectAccountAccessError,
     InvalidEqPayLoad,
     JWTTimeoutError,
-    JWTValidationError, NoSurveyPermission,
+    JWTValidationError,
+    NoSurveyPermission,
 )
 from frontstage.views.template_helper import render_template
 

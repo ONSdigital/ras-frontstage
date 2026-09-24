@@ -24,49 +24,21 @@ def access_survey(session):
     collection_instrument_type = request.args.get("ci_type")
 
     if collection_instrument_type == "EQ":
-        logger.info(
-            "Attempting to redirect to EQ",
-            party_id=party_id,
-            case_id=case_id,
-        )
-
+        logger.info("Attempting to redirect to EQ", party_id=party_id, case_id=case_id)
         case = case_controller.get_case_by_case_id(case_id)
-
         collection_exercise = collection_exercise_controller.get_collection_exercise(
             case["caseGroup"]["collectionExerciseId"]
         )
 
-        eq_url = case_controller.get_eq_url(
-            case=case,
-            collection_exercise=collection_exercise,
-            party_id=party_id,
-            business_party_id=business_party_id,
-            survey_short_name=survey_short_name,
-        )
-
+        eq_url = case_controller.get_eq_url(case=case, collection_exercise=collection_exercise, party_id=party_id,
+                                            business_party_id=business_party_id, survey_short_name=survey_short_name)
         return redirect(eq_url)
 
-    logger.info(
-        "Retrieving case data",
-        party_id=party_id,
-        case_id=case_id,
-    )
-
-    case_data = case_controller.get_case_data(
-        case_id,
-        party_id,
-        business_party_id,
-        survey_short_name,
-    )
-
+    logger.info("Retrieving case data", party_id=party_id, case_id=case_id,)
+    case_data = case_controller.get_case_data(case_id, party_id, business_party_id, survey_short_name)
     referer_header = request.headers.get("referer", {})
 
-    logger.info(
-        "Successfully retrieved case data",
-        party_id=party_id,
-        case_id=case_id,
-    )
-
+    logger.info("Successfully retrieved case data", party_id=party_id, case_id=case_id)
     return render_template(
         "surveys/surveys-access.html",
         session=session,

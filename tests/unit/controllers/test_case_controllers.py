@@ -128,6 +128,8 @@ class TestCaseControllers(unittest.TestCase):
     @patch("frontstage.common.eq_payload.EqPayload.create_payload")
     @patch("frontstage.controllers.case_controller.get_case_by_case_id")
     def test_get_eq_url_case_group_status_not_complete(self, get_case_by_id, create_eq_payload, *_):
+        collection_exercise_copy = deepcopy(collection_exercise)
+        collection_exercise_copy["surveyId"] = survey_eq["id"]
         get_case_by_id.return_value = case
         create_eq_payload.return_value = eq_payload
         with responses.RequestsMock() as rsps:
@@ -135,7 +137,7 @@ class TestCaseControllers(unittest.TestCase):
             with app.app_context():
                 eq_url = case_controller.get_eq_url(
                     case,
-                    collection_exercise,
+                    collection_exercise_copy,
                     respondent_party["id"],
                     business_party["id"],
                     survey_eq["shortName"],
@@ -148,6 +150,8 @@ class TestCaseControllers(unittest.TestCase):
     @patch("frontstage.common.eq_payload.EqPayload.create_payload")
     @patch("frontstage.controllers.case_controller.get_case_by_case_id")
     def test_get_eq_v3_url_case_group_status_not_complete(self, get_case_by_id, create_eq_payload, *_):
+        collection_exercise_copy = deepcopy(collection_exercise)
+        collection_exercise_copy["surveyId"] = survey_eq["id"]
         get_case_by_id.return_value = case
         create_eq_payload.return_value = eq_payload
         with responses.RequestsMock() as rsps:
@@ -155,7 +159,7 @@ class TestCaseControllers(unittest.TestCase):
             with app.app_context():
                 eq_url = case_controller.get_eq_url(
                     case,
-                    collection_exercise,
+                    collection_exercise_copy,
                     respondent_party["id"],
                     business_party["id"],
                     survey_eq["shortName"],
@@ -214,6 +218,8 @@ class TestCaseControllers(unittest.TestCase):
     @patch("frontstage.controllers.case_controller.get_case_by_case_id")
     @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
     def test_get_eq_url_no_survey_permission(self, is_respondent_enrolled, get_case_by_id):
+        collection_exercise_copy = deepcopy(collection_exercise)
+        collection_exercise_copy["surveyId"] = survey_eq["id"]
         is_respondent_enrolled.return_value = False
         get_case_by_id.return_value = case
 
@@ -223,7 +229,7 @@ class TestCaseControllers(unittest.TestCase):
                 with self.assertRaises(NoSurveyPermission):
                     case_controller.get_eq_url(
                         case,
-                        collection_exercise,
+                        collection_exercise_copy,
                         respondent_party["id"],
                         business_party["id"],
                         survey_eq["shortName"],

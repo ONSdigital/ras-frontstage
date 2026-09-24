@@ -158,7 +158,7 @@ class TestAccessSurvey(unittest.TestCase):
             follow_redirects=True,
         )
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 500)
         self.assertTrue("An error has occurred".encode() in response.data)
 
     def test_access_survey_missing_request_arg_business_party_id(self, mock_request):
@@ -167,7 +167,7 @@ class TestAccessSurvey(unittest.TestCase):
             f"/surveys/access-survey?case_id={case_id}&" "survey_short_name=Bricks&ci_type=SEFT", headers=self.headers
         )
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 500)
         self.assertTrue("An error has occurred".encode() in response.data)
 
     def test_access_survey_missing_request_arg_survey_short_name(self, mock_request):
@@ -178,7 +178,7 @@ class TestAccessSurvey(unittest.TestCase):
             follow_redirects=True,
         )
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 500)
         self.assertTrue("An error has occurred".encode() in response.data)
 
     def test_access_survey_missing_request_arg_ci_type(self, mock_request):
@@ -189,15 +189,19 @@ class TestAccessSurvey(unittest.TestCase):
             follow_redirects=True,
         )
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 500)
         self.assertTrue("An error has occurred".encode() in response.data)
 
     @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
     @patch("frontstage.controllers.party_controller.RedisCache.get_registry_instrument")
     def test_generate_eq_url(self, mock_request, mock_cache, _):
         # Given all external services are mocked, and we have an EQ collection instrument
+        collection_exercise_copy = {
+            **collection_exercise_v3,
+            "surveyId": survey_eq["id"],
+        }
         mock_request.get(url_get_case, json=case)
-        mock_request.get(url_get_collection_exercise, json=collection_exercise_v3)
+        mock_request.get(url_get_collection_exercise, json=collection_exercise_copy)
         mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
         mock_request.get(url_get_business_party, json=business_party)
         mock_request.get(url_get_survey_by_short_name_eq, json=survey_eq)

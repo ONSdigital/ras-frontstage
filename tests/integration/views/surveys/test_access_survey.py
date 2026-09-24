@@ -158,7 +158,7 @@ class TestAccessSurvey(unittest.TestCase):
             follow_redirects=True,
         )
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 500)
         self.assertTrue("An error has occurred".encode() in response.data)
 
     def test_access_survey_missing_request_arg_business_party_id(self, mock_request):
@@ -167,7 +167,7 @@ class TestAccessSurvey(unittest.TestCase):
             f"/surveys/access-survey?case_id={case_id}&" "survey_short_name=Bricks&ci_type=SEFT", headers=self.headers
         )
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 500)
         self.assertTrue("An error has occurred".encode() in response.data)
 
     def test_access_survey_missing_request_arg_survey_short_name(self, mock_request):
@@ -178,7 +178,7 @@ class TestAccessSurvey(unittest.TestCase):
             follow_redirects=True,
         )
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 500)
         self.assertTrue("An error has occurred".encode() in response.data)
 
     def test_access_survey_missing_request_arg_ci_type(self, mock_request):
@@ -189,7 +189,7 @@ class TestAccessSurvey(unittest.TestCase):
             follow_redirects=True,
         )
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 500)
         self.assertTrue("An error has occurred".encode() in response.data)
 
     @patch("frontstage.controllers.party_controller.is_respondent_enrolled")

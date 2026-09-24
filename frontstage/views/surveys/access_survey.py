@@ -30,11 +30,20 @@ def access_survey(session):
             case["caseGroup"]["collectionExerciseId"]
         )
 
-        eq_url = case_controller.get_eq_url(case=case, collection_exercise=collection_exercise, party_id=party_id,
-                                            business_party_id=business_party_id, survey_short_name=survey_short_name)
+        eq_url = case_controller.get_eq_url(
+            case=case,
+            collection_exercise=collection_exercise,
+            party_id=party_id,
+            business_party_id=business_party_id,
+            survey_short_name=survey_short_name,
+        )
         return redirect(eq_url)
 
-    logger.info("Retrieving case data", party_id=party_id, case_id=case_id,)
+    logger.info(
+        "Retrieving case data",
+        party_id=party_id,
+        case_id=case_id,
+    )
     case_data = case_controller.get_case_data(case_id, party_id, business_party_id, survey_short_name)
     referer_header = request.headers.get("referer", {})
 

@@ -30,8 +30,8 @@ def client_error(error):
 
 @app.errorhandler(NoSurveyPermission)
 def no_survey_permission(error):
-    logger.info("Missing required access survey parameters", url=request.url, status_code=error.code)
-    return render_template("errors/400-error.html"), 400
+    logger.info("change me", url=request.url)
+    return render_template("errors/400-error.html"), 401
 
 
 @app.errorhandler(404)

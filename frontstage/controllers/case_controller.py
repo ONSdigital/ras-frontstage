@@ -5,6 +5,7 @@ from flask import abort
 from flask import current_app as app
 from structlog import wrap_logger
 
+from frontstage.common.authorize_access import CaseAccess
 from frontstage.common.encrypter import Encrypter
 from frontstage.common.eq_payload import EqPayload
 from frontstage.controllers import (
@@ -141,57 +142,6 @@ def get_cases_by_party_id(party_id, case_url, case_auth, case_events=False, iac=
     return response.json()
 
 
-def authorize_case_access(case, collection_exercise, party_id, business_party_id, survey_short_name):
-    """Authorize EQ access using relationships derived from the fetched case."""
-    case_id = case["id"]
-    case_business_party_id = case["caseGroup"]["partyId"]
-    case_collection_exercise_id = case["caseGroup"]["collectionExerciseId"]
-
-    if business_party_id != case_business_party_id:
-        logger.warning(
-            "Supplied business does not belong to case",
-            case_id=case_id,
-            party_id=party_id,
-            supplied_business_party_id=business_party_id,
-            case_business_party_id=case_business_party_id,
-        )
-        raise NoSurveyPermission(party_id, case_id)
-
-    if collection_exercise["id"] != case_collection_exercise_id:
-        logger.warning(
-            "Collection exercise does not belong to case",
-            case_id=case_id,
-            party_id=party_id,
-            collection_exercise_id=collection_exercise["id"],
-            case_collection_exercise_id=case_collection_exercise_id,
-        )
-        raise NoSurveyPermission(party_id, case_id)
-
-    survey = survey_controller.get_survey_by_short_name(survey_short_name)
-
-    if survey["id"] != collection_exercise["surveyId"]:
-        logger.warning(
-            "Survey does not belong to collection exercise",
-            case_id=case_id,
-            party_id=party_id,
-            supplied_survey_id=survey["id"],
-            collection_exercise_survey_id=collection_exercise["surveyId"],
-        )
-        raise NoSurveyPermission(party_id, case_id)
-
-    if not party_controller.is_respondent_enrolled(party_id, case_business_party_id, survey["id"]):
-        logger.warning(
-            "Respondent is not enrolled for case business and survey",
-            case_id=case_id,
-            party_id=party_id,
-            business_party_id=case_business_party_id,
-            survey_id=survey["id"],
-        )
-        raise NoSurveyPermission(party_id, case_id)
-
-    return case_business_party_id, survey
-
-
 def get_eq_url(case, collection_exercise, party_id, business_party_id, survey_short_name):
     case_id = case["id"]
     logger.info("Attempting to generate EQ URL", case_id=case_id, party_id=party_id)
@@ -200,11 +150,11 @@ def get_eq_url(case, collection_exercise, party_id, business_party_id, survey_sh
         logger.info("The case group status is complete, opening an EQ is forbidden", case_id=case_id, party_id=party_id)
         abort(403)
 
-    authorized_business_party_id, survey = authorize_case_access(
-        case, collection_exercise, party_id, business_party_id, survey_short_name
-    )
+    survey = survey_controller.get_survey_by_short_name(survey_short_name)
 
-    payload = EqPayload().create_payload(case, collection_exercise, party_id, authorized_business_party_id, survey)
+    CaseAccess().case_access(case, collection_exercise, party_id, business_party_id, survey_short_name)
+
+    payload = EqPayload().create_payload(case, collection_exercise, party_id, business_party_id, survey)
 
     json_secret_keys = app.config["JSON_SECRET_KEYS"]
     encrypter = Encrypter(json_secret_keys)
@@ -226,7 +176,7 @@ def get_eq_url(case, collection_exercise, party_id, business_party_id, survey_sh
         case_id=case_id,
         ci_id=ci_id,
         party_id=party_id,
-        business_party_id=authorized_business_party_id,
+        business_party_id=business_party_id,
         survey_short_name=survey_short_name,
         tx_id=payload["tx_id"],
     )

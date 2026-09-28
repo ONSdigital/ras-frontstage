@@ -16,10 +16,8 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 class CaseAccess:
 
-    def __init__(self):
-        pass
-
-    def case_access(self, case, collection_exercise, party_id, business_party_id, survey_short_name):
+    @staticmethod
+    def case_access(case, collection_exercise, party_id, business_party_id, survey_short_name):
         """Authorize EQ access using relationships derived from the fetched case."""
         case_id = case["id"]
         case_business_party_id = case["caseGroup"]["partyId"]
@@ -55,20 +53,11 @@ class CaseAccess:
                 collection_exercise_survey_id=collection_exercise["surveyId"],
             )
             abort(401)
-
-        if not party_controller.is_respondent_enrolled(party_id, case_business_party_id, survey["id"]):
-            logger.warning(
-                "Respondent is not enrolled for case business and survey",
-                case_id=case_id,
-                party_id=party_id,
-                business_party_id=case_business_party_id,
-                survey_id=survey["id"],
-            )
-            abort(401)
+        CaseAccess.check_enrollment(business_party_id, case_id, party_id, survey)
         return True
 
     @staticmethod
-    def check_permission(business_party_id, case_id, party_id, survey):
+    def check_enrollment(business_party_id, case_id, party_id, survey):
         if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey["id"]):
             raise NoSurveyPermission(party_id, case_id)
 

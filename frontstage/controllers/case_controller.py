@@ -27,9 +27,10 @@ def calculate_case_status(case_group_status: str, collection_instrument_type: st
     Given a case group status and instrument type, this will generate user readable text to describe the status.
 
     :param case_group_status: Status of the case group
-    :param collection_instrument_type: The type of collection instrument. Either EQ or SEFT
+    :param collection_instrument_type: The type of collection instrument.  Either EQ or SEFT
     :return: A user readable description of the status.
     """
+
     if case_group_status == "COMPLETE":
         return "Complete"
     elif case_group_status == "COMPLETEDBYPHONE":
@@ -95,9 +96,10 @@ def get_case_categories():
 def get_case_data(case_id, party_id, business_party_id, survey_short_name):
     logger.info("Attempting to retrieve detailed case data", case_id=case_id, party_id=party_id)
 
+    # Check if respondent has permission to see case data
     case = get_case_by_case_id(case_id)
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
-    CaseAccess.check_permission(business_party_id, case_id, party_id, survey)
+    CaseAccess.check_enrollment(business_party_id, case_id, party_id, survey)
 
     case_data = {
         "collection_exercise": collection_exercise_controller.get_collection_exercise(
@@ -169,6 +171,7 @@ def get_eq_url(case, collection_exercise, party_id, business_party_id, survey_sh
         description=f"Instrument {ci_id} launched by {party_id} for case {case_id}",
     )
 
+    # This log is associated with a custom log metric
     logger.info(
         "Successfully generated EQ URL",
         case_id=case_id,

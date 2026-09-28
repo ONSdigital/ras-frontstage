@@ -60,7 +60,7 @@ def upload_survey(session):
     )
 
     # Check if respondent has permission to upload for this case
-    CaseAccess.check_permission(case_id, party_id, survey)
+    CaseAccess.check_enrollment(business_party_id, case_id, party_id, survey)
 
     upload_file = request.files["file"]
     content_length = request.content_length

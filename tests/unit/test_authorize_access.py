@@ -111,8 +111,8 @@ class TestCaseAccess(unittest.TestCase):
                 self.survey_short_name,
             )
 
-    @patch("frontstage.common.authorize_access.party_controller.is_respondent_enrolled")
-    @patch("frontstage.common.authorize_access.survey_controller.get_survey_by_short_name")
+    @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
+    @patch("frontstage.common.authorize_access." "survey_controller.get_survey_by_short_name")
     def test_case_access_rejects_not_enrolled(
         self,
         get_survey_by_short_name,
@@ -121,7 +121,7 @@ class TestCaseAccess(unittest.TestCase):
         get_survey_by_short_name.return_value = self.survey
         is_respondent_enrolled.return_value = False
 
-        with self.assertRaises(Unauthorized):
+        with self.assertRaises(NoSurveyPermission):
             self.case_access.case_access(
                 self.case,
                 self.collection_exercise,
@@ -130,15 +130,21 @@ class TestCaseAccess(unittest.TestCase):
                 self.survey_short_name,
             )
 
+        is_respondent_enrolled.assert_called_once_with(
+            self.party_id,
+            self.business_party_id,
+            self.survey_id,
+        )
+
     @patch("frontstage.common.authorize_access.party_controller.is_respondent_enrolled")
-    def test_check_permission_success(
+    def test_check_enrollment_success(
         self,
         is_respondent_enrolled,
     ):
         is_respondent_enrolled.return_value = True
 
         self.assertIsNone(
-            CaseAccess.check_permission(
+            CaseAccess.check_enrollment(
                 self.business_party_id,
                 self.case_id,
                 self.party_id,
@@ -147,14 +153,14 @@ class TestCaseAccess(unittest.TestCase):
         )
 
     @patch("frontstage.common.authorize_access.party_controller.is_respondent_enrolled")
-    def test_check_permission_raises(
+    def test_check_enrollment_raises(
         self,
         is_respondent_enrolled,
     ):
         is_respondent_enrolled.return_value = False
 
         with self.assertRaises(NoSurveyPermission):
-            CaseAccess.check_permission(
+            CaseAccess.check_enrollment(
                 self.business_party_id,
                 self.case_id,
                 self.party_id,

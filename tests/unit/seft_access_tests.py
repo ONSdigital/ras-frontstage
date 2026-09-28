@@ -27,13 +27,13 @@ class SeftAccessTests(unittest.TestCase):
         }
 
     @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
-    def test_check_perm_success(
+    def test_check_enrollment_success(
         self,
         is_respondent_enrolled,
     ):
         is_respondent_enrolled.return_value = True
 
-        result = self.case_access.check_permission(
+        result = self.case_access.check_enrollment(
             self.business_party_id,
             self.case_id,
             self.party_id,
@@ -49,14 +49,14 @@ class SeftAccessTests(unittest.TestCase):
         )
 
     @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
-    def test_check_perm_not_enrolled(
+    def test_check_enrollment_not_enrolled(
         self,
         is_respondent_enrolled,
     ):
         is_respondent_enrolled.return_value = False
 
         with self.assertRaises(NoSurveyPermission):
-            self.case_access.check_permission(
+            self.case_access.check_enrollment(
                 self.business_party_id,
                 self.case_id,
                 self.party_id,

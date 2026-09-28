@@ -28,6 +28,11 @@ def logger_initial_config(log_level: str = "INFO") -> None:
             event_dict["exception"] = exception.replace('"', "'").split("\n")
         return event_dict
 
+    def redaction_filter(_, __, event_dict: dict) -> dict:
+        if "enrolment_code" in event_dict:
+            event_dict["enrolment_code"] = event_dict["enrolment_code"][:-8] + "********"
+        return event_dict
+
     logging.basicConfig(format="%(message)s", stream=sys.stdout, level=logging.INFO)
 
     structlog.configure(
@@ -38,6 +43,7 @@ def logger_initial_config(log_level: str = "INFO") -> None:
             structlog.processors.format_exc_info,
             structlog.processors.TimeStamper(fmt="%Y-%m-%dT%H:%M%s", utc=True, key="created_at"),
             parse_exception,
+            redaction_filter,
             structlog.processors.JSONRenderer(indent=None),
         ],
         wrapper_class=structlog.make_filtering_bound_logger(logging.getLevelName(log_level)),

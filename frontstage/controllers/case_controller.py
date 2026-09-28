@@ -17,7 +17,6 @@ from frontstage.controllers import (
 from frontstage.exceptions.exceptions import (
     ApiError,
     InvalidCaseCategory,
-    NoSurveyPermission,
 )
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -98,8 +97,7 @@ def get_case_data(case_id, party_id, business_party_id, survey_short_name):
 
     case = get_case_by_case_id(case_id)
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
-    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey["id"]):
-        raise NoSurveyPermission(party_id, case_id)
+    CaseAccess.check_permission(business_party_id, case_id, party_id, survey)
 
     case_data = {
         "collection_exercise": collection_exercise_controller.get_collection_exercise(

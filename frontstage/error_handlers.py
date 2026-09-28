@@ -15,7 +15,6 @@ from frontstage.exceptions.exceptions import (
     InvalidEqPayLoad,
     JWTTimeoutError,
     JWTValidationError,
-    NoSurveyPermission,
 )
 from frontstage.views.template_helper import render_template
 
@@ -26,12 +25,6 @@ logger = wrap_logger(logging.getLogger(__name__))
 def client_error(error):
     logger.info("Client error", url=request.url, status_code=error.code)
     return render_template("errors/400-error.html"), 400
-
-
-@app.errorhandler(NoSurveyPermission)
-def no_survey_permission(error):
-    logger.info("change me", url=request.url)
-    return render_template("errors/400-error.html"), 401
 
 
 @app.errorhandler(404)

@@ -5,6 +5,7 @@ from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
+from frontstage.common.authorize_access import CaseAccess
 from frontstage.controllers import (
     case_controller,
     collection_instrument_controller,
@@ -13,7 +14,6 @@ from frontstage.controllers import (
 )
 from frontstage.exceptions.exceptions import (
     CiUploadError,
-    NoSurveyPermission,
 )
 from frontstage.views.surveys import surveys_bp
 from frontstage.views.template_helper import render_template
@@ -49,14 +49,7 @@ def upload_survey(session):
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
     survey_id = survey["id"]
 
-    if business_party_id != case_group["partyId"]:
-        logger.error(
-            f"business_party_id {business_party_id} does not match case_group['partyId'] {case_group['partyId']}"
-        )
-        abort(400)
-    if survey_id != case_group["surveyId"]:
-        logger.error(f"survey_id {survey_id} and case_group['surveyId'] {case_group['surveyId']}")
-        abort(400)
+    CaseAccess.check_seft(business_party_id, case_group, survey_id)
 
     business_party = party_controller.get_party_by_business_id(
         case_group["partyId"],
@@ -67,8 +60,7 @@ def upload_survey(session):
     )
 
     # Check if respondent has permission to upload for this case
-    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey["id"]):
-        raise NoSurveyPermission(party_id, case_id)
+    CaseAccess.check_permission(case_id, party_id, survey)
 
     upload_file = request.files["file"]
     content_length = request.content_length

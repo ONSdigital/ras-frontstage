@@ -1,5 +1,6 @@
 import logging
 
+from flask import abort
 from structlog import wrap_logger
 
 from frontstage.controllers import (
@@ -33,7 +34,7 @@ class CaseAccess:
                 supplied_business_party_id=business_party_id,
                 case_business_party_id=case_business_party_id,
             )
-            raise NoSurveyPermission(party_id, case_id)
+            abort(401)
 
         if collection_exercise["id"] != case_collection_exercise_id:
             logger.warning(
@@ -43,7 +44,7 @@ class CaseAccess:
                 collection_exercise_id=collection_exercise["id"],
                 case_collection_exercise_id=case_collection_exercise_id,
             )
-            raise NoSurveyPermission(party_id, case_id)
+            abort(401)
 
         if survey["id"] != collection_exercise["surveyId"]:
             logger.warning(
@@ -53,7 +54,7 @@ class CaseAccess:
                 supplied_survey_id=survey["id"],
                 collection_exercise_survey_id=collection_exercise["surveyId"],
             )
-            raise NoSurveyPermission(party_id, case_id)
+            abort(401)
 
         if not party_controller.is_respondent_enrolled(party_id, case_business_party_id, survey["id"]):
             logger.warning(
@@ -63,5 +64,21 @@ class CaseAccess:
                 business_party_id=case_business_party_id,
                 survey_id=survey["id"],
             )
-            raise NoSurveyPermission(party_id, case_id)
+            abort(401)
         return True
+
+    @staticmethod
+    def check_permission(business_party_id, case_id, party_id, survey):
+        if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey["id"]):
+            raise NoSurveyPermission(party_id, case_id)
+
+    @staticmethod
+    def check_seft(business_party_id, case_group, survey_id):
+        if business_party_id != case_group["partyId"]:
+            logger.error(
+                f"business_party_id {business_party_id} does not match case_group['partyId'] {case_group['partyId']}"
+            )
+            abort(400)
+        if survey_id != case_group["surveyId"]:
+            logger.error(f"survey_id {survey_id} and case_group['surveyId'] {case_group['surveyId']}")
+            abort(400)

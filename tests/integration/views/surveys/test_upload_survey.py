@@ -1,178 +1,271 @@
-import io
-import logging
 import unittest
+from copy import deepcopy
 from unittest.mock import patch
 
-import requests_mock
-from structlog import wrap_logger
+from werkzeug.exceptions import BadRequest, Unauthorized
 
-from frontstage import app
-from frontstage.exceptions.exceptions import CiUploadError
+from frontstage.common.authorize_access import CaseAccess
+from frontstage.exceptions.exceptions import NoSurveyPermission
 from tests.integration.mocked_services import (
     business_party,
     case,
     collection_exercise,
-    encoded_jwt_token,
-    survey,
+    respondent_party,
     survey_eq,
-    url_banner_api,
-    url_get_business_party,
-    url_get_case,
-    url_get_survey_by_short_name,
-    url_get_survey_by_short_name_eq,
 )
 
-logger = wrap_logger(logging.getLogger(__name__))
 
-
-@requests_mock.mock()
-class TestUploadSurvey(unittest.TestCase):
+class TestCaseAccess(unittest.TestCase):
     def setUp(self):
-        self.app = app.test_client()
-        self.app.set_cookie("authorization", "session_key")
-        self.headers = {
-            "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicmluZ3JhbUBub3d3aGVyZS5jb20iLCJ1c2Vy"
-            + "X3Njb3BlcyI6WyJjaS5yZWFkIiwiY2kud3JpdGUiXX0.se0BJtNksVtk14aqjp7SvnXzRbEKoqXb8Q5U9VVdy54"
-            # NOQA
-        }
-        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
-        self.patcher = patch("redis.StrictRedis.get", return_value=encoded_jwt_token)
-        self.patcher.start()
+        self.case_access = CaseAccess()
 
-    def tearDown(self):
-        self.patcher.stop()
+        self.case = deepcopy(case)
+        self.collection_exercise = deepcopy(collection_exercise)
+        self.survey = deepcopy(survey_eq)
 
-    @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
-    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
-    def test_upload_survey_success(self, mock_request, _, upload_collection_instrument):
-        mock_request.get(
-            f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True",
-            json=business_party,
-            status_code=200,
-        )
-        mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
-        mock_request.get(url_get_case, json=case, status_code=200)
-        upload_collection_instrument.return_value = None
-        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
-        response = self.app.post(
-            f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-            f'&survey_short_name={survey["shortName"]}',
-            data=self.survey_file,
-        )
+        self.case_id = self.case["id"]
+        self.party_id = respondent_party["id"]
+        self.business_party_id = business_party["id"]
+        self.survey_id = self.survey["id"]
+        self.survey_short_name = self.survey["shortName"]
 
-        self.assertEqual(response.status_code, 200)
+        self.case["caseGroup"]["partyId"] = self.business_party_id
+        self.case["caseGroup"]["collectionExerciseId"] = self.collection_exercise["id"]
+        self.case["caseGroup"]["surveyId"] = self.survey_id
+        self.collection_exercise["surveyId"] = self.survey_id
 
-    @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
-    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
-    def test_upload_survey_validation_errors(self, mock_request, _, upload_collection_instrument):
-        mock_request.get(
-            f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True",
-            json=business_party,
-            status_code=200,
-        )
-        mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
-        mock_request.get(url_get_case, json=case, status_code=200)
-        upload_collection_instrument.return_value = [
-            "The spreadsheet must be in .xls or .xlsx format",
-            "The file name of your spreadsheet must be less than 50 characters long",
-        ]
-        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
-        response = self.app.post(
-            f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-            f'&survey_short_name={survey["shortName"]}',
-            data=self.survey_file,
+    @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
+    @patch("frontstage.common.authorize_access." "survey_controller.get_survey_by_short_name")
+    def test_case_access_returns_true_when_authorized(
+        self,
+        get_survey_by_short_name,
+        is_respondent_enrolled,
+    ):
+        get_survey_by_short_name.return_value = self.survey
+        is_respondent_enrolled.return_value = True
+
+        result = self.case_access.case_access(
+            self.case,
+            self.collection_exercise,
+            self.party_id,
+            self.business_party_id,
+            self.survey_short_name,
         )
 
-        self.assertIn("There are 2 problems with your answer.".encode(), response.data)
-        self.assertIn("The spreadsheet must be in .xls or .xlsx format".encode(), response.data)
-        self.assertIn("The file name of your spreadsheet must be less than 50 characters long".encode(), response.data)
-        self.assertEqual(response.status_code, 200)
+        self.assertTrue(result)
 
-    def test_upload_survey_missing_required_data(self, mock_request):
-        mock_request.get(url_banner_api, status_code=404)
-        response = self.app.post(
-            f'/surveys/upload-survey?case_id={case["id"]}' f'&survey_short_name={survey["shortName"]}',
-            data=self.survey_file,
+        get_survey_by_short_name.assert_called_once_with(self.survey_short_name)
+        is_respondent_enrolled.assert_called_once_with(
+            self.party_id,
+            self.business_party_id,
+            self.survey_id,
         )
-        self.assertEqual(response.status_code, 400)
 
-    @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
-    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
-    def test_upload_survey_ci_upload_error(self, mock_request, _, upload_collection_instrument):
-        mock_request.get(
-            f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True",
-            json=business_party,
-            status_code=200,
-        )
-        mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
-        mock_request.get(url_get_case, json=case, status_code=200)
-        upload_collection_instrument.side_effect = CiUploadError("Upload failed")
+    @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
+    @patch("frontstage.common.authorize_access." "survey_controller.get_survey_by_short_name")
+    def test_case_access_rejects_mismatched_business_party(
+        self,
+        get_survey_by_short_name,
+        is_respondent_enrolled,
+    ):
+        get_survey_by_short_name.return_value = self.survey
 
-        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
-        response = self.app.post(
-            f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-            f'&survey_short_name={survey["shortName"]}',
-            data=self.survey_file,
-        )
-        self.assertIn("There is 1 error on this page".encode(), response.data)
-        self.assertIn("The selected file could not be uploaded. Please try again.".encode(), response.data)
+        with self.assertRaises(Unauthorized) as raised:
+            self.case_access.case_access(
+                self.case,
+                self.collection_exercise,
+                self.party_id,
+                "different-business-party-id",
+                self.survey_short_name,
+            )
 
-    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
-    def test_upload_survey_no_permission(self, mock_request, is_respondent_enrolled):
+        self.assertEqual(raised.exception.code, 401)
+        get_survey_by_short_name.assert_called_once_with(self.survey_short_name)
+        is_respondent_enrolled.assert_not_called()
+
+    @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
+    @patch("frontstage.common.authorize_access." "survey_controller.get_survey_by_short_name")
+    def test_case_access_rejects_mismatched_collection_exercise(
+        self,
+        get_survey_by_short_name,
+        is_respondent_enrolled,
+    ):
+        get_survey_by_short_name.return_value = self.survey
+
+        self.collection_exercise["id"] = "different-collection-exercise-id"
+
+        with self.assertRaises(Unauthorized) as raised:
+            self.case_access.case_access(
+                self.case,
+                self.collection_exercise,
+                self.party_id,
+                self.business_party_id,
+                self.survey_short_name,
+            )
+
+        self.assertEqual(raised.exception.code, 401)
+        get_survey_by_short_name.assert_called_once_with(self.survey_short_name)
+        is_respondent_enrolled.assert_not_called()
+
+    @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
+    @patch("frontstage.common.authorize_access." "survey_controller.get_survey_by_short_name")
+    def test_case_access_rejects_mismatched_survey(
+        self,
+        get_survey_by_short_name,
+        is_respondent_enrolled,
+    ):
+        mismatched_survey = deepcopy(self.survey)
+        mismatched_survey["id"] = "different-survey-id"
+
+        get_survey_by_short_name.return_value = mismatched_survey
+
+        with self.assertRaises(Unauthorized) as raised:
+            self.case_access.case_access(
+                self.case,
+                self.collection_exercise,
+                self.party_id,
+                self.business_party_id,
+                self.survey_short_name,
+            )
+
+        self.assertEqual(raised.exception.code, 401)
+        get_survey_by_short_name.assert_called_once_with(self.survey_short_name)
+        is_respondent_enrolled.assert_not_called()
+
+    @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
+    @patch("frontstage.common.authorize_access." "survey_controller.get_survey_by_short_name")
+    def test_case_access_rejects_respondent_without_enrolment(
+        self,
+        get_survey_by_short_name,
+        is_respondent_enrolled,
+    ):
+        get_survey_by_short_name.return_value = self.survey
         is_respondent_enrolled.return_value = False
-        mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
-        response = self.app.post(
-            f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-            f'&survey_short_name={survey["shortName"]}'
-        )
-        self.assertEqual(response.status_code, 500)
 
-    def test_upload_survey_ci_upload_with_mismatched_business_id(self, mock_request):
-        mock_request.get(
-            f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True",
-            json=business_party,
-            status_code=200,
-        )
+        with self.assertRaises(Unauthorized) as raised:
+            self.case_access.case_access(
+                self.case,
+                self.collection_exercise,
+                self.party_id,
+                self.business_party_id,
+                self.survey_short_name,
+            )
 
-        mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
-        mock_request.get(url_get_case, json=case, status_code=200)
-        business_party_id = "f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b"
-
-        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
-        response = self.app.post(
-            f'/surveys/upload-survey?case_id={case["id"]}'
-            f'&business_party_id={business_party_id}&survey_short_name={survey["shortName"]}',
-            data=self.survey_file,
-        )
-        self.assertEqual(response.status_code, 400)
-        self.assertLogs(
-            f"business_party_id {business_party_id} does not match case_group['partyId'] " f"{case["partyId"]}",
-            response.data,
+        self.assertEqual(raised.exception.code, 401)
+        get_survey_by_short_name.assert_called_once_with(self.survey_short_name)
+        is_respondent_enrolled.assert_called_once_with(
+            self.party_id,
+            self.business_party_id,
+            self.survey_id,
         )
 
-    def test_upload_survey_ci_upload_with_mismatched_survey_id(self, mock_request):
-        mock_request.get(
-            f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True",
-            json=business_party,
-            status_code=200,
+    @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
+    def test_check_permission_allows_enrolled_respondent(
+        self,
+        is_respondent_enrolled,
+    ):
+        is_respondent_enrolled.return_value = True
+
+        result = CaseAccess.check_permission(
+            self.business_party_id,
+            self.case_id,
+            self.party_id,
+            self.survey,
         )
 
-        mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_survey_by_short_name_eq, json=survey_eq, status_code=200)
-        mock_request.get(url_get_case, json=case, status_code=200)
+        self.assertIsNone(result)
+        is_respondent_enrolled.assert_called_once_with(
+            self.party_id,
+            self.business_party_id,
+            self.survey_id,
+        )
 
-        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
-        response = self.app.post(
-            f'/surveys/upload-survey?case_id={case["id"]}'
-            f'&business_party_id={business_party["id"]}&survey_short_name=QBS',
-            data=self.survey_file,
+    @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
+    def test_check_permission_rejects_respondent_without_enrolment(
+        self,
+        is_respondent_enrolled,
+    ):
+        is_respondent_enrolled.return_value = False
+
+        with self.assertRaises(NoSurveyPermission):
+            CaseAccess.check_permission(
+                self.business_party_id,
+                self.case_id,
+                self.party_id,
+                self.survey,
+            )
+
+        is_respondent_enrolled.assert_called_once_with(
+            self.party_id,
+            self.business_party_id,
+            self.survey_id,
         )
-        self.assertEqual(response.status_code, 400)
-        self.assertLogs(
-            f"survey_id{survey_eq["id"]} and case_group['surveyId'] {case["caseGroup"]['surveyId']}", response.data
+
+    def test_check_seft_allows_matching_business_and_survey(self):
+        result = CaseAccess.check_seft(
+            self.business_party_id,
+            self.case["caseGroup"],
+            self.survey_id,
         )
+
+        self.assertIsNone(result)
+
+    def test_check_seft_rejects_mismatched_business_party(self):
+        different_business_party_id = "different-business-party-id"
+
+        with self.assertLogs(
+            "frontstage.common.authorize_access",
+            level="ERROR",
+        ) as captured_logs:
+            with self.assertRaises(BadRequest) as raised:
+                CaseAccess.check_seft(
+                    different_business_party_id,
+                    self.case["caseGroup"],
+                    self.survey_id,
+                )
+
+        self.assertEqual(raised.exception.code, 400)
+        self.assertIn(
+            (
+                f"business_party_id {different_business_party_id} "
+                "does not match case_group['partyId'] "
+                f"{self.business_party_id}"
+            ),
+            "\n".join(captured_logs.output),
+        )
+
+    def test_check_seft_rejects_mismatched_survey(self):
+        different_survey_id = "different-survey-id"
+
+        with self.assertLogs(
+            "frontstage.common.authorize_access",
+            level="ERROR",
+        ) as captured_logs:
+            with self.assertRaises(BadRequest) as raised:
+                CaseAccess.check_seft(
+                    self.business_party_id,
+                    self.case["caseGroup"],
+                    different_survey_id,
+                )
+
+        self.assertEqual(raised.exception.code, 400)
+        self.assertIn(
+            (f"survey_id {different_survey_id} and " f"case_group['surveyId'] {self.survey_id}"),
+            "\n".join(captured_logs.output),
+        )
+
+    @patch("frontstage.common.authorize_access.abort")
+    def test_check_seft_stops_after_business_party_mismatch(
+        self,
+        abort,
+    ):
+        abort.side_effect = BadRequest()
+
+        with self.assertRaises(BadRequest):
+            CaseAccess.check_seft(
+                "different-business-party-id",
+                self.case["caseGroup"],
+                "different-survey-id",
+            )
+
+        abort.assert_called_once_with(400)

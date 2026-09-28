@@ -123,6 +123,138 @@ class TestCaseControllers(unittest.TestCase):
                 with self.assertRaises(ApiError):
                     self.assertRaises(ApiError, case_controller.get_case_categories())
 
+    @patch("frontstage.controllers.case_controller." "CaseAccess.case_access")
+    @patch("frontstage.controllers.case_controller.post_case_event")
+    @patch("frontstage.common.eq_payload." "EqPayload.create_payload")
+    def test_get_eq_url_case_group_status_not_complete(
+        self,
+        create_eq_payload,
+        post_case_event,
+        case_access,
+    ):
+        collection_exercise_copy = {
+            **collection_exercise,
+            "surveyId": survey_eq["id"],
+        }
+
+        case_access.return_value = True
+        create_eq_payload.return_value = eq_payload
+
+        with responses.RequestsMock() as rsps:
+            rsps.add(
+                rsps.GET,
+                url_get_survey_by_short_name_eq,
+                json=survey_eq,
+                status=200,
+            )
+
+            with app.app_context():
+                eq_url = case_controller.get_eq_url(
+                    case,
+                    collection_exercise_copy,
+                    respondent_party["id"],
+                    business_party["id"],
+                    survey_eq["shortName"],
+                )
+
+        self.assertIn(
+            "https://eq-test/v3/session?token=",
+            eq_url,
+        )
+
+        case_access.assert_called_once_with(
+            case,
+            collection_exercise_copy,
+            respondent_party["id"],
+            business_party["id"],
+            survey_eq["shortName"],
+        )
+
+        create_eq_payload.assert_called_once_with(
+            case,
+            collection_exercise_copy,
+            respondent_party["id"],
+            business_party["id"],
+            survey_eq,
+        )
+
+        post_case_event.assert_called_once_with(
+            case["id"],
+            party_id=respondent_party["id"],
+            category="EQ_LAUNCH",
+            description=(
+                f"Instrument {case['collectionInstrumentId']} "
+                f"launched by {respondent_party['id']} "
+                f"for case {case['id']}"
+            ),
+        )
+
+    @patch("frontstage.controllers.case_controller." "CaseAccess.case_access")
+    @patch("frontstage.controllers.case_controller.post_case_event")
+    @patch("frontstage.common.eq_payload." "EqPayload.create_payload")
+    def test_get_eq_v3_url_case_group_status_not_complete(
+        self,
+        create_eq_payload,
+        post_case_event,
+        case_access,
+    ):
+        collection_exercise_copy = {
+            **collection_exercise,
+            "surveyId": survey_eq["id"],
+        }
+
+        case_access.return_value = True
+        create_eq_payload.return_value = eq_payload
+
+        with responses.RequestsMock() as rsps:
+            rsps.add(
+                rsps.GET,
+                url_get_survey_by_short_name_eq,
+                json=survey_eq,
+                status=200,
+            )
+
+            with app.app_context():
+                eq_url = case_controller.get_eq_url(
+                    case,
+                    collection_exercise_copy,
+                    respondent_party["id"],
+                    business_party["id"],
+                    survey_eq["shortName"],
+                )
+
+        self.assertIn(
+            "https://eq-test/v3/session?token=",
+            eq_url,
+        )
+
+        case_access.assert_called_once_with(
+            case,
+            collection_exercise_copy,
+            respondent_party["id"],
+            business_party["id"],
+            survey_eq["shortName"],
+        )
+
+        create_eq_payload.assert_called_once_with(
+            case,
+            collection_exercise_copy,
+            respondent_party["id"],
+            business_party["id"],
+            survey_eq,
+        )
+
+        post_case_event.assert_called_once_with(
+            case["id"],
+            party_id=respondent_party["id"],
+            category="EQ_LAUNCH",
+            description=(
+                f"Instrument {case['collectionInstrumentId']} "
+                f"launched by {respondent_party['id']} "
+                f"for case {case['id']}"
+            ),
+        )
+
     @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
     @patch("frontstage.controllers.case_controller.get_case_by_case_id")
     def test_get_eq_url_when_caseGroupStatus_is_complete(self, get_case_by_id, _):
@@ -495,136 +627,4 @@ class TestCaseControllers(unittest.TestCase):
             respondent_party["id"],
             business_party["id"],
             survey_eq["shortName"],
-        )
-
-    @patch("frontstage.controllers.case_controller." "CaseAccess.case_access")
-    @patch("frontstage.controllers.case_controller.post_case_event")
-    @patch("frontstage.common.eq_payload." "EqPayload.create_payload")
-    def test_get_eq_url_case_group_status_not_complete(
-        self,
-        create_eq_payload,
-        post_case_event,
-        case_access,
-    ):
-        collection_exercise_copy = {
-            **collection_exercise,
-            "surveyId": survey_eq["id"],
-        }
-
-        case_access.return_value = True
-        create_eq_payload.return_value = eq_payload
-
-        with responses.RequestsMock() as rsps:
-            rsps.add(
-                rsps.GET,
-                url_get_survey_by_short_name_eq,
-                json=survey_eq,
-                status=200,
-            )
-
-            with app.app_context():
-                eq_url = case_controller.get_eq_url(
-                    case,
-                    collection_exercise_copy,
-                    respondent_party["id"],
-                    business_party["id"],
-                    survey_eq["shortName"],
-                )
-
-        self.assertIn(
-            "https://eq-test/v3/session?token=",
-            eq_url,
-        )
-
-        case_access.assert_called_once_with(
-            case,
-            collection_exercise_copy,
-            respondent_party["id"],
-            business_party["id"],
-            survey_eq["shortName"],
-        )
-
-        create_eq_payload.assert_called_once_with(
-            case,
-            collection_exercise_copy,
-            respondent_party["id"],
-            business_party["id"],
-            survey_eq,
-        )
-
-        post_case_event.assert_called_once_with(
-            case["id"],
-            party_id=respondent_party["id"],
-            category="EQ_LAUNCH",
-            description=(
-                f"Instrument {case['collectionInstrumentId']} "
-                f"launched by {respondent_party['id']} "
-                f"for case {case['id']}"
-            ),
-        )
-
-    @patch("frontstage.controllers.case_controller." "CaseAccess.case_access")
-    @patch("frontstage.controllers.case_controller.post_case_event")
-    @patch("frontstage.common.eq_payload." "EqPayload.create_payload")
-    def test_get_eq_v3_url_case_group_status_not_complete(
-        self,
-        create_eq_payload,
-        post_case_event,
-        case_access,
-    ):
-        collection_exercise_copy = {
-            **collection_exercise,
-            "surveyId": survey_eq["id"],
-        }
-
-        case_access.return_value = True
-        create_eq_payload.return_value = eq_payload
-
-        with responses.RequestsMock() as rsps:
-            rsps.add(
-                rsps.GET,
-                url_get_survey_by_short_name_eq,
-                json=survey_eq,
-                status=200,
-            )
-
-            with app.app_context():
-                eq_url = case_controller.get_eq_url(
-                    case,
-                    collection_exercise_copy,
-                    respondent_party["id"],
-                    business_party["id"],
-                    survey_eq["shortName"],
-                )
-
-        self.assertIn(
-            "https://eq-test/v3/session?token=",
-            eq_url,
-        )
-
-        case_access.assert_called_once_with(
-            case,
-            collection_exercise_copy,
-            respondent_party["id"],
-            business_party["id"],
-            survey_eq["shortName"],
-        )
-
-        create_eq_payload.assert_called_once_with(
-            case,
-            collection_exercise_copy,
-            respondent_party["id"],
-            business_party["id"],
-            survey_eq,
-        )
-
-        post_case_event.assert_called_once_with(
-            case["id"],
-            party_id=respondent_party["id"],
-            category="EQ_LAUNCH",
-            description=(
-                f"Instrument {case['collectionInstrumentId']} "
-                f"launched by {respondent_party['id']} "
-                f"for case {case['id']}"
-            ),
         )

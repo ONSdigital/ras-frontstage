@@ -1,9 +1,13 @@
 import unittest
 from unittest.mock import patch
 
-from werkzeug.exceptions import BadRequest, Unauthorized
+from werkzeug.exceptions import Unauthorized
 
-from frontstage.common.authorize_access import case_access, check_enrollment, check_seft
+from frontstage.common.authorize_access import (
+    authorize_access,
+    check_enrollment,
+    check_seft,
+)
 from frontstage.exceptions.exceptions import NoSurveyPermission
 
 
@@ -38,7 +42,7 @@ class TestCaseAccess(unittest.TestCase):
 
     @patch("frontstage.common.authorize_access.party_controller.is_respondent_enrolled")
     @patch("frontstage.common.authorize_access.survey_controller.get_survey_by_short_name")
-    def test_case_access_returns_true_when_authorized(
+    def test_authorize_access_returns_true_when_authorized(
         self,
         get_survey_by_short_name,
         is_respondent_enrolled,
@@ -47,7 +51,7 @@ class TestCaseAccess(unittest.TestCase):
         is_respondent_enrolled.return_value = True
 
         self.assertTrue(
-            case_access(
+            authorize_access(
                 self.case,
                 self.collection_exercise,
                 self.party_id,
@@ -57,14 +61,14 @@ class TestCaseAccess(unittest.TestCase):
         )
 
     @patch("frontstage.common.authorize_access.survey_controller.get_survey_by_short_name")
-    def test_case_access_rejects_mismatched_business_party(
+    def test_authorize_access_rejects_mismatched_business_party(
         self,
         get_survey_by_short_name,
     ):
         get_survey_by_short_name.return_value = self.survey
 
         with self.assertRaises(Unauthorized):
-            case_access(
+            authorize_access(
                 self.case,
                 self.collection_exercise,
                 self.party_id,
@@ -73,14 +77,14 @@ class TestCaseAccess(unittest.TestCase):
             )
 
     @patch("frontstage.common.authorize_access.survey_controller.get_survey_by_short_name")
-    def test_case_access_rejects_mismatched_collection_exercise(
+    def test_authorize_access_rejects_mismatched_collection_exercise(
         self,
         get_survey_by_short_name,
     ):
         get_survey_by_short_name.return_value = self.survey
 
         with self.assertRaises(Unauthorized):
-            case_access(
+            authorize_access(
                 self.case,
                 {
                     "id": "wrong-collection-exercise",
@@ -92,7 +96,7 @@ class TestCaseAccess(unittest.TestCase):
             )
 
     @patch("frontstage.common.authorize_access.survey_controller.get_survey_by_short_name")
-    def test_case_access_rejects_mismatched_survey(
+    def test_authorize_access_rejects_mismatched_survey(
         self,
         get_survey_by_short_name,
     ):
@@ -102,7 +106,7 @@ class TestCaseAccess(unittest.TestCase):
         }
 
         with self.assertRaises(Unauthorized):
-            case_access(
+            authorize_access(
                 self.case,
                 self.collection_exercise,
                 self.party_id,
@@ -112,7 +116,7 @@ class TestCaseAccess(unittest.TestCase):
 
     @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
     @patch("frontstage.common.authorize_access." "survey_controller.get_survey_by_short_name")
-    def test_case_access_rejects_not_enrolled(
+    def test_authorize_access_rejects_not_enrolled(
         self,
         get_survey_by_short_name,
         is_respondent_enrolled,
@@ -121,7 +125,7 @@ class TestCaseAccess(unittest.TestCase):
         is_respondent_enrolled.return_value = False
 
         with self.assertRaises(NoSurveyPermission):
-            case_access(
+            authorize_access(
                 self.case,
                 self.collection_exercise,
                 self.party_id,
@@ -176,17 +180,19 @@ class TestCaseAccess(unittest.TestCase):
         )
 
     def test_check_seft_business_mismatch(self):
-        with self.assertRaises(BadRequest):
+        with self.assertRaises(Unauthorized) as raised:
             check_seft(
                 "wrong-business",
                 self.case["caseGroup"],
                 self.survey_id,
             )
+        self.assertEqual(raised.exception.code, 401)
 
     def test_check_seft_survey_mismatch(self):
-        with self.assertRaises(BadRequest):
+        with self.assertRaises(Unauthorized) as raised:
             check_seft(
                 self.business_party_id,
                 self.case["caseGroup"],
                 "wrong-survey",
             )
+        self.assertEqual(raised.exception.code, 401)

@@ -6,7 +6,7 @@ from werkzeug.exceptions import Forbidden, Unauthorized
 
 from config import TestingConfig
 from frontstage import app
-from frontstage.common.authorize_access import case_access
+from frontstage.common.authorize_access import authorize_access
 from frontstage.controllers import case_controller
 from frontstage.exceptions.exceptions import (
     ApiError,
@@ -133,21 +133,21 @@ class TestCaseControllers(unittest.TestCase):
                 with self.assertRaises(ApiError):
                     self.assertRaises(ApiError, case_controller.get_case_categories())
 
-    @patch("frontstage.controllers.case_controller.case_access")
+    @patch("frontstage.controllers.case_controller.authorize_access")
     @patch("frontstage.controllers.case_controller.post_case_event")
     @patch("frontstage.common.eq_payload." "EqPayload.create_payload")
     def test_get_eq_url_case_group_status_not_complete(
         self,
         create_eq_payload,
         post_case_event,
-        case_access,
+        authorize_access,
     ):
         collection_exercise_copy = {
             **collection_exercise,
             "surveyId": survey_eq["id"],
         }
 
-        case_access.return_value = True
+        authorize_access.return_value = True
         create_eq_payload.return_value = eq_payload
 
         with responses.RequestsMock() as rsps:
@@ -172,7 +172,7 @@ class TestCaseControllers(unittest.TestCase):
             eq_url,
         )
 
-        case_access.assert_called_once_with(
+        authorize_access.assert_called_once_with(
             case,
             collection_exercise_copy,
             respondent_party["id"],
@@ -199,21 +199,21 @@ class TestCaseControllers(unittest.TestCase):
             ),
         )
 
-    @patch("frontstage.controllers.case_controller.case_access")
+    @patch("frontstage.controllers.case_controller.authorize_access")
     @patch("frontstage.controllers.case_controller.post_case_event")
     @patch("frontstage.common.eq_payload." "EqPayload.create_payload")
     def test_get_eq_v3_url_case_group_status_not_complete(
         self,
         create_eq_payload,
         post_case_event,
-        case_access,
+        authorize_access,
     ):
         collection_exercise_copy = {
             **collection_exercise,
             "surveyId": survey_eq["id"],
         }
 
-        case_access.return_value = True
+        authorize_access.return_value = True
         create_eq_payload.return_value = eq_payload
 
         with responses.RequestsMock() as rsps:
@@ -301,7 +301,7 @@ class TestCaseControllers(unittest.TestCase):
 
     @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
     @patch("frontstage.common.authorize_access." "survey_controller.get_survey_by_short_name")
-    def test_case_access_rejects_not_enrolled(
+    def test_authorize_access_rejects_not_enrolled(
         self,
         get_survey_by_short_name,
         is_respondent_enrolled,
@@ -323,7 +323,7 @@ class TestCaseControllers(unittest.TestCase):
         }
 
         with self.assertRaises(NoSurveyPermission):
-            case_access(
+            authorize_access(
                 case_copy,
                 collection_exercise_copy,
                 respondent_party["id"],
@@ -512,19 +512,19 @@ class TestCaseControllers(unittest.TestCase):
                         case["partyId"], self.app_config["CASE_URL"], self.app_config["BASIC_AUTH"]
                     )
 
-    @patch("frontstage.controllers.case_controller.case_access")
+    @patch("frontstage.controllers.case_controller.authorize_access")
     @patch("frontstage.common.eq_payload.EqPayload.create_payload")
     def test_get_eq_url_does_not_create_payload_when_authorization_fails(
         self,
         create_eq_payload,
-        case_access,
+        authorize_access,
     ):
         collection_exercise_copy = {
             **collection_exercise,
             "surveyId": survey_eq["id"],
         }
 
-        case_access.side_effect = Unauthorized()
+        authorize_access.side_effect = Unauthorized()
 
         with responses.RequestsMock() as rsps:
             rsps.add(
@@ -546,19 +546,19 @@ class TestCaseControllers(unittest.TestCase):
 
         create_eq_payload.assert_not_called()
 
-    @patch("frontstage.controllers.case_controller.case_access")
+    @patch("frontstage.controllers.case_controller.authorize_access")
     @patch("frontstage.controllers.case_controller.post_case_event")
     def test_get_eq_url_does_not_post_case_event_when_authorization_fails(
         self,
         post_case_event,
-        case_access,
+        authorize_access,
     ):
         collection_exercise_copy = {
             **collection_exercise,
             "surveyId": survey_eq["id"],
         }
 
-        case_access.side_effect = Unauthorized()
+        authorize_access.side_effect = Unauthorized()
 
         with responses.RequestsMock() as rsps:
             rsps.add(
@@ -580,21 +580,21 @@ class TestCaseControllers(unittest.TestCase):
 
         post_case_event.assert_not_called()
 
-    @patch("frontstage.controllers.case_controller.case_access")
+    @patch("frontstage.controllers.case_controller.authorize_access")
     @patch("frontstage.controllers.case_controller.post_case_event")
     @patch("frontstage.common.eq_payload.EqPayload.create_payload")
-    def test_get_eq_url_calls_case_access(
+    def test_get_eq_url_calls_authorize_access(
         self,
         create_eq_payload,
         _,
-        case_access,
+        authorize_access,
     ):
         collection_exercise_copy = {
             **collection_exercise,
             "surveyId": survey_eq["id"],
         }
 
-        case_access.return_value = True
+        authorize_access.return_value = True
         create_eq_payload.return_value = eq_payload
 
         with responses.RequestsMock() as rsps:
@@ -614,7 +614,7 @@ class TestCaseControllers(unittest.TestCase):
                     survey_eq["shortName"],
                 )
 
-        case_access.assert_called_once_with(
+        authorize_access.assert_called_once_with(
             case,
             collection_exercise_copy,
             respondent_party["id"],

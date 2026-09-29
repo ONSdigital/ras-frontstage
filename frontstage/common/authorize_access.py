@@ -14,7 +14,7 @@ from frontstage.exceptions.exceptions import (
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def case_access(case, collection_exercise, party_id, business_party_id, survey_short_name):
+def authorize_access(case, collection_exercise, party_id, business_party_id, survey_short_name):
     case_id = case["id"]
     case_business_party_id = case["caseGroup"]["partyId"]
     case_collection_exercise_id = case["caseGroup"]["collectionExerciseId"]
@@ -63,7 +63,7 @@ def check_seft(business_party_id, case_group, survey_id):
         logger.error(
             f"business_party_id {business_party_id} does not match case_group['partyId'] {case_group['partyId']}"
         )
-        abort(400)
+        abort(401)
     if survey_id != case_group["surveyId"]:
         logger.error(f"survey_id {survey_id} and case_group['surveyId'] {case_group['surveyId']}")
-        abort(400)
+        abort(401)

@@ -5,7 +5,7 @@ from flask import abort
 from flask import current_app as app
 from structlog import wrap_logger
 
-from frontstage.common.authorize_access import CaseAccess
+from frontstage.common.authorize_access import case_access, check_enrollment
 from frontstage.common.encrypter import Encrypter
 from frontstage.common.eq_payload import EqPayload
 from frontstage.controllers import (
@@ -99,7 +99,7 @@ def get_case_data(case_id, party_id, business_party_id, survey_short_name):
     # Check if respondent has permission to see case data
     case = get_case_by_case_id(case_id)
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
-    CaseAccess.check_enrollment(business_party_id, case_id, party_id, survey)
+    check_enrollment(business_party_id, case_id, party_id, survey)
 
     case_data = {
         "collection_exercise": collection_exercise_controller.get_collection_exercise(
@@ -152,7 +152,7 @@ def get_eq_url(case, collection_exercise, party_id, business_party_id, survey_sh
 
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
 
-    CaseAccess().case_access(case, collection_exercise, party_id, business_party_id, survey_short_name)
+    case_access(case, collection_exercise, party_id, business_party_id, survey_short_name)
 
     payload = EqPayload().create_payload(case, collection_exercise, party_id, business_party_id, survey)
 

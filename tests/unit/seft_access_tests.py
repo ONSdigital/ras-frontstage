@@ -3,14 +3,13 @@ from unittest.mock import patch
 
 from werkzeug.exceptions import BadRequest
 
-from frontstage.case_access import CaseAccess
+from frontstage.common.authorize_access import check_enrollment, check_seft
 from frontstage.exceptions.exceptions import NoSurveyPermission
 
 
 class SeftAccessTests(unittest.TestCase):
 
     def setUp(self):
-        self.case_access = CaseAccess()
 
         self.party_id = "respondent-id"
         self.case_id = "case-id"
@@ -33,7 +32,7 @@ class SeftAccessTests(unittest.TestCase):
     ):
         is_respondent_enrolled.return_value = True
 
-        result = self.case_access.check_enrollment(
+        result = check_enrollment(
             self.business_party_id,
             self.case_id,
             self.party_id,
@@ -56,7 +55,7 @@ class SeftAccessTests(unittest.TestCase):
         is_respondent_enrolled.return_value = False
 
         with self.assertRaises(NoSurveyPermission):
-            self.case_access.check_enrollment(
+            check_enrollment(
                 self.business_party_id,
                 self.case_id,
                 self.party_id,
@@ -70,7 +69,7 @@ class SeftAccessTests(unittest.TestCase):
         )
 
     def test_check_this_success(self):
-        result = self.case_access.check_seft(
+        result = check_seft(
             self.business_party_id,
             self.case_group,
             self.survey["id"],
@@ -80,7 +79,7 @@ class SeftAccessTests(unittest.TestCase):
 
     def test_check_this_business_party_mismatch(self):
         with self.assertRaises(BadRequest):
-            self.case_access.check_seft(
+            check_seft(
                 "different-business-party-id",
                 self.case_group,
                 self.survey["id"],
@@ -88,7 +87,7 @@ class SeftAccessTests(unittest.TestCase):
 
     def test_check_this_survey_mismatch(self):
         with self.assertRaises(BadRequest):
-            self.case_access.check_seft(
+            check_seft(
                 self.business_party_id,
                 self.case_group,
                 "different-survey-id",

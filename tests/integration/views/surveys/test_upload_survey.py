@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from werkzeug.exceptions import BadRequest, Unauthorized
 
-from frontstage.common.authorize_access import CaseAccess
+from frontstage.common.authorize_access import case_access, check_enrollment, check_seft
 from frontstage.exceptions.exceptions import NoSurveyPermission
 from tests.integration.mocked_services import (
     business_party,
@@ -16,7 +16,6 @@ from tests.integration.mocked_services import (
 
 class TestCaseAccess(unittest.TestCase):
     def setUp(self):
-        self.case_access = CaseAccess()
 
         self.case_id = case["id"]
         self.party_id = respondent_party["id"]
@@ -53,7 +52,7 @@ class TestCaseAccess(unittest.TestCase):
         get_survey_by_short_name.return_value = self.survey
         is_respondent_enrolled.return_value = True
 
-        result = self.case_access.case_access(
+        result = case_access(
             self.case,
             self.collection_exercise,
             self.party_id,
@@ -80,7 +79,7 @@ class TestCaseAccess(unittest.TestCase):
         get_survey_by_short_name.return_value = self.survey
 
         with self.assertRaises(Unauthorized) as raised:
-            self.case_access.case_access(
+            case_access(
                 self.case,
                 self.collection_exercise,
                 self.party_id,
@@ -107,7 +106,7 @@ class TestCaseAccess(unittest.TestCase):
         }
 
         with self.assertRaises(Unauthorized) as raised:
-            self.case_access.case_access(
+            case_access(
                 self.case,
                 mismatched_collection_exercise,
                 self.party_id,
@@ -134,7 +133,7 @@ class TestCaseAccess(unittest.TestCase):
         get_survey_by_short_name.return_value = mismatched_survey
 
         with self.assertRaises(Unauthorized) as raised:
-            self.case_access.case_access(
+            case_access(
                 self.case,
                 self.collection_exercise,
                 self.party_id,
@@ -157,7 +156,7 @@ class TestCaseAccess(unittest.TestCase):
         is_respondent_enrolled.return_value = False
 
         with self.assertRaises(NoSurveyPermission):
-            self.case_access.case_access(
+            case_access(
                 self.case,
                 self.collection_exercise,
                 self.party_id,
@@ -178,7 +177,7 @@ class TestCaseAccess(unittest.TestCase):
     ):
         is_respondent_enrolled.return_value = True
 
-        result = CaseAccess.check_enrollment(
+        result = check_enrollment(
             self.business_party_id,
             self.case_id,
             self.party_id,
@@ -200,7 +199,7 @@ class TestCaseAccess(unittest.TestCase):
         is_respondent_enrolled.return_value = False
 
         with self.assertRaises(NoSurveyPermission):
-            CaseAccess.check_enrollment(
+            check_enrollment(
                 self.business_party_id,
                 self.case_id,
                 self.party_id,
@@ -214,7 +213,7 @@ class TestCaseAccess(unittest.TestCase):
         )
 
     def test_check_seft_allows_matching_business_and_survey(self):
-        result = CaseAccess.check_seft(
+        result = check_seft(
             self.business_party_id,
             self.case["caseGroup"],
             self.survey_id,
@@ -230,7 +229,7 @@ class TestCaseAccess(unittest.TestCase):
             level="ERROR",
         ) as captured_logs:
             with self.assertRaises(BadRequest) as raised:
-                CaseAccess.check_seft(
+                check_seft(
                     different_business_party_id,
                     self.case["caseGroup"],
                     self.survey_id,
@@ -254,7 +253,7 @@ class TestCaseAccess(unittest.TestCase):
             level="ERROR",
         ) as captured_logs:
             with self.assertRaises(BadRequest) as raised:
-                CaseAccess.check_seft(
+                check_seft(
                     self.business_party_id,
                     self.case["caseGroup"],
                     different_survey_id,
@@ -274,7 +273,7 @@ class TestCaseAccess(unittest.TestCase):
         abort.side_effect = BadRequest()
 
         with self.assertRaises(BadRequest):
-            CaseAccess.check_seft(
+            check_seft(
                 "different-business-party-id",
                 self.case["caseGroup"],
                 "different-survey-id",

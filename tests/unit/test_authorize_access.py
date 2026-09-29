@@ -3,14 +3,13 @@ from unittest.mock import patch
 
 from werkzeug.exceptions import BadRequest, Unauthorized
 
-from frontstage.common.authorize_access import CaseAccess
+from frontstage.common.authorize_access import case_access, check_enrollment, check_seft
 from frontstage.exceptions.exceptions import NoSurveyPermission
 
 
 class TestCaseAccess(unittest.TestCase):
 
     def setUp(self):
-        self.case_access = CaseAccess()
 
         self.case = {
             "id": "case-id",
@@ -48,7 +47,7 @@ class TestCaseAccess(unittest.TestCase):
         is_respondent_enrolled.return_value = True
 
         self.assertTrue(
-            self.case_access.case_access(
+            case_access(
                 self.case,
                 self.collection_exercise,
                 self.party_id,
@@ -65,7 +64,7 @@ class TestCaseAccess(unittest.TestCase):
         get_survey_by_short_name.return_value = self.survey
 
         with self.assertRaises(Unauthorized):
-            self.case_access.case_access(
+            case_access(
                 self.case,
                 self.collection_exercise,
                 self.party_id,
@@ -81,7 +80,7 @@ class TestCaseAccess(unittest.TestCase):
         get_survey_by_short_name.return_value = self.survey
 
         with self.assertRaises(Unauthorized):
-            self.case_access.case_access(
+            case_access(
                 self.case,
                 {
                     "id": "wrong-collection-exercise",
@@ -103,7 +102,7 @@ class TestCaseAccess(unittest.TestCase):
         }
 
         with self.assertRaises(Unauthorized):
-            self.case_access.case_access(
+            case_access(
                 self.case,
                 self.collection_exercise,
                 self.party_id,
@@ -122,7 +121,7 @@ class TestCaseAccess(unittest.TestCase):
         is_respondent_enrolled.return_value = False
 
         with self.assertRaises(NoSurveyPermission):
-            self.case_access.case_access(
+            case_access(
                 self.case,
                 self.collection_exercise,
                 self.party_id,
@@ -144,7 +143,7 @@ class TestCaseAccess(unittest.TestCase):
         is_respondent_enrolled.return_value = True
 
         self.assertIsNone(
-            CaseAccess.check_enrollment(
+            check_enrollment(
                 self.business_party_id,
                 self.case_id,
                 self.party_id,
@@ -160,7 +159,7 @@ class TestCaseAccess(unittest.TestCase):
         is_respondent_enrolled.return_value = False
 
         with self.assertRaises(NoSurveyPermission):
-            CaseAccess.check_enrollment(
+            check_enrollment(
                 self.business_party_id,
                 self.case_id,
                 self.party_id,
@@ -169,7 +168,7 @@ class TestCaseAccess(unittest.TestCase):
 
     def test_check_seft_success(self):
         self.assertIsNone(
-            CaseAccess.check_seft(
+            check_seft(
                 self.business_party_id,
                 self.case["caseGroup"],
                 self.survey_id,
@@ -178,7 +177,7 @@ class TestCaseAccess(unittest.TestCase):
 
     def test_check_seft_business_mismatch(self):
         with self.assertRaises(BadRequest):
-            CaseAccess.check_seft(
+            check_seft(
                 "wrong-business",
                 self.case["caseGroup"],
                 self.survey_id,
@@ -186,7 +185,7 @@ class TestCaseAccess(unittest.TestCase):
 
     def test_check_seft_survey_mismatch(self):
         with self.assertRaises(BadRequest):
-            CaseAccess.check_seft(
+            check_seft(
                 self.business_party_id,
                 self.case["caseGroup"],
                 "wrong-survey",

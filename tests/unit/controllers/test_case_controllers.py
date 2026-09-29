@@ -6,7 +6,7 @@ from werkzeug.exceptions import Forbidden, Unauthorized
 
 from config import TestingConfig
 from frontstage import app
-from frontstage.common.authorize_access import CaseAccess
+from frontstage.common.authorize_access import case_access
 from frontstage.controllers import case_controller
 from frontstage.exceptions.exceptions import (
     ApiError,
@@ -133,7 +133,7 @@ class TestCaseControllers(unittest.TestCase):
                 with self.assertRaises(ApiError):
                     self.assertRaises(ApiError, case_controller.get_case_categories())
 
-    @patch("frontstage.controllers.case_controller." "CaseAccess.case_access")
+    @patch("frontstage.controllers.case_controller.case_access")
     @patch("frontstage.controllers.case_controller.post_case_event")
     @patch("frontstage.common.eq_payload." "EqPayload.create_payload")
     def test_get_eq_url_case_group_status_not_complete(
@@ -199,7 +199,7 @@ class TestCaseControllers(unittest.TestCase):
             ),
         )
 
-    @patch("frontstage.controllers.case_controller." "CaseAccess.case_access")
+    @patch("frontstage.controllers.case_controller.case_access")
     @patch("frontstage.controllers.case_controller.post_case_event")
     @patch("frontstage.common.eq_payload." "EqPayload.create_payload")
     def test_get_eq_v3_url_case_group_status_not_complete(
@@ -323,7 +323,7 @@ class TestCaseControllers(unittest.TestCase):
         }
 
         with self.assertRaises(NoSurveyPermission):
-            CaseAccess().case_access(
+            case_access(
                 case_copy,
                 collection_exercise_copy,
                 respondent_party["id"],
@@ -512,7 +512,7 @@ class TestCaseControllers(unittest.TestCase):
                         case["partyId"], self.app_config["CASE_URL"], self.app_config["BASIC_AUTH"]
                     )
 
-    @patch("frontstage.controllers.case_controller.CaseAccess.case_access")
+    @patch("frontstage.controllers.case_controller.case_access")
     @patch("frontstage.common.eq_payload.EqPayload.create_payload")
     def test_get_eq_url_does_not_create_payload_when_authorization_fails(
         self,
@@ -546,7 +546,7 @@ class TestCaseControllers(unittest.TestCase):
 
         create_eq_payload.assert_not_called()
 
-    @patch("frontstage.controllers.case_controller.CaseAccess.case_access")
+    @patch("frontstage.controllers.case_controller.case_access")
     @patch("frontstage.controllers.case_controller.post_case_event")
     def test_get_eq_url_does_not_post_case_event_when_authorization_fails(
         self,
@@ -580,7 +580,7 @@ class TestCaseControllers(unittest.TestCase):
 
         post_case_event.assert_not_called()
 
-    @patch("frontstage.controllers.case_controller.CaseAccess.case_access")
+    @patch("frontstage.controllers.case_controller.case_access")
     @patch("frontstage.controllers.case_controller.post_case_event")
     @patch("frontstage.common.eq_payload.EqPayload.create_payload")
     def test_get_eq_url_calls_case_access(

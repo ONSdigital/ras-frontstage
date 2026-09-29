@@ -4,7 +4,7 @@ from flask import request
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
-from frontstage.common.authorize_access import CaseAccess
+from frontstage.common.authorize_access import check_enrollment
 from frontstage.controllers import (
     case_controller,
     collection_instrument_controller,
@@ -27,7 +27,7 @@ def download_survey(session):
     # Check if respondent has permission to download for this case
     case = case_controller.get_case_by_case_id(case_id)
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
-    CaseAccess.check_enrollment(business_party_id, case_id, party_id, survey)
+    check_enrollment(business_party_id, case_id, party_id, survey)
 
     collection_instrument, headers = collection_instrument_controller.download_collection_instrument(
         case["collectionInstrumentId"], case_id, party_id

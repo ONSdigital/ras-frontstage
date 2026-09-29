@@ -5,7 +5,7 @@ from structlog import wrap_logger
 
 from frontstage import app
 from frontstage.common.authorisation import jwt_authorization
-from frontstage.common.authorize_access import CaseAccess
+from frontstage.common.authorize_access import case_access
 from frontstage.controllers import (
     case_controller,
     collection_instrument_controller,
@@ -49,7 +49,7 @@ def upload_survey(session):
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
     survey_id = survey["id"]
 
-    CaseAccess.check_seft(business_party_id, case_group, survey_id)
+    case_access.check_seft(business_party_id, case_group, survey_id)
 
     business_party = party_controller.get_party_by_business_id(
         case_group["partyId"],
@@ -60,7 +60,7 @@ def upload_survey(session):
     )
 
     # Check if respondent has permission to upload for this case
-    CaseAccess.check_enrollment(business_party_id, case_id, party_id, survey)
+    case_access.check_enrollment(business_party_id, case_id, party_id, survey)
 
     upload_file = request.files["file"]
     content_length = request.content_length

@@ -53,6 +53,21 @@ class TestAddSurvey(unittest.TestCase):
         )
 
     @patch("frontstage.controllers.iac_controller.get_iac_from_enrolment")
+    @patch("frontstage.common.cryptographer.Cryptographer.encrypt")
+    def test_enrolment_code_redacted_when_adding_survey(
+        self, mock_request, encrypt_enrolment_code, get_iac_by_enrolment_code
+    ):
+        mock_request.get(url_banner_api, status_code=404)
+        encrypt_enrolment_code.return_value = encrypted_enrolment_code.encode()
+        get_iac_by_enrolment_code.return_value = active_iac
+
+        with self.assertLogs(level="INFO") as logs:
+            response = self.app.post("/surveys/add-survey", data={"enrolment_code": enrolment_code})
+
+            self.assertIn('"enrolment_code": "abcd********"', logs.output[0])
+            self.assertEqual(response.status_code, 302)
+
+    @patch("frontstage.controllers.iac_controller.get_iac_from_enrolment")
     def test_add_survey_post_no_iac_found_for_enrolment_code(self, mock_request, get_iac_by_enrolment_code):
         mock_request.get(url_banner_api, status_code=404)
         get_iac_by_enrolment_code.return_value = None

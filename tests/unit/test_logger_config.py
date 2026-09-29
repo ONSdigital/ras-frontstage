@@ -74,6 +74,14 @@ class TestLoggerConfig(unittest.TestCase):
 
         self.assertIn("GenerateException('test exception for logging'", logs[0][0].msg)
 
+    def test_log_redaction(self):
+        logger_initial_config("INFO")
+        logger = wrap_logger(logging.getLogger())
+        with self.assertLogs() as logs:
+            logger.info("Enrolment code redaction test", enrolment_code="0123456789ab")
+
+        self.assertIn('"enrolment_code": "0123********"', logs[0][0].msg)
+
     def _get_logs(self, log_level):
         logger_initial_config(log_level)
         logger = wrap_logger(logging.getLogger())

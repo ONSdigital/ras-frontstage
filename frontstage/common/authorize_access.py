@@ -15,7 +15,6 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def case_access(case, collection_exercise, party_id, business_party_id, survey_short_name):
-    """Authorize EQ access using relationships derived from the fetched case."""
     case_id = case["id"]
     case_business_party_id = case["caseGroup"]["partyId"]
     case_collection_exercise_id = case["caseGroup"]["collectionExerciseId"]

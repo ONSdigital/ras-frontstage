@@ -264,7 +264,7 @@ class TestUploadSurvey(unittest.TestCase):
             response.data,
         )
 
-    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
+    @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
     def test_upload_survey_no_permission(self, mock_request, is_respondent_enrolled):
         is_respondent_enrolled.return_value = False
         mock_request.get(url_banner_api, status_code=404)

@@ -9,6 +9,7 @@ from frontstage.controllers import (
     case_controller,
     collection_exercise_controller,
     collection_instrument_controller,
+    survey_controller,
 )
 from frontstage.views.surveys import surveys_bp
 
@@ -23,11 +24,12 @@ def download_survey(session):
     business_party_id = request.args["business_party_id"]
     survey_short_name = request.args["survey_short_name"]
     case = case_controller.get_case_by_case_id(case_id)
+    survey = survey_controller.get_survey_by_short_name(survey_short_name)
     collection_exercise = collection_exercise_controller.get_collection_exercise(
         case["caseGroup"]["collectionExerciseId"]
     )
     # Check if respondent has permission to download for this case
-    authorize_access(case, collection_exercise, party_id, business_party_id, survey_short_name)
+    authorize_access(case, collection_exercise, party_id, business_party_id, survey_short_name, survey,)
 
     logger.info("Attempting to download collection instrument", case_id=case_id, party_id=party_id)
     collection_instrument, headers = collection_instrument_controller.download_collection_instrument(

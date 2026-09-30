@@ -152,7 +152,7 @@ def get_eq_url(case, collection_exercise, party_id, business_party_id, survey_sh
 
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
 
-    authorize_access(case, collection_exercise, party_id, business_party_id, survey_short_name)
+    authorize_access(case, collection_exercise, party_id, business_party_id, survey_short_name, survey)
 
     payload = EqPayload().create_payload(case, collection_exercise, party_id, business_party_id, survey)
 

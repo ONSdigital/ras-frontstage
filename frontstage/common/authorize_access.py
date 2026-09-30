@@ -5,7 +5,6 @@ from structlog import wrap_logger
 
 from frontstage.controllers import (
     party_controller,
-    survey_controller,
 )
 from frontstage.exceptions.exceptions import (
     NoSurveyPermission,
@@ -14,11 +13,10 @@ from frontstage.exceptions.exceptions import (
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def authorize_access(case, collection_exercise, party_id, business_party_id, survey_short_name):
+def authorize_access(case, collection_exercise, party_id, business_party_id, survey_short_name, survey):
     case_id = case["id"]
     case_business_party_id = case["caseGroup"]["partyId"]
     case_collection_exercise_id = case["caseGroup"]["collectionExerciseId"]
-    survey = survey_controller.get_survey_by_short_name(survey_short_name)
 
     if business_party_id != case_business_party_id:
         logger.warning(

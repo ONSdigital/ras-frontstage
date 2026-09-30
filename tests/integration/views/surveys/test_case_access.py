@@ -46,13 +46,10 @@ class TestCaseAccess(unittest.TestCase):
         }
 
     @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
-    @patch("frontstage.common.authorize_access." "survey_controller.get_survey_by_short_name")
     def test_authorize_access_returns_true_when_authorized(
         self,
-        get_survey_by_short_name,
         is_respondent_enrolled,
     ):
-        get_survey_by_short_name.return_value = self.survey
         is_respondent_enrolled.return_value = True
 
         result = authorize_access(
@@ -61,11 +58,11 @@ class TestCaseAccess(unittest.TestCase):
             self.party_id,
             self.business_party_id,
             self.survey_short_name,
+            self.survey,
         )
 
         self.assertTrue(result)
 
-        get_survey_by_short_name.assert_called_once_with(self.survey_short_name)
         is_respondent_enrolled.assert_called_once_with(
             self.party_id,
             self.business_party_id,
@@ -73,13 +70,10 @@ class TestCaseAccess(unittest.TestCase):
         )
 
     @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
-    @patch("frontstage.common.authorize_access." "survey_controller.get_survey_by_short_name")
     def test_authorize_access_rejects_mismatched_business_party(
         self,
-        get_survey_by_short_name,
         is_respondent_enrolled,
     ):
-        get_survey_by_short_name.return_value = self.survey
 
         with self.assertRaises(BadRequest) as raised:
             authorize_access(
@@ -88,20 +82,17 @@ class TestCaseAccess(unittest.TestCase):
                 self.party_id,
                 "different-business-party-id",
                 self.survey_short_name,
+                self.survey,
             )
 
         self.assertEqual(raised.exception.code, 400)
-        get_survey_by_short_name.assert_called_once_with(self.survey_short_name)
         is_respondent_enrolled.assert_not_called()
 
     @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
-    @patch("frontstage.common.authorize_access." "survey_controller.get_survey_by_short_name")
     def test_authorize_access_rejects_mismatched_collection_exercise(
         self,
-        get_survey_by_short_name,
         is_respondent_enrolled,
     ):
-        get_survey_by_short_name.return_value = self.survey
 
         mismatched_collection_exercise = {
             **self.collection_exercise,
@@ -115,25 +106,21 @@ class TestCaseAccess(unittest.TestCase):
                 self.party_id,
                 self.business_party_id,
                 self.survey_short_name,
+                self.survey,
             )
 
         self.assertEqual(raised.exception.code, 400)
-        get_survey_by_short_name.assert_called_once_with(self.survey_short_name)
         is_respondent_enrolled.assert_not_called()
 
     @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
-    @patch("frontstage.common.authorize_access." "survey_controller.get_survey_by_short_name")
     def test_authorize_access_rejects_mismatched_survey(
         self,
-        get_survey_by_short_name,
         is_respondent_enrolled,
     ):
         mismatched_survey = {
             **self.survey,
-            "id": "different-survey-id",
+            "id": "wrong-survey-id",
         }
-
-        get_survey_by_short_name.return_value = mismatched_survey
 
         with self.assertRaises(BadRequest) as raised:
             authorize_access(
@@ -142,20 +129,18 @@ class TestCaseAccess(unittest.TestCase):
                 self.party_id,
                 self.business_party_id,
                 self.survey_short_name,
+                mismatched_survey,
             )
 
         self.assertEqual(raised.exception.code, 400)
-        get_survey_by_short_name.assert_called_once_with(self.survey_short_name)
+
         is_respondent_enrolled.assert_not_called()
 
     @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
-    @patch("frontstage.common.authorize_access." "survey_controller.get_survey_by_short_name")
     def test_authorize_access_rejects_not_enrolled(
         self,
-        get_survey_by_short_name,
         is_respondent_enrolled,
     ):
-        get_survey_by_short_name.return_value = self.survey
         is_respondent_enrolled.return_value = False
 
         with self.assertRaises(NoSurveyPermission):
@@ -165,6 +150,7 @@ class TestCaseAccess(unittest.TestCase):
                 self.party_id,
                 self.business_party_id,
                 self.survey_short_name,
+                self.survey,
             )
 
         is_respondent_enrolled.assert_called_once_with(

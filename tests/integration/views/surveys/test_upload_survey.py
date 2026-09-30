@@ -6,7 +6,6 @@ from werkzeug.exceptions import Unauthorized
 from frontstage.common.authorize_access import (
     authorize_access,
     check_enrollment,
-    check_seft,
 )
 from frontstage.exceptions.exceptions import NoSurveyPermission
 from tests.integration.mocked_services import (
@@ -215,74 +214,3 @@ class TestCaseAccess(unittest.TestCase):
             self.business_party_id,
             self.survey_id,
         )
-
-    def test_check_seft_allows_matching_business_and_survey(self):
-        result = check_seft(
-            self.business_party_id,
-            self.case["caseGroup"],
-            self.survey_id,
-        )
-
-        self.assertIsNone(result)
-
-    def test_check_seft_rejects_mismatched_business_party(self):
-        different_business_party_id = "different-business-party-id"
-
-        with self.assertLogs(
-            "frontstage.common.authorize_access",
-            level="ERROR",
-        ) as captured_logs:
-            with self.assertRaises(Unauthorized) as raised:
-                check_seft(
-                    different_business_party_id,
-                    self.case["caseGroup"],
-                    self.survey_id,
-                )
-
-        self.assertEqual(raised.exception.code, 401)
-
-        self.assertIn(
-            (
-                f"business_party_id {different_business_party_id} "
-                "does not match case_group['partyId'] "
-                f"{self.business_party_id}"
-            ),
-            "\n".join(captured_logs.output),
-        )
-
-    def test_check_seft_survey_mismatch(self):
-        different_survey_id = "different-survey-id"
-
-        with self.assertLogs(
-            "frontstage.common.authorize_access",
-            level="ERROR",
-        ) as captured_logs:
-            with self.assertRaises(Unauthorized) as raised:
-                check_seft(
-                    self.business_party_id,
-                    self.case["caseGroup"],
-                    different_survey_id,
-                )
-
-        self.assertEqual(raised.exception.code, 401)
-
-        self.assertIn(
-            (f"survey_id {different_survey_id} and " f"case_group['surveyId'] {self.survey_id}"),
-            "\n".join(captured_logs.output),
-        )
-
-    @patch("frontstage.common.authorize_access.abort")
-    def test_check_seft_stops_after_business_party_mismatch(
-        self,
-        abort,
-    ):
-        abort.side_effect = Unauthorized()
-
-        with self.assertRaises(Unauthorized):
-            check_seft(
-                "different-business-party-id",
-                self.case["caseGroup"],
-                "different-survey-id",
-            )
-
-        abort.assert_called_once_with(401)

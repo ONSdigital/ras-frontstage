@@ -6,9 +6,15 @@ from werkzeug.exceptions import Unauthorized
 from frontstage.common.authorize_access import (
     authorize_access,
     check_enrollment,
-    check_seft,
 )
 from frontstage.exceptions.exceptions import NoSurveyPermission
+from tests.integration.mocked_services import (
+    business_party,
+    case,
+    collection_exercise,
+    respondent_party,
+    survey_eq,
+)
 
 
 class TestCaseAccess(unittest.TestCase):
@@ -121,22 +127,35 @@ class TestCaseAccess(unittest.TestCase):
         get_survey_by_short_name,
         is_respondent_enrolled,
     ):
-        get_survey_by_short_name.return_value = self.survey
+        get_survey_by_short_name.return_value = survey_eq
         is_respondent_enrolled.return_value = False
+
+        collection_exercise_copy = {
+            **collection_exercise,
+            "surveyId": survey_eq["id"],
+        }
+
+        case_copy = {
+            **case,
+            "caseGroup": {
+                **case["caseGroup"],
+                "partyId": business_party["id"],
+            },
+        }
 
         with self.assertRaises(NoSurveyPermission):
             authorize_access(
-                self.case,
-                self.collection_exercise,
-                self.party_id,
-                self.business_party_id,
-                self.survey_short_name,
+                case_copy,
+                collection_exercise_copy,
+                respondent_party["id"],
+                business_party["id"],
+                survey_eq["shortName"],
             )
 
         is_respondent_enrolled.assert_called_once_with(
-            self.party_id,
-            self.business_party_id,
-            self.survey_id,
+            respondent_party["id"],
+            business_party["id"],
+            survey_eq["id"],
         )
 
     @patch("frontstage.common.authorize_access.party_controller.is_respondent_enrolled")
@@ -169,30 +188,3 @@ class TestCaseAccess(unittest.TestCase):
                 self.party_id,
                 self.survey,
             )
-
-    def test_check_seft_success(self):
-        self.assertIsNone(
-            check_seft(
-                self.business_party_id,
-                self.case["caseGroup"],
-                self.survey_id,
-            )
-        )
-
-    def test_check_seft_business_mismatch(self):
-        with self.assertRaises(Unauthorized) as raised:
-            check_seft(
-                "wrong-business",
-                self.case["caseGroup"],
-                self.survey_id,
-            )
-        self.assertEqual(raised.exception.code, 401)
-
-    def test_check_seft_survey_mismatch(self):
-        with self.assertRaises(Unauthorized) as raised:
-            check_seft(
-                self.business_party_id,
-                self.case["caseGroup"],
-                "wrong-survey",
-            )
-        self.assertEqual(raised.exception.code, 401)

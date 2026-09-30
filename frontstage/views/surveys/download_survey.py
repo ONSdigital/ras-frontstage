@@ -26,11 +26,10 @@ def download_survey(session):
     collection_exercise = collection_exercise_controller.get_collection_exercise(
         case["caseGroup"]["collectionExerciseId"]
     )
-    logger.info("Attempting to download collection instrument", case_id=case_id, party_id=party_id)
-
     # Check if respondent has permission to download for this case
     authorize_access(case, collection_exercise, party_id, business_party_id, survey_short_name)
 
+    logger.info("Attempting to download collection instrument", case_id=case_id, party_id=party_id)
     collection_instrument, headers = collection_instrument_controller.download_collection_instrument(
         case["collectionInstrumentId"], case_id, party_id
     )

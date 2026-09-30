@@ -53,9 +53,6 @@ def upload_survey(session):
         case["caseGroup"]["collectionExerciseId"]
     )
 
-    # Check if respondent has permission to upload for this case
-    authorize_access(case, collection_exercise, party_id, business_party_id, survey_short_name)
-
     business_party = party_controller.get_party_by_business_id(
         case_group["partyId"],
         app.config["PARTY_URL"],
@@ -63,6 +60,9 @@ def upload_survey(session):
         collection_exercise_id=collection_exercise_id,
         verbose=True,
     )
+
+    # Check if respondent has permission to upload for this case
+    authorize_access(case, collection_exercise, party_id, business_party_id, survey_short_name)
 
     upload_file = request.files["file"]
     content_length = request.content_length

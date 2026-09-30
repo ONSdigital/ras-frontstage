@@ -1,13 +1,11 @@
 import unittest
 from unittest.mock import patch
 
-from werkzeug.exceptions import BadRequest
-
-from frontstage.common.authorize_access import check_enrollment, check_seft
+from frontstage.common.authorize_access import check_enrollment
 from frontstage.exceptions.exceptions import NoSurveyPermission
 
 
-class SeftAccessTests(unittest.TestCase):
+class TestValidateEnrollment(unittest.TestCase):
 
     def setUp(self):
 
@@ -67,28 +65,3 @@ class SeftAccessTests(unittest.TestCase):
             self.business_party_id,
             self.survey["id"],
         )
-
-    def test_check_this_success(self):
-        result = check_seft(
-            self.business_party_id,
-            self.case_group,
-            self.survey["id"],
-        )
-
-        self.assertIsNone(result)
-
-    def test_check_this_business_party_mismatch(self):
-        with self.assertRaises(BadRequest):
-            check_seft(
-                "different-business-party-id",
-                self.case_group,
-                self.survey["id"],
-            )
-
-    def test_check_this_survey_mismatch(self):
-        with self.assertRaises(BadRequest):
-            check_seft(
-                self.business_party_id,
-                self.case_group,
-                "different-survey-id",
-            )

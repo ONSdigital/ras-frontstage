@@ -56,14 +56,3 @@ def authorize_access(case, collection_exercise, party_id, business_party_id, sur
 def check_enrollment(business_party_id, case_id, party_id, survey):
     if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey["id"]):
         raise NoSurveyPermission(party_id, case_id)
-
-
-def check_seft(business_party_id, case_group, survey_id):
-    if business_party_id != case_group["partyId"]:
-        logger.error(
-            f"business_party_id {business_party_id} does not match case_group['partyId'] {case_group['partyId']}"
-        )
-        abort(401)
-    if survey_id != case_group["surveyId"]:
-        logger.error(f"survey_id {survey_id} and case_group['surveyId'] {case_group['surveyId']}")
-        abort(401)

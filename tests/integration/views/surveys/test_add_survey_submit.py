@@ -84,6 +84,39 @@ class TestAddSurveySubmit(unittest.TestCase):
     @patch("frontstage.controllers.case_controller.get_case_by_enrolment_code")
     @patch("frontstage.controllers.iac_controller.get_iac_from_enrolment")
     @patch("frontstage.common.cryptographer.Cryptographer.decrypt")
+    def test_enrolment_code_redacted_when_survey_submitted(
+        self,
+        mock_request,
+        decrypt_enrolment_code,
+        get_iac_from_enrolment_code,
+        get_case_by_enrolment,
+        get_collection_exercise,
+        get_party_by_business_id,
+        *_,
+    ):
+        mock_request.get(url_banner_api, status_code=404)
+        decrypt_enrolment_code.return_value = enrolment_code.encode()
+        get_iac_from_enrolment_code.return_value = active_iac
+        get_case_by_enrolment.return_value = case
+        get_collection_exercise.return_value = collection_exercise
+        get_party_by_business_id.return_value = business_party
+
+        with self.assertLogs(level="INFO") as logs:
+            response = self.app.get(
+                f"/surveys/add-survey/add-survey-submit?encrypted_enrolment_code={encrypted_enrolment_code}"
+            )
+
+            self.assertIn('"enrolment_code": "ABCD********"', logs.output[0])
+            self.assertEqual(response.status_code, 302)
+
+    @requests_mock.mock()
+    @patch("frontstage.controllers.party_controller.add_survey")
+    @patch("frontstage.controllers.case_controller.post_case_event")
+    @patch("frontstage.controllers.party_controller.get_party_by_business_id")
+    @patch("frontstage.controllers.collection_exercise_controller.get_collection_exercise")
+    @patch("frontstage.controllers.case_controller.get_case_by_enrolment_code")
+    @patch("frontstage.controllers.iac_controller.get_iac_from_enrolment")
+    @patch("frontstage.common.cryptographer.Cryptographer.decrypt")
     def test_add_survey_submit_already_enrolled(
         self,
         mock_request,

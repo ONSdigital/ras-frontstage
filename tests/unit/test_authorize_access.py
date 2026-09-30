@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from werkzeug.exceptions import Unauthorized
+from werkzeug.exceptions import BadRequest
 
 from frontstage.common.authorize_access import (
     authorize_access,
@@ -73,7 +73,7 @@ class TestCaseAccess(unittest.TestCase):
     ):
         get_survey_by_short_name.return_value = self.survey
 
-        with self.assertRaises(Unauthorized):
+        with self.assertRaises(BadRequest):
             authorize_access(
                 self.case,
                 self.collection_exercise,
@@ -89,7 +89,7 @@ class TestCaseAccess(unittest.TestCase):
     ):
         get_survey_by_short_name.return_value = self.survey
 
-        with self.assertRaises(Unauthorized):
+        with self.assertRaises(BadRequest):
             authorize_access(
                 self.case,
                 {
@@ -111,7 +111,7 @@ class TestCaseAccess(unittest.TestCase):
             "shortName": self.survey_short_name,
         }
 
-        with self.assertRaises(Unauthorized):
+        with self.assertRaises(BadRequest):
             authorize_access(
                 self.case,
                 self.collection_exercise,

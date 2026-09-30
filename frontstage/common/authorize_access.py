@@ -28,7 +28,7 @@ def authorize_access(case, collection_exercise, party_id, business_party_id, sur
             supplied_business_party_id=business_party_id,
             case_business_party_id=case_business_party_id,
         )
-        abort(401)
+        abort(400)
 
     if collection_exercise["id"] != case_collection_exercise_id:
         logger.warning(
@@ -38,7 +38,7 @@ def authorize_access(case, collection_exercise, party_id, business_party_id, sur
             collection_exercise_id=collection_exercise["id"],
             case_collection_exercise_id=case_collection_exercise_id,
         )
-        abort(401)
+        abort(400)
 
     if survey["id"] != collection_exercise["surveyId"]:
         logger.warning(
@@ -48,7 +48,7 @@ def authorize_access(case, collection_exercise, party_id, business_party_id, sur
             supplied_survey_id=survey["id"],
             collection_exercise_survey_id=collection_exercise["surveyId"],
         )
-        abort(401)
+        abort(400)
     check_enrollment(business_party_id, case_id, party_id, survey)
     return True
 

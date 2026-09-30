@@ -381,9 +381,4 @@ class TestUploadSurvey(unittest.TestCase):
             ),
             data=survey_file,
         )
-
-        print(response.status_code)
-        print(response.location)
-        print(response.data.decode())
-
         self.assertEqual(response.status_code, 400)

@@ -30,7 +30,9 @@ def logger_initial_config(log_level: str = "INFO") -> None:
 
     def redaction_filter(_, __, event_dict: dict) -> dict:
         if "enrolment_code" in event_dict:
-            event_dict["enrolment_code"] = event_dict["enrolment_code"][:-8] + "********"
+            event_dict["enrolment_code"] = (
+                event_dict["enrolment_code"][: -max(0, len(event_dict["enrolment_code"]) - 4)] + "********"
+            )
         return event_dict
 
     logging.basicConfig(format="%(message)s", stream=sys.stdout, level=logging.INFO)

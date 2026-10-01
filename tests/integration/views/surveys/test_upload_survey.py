@@ -13,11 +13,13 @@ from tests.integration.mocked_services import (
     case,
     collection_exercise,
     encoded_jwt_token,
+    respondent_party,
     survey,
     survey_eq,
     url_banner_api,
     url_get_business_party,
     url_get_case,
+    url_get_collection_exercise,
     url_get_survey_by_short_name,
     url_get_survey_by_short_name_eq,
 )
@@ -42,53 +44,147 @@ class TestUploadSurvey(unittest.TestCase):
     def tearDown(self):
         self.patcher.stop()
 
-    @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
-    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
-    def test_upload_survey_success(self, mock_request, _, upload_collection_instrument):
-        mock_request.get(
-            f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True",
-            json=business_party,
-            status_code=200,
-        )
-        mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
-        mock_request.get(url_get_case, json=case, status_code=200)
+    @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
+    @patch("frontstage.controllers.collection_instrument_controller." "upload_collection_instrument")
+    def test_upload_survey_success(
+        self,
+        mock_request,
+        upload_collection_instrument,
+        is_respondent_enrolled,
+    ):
+        is_respondent_enrolled.return_value = True
         upload_collection_instrument.return_value = None
-        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
-        response = self.app.post(
-            f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-            f'&survey_short_name={survey["shortName"]}',
-            data=self.survey_file,
-        )
 
-        self.assertEqual(response.status_code, 200)
-
-    @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
-    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
-    def test_upload_survey_validation_errors(self, mock_request, _, upload_collection_instrument):
         mock_request.get(
-            f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True",
+            (f"{url_get_business_party}" f"?collection_exercise_id={collection_exercise['id']}" "&verbose=True"),
             json=business_party,
             status_code=200,
         )
-        mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
-        mock_request.get(url_get_case, json=case, status_code=200)
-        upload_collection_instrument.return_value = [
-            "The spreadsheet must be in .xls or .xlsx format",
-            "The file name of your spreadsheet must be less than 50 characters long",
-        ]
-        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
-        response = self.app.post(
-            f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-            f'&survey_short_name={survey["shortName"]}',
-            data=self.survey_file,
+        mock_request.get(
+            url_banner_api,
+            status_code=404,
+        )
+        mock_request.get(
+            url_get_survey_by_short_name,
+            json=survey,
+            status_code=200,
+        )
+        mock_request.get(
+            url_get_case,
+            json=case,
+            status_code=200,
+        )
+        mock_request.get(
+            url_get_collection_exercise,
+            json=collection_exercise,
+            status_code=200,
         )
 
-        self.assertIn("There are 2 problems with your answer.".encode(), response.data)
-        self.assertIn("The spreadsheet must be in .xls or .xlsx format".encode(), response.data)
-        self.assertIn("The file name of your spreadsheet must be less than 50 characters long".encode(), response.data)
+        survey_file = {
+            "file": (
+                io.BytesIO(b"my file contents"),
+                "testfile.xlsx",
+            )
+        }
+
+        response = self.app.post(
+            (
+                "/surveys/upload-survey"
+                f"?case_id={case['id']}"
+                f"&business_party_id={business_party['id']}"
+                f"&survey_short_name={survey['shortName']}"
+            ),
+            data=survey_file,
+        )
+
         self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            b"testfile.xlsx",
+            response.data,
+        )
+
+        is_respondent_enrolled.assert_called_once_with(
+            respondent_party["id"],
+            business_party["id"],
+            survey["id"],
+        )
+
+        upload_collection_instrument.assert_called_once()
+
+    @patch("frontstage.views.surveys.upload_survey.authorize_access")
+    @patch("frontstage.controllers.collection_instrument_controller." "upload_collection_instrument")
+    def test_upload_survey_validation_errors(
+        self,
+        mock_request,
+        upload_collection_instrument,
+        mock_authorize_access,
+    ):
+        mock_authorize_access.return_value = True
+
+        mock_request.get(
+            (f"{url_get_business_party}" f"?collection_exercise_id={collection_exercise['id']}" "&verbose=True"),
+            json=business_party,
+            status_code=200,
+        )
+        mock_request.get(
+            url_banner_api,
+            status_code=404,
+        )
+        mock_request.get(
+            url_get_survey_by_short_name,
+            json=survey,
+            status_code=200,
+        )
+        mock_request.get(
+            url_get_case,
+            json=case,
+            status_code=200,
+        )
+        mock_request.get(
+            url_get_collection_exercise,
+            json=collection_exercise,
+            status_code=200,
+        )
+
+        validation_errors = [
+            "The spreadsheet must be in .xls or .xlsx format",
+            ("The file name of your spreadsheet must be " "less than 50 characters long"),
+        ]
+        upload_collection_instrument.return_value = validation_errors
+
+        survey_file = {
+            "file": (
+                io.BytesIO(b"my file contents"),
+                "testfile.xlsx",
+            )
+        }
+
+        response = self.app.post(
+            (
+                "/surveys/upload-survey"
+                f"?case_id={case['id']}"
+                f"&business_party_id={business_party['id']}"
+                f"&survey_short_name={survey['shortName']}"
+            ),
+            data=survey_file,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            b"There are 2 problems with your answer.",
+            response.data,
+        )
+        self.assertIn(
+            b"The spreadsheet must be in .xls or .xlsx format",
+            response.data,
+        )
+        self.assertIn(
+            (b"The file name of your spreadsheet must be " b"less than 50 characters long"),
+            response.data,
+        )
+
+        mock_authorize_access.assert_called_once()
+        upload_collection_instrument.assert_called_once()
 
     def test_upload_survey_missing_required_data(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
@@ -98,29 +194,77 @@ class TestUploadSurvey(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 400)
 
-    @patch("frontstage.controllers.collection_instrument_controller.upload_collection_instrument")
-    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
-    def test_upload_survey_ci_upload_error(self, mock_request, _, upload_collection_instrument):
+    @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
+    @patch("frontstage.controllers.collection_instrument_controller." "upload_collection_instrument")
+    def test_upload_survey_ci_upload_error(
+        self,
+        mock_request,
+        upload_collection_instrument,
+        is_respondent_enrolled,
+    ):
+        is_respondent_enrolled.return_value = True
+
         mock_request.get(
-            f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True",
+            f"{url_get_business_party}" f"?collection_exercise_id={collection_exercise['id']}" "&verbose=True",
             json=business_party,
             status_code=200,
         )
-        mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
-        mock_request.get(url_get_case, json=case, status_code=200)
+
+        mock_request.get(
+            url_banner_api,
+            status_code=404,
+        )
+
+        mock_request.get(
+            url_get_survey_by_short_name,
+            json=survey,
+            status_code=200,
+        )
+
+        mock_request.get(
+            url_get_case,
+            json=case,
+            status_code=200,
+        )
+
+        mock_request.get(
+            url_get_collection_exercise,
+            json=collection_exercise,
+            status_code=200,
+        )
+
         upload_collection_instrument.side_effect = CiUploadError("Upload failed")
 
-        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
-        response = self.app.post(
-            f'/surveys/upload-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-            f'&survey_short_name={survey["shortName"]}',
-            data=self.survey_file,
-        )
-        self.assertIn("There is 1 error on this page".encode(), response.data)
-        self.assertIn("The selected file could not be uploaded. Please try again.".encode(), response.data)
+        survey_file = {
+            "file": (
+                io.BytesIO(b"my file contents"),
+                "testfile.xlsx",
+            )
+        }
 
-    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
+        response = self.app.post(
+            (
+                "/surveys/upload-survey"
+                f"?case_id={case['id']}"
+                f"&business_party_id={business_party['id']}"
+                f"&survey_short_name={survey['shortName']}"
+            ),
+            data=survey_file,
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertIn(
+            b"There is 1 error on this page",
+            response.data,
+        )
+
+        self.assertIn(
+            (b"The selected file could not be uploaded. " b"Please try again."),
+            response.data,
+        )
+
+    @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
     def test_upload_survey_no_permission(self, mock_request, is_respondent_enrolled):
         is_respondent_enrolled.return_value = False
         mock_request.get(url_banner_api, status_code=404)
@@ -131,48 +275,113 @@ class TestUploadSurvey(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 500)
 
-    def test_upload_survey_ci_upload_with_mismatched_business_id(self, mock_request):
+    def test_upload_survey_ci_upload_with_mismatched_business_id(
+        self,
+        mock_request,
+    ):
+        mismatched_business_party_id = "f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b"
+
         mock_request.get(
-            f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True",
+            url_banner_api,
+            status_code=404,
+        )
+
+        mock_request.get(
+            url_get_case,
+            json=case,
+            status_code=200,
+        )
+
+        mock_request.get(
+            url_get_collection_exercise,
+            json=collection_exercise,
+            status_code=200,
+        )
+
+        mock_request.get(
+            url_get_survey_by_short_name,
+            json=survey,
+            status_code=200,
+        )
+
+        mock_request.get(
+            (f"{url_get_business_party}" f"?collection_exercise_id={collection_exercise['id']}" "&verbose=True"),
             json=business_party,
             status_code=200,
         )
 
-        mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
-        mock_request.get(url_get_case, json=case, status_code=200)
-        business_party_id = "f956e8ae-6e0f-4414-b0cf-a07c1aa3e37b"
+        survey_file = {
+            "file": (
+                io.BytesIO(b"my file contents"),
+                "testfile.xlsx",
+            )
+        }
 
-        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
         response = self.app.post(
-            f'/surveys/upload-survey?case_id={case["id"]}'
-            f'&business_party_id={business_party_id}&survey_short_name={survey["shortName"]}',
-            data=self.survey_file,
-        )
-        self.assertEqual(response.status_code, 400)
-        self.assertLogs(
-            f"business_party_id {business_party_id} does not match case_group['partyId'] " f"{case["partyId"]}",
-            response.data,
+            (
+                "/surveys/upload-survey"
+                f"?case_id={case['id']}"
+                f"&business_party_id={mismatched_business_party_id}"
+                f"&survey_short_name={survey['shortName']}"
+            ),
+            data=survey_file,
         )
 
-    def test_upload_survey_ci_upload_with_mismatched_survey_id(self, mock_request):
+        self.assertEqual(response.status_code, 401)
+
+    @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
+    def test_upload_survey_ci_upload_with_mismatched_survey_id(
+        self,
+        mock_request,
+        is_respondent_enrolled,
+    ):
+        is_respondent_enrolled.return_value = True
+
         mock_request.get(
-            f"{url_get_business_party}?collection_exercise_id={collection_exercise['id']}&verbose=True",
+            url_banner_api,
+            status_code=404,
+        )
+
+        mock_request.get(
+            url_get_case,
+            json=case,
+            status_code=200,
+        )
+
+        mock_request.get(
+            url_get_collection_exercise,
+            json=collection_exercise,
+            status_code=200,
+        )
+
+        mock_request.get(
+            (f"{url_get_business_party}" f"?collection_exercise_id={collection_exercise['id']}" "&verbose=True"),
             json=business_party,
             status_code=200,
         )
 
-        mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_survey_by_short_name_eq, json=survey_eq, status_code=200)
-        mock_request.get(url_get_case, json=case, status_code=200)
+        mock_request.get(
+            url_get_survey_by_short_name_eq,
+            json=survey_eq,
+            status_code=200,
+        )
 
-        self.survey_file = dict(file=(io.BytesIO(b"my file contents"), "testfile.xlsx"))
+        survey_file = {
+            "file": (
+                io.BytesIO(b"my file contents"),
+                "testfile.xlsx",
+            )
+        }
+
         response = self.app.post(
-            f'/surveys/upload-survey?case_id={case["id"]}'
-            f'&business_party_id={business_party["id"]}&survey_short_name=QBS',
-            data=self.survey_file,
+            (
+                "/surveys/upload-survey"
+                f"?case_id={case['id']}"
+                f"&business_party_id={business_party['id']}"
+                "&survey_short_name=QBS"
+            ),
+            data=survey_file,
         )
-        self.assertEqual(response.status_code, 400)
-        self.assertLogs(
-            f"survey_id{survey_eq["id"]} and case_group['surveyId'] {case["caseGroup"]['surveyId']}", response.data
-        )
+
+        self.assertEqual(response.status_code, 401)
+        is_respondent_enrolled.assert_not_called()

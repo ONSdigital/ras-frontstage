@@ -68,6 +68,21 @@ class TestRegistration(unittest.TestCase):
         self.assertTrue("confirm-organisation-survey".encode() in response.data)
 
     @requests_mock.mock()
+    def test_enrolment_code_redacted_on_account_creation(self, mock_request):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_validate_enrolment, json={"active": True, "caseId": case["id"]}, status_code=200)
+        mock_request.get(url_get_case_by_enrolment_code, json=case)
+        mock_request.get(url_get_case_categories, json=categories)
+        mock_request.post(url_post_case_event_uuid, status_code=201)
+        mock_request.post(url_create_account)
+
+        with self.assertLogs(level="INFO") as logs:
+            response = self.app.post("/register/create-account", data={"enrolment_code": enrolment_code})
+
+            self.assertIn('"enrolment_code": "abcd********"', logs.output[0])
+            self.assertEqual(response.status_code, 302)
+
+    @requests_mock.mock()
     def test_enter_enrolment_code_no_enrolment_code(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         response = self.app.post("/register/create-account")

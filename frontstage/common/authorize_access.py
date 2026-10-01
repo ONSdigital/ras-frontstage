@@ -17,9 +17,23 @@ def authorize_access(case, collection_exercise, party_id, business_party_id, sur
     case_business_party_id = case["caseGroup"]["partyId"]
 
     if business_party_id != case_business_party_id:
+        logger.warning(
+            "Business does not belong to Case",
+            case_id=case_id,
+            party_id=party_id,
+            supplied_survey_id=survey_id,
+            collection_exercise_survey_id=collection_exercise["surveyId"],
+        )
         raise NoSurveyPermission(party_id=party_id, case_id=case_id)
 
     if survey_id != collection_exercise["surveyId"]:
+        logger.warning(
+            "Survey does not belong to Collection Exercise",
+            case_id=case_id,
+            party_id=party_id,
+            supplied_survey_id=survey_id,
+            collection_exercise_survey_id=collection_exercise["surveyId"],
+        )
         raise NoSurveyPermission(party_id, case_id)
 
     check_enrollment(business_party_id, case_id, party_id, survey_id)

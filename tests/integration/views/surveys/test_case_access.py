@@ -57,8 +57,7 @@ class TestCaseAccess(unittest.TestCase):
             self.collection_exercise,
             self.party_id,
             self.business_party_id,
-            self.survey_short_name,
-            self.survey,
+            self.survey_id,
         )
 
         self.assertTrue(result)
@@ -81,32 +80,7 @@ class TestCaseAccess(unittest.TestCase):
                 self.collection_exercise,
                 self.party_id,
                 "different-business-party-id",
-                self.survey_short_name,
-                self.survey,
-            )
-
-        self.assertEqual(raised.exception.code, 400)
-        is_respondent_enrolled.assert_not_called()
-
-    @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
-    def test_authorize_access_rejects_mismatched_collection_exercise(
-        self,
-        is_respondent_enrolled,
-    ):
-
-        mismatched_collection_exercise = {
-            **self.collection_exercise,
-            "id": "different-collection-exercise-id",
-        }
-
-        with self.assertRaises(BadRequest) as raised:
-            authorize_access(
-                self.case,
-                mismatched_collection_exercise,
-                self.party_id,
-                self.business_party_id,
-                self.survey_short_name,
-                self.survey,
+                self.survey_id,
             )
 
         self.assertEqual(raised.exception.code, 400)
@@ -117,10 +91,6 @@ class TestCaseAccess(unittest.TestCase):
         self,
         is_respondent_enrolled,
     ):
-        mismatched_survey = {
-            **self.survey,
-            "id": "wrong-survey-id",
-        }
 
         with self.assertRaises(BadRequest) as raised:
             authorize_access(
@@ -128,8 +98,7 @@ class TestCaseAccess(unittest.TestCase):
                 self.collection_exercise,
                 self.party_id,
                 self.business_party_id,
-                self.survey_short_name,
-                mismatched_survey,
+                "wrong-survey-id",
             )
 
         self.assertEqual(raised.exception.code, 400)
@@ -149,8 +118,7 @@ class TestCaseAccess(unittest.TestCase):
                 self.collection_exercise,
                 self.party_id,
                 self.business_party_id,
-                self.survey_short_name,
-                self.survey,
+                self.survey_id,
             )
 
         is_respondent_enrolled.assert_called_once_with(
@@ -170,7 +138,7 @@ class TestCaseAccess(unittest.TestCase):
             self.business_party_id,
             self.case_id,
             self.party_id,
-            self.survey,
+            self.survey_id,
         )
 
         self.assertIsNone(result)
@@ -192,7 +160,7 @@ class TestCaseAccess(unittest.TestCase):
                 self.business_party_id,
                 self.case_id,
                 self.party_id,
-                self.survey,
+                self.survey_id,
             )
 
         is_respondent_enrolled.assert_called_once_with(

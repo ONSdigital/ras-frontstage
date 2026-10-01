@@ -34,8 +34,7 @@ def download_survey(session):
         collection_exercise,
         party_id,
         business_party_id,
-        survey_short_name,
-        survey,
+        survey["id"],
     )
 
     logger.info("Attempting to download collection instrument", case_id=case_id, party_id=party_id)

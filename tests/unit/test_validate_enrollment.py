@@ -34,7 +34,7 @@ class TestValidateEnrollment(unittest.TestCase):
             self.business_party_id,
             self.case_id,
             self.party_id,
-            self.survey,
+            self.survey["id"],
         )
 
         self.assertIsNone(result)
@@ -57,7 +57,7 @@ class TestValidateEnrollment(unittest.TestCase):
                 self.business_party_id,
                 self.case_id,
                 self.party_id,
-                self.survey,
+                self.survey["id"],
             )
 
         is_respondent_enrolled.assert_called_once_with(

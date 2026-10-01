@@ -13,10 +13,9 @@ from frontstage.exceptions.exceptions import (
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def authorize_access(case, collection_exercise, party_id, business_party_id, survey_short_name, survey):
+def authorize_access(case, collection_exercise, party_id, business_party_id, survey_id):
     case_id = case["id"]
     case_business_party_id = case["caseGroup"]["partyId"]
-    case_collection_exercise_id = case["caseGroup"]["collectionExerciseId"]
 
     if business_party_id != case_business_party_id:
         logger.warning(
@@ -28,29 +27,19 @@ def authorize_access(case, collection_exercise, party_id, business_party_id, sur
         )
         abort(400)
 
-    if collection_exercise["id"] != case_collection_exercise_id:
-        logger.warning(
-            "Collection exercise does not belong to case",
-            case_id=case_id,
-            party_id=party_id,
-            collection_exercise_id=collection_exercise["id"],
-            case_collection_exercise_id=case_collection_exercise_id,
-        )
-        abort(400)
-
-    if survey["id"] != collection_exercise["surveyId"]:
+    if survey_id != collection_exercise["surveyId"]:
         logger.warning(
             "Survey does not belong to collection exercise",
             case_id=case_id,
             party_id=party_id,
-            supplied_survey_id=survey["id"],
+            supplied_survey_id=survey_id,
             collection_exercise_survey_id=collection_exercise["surveyId"],
         )
         abort(400)
-    check_enrollment(business_party_id, case_id, party_id, survey)
+    check_enrollment(business_party_id, case_id, party_id, survey_id)
     return True
 
 
-def check_enrollment(business_party_id, case_id, party_id, survey):
-    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey["id"]):
+def check_enrollment(business_party_id, case_id, party_id, survey_id):
+    if not party_controller.is_respondent_enrolled(party_id, business_party_id, survey_id):
         raise NoSurveyPermission(party_id, case_id)

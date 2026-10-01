@@ -176,8 +176,7 @@ class TestCaseControllers(unittest.TestCase):
             collection_exercise_copy,
             respondent_party["id"],
             business_party["id"],
-            survey_eq["shortName"],
-            survey_eq,
+            survey_eq["id"],
         )
 
         create_eq_payload.assert_called_once_with(
@@ -243,8 +242,7 @@ class TestCaseControllers(unittest.TestCase):
             collection_exercise_copy,
             respondent_party["id"],
             business_party["id"],
-            survey_eq["shortName"],
-            survey_eq,
+            survey_eq["id"],
         )
 
         create_eq_payload.assert_called_once_with(

@@ -58,8 +58,7 @@ class TestCaseAccess(unittest.TestCase):
             self.collection_exercise,
             self.party_id,
             self.business_party_id,
-            self.survey_short_name,
-            self.survey,
+            self.survey_id,
         )
 
         self.assertTrue(result)
@@ -79,26 +78,22 @@ class TestCaseAccess(unittest.TestCase):
                 self.collection_exercise,
                 self.party_id,
                 "wrong-business",
-                self.survey_short_name,
-                self.survey,
+                self.survey_id,
             )
 
     def test_authorize_access_rejects_mismatched_collection_exercise(
         self,
     ):
-
-        with self.assertRaises(BadRequest):
+        with self.assertRaises(BadRequest) as raised:
             authorize_access(
                 self.case,
-                {
-                    "id": "wrong-collection-exercise",
-                    "surveyId": self.survey_id,
-                },
+                self.collection_exercise,
                 self.party_id,
                 self.business_party_id,
-                self.survey_short_name,
-                self.survey,
+                "wrong-survey-id",
             )
+
+        self.assertEqual(raised.exception.code, 400)
 
     @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
     def test_authorize_access_rejects_mismatched_survey(
@@ -106,19 +101,13 @@ class TestCaseAccess(unittest.TestCase):
         is_respondent_enrolled,
     ):
 
-        mismatched_survey = {
-            **self.survey,
-            "id": "wrong-survey-id",
-        }
-
         with self.assertRaises(BadRequest) as raised:
             authorize_access(
                 self.case,
                 self.collection_exercise,
                 self.party_id,
                 self.business_party_id,
-                self.survey_short_name,
-                mismatched_survey,
+                "wrong-survey-id",
             )
 
         self.assertEqual(raised.exception.code, 400)
@@ -150,8 +139,7 @@ class TestCaseAccess(unittest.TestCase):
                 collection_exercise_copy,
                 respondent_party["id"],
                 business_party["id"],
-                survey_eq["shortName"],
-                survey_eq,
+                survey_eq["id"],
             )
 
         is_respondent_enrolled.assert_called_once_with(

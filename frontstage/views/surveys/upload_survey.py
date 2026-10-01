@@ -61,7 +61,7 @@ def upload_survey(session):
     )
 
     # Check if respondent has permission to upload for this case
-    authorize_access(case, collection_exercise, party_id, business_party_id, survey_short_name, survey)
+    authorize_access(case, collection_exercise, party_id, business_party_id, survey["id"])
 
     upload_file = request.files["file"]
     content_length = request.content_length

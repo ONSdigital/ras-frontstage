@@ -1,8 +1,6 @@
 import unittest
 from unittest.mock import patch
 
-from werkzeug.exceptions import BadRequest
-
 from frontstage.common.authorize_access import (
     authorize_access,
     check_enrollment,
@@ -74,7 +72,7 @@ class TestCaseAccess(unittest.TestCase):
         is_respondent_enrolled,
     ):
 
-        with self.assertRaises(BadRequest) as raised:
+        with self.assertRaises(NoSurveyPermission) as raised:
             authorize_access(
                 self.case,
                 self.collection_exercise,
@@ -83,7 +81,8 @@ class TestCaseAccess(unittest.TestCase):
                 self.survey_id,
             )
 
-        self.assertEqual(raised.exception.code, 400)
+        self.assertEqual(raised.exception.party_id, self.party_id)
+        self.assertEqual(raised.exception.case_id, self.case_id)
         is_respondent_enrolled.assert_not_called()
 
     @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
@@ -92,7 +91,7 @@ class TestCaseAccess(unittest.TestCase):
         is_respondent_enrolled,
     ):
 
-        with self.assertRaises(BadRequest) as raised:
+        with self.assertRaises(NoSurveyPermission) as raised:
             authorize_access(
                 self.case,
                 self.collection_exercise,
@@ -101,7 +100,8 @@ class TestCaseAccess(unittest.TestCase):
                 "wrong-survey-id",
             )
 
-        self.assertEqual(raised.exception.code, 400)
+        self.assertEqual(raised.exception.party_id, self.party_id)
+        self.assertEqual(raised.exception.case_id, self.case_id)
 
         is_respondent_enrolled.assert_not_called()
 

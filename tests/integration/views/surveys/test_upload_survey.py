@@ -327,15 +327,16 @@ class TestUploadSurvey(unittest.TestCase):
             data=survey_file,
         )
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 401)
 
-    @patch("frontstage.common.authorize_access.party_controller.is_respondent_enrolled")
+    @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
     def test_upload_survey_ci_upload_with_mismatched_survey_id(
         self,
         mock_request,
         is_respondent_enrolled,
     ):
         is_respondent_enrolled.return_value = True
+
         mock_request.get(
             url_banner_api,
             status_code=404,
@@ -354,7 +355,7 @@ class TestUploadSurvey(unittest.TestCase):
         )
 
         mock_request.get(
-            f"{url_get_business_party}" f"?collection_exercise_id={collection_exercise['id']}" "&verbose=True",
+            (f"{url_get_business_party}" f"?collection_exercise_id={collection_exercise['id']}" "&verbose=True"),
             json=business_party,
             status_code=200,
         )
@@ -381,4 +382,6 @@ class TestUploadSurvey(unittest.TestCase):
             ),
             data=survey_file,
         )
-        self.assertEqual(response.status_code, 400)
+
+        self.assertEqual(response.status_code, 401)
+        is_respondent_enrolled.assert_not_called()

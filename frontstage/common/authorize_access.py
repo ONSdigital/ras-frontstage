@@ -1,6 +1,5 @@
 import logging
 
-from flask import abort
 from structlog import wrap_logger
 
 from frontstage.controllers import (
@@ -18,24 +17,11 @@ def authorize_access(case, collection_exercise, party_id, business_party_id, sur
     case_business_party_id = case["caseGroup"]["partyId"]
 
     if business_party_id != case_business_party_id:
-        logger.warning(
-            "Supplied business does not belong to case",
-            case_id=case_id,
-            party_id=party_id,
-            supplied_business_party_id=business_party_id,
-            case_business_party_id=case_business_party_id,
-        )
-        abort(400)
+        raise NoSurveyPermission(party_id=party_id, case_id=case_id)
 
     if survey_id != collection_exercise["surveyId"]:
-        logger.warning(
-            "Survey does not belong to collection exercise",
-            case_id=case_id,
-            party_id=party_id,
-            supplied_survey_id=survey_id,
-            collection_exercise_survey_id=collection_exercise["surveyId"],
-        )
-        abort(400)
+        raise NoSurveyPermission(party_id, case_id)
+
     check_enrollment(business_party_id, case_id, party_id, survey_id)
     return True
 

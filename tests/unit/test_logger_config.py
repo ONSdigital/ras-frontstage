@@ -79,8 +79,16 @@ class TestLoggerConfig(unittest.TestCase):
         logger = wrap_logger(logging.getLogger())
         with self.assertLogs() as logs:
             logger.info("Enrolment code redaction test", enrolment_code="0123456789ab")
+            logger.info("URL redaction test", url="http.www.thisshouldntbelogged.com")
+            logger.info("API URL redaction test", api_url="http.www.thisalsoshouldntbelogged.com")
+            logger.info("Token redaction test", token="ABCDEF0123")
+            logger.info("Session key redaction test", session_key="A1B2C3D4E5F6")
 
         self.assertIn('"enrolment_code": "0123********"', logs[0][0].msg)
+        self.assertIn('"url": "http********"', logs[0][1].msg)
+        self.assertIn('"api_url": "http********"', logs[0][2].msg)
+        self.assertIn('"token": "ABCD********"', logs[0][3].msg)
+        self.assertIn('"session_key": "A1B2********"', logs[0][4].msg)
 
     def _get_logs(self, log_level):
         logger_initial_config(log_level)

@@ -135,6 +135,22 @@ class TestAcceptShareSurvey(unittest.TestCase):
         )
 
     @requests_mock.mock()
+    def test_token_and_api_url_redacted_when_sharing_surveys(self, mock_request):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
+        mock_request.get(url_get_business_details, status_code=200, json=[dummy_business])
+        mock_request.get(url_get_survey, status_code=200, json=survey)
+        mock_request.get(url_get_survey_second, status_code=200, json=dummy_survey)
+        mock_request.get(url_get_share_survey_verify, status_code=404)
+
+        with self.assertLogs(level="INFO") as logs:
+            response = self.app.get(f"/my-account/share-surveys/accept-share-surveys/{token}")
+
+            self.assertIn('"token": "ImM0********"', logs.output[0])
+            self.assertIn('"api_url": "http********"', logs.output[3])
+            self.assertEqual(200, response.status_code)
+
+    @requests_mock.mock()
     @patch("frontstage.controllers.party_controller.get_case_list_for_respondent")
     def test_get_accept_share_surveys_success_existing_account(self, mock_request, get_survey_list):
         survey_list = [

@@ -9,10 +9,12 @@ from frontstage import app
 from tests.integration.mocked_services import (
     business_party,
     case,
+    collection_exercise,
     collection_instrument_seft,
     encoded_jwt_token,
     survey,
     url_banner_api,
+    url_get_collection_exercise,
     url_get_survey_by_short_name,
 )
 
@@ -32,21 +34,55 @@ class TestDownloadSurvey(unittest.TestCase):
     def tearDown(self):
         self.patcher.stop()
 
-    @patch("frontstage.controllers.collection_instrument_controller.download_collection_instrument")
-    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
-    @patch("frontstage.controllers.case_controller.get_case_by_case_id")
-    def test_download_survey_success(self, mock_request, get_case_by_id, _, download_collection_instrument):
-        mock_request.get(url_banner_api, status_code=404)
-        mock_request.get(url_get_survey_by_short_name, json=survey, status_code=200)
-        str = json.dumps(collection_instrument_seft)
-        binary = " ".join(format(ord(letter), "b") for letter in str)
+    @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
+    @patch("frontstage.controllers.collection_instrument_controller." "download_collection_instrument")
+    @patch("frontstage.controllers.case_controller." "get_case_by_case_id")
+    def test_download_survey_success(
+        self,
+        mock_request,
+        get_case_by_id,
+        download_collection_instrument,
+        is_respondent_enrolled,
+    ):
+        mock_request.get(
+            url_banner_api,
+            status_code=404,
+        )
+
+        mock_request.get(
+            url_get_survey_by_short_name,
+            json=survey,
+            status_code=200,
+        )
+
+        mock_request.get(
+            url_get_collection_exercise,
+            json=collection_exercise,
+            status_code=200,
+        )
+
+        is_respondent_enrolled.return_value = True
+
+        data = json.dumps(collection_instrument_seft)
+        binary = " ".join(format(ord(letter), "b") for letter in data)
+
         get_case_by_id.return_value = case
-        headers = {"Content-type": "application/json", "Content-Length": "5962"}
-        download_collection_instrument.return_value = binary, headers
+
+        headers = {
+            "Content-type": "application/json",
+            "Content-Length": "5962",
+        }
+
+        download_collection_instrument.return_value = (
+            binary,
+            headers,
+        )
 
         response = self.app.get(
-            f'/surveys/download-survey?case_id={case["id"]}&business_party_id={business_party["id"]}'
-            f'&survey_short_name={survey["shortName"]}'
+            f"/surveys/download-survey"
+            f"?case_id={case['id']}"
+            f"&business_party_id={business_party['id']}"
+            f"&survey_short_name={survey['shortName']}"
         )
 
         self.assertEqual(response.status_code, 200)

@@ -4,7 +4,10 @@ from flask import redirect, request
 from structlog import wrap_logger
 
 from frontstage.common.authorisation import jwt_authorization
-from frontstage.controllers import case_controller, collection_exercise_controller
+from frontstage.controllers import (
+    case_controller,
+    collection_exercise_controller,
+)
 from frontstage.views.surveys import surveys_bp
 from frontstage.views.template_helper import render_template
 

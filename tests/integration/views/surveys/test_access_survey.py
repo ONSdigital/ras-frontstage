@@ -28,6 +28,7 @@ from tests.integration.mocked_services import (
     url_get_collection_exercise,
     url_get_collection_exercise_events,
     url_get_respondent_party,
+    url_get_survey_by_short_name,
     url_get_survey_by_short_name_eq,
     url_post_case_event_uuid,
 )
@@ -192,32 +193,81 @@ class TestAccessSurvey(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertTrue("An error has occurred".encode() in response.data)
 
-    @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
-    @patch("frontstage.controllers.party_controller.RedisCache.get_registry_instrument")
-    def test_generate_eq_url(self, mock_request, mock_cache, _):
-        # Given all external services are mocked, and we have an EQ collection instrument
-        mock_request.get(url_get_case, json=case)
-        mock_request.get(url_get_collection_exercise, json=collection_exercise_v3)
-        mock_request.get(url_get_collection_exercise_events, json=collection_exercise_events)
-        mock_request.get(url_get_business_party, json=business_party)
-        mock_request.get(url_get_survey_by_short_name_eq, json=survey_eq)
-        mock_request.get(url_get_ci, json=collection_instrument_eq)
-        mock_request.get(url_get_case_categories, json=categories)
-        mock_request.post(url_post_case_event_uuid, status_code=201)
-        mock_request.get(url_get_respondent_party, status_code=200, json=respondent_party)
-        mock_request.get(url_banner_api, status_code=404)
+    @patch("frontstage.common.authorize_access." "party_controller.is_respondent_enrolled")
+    @patch("frontstage.controllers.party_controller." "RedisCache.get_registry_instrument")
+    def test_generate_eq_url(
+        self,
+        mock_request,
+        mock_cache,
+        is_respondent_enrolled,
+    ):
+        is_respondent_enrolled.return_value = True
         mock_cache.return_value = None
 
-        # When the generate-eq-url is called
+        mock_request.get(
+            url_get_case,
+            json=case,
+        )
+        mock_request.get(
+            url_get_collection_exercise,
+            json=collection_exercise_v3,
+        )
+        mock_request.get(
+            url_get_collection_exercise_events,
+            json=collection_exercise_events,
+        )
+        mock_request.get(
+            url_get_business_party,
+            json=business_party,
+        )
+        mock_request.get(
+            url_get_survey_by_short_name,
+            json=survey,
+        )
+        mock_request.get(
+            url_get_ci,
+            json=collection_instrument_eq,
+        )
+        mock_request.get(
+            url_get_case_categories,
+            json=categories,
+        )
+        mock_request.post(
+            url_post_case_event_uuid,
+            status_code=201,
+        )
+        mock_request.get(
+            url_get_respondent_party,
+            status_code=200,
+            json=respondent_party,
+        )
+        mock_request.get(
+            url_banner_api,
+            status_code=404,
+        )
+
         response = self.app.get(
-            f"/surveys/access-survey?case_id={case['id']}&business_party_id={business_party['id']}"
-            f"&survey_short_name={survey_eq['shortName']}&ci_type=EQ",
+            (
+                "/surveys/access-survey"
+                f"?case_id={case['id']}"
+                f"&business_party_id={business_party['id']}"
+                f"&survey_short_name={survey['shortName']}"
+                "&ci_type=EQ"
+            ),
             headers=self.headers,
         )
 
-        # An eq url is generated
         self.assertEqual(response.status_code, 302)
-        self.assertIn("https://eq-test/v3/session?token=", response.location)
+        self.assertIn(
+            "https://eq-test/v3/session?token=",
+            response.location,
+        )
+
+        is_respondent_enrolled.assert_called_once_with(
+            respondent_party["id"],
+            business_party["id"],
+            survey["id"],
+        )
 
     @patch("frontstage.controllers.party_controller.is_respondent_enrolled")
     def test_generate_eq_url_complete_case(self, mock_request, _):

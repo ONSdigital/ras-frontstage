@@ -15,6 +15,7 @@ from frontstage.exceptions.exceptions import (
     InvalidEqPayLoad,
     JWTTimeoutError,
     JWTValidationError,
+    NoSurveyPermission,
 )
 from frontstage.views.template_helper import render_template
 
@@ -106,3 +107,9 @@ def secure_message_forbidden_error(error):
         thread_id=error.thread,
     )
     return render_template("errors/403-incorrect-account-error.html")
+
+
+@app.errorhandler(NoSurveyPermission)
+def no_survey_permission(error):
+    logger.error("No permission to access to survey", status_code=401)
+    return render_template("errors/400-error.html"), 401

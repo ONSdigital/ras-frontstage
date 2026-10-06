@@ -33,7 +33,7 @@ def logger_initial_config(log_level: str = "INFO") -> None:
 
         for field in filtered_fields:
             if field in event_dict:
-                event_dict[field] = event_dict[field][: -max(0, len(event_dict[field]) - 4)] + "********"
+                event_dict[field] = event_dict[field][:4] + "********"
         return event_dict
 
     logging.basicConfig(format="%(message)s", stream=sys.stdout, level=logging.INFO)

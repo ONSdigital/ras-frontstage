@@ -1,5 +1,5 @@
-env: minikube
-namespace: minikube
+env: dev
+namespace: dev
 armorPolicy: "ras-cloud-armor-policy"
 
 serviceAccount:

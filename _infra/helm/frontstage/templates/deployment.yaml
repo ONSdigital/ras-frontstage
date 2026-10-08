@@ -25,10 +25,11 @@ spec:
         app: {{ .Chart.Name }}
         env: {{ .Values.env }}
     spec:
-      volumes:
-      - name: google-cloud-key
-        secret:
-          secretName: google-application-credentials
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      imagePullSecrets:
+          {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      nodeSelector:
+        iam.gke.io/gke-metadata-server-enabled: "true"
       containers:
         - name: {{ .Chart.Name }}
           {{- if eq .Values.image.tag "latest"}}
@@ -37,9 +38,6 @@ spec:
           image: "{{ .Values.image.devRepo }}/{{ .Chart.Name }}:{{ .Values.image.tag }}"
           {{- end}}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          volumeMounts:
-          - name: google-cloud-key
-            mountPath: /var/secrets/google
           ports:
             - name: http-server
               containerPort: {{ .Values.container.port }}
@@ -159,8 +157,6 @@ spec:
             value: "{{ .Values.container.port }}"
           - name: GOOGLE_CLOUD_PROJECT
             value: "{{ .Values.gcp.project }}"
-          - name: GOOGLE_APPLICATION_CREDENTIALS
-            value: /var/secrets/google/credentials.json
           - name: PUBSUB_TOPIC
             value: "{{ .Values.gcp.topic }}"
           {{- if .Values.email.enabled }}

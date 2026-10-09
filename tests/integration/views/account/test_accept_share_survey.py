@@ -147,7 +147,7 @@ class TestAcceptShareSurvey(unittest.TestCase):
             response = self.app.get(f"/my-account/share-surveys/accept-share-surveys/{token}")
 
             self.assertIn('"token": "ImM0********"', logs.output[0])
-            self.assertIn('"api_url": "http********"', logs.output[3])
+            self.assertIn('"api_url": "http://localhost:8081/party-api/v1/pending-survey/verification"', logs.output[3])
             self.assertEqual(200, response.status_code)
 
     @requests_mock.mock()

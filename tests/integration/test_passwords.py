@@ -417,7 +417,7 @@ class TestPasswords(unittest.TestCase):
         with self.assertLogs(level="INFO") as logs:
             response = self.app.get(f"passwords/resend-password-email-expired-token/{token}", follow_redirects=True)
 
-            self.assertIn('"url": "http********"', logs.output[9])
+            self.assertIn('"url": "http://localhost/passwords/reset-password"', logs.output[9])
             self.assertEqual(response.status_code, 200)
 
     @requests_mock.mock()

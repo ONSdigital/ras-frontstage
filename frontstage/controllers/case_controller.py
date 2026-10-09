@@ -99,7 +99,8 @@ def get_case_data(case_id, party_id, business_party_id, survey_short_name):
     # Check if respondent has permission to see case data
     case = get_case_by_case_id(case_id)
     survey = survey_controller.get_survey_by_short_name(survey_short_name)
-    check_enrollment(business_party_id, case_id, party_id, survey)
+
+    check_enrollment(business_party_id, case_id, party_id, survey["id"])
 
     case_data = {
         "collection_exercise": collection_exercise_controller.get_collection_exercise(

@@ -535,5 +535,5 @@ class TestCaseControllers(unittest.TestCase):
             business_party["id"],
             case["id"],
             respondent_party["id"],
-            survey,
+            survey["id"],
         )

@@ -161,7 +161,7 @@ class TestCaseAccess(unittest.TestCase):
                 self.business_party_id,
                 self.case_id,
                 self.party_id,
-                self.survey,
+                self.survey_id,
             )
         )
 
@@ -177,5 +177,5 @@ class TestCaseAccess(unittest.TestCase):
                 self.business_party_id,
                 self.case_id,
                 self.party_id,
-                self.survey,
+                self.survey_id,
             )

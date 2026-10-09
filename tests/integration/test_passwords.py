@@ -402,6 +402,25 @@ class TestPasswords(unittest.TestCase):
         self.assertTrue("Check your email".encode() in response.data)
 
     @requests_mock.mock()
+    @patch("frontstage.controllers.notify_controller.NotifyGateway.request_to_notify")
+    @patch.object(verification, "decode_email_token", Mock(return_value=respondent_party["emailAddress"]))
+    @patch.object(verification, "generate_email_token", Mock(return_value=token))
+    def test_url_redacted_when_resetting_email_with_expired_token(self, mock_request, mock_notify):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get("http://localhost:8081/party-api/v1/respondents/email", json=respondent_party_without_token)
+        mock_request.get(url_password_reset_counter, json={"counter": 0})
+        mock_request.delete(url_password_reset_counter)
+        mock_request.post(
+            f"{TestingConfig.PARTY_URL}/party-api/v1/respondents/{respondent_id}/password-verification-token",
+            json={"message": "Successfully added token"},
+        )
+        with self.assertLogs(level="INFO") as logs:
+            response = self.app.get(f"passwords/resend-password-email-expired-token/{token}", follow_redirects=True)
+
+            self.assertIn('"url": "http://localhost/passwords/reset-password"', logs.output[9])
+            self.assertEqual(response.status_code, 200)
+
+    @requests_mock.mock()
     def test_fail_resend_verification_email_using_expired_token(self, mock_request):
         mock_request.get(url_banner_api, status_code=404)
         mock_request.post(url_resend_password_email_expired_token, status_code=500)

@@ -29,10 +29,17 @@ def logger_initial_config(log_level: str = "INFO") -> None:
         return event_dict
 
     def redaction_filter(_, __, event_dict: dict) -> dict:
-        if "enrolment_code" in event_dict:
-            event_dict["enrolment_code"] = (
-                event_dict["enrolment_code"][: -max(0, len(event_dict["enrolment_code"]) - 4)] + "********"
-            )
+        filtered_fields = ["enrolment_code", "session_key", "token"]
+        filtered_url_fields = ["url", "api_url"]
+
+        for field in filtered_fields:
+            if field in event_dict:
+                event_dict[field] = event_dict[field][: -max(0, len(event_dict[field]) - 4)] + "********"
+
+        for field in filtered_url_fields:
+            if field in event_dict:
+                event_dict[field] = event_dict[field].rsplit("/", 1)[0]
+
         return event_dict
 
     logging.basicConfig(format="%(message)s", stream=sys.stdout, level=logging.INFO)

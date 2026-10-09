@@ -124,6 +124,21 @@ class TestSignIn(unittest.TestCase):
         self.assertTrue("/surveys/".encode() in response.data)
 
     @requests_mock.mock()
+    def test_session_key_redacted_when_signing_in(self, mock_request):
+        mock_request.get(url_banner_api, status_code=404)
+        mock_request.get(url_get_respondent_email, json=party)
+        mock_request.post(url_auth_token, status_code=200, json=self.auth_response)
+        mock_request.get(url_get_conversation_count, json=message_count)
+
+        with self.assertLogs(level="INFO") as logs:
+            response = self.app.post("/sign-in/", data=self.sign_in_form)
+            # Have to use a regex to find the session_key, because it's not the same each time test is run
+            regex_pattern = r'"session_key": ".{4}\*{8}"'
+
+            self.assertRegex(logs.output[9], regex_pattern)
+            self.assertEqual(response.status_code, 302)
+
+    @requests_mock.mock()
     def test_sign_in_success_csrf(self, mock_request):
         # Given csrf is enabled, services are mocked and there is a valid csrf_token
         app.config["WTF_CSRF_ENABLED"] = True

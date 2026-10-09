@@ -26,8 +26,6 @@ spec:
         env: {{ .Values.env }}
     spec:
       serviceAccountName: {{ .Values.serviceAccount.name }}
-      imagePullSecrets:
-          {{- toYaml .Values.imagePullSecrets | nindent 8 }}
       nodeSelector:
         iam.gke.io/gke-metadata-server-enabled: "true"
       containers:
